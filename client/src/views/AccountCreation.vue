@@ -2,12 +2,7 @@
   <div>
     <view-title title="Create Account" navigation="home"/>
 
-    <p v-if="errors.length">
-        <b>Please correct the following error(s):</b>
-        <ul>
-            <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-        </ul>
-    </p>
+    <form-error-list v-bind:errors="errors"/>
 
     <form @submit="handleSubmit">
 
@@ -42,10 +37,12 @@
 <script>
 import router from '../router';
 import ViewTitle from '../components/ViewTitle';
+import FormErrorList from '../components/FormErrorList';
 
 export default {
     components: {
-        'view-title': ViewTitle
+        'view-title': ViewTitle,
+        'form-error-list': FormErrorList
     },
     data() {
         return {
