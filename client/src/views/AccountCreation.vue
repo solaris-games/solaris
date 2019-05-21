@@ -5,7 +5,6 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit="handleSubmit">
-
       <div>
         <label for="username">Username</label>
         <input type="text" name="username" v-model="username">
@@ -27,66 +26,65 @@
       </div>
 
       <div>
-          <router-link to="/" tag="button">Cancel</router-link>
-          <button type="submit">Create Account</button>
+        <router-link to="/" tag="button">Cancel</router-link>
+        <button type="submit">Create Account</button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import router from '../router';
-import ViewTitle from '../components/ViewTitle';
-import FormErrorList from '../components/FormErrorList';
+import router from "../router";
+import ViewTitle from "../components/ViewTitle";
+import FormErrorList from "../components/FormErrorList";
 
 export default {
-    components: {
-        'view-title': ViewTitle,
-        'form-error-list': FormErrorList
-    },
-    data() {
-        return {
-            errors: [],
-            username: null,
-            email: null,
-            password: null,
-            passwordConfirm: null
-        }
-    },
-    methods: {
-        handleSubmit(e) {
-            this.errors = [];
+  components: {
+    "view-title": ViewTitle,
+    "form-error-list": FormErrorList
+  },
+  data() {
+    return {
+      errors: [],
+      username: null,
+      email: null,
+      password: null,
+      passwordConfirm: null
+    };
+  },
+  methods: {
+    handleSubmit(e) {
+      this.errors = [];
 
-            if (!this.username) {
-                this.errors.push('Username required.');
-            }
+      if (!this.username) {
+        this.errors.push("Username required.");
+      }
 
-            if (!this.email) {
-                this.errors.push('Email required.');
-            }
+      if (!this.email) {
+        this.errors.push("Email required.");
+      }
 
-            if (!this.password) {
-                this.errors.push('Password required.');
-            }
+      if (!this.password) {
+        this.errors.push("Password required.");
+      }
 
-            if (!this.passwordConfirm) {
-                this.errors.push('Password confirmation required.');
-            }
+      if (!this.passwordConfirm) {
+        this.errors.push("Password confirmation required.");
+      }
 
-            if (this.password !== this.passwordConfirm) {
-                this.errors.push('Passwords must match.');
-            }
+      if (this.password !== this.passwordConfirm) {
+        this.errors.push("Passwords must match.");
+      }
 
-            e.preventDefault();
+      e.preventDefault();
 
-            if (this.errors.length)
-                return;
+      if (this.errors.length) return;
 
-            // TODO: Call the account create API endpoint
+      // TODO: Call the account create API endpoint
 
-            router.push({ name: 'main-menu'});
-        }
+      router.push({ name: "main-menu" });
     }
+  }
 };
 </script>
 

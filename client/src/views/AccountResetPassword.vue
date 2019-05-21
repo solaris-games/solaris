@@ -5,7 +5,6 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit.prevent="handleSubmit">
-
       <div>
         <label for="currentPassword">Current Password</label>
         <input type="password" name="currentPassword" v-model="currentPassword">
@@ -22,61 +21,60 @@
       </div>
 
       <div>
-          <router-link to="/main-menu" tag="button">Cancel</router-link>
-          <button type="submit">Change Password</button>
+        <router-link to="/main-menu" tag="button">Cancel</router-link>
+        <button type="submit">Change Password</button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import router from '../router';
-import ViewTitle from '../components/ViewTitle';
-import FormErrorList from '../components/FormErrorList';
+import router from "../router";
+import ViewTitle from "../components/ViewTitle";
+import FormErrorList from "../components/FormErrorList";
 
 export default {
-    components: {
-        'view-title': ViewTitle,
-        'form-error-list': FormErrorList
-    },
-    data() {
-        return {
-            errors: [],
-            currentPassword: null,
-            newPassword: null,
-            newPasswordConfirm: null
-        }
-    },
-    methods: {
-        handleSubmit(e) {
-            this.errors = [];
+  components: {
+    "view-title": ViewTitle,
+    "form-error-list": FormErrorList
+  },
+  data() {
+    return {
+      errors: [],
+      currentPassword: null,
+      newPassword: null,
+      newPasswordConfirm: null
+    };
+  },
+  methods: {
+    handleSubmit(e) {
+      this.errors = [];
 
-            if (!this.currentPassword) {
-                this.errors.push('Current password required.');
-            }
+      if (!this.currentPassword) {
+        this.errors.push("Current password required.");
+      }
 
-            if (!this.newPassword) {
-                this.errors.push('New password required.');
-            }
+      if (!this.newPassword) {
+        this.errors.push("New password required.");
+      }
 
-            if (!this.newPasswordConfirm) {
-                this.errors.push('New password confirmation required.');
-            }
+      if (!this.newPasswordConfirm) {
+        this.errors.push("New password confirmation required.");
+      }
 
-            if (this.newPassword !== this.newPasswordConfirm) {
-                this.errors.push('Passwords must match.');
-            }
+      if (this.newPassword !== this.newPasswordConfirm) {
+        this.errors.push("Passwords must match.");
+      }
 
-            e.preventDefault();
+      e.preventDefault();
 
-            if (this.errors.length)
-                return;
+      if (this.errors.length) return;
 
-            // TODO: Call the password reset API endpoint
+      // TODO: Call the password reset API endpoint
 
-            router.push({ name: 'main-menu'});
-        }
+      router.push({ name: "main-menu" });
     }
+  }
 };
 </script>
 

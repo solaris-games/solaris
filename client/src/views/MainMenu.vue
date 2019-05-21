@@ -25,16 +25,16 @@
 </template>
 
 <script>
-import router from '../router';
+import router from "../router";
 
 export default {
-    methods: {
-        logout() {
-            // TODO: Log the user out.
+  methods: {
+    logout() {
+      // TODO: Log the user out.
 
-            router.push({ name: 'home' });
-        }
+      router.push({ name: "home" });
     }
+  }
 };
 </script>
 

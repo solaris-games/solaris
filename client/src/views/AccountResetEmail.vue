@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Forgot Password" navigation="home"/>
+    <view-title title="Reset Email Address" navigation="main-menu"/>
 
     <form-error-list v-bind:errors="errors"/>
 
@@ -11,8 +11,8 @@
       </div>
 
       <div>
-        <router-link to="/" tag="button">Cancel</router-link>
-        <button type="submit">Reset Password</button>
+        <router-link to="/main-menu" tag="button">Cancel</router-link>
+        <button type="submit">Change Email</button>
       </div>
     </form>
   </div>
@@ -31,8 +31,7 @@ export default {
   data() {
     return {
       errors: [],
-      username: null,
-      password: null
+      email: null
     };
   },
   methods: {
@@ -40,16 +39,16 @@ export default {
       this.errors = [];
 
       if (!this.email) {
-        this.errors.push("Email required.");
+        this.errors.push("Email address required.");
       }
 
       e.preventDefault();
 
       if (this.errors.length) return;
 
-      // TODO: Call the password reset API endpoint
+      // TODO: Call the email reset API endpoint
 
-      router.push({ name: "home" });
+      router.push({ name: "main-menu" });
     }
   }
 };

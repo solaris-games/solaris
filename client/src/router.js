@@ -4,6 +4,7 @@ import AccountAchievements from './views/AccountAchievements.vue'
 import AccountCreation from './views/AccountCreation.vue'
 import AccountForgotPassword from './views/AccountForgotPassword.vue'
 import AccountLogin from './views/AccountLogin.vue'
+import AccountResetEmail from './views/AccountResetEmail.vue'
 import AccountResetPassword from './views/AccountResetPassword.vue'
 import AccountSettings from './views/AccountSettings.vue'
 import Codex from './views/Codex.vue'
@@ -39,6 +40,11 @@ export default new Router({
       path: '/account/login',
       name: 'account-login',
       component: AccountLogin
+    },
+    {
+      path: '/account/reset-email',
+      name: 'account-reset-email',
+      component: AccountResetEmail
     },
     {
       path: '/account/reset-password',

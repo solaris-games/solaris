@@ -1,8 +1,6 @@
 <template>
   <div>
-      <view-title title="Account" navigation="main-menu"/>
-    
-    Galactic Credits:
+    <view-title title="Account" navigation="main-menu"/>Galactic Credits:
     <span>{{ credits }} Credits</span>
     <br>Username:
     <span>{{ username }}</span>
@@ -20,12 +18,12 @@
 </template>
 
 <script>
-import ViewTitle from '../components/ViewTitle';
+import ViewTitle from "../components/ViewTitle";
 
 export default {
-    components: {
-        'view-title': ViewTitle
-    },
+  components: {
+    "view-title": ViewTitle
+  },
   data() {
     return {
       credits: 0,
