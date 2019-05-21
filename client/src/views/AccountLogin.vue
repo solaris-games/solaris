@@ -27,7 +27,7 @@
       </div>
 
       <div>
-          <router-link to="/account/password-reset" tag="button">Reset Password</router-link>
+          <router-link to="/account/forgot-password" tag="button">Forgot Password</router-link>
       </div>
     </form>
   </div>

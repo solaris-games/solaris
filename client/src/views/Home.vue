@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- DEV ONLY -->
+    <router-link to="/main-menu" tag="button">Main Menu</router-link>
+
     <h1>Home</h1>
 
     <div>
