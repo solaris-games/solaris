@@ -9,7 +9,7 @@
         </ul>
     </p>
 
-    <form @submit="validate">
+    <form @submit="handleSubmit">
 
       <div>
         <label for="username">Username</label>
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import router from '../router';
+
 export default {
     data() {
         return {
@@ -51,7 +53,7 @@ export default {
         }
     },
     methods: {
-        validate(e) {
+        handleSubmit(e) {
             this.errors = [];
 
             if (!this.username) {
@@ -76,7 +78,12 @@ export default {
 
             e.preventDefault();
 
-            return this.errors.length == 0;
+            if (this.errors.length)
+                return;
+
+            // TODO: Call the account create API endpoint
+
+            router.push({ name: 'main-menu'});
         }
     }
 };
