@@ -25,6 +25,10 @@
           <router-link to="/" tag="button">Cancel</router-link>
           <button type="submit">Login</button>
       </div>
+
+      <div>
+          <router-link to="/account/password-reset" tag="button">Reset Password</router-link>
+      </div>
     </form>
   </div>
 </template>
