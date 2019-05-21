@@ -13,8 +13,8 @@
     <br>
 
     <div>
-      <router-link to="/account/change-email" tag="button">Change Email Address</router-link>
-      <router-link to="/account/change-password" tag="button">Change Password</router-link>
+      <router-link to="/account/reset-email" tag="button">Change Email Address</router-link>
+      <router-link to="/account/reset-password" tag="button">Change Password</router-link>
     </div>
   </div>
 </template>

@@ -2,8 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import AccountAchievements from './views/AccountAchievements.vue'
 import AccountCreation from './views/AccountCreation.vue'
-import AccountLogin from './views/AccountLogin.vue'
 import AccountForgotPassword from './views/AccountForgotPassword.vue'
+import AccountLogin from './views/AccountLogin.vue'
+import AccountResetPassword from './views/AccountResetPassword.vue'
 import AccountSettings from './views/AccountSettings.vue'
 import Codex from './views/Codex.vue'
 import Game from './views/Game.vue'
@@ -30,14 +31,19 @@ export default new Router({
       component: AccountCreation
     },
     {
+      path: '/account/forgot-password',
+      name: 'account-forgot-password',
+      component: AccountForgotPassword
+    },
+    {
       path: '/account/login',
       name: 'account-login',
       component: AccountLogin
     },
     {
-      path: '/account/forgot-password',
-      name: 'account-forgot-password',
-      component: AccountForgotPassword
+      path: '/account/reset-password',
+      name: 'account-reset-password',
+      component: AccountResetPassword
     },
     {
       path: '/account/settings',
