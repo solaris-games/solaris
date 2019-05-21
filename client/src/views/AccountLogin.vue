@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Login</h1>
+    <view-title title="Login" navigation="home"/>
 
     <p v-if="errors.length">
         <b>Please correct the following error(s):</b>
@@ -35,8 +35,12 @@
 
 <script>
 import router from '../router';
+import ViewTitle from '../components/ViewTitle';
 
 export default {
+    components: {
+        'view-title': ViewTitle
+    },
     data() {
         return {
             errors: [],

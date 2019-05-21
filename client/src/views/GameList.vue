@@ -1,12 +1,16 @@
 <template>
     <div>
-        <h1>Open Games</h1>
+      <view-title title="Game List" navigation="main-menu"/>
     </div>
 </template>
 
 <script>
-export default {
+import ViewTitle from '../components/ViewTitle';
 
+export default {
+    components: {
+        'view-title': ViewTitle
+    }
 }
 </script>
 

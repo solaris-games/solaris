@@ -1,12 +1,16 @@
 <template>
     <div>
-        <h1>Achievements</h1>
+        <view-title title="Achievements" navigation="main-menu"/>
     </div>
 </template>
 
 <script>
-export default {
+import ViewTitle from '../components/ViewTitle';
 
+export default {
+    components: {
+        'view-title': ViewTitle
+    }
 }
 </script>
 
