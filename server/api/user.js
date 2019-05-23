@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const middleware = require('./middleware');
 
 const User = require('../data/db/models/User');
 const bcrypt = require('bcrypt');
@@ -63,6 +64,22 @@ router.post('/', (req, res, next) => {
                 }
             });
         });
+    });
+});
+
+router.get('/me', middleware.authenticate, (req, res, next) => {
+    User.findById(req.session.userId, (err, user) => {
+        if (err) {
+            return next(err);
+        }
+
+        // Remove any props we don't want to send back.
+        user = user.toObject();
+        
+        delete user.password;
+        delete user.premiumEndDate;
+
+        return res.status(200).json(user);
     });
 });
 
