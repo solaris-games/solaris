@@ -65,6 +65,9 @@ export default {
       axios.post('http://localhost:3000/api/auth/login', {
         username: this.username,
         password: this.password
+      },
+      {
+        withCredentials: true
       })
       .then(response => {
         if (response.status === 200) {

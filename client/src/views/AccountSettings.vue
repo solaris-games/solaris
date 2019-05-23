@@ -1,11 +1,11 @@
 <template>
   <div>
     <view-title title="Account" navigation="main-menu"/>Galactic Credits:
-    <span>{{ credits }} Credits</span>
+    <span>{{ info.credits }} Credits</span>
     <br>Username:
-    <span>{{ username }}</span>
+    <span>{{ info.username }}</span>
     <br>Email Address:
-    <span>{{ email }}</span>
+    <span>{{ info.email }}</span>
     <br>Email Enabled:
     <input type="checkbox" v-model="emailEnabled">
     <br>
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import ViewTitle from "../components/ViewTitle";
 
 export default {
@@ -26,11 +27,16 @@ export default {
   },
   data() {
     return {
-      credits: 0,
-      username: null,
-      email: null,
-      emailEnabled: true
+      info: null
     };
+  },
+  mounted() {
+    axios.get('http://localhost:3000/api/user/me', { withCredentials: true })
+      .then(response => {
+        if (response.status === 200) {
+          this.info = response.data;
+        }
+      });
   }
 };
 </script>
