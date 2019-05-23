@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import router from "../router";
 import ViewTitle from "../components/ViewTitle";
 import FormErrorList from "../components/FormErrorList";
@@ -80,9 +81,20 @@ export default {
 
       if (this.errors.length) return;
 
-      // TODO: Call the account create API endpoint
-
-      router.push({ name: "main-menu" });
+      // Call the account create API endpoint
+      axios.post('http://localhost:3000/api/user', {
+        username: this.username,
+        email: this.email,
+        password: this.password
+      })
+      .then(response => {
+        if (response.status === 201) {
+          router.push({ name: "main-menu" });
+        }
+      })
+      .catch(err => {
+        this.errors = err.response.data.errors || [];
+      });
     }
   }
 };

@@ -56,6 +56,9 @@ router.post('/', (req, res, next) => {
                 if (err) {
                     return next(err)
                 } else {
+                    // Save the user ID to the session to log the user in.
+                    req.session.userId = doc._id;
+
                     return res.sendStatus(201);
                 }
             });

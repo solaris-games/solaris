@@ -73,7 +73,7 @@ export default {
       })
       .catch(err => {
         this.errors = err.response.data.errors || [];
-      })
+      });
     }
   }
 };
