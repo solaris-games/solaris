@@ -1,6 +1,6 @@
 const env = require('dotenv').config();
 
-const db = require('./db/connection');
+const db = require('./data/db/connection');
 
 const express = require('express');
 const app = express();
@@ -10,8 +10,10 @@ const port = process.env.PORT;
 const user = require('./api/user');
 const game = require('./api/game');
 
-app.use('/user', user);
-app.use('/game', game);
+app.use(require('body-parser').json());
+
+app.use('/api/user', user);
+app.use('/api/game', game);
 
 db.connect()
     .then(() => {
