@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import router from "../router";
 import ViewTitle from "../components/ViewTitle";
 import FormErrorList from "../components/FormErrorList";
@@ -60,9 +61,18 @@ export default {
 
       if (this.errors.length) return;
 
-      // TODO: Call the login API endpoint
-
-      router.push({ name: "main-menu" });
+      // Call the login API endpoint
+      axios.post('http://localhost:3000/api/auth/login', {
+        username: this.username,
+        password: this.password
+      })
+      .then(response => {
+        if (response.status === 200) {
+          router.push({ name: "main-menu" });
+        } else {
+          this.errors = response.data.errors || [];
+        }
+      });
     }
   }
 };

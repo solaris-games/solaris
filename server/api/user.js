@@ -23,25 +23,42 @@ router.post('/', (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    const user = new User({
-        email: req.body.email,
-        username: req.body.username,
-        password: req.body.password
-    });
-
-    bcrypt.hash(user.password, 10, (err, hash) => {
+    User.findOne({
+        username: req.body.username
+    })
+    .exec((err, user) => {
         if (err) {
             return next(err);
         }
 
-        user.password = hash;
+        if (user) {
+            return res.status(400).json({
+                errors: [
+                    'Username already exists.'
+                ]
+            });
+        }
 
-        user.save((err, user) => {
+        const newUser = new User({
+            email: req.body.email,
+            username: req.body.username,
+            password: req.body.password
+        });
+    
+        bcrypt.hash(newUser.password, 10, (err, hash) => {
             if (err) {
-                return next(err)
-            } else {
-                return res.sendStatus(201);
+                return next(err);
             }
+    
+            newUser.password = hash;
+    
+            newUser.save((err, doc) => {
+                if (err) {
+                    return next(err)
+                } else {
+                    return res.sendStatus(201);
+                }
+            });
         });
     });
 });

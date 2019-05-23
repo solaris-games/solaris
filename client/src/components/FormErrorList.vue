@@ -12,7 +12,7 @@ import router from '../router';
 
 export default {
     props: {
-        errors: []
+        errors: Array
     }
 }
 </script>
