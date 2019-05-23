@@ -25,14 +25,16 @@
 </template>
 
 <script>
+import axios from 'axios';
 import router from "../router";
 
 export default {
   methods: {
     logout() {
-      // TODO: Log the user out.
-
-      router.push({ name: "home" });
+      axios.post('http://localhost:3000/api/auth/logout')
+      .then(response => {
+        router.push({ name: "home" });
+      });
     }
   }
 };

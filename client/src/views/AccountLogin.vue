@@ -69,10 +69,11 @@ export default {
       .then(response => {
         if (response.status === 200) {
           router.push({ name: "main-menu" });
-        } else {
-          this.errors = response.data.errors || [];
         }
-      });
+      })
+      .catch(err => {
+        this.errors = err.response.data.errors || [];
+      })
     }
   }
 };
