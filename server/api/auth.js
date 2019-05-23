@@ -52,4 +52,19 @@ router.post('/login', (req, res, next) => {
         });
 });
 
+router.post('/logout', (req, res, next) => {
+    if (req.session) {
+        // Delete the session object.
+        req.session.destroy((err) => {
+            if (err) {
+                return next(err);
+            }
+
+            return res.sendStatus(200);
+        });
+    } else {
+        return res.sendStatus(200);
+    }
+});
+
 module.exports = router;
