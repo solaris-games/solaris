@@ -5,7 +5,7 @@
             <h1>{{ title }}</h1>
         </div>
         <div class="col-1">
-            <button v-if="navigation" @click="navigate" class="float-right"><font-awesome-icon icon="house" /></button>
+            <button v-if="navigation" @click="navigate" id="btnHome" class="float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
         </div>
     </div>
 </div>
@@ -16,8 +16,9 @@ import router from '../router';
 
 export default {
     props: {
-        title: null,
-        navigation: null
+        title: String,
+        navigation: { type:String, default: 'main-menu' },
+        icon: { type: String, default: 'home' }
     },
     methods: {
         navigate() {
@@ -28,5 +29,7 @@ export default {
 </script>
 
 <style scoped>
-
+#btnHome {
+    margin-top: 10px;
+}
 </style>

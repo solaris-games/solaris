@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Create Game" navigation="main-menu"/>
+    <view-title title="Create Game" />
   </div>
 </template>
 

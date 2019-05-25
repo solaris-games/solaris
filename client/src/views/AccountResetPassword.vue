@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Reset Password" navigation="main-menu"/>
+    <view-title title="Reset Password" />
 
     <form-error-list v-bind:errors="errors"/>
 

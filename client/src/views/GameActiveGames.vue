@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Active Games" navigation="main-menu"/>
+    <view-title title="Active Games" />
 
     <div v-if="!games.length">
         <p>You are not in any active games.</p>

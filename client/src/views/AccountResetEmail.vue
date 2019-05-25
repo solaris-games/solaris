@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Reset Email Address" navigation="main-menu"/>
+    <view-title title="Reset Email Address" />
 
     <form-error-list v-bind:errors="errors"/>
 

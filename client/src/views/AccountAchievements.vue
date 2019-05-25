@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Achievements" navigation="main-menu"/>
+    <view-title title="Achievements" />
 
     <div>
       <p>Victories</p>

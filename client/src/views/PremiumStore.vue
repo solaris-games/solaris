@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Premium Membership" navigation="main-menu"/>
+    <view-title title="Premium Membership" />
 
     <h3>Premium Memberships</h3>
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Account" navigation="main-menu"/>Galactic Credits:
+    <view-title title="Account" />Galactic Credits:
     <span>{{ info.credits }} Credits</span>
     <br>Username:
     <span>{{ info.username }}</span>

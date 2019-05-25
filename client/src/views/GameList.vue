@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Game List" navigation="main-menu"/>
+    <view-title title="Game List" />
 
     <div v-for="game in serverGames" v-bind:key="game._id">
         <h4>{{game.name}}</h4>

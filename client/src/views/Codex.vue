@@ -1,6 +1,6 @@
 <template>
   <div>
-    <view-title title="Codex" navigation="main-menu"/>
+    <view-title title="Codex" />
   </div>
 </template>
 
