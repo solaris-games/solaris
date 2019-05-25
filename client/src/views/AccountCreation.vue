@@ -26,8 +26,8 @@
       </div>
 
       <div>
-        <router-link to="/" tag="button">Cancel</router-link>
-        <button type="submit">Create Account</button>
+        <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
+        <button type="submit" class="btn btn-success">Create Account</button>
       </div>
     </form>
   </div>

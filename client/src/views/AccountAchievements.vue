@@ -205,9 +205,54 @@ export default {
   color: gold;
 }
 .fa-star {
-  color: yellow;
+  color: lightyellow;
 }
 .fa-heart {
+  color: red;
+}
+.fa-flag {
+  color: green;
+}
+.fa-skull-crossbones {
+  color: #e3dac9;
+}
+.fa-skull {
+  color: #e3dac9;
+}
+.fa-chess-king {
+  color: burlywood;
+}
+.fa-pen-fancy {
+  color: blueviolet;
+}
+.fa-paw {
+  color: red;
+}
+.fa-dice {
+  color: red;
+}
+.fa-pizza-slice {
+  color: red;
+}
+.fa-fish {
+  color: red;
+}
+.fa-fighter-jet {
+  color: red;
+}
+.fa-satellite {
+  color: red;
+}
+.fa-atom {
+  color: red;
+}
+.fa-question {
+  color: red;
+}
+.fa-biohazard {
+  color: red;
+}
+.fa-user-friends {
   color: red;
 }
 </style>

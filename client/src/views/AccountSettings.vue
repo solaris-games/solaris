@@ -11,8 +11,8 @@
     <br>
 
     <div>
-      <router-link to="/account/reset-email" tag="button">Change Email Address</router-link>
-      <router-link to="/account/reset-password" tag="button">Change Password</router-link>
+      <router-link to="/account/reset-email" tag="button" class="btn btn-primary">Change Email Address</router-link>
+      <router-link to="/account/reset-password" tag="button" class="btn btn-primary">Change Password</router-link>
     </div>
   </div>
 </template>

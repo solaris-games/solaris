@@ -5,7 +5,7 @@
     <div v-if="!games.length">
         <p>You are not in any active games.</p>
         
-        <router-link to="/game/list" tag="button">Join Game</router-link>
+        <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
   </div>
 </template>

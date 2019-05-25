@@ -7,7 +7,7 @@
     <div v-for="membership in premiumMemberships" v-bind:key="membership.name">
       <p>{{membership.name}}: £{{membership.price}}</p>
       <p>{{membership.caption}}</p>
-      <button @click="buyMembership(membership)">Buy Now</button>
+      <button @click="buyMembership(membership)" class="btn btn-success">Buy Now</button>
     </div>
 
     <hr>
@@ -17,7 +17,7 @@
     <div v-for="pack in creditPacks" v-bind:key="pack.name">
       <p>{{pack.name}}: £{{pack.price}}</p>
       <p>{{pack.caption}}</p>
-      <button @click="buyCreditPack(pack)">Buy Now</button>
+      <button @click="buyCreditPack(pack)" class="btn btn-success">Buy Now</button>
     </div>
   </div>
 </template>

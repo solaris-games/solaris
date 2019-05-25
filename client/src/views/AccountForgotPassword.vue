@@ -11,8 +11,8 @@
       </div>
 
       <div>
-        <router-link to="/" tag="button">Cancel</router-link>
-        <button type="submit">Reset Password</button>
+        <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
+        <button type="submit" class="btn btn-success">Reset Password</button>
       </div>
     </form>
   </div>

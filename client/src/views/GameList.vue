@@ -7,7 +7,7 @@
         <img :src="getServerGameImage(game)">
         <p>{{game.playerCount}} of {{game.maxPlayers}} Players</p>
          
-        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button">Read More</router-link>
+        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
     </div>
 
     <hr>
@@ -27,7 +27,7 @@
                 <td>{{game.name}}</td>
                 <td>{{game.playerCount}} of {{game.maxPlayers}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button">Read More</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
                 </td>
             </tr>
         </tbody>
