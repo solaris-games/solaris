@@ -21,7 +21,7 @@
       </div>
 
       <div>
-        <router-link to="/main-menu" tag="button">Cancel</router-link>
+        <router-link to="/account/settings" tag="button">Cancel</router-link>
         <button type="submit">Change Password</button>
       </div>
     </form>

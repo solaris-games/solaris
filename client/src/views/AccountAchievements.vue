@@ -201,4 +201,13 @@ export default {
 </script>
 
 <style scoped>
+.fa-trophy {
+  color: gold;
+}
+.fa-star {
+  color: yellow;
+}
+.fa-heart {
+  color: red;
+}
 </style>
