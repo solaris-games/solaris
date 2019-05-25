@@ -1,29 +1,31 @@
 <template>
-  <div>
-    <view-title title="Login" navigation="home"/>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col col-md-6 col-lg-5">
+        <view-title title="Login" navigation="home"/>
 
-    <form-error-list v-bind:errors="errors"/>
+        <form @submit.prevent="handleSubmit">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Username" v-model="username" />
+            </div>
 
-    <form @submit.prevent="handleSubmit">
-      <div>
-        <label for="username">Username</label>
-        <input type="text" name="username" v-model="username">
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Password" v-model="password" />
+            </div>
+
+            <form-error-list v-bind:errors="errors"/>
+        
+            <div class="form-group">
+                <router-link to="/" tag="button" type="button" class="btn btn-danger">Cancel</router-link>
+                <input type="submit" class="btn btn-primary" value="Login" />
+            </div>
+
+            <div class="form-group">
+                <router-link to="/account/forgot-password">Forgot Password?</router-link>
+            </div>
+        </form>
       </div>
-
-      <div>
-        <label for="password">Password</label>
-        <input type="password" name="password" v-model="password">
-      </div>
-
-      <div>
-        <router-link to="/" tag="button">Cancel</router-link>
-        <button type="submit">Login</button>
-      </div>
-
-      <div>
-        <router-link to="/account/forgot-password" tag="button">Forgot Password</router-link>
-      </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -78,4 +80,7 @@ export default {
 </script>
 
 <style scoped>
+  button {
+    margin-right: 5px;
+  }
 </style>
