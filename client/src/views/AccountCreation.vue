@@ -38,6 +38,7 @@ import axios from 'axios';
 import router from "../router";
 import ViewTitle from "../components/ViewTitle";
 import FormErrorList from "../components/FormErrorList";
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -54,7 +55,7 @@ export default {
     };
   },
   methods: {
-    handleSubmit(e) {
+    async handleSubmit(e) {
       this.errors = [];
 
       if (!this.username) {
@@ -81,20 +82,16 @@ export default {
 
       if (this.errors.length) return;
 
-      // Call the account create API endpoint
-      axios.post('http://localhost:3000/api/user', {
-        username: this.username,
-        email: this.email,
-        password: this.password
-      })
-      .then(response => {
-        if (response.status === 201) {
-          router.push({ name: "main-menu" });
-        }
-      })
-      .catch(err => {
-        this.errors = err.response.data.errors || [];
-      });
+		try {
+			// Call the account create API endpoint
+			let response = await apiService.createUser(this.username, this.email, this.password);
+
+			if (response.status === 201) {
+				router.push({ name: "main-menu" });
+			}
+		} catch (err) {
+			this.errors = err.response.data.errors || [];
+		}
     }
   }
 };

@@ -27,14 +27,14 @@
 <script>
 import axios from 'axios';
 import router from "../router";
+import apiService from '../services/apiService';
 
 export default {
   methods: {
-    logout() {
-      axios.post('http://localhost:3000/api/auth/logout')
-      .then(response => {
-        router.push({ name: "home" });
-      });
+    async logout() {
+      await apiService.logout();
+      
+      router.push({ name: "home" });
     }
   }
 };

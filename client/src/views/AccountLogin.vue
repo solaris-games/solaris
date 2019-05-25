@@ -32,6 +32,7 @@ import axios from 'axios';
 import router from "../router";
 import ViewTitle from "../components/ViewTitle";
 import FormErrorList from "../components/FormErrorList";
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -46,7 +47,7 @@ export default {
     };
   },
   methods: {
-    handleSubmit(e) {
+    async handleSubmit(e) {
       this.errors = [];
 
       if (!this.username) {
@@ -61,22 +62,16 @@ export default {
 
       if (this.errors.length) return;
 
-      // Call the login API endpoint
-      axios.post('http://localhost:3000/api/auth/login', {
-        username: this.username,
-        password: this.password
-      },
-      {
-        withCredentials: true
-      })
-      .then(response => {
+      try {
+        // Call the login API endpoint
+        let response = await apiService.login(this.username, this.password);
+
         if (response.status === 200) {
           router.push({ name: "main-menu" });
         }
-      })
-      .catch(err => {
+      } catch(err) {
         this.errors = err.response.data.errors || [];
-      });
+      }
     }
   }
 };
