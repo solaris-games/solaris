@@ -8,12 +8,12 @@ class ApiService {
             password: password
             },
             {
-            withCredentials: true
+                withCredentials: true
             });
     }
     
     logout() {
-        return axios.post('http://localhost:3000/api/auth/logout');
+        return axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
     }
 
     getUserInfo() {
