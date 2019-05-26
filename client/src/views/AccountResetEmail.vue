@@ -5,9 +5,9 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit.prevent="handleSubmit">
-      <div>
-        <label for="email">Email Address</label>
-        <input type="email" name="email" v-model="email">
+      <div class="form-group">
+        <label for="email">New Email Address</label>
+        <input type="email" class="form-control" v-model="email" />
       </div>
 
       <div>
@@ -22,6 +22,7 @@
 import router from "../router";
 import ViewTitle from "../components/ViewTitle";
 import FormErrorList from "../components/FormErrorList";
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -35,7 +36,7 @@ export default {
     };
   },
   methods: {
-    handleSubmit(e) {
+    async handleSubmit(e) {
       this.errors = [];
 
       if (!this.email) {
@@ -46,7 +47,11 @@ export default {
 
       if (this.errors.length) return;
 
-      // TODO: Call the email reset API endpoint
+      try {
+        await apiService.updateEmailAddress(this.email);
+      } catch(err) {
+        console.error(err);
+      }
 
       router.push({ name: "main-menu" });
     }
