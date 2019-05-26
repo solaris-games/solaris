@@ -83,4 +83,22 @@ router.get('/me', middleware.authenticate, (req, res, next) => {
     });
 });
 
+router.post('/changeEmailPreference', middleware.authenticate, (req, res, next) => {
+    User.findById(req.session.userId, (err, user) => {
+        if (err) {
+            return next(err);
+        }
+
+        user.emailEnabled = req.body.enabled;
+
+        user.save((err, doc) => {
+            if (err) {
+                return next(err);
+            }
+
+            return res.sendStatus(200);
+        });
+    });
+});
+
 module.exports = router;

@@ -27,6 +27,13 @@ class ApiService {
             password: password
         });
     }
+
+    toggleEmailNotifications(enabled) {
+        return axios.post('http://localhost:3000/api/user/changeEmailPreference', {
+            enabled
+        },
+        { withCredentials: true });
+    }
 }
 
 export default new ApiService();

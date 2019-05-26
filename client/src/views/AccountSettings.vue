@@ -1,14 +1,43 @@
 <template>
-  <div>
-    <view-title title="Account" />Galactic Credits:
-    <span>{{ info.credits }} Credits</span>
-    <br>Username:
-    <span>{{ info.username }}</span>
-    <br>Email Address:
-    <span>{{ info.email }}</span>
-    <br>Email Enabled:
-    <input type="checkbox" v-model="emailEnabled">
-    <br>
+  <div class="container">
+    <view-title title="Account" />
+
+    <div class="row">
+      <div class="col">
+        <p>Galactic Credits</p>
+      </div>
+      <div class="col">
+        <p class="text-right">{{ info.credits }} Credits</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <p>Username</p>
+      </div>
+      <div class="col">
+        <p class="text-right">{{ info.username }}</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <p>Email Address</p>
+      </div>
+      <div class="col">
+        <p class="text-right">{{ info.email }}</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <p>Email Notifications</p>
+      </div>
+      <div class="col text-right">
+        <button v-if="info.emailEnabled" @click="toggleEmailNotifications(false)" class="btn btn-success">Enabled</button>
+        <button v-if="!info.emailEnabled" @click="toggleEmailNotifications(true)" class="btn btn-danger">Disabled</button>
+      </div>
+    </div>
 
     <div>
       <router-link to="/account/reset-email" tag="button" class="btn btn-primary">Change Email Address</router-link>
@@ -36,6 +65,13 @@ export default {
       
     if (response.status === 200) {
       this.info = response.data;
+    }
+  },
+  methods: {
+    async toggleEmailNotifications(enabled) {
+      this.info.emailEnabled = enabled;
+
+      await apiService.toggleEmailNotifications(this.info.emailEnabled);
     }
   }
 };
