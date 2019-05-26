@@ -205,7 +205,7 @@ export default {
   color: gold;
 }
 .fa-star {
-  color: lightyellow;
+  color: yellow;
 }
 .fa-heart {
   color: red;
