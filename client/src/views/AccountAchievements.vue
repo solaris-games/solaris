@@ -3,15 +3,15 @@
     <view-title title="Achievements" />
 
     <div class="row">
-      <div class="col text-center">
+      <div class="col text-center bg-primary">
         <p>Victories</p>
         <h2><i class="fas fa-trophy"></i> {{ achievements.victories }}</h2>
       </div>
-      <div class="col text-center">
+      <div class="col text-center bg-secondary">
         <p>Rank</p>
         <h2><i class="fas fa-star"></i> {{ achievements.rank }}</h2>
       </div>
-      <div class="col text-center">
+      <div class="col text-center bg-primary">
         <p>Renown</p>
         <h2><i class="fas fa-heart"></i> {{ achievements.renown }}</h2>
       </div>

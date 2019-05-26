@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <view-title title="Game Info" navigation="game-list"/>
 
     {{ id }}

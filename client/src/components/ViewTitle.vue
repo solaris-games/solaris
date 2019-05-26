@@ -1,11 +1,11 @@
 <template>
 <div>
-    <div class="row">
+    <div class="row bg-primary">
         <div class="col">
             <h1>{{ title }}</h1>
         </div>
         <div class="col-1">
-            <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-primary float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
+            <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
         </div>
     </div>
 </div>

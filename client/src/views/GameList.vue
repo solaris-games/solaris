@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <view-title title="Game List" />
 
     <div v-for="game in serverGames" v-bind:key="game._id">

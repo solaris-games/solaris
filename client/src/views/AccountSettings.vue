@@ -2,7 +2,7 @@
   <div class="container">
     <view-title title="Account" />
 
-    <div class="row">
+    <div class="row bg-info">
       <div class="col">
         <p>Galactic Credits</p>
       </div>
@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row bg-primary">
       <div class="col">
         <p>Username</p>
       </div>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row bg-secondary">
       <div class="col">
         <p>Email Address</p>
       </div>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row bg-primary">
       <div class="col">
         <p>Email Notifications</p>
       </div>

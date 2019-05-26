@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h1>Main Menu</h1>
 
     <div>

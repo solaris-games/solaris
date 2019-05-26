@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <view-title title="Reset Email Address" />
 
     <form @submit.prevent="handleSubmit">

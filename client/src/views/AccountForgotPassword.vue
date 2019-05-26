@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <view-title title="Forgot Password" navigation="home"/>
 
     <form-error-list v-bind:errors="errors"/>
