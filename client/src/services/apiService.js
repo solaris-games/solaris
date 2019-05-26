@@ -41,6 +41,13 @@ class ApiService {
         },
         { withCredentials: true });
     }
+
+    updatePassword(currentPassword, newPassword) {
+        return axios.post('http://localhost:3000/api/user/changePassword', {
+            currentPassword, newPassword
+        },
+        { withCredentials: true });
+    }
 }
 
 export default new ApiService();

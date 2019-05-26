@@ -2,23 +2,23 @@
   <div>
     <view-title title="Reset Password" />
 
-    <form-error-list v-bind:errors="errors"/>
-
     <form @submit.prevent="handleSubmit">
-      <div>
+      <div class="form-group">
         <label for="currentPassword">Current Password</label>
-        <input type="password" name="currentPassword" v-model="currentPassword">
+        <input type="password" name="currentPassword" class="form-control" v-model="currentPassword">
       </div>
 
-      <div>
+      <div class="form-group">
         <label for="newPassword">New Password</label>
-        <input type="password" name="newPassword" v-model="newPassword">
+        <input type="password" name="newPassword" class="form-control" v-model="newPassword">
       </div>
 
-      <div>
+      <div class="form-group">
         <label for="newPasswordConfirm">Confirm New Password</label>
-        <input type="password" name="newPasswordConfirm" v-model="newPasswordConfirm">
+        <input type="password" name="newPasswordConfirm" class="form-control" v-model="newPasswordConfirm">
       </div>
+
+      <form-error-list v-bind:errors="errors"/>
 
       <div>
         <router-link to="/account/settings" tag="button" class="btn btn-danger">Cancel</router-link>
@@ -32,6 +32,7 @@
 import router from "../router";
 import ViewTitle from "../components/ViewTitle";
 import FormErrorList from "../components/FormErrorList";
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -47,7 +48,7 @@ export default {
     };
   },
   methods: {
-    handleSubmit(e) {
+    async handleSubmit(e) {
       this.errors = [];
 
       if (!this.currentPassword) {
@@ -70,9 +71,13 @@ export default {
 
       if (this.errors.length) return;
 
-      // TODO: Call the password reset API endpoint
+      try {
+        await apiService.updatePassword(this.currentPassword, this.newPassword);
 
-      router.push({ name: "main-menu" });
+        router.push({ name: "main-menu" });
+      } catch(err) {
+        this.errors = err.response.data.errors || [];
+      }
     }
   }
 };

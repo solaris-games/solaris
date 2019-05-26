@@ -102,6 +102,16 @@ router.post('/changeEmailPreference', middleware.authenticate, (req, res, next) 
 });
 
 router.post('/changeEmailAddress', middleware.authenticate, (req, res, next) => {
+    let errors = [];
+
+    if (!req.body.email) {
+        errors.push('Email is a required field');
+    }
+
+    if (errors.length) {
+        return res.status(400).json({ errors: errors });
+    }
+
     User.findById(req.session.userId, (err, user) => {
         if (err) {
             return next(err);
@@ -115,6 +125,56 @@ router.post('/changeEmailAddress', middleware.authenticate, (req, res, next) => 
             }
 
             return res.sendStatus(200);
+        });
+    });
+});
+
+router.post('/changePassword', middleware.authenticate, (req, res, next) => {
+    let errors = [];
+
+    if (!req.body.currentPassword) {
+        errors.push('Current password is a required field');
+    }
+
+    if (!req.body.newPassword) {
+        errors.push('New password is a required field');
+    }
+
+    if (errors.length) {
+        return res.status(400).json({ errors: errors });
+    }
+
+    User.findById(req.session.userId, (err, user) => {
+        if (err) {
+            return next(err);
+        }
+
+        // Make sure the current password matches.
+        bcrypt.compare(req.body.currentPassword, user.password, (err, result) => {
+            if (result) {
+                // Update the current password to the new password.
+                bcrypt.hash(req.body.newPassword, 10, (err, hash) => {
+                    if (err) {
+                        return next(err);
+                    }
+            
+                    user.password = hash;
+            
+                    user.save((err, doc) => {
+                        if (err) {
+                            return next(err)
+                        } else {
+                            return res.sendStatus(201);
+                        }
+                    });
+                });
+            } else {
+                return res.status(400).json({
+                    errors: [
+                        'The current password is incorrect.'
+                    ]
+                });
+            }
         });
     });
 });

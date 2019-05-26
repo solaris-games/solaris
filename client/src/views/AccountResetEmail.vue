@@ -2,13 +2,13 @@
   <div>
     <view-title title="Reset Email Address" />
 
-    <form-error-list v-bind:errors="errors"/>
-
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
         <label for="email">New Email Address</label>
         <input type="email" class="form-control" v-model="email" />
       </div>
+
+      <form-error-list v-bind:errors="errors"/>
 
       <div>
         <router-link to="/account/settings" tag="button" class="btn btn-danger">Cancel</router-link>
@@ -49,11 +49,11 @@ export default {
 
       try {
         await apiService.updateEmailAddress(this.email);
-      } catch(err) {
-        console.error(err);
-      }
 
-      router.push({ name: "main-menu" });
+        router.push({ name: "main-menu" });
+      } catch(err) {
+        this.errors = err.response.data.errors || [];
+      }
     }
   }
 };
