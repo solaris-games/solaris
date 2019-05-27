@@ -3,7 +3,7 @@
     <view-title title="Create Game" />
 
     <form>
-      <h4>Game Settings</h4>
+      <view-subtitle title="Game Settings"/>
 
       <div class="form-group row">
         <label for="name" class="col-sm-2 col-form-label">Name</label>
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <h4>Special Galaxy Settings</h4>
+      <view-subtitle title="Special Galaxy Settings"/>
 
       <div class="form-group row">
         <label for="buildWarpgates" class="col-sm-2 col-form-label">Build Warpgates</label>
@@ -116,7 +116,7 @@
         </div>
       </div>
 
-      <h4>Galaxy </h4>
+      <view-subtitle title="Galaxy Settings"/>
 
       <div class="form-group row">
         <label for="galaxyType" class="col-sm-2 col-form-label">Galaxy Type</label>
@@ -184,7 +184,7 @@
         </div>
       </div>
 
-      <h4>Player Settings</h4>
+      <view-subtitle title="Player Settings"/>
 
       <div class="form-group row">
         <label for="startingStars" class="col-sm-2 col-form-label">Starting Stars</label>
@@ -307,7 +307,7 @@
         </div>
       </div>
 
-      <h4>Technology Settings</h4>
+      <view-subtitle title="Technology Settings"/>
 
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Starting Tech</label>
@@ -463,7 +463,7 @@
         </div>
       </div>
 
-      <h4>Game Time Settings</h4>
+      <view-subtitle title="Game Time Settings"/>
 
       <div class="form-group row">
         <label for="gameTime" class="col-sm-2 col-form-label">Game Time</label>
@@ -515,11 +515,13 @@
 
 <script>
 import ViewTitle from "../components/ViewTitle";
+import ViewSubtitle from "../components/ViewSubtitle";
 import apiService from '../services/apiService';
 
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle,
+    'view-subtitle': ViewSubtitle
   },
   data() {
     return {

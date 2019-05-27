@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="row bg-primary">
+    <div class="row bg-primary mt-3 mb-3">
         <div class="col">
             <h1>{{ title }}</h1>
         </div>
