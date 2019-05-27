@@ -1,18 +1,18 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Reset Email Address" />
 
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
         <label for="email">New Email Address</label>
-        <input type="email" class="form-control" v-model="email" />
+        <input type="email" required="required" class="form-control" v-model="email" />
       </div>
 
       <form-error-list v-bind:errors="errors"/>
 
       <div>
         <router-link to="/account/settings" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success">Change Email</button>
+        <button type="submit" class="btn btn-success ml-1">Change Email</button>
       </div>
     </form>
   </div>

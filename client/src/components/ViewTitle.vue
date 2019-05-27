@@ -1,12 +1,10 @@
 <template>
-<div>
-    <div class="row bg-primary mt-3 mb-3">
-        <div class="col">
-            <h1>{{ title }}</h1>
-        </div>
-        <div class="col-1">
-            <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
-        </div>
+<div class="row bg-primary pt-3 pb-3 mb-2">
+    <div class="col">
+        <h2>{{ title }}</h2>
+    </div>
+    <div class="col-1">
+        <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
 </div>
 </template>
@@ -29,7 +27,7 @@ export default {
 </script>
 
 <style scoped>
-#btnHome {
-    margin-top: 10px;
+h2 {
+    margin-bottom: 0;
 }
 </style>

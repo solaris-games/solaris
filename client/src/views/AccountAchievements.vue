@@ -1,29 +1,29 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Achievements" />
 
     <div class="row">
-      <div class="col text-center bg-primary">
-        <p>Victories</p>
+      <div class="col text-center bg-primary pt-2 pb-2">
+        <h5>Victories</h5>
         <h2><i class="fas fa-trophy"></i> {{ achievements.victories }}</h2>
       </div>
-      <div class="col text-center bg-secondary">
+      <div class="col text-center bg-secondary pt-2 pb-2">
         <p>Rank</p>
         <h2><i class="fas fa-star"></i> {{ achievements.rank }}</h2>
       </div>
-      <div class="col text-center bg-primary">
+      <div class="col text-center bg-primary pt-2 pb-2">
         <p>Renown</p>
         <h2><i class="fas fa-heart"></i> {{ achievements.renown }}</h2>
       </div>
     </div>
 
-    <p class="text-center">Read more about <a href="">Victory, Rank and Renown</a>.</p>
+    <p class="text-center pt-3">Read more about <a href="">Victory, Rank and Renown</a>.</p>
 
-    <hr>
+    <view-subtitle title="Badges"/>
 
-    <h3>Badges</h3>
+    <p class="text-center">In the game you are rewarded for being a tough opponent or great ally. When others enjoying playing against you they will buy you a badge.</p>
 
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-flag"></i></h1>
       </div>
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-skull-crossbones"></i></h1>
       </div>
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-skull"></i></h1>
       </div>
@@ -53,7 +53,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-chess-king"></i></h1>
       </div>
@@ -63,7 +63,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-pen-fancy"></i></h1>
       </div>
@@ -73,7 +73,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-paw"></i></h1>
       </div>
@@ -83,7 +83,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-dice"></i></h1>
       </div>
@@ -93,7 +93,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-pizza-slice"></i></h1>
       </div>
@@ -103,7 +103,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-fish"></i></h1>
       </div>
@@ -113,7 +113,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-fighter-jet"></i></h1>
       </div>
@@ -123,7 +123,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-satellite"></i></h1>
       </div>
@@ -133,7 +133,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-atom"></i></h1>
       </div>
@@ -143,7 +143,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-question"></i></h1>
       </div>
@@ -153,7 +153,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-biohazard"></i></h1>
       </div>
@@ -163,7 +163,7 @@
       </div>
     </div>
     
-    <div class="row">
+    <div class="row container">
       <div class="">
         <h1><i class="fas fa-user-friends"></i></h1>
       </div>
@@ -176,12 +176,14 @@
 </template>
 
 <script>
-import ViewTitle from "../components/ViewTitle";
+import ViewTitle from '../components/ViewTitle';
+import ViewSubtitle from '../components/ViewSubtitle';
 import apiService from '../services/apiService';
 
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle,
+    'view-subtitle': ViewSubtitle
   },
   data() {
     return {

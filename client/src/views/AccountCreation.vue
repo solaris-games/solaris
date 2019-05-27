@@ -1,33 +1,33 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Create Account" navigation="home"/>
 
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit="handleSubmit">
-      <div>
+      <div class="form-group">
         <label for="username">Username</label>
-        <input type="text" name="username" v-model="username">
+        <input type="text" required="required" class="form-control" name="username" v-model="username">
       </div>
 
-      <div>
+      <div class="form-group">
         <label for="email">Email Address</label>
-        <input type="email" name="email" v-model="email">
+        <input type="email" required="required" class="form-control" name="email" v-model="email">
       </div>
 
-      <div>
+      <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" name="password" v-model="password">
+        <input type="password" required="required" class="form-control" name="password" v-model="password">
       </div>
 
-      <div>
+      <div class="form-group">
         <label for="passwordConfirm">Re-enter Password</label>
-        <input type="password" name="passwordConfirm" v-model="passwordConfirm">
+        <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm">
       </div>
 
       <div>
         <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success">Create Account</button>
+        <button type="submit" class="btn btn-success ml-1">Create Account</button>
       </div>
     </form>
   </div>

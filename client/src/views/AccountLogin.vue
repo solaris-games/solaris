@@ -1,23 +1,23 @@
 <template>
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col col-md-6 col-lg-5">
+      <div class="col col-md-6 col-lg-5 bg-light">
         <view-title title="Login" navigation="home"/>
 
         <form @submit.prevent="handleSubmit">
             <div class="form-group">
-                <input type="text" class="form-control" placeholder="Username" v-model="username" />
+                <input type="text" required="required" class="form-control" placeholder="Username" v-model="username" />
             </div>
 
             <div class="form-group">
-                <input type="password" class="form-control" placeholder="Password" v-model="password" />
+                <input type="password" required="required" class="form-control" placeholder="Password" v-model="password" />
             </div>
 
             <form-error-list v-bind:errors="errors"/>
         
             <div class="form-group">
                 <router-link to="/" tag="button" type="button" class="btn btn-danger">Cancel</router-link>
-                <input type="submit" class="btn btn-primary" value="Login" />
+                <input type="submit" class="btn btn-success ml-1" value="Login" />
             </div>
 
             <div class="form-group">
@@ -80,7 +80,4 @@ export default {
 </script>
 
 <style scoped>
-  button {
-    margin-right: 5px;
-  }
 </style>

@@ -1,8 +1,8 @@
 <template>
-  <div class="container">
+  <div class="container bg-light pb-3">
     <view-title title="Account" />
 
-    <div class="row bg-info">
+    <div class="row pt-3 pb-3 bg-info">
       <div class="col">
         <p>Galactic Credits</p>
       </div>
@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="row bg-primary">
+    <div class="row pt-3 pb-3 bg-primary">
       <div class="col">
         <p>Username</p>
       </div>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="row bg-secondary">
+    <div class="row pt-3 pb-3 bg-secondary">
       <div class="col">
         <p>Email Address</p>
       </div>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="row bg-primary">
+    <div class="row pt-3 pb-3 bg-primary">
       <div class="col">
         <p>Email Notifications</p>
       </div>
@@ -39,9 +39,9 @@
       </div>
     </div>
 
-    <div>
+    <div class="mt-3">
       <router-link to="/account/reset-email" tag="button" class="btn btn-primary">Change Email Address</router-link>
-      <router-link to="/account/reset-password" tag="button" class="btn btn-primary">Change Password</router-link>
+      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
     </div>
   </div>
 </template>
@@ -78,4 +78,7 @@ export default {
 </script>
 
 <style scoped>
+p {
+  margin-bottom: 0;
+}
 </style>

@@ -8,21 +8,21 @@
       <div class="form-group row">
         <label for="name" class="col-sm-2 col-form-label">Name</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="name" v-model="settings.general.name">
+          <input type="text" required="required" class="form-control" id="name" v-model="settings.general.name">
         </div>
       </div>
 
       <div class="form-group row">
         <label for="description" class="col-sm-2 col-form-label">Description</label>
         <div class="col-sm-10">
-          <textarea rows="4" class="form-control" id="description" v-model="settings.general.description"></textarea>
+          <textarea rows="4" required="required" class="form-control" id="description" v-model="settings.general.description"></textarea>
         </div>
       </div>
 
       <div class="form-group row">
         <label for="password" class="col-sm-2 col-form-label">Password</label>
         <div class="col-sm-10">
-          <input type="password" class="form-control" id="password" v-model="settings.general.password">
+          <input type="password" required="required" class="form-control" id="password" v-model="settings.general.password">
         </div>
       </div>
 

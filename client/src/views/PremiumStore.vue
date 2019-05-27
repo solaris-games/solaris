@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Premium Membership" />
 
     <h3>Premium Memberships</h3>

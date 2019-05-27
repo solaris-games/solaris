@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <!-- DEV ONLY -->
     <router-link to="/main-menu" tag="button" class="btn btn-primary">Main Menu</router-link>
 
@@ -7,7 +7,7 @@
 
     <div>
       <router-link to="/account/create" tag="button" class="btn btn-primary">Create A New Account</router-link>
-      <router-link to="/account/login" tag="button" class="btn btn-success">Login</router-link>
+      <router-link to="/account/login" tag="button" class="btn btn-success ml-1">Login</router-link>
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Active Games" />
 
     <div v-if="!games.length">

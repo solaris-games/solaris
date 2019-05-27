@@ -1,18 +1,18 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Forgot Password" navigation="home"/>
 
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit.prevent="handleSubmit">
-      <div>
+      <div class="form-group">
         <label for="email">Email Address</label>
-        <input type="email" name="email" v-model="email">
+        <input type="email" required="required" class="form-control" name="email" v-model="email">
       </div>
 
       <div>
         <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success">Reset Password</button>
+        <button type="submit" class="btn btn-success ml-1">Reset Password</button>
       </div>
     </form>
   </div>
