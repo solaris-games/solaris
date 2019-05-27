@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container bg-light">
     <view-title title="Create Game" />
 
     <form>
@@ -220,7 +220,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="startingInfrastructureEconomy" class="col-sm-2 col-form-label">Starting Economy</label>
+        <label class="col-sm-2">Starting Infrastructure</label>
         <div class="col-sm-10">
           <select class="form-control" id="startingInfrastructureEconomy" v-model="settings.player.startingInfrastructure.economy">
             <option v-for="opt in options.player.startingInfrastructure.economy" v-bind:key="opt" v-bind:value="opt">
@@ -231,7 +231,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="startingInfrastructureIndustry" class="col-sm-2 col-form-label">Starting Industry</label>
+        <label class="col-sm-2"></label>
         <div class="col-sm-10">
           <select class="form-control" id="startingInfrastructureIndustry" v-model="settings.player.startingInfrastructure.industry">
             <option v-for="opt in options.player.startingInfrastructure.industry" v-bind:key="opt" v-bind:value="opt">
@@ -242,7 +242,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="startingInfrastructureScience" class="col-sm-2 col-form-label">Starting Science</label>
+        <label class="col-sm-2"></label>
         <div class="col-sm-10">
           <select class="form-control" id="startingInfrastructureScience" v-model="settings.player.startingInfrastructure.science">
             <option v-for="opt in options.player.startingInfrastructure.science" v-bind:key="opt" v-bind:value="opt">
@@ -253,7 +253,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="economyCost" class="col-sm-2 col-form-label">Economy Cost</label>
+        <label for="economyCost" class="col-sm-2 col-form-label">Development Cost</label>
         <div class="col-sm-10">
           <select class="form-control" id="economyCost" v-model="settings.player.developmentCost.economy">
             <option v-for="opt in options.player.developmentCost.economy" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -264,7 +264,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="industryCost" class="col-sm-2 col-form-label">Industry Cost</label>
+        <label class="col-sm-2"></label>
         <div class="col-sm-10">
           <select class="form-control" id="industryCost" v-model="settings.player.developmentCost.industry">
             <option v-for="opt in options.player.developmentCost.industry" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -275,7 +275,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="scienceCost" class="col-sm-2 col-form-label">Science Cost</label>
+        <label class="col-sm-2"></label>
         <div class="col-sm-10">
           <select class="form-control" id="scienceCost" v-model="settings.player.developmentCost.science">
             <option v-for="opt in options.player.developmentCost.science" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -337,6 +337,173 @@
           <select class="form-control" id="startingTechLevelScanning" v-model="settings.technology.startingTechnologyLevel.scanning">
             <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
               Level {{ opt }} Scanning
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="startingTechLevelHyperspace" v-model="settings.technology.startingTechnologyLevel.hyperspace">
+            <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
+              Level {{ opt }} Hyperspace
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="startingTechLevelManufacturing" v-model="settings.technology.startingTechnologyLevel.manufacturing">
+            <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
+              Level {{ opt }} Manufacturing
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="startingTechLevelBanking" v-model="settings.technology.startingTechnologyLevel.banking">
+            <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
+              Level {{ opt }} Banking
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="startingTechLevelWeapons" v-model="settings.technology.startingTechnologyLevel.weapons">
+            <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
+              Level {{ opt }} Weapons
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Research Costs</label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechTerraforming" v-model="settings.technology.researchCosts.terraforming">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Terraforming Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechExperimentation" v-model="settings.technology.researchCosts.experimentation">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Experimentation Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechScanning" v-model="settings.technology.researchCosts.scanning">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Scanning Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechHyperspace" v-model="settings.technology.researchCosts.hyperspace">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Hyperspace Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechManufacturing" v-model="settings.technology.researchCosts.manufacturing">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Manufacturing Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechBanking" v-model="settings.technology.researchCosts.banking">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Banking Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2"></label>
+        <div class="col-sm-10">
+          <select class="form-control" id="researchCostsTechWeapons" v-model="settings.technology.researchCosts.weapons">
+            <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }} Weapons Research
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <h4>Game Time Settings</h4>
+
+      <div class="form-group row">
+        <label for="gameTime" class="col-sm-2 col-form-label">Game Time</label>
+        <div class="col-sm-10">
+          <select class="form-control" id="gameTime" v-model="settings.gameTime.time">
+            <option v-for="opt in options.gameTime.time" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row" v-if="settings.gameTime.time === 0">
+        <label for="gameSpeed" class="col-sm-2 col-form-label">Game Speed</label>
+        <div class="col-sm-10">
+          <select class="form-control" id="gameSpeed" v-model="settings.gameTime.speed">
+            <option v-for="opt in options.gameTime.speed" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row" v-if="settings.gameTime.time === 1">
+        <label for="turnJumps" class="col-sm-2 col-form-label">Turn Jumps</label>
+        <div class="col-sm-10">
+          <select class="form-control" id="turnJumps" v-model="settings.gameTime.turnJumps">
+            <option v-for="opt in options.gameTime.turnJumps" v-bind:key="opt" v-bind:value="opt">
+              {{ opt }} Tick Jumps
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row" v-if="settings.gameTime.time === 1">
+        <label for="maxTurnWait" class="col-sm-2 col-form-label">Max Turn Wait</label>
+        <div class="col-sm-10">
+          <select class="form-control" id="maxTurnWait" v-model="settings.gameTime.maxTurnWait">
+            <option v-for="opt in options.gameTime.maxTurnWait" v-bind:key="opt" v-bind:value="opt">
+              {{ opt }} Hours
             </option>
           </select>
         </div>
@@ -415,6 +582,12 @@ export default {
             banking: 2,
             weapons: 2
           }
+        },
+        gameTime: {
+          time: 0,
+          speed: 24,
+          turnJumps: 8,
+          maxTurnWait: 24
         }
       },
       options: {
@@ -526,6 +699,20 @@ export default {
             { value: 4, text: 'Very Expensive' },
             { value: 5, text: 'Crazy Expensive' },
           ]
+        },
+        gameTime: {
+          time: [
+            { value: 0, text: 'Real Time' },
+            { value: 1, text: 'Turn Based' }
+          ],
+          speed: [
+            { value: 6, text: 'Quad Speed (4 Pays / 24h)' },
+            { value: 12, text: 'Double Speed (2 Pays / 24h)' },
+            { value: 24, text: 'Normal Speed (1 Pay / 24h)' },
+            { value: 48, text: 'Slow Speed (1 Pay / 48h)' },
+          ],
+          turnJumps: [1,6,8,12,24],
+          maxTurnWait: [1,6,8,10,12,18,24,48]
         }
       }
     };
