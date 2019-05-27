@@ -88,7 +88,7 @@
         <div class="col-sm-10">
           <select class="form-control" id="buildWarpgates" v-model="settings.specialGalaxy.buildWarpgates">
             <option v-for="opt in options.specialGalaxy.buildWarpgates" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
+              {{ opt.text }} Gates
             </option>
           </select>
         </div>
@@ -99,7 +99,7 @@
         <div class="col-sm-10">
           <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates">
             <option v-for="opt in options.specialGalaxy.randomGates" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
+              {{ opt.text }} Gates
             </option>
           </select>
         </div>
@@ -256,7 +256,7 @@
         <label for="economyCost" class="col-sm-2 col-form-label">Development Cost</label>
         <div class="col-sm-10">
           <select class="form-control" id="economyCost" v-model="settings.player.developmentCost.economy">
-            <option v-for="opt in options.player.developmentCost.economy" v-bind:key="opt.value" v-bind:value="opt.value">
+            <option v-for="opt in options.player.developmentCost" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Economy
             </option>
           </select>
@@ -267,7 +267,7 @@
         <label class="col-sm-2"></label>
         <div class="col-sm-10">
           <select class="form-control" id="industryCost" v-model="settings.player.developmentCost.industry">
-            <option v-for="opt in options.player.developmentCost.industry" v-bind:key="opt.value" v-bind:value="opt.value">
+            <option v-for="opt in options.player.developmentCost" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Industry
             </option>
           </select>
@@ -278,7 +278,7 @@
         <label class="col-sm-2"></label>
         <div class="col-sm-10">
           <select class="form-control" id="scienceCost" v-model="settings.player.developmentCost.science">
-            <option v-for="opt in options.player.developmentCost.science" v-bind:key="opt.value" v-bind:value="opt.value">
+            <option v-for="opt in options.player.developmentCost" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Science
             </option>
           </select>
@@ -515,6 +515,7 @@
 
 <script>
 import ViewTitle from "../components/ViewTitle";
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -522,200 +523,19 @@ export default {
   },
   data() {
     return {
-      settings: {
-        general: {
-          name: null,
-          description: null,
-          password: null,
-          starsForVictoryPercentage: 50,
-          playerCount: 8,
-          playerType: 0,
-          formalAlliances: 0,
-          anonymity: 0
-        },
-        specialGalaxy: {
-          buildWarpgates: 1,
-          randomGates: 0,
-          darkGalaxy: 2
-        },
-        galaxy: {
-          galaxyType: 0,
-          starScatter: 0,
-          starsPerPlayer: 24,
-          startingDistance: 0,
-          resources: 1,
-          productionTicks: 24
-        },
-        player: {
-          startingStars: 6,
-          startingCash: 500,
-          startingShips: 10,
-          startingInfrastructure: {
-            economy: 5,
-            industry: 5,
-            science: 1
-          },
-          developmentCost: {
-            economy: 1,
-            industry: 1,
-            science: 1
-          },
-          tradeCost: 15,
-          tradeScanning: 0
-        },
-        technology: {
-          startingTechnologyLevel: {
-            terraforming: 1,
-            experimentation: 1,
-            scanning: 1,
-            hyperspace: 1,
-            manufacturing: 1,
-            banking: 1,
-            weapons: 1
-          },
-          researchCosts: {
-            terraforming: 2,
-            experimentation: 2,
-            scanning: 2,
-            hyperspace: 2,
-            manufacturing: 2,
-            banking: 2,
-            weapons: 2
-          }
-        },
-        gameTime: {
-          time: 0,
-          speed: 24,
-          turnJumps: 8,
-          maxTurnWait: 24
-        }
-      },
-      options: {
-        general: {
-          starsForVictoryPercentage: [25, 33, 50, 66],
-          playerCount: [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
-          playerType: [
-            { value: 0, text: 'All Players' },
-            { value: 1, text: 'Premium Players Only' }
-          ],
-          formalAlliances: [
-            { value: 0, text: 'No Formal Alliances' },
-            { value: 1, text: 'Formal Alliances Enabled' }
-          ],
-          anonymity: [
-            { value: 0, text: 'Normal' },
-            { value: 1, text: 'Extra' }
-          ]
-        },
-        specialGalaxy: {
-          buildWarpgates: [
-            { value: 0, text: 'Disabled' },
-            { value: 1, text: 'Cheap Gates' },
-            { value: 2, text: 'Expensive Gates' }
-          ],
-          randomGates: [
-            { value: 0, text: 'No Random Gates' },
-            { value: 1, text: 'Rare Gates' },
-            { value: 2, text: 'Common Gates' }
-          ],
-          darkGalaxy: [
-            { value: 0, text: 'Disabled' },
-            { value: 1, text: 'Enabled' },
-            { value: 2, text: 'Dark Start Only' }
-          ],
-        },
-        galaxy: {
-          galaxyType: [
-            { value: 0, text: 'Random Hex' },
-            { value: 1, text: 'Circular' },
-            { value: 2, text: 'Custom' }
-          ],
-          starScatter: [
-            { value: 0, text: 'Random Scatter' },
-            { value: 1, text: 'Twin Rings (Symmetrical)' }
-          ],
-          starsPerPlayer: [
-            { value: 8, text: '8 Stars (Tiny)' },
-            { value: 16, text: '16 Stars (Small)' },
-            { value: 24, text: '24 Stars (Medium)' },
-            { value: 32, text: '32 Stars (Large)' }
-          ],
-          startingDistance: [
-            { value: 0, text: 'Close' },
-            { value: 1, text: 'Medium' },
-            { value: 2, text: 'Far' }
-          ],
-          resources: [
-            { value: 0, text: 'Sparse' },
-            { value: 1, text: 'Standard' },
-            { value: 2, text: 'Plentiful' }
-          ],
-          productionTicks: [ 16,18,20,22,24,26,28,30,32,34,36 ],
-        },
-        player: {
-          startingStars: [ 1,2,3,4,5,6,7,8,9,10 ],
-          startingCash: [ 25,500,1000,1500,2000,2500,3000 ],
-          startingShips: [ 0,10,50,100 ],
-          startingInfrastructure: {
-            economy: [ 0,5,10,20,30 ],
-            industry: [ 0,5,10,20,30 ],
-            science: [ 0,1,2,3,4,5 ],
-          },
-          developmentCost: {
-            economy: [
-              { value: 0, text: 'Cheap' },
-              { value: 1, text: 'Standard' },
-              { value: 2, text: 'Expensive' }
-            ],
-            industry: [
-              { value: 0, text: 'Cheap' },
-              { value: 1, text: 'Standard' },
-              { value: 2, text: 'Expensive' }
-            ],
-            science: [
-              { value: 0, text: 'Cheap' },
-              { value: 1, text: 'Standard' },
-              { value: 2, text: 'Expensive' }
-            ],
-          },
-          tradeCost: [
-            { value: 5, text: 'Cheap' },
-            { value: 15, text: 'Standard' },
-            { value: 25, text: 'Expensive' },
-            { value: 50, text: 'Very Expensive' }
-          ],
-          tradeScanning: [
-            { value: 0, text: 'Trade with all players' },
-            { value: 1, text: 'Trade with scanned players only' }
-          ]
-        },
-        technology: {
-          startingTechnologyLevel: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 ],
-          researchCosts: [
-            { value: 0, text: 'No' },
-            { value: 1, text: 'Cheap' },
-            { value: 2, text: 'Normal' },
-            { value: 3, text: 'Expensive' },
-            { value: 4, text: 'Very Expensive' },
-            { value: 5, text: 'Crazy Expensive' },
-          ]
-        },
-        gameTime: {
-          time: [
-            { value: 0, text: 'Real Time' },
-            { value: 1, text: 'Turn Based' }
-          ],
-          speed: [
-            { value: 6, text: 'Quad Speed (4 Pays / 24h)' },
-            { value: 12, text: 'Double Speed (2 Pays / 24h)' },
-            { value: 24, text: 'Normal Speed (1 Pay / 24h)' },
-            { value: 48, text: 'Slow Speed (1 Pay / 48h)' },
-          ],
-          turnJumps: [1,6,8,12,24],
-          maxTurnWait: [1,6,8,10,12,18,24,48]
-        }
-      }
+      settings: null,
+      options: null
     };
+  },
+  async mounted() {
+    try {
+      let response = await apiService.getDefaultGameSettings();
+
+      this.settings = response.data.settings;
+      this.options = response.data.options;
+    } catch(err) {
+      console.error(err);
+    }
   }
 };
 </script>
