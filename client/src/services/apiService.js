@@ -53,6 +53,11 @@ class ApiService {
         return axios.get('http://localhost:3000/api/game/defaultSettings',
         { withCredentials: true });
     }
+
+    createGame(settings) {
+        return axios.post('http://localhost:3000/api/game', settings,
+        { withCredentials: true });
+    }
 }
 
 export default new ApiService();

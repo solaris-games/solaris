@@ -2,7 +2,7 @@
   <div class="container bg-light">
     <view-title title="Create Game" />
 
-    <form>
+    <form @submit.prevent="handleSubmit">
       <view-subtitle title="Game Settings"/>
 
       <div class="form-group row">
@@ -15,7 +15,7 @@
       <div class="form-group row">
         <label for="description" class="col-sm-2 col-form-label">Description</label>
         <div class="col-sm-10">
-          <textarea rows="4" required="required" class="form-control" id="description" v-model="settings.general.description"></textarea>
+          <textarea rows="4" class="form-control" id="description" v-model="settings.general.description"></textarea>
         </div>
       </div>
 
@@ -80,6 +80,10 @@
           </select>
         </div>
       </div>
+
+      <form-error-list v-bind:errors="errors"/>
+
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block">Create Game</button>
 
       <view-subtitle title="Special Galaxy Settings"/>
 
@@ -516,15 +520,19 @@
 <script>
 import ViewTitle from "../components/ViewTitle";
 import ViewSubtitle from "../components/ViewSubtitle";
+import FormErrorList from "../components/FormErrorList";
 import apiService from '../services/apiService';
+import router from '../router';
 
 export default {
   components: {
     'view-title': ViewTitle,
-    'view-subtitle': ViewSubtitle
+    'view-subtitle': ViewSubtitle,
+    "form-error-list": FormErrorList
   },
   data() {
     return {
+      errors: [],
       settings: null,
       options: null
     };
@@ -537,6 +545,34 @@ export default {
       this.options = response.data.options;
     } catch(err) {
       console.error(err);
+    }
+  },
+  methods: {
+    async handleSubmit(e) {
+      this.errors = [];
+
+      if (!this.settings.general.name) {
+        this.errors.push("Game name required.");
+      }
+
+      if (!this.settings.general.password) {
+        this.errors.push("Password required.");
+      }
+
+      e.preventDefault();
+
+      if (this.errors.length) return;
+
+      try {
+        // Call the login API endpoint
+        let response = await apiService.createGame(this.settings);
+        
+        if (response.status === 201) {
+          router.push({ name: "game-detail", query: { id: response.data._id } });
+        }
+      } catch(err) {
+        this.errors = err.response.data.errors || [];
+      }
     }
   }
 };
