@@ -1,25 +1,60 @@
 <template>
   <div class="container bg-light">
-    <view-title title="Game Info" navigation="game-list"/>
+    <view-title title="Game Detail" navigation="main-menu"/>
 
-    {{ id }}
+    <img :src="getServerGameImage(game)">
+
+    <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
+
+    <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
+
+    <div>
+      <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
+      <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ml-1">Open Game <i class="fas fa-arrow-right"></i> </router-link>
+    </div>
   </div>
 </template>
 
 <script>
 import ViewTitle from "../components/ViewTitle";
-import router from '../router'
+import ViewSubtitle from "../components/ViewSubtitle";
+import router from '../router';
+import apiService from '../services/apiService';
+
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle,
+    'view-subtitle': ViewSubtitle
   },
   data() {
       return {
-          id: null
+          game: {
+            _id: null,
+            settings: {
+              general: {
+                name: null,
+                description: null
+              }
+            }
+          }
       }
   },
   created() {
-      this.id = this.$route.query.id;
+      this.game._id = this.$route.query.id;
+  },
+  async mounted() {
+    try {
+      let response = await apiService.getGameInfo(this.game._id);
+
+      this.game = response.data;
+    } catch(err) {
+      console.error(err);
+    }
+  },
+  methods: {
+      getServerGameImage() {
+          return require('../assets/cards/npg_large.jpg');
+      }
   }
 };
 </script>
