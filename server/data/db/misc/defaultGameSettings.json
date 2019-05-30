@@ -5,22 +5,22 @@
         "description": null,
         "password": null,
         "starsForVictoryPercentage": 50,
-        "playerCount": 8,
-        "playerType": 0,
-        "formalAlliances": 0,
-        "anonymity": 0
+        "playerLimit": 8,
+        "playerType": "premium",
+        "formalAlliances": "disabled",
+        "anonymity": "normal"
       },
       "specialGalaxy": {
-        "buildWarpgates": 1,
-        "randomGates": 0,
-        "darkGalaxy": 2
+        "buildWarpgates": "cheap",
+        "randomGates": "none",
+        "darkGalaxy": "start"
       },
       "galaxy": {
-        "galaxyType": 0,
-        "starScatter": 0,
+        "galaxyType": "hex",
+        "starScatter": "random",
         "starsPerPlayer": 24,
-        "startingDistance": 0,
-        "resources": 1,
+        "startingDistance": "medium",
+        "resources": "standard",
         "productionTicks": 24
       },
       "player": {
@@ -33,12 +33,12 @@
           "science": 1
         },
         "developmentCost": {
-          "economy": 1,
-          "industry": 1,
-          "science": 1
+          "economy": "standard",
+          "industry": "standard",
+          "science": "standard"
         },
         "tradeCost": 15,
-        "tradeScanning": 0
+        "tradeScanning": "all"
       },
       "technology": {
         "startingTechnologyLevel": {
@@ -51,17 +51,17 @@
           "weapons": 1
         },
         "researchCosts": {
-          "terraforming": 2,
-          "experimentation": 2,
-          "scanning": 2,
-          "hyperspace": 2,
-          "manufacturing": 2,
-          "banking": 2,
-          "weapons": 2
+          "terraforming": "normal",
+          "experimentation": "normal",
+          "scanning": "normal",
+          "hyperspace": "normal",
+          "manufacturing": "normal",
+          "banking": "normal",
+          "weapons": "normal"
         }
       },
       "gameTime": {
-        "time": 0,
+        "time": "realTime",
         "speed": 24,
         "turnJumps": 8,
         "maxTurnWait": 24
@@ -75,7 +75,7 @@
           50,
           66
         ],
-        "playerCount": [
+        "playerLimit": [
           2,
           3,
           4,
@@ -94,31 +94,31 @@
         ],
         "playerType": [
           {
-            "value": 0,
+            "value": "all",
             "text": "All Players"
           },
           {
-            "value": 1,
+            "value": "premium",
             "text": "Premium Players Only"
           }
         ],
         "formalAlliances": [
           {
-            "value": 0,
+            "value": "disabled",
             "text": "No Formal Alliances"
           },
           {
-            "value": 1,
+            "value": "enabled",
             "text": "Formal Alliances Enabled"
           }
         ],
         "anonymity": [
           {
-            "value": 0,
+            "value": "normal",
             "text": "Normal"
           },
           {
-            "value": 1,
+            "value": "extra",
             "text": "Extra"
           }
         ]
@@ -126,43 +126,43 @@
       "specialGalaxy": {
         "buildWarpgates": [
           {
-            "value": 0,
+            "value": "none",
             "text": "No"
           },
           {
-            "value": 1,
+            "value": "cheap",
             "text": "Cheap"
           },
           {
-            "value": 2,
+            "value": "expensive",
             "text": "Expensive"
           }
         ],
         "randomGates": [
           {
-            "value": 0,
+            "value": "none",
             "text": "No"
           },
           {
-            "value": 1,
+            "value": "rare",
             "text": "Rare"
           },
           {
-            "value": 2,
+            "value": "common",
             "text": "Common"
           }
         ],
         "darkGalaxy": [
           {
-            "value": 0,
+            "value": "disabled",
             "text": "Disabled"
           },
           {
-            "value": 1,
+            "value": "enabled",
             "text": "Enabled"
           },
           {
-            "value": 2,
+            "value": "start",
             "text": "Dark Start Only"
           }
         ]
@@ -170,25 +170,21 @@
       "galaxy": {
         "galaxyType": [
           {
-            "value": 0,
+            "value": "hex",
             "text": "Random Hex"
           },
           {
-            "value": 1,
+            "value": "circular",
             "text": "Circular"
-          },
-          {
-            "value": 2,
-            "text": "Custom"
           }
         ],
         "starScatter": [
           {
-            "value": 0,
+            "value": "random",
             "text": "Random Scatter"
           },
           {
-            "value": 1,
+            "value": "rings",
             "text": "Twin Rings (Symmetrical)"
           }
         ],
@@ -212,29 +208,29 @@
         ],
         "startingDistance": [
           {
-            "value": 0,
+            "value": "close",
             "text": "Close"
           },
           {
-            "value": 1,
+            "value": "medium",
             "text": "Medium"
           },
           {
-            "value": 2,
+            "value": "far",
             "text": "Far"
           }
         ],
         "resources": [
           {
-            "value": 0,
+            "value": "sparse",
             "text": "Sparse"
           },
           {
-            "value": 1,
+            "value": "standard",
             "text": "Standard"
           },
           {
-            "value": 2,
+            "value": "plentiful",
             "text": "Plentiful"
           }
         ],
@@ -306,15 +302,15 @@
         },
         "developmentCost": [
           {
-            "value": 0,
+            "value": "cheap",
             "text": "Cheap"
           },
           {
-            "value": 1,
+            "value": "standard",
             "text": "Standard"
           },
           {
-            "value": 2,
+            "value": "expensive",
             "text": "Expensive"
           }
         ],
@@ -338,11 +334,11 @@
         ],
         "tradeScanning": [
           {
-            "value": 0,
+            "value": "all",
             "text": "Trade with all players"
           },
           {
-            "value": 1,
+            "value": "scanned",
             "text": "Trade with scanned players only"
           }
         ]
@@ -368,27 +364,27 @@
         ],
         "researchCosts": [
           {
-            "value": 0,
+            "value": "none",
             "text": "No"
           },
           {
-            "value": 1,
+            "value": "cheap",
             "text": "Cheap"
           },
           {
-            "value": 2,
+            "value": "normal",
             "text": "Normal"
           },
           {
-            "value": 3,
+            "value": "expensive",
             "text": "Expensive"
           },
           {
-            "value": 4,
+            "value": "veryExpensive",
             "text": "Very Expensive"
           },
           {
-            "value": 5,
+            "value": "crazyExpensive",
             "text": "Crazy Expensive"
           }
         ]
@@ -396,11 +392,11 @@
       "gameTime": {
         "time": [
           {
-            "value": 0,
+            "value": "realTime",
             "text": "Real Time"
           },
           {
-            "value": 1,
+            "value": "turnBased",
             "text": "Turn Based"
           }
         ],

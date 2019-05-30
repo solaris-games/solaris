@@ -2,38 +2,54 @@ const Game = require('./db/models/Game');
 
 module.exports = {
 
-    listOfficialGames() {
-        return Promise.resolve([
-            {
-                _id: 1,
-                name: 'New Player Game',
-                description: 'Test official game',
-                playerLimit: 8,
-                playerCount: 2
+    listOfficialGames(callback) {
+        Game.find({
+            'settings.general.createdByUserId': { $eq: null }
+        }).exec((err, docs) => {
+            if (err) {
+                return callback(err);
             }
-        ]);
-    },
 
-    listUserGames() {
-        return Promise.resolve([
-            {
-                _id: 1,
-                name: 'Test User Game',
-                description: 'Test user game',
-                playerLimit: 8,
-                playerCount: 2
-            }
-        ]);
-    },
-
-    getById(id) {
-        return Promise.resolve({
-            _id: id,
-            name: 'Test Game',
-            description: 'Test game',
-            playerLimit: 8,
-            playerCount: 2
+            return callback(null, docs);
         });
     },
 
+    listUserGames(callback) {
+        Game.find({
+            'settings.general.createdByUserId': { $ne: null }
+        }).exec((err, docs) => {
+            if (err) {
+                return callback(err);
+            }
+
+            return callback(null, docs);
+        });
+    },
+
+    getById(id, callback) {
+        Game.findById(id).exec((err, doc) => {
+            if (err) {
+                return callback(err);
+            }
+
+            return callback(null, doc);
+        });
+    },
+
+    create(settings, callback) {
+        let game = new Game({
+            settings
+        });
+
+        game._doc.galaxy.state.stars = game._doc.settings.galaxy.starsPerPlayer * 10;
+        game._doc.galaxy.state.starsForVictory = (game._doc.galaxy.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
+
+        game.save((err, doc) => {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, doc);
+        });
+    }
 };

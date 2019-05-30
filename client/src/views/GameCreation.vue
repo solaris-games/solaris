@@ -2,7 +2,7 @@
   <div class="container bg-light">
     <view-title title="Create Game" />
 
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="handleSubmit" v-if="settings">
       <view-subtitle title="Game Settings"/>
 
       <div class="form-group row">
@@ -22,7 +22,7 @@
       <div class="form-group row">
         <label for="password" class="col-sm-2 col-form-label">Password</label>
         <div class="col-sm-10">
-          <input type="password" required="required" class="form-control" id="password" v-model="settings.general.password">
+          <input type="password" class="form-control" id="password" v-model="settings.general.password">
         </div>
       </div>
 
@@ -40,8 +40,8 @@
       <div class="form-group row">
         <label for="players" class="col-sm-2 col-form-label">Players</label>
         <div class="col-sm-10">
-          <select class="form-control" id="players" v-model="settings.general.playerCount">
-            <option v-for="opt in options.general.playerCount" v-bind:key="opt" v-bind:value="opt">
+          <select class="form-control" id="players" v-model="settings.general.playerLimit">
+            <option v-for="opt in options.general.playerLimit" v-bind:key="opt" v-bind:value="opt">
               {{ opt }} Players
             </option>
           </select>
@@ -480,7 +480,7 @@
         </div>
       </div>
 
-      <div class="form-group row" v-if="settings.gameTime.time === 0">
+      <div class="form-group row" v-if="settings.gameTime.time === 'realTime'">
         <label for="gameSpeed" class="col-sm-2 col-form-label">Game Speed</label>
         <div class="col-sm-10">
           <select class="form-control" id="gameSpeed" v-model="settings.gameTime.speed">
@@ -491,7 +491,7 @@
         </div>
       </div>
 
-      <div class="form-group row" v-if="settings.gameTime.time === 1">
+      <div class="form-group row" v-if="settings.gameTime.time === 'turnBased'">
         <label for="turnJumps" class="col-sm-2 col-form-label">Turn Jumps</label>
         <div class="col-sm-10">
           <select class="form-control" id="turnJumps" v-model="settings.gameTime.turnJumps">
@@ -553,10 +553,6 @@ export default {
 
       if (!this.settings.general.name) {
         this.errors.push("Game name required.");
-      }
-
-      if (!this.settings.general.password) {
-        this.errors.push("Password required.");
       }
 
       e.preventDefault();

@@ -3,9 +3,9 @@
     <view-title title="Game List" />
 
     <div v-for="game in serverGames" v-bind:key="game._id">
-        <h4>{{game.name}}</h4>
-        <img :src="getServerGameImage(game)">
-        <p>{{game.playerCount}} of {{game.playerLimit}} Players</p>
+        <h4>{{game.settings.general.name}}</h4>
+        <img :src="getServerGameImage(game.settings.general.name)">
+        <p>{{game.galaxy.state.playerCount}} of {{game.settings.general.playerLimit}} Players</p>
          
         <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
     </div>
@@ -24,8 +24,8 @@
         </thead>
         <tbody>
             <tr v-for="game in userGames" v-bind:key="game._id">
-                <td>{{game.name}}</td>
-                <td>{{game.playerCount}} of {{game.playerLimit}}</td>
+                <td>{{game.settings.general.name}}</td>
+                <td>{{game.galaxy.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
                 </td>
@@ -61,8 +61,14 @@ export default {
       }
   },
   methods: {
-      getServerGameImage(game) {
-          return require('../assets/cards/' + game.name.replace(/\s/g, '') + '.jpg');
+      getServerGameImage(name) {
+          try {
+            return require('../assets/cards/' + name.replace(/\s/g, '') + '.jpg');
+          } catch(err) {
+            console.error(err);
+
+            return '';
+          }
       }
   }
 };
