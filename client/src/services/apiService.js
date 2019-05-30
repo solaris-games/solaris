@@ -63,6 +63,17 @@ class ApiService {
         return axios.get('http://localhost:3000/api/game/' + id,
         { withCredentials: true });
     }
+
+    listOfficialGames() {
+        return axios.get('http://localhost:3000/api/game/list/official',
+        { withCredentials: true });
+    }
+
+    listUserGames() {
+        return axios.get('http://localhost:3000/api/game/list/user',
+        { withCredentials: true });
+    }
+    
 }
 
 export default new ApiService();

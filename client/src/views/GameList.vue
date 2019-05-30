@@ -5,7 +5,7 @@
     <div v-for="game in serverGames" v-bind:key="game._id">
         <h4>{{game.name}}</h4>
         <img :src="getServerGameImage(game)">
-        <p>{{game.playerCount}} of {{game.maxPlayers}} Players</p>
+        <p>{{game.playerCount}} of {{game.playerLimit}} Players</p>
          
         <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
     </div>
@@ -25,7 +25,7 @@
         <tbody>
             <tr v-for="game in userGames" v-bind:key="game._id">
                 <td>{{game.name}}</td>
-                <td>{{game.playerCount}} of {{game.maxPlayers}}</td>
+                <td>{{game.playerCount}} of {{game.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
                 </td>
@@ -37,6 +37,7 @@
 
 <script>
 import ViewTitle from "../components/ViewTitle";
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -44,23 +45,20 @@ export default {
   },
   data() {
       return {
-          serverGames: [
-              {
-                  _id: 1,
-                  name: 'New Player Game',
-                  playerCount: 1,
-                  maxPlayers: 8
-              }
-          ],
-          userGames: [
-              {
-                  _id: 2,
-                  name: 'Mr Test\'s Game',
-                  playerCount: 1,
-                  maxPlayers: 8
-              }
-          ]
+          serverGames: [],
+          userGames: []
       };
+  },
+  async mounted() {
+      try {
+        let response = await apiService.listOfficialGames();
+        this.serverGames = response.data;
+
+        response = await apiService.listUserGames();
+        this.userGames = response.data;
+      } catch(err) {
+          console.error(err);
+      }
   },
   methods: {
       getServerGameImage(game) {
