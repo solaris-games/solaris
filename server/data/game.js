@@ -1,6 +1,7 @@
 const Game = require('./db/models/Game');
 
 const mapHelper = require('./map');
+const playerHelper = require('./player');
 
 module.exports = {
 
@@ -48,7 +49,10 @@ module.exports = {
         game._doc.galaxy.state.starsForVictory = (game._doc.galaxy.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
 
         // Create all of the stars required.
-        game._doc.stars = mapHelper.generateStars(game._doc.galaxy.state.stars);
+        game._doc.galaxy.stars = mapHelper.generateStars(game._doc.galaxy.state.stars);
+
+        // Setup players and assign to their starting positions.
+        game._doc.galaxy.players = playerHelper.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);
 
         game.save((err, doc) => {
             if (err) {

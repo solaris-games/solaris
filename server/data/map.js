@@ -53,11 +53,22 @@ module.exports = {
     },
 
     getClosestStars(star, stars, amount) {
-        return stars.sort((a, b) => {
-            return module.exports.getDistanceBetweenStars(star, a)
-                - module.exports.getDistanceBetweenStars(star, b);
-        })
-        .splice(1, amount);
+        return stars
+            .sort((a, b) => {
+                return module.exports.getDistanceBetweenStars(star, a)
+                    - module.exports.getDistanceBetweenStars(star, b);
+            })
+            .splice(1, amount);
+    },
+
+    getClosestUnownedStars(star, stars, amount) {
+        return stars
+            .filter(s => !s.ownedByPlayerId)
+            .sort((a, b) => {
+                return module.exports.getDistanceBetweenStars(star, a)
+                    - module.exports.getDistanceBetweenStars(star, b);
+            })
+            .splice(1, amount);
     }
 
 };

@@ -1,6 +1,8 @@
 const starNames = require('./db/misc/starNames');
 const random = require('./random');
 
+const Star = require('./db/models/schemas/star');
+
 // Default starting values for resources.
 const minNaturalResources = 1,
     maxNaturalResources = 50,
