@@ -1,5 +1,7 @@
 const Game = require('./db/models/Game');
 
+const mapHelper = require('./map');
+
 module.exports = {
 
     listOfficialGames(callback) {
@@ -41,8 +43,12 @@ module.exports = {
             settings
         });
 
-        game._doc.galaxy.state.stars = game._doc.settings.galaxy.starsPerPlayer * 10;
+        // Calculate how many stars we need.
+        game._doc.galaxy.state.stars = game._doc.settings.galaxy.starsPerPlayer * game._doc.settings.general.playerLimit * 2.5;
         game._doc.galaxy.state.starsForVictory = (game._doc.galaxy.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
+
+        // Create all of the stars required.
+        game._doc.stars = mapHelper.generateStars(game._doc.galaxy.state.stars);
 
         game.save((err, doc) => {
             if (err) {
