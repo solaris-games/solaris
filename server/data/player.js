@@ -11,7 +11,7 @@ module.exports = {
         return {
             _id: mongoose.Types.ObjectId(),
             userId: null,
-            alias: '',
+            alias: 'Empty Slot',
             cash: gameSettings.player.startingCash
         };
     },

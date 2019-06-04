@@ -6,7 +6,7 @@ const carrierSchema = require('./carrier');
 const messageSchema = require('./message');
 
 const schema = new Schema({
-    userId: { type: Types.String, required: true },
+    userId: { type: Types.String, required: false, default: null },
     alias: { type: Types.String, required: true },
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },

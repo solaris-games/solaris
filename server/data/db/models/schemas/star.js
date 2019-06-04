@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
 const schema = new Schema({
-    ownedByPlayerId: { type: Types.String, required: true },
+    ownedByPlayerId: { type: Types.ObjectId, required: false, default: null },
     name: { type: Types.String, required: true },
     naturalResources: { type: Types.Number, required: true },
     terraformedResources: { type: Types.Number, required: true },
