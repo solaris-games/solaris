@@ -6,6 +6,8 @@ import store from './store'
 import 'bootstrap';
 import 'bootswatch/dist/darkly/bootstrap.min.css'
 
+import 'pixi.js'
+
 Vue.config.productionTip = false
 
 new Vue({
