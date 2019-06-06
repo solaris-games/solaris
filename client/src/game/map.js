@@ -2,44 +2,30 @@ import * as PIXI from 'pixi.js';
 import { logoTexture } from "../game/textures";
 import gameContainer from '../game/container';
 
+function drawStars(game) {
+    const container = new PIXI.Container();
+
+    const graphics = new PIXI.Graphics();
+    
+    // Draw all stars in their positions.
+    for (let i = 0; i < game.galaxy.stars.length; i++) {
+        let star = game.galaxy.stars[i];
+
+        graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
+        graphics.beginFill(0xFFFFFF, 1);
+        graphics.drawCircle(star.location.x, star.location.y, 2);
+        graphics.endFill();
+    }
+
+    container.addChild(graphics);
+
+    gameContainer.app.stage.addChild(container);
+}
+
 export default {
     draw(game) {
-        const container = new PIXI.Container();
+        drawStars(game);
 
-        gameContainer.app.stage.addChild(container);
-
-        // Create a new texture
-        const texture = logoTexture;
-
-        // Create a 5x5 grid of bunnies
-        for (let i = 0; i < 25; i++) {
-        const bunny = new PIXI.Sprite(texture);
-        bunny.anchor.set(0.5);
-        bunny.x = (i % 5) * 40;
-        bunny.y = Math.floor(i / 5) * 40;
-        container.addChild(bunny);
-        }
-
-        // Move container to the center
-        container.x = gameContainer.app.screen.width / 2;
-        container.y = gameContainer.app.screen.height / 2;
-
-        // Center bunny sprite in local container coordinates
-        container.pivot.x = container.width / 2;
-        container.pivot.y = container.height / 2;
-
-        // Listen for animate update
-        gameContainer.app.ticker.add(delta => {
-        // rotate the container!
-        // use delta to create frame-independent transform
-        container.rotation -= 0.01 * delta;
-        });
-
-        // Listen for animate update
-        gameContainer.app.ticker.add(delta => {
-        // rotate the container!
-        // use delta to create frame-independent transform
-        container.rotation -= 0.01 * delta;
-        });
+        // TODO: Draw other shit.
     }
 }
