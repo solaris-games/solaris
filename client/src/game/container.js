@@ -3,6 +3,8 @@ import {Viewport} from 'pixi-viewport';
 
 class GameContainer {
     constructor() {
+        PIXI.settings.SORTABLE_CHILDREN = true;
+
         this.app = new PIXI.Application({
             width: window.innerWidth,
             height: window.innerHeight,

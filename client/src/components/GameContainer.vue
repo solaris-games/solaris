@@ -4,6 +4,7 @@
 
 <script>
 import gameContainer from '../game/container'
+import map from '../game/map'
 
 export default {
   created() {
@@ -11,17 +12,25 @@ export default {
   },
   mounted() {
     this.$el.appendChild(gameContainer.app.view); // Add the pixi canvas to the element.
+    
+    gameContainer.viewport.on('zoomed', this.handleZoomed);
+    gameContainer.viewport.on('moved', this.handleZoomed);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
+    //gameContainer.viewport.removeEventListener('zoomed', this.handleZoomed);
   },
   methods: {
     handleResize(e) {
-      console.log(window.innerWidth + " " + window.innerHeight);
       gameContainer.app.renderer.resize(
         window.innerWidth,
         window.innerHeight
       );
+
+      map.refreshBackground();
+    },
+    handleZoomed(e) {
+      map.refreshBackground();
     }
   }
 };
@@ -29,7 +38,7 @@ export default {
 
 
 <style scoped>
-#gameContainer {
+div {
   position: absolute;
   z-index: -1;
   left: 0;
