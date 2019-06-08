@@ -8,7 +8,6 @@ import gameContainer from '../game/container'
 export default {
   created() {
     window.addEventListener("resize", this.handleResize);
-    window.addEventListener("wheel", this.handleWheel);
   },
   mounted() {
     this.$el.appendChild(gameContainer.app.view); // Add the pixi canvas to the element.
@@ -23,17 +22,6 @@ export default {
         window.innerWidth,
         window.innerHeight
       );
-    },
-    handleWheel(e) {
-      let direction = e.deltaY < e.deltaX ? 0.05 : -0.05;
-
-      gameContainer.app.stage.scale.x += direction;
-      gameContainer.app.stage.scale.y += direction;
-
-      // TODO: Work out how to move the camera to the mouse pointer.
-      //gameContainer.app.stage.transform.position = 
-
-      const app = new PIXI.Application()
     }
   }
 };
