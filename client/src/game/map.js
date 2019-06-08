@@ -28,6 +28,10 @@ function drawStars(game) {
         text.resolution = 10;
 
         container.addChild(text);
+
+        // Draw the star halo.
+        graphics.lineStyle(1, 0xFFFFFF);
+        graphics.drawCircle(star.location.x, star.location.y, star.naturalResources);
     }
 
     container.addChild(graphics);
