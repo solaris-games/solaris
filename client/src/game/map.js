@@ -1,37 +1,17 @@
 import * as PIXI from 'pixi.js';
 import { logoTexture } from "../game/textures";
 import gameContainer from '../game/container';
+import Star from './star';
 
 function drawStars(game) {
     const container = new PIXI.Container();
-
     const graphics = new PIXI.Graphics();
     
     // Draw all stars in their positions.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
-        let star = game.galaxy.stars[i];
+        let star = new Star(game.galaxy.stars[i]);
 
-        // Draw the star itself.
-        graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-        graphics.beginFill(0xFFFFFF, 1);
-        graphics.drawCircle(star.location.x, star.location.y, 2);
-        graphics.endFill();
-
-        // Draw the star name.
-        let text = new PIXI.Text(star.name, {
-            fontSize: 8,
-            fill: 0xFFFFFF
-        });
-
-        text.x = star.location.x - (text.width / 2);
-        text.y = star.location.y + 3;
-        text.resolution = 10;
-
-        container.addChild(text);
-
-        // Draw the star halo.
-        graphics.lineStyle(1, 0xFFFFFF);
-        graphics.drawCircle(star.location.x, star.location.y, star.naturalResources);
+        star.draw(container, graphics);
     }
 
     container.addChild(graphics);
