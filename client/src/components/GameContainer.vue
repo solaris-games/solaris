@@ -32,6 +32,8 @@ export default {
 
       // TODO: Work out how to move the camera to the mouse pointer.
       //gameContainer.app.stage.transform.position = 
+
+      const app = new PIXI.Application()
     }
   }
 };

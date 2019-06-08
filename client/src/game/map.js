@@ -18,8 +18,8 @@ function drawStars(game) {
     }
 
     container.addChild(graphics);
-
-    gameContainer.app.stage.addChild(container);
+    
+    gameContainer.viewport.addChild(container);
 }
 
 export default {
