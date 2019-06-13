@@ -8,8 +8,6 @@ class Background {
         this.height = height;
 
         this.nebulaCount = 3; // TODO: Should be calculated based on the size of the world.
-
-        console.log(this.nebulaCount);
     }
 
     draw() {

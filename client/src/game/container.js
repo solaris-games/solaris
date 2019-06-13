@@ -43,7 +43,13 @@ class GameContainer {
             .drag()
             .pinch()
             .wheel()
-            .decelerate({ friction: 0.9 });
+            .decelerate({ friction: 0.9 })
+            .clampZoom({
+                minWidth: 200,
+                minHeight: 200,
+                maxWidth: this.viewport.worldWidth * 2,
+                maxHeight: this.viewport.worldHeight * 2
+            });
     }
 
     _calculateWorldWidth(game) {
