@@ -1,9 +1,8 @@
 import * as PIXI from 'pixi.js';
 
 class Star {
-    constructor(container, graphics) {
+    constructor(container) {
         this.container = container;
-        this.graphics = graphics;
     }
 
     draw(data) {
@@ -18,15 +17,23 @@ class Star {
     }
 
     drawStar(data) {
-        this.graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-        this.graphics.beginFill(0xFFFFFF, 1);
-        this.graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
-        this.graphics.endFill();
+        let graphics = new PIXI.Graphics();
+
+        graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
+        graphics.beginFill(0xFFFFFF, 1);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
+        graphics.endFill();
+
+        this.container.addChild(graphics);
     }
 
     drawHalo() {
-        this.graphics.lineStyle(1, 0xFFFFFF, 0.1);
-        this.graphics.drawCircle(this.data.location.x, this.data.location.y, (this.data.naturalResources + 20) / 2);
+        let graphics = new PIXI.Graphics();
+
+        graphics.lineStyle(1, 0xFFFFFF, 0.1);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, (this.data.naturalResources + 20) / 2);
+
+        this.container.addChild(graphics);
     }
 
     drawName() {

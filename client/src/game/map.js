@@ -9,16 +9,12 @@ class Map {
     }
 
     draw(game) {
-        const graphics = new PIXI.Graphics();
-        
         // Draw all stars in their positions.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let star = new Star(this.container, graphics);
+            let star = new Star(this.container);
 
             star.draw(game.galaxy.stars[i]);
         }
-
-        this.container.addChild(graphics);
     }
 }
 
