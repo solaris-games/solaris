@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
+import Background from './background';
 
 class GameContainer {
     constructor() {
@@ -11,14 +12,25 @@ class GameContainer {
             backgroundColor: 0x000000, // black hexadecimal
             resolution: window.devicePixelRatio || 1
         });
+    }
+
+    setup(game) {
+        console.log(game);
+
+        this.app = new PIXI.Application({
+            width: this._calculateWorldWidth(game), //window.innerWidth,
+            height: this._calculateWorldHeight(game), //window.innerHeight,
+            backgroundColor: 0x000000, // black hexadecimal
+            resolution: window.devicePixelRatio || 1
+        });
 
         // create viewport
         this.viewport = new Viewport({
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
 
-            worldWidth: window.innerWidth,
-            worldHeight: window.innerHeight,
+            worldWidth: this._calculateWorldWidth(game),
+            worldHeight: this._calculateWorldHeight(game),
         
             interaction: this.app.renderer.plugins.interaction // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
         });
@@ -33,6 +45,14 @@ class GameContainer {
             .wheel()
             .decelerate({ friction: 0.9 });
     }
+
+    _calculateWorldWidth(game) {
+        return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
+    }
+
+    _calculateWorldHeight(game) {
+        return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.x;
+    }
 }
 
-export default new GameContainer();
+export default GameContainer;

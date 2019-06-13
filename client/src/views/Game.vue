@@ -1,14 +1,14 @@
 <template>
     <div>
         {{ game._id}}
-        <game-container/>
+        <game-container v-bind:game="game"/>
     </div>
 </template>
 
 <script>
 import GameContainer from "../components/GameContainer.vue";
 import apiService from '../services/apiService';
-import map from '../game/map';
+import Map from '../game/map';
 
 export default {
     components: {
@@ -23,9 +23,7 @@ export default {
         try {
             let response = await apiService.getGameInfo(this.$route.query.id);
 
-            this.game = response.data;
-
-            map.draw(this.game);
+            this.game = response.data; // This will be passed to the game container component.
         } catch(err) {
             console.error(err);
         }
