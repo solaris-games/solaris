@@ -32,15 +32,12 @@ module.exports = {
         return list;
     },
 
-    generateUnownedStar(name, maxX = 1000, maxY = 1000) {
+    generateUnownedStar(name, maxRadius = 1000) {
         return {
             name: name,
             naturalResources: random.getWeightedRandomNumberBetween(minNaturalResources, maxNaturalResources),
             terraformedResources: random.getWeightedRandomNumberBetween(minTerraformResources, maxTerraformResources),
-            location: {
-                x: random.getRandomNumberBetween(minX, maxX),
-                y: random.getRandomNumberBetween(minY, maxY)
-            }
+            location: random.getRandomPositionInCircle(maxRadius)
         };
     }
 }

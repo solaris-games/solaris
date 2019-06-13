@@ -15,7 +15,7 @@ module.exports = {
     generateStars(starCount) {
         const stars = [];
 
-        const maxXY = starCount * 3; // Square universe.
+        const maxRadius = starCount * 5; // Circle universe.
 
         const starNames = starHelper.getRandomStarNames(starCount);
 
@@ -24,18 +24,53 @@ module.exports = {
         do {
             const starName = starNames[index];
             
-            const star = starHelper.generateUnownedStar(starName, maxXY, maxXY);
+            const star = starHelper.generateUnownedStar(starName, maxRadius);
 
-            if (isDuplicateStarPosition(star, stars)) {
+            if (isDuplicateStarPosition(star, stars))
                 continue;
+
+            let isTooClose = false;
+
+            // Stars must be at least 30 away from eachother.
+            for(let i = 0; i < stars.length; i++) {
+                let otherStar = stars[i];
+                const distance = module.exports.getDistanceBetweenStars(star, otherStar);
+
+                if (distance < 30) {
+                    isTooClose = true;
+                    break;
+                }
             }
+
+            if (isTooClose)
+                continue;
 
             stars.push(star);
 
             index++;
         } while (stars.length < starCount);
 
+        // We need to sanitize all star positions to make sure that all
+        // x's and y's are positive integers otherwise rendering is a bitch.
+        module.exports.sanitizeStarPositions(stars);
+
         return stars;
+    },
+
+    sanitizeStarPositions(stars) {
+        // Get the min X and min Y and add them onto all stars.
+        // This will ensure that all stars have a positive x and y coordinate.
+        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
+        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
+
+        if (minX < 0) minX *= -1;
+        if (minY < 0) minY *= -1;
+
+        for(let i = 0; i < stars.length; i++) {
+            let star = stars[i];
+            star.location.x += minX;
+            star.location.y += minY;
+        }
     },
 
     getDistanceBetweenStars(star1, star2) {

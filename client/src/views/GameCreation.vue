@@ -555,6 +555,10 @@ export default {
         this.errors.push("Game name required.");
       }
 
+      if (!this.settings.general.description) {
+        this.errors.push("Game description required.");
+      }
+
       e.preventDefault();
 
       if (this.errors.length) return;
@@ -564,7 +568,7 @@ export default {
         let response = await apiService.createGame(this.settings);
         
         if (response.status === 201) {
-          router.push({ name: "game-detail", query: { id: response.data._id } });
+          router.push({ name: "game-detail", query: { id: response.data } });
         }
       } catch(err) {
         this.errors = err.response.data.errors || [];

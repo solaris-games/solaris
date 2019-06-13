@@ -2,11 +2,14 @@ import * as PIXI from 'pixi.js';
 import Nebula from './nebula';
 
 class Background {
-    constructor(container, width, height, nebulaCount = 2) {
+    constructor(container, width, height) {
         this.container = container;
         this.width = width;
         this.height = height;
-        this.nebulaCount = nebulaCount;
+
+        this.nebulaCount = 3; // TODO: Should be calculated based on the size of the world.
+
+        console.log(this.nebulaCount);
     }
 
     draw() {
@@ -26,8 +29,6 @@ class Background {
             neb2.draw();
             neb3.draw();
             neb4.draw();
-
-            console.log(i);
         }
     }
 };

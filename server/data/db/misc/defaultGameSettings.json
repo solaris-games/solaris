@@ -18,7 +18,7 @@
       "galaxy": {
         "galaxyType": "hex",
         "starScatter": "random",
-        "starsPerPlayer": 24,
+        "starsPerPlayer": 8,
         "startingDistance": "medium",
         "resources": "standard",
         "productionTicks": 24

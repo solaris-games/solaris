@@ -18,8 +18,8 @@ class GameContainer {
         console.log(game);
 
         this.app = new PIXI.Application({
-            width: this._calculateWorldWidth(game), //window.innerWidth,
-            height: this._calculateWorldHeight(game), //window.innerHeight,
+            width: window.innerWidth, //window.innerWidth,
+            height: window.innerHeight, //window.innerHeight,
             backgroundColor: 0x000000, // black hexadecimal
             resolution: window.devicePixelRatio || 1
         });
@@ -47,11 +47,17 @@ class GameContainer {
     }
 
     _calculateWorldWidth(game) {
-        return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
+        let min = game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
+        let max = game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
+
+        return max - min;
     }
 
     _calculateWorldHeight(game) {
-        return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.x;
+        let min = game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
+        let max = game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
+
+        return max - min;
     }
 }
 
