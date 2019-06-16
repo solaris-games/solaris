@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import Carrier from './carrier';
 
 class Star {
     constructor(container) {
@@ -9,11 +10,28 @@ class Star {
         return this.players.find(x => x._id === this.data.ownedByPlayerId);
     }
 
+    _getStarCarriers() {
+        // Get the player who owns the star.
+        let player = this._getStarPlayer();
+                
+        if (!player)
+            return [];
+
+        let carriersAtStar = player.carriers.filter(x => x.orbiting === this.data._id);
+
+        return carriersAtStar;
+    }
+
     draw(data, players) {
         this.data = data;
         this.players = players;
 
-        this.drawStar();
+        // If the star has a carrier, draw that instead of the star circle.
+        if (this._getStarCarriers().length)
+            this.drawCarrier();
+        else
+            this.drawStar();
+
         this.drawColour();
         this.drawHalo();
         this.drawName();
@@ -46,6 +64,17 @@ class Star {
         graphics.drawCircle(this.data.location.x, this.data.location.y, 5);
 
         this.container.addChild(graphics);
+    }
+
+    drawCarrier() {
+        let starCarriers = this._getStarCarriers();
+
+        if (!starCarriers.length)
+            return;
+            
+        let carrier = new Carrier(this.container, starCarriers[0]);
+
+        carrier.draw();
     }
 
     drawHalo() {
