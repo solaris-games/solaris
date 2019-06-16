@@ -5,10 +5,16 @@ class Star {
         this.container = container;
     }
 
-    draw(data) {
+    _getStarPlayer() {
+        return this.players.find(x => x._id === this.data.ownedByPlayerId);
+    }
+
+    draw(data, players) {
         this.data = data;
+        this.players = players;
 
         this.drawStar();
+        this.drawColour();
         this.drawHalo();
         this.drawName();
         this.drawGarrison();
@@ -16,13 +22,28 @@ class Star {
         this.drawPlayerName();
     }
 
-    drawStar(data) {
+    drawStar() {
         let graphics = new PIXI.Graphics();
 
         graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
         graphics.beginFill(0xFFFFFF, 1);
         graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
         graphics.endFill();
+
+        this.container.addChild(graphics);
+    }
+
+    drawColour() {
+        // Get the player who owns the star.
+        let player = this._getStarPlayer();
+        
+        if (!player)
+            return;
+            
+        let graphics = new PIXI.Graphics();
+
+        graphics.lineStyle(2, player.colour.value);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, 5);
 
         this.container.addChild(graphics);
     }

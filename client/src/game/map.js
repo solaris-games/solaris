@@ -13,7 +13,7 @@ class Map {
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let star = new Star(this.container);
 
-            star.draw(game.galaxy.stars[i]);
+            star.draw(game.galaxy.stars[i], game.galaxy.players);
         }
     }
 }
