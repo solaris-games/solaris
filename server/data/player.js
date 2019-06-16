@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+const colours = require('./db/misc/colours');
 const random = require('./random');
 const mapHelper = require('./map');
 
@@ -21,6 +22,9 @@ module.exports = {
 
         for(let i = 0; i < gameSettings.general.playerLimit; i++) {
             player = module.exports.createEmptyPlayer(gameSettings);
+
+            // Set the players colour based on their index position in the array.
+            player.colour = colours[i];
 
             // Find a starting position for the player by picking a random
             // home star.

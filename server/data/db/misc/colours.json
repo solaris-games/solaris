@@ -1,0 +1,34 @@
+[
+    {
+        "alias": "Blue",
+        "value": "#0000FF"
+    },
+    {
+        "alias": "Light Blue",
+        "value": "#009FDF"
+    },
+    {
+        "alias": "Green",
+        "value": "#40C000"
+    },
+    {
+        "alias": "Yellow",
+        "value": "#FFC000"
+    },
+    {
+        "alias": "Orange",
+        "value": "#DF5F00"
+    },
+    {
+        "alias": "Red",
+        "value": "#C00000"
+    },
+    {
+        "alias": "Pink",
+        "value": "#C000C0"
+    },
+    {
+        "alias": "Purple",
+        "value": "#6000C0"
+    }
+]
