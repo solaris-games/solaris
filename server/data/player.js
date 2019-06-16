@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 
 const colours = require('./db/misc/colours');
 const random = require('./random');
+
 const mapHelper = require('./map');
+const carrierHelper = require('./carrier');
 
 const Player = require('./db/models/schemas/player');
 
@@ -13,7 +15,8 @@ module.exports = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
-            cash: gameSettings.player.startingCash
+            cash: gameSettings.player.startingCash,
+            carriers: []
         };
     },
 
@@ -43,6 +46,11 @@ module.exports = {
             homeStar.economy = gameSettings.player.startingInfrastructure.economy;
             homeStar.industry = gameSettings.player.startingInfrastructure.industry;
             homeStar.science = gameSettings.player.startingInfrastructure.science;
+
+            // Create a carrier for the home star.
+            let homeCarrier = carrierHelper.createAtStar(homeStar);
+
+            player.carriers.push(homeCarrier);
 
             // Get X closest stars to the home star and also give those to
             // the player.

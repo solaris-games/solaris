@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const starNames = require('./db/misc/starNames');
 const random = require('./random');
 
@@ -34,6 +35,7 @@ module.exports = {
 
     generateUnownedStar(name, maxRadius = 1000) {
         return {
+            _id: mongoose.Types.ObjectId(),
             name: name,
             naturalResources: random.getWeightedRandomNumberBetween(minNaturalResources, maxNaturalResources),
             terraformedResources: random.getWeightedRandomNumberBetween(minTerraformResources, maxTerraformResources),

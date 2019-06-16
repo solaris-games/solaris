@@ -93,7 +93,7 @@ module.exports = {
                 return module.exports.getDistanceBetweenStars(star, a)
                     - module.exports.getDistanceBetweenStars(star, b);
             })
-            .splice(1, amount);
+            .splice(1, amount); // Splice 1 ignores the first star because it will be the current star.
     },
 
     getClosestUnownedStars(star, stars, amount) {
