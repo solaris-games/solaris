@@ -79,7 +79,7 @@ class Star {
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 15;
+        text.y = this.data.location.y + 14;
         text.resolution = 10;
 
         this.container.addChild(text);
@@ -101,7 +101,22 @@ class Star {
     }
 
     drawPlayerName() {
-        // TODO 
+        // Get the player who owns the star.
+        let player = this._getStarPlayer();
+        
+        if (!player)
+            return;
+
+        let text = new PIXI.Text(player.alias, {
+            fontSize: 8,
+            fill: 0xFFFFFF
+        });
+
+        text.x = this.data.location.x - (text.width / 2);
+        text.y = this.data.location.y + 22;
+        text.resolution = 10;
+
+        this.container.addChild(text);
     }
 }
 
