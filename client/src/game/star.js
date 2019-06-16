@@ -27,7 +27,7 @@ class Star {
         this.players = players;
 
         this.drawColour();
-        
+
         // If the star has a carrier, draw that instead of the star circle.
         if (this._getStarCarriers().length)
             this.drawCarrier();
