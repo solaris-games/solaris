@@ -89,21 +89,23 @@ module.exports = {
 
     getClosestStars(star, stars, amount) {
         return stars
+            .filter(s => s._id !== star._id) // Exclude the current star.
             .sort((a, b) => {
                 return module.exports.getDistanceBetweenStars(star, a)
                     - module.exports.getDistanceBetweenStars(star, b);
             })
-            .splice(1, amount); // Splice 1 ignores the first star because it will be the current star.
+            .splice(0, amount); // Splice 1 ignores the first star because it will be the current star.
     },
 
     getClosestUnownedStars(star, stars, amount) {
         return stars
+            .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => !s.ownedByPlayerId)
             .sort((a, b) => {
                 return module.exports.getDistanceBetweenStars(star, a)
                     - module.exports.getDistanceBetweenStars(star, b);
             })
-            .splice(1, amount);
+            .splice(0, amount);
     }
 
 };
