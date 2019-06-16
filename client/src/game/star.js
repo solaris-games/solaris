@@ -82,7 +82,7 @@ class Star {
         let graphics = new PIXI.Graphics();
 
         graphics.lineStyle(1, 0xFFFFFF, 0.1);
-        graphics.drawCircle(this.data.location.x, this.data.location.y, (this.data.naturalResources + 20) / 2);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2);
 
         this.container.addChild(graphics);
     }

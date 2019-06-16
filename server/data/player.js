@@ -4,6 +4,7 @@ const colours = require('./db/misc/colours');
 const random = require('./random');
 
 const mapHelper = require('./map');
+const starHelper = require('./star');
 const carrierHelper = require('./carrier');
 
 const Player = require('./db/models/schemas/player');
@@ -49,6 +50,7 @@ module.exports = {
             // Set up the home star
             homeStar.ownedByPlayerId = player._id;
             homeStar.garrison = gameSettings.player.startingShips;
+            homeStar.naturalResources = starHelper.DEFAULTS.MAX_NATURAL_RESOURCES; // Home stars should always get max resources.
             
             // ONLY the home star gets the starting infrastructure.
             homeStar.economy = gameSettings.player.startingInfrastructure.economy;

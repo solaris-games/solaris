@@ -4,15 +4,12 @@ const random = require('./random');
 
 const Star = require('./db/models/schemas/star');
 
-// Default starting values for resources.
-const minNaturalResources = 1,
-    maxNaturalResources = 50,
-    minTerraformResources = 1,
-    maxTerraformResources = 50,
-    minX = 0,
-    minY = 0;
-
 module.exports = {
+    DEFAULTS: {
+        MIN_NATURAL_RESOURCES: 10,
+        MAX_NATURAL_RESOURCES: 50
+    },
+
     starNames: starNames,
 
     getRandomStarName() {
@@ -37,9 +34,10 @@ module.exports = {
         return {
             _id: mongoose.Types.ObjectId(),
             name: name,
-            naturalResources: random.getWeightedRandomNumberBetween(minNaturalResources, maxNaturalResources),
-            terraformedResources: random.getWeightedRandomNumberBetween(minTerraformResources, maxTerraformResources),
+            naturalResources: random.getRandomNumberBetween(module.exports.DEFAULTS.MIN_NATURAL_RESOURCES, module.exports.DEFAULTS.MAX_NATURAL_RESOURCES),
+            terraformedResources: 0, // TODO: This is calculated based on the player's tech level.
             location: random.getRandomPositionInCircle(maxRadius)
         };
     }
+
 }
