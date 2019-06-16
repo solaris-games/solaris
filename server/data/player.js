@@ -8,6 +8,13 @@ const carrierHelper = require('./carrier');
 
 const Player = require('./db/models/schemas/player');
 
+function isTooCloseStartingPosition(homeStar, stars) {
+    let closestStar = mapHelper.getClosestOwnedStars(homeStar, stars, 1)[0];
+    let distanceToClosest = mapHelper.getDistanceBetweenStars(homeStar, closestStar);
+    
+    return distanceToClosest > 1000;
+}
+
 module.exports = {
     
     createEmptyPlayer(gameSettings) {
@@ -36,7 +43,8 @@ module.exports = {
             do {
                 homeStar = allStars[random.getRandomNumberBetween(0, allStars.length)];
             }
-            while (homeStar.ownedByPlayerId);
+            while (homeStar.ownedByPlayerId 
+                && !isTooCloseStartingPosition(homeStar, allStars));
 
             // Set up the home star
             homeStar.ownedByPlayerId = player._id;
@@ -67,5 +75,5 @@ module.exports = {
 
         return players;
     }
-
+    
 }

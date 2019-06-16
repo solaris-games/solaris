@@ -106,6 +106,17 @@ module.exports = {
                     - module.exports.getDistanceBetweenStars(star, b);
             })
             .splice(0, amount);
+    },
+
+    getClosestOwnedStars(star, stars, amount) {
+        return stars
+            .filter(s => s._id !== star._id) // Exclude the current star.
+            .filter(s => s.ownedByPlayerId)
+            .sort((a, b) => {
+                return module.exports.getDistanceBetweenStars(star, a)
+                    - module.exports.getDistanceBetweenStars(star, b);
+            })
+            .splice(0, amount);
     }
 
 };
