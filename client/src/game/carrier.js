@@ -24,6 +24,7 @@ class Carrier {
         graphics.pivot.set(this.data.location.x, this.data.location.y);
         graphics.position.x = this.data.location.x;
         graphics.position.y = this.data.location.y;
+        graphics.scale.set(1.5)
 
         // graphics.angle = 90;
 

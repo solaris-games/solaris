@@ -26,13 +26,14 @@ class Star {
         this.data = data;
         this.players = players;
 
+        this.drawColour();
+        
         // If the star has a carrier, draw that instead of the star circle.
         if (this._getStarCarriers().length)
             this.drawCarrier();
         else
             this.drawStar();
 
-        this.drawColour();
         this.drawHalo();
         this.drawName();
         this.drawGarrison();
@@ -44,8 +45,8 @@ class Star {
         let graphics = new PIXI.Graphics();
 
         graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-        graphics.beginFill(0xFFFFFF, 1);
-        graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
+        graphics.beginFill(0xFFFFFF);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, 3);
         graphics.endFill();
 
         this.container.addChild(graphics);
@@ -61,7 +62,7 @@ class Star {
         let graphics = new PIXI.Graphics();
 
         graphics.lineStyle(2, player.colour.value);
-        graphics.drawCircle(this.data.location.x, this.data.location.y, 5);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, 6);
 
         this.container.addChild(graphics);
     }
