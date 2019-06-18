@@ -1,18 +1,21 @@
 <template>
     <div>
         {{ game._id}}
+        <main-bar v-bind:game="game"/>
         <game-container v-bind:game="game"/>
     </div>
 </template>
 
 <script>
 import GameContainer from "../components/GameContainer.vue";
+import MainBar from '../components/game-menu/MainBar.vue';
 import apiService from '../services/apiService';
 import Map from '../game/map';
 
 export default {
     components: {
-        'game-container': GameContainer
+        'game-container': GameContainer,
+        'main-bar': MainBar
     },
     data() {
         return {
