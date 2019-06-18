@@ -30,6 +30,7 @@ img {
 
 .list-group-item {
     padding: 0;
+    border: 0;
 }
 
 .colour-bar {

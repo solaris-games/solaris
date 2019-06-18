@@ -59,5 +59,8 @@ div {
   z-index: -1;
   left: 0;
   top: 0;
+  margin: 0;
+  height: 100%; 
+  overflow: hidden;
 }
 </style>

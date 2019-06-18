@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{ game._id}}
+        <span class="d-none">{{ game._id}}</span>
         <main-bar v-bind:game="game"/>
         <game-container v-bind:game="game"/>
     </div>
