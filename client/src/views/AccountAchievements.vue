@@ -2,20 +2,7 @@
   <div class="container bg-light">
     <view-title title="Achievements" />
 
-    <div class="row">
-      <div class="col text-center bg-primary pt-2 pb-2">
-        <h5>Victories</h5>
-        <h2><i class="fas fa-trophy"></i> {{ achievements.victories }}</h2>
-      </div>
-      <div class="col text-center bg-secondary pt-2 pb-2">
-        <p>Rank</p>
-        <h2><i class="fas fa-star"></i> {{ achievements.rank }}</h2>
-      </div>
-      <div class="col text-center bg-primary pt-2 pb-2">
-        <p>Renown</p>
-        <h2><i class="fas fa-heart"></i> {{ achievements.renown }}</h2>
-      </div>
-    </div>
+    <achievements v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
 
     <p class="text-center pt-3">Read more about <a href="">Victory, Rank and Renown</a>.</p>
 
@@ -178,12 +165,14 @@
 <script>
 import ViewTitle from '../components/ViewTitle';
 import ViewSubtitle from '../components/ViewSubtitle';
+import Achievements from '../components/Achievements';
 import apiService from '../services/apiService';
 
 export default {
   components: {
     'view-title': ViewTitle,
-    'view-subtitle': ViewSubtitle
+    'view-subtitle': ViewSubtitle,
+    'achievements': Achievements
   },
   data() {
     return {
