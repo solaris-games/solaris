@@ -1,7 +1,7 @@
 <template>
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item" v-for="p in players" v-bind:key="p._id">
-            <img src="../../assets/avatars/0.jpg">
+            <img src="../../../assets/avatars/0.jpg">
 
             <div class="colour-bar" v-bind:style="{'background-color':getFriendlyColour(p.colour.value)}">
             </div>

@@ -33,9 +33,9 @@
 </template>
 
 <script>
-import router from '../../router';
+import router from '../../../router';
 import { setInterval } from 'timers';
-import MENU_STATES from '../data/menuStates';
+import MENU_STATES from '../../data/menuStates';
 
 export default {
     props: {

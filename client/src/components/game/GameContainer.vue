@@ -4,9 +4,9 @@
 
 <script>
 import * as PIXI from 'pixi.js';
-import GameContainer from '../game/container';
-import Background from '../game/background';
-import Map from '../game/map';
+import GameContainer from '../../game/container';
+import Background from '../../game/background';
+import Map from '../../game/map';
 
 export default {
   props: {

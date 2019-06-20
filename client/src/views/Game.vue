@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import GameContainer from "../components/GameContainer.vue";
-import MainBar from '../components/game-menu/MainBar.vue';
+import GameContainer from "../components/game/GameContainer.vue";
+import MainBar from '../components/game/menu/MainBar.vue';
 import apiService from '../services/apiService';
 import Map from '../game/map';
 

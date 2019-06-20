@@ -17,7 +17,7 @@
 <script>
 import GameInfo from './GameInfo.vue';
 import PlayerList from './PlayerList.vue';
-import MENU_STATES from '../data/menuStates';
+import MENU_STATES from '../../data/menuStates';
 
 export default {
     components: {

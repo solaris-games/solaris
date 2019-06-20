@@ -165,7 +165,7 @@
 <script>
 import ViewTitle from '../components/ViewTitle';
 import ViewSubtitle from '../components/ViewSubtitle';
-import Achievements from '../components/Achievements';
+import Achievements from '../components/game/player/Achievements';
 import apiService from '../services/apiService';
 
 export default {
