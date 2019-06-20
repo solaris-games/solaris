@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const game = require('../data/game');
+const gameHelper = require('../data/game');
 
 router.get('/defaultSettings', (req, res, next) => {
     return res.status(200).json(require('../data/db/misc/defaultGameSettings.json'));
@@ -9,7 +9,7 @@ router.get('/defaultSettings', (req, res, next) => {
 router.post('/', (req, res, next) => {
     req.body.general.createdByUserId = req.session.userId;
 
-    game.create(req.body, (err, game) => {
+    gameHelper.create(req.body, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -19,7 +19,7 @@ router.post('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-    game.getById(req.params.id, (err, game) => {
+    gameHelper.getById(req.params.id, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -29,7 +29,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 router.get('/list/official', (req, res, next) => {
-    game.listOfficialGames((err, games) => {
+    gameHelper.listOfficialGames((err, games) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -39,7 +39,7 @@ router.get('/list/official', (req, res, next) => {
 });
 
 router.get('/list/user', (req, res, next) => {
-    game.listUserGames((err, games) => {
+    gameHelper.listUserGames((err, games) => {
         if (err) {
             return res.status(401).json(err);
         }

@@ -16,8 +16,12 @@ class ApiService {
         return axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
     }
 
-    getUserInfo() {
-        return axios.get('http://localhost:3000/api/user/me', { withCredentials: true });
+    getMyUserInfo() {
+        return axios.get('http://localhost:3000/api/user', { withCredentials: true });
+    }
+
+    getUserInfo(userId) {
+        return axios.get('http://localhost:3000/api/user/' + userId, { withCredentials: true });
     }
 
     createUser(username, email, password) {

@@ -61,7 +61,7 @@ export default {
     };
   },
   async mounted() {
-    let response = await apiService.getUserInfo();
+    let response = await apiService.getMyUserInfo();
       
     if (response.status === 200) {
       this.info = response.data;

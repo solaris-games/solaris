@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group list-group-horizontal">
-        <li class="list-group-item" v-for="p in players" v-bind:key="p._id">
+        <li class="list-group-item" v-for="p in players" v-bind:key="p._id" v-on:click="onPlayerSelected(p)">
             <img src="../../../assets/avatars/0.jpg">
 
             <div class="colour-bar" v-bind:style="{'background-color':getFriendlyColour(p.colour.value)}">
@@ -17,6 +17,9 @@ export default {
     methods: {
         getFriendlyColour(colour) {
             return colour.replace('0x', '#');
+        },
+        onPlayerSelected(player) {
+            this.$emit('onPlayerSelected', player);
         }
     }
 }

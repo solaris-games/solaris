@@ -76,6 +76,6 @@ module.exports = {
         }
 
         return players;
-    }
-    
+    },
+
 }

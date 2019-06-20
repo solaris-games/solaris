@@ -181,7 +181,7 @@ export default {
   },
   async mounted() {
     try {
-      let response = await apiService.getUserInfo();
+      let response = await apiService.getMyUserInfo();
 
       this.achievements = response.data.achievements;
     } catch(err) {

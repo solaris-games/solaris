@@ -67,17 +67,33 @@ router.post('/', (req, res, next) => {
     });
 });
 
-router.get('/me', middleware.authenticate, (req, res, next) => {
-    User.findById(req.session.userId, (err, user) => {
+router.get('/', middleware.authenticate, (req, res, next) => {
+    User.findById(req.session.userId, {
+        // Remove fields we don't want to send back.
+        password: 0,
+        premiumEndDate: 0
+    }, (err, user) => {
         if (err) {
             return next(err);
         }
 
-        // Remove any props we don't want to send back.
-        user = user.toObject();
-        
-        delete user.password;
-        delete user.premiumEndDate;
+        return res.status(200).json(user);
+    });
+});
+
+router.get('/:id', middleware.authenticate, (req, res, next) => {
+    User.findById(req.params.id, {
+        // Remove fields we don't want to send back.
+        password: 0,
+        premiumEndDate: 0,
+        credits: 0,
+        email: 0,
+        emailEnabled: 0,
+        username: 0
+    }, (err, user) => {
+        if (err) {
+            return next(err);
+        }
 
         return res.status(200).json(user);
     });
