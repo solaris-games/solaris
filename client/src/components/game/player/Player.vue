@@ -1,17 +1,21 @@
 <template>
 <div class="container bg-secondary">
-    <h3>{{player.alias}}</h3>
+    <h3 class="pt-2">Player</h3>
+
+    <overview :player="player"/>
 
     <achievements />
 </div>
 </template>
 
 <script>
+import Overview from './Overview';
 import Achievements from './Achievements';
 import apiService from '../../../services/apiService';
 
 export default {
     components: {
+        'overview': Overview,
         'achievements': Achievements
     },
     props: {

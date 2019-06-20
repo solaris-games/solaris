@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="menu">
     <game-info v-bind:credits="500" v-bind:nextProduction="new Date()" @onMenuStateChanged="onMenuStateChanged"/>
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
@@ -56,7 +56,13 @@ export default {
 </script>
 
 <style scoped>
-div {
-    width: 480px;
+.menu {
+    width: 473px;
+}
+
+@media(max-width: 473px) {
+    .menu {
+        width: 100%;
+    }
 }
 </style>

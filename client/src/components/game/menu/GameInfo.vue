@@ -1,8 +1,8 @@
 <template>
 <div class="bg-primary">
-    <div class="container">
+    <div class="container-fluid">
         <div class="row no-gutters pt-2 pb-2">
-            <div class="col-1 dropdown">
+            <div class="col-auto dropdown">
                 <button class="btn btn-sm btn-info" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -16,13 +16,13 @@
                     <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
                 </div>
             </div>
-            <div class="col-4 text-center">
+            <div class="col-auto ml-3 mr-2 text-center">
                 <span class="align-middle">Credits: ${{credits}}</span>
             </div>
-            <div class="col-6 text-center">
+            <div class="col text-center">
                 <span class="align-middle">Production: {{timeRemaining}}</span>
             </div>
-            <div class="col-1">
+            <div class="col-auto">
                 <button class="btn btn-sm btn-info" v-on:click="setMenuState(MENU_STATES.INBOX)">
                     <i class="fas fa-inbox"></i>
                 </button>
@@ -65,7 +65,23 @@ export default {
             let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
             let secs = Math.floor((t % (1000 * 60)) / 1000);
 
-            return `${days}d ${hours}h ${mins}m ${secs}s`;
+            let str = '';
+
+            if (days > 0) {
+                str += `${days}d `;
+            }
+
+            if (hours > 0) {
+                str += `${hours}h `;
+            }
+
+            if (mins > 0) {
+                str += `${mins}m `;
+            }
+
+            str += `${secs}s`;
+
+            return str;
         }
     },
     methods: {
