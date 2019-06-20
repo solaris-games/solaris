@@ -18,10 +18,11 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col pr-0">
             <table class="table table-sm mb-0">
                 <thead>
                     <tr>
+                        <th></th>
                         <th></th>
                         <th class="text-center">You</th>
                     </tr>
@@ -30,17 +31,21 @@
                     <tr>
                         <td>Total Stars</td>
                         <td class="text-center">0</td>
+                        <td class="text-center">0</td>
                     </tr>
                     <tr>
                         <td>Total Carriers</td>
                         <td class="text-center">{{player.carriers.length}}</td>
+                        <td class="text-center">0</td>
                     </tr>
                     <tr>
                         <td>Total Ships</td>
                         <td class="text-center">0</td>
+                        <td class="text-center">0</td>
                     </tr>
                     <tr>
                         <td>New Ships</td>
+                        <td class="text-center">0</td>
                         <td class="text-center">0</td>
                     </tr>
                 </tbody>

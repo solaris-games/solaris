@@ -16,7 +16,7 @@
                     <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
                 </div>
             </div>
-            <div class="col-auto ml-3 mr-2 text-center">
+            <div class="col-auto ml-4 mr-2 text-center">
                 <span class="align-middle">Credits: ${{credits}}</span>
             </div>
             <div class="col text-center">

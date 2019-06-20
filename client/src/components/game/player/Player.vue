@@ -3,8 +3,10 @@
     <h3 class="pt-2">Player</h3>
 
     <overview :player="player"/>
-
-    <achievements />
+    
+    <achievements v-if="user" :victories="user.achievements.victories"
+                    :rank="user.achievements.rank"
+                    :renown="user.achievements.renown"/>
 </div>
 </template>
 

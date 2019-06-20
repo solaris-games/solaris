@@ -57,6 +57,7 @@ export default {
 
 <style scoped>
 .menu {
+    position:absolute; /* This is a must otherwise the div overlays the map */
     width: 473px;
 }
 
