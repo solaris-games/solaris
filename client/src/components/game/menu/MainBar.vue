@@ -4,7 +4,6 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div v-if="currentMenuState == MENU_STATES.LEADERBOARD">LEADERBOARD</div>
     <div v-if="currentMenuState == MENU_STATES.RESEARCH">RESEARCH</div>
     <div v-if="currentMenuState == MENU_STATES.GALAXY">GALAXY</div>
     <div v-if="currentMenuState == MENU_STATES.INTEL">INTEL</div>
@@ -12,6 +11,7 @@
     <div v-if="currentMenuState == MENU_STATES.HELP">HELP</div>
     <div v-if="currentMenuState == MENU_STATES.INBOX">INBOX</div>
     
+    <leaderboard v-if="currentMenuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="currentMenuState == MENU_STATES.PLAYER" :game="game" :player="currentMenuArguments" :key="currentMenuArguments._id"/>
 </div>
 </template>
@@ -19,6 +19,7 @@
 <script>
 import GameInfo from './GameInfo.vue';
 import PlayerList from './PlayerList.vue';
+import Leaderboard from '../leaderboard/Leaderboard.vue';
 import Player from '../player/Player.vue';
 import MENU_STATES from '../../data/menuStates';
 
@@ -26,6 +27,7 @@ export default {
     components: {
         'game-info': GameInfo,
         'player-list': PlayerList,
+        'leaderboard': Leaderboard,
         'player': Player
     },
     props: {
