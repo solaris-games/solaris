@@ -27,11 +27,14 @@
 <script>
 import axios from 'axios';
 import router from "../router";
+import store from '../store';
 import apiService from '../services/apiService';
 
 export default {
   methods: {
     async logout() {
+      this.$store.commit('clearUserId');
+
       await apiService.logout();
       
       router.push({ name: "home" });

@@ -11,6 +11,7 @@
     <div v-if="currentMenuState == MENU_STATES.HELP">HELP</div>
     <div v-if="currentMenuState == MENU_STATES.INBOX">INBOX</div>
     
+    <welcome v-if="currentMenuState == MENU_STATES.WELCOME" :game="game"/>
     <leaderboard v-if="currentMenuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="currentMenuState == MENU_STATES.PLAYER" :game="game" :player="currentMenuArguments" :key="currentMenuArguments._id"/>
 </div>
@@ -19,6 +20,7 @@
 <script>
 import GameInfo from './GameInfo.vue';
 import PlayerList from './PlayerList.vue';
+import Welcome from '../welcome/Welcome.vue';
 import Leaderboard from '../leaderboard/Leaderboard.vue';
 import Player from '../player/Player.vue';
 import MENU_STATES from '../../data/menuStates';
@@ -26,6 +28,7 @@ import MENU_STATES from '../../data/menuStates';
 export default {
     components: {
         'game-info': GameInfo,
+        'welcome': Welcome,
         'player-list': PlayerList,
         'leaderboard': Leaderboard,
         'player': Player
@@ -39,6 +42,12 @@ export default {
             currentMenuArguments: null,
             MENU_STATES: MENU_STATES
         };
+    },
+    mounted() {
+        // Check if the user is in this game, if not then show the welcome screen.
+        let thisPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
+
+        this.currentMenuState = thisPlayer ? 'leaderboard' : 'welcome';
     },
     methods: {
         resetMenuState() {

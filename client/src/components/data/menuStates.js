@@ -1,5 +1,6 @@
 export default {
     NONE: null,
+    WELCOME: 'welcome',
     LEADERBOARD: 'leaderboard',
     RESEARCH: 'research',
     GALAXY: 'galaxy',

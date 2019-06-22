@@ -40,7 +40,7 @@ router.post('/login', (req, res, next) => {
                     // Store the user id in the session.
                     req.session.userId = user._id;
 
-                    return res.sendStatus(200);
+                    return res.status(200).json({id: user._id});
                 } else {
                     return res.status(400).json({
                         errors: [

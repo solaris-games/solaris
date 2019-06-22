@@ -87,6 +87,8 @@ export default {
 			let response = await apiService.createUser(this.username, this.email, this.password);
 
 			if (response.status === 201) {
+        this.$store.commit('setUserId', response.data.id);
+
 				router.push({ name: "main-menu" });
 			}
 		} catch (err) {
