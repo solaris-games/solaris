@@ -45,16 +45,16 @@ class GameContainer {
             .wheel()
             .decelerate({ friction: 0.9 })
             .clamp({
-                left: -250,
-                right: this.viewport.worldWidth + 250,
-                top: -250,
-                bottom: this.viewport.worldHeight + 250
+                left: -500,
+                right: this.viewport.worldWidth + 500,
+                top: -500,
+                bottom: this.viewport.worldHeight + 500
             })
             .clampZoom({
                 minWidth: 250,
                 minHeight: 250,
                 maxWidth: this.viewport.worldWidth * 2,
-                maxHeight: this.viewport.worldHeight * 2
+                maxHeight: this.viewport.worldHeight
             });
     }
 
