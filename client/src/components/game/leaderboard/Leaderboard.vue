@@ -20,14 +20,16 @@
             <tbody>
                 <tr v-for="player in game.galaxy.players" :key="player._id">
                     <td :style="{'width': '8px', 'background-color':player.colour.value.replace('0x', '#')}"></td>
-                    <td>
+                    <td class="col-avatar">
                         <img src="../../../assets/avatars/0.jpg">
                     </td>
-                    <td>
-                        <h5>{{player.alias}}</h5>
+                    <td class="pl-2 pt-3 pb-2">
+                        <h5 style="vertical-align: middle;">{{player.alias}}</h5>
                     </td>
-                    <td>0 Stars</td>
-                    <td>
+                    <td class="fit pt-3 pr-2">
+                        <span>0 Stars</span>
+                    </td>
+                    <td class="fit pt-2 pb-2 pr-2">
                         <button class="btn btn-info"><i class="fas fa-eye"></i></button>
                     </td>
                 </tr>
@@ -49,5 +51,19 @@ export default {
 img {
     height: 48px;
     width: 48px;
+}
+
+.col-avatar {
+    width: 48px;
+}
+
+.table-sm td {
+    padding: 0;
+}
+
+.table td.fit, 
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
 }
 </style>

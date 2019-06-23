@@ -2,14 +2,18 @@
 <div class="container bg-secondary">
     <h3 class="pt-2">Welcome</h3>
 
-    <select-race />
+    <select-race v-on:onRaceChanged="onRaceChanged"/>
     <select-alias v-on:onAliasChanged="onAliasChanged"/>
-    <select-location />
 
-    <form-error-list v-bind:errors="errors"/>
+    <form-error-list v-bind:errors="errors" class="mt-2"/>
 
-    <div class="mb-2">
-        <button type="button" class="btn btn-success btn-block" @click="join">Join Game</button>
+    <select-location :game="game" v-on:onJoinRequested="onJoinRequested"/>
+
+    <div class="text-center">
+        <p>Invite your friends and take on the Galaxy together!</p>
+
+        <p class="mb-0">Send them this address!</p>
+        <p class="text-info"><i>/#/game?id={{game._id}}</i></p>
     </div>
 </div>
 </template>
@@ -27,28 +31,36 @@ export default {
         'select-alias': SelectAliasVue,
         'select-location': SelectLocationVue
     },
+    props: {
+        game: Object
+    },
     data() {
         return {
             errors: [],
-            _alias: ''
+            _alias: '',
+            _race: 0
         };
     },
     methods: {
         onAliasChanged(e) {
             this._alias = e;
         },
-        join() {
+        onRaceChanged(e) {
+            this._race = e;
+            console.log(e);
+        },
+        onJoinRequested(player) {
             this.errors = [];
 
             if (!this._alias) {
                 this.errors.push("Alias is required.");
             }
 
-            if (this._alias.length < 3) {
+            if (this._alias && this._alias.length < 3) {
                 this.errors.push("Alias must be 3 characters or more.");
             }
 
-            if (this._alias.length > 24) {
+            if (this._alias && this._alias.length > 24) {
                 this.errors.push("Alias must less than 24 characters.");
             }
 
