@@ -18,7 +18,7 @@ export default {
   },
 
   mounted() {
-    this.gameContainer = new GameContainer();
+    this.gameContainer = GameContainer;
     this.gameContainer.setup(this.game);
     
     // Draw the background
@@ -28,7 +28,7 @@ export default {
     this.gameContainer.viewport.addChild(background.container);
 
     // Draw the map
-    let map = new Map(new PIXI.Container());
+    let map = Map;
     map.draw(this.game);
 
     this.gameContainer.viewport.addChild(map.container);

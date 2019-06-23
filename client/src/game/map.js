@@ -4,8 +4,8 @@ import Star from './star';
 import Background from './background';
 
 class Map {
-    constructor(container) {
-        this.container = container;
+    constructor() {
+        this.container = new PIXI.Container();
     }
 
     draw(game) {
@@ -16,6 +16,15 @@ class Map {
             star.draw(game.galaxy.stars[i], game.galaxy.players);
         }
     }
+
+    zoomToPlayer(game, player) {
+        // Find the home star the player owns.
+        let homeStar = game.galaxy.stars.find(x => {
+            return x.ownedByPlayerId === player._id && x.economy === 5 // TODO: Need to work out home star.
+        });
+
+        gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y);
+    }
 }
 
-export default Map;
+export default new Map();

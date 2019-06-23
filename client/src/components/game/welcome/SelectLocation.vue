@@ -3,7 +3,7 @@
     <div class="row text-center bg-primary">
         <div class="col">
             <p class="mb-0 mt-2">Select a colour and starting location.</p>
-            <p>(Step 3 of 3)</p>
+            <p class="mb-2">(Step 3 of 3)</p>
         </div>
     </div>
 
@@ -19,7 +19,7 @@
                         <h5 style="vertical-align: middle;">{{player.alias}}</h5>
                     </td>
                     <td class="fit pl-2 pt-2 pb-2 pr-2">
-                        <button class="btn btn-info"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
                         <button class="btn btn-success ml-1" @click="onJoinRequested(player)">Join</button>
                     </td>
                 </tr>
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import Map from '../../../game/map';
+
 export default {
     props: {
         game: Object
@@ -37,6 +39,9 @@ export default {
     methods: {
         onJoinRequested(player) {
             this.$emit('onJoinRequested', this.player);
+        },
+        zoomToPlayer(player) {
+            Map.zoomToPlayer(this.game, player);
         }
     }
 }

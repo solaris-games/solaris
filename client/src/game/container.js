@@ -73,4 +73,4 @@ class GameContainer {
     }
 }
 
-export default GameContainer;
+export default new GameContainer();

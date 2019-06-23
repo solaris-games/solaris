@@ -13,7 +13,7 @@
         <p>Invite your friends and take on the Galaxy together!</p>
 
         <p class="mb-0">Send them this address!</p>
-        <p class="text-info"><i>/#/game?id={{game._id}}</i></p>
+        <p class="text-info"><i>{{protocol}}//{{domain}}{{$route.fullPath}}</i></p>
     </div>
 </div>
 </template>
@@ -36,10 +36,15 @@ export default {
     },
     data() {
         return {
+            domain: '',
             errors: [],
             _alias: '',
             _race: 0
         };
+    },
+    mounted() {
+        this.protocol = window.location.protocol;
+        this.domain = window.location.host;
     },
     methods: {
         onAliasChanged(e) {

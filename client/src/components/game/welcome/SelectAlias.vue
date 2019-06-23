@@ -3,7 +3,7 @@
     <div class="row text-center bg-primary">
         <div class="col">
             <p class="mb-0 mt-2">Select a name for your commander in chief.</p>
-            <p>(Step 2 of 3)</p>
+            <p class="mb-2">(Step 2 of 3)</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
                 </div>
 
                 <div class="form-group">
-                    <input class="form-control" required="required" type="text" v-model="alias" v-on:keyup="onAliasChanged">
+                    <input class="form-control" required="required" placeholder="Enter your alias here" type="text" v-model="alias" v-on:keyup="onAliasChanged">
                 </div>
 
                 <div class="form-group text-center small">
