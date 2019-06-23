@@ -30,7 +30,7 @@
                         <span>0 Stars</span>
                     </td>
                     <td class="fit pt-2 pb-2 pr-2">
-                        <button class="btn btn-info"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
                     </td>
                 </tr>
             </tbody>
@@ -40,9 +40,16 @@
 </template>
 
 <script>
+import Map from '../../../game/map';
+
 export default {
     props: {
         game: Object
+    },
+    methods: {
+        zoomToPlayer(player) {
+            Map.zoomToPlayer(this.game, player);
+        }
     }
 }
 </script>
