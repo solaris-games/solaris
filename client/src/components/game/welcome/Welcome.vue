@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import apiService from '../../../services/apiService';
+
 import FormErrorListVue from '../../FormErrorList';
 import SelectRaceVue from './SelectRace.vue';
 import SelectAliasVue from './SelectAlias.vue';
@@ -39,7 +41,7 @@ export default {
             domain: '',
             errors: [],
             _alias: '',
-            _race: 0
+            _race: 38
         };
     },
     mounted() {
@@ -52,9 +54,8 @@ export default {
         },
         onRaceChanged(e) {
             this._race = e;
-            console.log(e);
         },
-        onJoinRequested(player) {
+        async onJoinRequested(playerId) {
             this.errors = [];
 
             if (!this._alias) {
@@ -70,6 +71,17 @@ export default {
             }
 
             if (this.errors.length) return;
+            
+            try {
+                debugger;
+                let response = await apiService.joinGame(this.game._id, playerId, this._race, this._alias);
+
+                if (response.status === 200) {
+                    this.$emit('onGameJoined', playerId);
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
     }
 }

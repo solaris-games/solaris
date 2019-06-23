@@ -20,7 +20,7 @@
                     </td>
                     <td class="fit pl-2 pt-2 pb-2 pr-2">
                         <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-success ml-1" @click="onJoinRequested(player)">Join</button>
+                        <button class="btn btn-success ml-1" @click="onJoinRequested(player)" v-if="!player.userId">Join</button>
                     </td>
                 </tr>
             </tbody>
@@ -38,7 +38,7 @@ export default {
     },
     methods: {
         onJoinRequested(player) {
-            this.$emit('onJoinRequested', this.player);
+            this.$emit('onJoinRequested', player._id);
         },
         zoomToPlayer(player) {
             Map.zoomToPlayer(this.game, player);

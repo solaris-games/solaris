@@ -77,6 +77,13 @@ class ApiService {
         return axios.get('http://localhost:3000/api/game/list/user',
         { withCredentials: true });
     }
+
+    joinGame(gameId, playerId, raceId, alias) {
+        return axios.post('http://localhost:3000/api/game/join', {
+            gameId, playerId, raceId, alias
+        },
+        { withCredentials: true });
+    }
     
 }
 

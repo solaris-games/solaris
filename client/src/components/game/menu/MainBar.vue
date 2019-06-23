@@ -11,7 +11,7 @@
     <div v-if="currentMenuState == MENU_STATES.HELP">HELP</div>
     <div v-if="currentMenuState == MENU_STATES.INBOX">INBOX</div>
     
-    <welcome v-if="currentMenuState == MENU_STATES.WELCOME" :game="game"/>
+    <welcome v-if="currentMenuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
     <leaderboard v-if="currentMenuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="currentMenuState == MENU_STATES.PLAYER" :game="game" :player="currentMenuArguments" :key="currentMenuArguments._id"/>
 </div>
@@ -61,6 +61,10 @@ export default {
         onPlayerSelected(player) {
             this.currentMenuState = MENU_STATES.PLAYER;
             this.currentMenuArguments = player;
+        },
+        onGameJoined() {
+            this.currentMenuState = MENU_STATES.LEADERBOARD;
+            this.currentMenuArguments = null;
         }
     }
 }

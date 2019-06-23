@@ -61,5 +61,30 @@ module.exports = {
 
             callback(null, doc);
         });
+    },
+
+    join(gameId, userId, playerId, raceId, alias, callback) {
+        module.exports.getById(gameId, (err, game) => {
+            if (err) {
+                return callback(err);
+            }
+
+            // Get the player and update it to assign the user to the player.
+            let player = game.galaxy.players.find(x => {
+                return x._id == playerId;
+            });
+
+            player.userId = userId;
+            player.raceId = raceId;
+            player.alias = alias;
+
+            game.save((err, doc) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                return callback(null, doc);
+            });
+        });
     }
 };
