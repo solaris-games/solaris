@@ -11,10 +11,7 @@
     <div v-if="currentMenuState == MENU_STATES.HELP">HELP</div>
     <div v-if="currentMenuState == MENU_STATES.INBOX">INBOX</div>
     
-    <select-race v-if="currentMenuState == MENU_STATES.SELECT_RACE" :game="game"/>
-    <select-alias v-if="currentMenuState == MENU_STATES.SELECT_ALIAS" :game="game"/>
-    <select-location v-if="currentMenuState == MENU_STATES.SELECT_LOCATION" :game="game"/>
-
+    <welcome v-if="currentMenuState == MENU_STATES.WELCOME" :game="game"/>
     <leaderboard v-if="currentMenuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="currentMenuState == MENU_STATES.PLAYER" :game="game" :player="currentMenuArguments" :key="currentMenuArguments._id"/>
 </div>
@@ -23,19 +20,15 @@
 <script>
 import MENU_STATES from '../../data/menuStates';
 import GameInfoVue from './GameInfo.vue';
-import SelectRaceVue from '../welcome/SelectRace.vue';
-import SelectAliasVue from '../welcome/SelectAlias.vue';
-import SelectLocationVue from '../welcome/SelectLocation.vue';
 import PlayerListVue from './PlayerList.vue';
 import LeaderboardVue from '../leaderboard/Leaderboard.vue';
 import PlayerVue from '../player/Player.vue';
+import WelcomeVue from '../welcome/Welcome.vue';
 
 export default {
     components: {
         'game-info': GameInfoVue,
-        'select-race': SelectRaceVue,
-        'select-alias': SelectAliasVue,
-        'select-location': SelectLocationVue,
+        'welcome': WelcomeVue,
         'player-list': PlayerListVue,
         'leaderboard': LeaderboardVue,
         'player': PlayerVue
@@ -54,7 +47,7 @@ export default {
         // Check if the user is in this game, if not then show the welcome screen.
         let thisPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
 
-        this.currentMenuState = thisPlayer ? 'leaderboard' : 'selectAlias';
+        this.currentMenuState = thisPlayer ? 'leaderboard' : 'welcome';
     },
     methods: {
         resetMenuState() {

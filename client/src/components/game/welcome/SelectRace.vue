@@ -1,7 +1,5 @@
 <template>
-<div class="container bg-secondary">
-    <h3 class="pt-2">Welcome</h3>
-
+<div>
     <div class="row text-center bg-primary">
         <div class="col">
             <p class="mb-0 mt-2">Select an alien race to play.</p>

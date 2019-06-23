@@ -1,8 +1,6 @@
 export default {
     NONE: null,
-    SELECT_RACE: 'selectRace',
-    SELECT_ALIAS: 'selectAlias',
-    SELECT_LOCATION: 'selectLocation',
+    WELCOME: 'welcome',
     LEADERBOARD: 'leaderboard',
     RESEARCH: 'research',
     GALAXY: 'galaxy',

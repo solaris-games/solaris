@@ -1,6 +1,6 @@
 <template>
-<div class="container bg-secondary">
-    <h3 class="pt-2">Welcome</h3>
+<div>
+    <h5 class="pt-2">Select Location</h5>
 </div>
 </template>
 
