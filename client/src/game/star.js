@@ -35,10 +35,11 @@ class Star {
             this.drawStar();
 
         this.drawHalo();
+        this.drawScanningRange();
         this.drawName();
         this.drawGarrison();
         this.drawInfrastructure();
-        this.drawPlayerName();
+        //this.drawPlayerName();
     }
 
     drawStar() {
@@ -117,7 +118,12 @@ class Star {
 
     drawInfrastructure() {
         if (!this.data.ownedByPlayerId) return; // TODO Does abandoning stars destroy ALL infrastructure?
-        
+
+        // These may be undefined, if so it means that they are out of scanning range.
+        if (typeof this.data.economy === 'undefined' || 
+            typeof this.data.industry === 'undefined' || 
+            typeof this.data.science === 'undefined') return;
+
         let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
             fontSize: 8,
             fill: 0xFFFFFF
@@ -147,6 +153,23 @@ class Star {
         text.resolution = 10;
 
         this.container.addChild(text);
+    }
+
+    drawScanningRange() {
+        // Get the player who owns the star.
+        let player = this._getStarPlayer();
+        
+        if (!player)
+            return;
+            
+        let graphics = new PIXI.Graphics();
+
+        let radius = ((player.research.scanning || 1) + 4) * 10;
+
+        graphics.lineStyle(1, 0xFFFFFF, 0.2);
+        graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);
+
+        this.container.addChild(graphics);
     }
 }
 

@@ -30,7 +30,7 @@ router.get('/:id/info', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/:id/galaxy', middleware.authenticate, (req, res, next) => {
-    gameHelper.getByIdGalaxy(req.params.id, (err, game) => {
+    gameHelper.getByIdGalaxy(req.params.id, req.session.userId, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }

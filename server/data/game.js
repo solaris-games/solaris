@@ -71,6 +71,63 @@ module.exports = {
         return module.exports.getById(id, SELECTS.GALAXY, callback);
     },
 
+    getByIdGalaxy(id, userId, callback) {
+        // TODO: Get from the user's perspective. i.e filter out stars that are not in scanning range.
+        return module.exports.getById(id, SELECTS.GALAXY, (err, doc) => {
+            if (err) {
+                return callback(err);
+            }
+
+            doc = doc.toObject();
+
+            // Check if the user is playing in this game.
+            let player = doc.galaxy.players.find(x => x.userId === userId);
+
+            // if the user isn't playing this game, then return all data.
+            // TODO: Should not allow this as it can easily be abused.
+            if (!player) {
+                return callback(null, doc);
+            }
+
+            let scanningRangeDistance = mapHelper.getScanningDistance(player.research.scanning);
+
+            // Get all of the players stars.
+            let playerStars = doc.galaxy.stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+
+            // Work out which ones are not in scanning range and clear their data.
+            doc.galaxy.stars = doc.galaxy.stars
+                .map(s => {
+                    // Ignore stars the player owns, they will always be visible.
+                    let isOwnedByPlayer = playerStars.find(y => y._id.equals(s._id));
+
+                    if (isOwnedByPlayer) {
+                        return s;
+                    }
+
+                    // Get the closest player star to this star.
+                    let closest = mapHelper.getClosestStar(s, playerStars);
+                    let distance = mapHelper.getDistanceBetweenStars(s, closest);
+
+                    let inRange = distance <= scanningRangeDistance;
+
+                    // If its in range then its all good, send the star back as is.
+                    // Otherwise only return a subset of the data.
+                    if (inRange) {
+                        return s;
+                    } else {
+                        return {
+                            _id: s._id,
+                            name: s.name,
+                            ownedByPlayerId: s.ownedByPlayerId,
+                            location: s.location
+                        }
+                    }
+                });
+
+            return callback(null, doc);
+        });
+    },
+
     create(settings, callback) {
         let game = new Game({
             settings
@@ -96,7 +153,7 @@ module.exports = {
     },
 
     join(gameId, userId, playerId, raceId, alias, callback) {
-        module.exports.getById(gameId, (err, game) => {
+        module.exports.getById(gameId, {}, (err, game) => {
             if (err) {
                 return callback(err);
             }

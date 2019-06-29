@@ -22,13 +22,13 @@ const schema = new Schema({
     karmaToGive: { type: Types.Number, required: true, default: 8 },
     apiCode: { type: Types.String, required: false },
     research: {
-        scanning: { type: Types.Number, required: true, default: 0 },
-        hyperspaceRange: { type: Types.Number, required: true, default: 0 },
-        terraforming: { type: Types.Number, required: true, default: 0 },
-        experimentation: { type: Types.Number, required: true, default: 0 },
-        weapons: { type: Types.Number, required: true, default: 0 },
-        banking: { type: Types.Number, required: true, default: 0 },
-        manufacturing: { type: Types.Number, required: true, default: 0 }
+        scanning: { type: Types.Number, required: true, default: 1 },
+        hyperspaceRange: { type: Types.Number, required: true, default: 1 },
+        terraforming: { type: Types.Number, required: true, default: 1 },
+        experimentation: { type: Types.Number, required: true, default: 1 },
+        weapons: { type: Types.Number, required: true, default: 1 },
+        banking: { type: Types.Number, required: true, default: 1 },
+        manufacturing: { type: Types.Number, required: true, default: 1 }
     },
     carriers: [carrierSchema],
     messages: [messageSchema]
