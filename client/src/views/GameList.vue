@@ -5,7 +5,7 @@
     <div v-for="game in serverGames" v-bind:key="game._id">
         <h4>{{game.settings.general.name}}</h4>
         <img :src="getServerGameImage(game.settings.general.name)">
-        <p>{{game.galaxy.state.playerCount}} of {{game.settings.general.playerLimit}} Players</p>
+        <p>{{game.state.playerCount}} of {{game.settings.general.playerLimit}} Players</p>
          
         <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
     </div>
@@ -25,7 +25,7 @@
         <tbody>
             <tr v-for="game in userGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
-                <td>{{game.galaxy.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
+                <td>{{game.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
                 </td>

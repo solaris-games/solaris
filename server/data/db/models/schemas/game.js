@@ -77,22 +77,22 @@ const schema = new Schema({
 		}
     },
     galaxy: {
-        state: {
-            tick: { type: Types.Number, required: true, default: 0 },
-            paused: { type: Types.Boolean, required: true, default: true },
-            productionTick: { type: Types.Number, required: true, default: 0 },
-            startDate: { type: Types.Date, required: false },
-            endDate: { type: Types.Date, required: false },
-            lastTickDate: { type: Types.Date, required: false },
-            nextTickDate: { type: Types.Date, required: false },
-            stars: { type: Types.Number, required: true },
-            starsForVictory: { type: Types.Number, required: true },
-            playerCount: { type: Types.Number, required: true, default: 0 }
-        },
         players: [playerSchema],
         stars: [starSchema],
         history: [historySchema]
-    }
+    },
+	state: {
+		tick: { type: Types.Number, required: true, default: 0 },
+		paused: { type: Types.Boolean, required: true, default: true },
+		productionTick: { type: Types.Number, required: true, default: 0 },
+		startDate: { type: Types.Date, required: false },
+		endDate: { type: Types.Date, required: false },
+		lastTickDate: { type: Types.Date, required: false },
+		nextTickDate: { type: Types.Date, required: false },
+		stars: { type: Types.Number, required: true },
+		starsForVictory: { type: Types.Number, required: true },
+		playerCount: { type: Types.Number, required: true, default: 0 }
+	}
 });
 
 module.exports = schema;

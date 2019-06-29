@@ -4,9 +4,9 @@ const mapHelper = require('./map');
 const playerHelper = require('./player');
 
 const SELECTS = {
-    BASIC: {
+    INFO: {
         settings: 1,
-        'galaxy.state': 1
+        state: 1
     },
     SETTINGS: {
         settings: 1
@@ -22,7 +22,7 @@ module.exports = {
         Game.find({
             'settings.general.createdByUserId': { $eq: null }
         })
-            .select(SELECTS.BASIC)
+            .select(SELECTS.INFO)
             .exec((err, docs) => {
                 if (err) {
                     return callback(err);
@@ -36,7 +36,7 @@ module.exports = {
         Game.find({
             'settings.general.createdByUserId': { $ne: null }
         })
-            .select(SELECTS.BASIC)
+            .select(SELECTS.INFO)
             .exec((err, docs) => {
                 if (err) {
                     return callback(err);
@@ -46,9 +46,9 @@ module.exports = {
             });
     },
 
-    getById(id, callback) {
+    getById(id, select, callback) {
         Game.findById(id)
-            .select(SELECTS.BASIC)
+            .select(select)
             .exec((err, doc) => {
                 if (err) {
                     return callback(err);
@@ -58,17 +58,30 @@ module.exports = {
             });
     },
 
+    getByIdAll(id, callback) {
+        return module.exports.getById(id, {}, callback);
+    },
+
+    getByIdInfo(id, callback) {
+        return module.exports.getById(id, SELECTS.INFO, callback);
+    },
+
+    getByIdGalaxy(id, callback) {
+        // TODO: Get from the user's perspective. i.e filter out stars that are not in scanning range.
+        return module.exports.getById(id, SELECTS.GALAXY, callback);
+    },
+
     create(settings, callback) {
         let game = new Game({
             settings
         });
 
         // Calculate how many stars we need.
-        game._doc.galaxy.state.stars = game._doc.settings.galaxy.starsPerPlayer * game._doc.settings.general.playerLimit * 2.5;
-        game._doc.galaxy.state.starsForVictory = (game._doc.galaxy.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
+        game._doc.state.stars = game._doc.settings.galaxy.starsPerPlayer * game._doc.settings.general.playerLimit * 2.5;
+        game._doc.state.starsForVictory = (game._doc.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
 
         // Create all of the stars required.
-        game._doc.galaxy.stars = mapHelper.generateStars(game._doc.galaxy.state.stars);
+        game._doc.galaxy.stars = mapHelper.generateStars(game._doc.state.stars);
 
         // Setup players and assign to their starting positions.
         game._doc.galaxy.players = playerHelper.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);

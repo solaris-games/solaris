@@ -10,8 +10,8 @@
 
     <div class="row">
         <div class="col text-center pt-2">
-            <p class="mb-0">Be the first to capture {{game.galaxy.state.starsForVictory}} of {{game.galaxy.state.stars}} stars.</p>
-            <p>Galactic Cycle {{game.galaxy.state.productionTick}} - Tick {{game.galaxy.state.tick}}</p>
+            <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p>Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
         </div>
     </div>
 

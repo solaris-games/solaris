@@ -19,8 +19,18 @@ router.post('/', middleware.authenticate, (req, res, next) => {
     });
 });
 
-router.get('/:id', middleware.authenticate, (req, res, next) => {
-    gameHelper.getById(req.params.id, (err, game) => {
+router.get('/:id/info', middleware.authenticate, (req, res, next) => {
+    gameHelper.getByIdInfo(req.params.id, (err, game) => {
+        if (err) {
+            return res.status(401).json(err);
+        }
+
+        return res.status(200).json(game);
+    });
+});
+
+router.get('/:id/galaxy', middleware.authenticate, (req, res, next) => {
+    gameHelper.getByIdGalaxy(req.params.id, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -51,18 +61,18 @@ router.get('/list/user', middleware.authenticate, (req, res, next) => {
 
 router.post('/join', middleware.authenticate, (req, res, next) => {
     gameHelper.join(
-        req.body.gameId, 
-        req.session.userId, 
-        req.body.playerId, 
+        req.body.gameId,
+        req.session.userId,
+        req.body.playerId,
         req.body.raceId,
         req.body.alias,
         (err) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+            if (err) {
+                return res.status(401).json(err);
+            }
 
-        return res.sendStatus(200);
-    });
+            return res.sendStatus(200);
+        });
 });
 
 module.exports = router;

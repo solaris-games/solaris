@@ -64,7 +64,12 @@ class ApiService {
     }
 
     getGameInfo(id) {
-        return axios.get('http://localhost:3000/api/game/' + id,
+        return axios.get('http://localhost:3000/api/game/' + id + '/info',
+        { withCredentials: true });
+    }
+
+    getGameGalaxy(id) {
+        return axios.get('http://localhost:3000/api/game/' + id + '/galaxy',
         { withCredentials: true });
     }
 

@@ -24,9 +24,11 @@ export default {
     },
     async mounted() {
         try {
-            let response = await apiService.getGameInfo(this.$route.query.id);
+            let infoResponse = await apiService.getGameInfo(this.$route.query.id);
+            let galaxyResponse = await apiService.getGameGalaxy(this.$route.query.id);
 
-            this.game = response.data; // This will be passed to the game container component.
+            this.game = infoResponse.data; // This will be passed to the game container component.
+            this.game.galaxy = galaxyResponse.data.galaxy;
         } catch(err) {
             console.error(err);
         }
