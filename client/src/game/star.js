@@ -22,6 +22,13 @@ class Star {
         return carriersAtStar;
     }
 
+    _isOutOfScanningRange() {
+        // These may be undefined, if so it means that they are out of scanning range.
+        return typeof this.data.economy === 'undefined' || 
+            typeof this.data.industry === 'undefined' || 
+            typeof this.data.science === 'undefined';
+    }
+
     draw(data, players) {
         this.data = data;
         this.players = players;
@@ -45,8 +52,14 @@ class Star {
     drawStar() {
         let graphics = new PIXI.Graphics();
 
-        graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-        graphics.beginFill(0xFFFFFF);
+        if (this._isOutOfScanningRange()) {
+            graphics.lineStyle(1, 0xFFFFFF);
+            graphics.beginFill(0x000000);
+        } else {
+            graphics.lineStyle(0);
+            graphics.beginFill(0xFFFFFF);
+        }
+
         graphics.drawCircle(this.data.location.x, this.data.location.y, 3);
         graphics.endFill();
 
@@ -118,11 +131,7 @@ class Star {
 
     drawInfrastructure() {
         if (!this.data.ownedByPlayerId) return; // TODO Does abandoning stars destroy ALL infrastructure?
-
-        // These may be undefined, if so it means that they are out of scanning range.
-        if (typeof this.data.economy === 'undefined' || 
-            typeof this.data.industry === 'undefined' || 
-            typeof this.data.science === 'undefined') return;
+        if (this._isOutOfScanningRange()) return;
 
         let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
             fontSize: 8,
