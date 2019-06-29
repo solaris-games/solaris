@@ -36,7 +36,9 @@ app.use('/api/auth', auth);
 app.use('/api/user', user);
 app.use('/api/game', game);
 
-db.connect()
+db.connect({
+    connectionString: process.env.CONNECTION_STRING
+})
     .then(() => {
         app.listen(port, () => console.log(`API server listening on ${port}.`));
     })

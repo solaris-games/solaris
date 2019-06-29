@@ -3,40 +3,59 @@ const Game = require('./db/models/Game');
 const mapHelper = require('./map');
 const playerHelper = require('./player');
 
+const SELECTS = {
+    BASIC: {
+        settings: 1,
+        'galaxy.state': 1
+    },
+    SETTINGS: {
+        settings: 1
+    },
+    GALAXY: {
+        galaxy: 1
+    }
+};
+
 module.exports = {
 
     listOfficialGames(callback) {
         Game.find({
             'settings.general.createdByUserId': { $eq: null }
-        }).exec((err, docs) => {
-            if (err) {
-                return callback(err);
-            }
+        })
+            .select(SELECTS.BASIC)
+            .exec((err, docs) => {
+                if (err) {
+                    return callback(err);
+                }
 
-            return callback(null, docs);
-        });
+                return callback(null, docs);
+            });
     },
 
     listUserGames(callback) {
         Game.find({
             'settings.general.createdByUserId': { $ne: null }
-        }).exec((err, docs) => {
-            if (err) {
-                return callback(err);
-            }
+        })
+            .select(SELECTS.BASIC)
+            .exec((err, docs) => {
+                if (err) {
+                    return callback(err);
+                }
 
-            return callback(null, docs);
-        });
+                return callback(null, docs);
+            });
     },
 
     getById(id, callback) {
-        Game.findById(id).exec((err, doc) => {
-            if (err) {
-                return callback(err);
-            }
+        Game.findById(id)
+            .select(SELECTS.BASIC)
+            .exec((err, doc) => {
+                if (err) {
+                    return callback(err);
+                }
 
-            return callback(null, doc);
-        });
+                return callback(null, doc);
+            });
     },
 
     create(settings, callback) {
