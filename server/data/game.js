@@ -168,7 +168,7 @@ module.exports = {
         game._doc.state.starsForVictory = (game._doc.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
 
         // Create all of the stars required.
-        game._doc.galaxy.stars = mapHelper.generateStars(game._doc.state.stars);
+        game._doc.galaxy.stars = mapHelper.generateStars(game._doc.state.stars, game._doc.settings.general.playerLimit);
 
         // Setup players and assign to their starting positions.
         game._doc.galaxy.players = playerHelper.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);

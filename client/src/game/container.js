@@ -54,7 +54,7 @@ class GameContainer {
                 minWidth: 250,
                 minHeight: 250,
                 maxWidth: this.viewport.worldWidth * 2,
-                maxHeight: this.viewport.worldHeight
+                maxHeight: this.viewport.worldHeight * 2
             });
     }
 

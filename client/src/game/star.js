@@ -80,7 +80,7 @@ class Star extends EventEmitter {
             graphics.beginFill(0xFFFFFF);
         }
 
-        graphics.drawCircle(this.data.location.x, this.data.location.y, 3);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
         graphics.endFill();
 
         this.starContainer.addChild(graphics);
@@ -95,8 +95,8 @@ class Star extends EventEmitter {
             
         let graphics = new PIXI.Graphics();
 
-        graphics.lineStyle(2, player.colour.value);
-        graphics.drawCircle(this.data.location.x, this.data.location.y, 6);
+        graphics.lineStyle(1.5, player.colour.value);
+        graphics.drawCircle(this.data.location.x, this.data.location.y, 4);
 
         this.starContainer.addChild(graphics);
     }
@@ -123,12 +123,12 @@ class Star extends EventEmitter {
 
     drawName() {
         let text = new PIXI.Text(this.data.name, {
-            fontSize: 8,
+            fontSize: 4,
             fill: 0xFFFFFF
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 6;
+        text.y = this.data.location.y + 5;
         text.resolution = 10;
 
         this.starContainer.addChild(text);
@@ -138,12 +138,12 @@ class Star extends EventEmitter {
         if (!this.data.garrison) return;
 
         let text = new PIXI.Text(this.data.garrison, {
-            fontSize: 8,
+            fontSize: 4,
             fill: 0xFFFFFF
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 14;
+        text.y = this.data.location.y + 10;
         text.resolution = 10;
 
         this.starContainer.addChild(text);
@@ -154,12 +154,12 @@ class Star extends EventEmitter {
         if (this._isOutOfScanningRange()) return;
 
         let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
-            fontSize: 8,
+            fontSize: 4,
             fill: 0xFFFFFF
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y - 18;
+        text.y = this.data.location.y - 10;
         text.resolution = 10;
 
         this.starContainer.addChild(text);
@@ -173,7 +173,7 @@ class Star extends EventEmitter {
             return;
 
         let text = new PIXI.Text(player.alias, {
-            fontSize: 8,
+            fontSize: 4,
             fill: 0xFFFFFF
         });
 
@@ -195,7 +195,7 @@ class Star extends EventEmitter {
 
         let radius = ((player.research.scanning || 1) + 2) * 10;
 
-        graphics.lineStyle(1, 0xFFFFFF, 0.2);
+        graphics.lineStyle(1, 0xFFFFFF, 0.3);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);
 
         this.starContainer.addChild(graphics);
@@ -212,7 +212,7 @@ class Star extends EventEmitter {
 
         let radius = ((player.research.hyperspace || 1) + 3) * 10;
 
-        graphics.lineStyle(1, 0xFFFFFF, 0.2);
+        graphics.lineStyle(1, 0xFFFFFF, 0.3);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2);
 
         this.starContainer.addChild(graphics);

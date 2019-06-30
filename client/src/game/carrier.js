@@ -25,7 +25,7 @@ class Carrier {
         graphics.pivot.set(this.data.location.x, this.data.location.y);
         graphics.position.x = this.data.location.x;
         graphics.position.y = this.data.location.y;
-        graphics.scale.set(1.5)
+        graphics.scale.set(1)
 
         // TODO: If the carrier has waypoints, get the first one and calculate the angle
         // between the carrier's current position and the destination.

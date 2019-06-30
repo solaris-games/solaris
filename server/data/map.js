@@ -18,11 +18,11 @@ module.exports = {
         BASE_SHIP_SPEED: 1  // 0.1 ly per tick
     },
     
-    generateStars(starCount) {
+    generateStars(starCount, playerCount) {
         const stars = [];
 
         // Circle universe.
-        const maxRadius = starCount * module.exports.DISTANCES.LIGHT_YEAR;
+        const maxRadius = (starCount * module.exports.DISTANCES.LIGHT_YEAR) / playerCount;
 
         const starNames = starHelper.getRandomStarNames(starCount);
 
