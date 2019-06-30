@@ -65,6 +65,7 @@ class Star extends EventEmitter {
         if (this.isSelected) {
             this.drawInfrastructure();
             this.drawScanningRange();
+            this.drawHyperspaceRange();
         }
     }
 
@@ -196,6 +197,23 @@ class Star extends EventEmitter {
 
         graphics.lineStyle(1, 0xFFFFFF, 0.2);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);
+
+        this.starContainer.addChild(graphics);
+    }
+
+    drawHyperspaceRange() {
+        // Get the player who owns the star.
+        let player = this._getStarPlayer();
+        
+        if (!player)
+            return;
+            
+        let graphics = new PIXI.Graphics();
+
+        let radius = ((player.research.hyperspace || 1) + 3) * 10;
+
+        graphics.lineStyle(1, 0xFFFFFF, 0.2);
+        graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2);
 
         this.starContainer.addChild(graphics);
     }
