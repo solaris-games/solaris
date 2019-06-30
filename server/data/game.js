@@ -93,6 +93,7 @@ module.exports = {
 
             // Get all of the players stars.
             let playerStars = doc.galaxy.stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+            let playerStarLocations = playerStars.map(s => s.location);
 
             // Work out which ones are not in scanning range and clear their data.
             doc.galaxy.stars = doc.galaxy.stars
@@ -123,6 +124,21 @@ module.exports = {
                         }
                     }
                 });
+
+            // Do the same for carriers.
+            doc.galaxy.players.forEach(p => {
+                if (p._id.equals(player._id)) return; // Ignore the current player.
+
+                p.carriers = p.carriers.filter(c => {
+                    // Get the closest player star to this carrier.
+                    let closest = mapHelper.getClosestLocation(c.location, playerStarLocations);
+                    let distance = mapHelper.getDistanceBetweenLocations(c.location, closest);
+
+                    let inRange = distance <= scanningRangeDistance;
+
+                    return inRange;
+                });
+            });
 
             return callback(null, doc);
         });

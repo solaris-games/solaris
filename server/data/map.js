@@ -79,9 +79,9 @@ module.exports = {
         }
     },
 
-    getDistanceBetweenStars(star1, star2) {
-        let xs = star2.location.x - star1.location.x,
-            ys = star2.location.y - star1.location.y;
+    getDistanceBetweenLocations(loc1, loc2) {
+        let xs = loc2.x - loc1.x,
+            ys = loc2.y - loc1.y;
 
         xs *= xs;
         ys *= ys;
@@ -89,40 +89,62 @@ module.exports = {
         return Math.sqrt(xs + ys);
     },
 
+    getClosestLocations(loc, locs, amount) {
+        let sorted = locs
+            .filter(a => a.x !== loc.x && a.y !== loc.y) // Ignore the location passed in if it exists in the array.
+            .sort((a, b) => {
+                return module.exports.getDistanceBetweenLocations(loc, a)
+                    - module.exports.getDistanceBetweenLocations(loc, b);
+            });
+        
+        return sorted.slice(0, amount);
+    },
+
+    getClosestLocation(loc, locs) {
+        return module.exports.getClosestLocations(loc, locs, 1)[0];
+    },
+
+    getDistanceBetweenStars(star1, star2) {
+        return module.exports.getDistanceBetweenLocations(star1.location, star2.location);
+    },
+
     getClosestStar(star, stars) {
         return module.exports.getClosestStars(star, stars, 1)[0];
     },
 
     getClosestStars(star, stars, amount) {
-        return stars
+        let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .sort((a, b) => {
                 return module.exports.getDistanceBetweenStars(star, a)
                     - module.exports.getDistanceBetweenStars(star, b);
-            })
-            .splice(0, amount); // Splice 1 ignores the first star because it will be the current star.
+            });
+        
+        return sorted.slice(0, amount); // Slice 1 ignores the first star because it will be the current star.
     },
 
     getClosestUnownedStars(star, stars, amount) {
-        return stars
+        let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => !s.ownedByPlayerId)
             .sort((a, b) => {
                 return module.exports.getDistanceBetweenStars(star, a)
                     - module.exports.getDistanceBetweenStars(star, b);
-            })
-            .splice(0, amount);
+            });
+
+        return sorted.slice(0, amount);
     },
 
     getClosestOwnedStars(star, stars, amount) {
-        return stars
+        let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => s.ownedByPlayerId)
             .sort((a, b) => {
                 return module.exports.getDistanceBetweenStars(star, a)
                     - module.exports.getDistanceBetweenStars(star, b);
-            })
-            .splice(0, amount);
+            });
+
+        return sorted.slice(0, amount);
     },
 
     getScanningDistance(scanning) {
