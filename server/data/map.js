@@ -13,15 +13,16 @@ function isDuplicateStarPosition(star, stars) {
 module.exports = {
 
     DISTANCES: {
-        LIGHT_YEAR: 10
+        LIGHT_YEAR: 10,
+        MIN_DISTANCE_BETWEEN_STARS: 10,
+        BASE_SHIP_SPEED: 1  // 0.1 ly per tick
     },
     
     generateStars(starCount) {
         const stars = [];
 
         // Circle universe.
-        // number of stars * ly distance / 2
-        const maxRadius = (starCount * module.exports.DISTANCES.LIGHT_YEAR) / 2;
+        const maxRadius = starCount * module.exports.DISTANCES.LIGHT_YEAR;
 
         const starNames = starHelper.getRandomStarNames(starCount);
 
@@ -42,7 +43,7 @@ module.exports = {
                 let otherStar = stars[i];
                 const distance = module.exports.getDistanceBetweenStars(star, otherStar);
 
-                if (distance < module.exports.DISTANCES.LIGHT_YEAR * 3) {
+                if (distance < module.exports.DISTANCES.MIN_DISTANCE_BETWEEN_STARS) {
                     isTooClose = true;
                     break;
                 }
@@ -148,7 +149,11 @@ module.exports = {
     },
 
     getScanningDistance(scanning) {
-        return ((scanning || 1) + 4) * module.exports.DISTANCES.LIGHT_YEAR;
+        return ((scanning || 1) + 2) * module.exports.DISTANCES.LIGHT_YEAR;
+    },
+    
+    getHyperspaceDistance(hyperspace) {
+        return ((hyperspace || 1) + 3) * module.exports.DISTANCES.LIGHT_YEAR;
     }
 
 };

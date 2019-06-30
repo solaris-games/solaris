@@ -72,7 +72,6 @@ module.exports = {
     },
 
     getByIdGalaxy(id, userId, callback) {
-        // TODO: Get from the user's perspective. i.e filter out stars that are not in scanning range.
         return module.exports.getById(id, SELECTS.GALAXY, (err, doc) => {
             if (err) {
                 return callback(err);
@@ -83,9 +82,23 @@ module.exports = {
             // Check if the user is playing in this game.
             let player = doc.galaxy.players.find(x => x.userId === userId);
 
-            // if the user isn't playing this game, then return all data.
-            // TODO: Should not allow this as it can easily be abused.
+            // if the user isn't playing this game, then only return
+            // basic data about the stars, exclude any important info like garrisons.
             if (!player) {
+                doc.galaxy.stars = doc.galaxy.stars
+                .map(s => {
+                    return {
+                        _id: s._id,
+                        name: s.name,
+                        ownedByPlayerId: s.ownedByPlayerId,
+                        location: s.location,
+                        homeStar: s.homeStar
+                    }
+                });
+
+                // Also remove all carriers from players.
+                doc.galaxy.players.forEach(p => p.carriers = []);
+
                 return callback(null, doc);
             }
 
@@ -120,7 +133,8 @@ module.exports = {
                             _id: s._id,
                             name: s.name,
                             ownedByPlayerId: s.ownedByPlayerId,
-                            location: s.location
+                            location: s.location,
+                            homeStar: s.homeStar
                         }
                     }
                 });

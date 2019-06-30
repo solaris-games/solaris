@@ -32,7 +32,7 @@ class Map {
     zoomToPlayer(game, player) {
         // Find the home star the player owns.
         let homeStar = game.galaxy.stars.find(x => {
-            return x.ownedByPlayerId === player._id && x.economy === 5 // TODO: Need to work out home star.
+            return x.ownedByPlayerId === player._id && x.homeStar === true
         });
 
         gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y);

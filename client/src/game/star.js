@@ -192,7 +192,7 @@ class Star extends EventEmitter {
             
         let graphics = new PIXI.Graphics();
 
-        let radius = ((player.research.scanning || 1) + 4) * 10;
+        let radius = ((player.research.scanning || 1) + 2) * 10;
 
         graphics.lineStyle(1, 0xFFFFFF, 0.2);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);

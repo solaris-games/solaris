@@ -56,6 +56,7 @@ module.exports = {
             homeStar.economy = gameSettings.player.startingInfrastructure.economy;
             homeStar.industry = gameSettings.player.startingInfrastructure.industry;
             homeStar.science = gameSettings.player.startingInfrastructure.science;
+            homeStar.homeStar = true;
 
             // Create a carrier for the home star.
             let homeCarrier = carrierHelper.createAtStar(homeStar);

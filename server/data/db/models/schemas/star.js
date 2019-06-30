@@ -11,6 +11,7 @@ const schema = new Schema({
     economy: { type: Types.Number, required: true, default: 0 },
     industry: { type: Types.Number, required: true, default: 0 },
     science: { type: Types.Number, required: true, default: 0 },
+    homeStar: { type: Types.Boolean, required: true, default: false },
     warpGate: { type: Types.Boolean, required: true, default: false },
     location: {
         x: { type: Types.Number, required: true, default: 0 },
