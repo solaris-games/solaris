@@ -8,12 +8,24 @@ class Map {
         this.container = new PIXI.Container();
     }
 
-    draw(game) {
+    setup(game) {
+        this.game = game;
+    }
+
+    draw() {
+        this.container.removeChildren();
+        this.stars = [];
+
         // Draw all stars in their positions.
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
+        for (let i = 0; i < this.game.galaxy.stars.length; i++) {
             let star = new Star(this.container);
 
-            star.draw(game.galaxy.stars[i], game.galaxy.players);
+            star.on('onSelected', this.onStarSelected.bind(this));
+            star.setup(this.game.galaxy.stars[i], this.game.galaxy.players);
+
+            star.draw();
+
+            this.stars.push(star);
         }
     }
 
@@ -24,6 +36,23 @@ class Map {
         });
 
         gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y);
+    }
+
+    onStarSelected(e) {
+        this.stars
+        .filter(s => s.isSelected || s.data._id === e.data._id) // Get only stars that are selected or the e star.
+        .forEach(s => {
+            // Set all other stars to unselected.
+            if (s.data._id !== e.data._id) {
+                s.isSelected = false;
+            }
+
+            s.draw();
+        });
+    }
+
+    cleanup() {
+        this.stars.forEach(s => s.removeListener('onSelected', this.onStarSelected));
     }
 }
 

@@ -28,10 +28,10 @@ export default {
     this.gameContainer.viewport.addChild(background.container);
 
     // Draw the map
-    let map = Map;
-    map.draw(this.game);
+    Map.setup(this.game);
+    Map.draw();
 
-    this.gameContainer.viewport.addChild(map.container);
+    this.gameContainer.viewport.addChild(Map.container);
 
     // Add the game canvas to the screen.
     this.$el.appendChild(this.gameContainer.app.view); // Add the pixi canvas to the element.
@@ -39,6 +39,8 @@ export default {
 
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
+
+    Map.cleanup();
   },
 
   methods: {

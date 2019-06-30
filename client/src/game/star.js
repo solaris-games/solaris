@@ -1,9 +1,21 @@
 import * as PIXI from 'pixi.js';
 import Carrier from './carrier';
+import EventEmitter from 'events';
 
-class Star {
+class Star extends EventEmitter {
     constructor(container) {
+        super();
+        
         this.container = container;
+
+        this.starContainer = new PIXI.Container();
+        this.starContainer.buttonMode = true;
+        this.starContainer.interactive = true;
+        this.starContainer.on('click', this.onClicked.bind(this));
+
+        this.isSelected = false;
+
+        this.container.addChild(this.starContainer);
     }
 
     _getStarPlayer() {
@@ -29,9 +41,13 @@ class Star {
             typeof this.data.science === 'undefined';
     }
 
-    draw(data, players) {
+    setup(data, players) {
         this.data = data;
         this.players = players;
+    }
+
+    draw() {
+        this.starContainer.removeChildren();
 
         this.drawColour();
 
@@ -42,11 +58,14 @@ class Star {
             this.drawStar();
 
         this.drawHalo();
-        this.drawScanningRange();
         this.drawName();
         this.drawGarrison();
-        this.drawInfrastructure();
         //this.drawPlayerName();
+        
+        if (this.isSelected) {
+            this.drawInfrastructure();
+            this.drawScanningRange();
+        }
     }
 
     drawStar() {
@@ -63,7 +82,7 @@ class Star {
         graphics.drawCircle(this.data.location.x, this.data.location.y, 3);
         graphics.endFill();
 
-        this.container.addChild(graphics);
+        this.starContainer.addChild(graphics);
     }
 
     drawColour() {
@@ -78,7 +97,7 @@ class Star {
         graphics.lineStyle(2, player.colour.value);
         graphics.drawCircle(this.data.location.x, this.data.location.y, 6);
 
-        this.container.addChild(graphics);
+        this.starContainer.addChild(graphics);
     }
 
     drawCarrier() {
@@ -87,7 +106,7 @@ class Star {
         if (!starCarriers.length)
             return;
             
-        let carrier = new Carrier(this.container, starCarriers[0]);
+        let carrier = new Carrier(this.starContainer, starCarriers[0]);
 
         carrier.draw();
     }
@@ -98,7 +117,7 @@ class Star {
         graphics.lineStyle(1, 0xFFFFFF, 0.1);
         graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2);
 
-        this.container.addChild(graphics);
+        this.starContainer.addChild(graphics);
     }
 
     drawName() {
@@ -111,7 +130,7 @@ class Star {
         text.y = this.data.location.y + 6;
         text.resolution = 10;
 
-        this.container.addChild(text);
+        this.starContainer.addChild(text);
     }
 
     drawGarrison() {
@@ -126,7 +145,7 @@ class Star {
         text.y = this.data.location.y + 14;
         text.resolution = 10;
 
-        this.container.addChild(text);
+        this.starContainer.addChild(text);
     }
 
     drawInfrastructure() {
@@ -142,7 +161,7 @@ class Star {
         text.y = this.data.location.y - 18;
         text.resolution = 10;
 
-        this.container.addChild(text);
+        this.starContainer.addChild(text);
     }
 
     drawPlayerName() {
@@ -161,7 +180,7 @@ class Star {
         text.y = this.data.location.y + 22;
         text.resolution = 10;
 
-        this.container.addChild(text);
+        this.starContainer.addChild(text);
     }
 
     drawScanningRange() {
@@ -178,7 +197,13 @@ class Star {
         graphics.lineStyle(1, 0xFFFFFF, 0.2);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);
 
-        this.container.addChild(graphics);
+        this.starContainer.addChild(graphics);
+    }
+
+    onClicked(e) {
+        this.isSelected = !this.isSelected;
+
+        this.emit('onSelected', this);
     }
 }
 
