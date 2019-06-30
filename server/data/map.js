@@ -13,9 +13,9 @@ function isDuplicateStarPosition(star, stars) {
 module.exports = {
 
     DISTANCES: {
-        LIGHT_YEAR: 10,
-        MIN_DISTANCE_BETWEEN_STARS: 10,
-        BASE_SHIP_SPEED: 1  // 0.1 ly per tick
+        LIGHT_YEAR: 30,
+        MIN_DISTANCE_BETWEEN_STARS: 15,
+        BASE_SHIP_SPEED: 3  // 0.1 ly per tick
     },
     
     generateStars(starCount, playerCount) {

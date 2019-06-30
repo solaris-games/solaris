@@ -30,5 +30,37 @@
     {
         "alias": "Purple",
         "value": "0x6000C0"
+    },
+    {
+        "alias": "Brown",
+        "value": "0xA52A2A"
+    },
+    {
+        "alias": "Navy",
+        "value": "0x000080"
+    },
+    {
+        "alias": "Gray",
+        "value": "0x808080"
+    },
+    {
+        "alias": "Tan",
+        "value": "0xD2B48C"
+    },
+    {
+        "alias": "Beige",
+        "value": "0xF5F5DC"
+    },
+    {
+        "alias": "Plum",
+        "value": "0xDDA0DD"
+    },
+    {
+        "alias": "Teal",
+        "value": "0x008080"
+    },
+    {
+        "alias": "Lime",
+        "value": "0x00FF00"
     }
 ]
