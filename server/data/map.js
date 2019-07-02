@@ -13,16 +13,16 @@ function isDuplicateStarPosition(star, stars) {
 module.exports = {
 
     DISTANCES: {
-        LIGHT_YEAR: 30,
-        MIN_DISTANCE_BETWEEN_STARS: 15,
-        BASE_SHIP_SPEED: 3  // 0.1 ly per tick
+        LIGHT_YEAR: 10,
+        MIN_DISTANCE_BETWEEN_STARS: 5,
+        BASE_SHIP_SPEED: 1  // 0.1 ly per tick
     },
     
     generateStars(starCount, playerCount) {
         const stars = [];
 
         // Circle universe.
-        const maxRadius = (starCount * module.exports.DISTANCES.LIGHT_YEAR) / playerCount;
+        const maxRadius = starCount * module.exports.DISTANCES.MIN_DISTANCE_BETWEEN_STARS;
 
         const starNames = starHelper.getRandomStarNames(starCount);
 
@@ -105,6 +105,14 @@ module.exports = {
         return module.exports.getClosestLocations(loc, locs, 1)[0];
     },
 
+    getFurthestLocations(loc, locs, amount) {
+        return module.exports.getClosestLocations(loc, locs, locs.length).reverse().slice(0, amount);
+    },
+
+    getFurthestLocation(loc, locs) {
+        return module.exports.getFurthestLocations(loc, locs, 1)[0];
+    },
+
     getDistanceBetweenStars(star1, star2) {
         return module.exports.getDistanceBetweenLocations(star1.location, star2.location);
     },
@@ -146,6 +154,24 @@ module.exports = {
             });
 
         return sorted.slice(0, amount);
+    },
+
+    getGalaxyDiameter(stars) {
+        let starLocations = stars.map(s => s.location);
+
+        // Calculate the furthest distance between two stars, that's the diameter.
+        let diameter = stars.reduce((distance, star) => {
+            let furthest = module.exports.getFurthestLocation(star.location, starLocations);
+            let newDistance = module.exports.getDistanceBetweenLocations(star.location, furthest);
+
+            if (newDistance > distance) {
+                distance = newDistance;
+            }
+
+            return distance;
+        }, 0);
+
+        return diameter;
     },
 
     getScanningDistance(scanning) {

@@ -50,7 +50,7 @@ const schema = new Schema({
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
         },
         technology: {
-			startingTechnology: {
+			startingTechnologyLevel: {
 				terraforming: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				experimentation: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				scanning: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },

@@ -95,7 +95,7 @@ class Star extends EventEmitter {
             
         let graphics = new PIXI.Graphics();
 
-        graphics.lineStyle(1.5, player.colour.value);
+        graphics.lineStyle(3, player.colour.value);
         graphics.drawCircle(this.data.location.x, this.data.location.y, 4);
 
         this.starContainer.addChild(graphics);
@@ -128,7 +128,7 @@ class Star extends EventEmitter {
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 5;
+        text.y = this.data.location.y + 7;
         text.resolution = 10;
 
         this.starContainer.addChild(text);
@@ -143,7 +143,7 @@ class Star extends EventEmitter {
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 10;
+        text.y = this.data.location.y + 12;
         text.resolution = 10;
 
         this.starContainer.addChild(text);
@@ -159,7 +159,7 @@ class Star extends EventEmitter {
         });
 
         text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y - 10;
+        text.y = this.data.location.y - 12;
         text.resolution = 10;
 
         this.starContainer.addChild(text);

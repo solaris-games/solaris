@@ -9,11 +9,30 @@ const carrierHelper = require('./carrier');
 
 const Player = require('./db/models/schemas/player');
 
-function isTooCloseStartingPosition(homeStar, stars) {
+function isTooCloseStartingPosition(distanceAllowed, homeStar, stars) {
     let closestStar = mapHelper.getClosestOwnedStars(homeStar, stars, 1)[0];
+
+    // If there is no closest owned star then we're all good, no need to check.
+    if (!closestStar)
+        return false;
+
     let distanceToClosest = mapHelper.getDistanceBetweenStars(homeStar, closestStar);
     
-    return distanceToClosest > 1000;
+    return distanceToClosest < distanceAllowed;
+}
+
+function calculateStartingDistance(gameSettings, stars) {
+    let galaxyDiameter = mapHelper.getGalaxyDiameter(stars);
+    let playerCount = gameSettings.general.playerLimit;
+    let minDistance;
+
+    switch (gameSettings.galaxy.startingDistance) {
+        case 'close': minDistance = galaxyDiameter / (playerCount * 4); break;
+        case 'medium': minDistance = galaxyDiameter / (playerCount * 2); break;
+        case 'far': minDistance = galaxyDiameter / playerCount; break;
+    }
+
+    return minDistance;
 }
 
 module.exports = {
@@ -24,7 +43,16 @@ module.exports = {
             userId: null,
             alias: 'Empty Slot',
             cash: gameSettings.player.startingCash,
-            carriers: []
+            carriers: [],
+            research: {
+                terraforming: gameSettings.technology.startingTechnologyLevel.terraforming,
+                experimentation: gameSettings.technology.startingTechnologyLevel.experimentation,
+                scanning: gameSettings.technology.startingTechnologyLevel.scanning,
+                hyperspace: gameSettings.technology.startingTechnologyLevel.hyperspace,
+                manufacturing: gameSettings.technology.startingTechnologyLevel.manufacturing,
+                banking: gameSettings.technology.startingTechnologyLevel.banking,
+                weapons: gameSettings.technology.startingTechnologyLevel.weapons
+            }
         };
     },
 
@@ -37,15 +65,19 @@ module.exports = {
             // Set the players colour based on their index position in the array.
             player.colour = colours[i];
 
+            let minDistance = calculateStartingDistance(gameSettings, allStars);
+            let isTooClose = false;
+        
             // Find a starting position for the player by picking a random
             // home star.
             let homeStar;
 
             do {
                 homeStar = allStars[random.getRandomNumberBetween(0, allStars.length)];
+
+                isTooClose = isTooCloseStartingPosition(minDistance, homeStar, allStars);
             }
-            while (homeStar.ownedByPlayerId 
-                && !isTooCloseStartingPosition(homeStar, allStars));
+            while (homeStar.ownedByPlayerId || isTooClose);
 
             // Set up the home star
             homeStar.ownedByPlayerId = player._id;
