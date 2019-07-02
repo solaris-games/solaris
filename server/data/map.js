@@ -22,7 +22,7 @@ module.exports = {
         const stars = [];
 
         // Circle universe.
-        const maxRadius = starCount * module.exports.DISTANCES.MIN_DISTANCE_BETWEEN_STARS;
+        const maxRadius = starCount * Math.PI;
 
         const starNames = starHelper.getRandomStarNames(starCount);
 
