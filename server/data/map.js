@@ -29,6 +29,9 @@ module.exports = {
         let index = 0;
 
         do {
+            // TODO: Figure out how to randomize resources and weight them.
+            // so that we can configure sparse, standard and plentiful resources.
+            
             const starName = starNames[index];
             
             const star = starHelper.generateUnownedStar(starName, maxRadius);
@@ -60,6 +63,8 @@ module.exports = {
         // We need to sanitize all star positions to make sure that all
         // x's and y's are positive integers otherwise rendering is a bitch.
         module.exports.sanitizeStarPositions(stars);
+
+        // TODO: If random warp gates are enabled, pick a random selection of stars and add gates to them.
 
         return stars;
     },
