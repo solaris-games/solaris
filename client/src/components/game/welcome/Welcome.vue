@@ -73,7 +73,6 @@ export default {
             if (this.errors.length) return;
             
             try {
-                debugger;
                 let response = await apiService.joinGame(this.game._id, playerId, this._race, this._alias);
 
                 if (response.status === 200) {

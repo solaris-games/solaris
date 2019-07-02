@@ -16,7 +16,7 @@ const schema = new Schema({
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     cash: { type: Types.Number, required: true },
-    condeded: { type: Types.Boolean, required: false, default: false },
+    defeated: { type: Types.Boolean, required: false, default: false },
     ready: { type: Types.Boolean, required: false, default: false },
     missedTurns: { type: Types.Number, required: false, default: 0 },
     karmaToGive: { type: Types.Number, required: true, default: 8 },

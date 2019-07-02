@@ -84,9 +84,14 @@ class ApiService {
     }
 
     joinGame(gameId, playerId, raceId, alias) {
-        return axios.post('http://localhost:3000/api/game/join', {
-            gameId, playerId, raceId, alias
+        return axios.post('http://localhost:3000/api/game/' + gameId + '/join', {
+            playerId, raceId, alias
         },
+        { withCredentials: true });
+    }
+
+    concedeDefeat(gameId) {
+        return axios.post('http://localhost:3000/api/game/' + gameId + '/concedeDefeat', null,
         { withCredentials: true });
     }
     

@@ -154,6 +154,9 @@ module.exports = {
                 });
             });
 
+            // TODO: Work out how to do dark galaxy.
+            // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
+
             return callback(null, doc);
         });
     },
@@ -188,14 +191,57 @@ module.exports = {
                 return callback(err);
             }
 
+            // TODO: Disallow if they are already in the game as another player.
+            // TODO: Only allow join if the game hasn't started.
+            // TODO: Only allow if the player isn't already occupied.
+            // TODO: Disallow if they have been defeated and are trying to rejoin.
+            // TODO: General checks to ensure that the game hasn't finished
+            //       or anything weird like that.
+
             // Get the player and update it to assign the user to the player.
             let player = game.galaxy.players.find(x => {
                 return x._id == playerId;
             });
 
+            if (!player) {
+                throw new Error('The player does not exist in this game.');
+            }
+
             player.userId = userId;
             player.raceId = raceId;
             player.alias = alias;
+
+            game.save((err, doc) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                return callback(null, doc);
+            });
+        });
+    },
+
+    concedeDefeat(gameId, userId, callback) {
+        // Remove the player from the game.
+        module.exports.getById(gameId, {}, (err, game) => {
+            if (err) {
+                return callback(err);
+            }
+
+            // TODO: Disallow if they have already been defeated.
+            // TODO: General checks to ensure that the game hasn't finished
+            //       or anything weird like that.
+
+            // Get the player that is linked to this user.
+            let player = game.galaxy.players.find(x => {
+                return x.userId == userId;
+            });
+
+            if (!player) {
+                throw new Error('The user is not participating in this game.');
+            }
+
+            player.defeated = true;
 
             game.save((err, doc) => {
                 if (err) {

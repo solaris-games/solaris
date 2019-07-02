@@ -59,13 +59,26 @@ router.get('/list/user', middleware.authenticate, (req, res, next) => {
     });
 });
 
-router.post('/join', middleware.authenticate, (req, res, next) => {
+router.post('/:gameId/join', middleware.authenticate, (req, res, next) => {
     gameHelper.join(
-        req.body.gameId,
+        req.params.gameId,
         req.session.userId,
         req.body.playerId,
         req.body.raceId,
         req.body.alias,
+        (err) => {
+            if (err) {
+                return res.status(401).json(err);
+            }
+
+            return res.sendStatus(200);
+        });
+});
+
+router.post('/:gameId/concedeDefeat', middleware.authenticate, (req, res, next) => {
+    gameHelper.concedeDefeat(
+        req.params.gameId,
+        req.session.userId,
         (err) => {
             if (err) {
                 return res.status(401).json(err);
