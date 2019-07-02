@@ -7,6 +7,15 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="pl-2">
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy"><i class="fas fa-compass"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomByPercent(0.5)"><i class="fas fa-search-plus"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomByPercent(-0.3)"><i class="fas fa-search-minus"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-ruler"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-bolt"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-money-bill"></i></button>
+                    </div>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)"><i class="fas fa-flask mr-2"></i>Research</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)"><i class="fas fa-star mr-2"></i>Galaxy</a>
@@ -36,6 +45,7 @@
 import router from '../../../router';
 import { setInterval } from 'timers';
 import MENU_STATES from '../../data/menuStates';
+import GameContainer from '../../../game/container';
 
 export default {
     props: {
@@ -93,6 +103,13 @@ export default {
         },
         goToMainMenu() {
             router.push({ name: 'main-menu' });
+        },
+        fitGalaxy() {
+            GameContainer.viewport.fitWorld();
+            this.zoomByPercent(-0.1);
+        },
+        zoomByPercent(percent) {
+            GameContainer.viewport.zoomPercent(percent, true);
         }
     }
 }
