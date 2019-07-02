@@ -35,6 +35,8 @@ class Map {
             return x.ownedByPlayerId === player._id && x.homeStar === true
         });
 
+        gameContainer.viewport.fitWorld();
+        gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true);
         gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y);
     }
 
