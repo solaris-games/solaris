@@ -66,18 +66,21 @@ module.exports = {
         return module.exports.getById(id, SELECTS.INFO, callback);
     },
 
-    getByIdGalaxy(id, callback) {
-        // TODO: Get from the user's perspective. i.e filter out stars that are not in scanning range.
-        return module.exports.getById(id, SELECTS.GALAXY, callback);
-    },
-
     getByIdGalaxy(id, userId, callback) {
-        return module.exports.getById(id, SELECTS.GALAXY, (err, doc) => {
+        return module.exports.getById(id, {}, (err, doc) => {
             if (err) {
                 return callback(err);
             }
 
             doc = doc.toObject();
+
+            // Work out whether we are in dark galaxy mode.
+            // This is true if the dark galaxy setting is enabled,
+            // OR if its "start only" and the game has not yet started.
+            const isDarkStart = doc.settings.specialGalaxy.darkGalaxy === 'start'
+                                    && !((doc.state.startDate || new Date()) < new Date());
+
+            const isDarkMode = doc.settings.specialGalaxy.darkGalaxy === 'enabled' || isDarkStart;
 
             // Check if the user is playing in this game.
             let player = doc.galaxy.players.find(x => x.userId === userId);
@@ -85,6 +88,11 @@ module.exports = {
             // if the user isn't playing this game, then only return
             // basic data about the stars, exclude any important info like garrisons.
             if (!player) {
+                // If its a dark galaxy start then return no stars.
+                if (isDarkStart) {
+                    doc.galaxy.stars = [];
+                }
+
                 doc.galaxy.stars = doc.galaxy.stars
                 .map(s => {
                     return {
@@ -130,6 +138,11 @@ module.exports = {
                     if (inRange) {
                         return s;
                     } else {
+                        // Return null if its dark mode
+                        if (isDarkMode) {
+                            return null;
+                        }
+
                         return {
                             _id: s._id,
                             name: s.name,
@@ -139,9 +152,13 @@ module.exports = {
                             warpGate: s.warpGate
                         }
                     }
-                });
+                })
+                // Filter out nulls because those are the ones that have been excluded by dark mode.
+                .filter(x => x != null);
 
             // Do the same for carriers.
+            // Note that we don't need to consider dark mode
+            // because carriers can only be seen if they are in range.
             doc.galaxy.players.forEach(p => {
                 if (p._id.equals(player._id)) return; // Ignore the current player.
 
@@ -156,7 +173,6 @@ module.exports = {
                 });
             });
 
-            // TODO: Work out how to do dark galaxy.
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
             // TODO: Can we get away with not sending other player's user ids?
 

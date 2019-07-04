@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
-import gameContainer from '../game/container';
+import gameContainer from './container';
 import Star from './star';
-import Background from './background';
 
 class Map {
     constructor() {
@@ -10,22 +9,33 @@ class Map {
 
     setup(game) {
         this.game = game;
+
+        this.stars = [];
+
+        for (let i = 0; i < this.game.galaxy.stars.length; i++) {
+            let star = new Star();
+
+            star.setup(this.game.galaxy.stars[i], this.game.galaxy.players);
+
+            this.stars.push(star);
+            
+            star.on('onSelected', this.onStarSelected.bind(this));
+        }
     }
 
     draw() {
         this.container.removeChildren();
-        this.stars = [];
 
-        // Draw all stars in their positions.
-        for (let i = 0; i < this.game.galaxy.stars.length; i++) {
-            let star = new Star(this.container);
+        this.drawStars();
+    }
 
-            star.on('onSelected', this.onStarSelected.bind(this));
-            star.setup(this.game.galaxy.stars[i], this.game.galaxy.players);
+    drawStars() {
+        for(let i = 0; i < this.stars.length - 1; i++) {
+            let star = this.stars[i];
+            
+            this.container.addChild(star.container);
 
             star.draw();
-
-            this.stars.push(star);
         }
     }
 
@@ -38,6 +48,16 @@ class Map {
         gameContainer.viewport.fitWorld();
         gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true);
         gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y);
+    }
+
+    zoomToUser(game, userId) {
+        let player = game.galaxy.players.find(x => x.userId === userId);
+
+        if (!player) {
+            return;
+        }
+
+        this.zoomToPlayer(game, player);
     }
 
     onStarSelected(e) {
@@ -58,4 +78,4 @@ class Map {
     }
 }
 
-export default new Map();
+export default Map;

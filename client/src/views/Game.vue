@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="game">
         <span class="d-none">{{ game._id}}</span>
         <main-bar v-bind:game="game"/>
         <game-container v-bind:game="game"/>

@@ -3,19 +3,17 @@ import Carrier from './carrier';
 import EventEmitter from 'events';
 
 class Star extends EventEmitter {
-    constructor(container) {
+    constructor() {
         super();
         
-        this.container = container;
+        this.container = new PIXI.Container();
+        this.container.buttonMode = true;
+        this.container.interactive = true;
 
-        this.starContainer = new PIXI.Container();
-        this.starContainer.buttonMode = true;
-        this.starContainer.interactive = true;
-        this.starContainer.on('click', this.onClicked.bind(this));
-
+        // TODO: This doesn't work on page load but works on hot reload. Fucking bullshit.
+        this.container.on('pointerdown', this.onClicked.bind(this));
+        
         this.isSelected = false;
-
-        this.container.addChild(this.starContainer);
     }
 
     _getStarPlayer() {
@@ -47,7 +45,7 @@ class Star extends EventEmitter {
     }
 
     draw() {
-        this.starContainer.removeChildren();
+        this.container.removeChildren();
 
         if (this.data.warpGate) {
             this.drawWarpGate();
@@ -86,8 +84,12 @@ class Star extends EventEmitter {
 
         graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
         graphics.endFill();
+        
+        // graphics.interactive= true;
+        // graphics.buttonMode = true;
+        // graphics.on('pointerdown', this.onClicked.bind(this));
 
-        this.starContainer.addChild(graphics);
+        this.container.addChild(graphics);
     }
 
     drawColour() {
@@ -102,7 +104,7 @@ class Star extends EventEmitter {
         graphics.lineStyle(2, player.colour.value);
         graphics.drawCircle(this.data.location.x, this.data.location.y, 4);
 
-        this.starContainer.addChild(graphics);
+        this.container.addChild(graphics);
     }
     
     drawWarpGate() {
@@ -111,7 +113,7 @@ class Star extends EventEmitter {
         graphics.lineStyle(1, 0xFFFFFF);
         graphics.drawStar(this.data.location.x, this.data.location.y, 12, 6, 5);
 
-        this.starContainer.addChild(graphics);
+        this.container.addChild(graphics);
     }
 
     drawCarrier() {
@@ -120,7 +122,7 @@ class Star extends EventEmitter {
         if (!starCarriers.length)
             return;
             
-        let carrier = new Carrier(this.starContainer, starCarriers[0]);
+        let carrier = new Carrier(this.container, starCarriers[0]);
 
         carrier.draw();
     }
@@ -131,7 +133,7 @@ class Star extends EventEmitter {
         graphics.lineStyle(1, 0xFFFFFF, 0.1);
         graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2);
 
-        this.starContainer.addChild(graphics);
+        this.container.addChild(graphics);
     }
 
     drawName() {
@@ -144,7 +146,7 @@ class Star extends EventEmitter {
         text.y = this.data.location.y + 7;
         text.resolution = 10;
 
-        this.starContainer.addChild(text);
+        this.container.addChild(text);
     }
 
     drawGarrison() {
@@ -159,7 +161,7 @@ class Star extends EventEmitter {
         text.y = this.data.location.y + 12;
         text.resolution = 10;
 
-        this.starContainer.addChild(text);
+        this.container.addChild(text);
     }
 
     drawInfrastructure() {
@@ -175,7 +177,7 @@ class Star extends EventEmitter {
         text.y = this.data.location.y - 12;
         text.resolution = 10;
 
-        this.starContainer.addChild(text);
+        this.container.addChild(text);
     }
 
     drawPlayerName() {
@@ -194,7 +196,7 @@ class Star extends EventEmitter {
         text.y = this.data.location.y + 22;
         text.resolution = 10;
 
-        this.starContainer.addChild(text);
+        this.container.addChild(text);
     }
 
     drawScanningRange() {
@@ -211,7 +213,7 @@ class Star extends EventEmitter {
         graphics.lineStyle(1, 0xFFFFFF, 0.3);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);
 
-        this.starContainer.addChild(graphics);
+        this.container.addChild(graphics);
     }
 
     drawHyperspaceRange() {
@@ -228,12 +230,12 @@ class Star extends EventEmitter {
         graphics.lineStyle(1, 0xFFFFFF, 0.3);
         graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2);
 
-        this.starContainer.addChild(graphics);
+        this.container.addChild(graphics);
     }
 
     onClicked(e) {
         this.isSelected = !this.isSelected;
-
+        
         this.emit('onSelected', this);
     }
 }

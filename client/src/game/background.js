@@ -3,10 +3,13 @@ import Nebula from './nebula';
 import Random from './random';
 
 class Background {
-    constructor(container, width, height) {
-        this.container = container;
-        this.width = width;
-        this.height = height;
+    constructor(maxWidth, maxHeight) {
+        this.container = new PIXI.Container({
+            zIndex: -1
+        });
+
+        this.maxWidth = maxWidth;
+        this.maxHeight = maxHeight;
 
         this.nebulaCount = 3; // TODO: Should be calculated based on the size of the world.
     }
@@ -24,10 +27,15 @@ class Background {
             const s3 = new PIXI.Sprite(n3);
             const s4 = new PIXI.Sprite(n4);
 
-            let neb1 = new Nebula(this.container, this.width, this.height, s1);
-            let neb2 = new Nebula(this.container, this.width, this.height, s2);
-            let neb3 = new Nebula(this.container, this.width, this.height, s3);
-            let neb4 = new Nebula(this.container, this.width, this.height, s4);
+            let neb1 = new Nebula(this.maxWidth, this.maxHeight, s1);
+            let neb2 = new Nebula(this.maxWidth, this.maxHeight, s2);
+            let neb3 = new Nebula(this.maxWidth, this.maxHeight, s3);
+            let neb4 = new Nebula(this.maxWidth, this.maxHeight, s4);
+
+            this.container.addChild(neb1.sprite);
+            this.container.addChild(neb2.sprite);
+            this.container.addChild(neb3.sprite);
+            this.container.addChild(neb4.sprite);
 
             neb1.draw();
             neb2.draw();

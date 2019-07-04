@@ -3,8 +3,7 @@ import Random from './random';
 
 class Nebula {
 
-    constructor(container, maxX, maxY, sprite) {
-        this.container = container;
+    constructor(maxX, maxY, sprite) {
         this.maxX = maxX;
         this.maxY = maxY;
         this.sprite = sprite;
@@ -21,8 +20,6 @@ class Nebula {
     drawAt(x, y) {
         this.sprite.x = x;
         this.sprite.y = y;
-
-        this.container.addChild(this.sprite);
     }
 
 }
