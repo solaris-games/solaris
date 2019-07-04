@@ -92,7 +92,8 @@ module.exports = {
                         name: s.name,
                         ownedByPlayerId: s.ownedByPlayerId,
                         location: s.location,
-                        homeStar: s.homeStar
+                        homeStar: s.homeStar,
+                        warpGate: s.warpGate
                     }
                 });
 
@@ -134,7 +135,8 @@ module.exports = {
                             name: s.name,
                             ownedByPlayerId: s.ownedByPlayerId,
                             location: s.location,
-                            homeStar: s.homeStar
+                            homeStar: s.homeStar,
+                            warpGate: s.warpGate
                         }
                     }
                 });
@@ -156,6 +158,7 @@ module.exports = {
 
             // TODO: Work out how to do dark galaxy.
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
+            // TODO: Can we get away with not sending other player's user ids?
 
             return callback(null, doc);
         });
@@ -172,6 +175,10 @@ module.exports = {
 
         // Create all of the stars required.
         game._doc.galaxy.stars = mapHelper.generateStars(game._doc.state.stars, game._doc.settings.general.playerLimit);
+        
+        if (game._doc.settings.specialGalaxy.randomGates !== 'none') {
+            mapHelper.generateGates(game._doc.galaxy.stars, game._doc.settings.specialGalaxy.randomGates, game._doc.settings.general.playerLimit);
+        }
 
         // Setup players and assign to their starting positions.
         game._doc.galaxy.players = playerHelper.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);
@@ -197,6 +204,7 @@ module.exports = {
             // TODO: Disallow if they have been defeated and are trying to rejoin.
             // TODO: General checks to ensure that the game hasn't finished
             //       or anything weird like that.
+            // TODO: Factor in player type setting. i.e premium players only.
 
             // Get the player and update it to assign the user to the player.
             let player = game.galaxy.players.find(x => {

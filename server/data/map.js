@@ -1,4 +1,5 @@
 const starHelper = require('./star');
+const random = require('./random');
 
 function isDuplicateStarPosition(star, stars) {
     const samePositionStars = 
@@ -67,6 +68,26 @@ module.exports = {
         // TODO: If random warp gates are enabled, pick a random selection of stars and add gates to them.
 
         return stars;
+    },
+
+    generateGates(stars, type, playerCount) {
+        let gateCount = 0;
+
+        switch(type) {
+            case 'rare': gateCount = playerCount; break;            // 1 per player
+            case 'common': gateCount = stars.length / playerCount; break;  // fucking loads
+        }
+
+        // Pick stars at random and set them to be warp gates.
+        do {
+            let star = stars[random.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.warpGate) {
+                gateCount++; // Increment because the while loop will decrement.
+            } else {
+                star.warpGate = true;
+            }
+        } while (gateCount--);
     },
 
     sanitizeStarPositions(stars) {

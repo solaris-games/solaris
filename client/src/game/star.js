@@ -49,6 +49,10 @@ class Star extends EventEmitter {
     draw() {
         this.starContainer.removeChildren();
 
+        if (this.data.warpGate) {
+            this.drawWarpGate();
+        }
+
         this.drawColour();
 
         // If the star has a carrier, draw that instead of the star circle.
@@ -95,8 +99,17 @@ class Star extends EventEmitter {
             
         let graphics = new PIXI.Graphics();
 
-        graphics.lineStyle(3, player.colour.value);
+        graphics.lineStyle(2, player.colour.value);
         graphics.drawCircle(this.data.location.x, this.data.location.y, 4);
+
+        this.starContainer.addChild(graphics);
+    }
+    
+    drawWarpGate() {
+        let graphics = new PIXI.Graphics();
+
+        graphics.lineStyle(1, 0xFFFFFF);
+        graphics.drawStar(this.data.location.x, this.data.location.y, 12, 6, 5);
 
         this.starContainer.addChild(graphics);
     }

@@ -44,10 +44,11 @@ export default {
   data() {
     return {
       errors: [],
-      username: null,
-      password: null
+      username: 't',//null,
+      password: 't'//null
     };
   },
+  mounted() { this.handleSubmit(null); },
   methods: {
     async handleSubmit(e) {
       this.errors = [];
@@ -60,7 +61,7 @@ export default {
         this.errors.push("Password required.");
       }
 
-      e.preventDefault();
+      e && e.preventDefault();
 
       if (this.errors.length) return;
 
