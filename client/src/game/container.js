@@ -32,8 +32,9 @@ class GameContainer {
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
 
-            // worldWidth: this._calculateMaxStarX(game),// - this._calculateMinStarX(game),
-            // worldHeight: this._calculateMaxStarY(game),// - this._calculateMinStarY(game),
+            // yolo
+            worldWidth: Number.MAX_VALUE,
+            worldHeight: Number.MAX_VALUE,
         
             interaction: this.app.renderer.plugins.interaction // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
         });
