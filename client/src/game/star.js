@@ -7,15 +7,15 @@ class Star extends EventEmitter {
         super();
         
         this.container = new PIXI.Container();
-        this.container.buttonMode = true;
         this.container.interactive = true;
+        this.container.buttonMode = true;
 
         // TODO: This doesn't work on page load but works on hot reload. Fucking bullshit.
         this.container.on('pointerdown', this.onClicked.bind(this));
-        
+
         this.isSelected = false;
     }
-
+    
     _getStarPlayer() {
         return this.players.find(x => x._id === this.data.ownedByPlayerId);
     }
@@ -85,10 +85,6 @@ class Star extends EventEmitter {
         graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
         graphics.endFill();
         
-        // graphics.interactive= true;
-        // graphics.buttonMode = true;
-        // graphics.on('pointerdown', this.onClicked.bind(this));
-
         this.container.addChild(graphics);
     }
 

@@ -19,13 +19,13 @@ class Map {
 
             this.stars.push(star);
             
+            this.container.addChild(star.container);
+            
             star.on('onSelected', this.onStarSelected.bind(this));
         }
     }
 
     draw() {
-        this.container.removeChildren();
-
         this.drawStars();
     }
 
@@ -33,8 +33,6 @@ class Map {
         for(let i = 0; i < this.stars.length - 1; i++) {
             let star = this.stars[i];
             
-            this.container.addChild(star.container);
-
             star.draw();
         }
     }

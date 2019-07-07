@@ -6,6 +6,7 @@
 import * as PIXI from "pixi.js";
 import GameContainer from "../../game/container";
 import Map from "../../game/map";
+import { setTimeout } from 'timers';
 
 export default {
   props: {
@@ -16,15 +17,19 @@ export default {
     window.addEventListener("resize", this.handleResize);
   },
 
-  mounted() {
+  beforeMount() {
     this.gameContainer = GameContainer;
-    this.gameContainer.setup(this.game);
+    this.gameContainer.setupViewport(this.game);
+    this.gameContainer.setupUI(this.game);
+  },
+
+  mounted() {
+    // Add the game canvas to the screen.
+    this.$el.appendChild(this.gameContainer.app.view); // Add the pixi canvas to the element.
+
     this.gameContainer.draw();
 
     this.gameContainer.map.zoomToUser(this.game, this.$store.state.userId);
-
-    // Add the game canvas to the screen.
-    this.$el.appendChild(this.gameContainer.app.view); // Add the pixi canvas to the element.
   },
 
   beforeDestroy() {

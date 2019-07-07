@@ -15,7 +15,9 @@ class GameContainer {
         });
     }
 
-    setup(game) {
+    setupViewport(game) {
+        this.game = game;
+
         console.log(game);
 
         this.app = new PIXI.Application({
@@ -62,22 +64,22 @@ class GameContainer {
                 maxWidth: 1000,
                 maxHeight: 1000
             });
+    }
 
+    setupUI() {
         this.background = new Background(
             this.starFieldRight - this.starFieldLeft,
             this.starFieldBottom - this.starFieldTop
         );
 
         this.map = new Map();
-        this.map.setup(game);
+        this.map.setup(this.game);
+        
+        this.viewport.addChild(this.background.container);
+        this.viewport.addChild(this.map.container);
     }
 
     draw() {
-        this.viewport.removeChildren();
-
-        this.viewport.addChild(this.background.container);
-        this.viewport.addChild(this.map.container);
-
         this.background.draw();
         this.map.draw();
 
