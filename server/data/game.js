@@ -1,3 +1,4 @@
+const moment = require('moment');
 const Game = require('./db/models/Game');
 
 const mapHelper = require('./map');
@@ -234,6 +235,18 @@ module.exports = {
             player.userId = userId;
             player.raceId = raceId;
             player.alias = alias;
+
+            game.state.playerCount++;
+
+            // If the max player count is reached then start the game.
+            if (game.state.playerCount === game.settings.general.playerLimit) {
+                let start = moment();
+
+                game.state.paused = false;
+                game.state.startDate = start.toDate();
+                game.state.lastTickDate = start.toDate();
+                game.state.nextTickDate = start.add(10, 'm').toDate();
+            }
 
             game.save((err, doc) => {
                 if (err) {

@@ -44,11 +44,10 @@ export default {
   data() {
     return {
       errors: [],
-      username: 't',//null,
-      password: 't'//null
+      username: null,
+      password: null
     };
   },
-  mounted() { this.handleSubmit(null); },
   methods: {
     async handleSubmit(e) {
       this.errors = [];

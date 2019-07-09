@@ -67,8 +67,8 @@ export default {
     computed: {
         timeRemaining: function() {
             this.forceRecomputeCounter;
-            
-            let t = this.nextProduction - new Date().getTime();
+
+            let t = new Date(this.nextProduction) - new Date();
 
             let days = Math.floor(t / (1000 * 60 * 60 * 24));
             let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
