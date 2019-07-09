@@ -1,7 +1,7 @@
 <template>
     <div v-if="game">
         <span class="d-none">{{ game._id}}</span>
-        <main-bar v-bind:game="game"/>
+        <main-bar v-bind:game="game" @onGameJoined="reloadGame"/>
         <game-container v-bind:game="game"/>
     </div>
 </template>
@@ -23,14 +23,19 @@ export default {
         }
     },
     async mounted() {
-        try {
-            let infoResponse = await apiService.getGameInfo(this.$route.query.id);
-            let galaxyResponse = await apiService.getGameGalaxy(this.$route.query.id);
+        this.reloadGame();
+    },
+    methods: {
+        async reloadGame() {
+            try {
+                let infoResponse = await apiService.getGameInfo(this.$route.query.id);
+                let galaxyResponse = await apiService.getGameGalaxy(this.$route.query.id);
 
-            this.game = infoResponse.data; // This will be passed to the game container component.
-            this.game.galaxy = galaxyResponse.data.galaxy;
-        } catch(err) {
-            console.error(err);
+                this.game = infoResponse.data; // This will be passed to the game container component.
+                this.game.galaxy = galaxyResponse.data.galaxy;
+            } catch(err) {
+                console.error(err);
+            }
         }
     }
 }

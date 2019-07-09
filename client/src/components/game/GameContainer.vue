@@ -19,17 +19,15 @@ export default {
 
   beforeMount() {
     this.gameContainer = GameContainer;
-    this.gameContainer.setupViewport(this.game);
-    this.gameContainer.setupUI(this.game);
+    
+    this.loadGame(this.game);
   },
 
   mounted() {
     // Add the game canvas to the screen.
     this.$el.appendChild(this.gameContainer.app.view); // Add the pixi canvas to the element.
 
-    this.gameContainer.draw();
-
-    this.gameContainer.map.zoomToUser(this.game, this.$store.state.userId);
+    this.drawGame(this.game);
   },
 
   beforeDestroy() {
@@ -39,11 +37,27 @@ export default {
   },
 
   methods: {
+    loadGame(game) {
+      this.gameContainer.setupViewport(this.game);
+      this.gameContainer.setupUI(this.game);
+    },
+    drawGame(game) {
+      this.gameContainer.draw();
+
+      this.gameContainer.map.zoomToUser(this.game, this.$store.state.userId);
+    },
     handleResize(e) {
       this.gameContainer.app.renderer.resize(
         window.innerWidth,
         window.innerHeight
       );
+    }
+  },
+
+  watch: {
+    game(newGame, oldGame) {
+      this.loadGame(newGame);
+      this.drawGame(newGame);
     }
   }
 };

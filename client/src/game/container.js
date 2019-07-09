@@ -8,19 +8,6 @@ class GameContainer {
         PIXI.settings.SORTABLE_CHILDREN = true;
 
         this.app = new PIXI.Application({
-            width: window.innerWidth,
-            height: window.innerHeight,
-            backgroundColor: 0x000000, // black hexadecimal
-            resolution: window.devicePixelRatio || 1
-        });
-    }
-
-    setupViewport(game) {
-        this.game = game;
-
-        console.log(game);
-
-        this.app = new PIXI.Application({
             width: window.innerWidth, //window.innerWidth,
             height: window.innerHeight, //window.innerHeight,
             backgroundColor: 0x000000, // black hexadecimal
@@ -41,6 +28,12 @@ class GameContainer {
 
         // add the viewport to the stage
         this.app.stage.addChild(this.viewport);
+    }
+
+    setupViewport(game) {
+        this.game = game;
+
+        console.log(game);
 
         this.starFieldLeft = this._calculateMinStarX(game) - 1000;
         this.starFieldRight = this._calculateMaxStarX(game) + 1000;
@@ -90,18 +83,30 @@ class GameContainer {
     }
 
     _calculateMinStarX(game) {
+        if (!game.galaxy.stars.length)
+            return 0;
+
         return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
     }
 
     _calculateMinStarY(game) {
+        if (!game.galaxy.stars.length)
+            return 0;
+            
         return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
     }
 
     _calculateMaxStarX(game) {
+        if (!game.galaxy.stars.length)
+            return 0;
+            
         return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
     }
 
     _calculateMaxStarY(game) {
+        if (!game.galaxy.stars.length)
+            return 0;
+            
         return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
     }
 }

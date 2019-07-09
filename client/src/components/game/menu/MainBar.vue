@@ -24,6 +24,7 @@ import PlayerListVue from './PlayerList.vue';
 import LeaderboardVue from '../leaderboard/Leaderboard.vue';
 import PlayerVue from '../player/Player.vue';
 import WelcomeVue from '../welcome/Welcome.vue';
+import apiService from '../../../services/apiService';
 
 export default {
     components: {
@@ -62,9 +63,11 @@ export default {
             this.currentMenuState = MENU_STATES.PLAYER;
             this.currentMenuArguments = player;
         },
-        onGameJoined() {
+        async onGameJoined(e) {
             this.currentMenuState = MENU_STATES.LEADERBOARD;
             this.currentMenuArguments = null;
+            
+            this.$emit('onGameJoined', e);
         }
     }
 }
