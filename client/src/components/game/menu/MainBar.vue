@@ -46,9 +46,9 @@ export default {
     },
     mounted() {
         // Check if the user is in this game, if not then show the welcome screen.
-        let thisPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
+        let userPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
 
-        this.currentMenuState = thisPlayer ? 'leaderboard' : 'welcome';
+        this.currentMenuState = userPlayer ? 'leaderboard' : 'welcome';
     },
     methods: {
         resetMenuState() {

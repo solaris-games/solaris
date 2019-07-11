@@ -2,7 +2,7 @@
 <div class="container bg-secondary">
     <h3 class="pt-2">Player</h3>
 
-    <overview :player="player"/>
+    <overview :game="game" :player="player"/>
     
     <achievements v-if="user" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
