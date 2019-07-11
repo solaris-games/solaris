@@ -4,7 +4,6 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div v-if="currentMenuState == MENU_STATES.RESEARCH">RESEARCH</div>
     <div v-if="currentMenuState == MENU_STATES.GALAXY">GALAXY</div>
     <div v-if="currentMenuState == MENU_STATES.INTEL">INTEL</div>
     <div v-if="currentMenuState == MENU_STATES.OPTIONS">OPTIONS</div>
@@ -14,6 +13,7 @@
     <welcome v-if="currentMenuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
     <leaderboard v-if="currentMenuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="currentMenuState == MENU_STATES.PLAYER" :game="game" :player="currentMenuArguments" :key="currentMenuArguments._id"/>
+    <research v-if="currentMenuState == MENU_STATES.RESEARCH"/>
 </div>
 </template>
 
@@ -24,6 +24,7 @@ import PlayerListVue from './PlayerList.vue';
 import LeaderboardVue from '../leaderboard/Leaderboard.vue';
 import PlayerVue from '../player/Player.vue';
 import WelcomeVue from '../welcome/Welcome.vue';
+import ResearchVue from '../research/Research.vue';
 import apiService from '../../../services/apiService';
 
 export default {
@@ -32,7 +33,8 @@ export default {
         'welcome': WelcomeVue,
         'player-list': PlayerListVue,
         'leaderboard': LeaderboardVue,
-        'player': PlayerVue
+        'player': PlayerVue,
+        'research': ResearchVue
     },
     props: {
         game: Object
