@@ -4,16 +4,17 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div v-if="currentMenuState == MENU_STATES.GALAXY">GALAXY</div>
-    <div v-if="currentMenuState == MENU_STATES.INTEL">INTEL</div>
-    <div v-if="currentMenuState == MENU_STATES.OPTIONS">OPTIONS</div>
-    <div v-if="currentMenuState == MENU_STATES.HELP">HELP</div>
-    <div v-if="currentMenuState == MENU_STATES.INBOX">INBOX</div>
+    <div v-if="menuState == MENU_STATES.GALAXY">GALAXY</div>
+    <div v-if="menuState == MENU_STATES.INTEL">INTEL</div>
+    <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
+    <div v-if="menuState == MENU_STATES.HELP">HELP</div>
+    <div v-if="menuState == MENU_STATES.INBOX">INBOX</div>
     
-    <welcome v-if="currentMenuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
-    <leaderboard v-if="currentMenuState == MENU_STATES.LEADERBOARD" :game="game"/>
-    <player v-if="currentMenuState == MENU_STATES.PLAYER" :game="game" :player="currentMenuArguments" :key="currentMenuArguments._id"/>
-    <research v-if="currentMenuState == MENU_STATES.RESEARCH"/>
+    <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
+    <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
+    <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :player="menuArguments" :key="menuArguments._id"/>
+    <research v-if="menuState == MENU_STATES.RESEARCH"/>
+    <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
 </div>
 </template>
 
@@ -25,6 +26,7 @@ import LeaderboardVue from '../leaderboard/Leaderboard.vue';
 import PlayerVue from '../player/Player.vue';
 import WelcomeVue from '../welcome/Welcome.vue';
 import ResearchVue from '../research/Research.vue';
+import StarDetailVue from '../star/StarDetail.vue';
 import apiService from '../../../services/apiService';
 
 export default {
@@ -34,15 +36,16 @@ export default {
         'player-list': PlayerListVue,
         'leaderboard': LeaderboardVue,
         'player': PlayerVue,
-        'research': ResearchVue
+        'research': ResearchVue,
+        'star-detail': StarDetailVue
     },
     props: {
-        game: Object
+        game: Object,
+        menuState: String,
+        menuArguments: Object
     },
     data() {
         return {
-            currentMenuState: null,
-            currentMenuArguments: null,
             MENU_STATES: MENU_STATES
         };
     },
@@ -50,25 +53,16 @@ export default {
         // Check if the user is in this game, if not then show the welcome screen.
         let userPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
 
-        this.currentMenuState = userPlayer ? 'leaderboard' : 'welcome';
+        this.menuState = userPlayer ? 'leaderboard' : 'welcome';
     },
     methods: {
-        resetMenuState() {
-            this.currentMenuState = null;
-            this.currentMenuArguments = null;
-        },
         onMenuStateChanged(e) {
-            this.currentMenuState = e.state || null;
-            this.currentMenuArguments = e.args || null;
+            this.$emit('onMenuStateChanged', e);
         },
-        onPlayerSelected(player) {
-            this.currentMenuState = MENU_STATES.PLAYER;
-            this.currentMenuArguments = player;
+        onPlayerSelected(e) {
+            this.$emit('onPlayerSelected', e);
         },
-        async onGameJoined(e) {
-            this.currentMenuState = MENU_STATES.LEADERBOARD;
-            this.currentMenuArguments = null;
-            
+        onGameJoined(e) {
             this.$emit('onGameJoined', e);
         }
     }

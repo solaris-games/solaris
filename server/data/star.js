@@ -38,6 +38,10 @@ module.exports = {
             terraformedResources: 0, // TODO: This is calculated based on the player's tech level.
             location: random.getRandomPositionInCircle(maxRadius)
         };
+    },
+
+    calculateTerraformedResources(star, player) {
+        return (player.research.terraforming * 5) + star.naturalResources;
     }
 
 }

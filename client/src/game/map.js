@@ -1,9 +1,12 @@
 import * as PIXI from 'pixi.js';
 import gameContainer from './container';
 import Star from './star';
+import EventEmitter from 'events';
 
-class Map {
+class Map extends EventEmitter {
     constructor() {
+        super();
+        
         this.container = new PIXI.Container();
     }
 
@@ -21,7 +24,7 @@ class Map {
             
             this.container.addChild(star.container);
             
-            star.on('onSelected', this.onStarSelected.bind(this));
+            star.on('onStarClicked', this.onStarClicked.bind(this));
         }
     }
 
@@ -58,7 +61,7 @@ class Map {
         this.zoomToPlayer(game, player);
     }
 
-    onStarSelected(e) {
+    onStarClicked(e) {
         this.stars
         .filter(s => s.isSelected || s.data._id === e.data._id) // Get only stars that are selected or the e star.
         .forEach(s => {
@@ -69,10 +72,12 @@ class Map {
 
             s.draw();
         });
+        
+        this.emit('onStarClicked', e);
     }
 
     cleanup() {
-        this.stars.forEach(s => s.removeListener('onSelected', this.onStarSelected));
+        this.stars.forEach(s => s.removeListener('onStarClicked', this.onStarClicked));
     }
 }
 

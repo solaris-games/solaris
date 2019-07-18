@@ -19,7 +19,7 @@ export default {
 
   beforeMount() {
     this.gameContainer = GameContainer;
-    
+
     this.loadGame(this.game);
   },
 
@@ -28,11 +28,18 @@ export default {
     this.$el.appendChild(this.gameContainer.app.view); // Add the pixi canvas to the element.
 
     this.drawGame(this.game);
+    
+    // Bind to game events.
+    this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this));
   },
 
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
 
+    // Remove game events.
+    this.gameContainer.map.removeListener('onStarClicked', this.onStarClicked);
+
+    // Call game cleanup to remove events.
     this.gameContainer.map.cleanup();
   },
 
@@ -51,6 +58,9 @@ export default {
         window.innerWidth,
         window.innerHeight
       );
+    },
+    onStarClicked(e) {
+      this.$emit('onStarClicked', e);
     }
   },
 

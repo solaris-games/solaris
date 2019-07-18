@@ -3,6 +3,7 @@ const Game = require('./db/models/Game');
 
 const mapHelper = require('./map');
 const playerHelper = require('./player');
+const starHelper = require('./star');
 
 const SELECTS = {
     INFO: {
@@ -121,10 +122,17 @@ module.exports = {
             // Work out which ones are not in scanning range and clear their data.
             doc.galaxy.stars = doc.galaxy.stars
                 .map(s => {
-                    // Ignore stars the player owns, they will always be visible.
-                    let isOwnedByPlayer = playerStars.find(y => y._id.equals(s._id));
+                    // Calculate the star's terraformed resources.
+                    if (s.ownedByPlayerId) {
+                        let owningPlayer = doc.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
 
-                    if (isOwnedByPlayer) {
+                        s.terraformedResources = starHelper.calculateTerraformedResources(s, owningPlayer);
+                    }
+
+                    // Ignore stars the player owns, they will always be visible.
+                    let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
+
+                    if (isOwnedByCurrentPlayer) {                        
                         return s;
                     }
 

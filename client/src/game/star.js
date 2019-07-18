@@ -10,7 +10,6 @@ class Star extends EventEmitter {
         this.container.interactive = true;
         this.container.buttonMode = true;
 
-        // TODO: This doesn't work on page load but works on hot reload. Fucking bullshit.
         this.container.on('pointerdown', this.onClicked.bind(this));
 
         this.isSelected = false;
@@ -232,7 +231,7 @@ class Star extends EventEmitter {
     onClicked(e) {
         this.isSelected = !this.isSelected;
         
-        this.emit('onSelected', this);
+        this.emit('onStarClicked', this);
     }
 }
 
