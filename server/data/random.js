@@ -5,11 +5,7 @@ module.exports = {
     },
 
     getRandomNumberBetween(min, max) {
-        return Math.floor(Math.random() * max) + min;
-    },
-
-    getWeightedRandomNumberBetween(min, max) {
-        return Math.round(max / (Math.random() * max + min));
+        return Math.floor(Math.random() * (max - min + 1) + min);
     },
 
     getRandomAngle() {
