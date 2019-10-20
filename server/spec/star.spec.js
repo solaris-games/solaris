@@ -50,4 +50,35 @@ describe('star', () => {
         expect(result).toEqual(35);
     });
 
+    it('should setup a player\'s home star', () => {
+        const newPlayer = {
+            _id: 1
+        }
+
+        const homeStar = {
+            _id: 2
+        };
+
+        const gameSettings = {
+            player: {
+                startingShips: 10,
+                startingInfrastructure: {
+                    economy: 10,
+                    industry: 10,
+                    science: 1
+                }
+            }
+        };
+
+        star.setupHomeStar(homeStar, newPlayer, gameSettings);
+
+        expect(homeStar.ownedByPlayerId).toBe(newPlayer._id);
+        expect(homeStar.garrison).toEqual(gameSettings.player.startingShips);
+        expect(homeStar.naturalResources).toEqual(star.DEFAULTS.MAX_NATURAL_RESOURCES);
+        expect(homeStar.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
+        expect(homeStar.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
+        expect(homeStar.science).toEqual(gameSettings.player.startingInfrastructure.science);
+        expect(homeStar.homeStar).toBeTruthy();
+    });
+
 });

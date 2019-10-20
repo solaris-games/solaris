@@ -37,11 +37,12 @@ function calculateStartingDistance(gameSettings, stars) {
 
 module.exports = {
     
-    createEmptyPlayer(gameSettings) {
+    createEmptyPlayer(gameSettings, colour) {
         return {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
+            colour: colour,
             cash: gameSettings.player.startingCash,
             carriers: [],
             research: {
@@ -59,13 +60,14 @@ module.exports = {
     createEmptyPlayers(gameSettings, allStars) {
         let players = [];
 
+        let minDistance = calculateStartingDistance(gameSettings, allStars);
+
         for(let i = 0; i < gameSettings.general.playerLimit; i++) {
-            player = module.exports.createEmptyPlayer(gameSettings);
-
             // Set the players colour based on their index position in the array.
-            player.colour = colours[i];
+            let colour = colours[i];
 
-            let minDistance = calculateStartingDistance(gameSettings, allStars);
+            player = module.exports.createEmptyPlayer(gameSettings, colour);
+
             let isTooClose = false;
         
             // Find a starting position for the player by picking a random
@@ -80,15 +82,7 @@ module.exports = {
             while (homeStar.ownedByPlayerId || isTooClose);
 
             // Set up the home star
-            homeStar.ownedByPlayerId = player._id;
-            homeStar.garrison = gameSettings.player.startingShips;
-            homeStar.naturalResources = starHelper.DEFAULTS.MAX_NATURAL_RESOURCES; // Home stars should always get max resources.
-            
-            // ONLY the home star gets the starting infrastructure.
-            homeStar.economy = gameSettings.player.startingInfrastructure.economy;
-            homeStar.industry = gameSettings.player.startingInfrastructure.industry;
-            homeStar.science = gameSettings.player.startingInfrastructure.science;
-            homeStar.homeStar = true;
+            starHelper.setupHomeStar(homeStar, player, gameSettings);
 
             // Create a carrier for the home star.
             let homeCarrier = carrierHelper.createAtStar(homeStar);

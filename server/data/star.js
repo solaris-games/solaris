@@ -40,6 +40,20 @@ module.exports = {
         };
     },
 
+    setupHomeStar(homeStar, player, gameSettings) {
+        // Set up the home star
+        player.homeStarId = homeStar._id;
+        homeStar.ownedByPlayerId = player._id;
+        homeStar.garrison = gameSettings.player.startingShips;
+        homeStar.naturalResources = module.exports.DEFAULTS.MAX_NATURAL_RESOURCES; // Home stars should always get max resources.
+        
+        // ONLY the home star gets the starting infrastructure.
+        homeStar.economy = gameSettings.player.startingInfrastructure.economy;
+        homeStar.industry = gameSettings.player.startingInfrastructure.industry;
+        homeStar.science = gameSettings.player.startingInfrastructure.science;
+        homeStar.homeStar = true;
+    },
+
     calculateTerraformedResources(naturalResources, terraforming) {
         return (terraforming * 5) + naturalResources;
     }
