@@ -126,7 +126,7 @@ module.exports = {
                     if (s.ownedByPlayerId) {
                         let owningPlayer = doc.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
 
-                        s.terraformedResources = starHelper.calculateTerraformedResources(s, owningPlayer);
+                        s.terraformedResources = starHelper.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming);
                     }
 
                     // Ignore stars the player owns, they will always be visible.

@@ -40,8 +40,8 @@ module.exports = {
         };
     },
 
-    calculateTerraformedResources(star, player) {
-        return (player.research.terraforming * 5) + star.naturalResources;
+    calculateTerraformedResources(naturalResources, terraforming) {
+        return (terraforming * 5) + naturalResources;
     }
 
 }
