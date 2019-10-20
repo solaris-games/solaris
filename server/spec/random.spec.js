@@ -17,7 +17,7 @@ describe('random', () => {
         const res = random.getRandomNumberBetween(min, max);
         
         expect(res).toBeGreaterThanOrEqual(min);
-        expect(res).toBeLessThan(max);
+        expect(res).toBeLessThanOrEqual(max);
     });
 
     it('should generate a random angle', () => {
