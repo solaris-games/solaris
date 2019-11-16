@@ -126,7 +126,7 @@ describe('player', () => {
             expect(homeStar.garrison).toEqual(gameSettings.player.startingShips - 1); // -1 because of carrier at this star.
         }
 
-        printStars(allStars);
+        //printStars(allStars);
     });
 
 });
