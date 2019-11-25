@@ -48,6 +48,20 @@ module.exports = {
             });
     },
 
+    listActiveGames(userId, callback) {
+        Game.find({
+            'galaxy.players': { $elemMatch: { userId } }
+        })
+            .select(SELECTS.INFO)
+            .exec((err, docs) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                return callback(null, docs);
+            });
+    },
+
     getById(id, select, callback) {
         Game.findById(id)
             .select(select)

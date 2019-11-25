@@ -7,11 +7,32 @@
         
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
+
+    <table>
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Players</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="game in games" v-bind:key="game._id">
+                <td>{{game.settings.general.name}}</td>
+                <td>{{game.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
+                <td>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
+                </td>
+            </tr>
+        </tbody>
+    </table>
   </div>
 </template>
 
 <script>
 import ViewTitle from "../components/ViewTitle";
+
+import apiService from '../services/apiService';
 
 export default {
   components: {
@@ -21,6 +42,15 @@ export default {
       return {
           games: []
       };
+  },
+  async mounted() {
+    try {
+      let response = await apiService.listActiveGames();
+
+      this.games = response.data;
+    } catch(err) {
+      console.error(err);
+    }
   }
 };
 </script>

@@ -59,6 +59,16 @@ router.get('/list/user', middleware.authenticate, (req, res, next) => {
     });
 });
 
+router.get('/list/active', middleware.authenticate, (req, res, next) => {
+    gameHelper.listActiveGames(req.session.userId, (err, games) => {
+        if (err) {
+            return res.status(401).json(err);
+        }
+
+        return res.status(200).json(games);
+    });
+});
+
 router.post('/:gameId/join', middleware.authenticate, (req, res, next) => {
     gameHelper.join(
         req.params.gameId,
