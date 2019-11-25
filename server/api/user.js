@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-
-const User = require('../data/db/models/User');
-const bcrypt = require('bcrypt');
+const userHelper = require('../data/user');
 
 router.post('/', (req, res, next) => {
     let errors = [];
@@ -24,15 +22,12 @@ router.post('/', (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    User.findOne({
-        username: req.body.username
-    })
-    .exec((err, user) => {
+    userHelper.userExists(req.body.username, (err, exists) => {
         if (err) {
             return next(err);
         }
 
-        if (user) {
+        if (exists) {
             return res.status(400).json({
                 errors: [
                     'Username already exists.'
@@ -40,39 +35,25 @@ router.post('/', (req, res, next) => {
             });
         }
 
-        const newUser = new User({
+        userHelper.create({
             email: req.body.email,
             username: req.body.username,
             password: req.body.password
-        });
-    
-        bcrypt.hash(newUser.password, 10, (err, hash) => {
+        }, (err, doc) => {
             if (err) {
                 return next(err);
             }
-    
-            newUser.password = hash;
-    
-            newUser.save((err, doc) => {
-                if (err) {
-                    return next(err)
-                } else {
-                    // Save the user ID to the session to log the user in.
-                    req.session.userId = doc._id;
 
-                    return res.status(201).json({id: doc._id});
-                }
-            });
+            // Save the user ID to the session to log the user in.
+            req.session.userId = doc.id;
+
+            return res.status(201).json(doc);
         });
     });
 });
 
 router.get('/', middleware.authenticate, (req, res, next) => {
-    User.findById(req.session.userId, {
-        // Remove fields we don't want to send back.
-        password: 0,
-        premiumEndDate: 0
-    }, (err, user) => {
+    userHelper.getMe(req.session.userId, (err, user) => {
         if (err) {
             return next(err);
         }
@@ -82,15 +63,7 @@ router.get('/', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/:id', middleware.authenticate, (req, res, next) => {
-    User.findById(req.params.id, {
-        // Remove fields we don't want to send back.
-        password: 0,
-        premiumEndDate: 0,
-        credits: 0,
-        email: 0,
-        emailEnabled: 0,
-        username: 0
-    }, (err, user) => {
+    userHelper.getById(req.params.id, (err, user) => {
         if (err) {
             return next(err);
         }
@@ -100,20 +73,12 @@ router.get('/:id', middleware.authenticate, (req, res, next) => {
 });
 
 router.post('/changeEmailPreference', middleware.authenticate, (req, res, next) => {
-    User.findById(req.session.userId, (err, user) => {
+    userHelper.updateEmailPreference(req.session.userId, req.body.enabled, (err) => {
         if (err) {
             return next(err);
         }
 
-        user.emailEnabled = req.body.enabled;
-
-        user.save((err, doc) => {
-            if (err) {
-                return next(err);
-            }
-
-            return res.sendStatus(200);
-        });
+        return res.sendStatus(200);
     });
 });
 
@@ -128,20 +93,12 @@ router.post('/changeEmailAddress', middleware.authenticate, (req, res, next) => 
         return res.status(400).json({ errors: errors });
     }
 
-    User.findById(req.session.userId, (err, user) => {
+    userHelper.updateEmailAddress(req.session.userId, req.body.email, (err) => {
         if (err) {
             return next(err);
         }
 
-        user.email = req.body.email;
-
-        user.save((err, doc) => {
-            if (err) {
-                return next(err);
-            }
-
-            return res.sendStatus(200);
-        });
+        return res.sendStatus(200);
     });
 });
 
@@ -160,39 +117,17 @@ router.post('/changePassword', middleware.authenticate, (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    User.findById(req.session.userId, (err, user) => {
-        if (err) {
-            return next(err);
-        }
-
-        // Make sure the current password matches.
-        bcrypt.compare(req.body.currentPassword, user.password, (err, result) => {
-            if (result) {
-                // Update the current password to the new password.
-                bcrypt.hash(req.body.newPassword, 10, (err, hash) => {
-                    if (err) {
-                        return next(err);
-                    }
-            
-                    user.password = hash;
-            
-                    user.save((err, doc) => {
-                        if (err) {
-                            return next(err)
-                        } else {
-                            return res.sendStatus(201);
-                        }
-                    });
-                });
-            } else {
-                return res.status(400).json({
-                    errors: [
-                        'The current password is incorrect.'
-                    ]
-                });
+    userHelper.updatePassword(
+        req.session.userId, 
+        req.body.currentPassword,
+        req.body.newPassword,
+        (err) => {
+            if (err) {
+                return next(err);
             }
+
+            return res.sendStatus(200);
         });
-    });
 });
 
 module.exports = router;

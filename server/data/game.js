@@ -311,5 +311,10 @@ module.exports = {
                 return callback(null, doc);
             });
         });
+    },
+
+    clearData(callback) {
+        Game.deleteMany({}, callback);
     }
+
 };
