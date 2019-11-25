@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Map from '../../../game/map'
+import gameContainer from '../../../game/container'
 
 export default {
   props: {
@@ -41,7 +41,7 @@ export default {
       this.$emit('onJoinRequested', player._id)
     },
     zoomToPlayer (player) {
-      Map.zoomToPlayer(this.game, player)
+      gameContainer.map.zoomToPlayer(this.game, player)
     }
   }
 }

@@ -71,8 +71,7 @@
 
 <script>
 import apiService from '../../../services/apiService'
-
-import Map from '../../../game/map'
+import gameContainer from '../../../game/container'
 
 export default {
   props: {
@@ -80,7 +79,7 @@ export default {
   },
   methods: {
     zoomToPlayer (player) {
-      Map.zoomToPlayer(this.game, player)
+      gameContainer.map.zoomToPlayer(this.game, player)
     },
     getUserPlayer () {
       let userId = this.$store.state.userId
