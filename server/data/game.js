@@ -225,31 +225,31 @@ module.exports = {
 
             // Only allow join if the game hasn't started.
             if (game.state.startDate) {
-                throw new Error('The game has already started.');
+                return callback('The game has already started.');
             }
 
             // Only allow join if the game hasn't finished.
             if (game.state.endDate) {
-                throw new Error('The game has already finished.');
+                return callback('The game has already finished.');
             }
 
             // Disallow if they are already in the game as another player.
             let existing = game.galaxy.players.find(x => x.userId === userId);
 
             if (existing) {
-                throw new Error('The user is already participating in this game.');
+                return callback('The user is already participating in this game.');
             }
 
             // Get the player and update it to assign the user to the player.
-            let player = game.galaxy.players.find(x => x._id === playerId);
+            let player = game.galaxy.players.find(x => x._id.toString() === playerId);
 
             if (!player) {
-                throw new Error('The player does not exist in this game.');
+                return callback('The player does not exist in this game.');
             }
 
             // Only allow if the player isn't already occupied.
             if (player && player.userId) {
-                throw new Error('This player has already been taken by another user.');
+                return callback('This player has already been taken by another user.');
             }
 
             // TODO: Factor in player type setting. i.e premium players only.

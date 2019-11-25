@@ -70,6 +70,10 @@ export default {
                 this.errors.push("Alias must less than 24 characters.");
             }
 
+            if (!this._race) {
+                this.errors.push("Race is required.");
+            }
+
             if (this.errors.length) return;
             
             try {
