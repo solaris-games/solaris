@@ -4,7 +4,7 @@
 
     <div v-if="!games.length">
         <p>You are not in any active games.</p>
-        
+
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
 
@@ -30,29 +30,29 @@
 </template>
 
 <script>
-import ViewTitle from "../components/ViewTitle";
+import ViewTitle from '../components/ViewTitle'
 
-import apiService from '../services/apiService';
+import apiService from '../services/apiService'
 
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle
   },
-  data() {
-      return {
-          games: []
-      };
+  data () {
+    return {
+      games: []
+    }
   },
-  async mounted() {
+  async mounted () {
     try {
-      let response = await apiService.listActiveGames();
+      let response = await apiService.listActiveGames()
 
-      this.games = response.data;
-    } catch(err) {
-      console.error(err);
+      this.games = response.data
+    } catch (err) {
+      console.error(err)
     }
   }
-};
+}
 </script>
 
 <style scoped>

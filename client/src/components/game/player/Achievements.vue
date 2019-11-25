@@ -16,14 +16,12 @@
 </template>
 
 <script>
-import router from '../../../router';
-
 export default {
-    props: {
-        victories: Number,
-        rank: Number,
-        renown: Number
-    }
+  props: {
+    victories: Number,
+    rank: Number,
+    renown: Number
+  }
 }
 </script>
 

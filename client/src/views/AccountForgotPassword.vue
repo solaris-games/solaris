@@ -19,40 +19,40 @@
 </template>
 
 <script>
-import router from "../router";
-import ViewTitle from "../components/ViewTitle";
-import FormErrorList from "../components/FormErrorList";
+import router from '../router'
+import ViewTitle from '../components/ViewTitle'
+import FormErrorList from '../components/FormErrorList'
 
 export default {
   components: {
-    "view-title": ViewTitle,
-    "form-error-list": FormErrorList
+    'view-title': ViewTitle,
+    'form-error-list': FormErrorList
   },
-  data() {
+  data () {
     return {
       errors: [],
       username: null,
       password: null
-    };
+    }
   },
   methods: {
-    handleSubmit(e) {
-      this.errors = [];
+    handleSubmit (e) {
+      this.errors = []
 
       if (!this.email) {
-        this.errors.push("Email required.");
+        this.errors.push('Email required.')
       }
 
-      e.preventDefault();
+      e.preventDefault()
 
-      if (this.errors.length) return;
+      if (this.errors.length) return
 
       // TODO: Call the password reset API endpoint
 
-      router.push({ name: "home" });
+      router.push({ name: 'home' })
     }
   }
-};
+}
 </script>
 
 <style scoped>

@@ -3,76 +3,72 @@
 </template>
 
 <script>
-import * as PIXI from "pixi.js";
-import GameContainer from "../../game/container";
-import Map from "../../game/map";
-import { setTimeout } from 'timers';
+import GameContainer from '../../game/container'
 
 export default {
   props: {
     game: Object
   },
 
-  created() {
-    window.addEventListener("resize", this.handleResize);
+  created () {
+    window.addEventListener('resize', this.handleResize)
   },
 
-  beforeMount() {
-    this.gameContainer = GameContainer;
+  beforeMount () {
+    this.gameContainer = GameContainer
 
-    this.loadGame(this.game);
+    this.loadGame(this.game)
   },
 
-  mounted() {
+  mounted () {
     // Add the game canvas to the screen.
-    this.$el.appendChild(this.gameContainer.app.view); // Add the pixi canvas to the element.
+    this.$el.appendChild(this.gameContainer.app.view) // Add the pixi canvas to the element.
 
-    this.drawGame(this.game);
-    
+    this.drawGame(this.game)
+
     // Bind to game events.
-    this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this));
+    this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this))
   },
 
-  beforeDestroy() {
-    window.removeEventListener("resize", this.handleResize);
+  beforeDestroy () {
+    window.removeEventListener('resize', this.handleResize)
 
     // Remove game events.
-    this.gameContainer.map.removeListener('onStarClicked', this.onStarClicked);
+    this.gameContainer.map.removeListener('onStarClicked', this.onStarClicked)
 
     // Call game cleanup to remove events.
-    this.gameContainer.map.cleanup();
+    this.gameContainer.map.cleanup()
   },
 
   methods: {
-    loadGame(game) {
-      this.gameContainer.setupViewport(this.game);
-      this.gameContainer.setupUI(this.game);
+    loadGame (game) {
+      this.gameContainer.setupViewport(this.game)
+      this.gameContainer.setupUI(this.game)
     },
-    drawGame(game) {
-      this.gameContainer.draw();
+    drawGame (game) {
+      this.gameContainer.draw()
 
-      this.gameContainer.map.zoomToUser(this.game, this.$store.state.userId);
+      this.gameContainer.map.zoomToUser(this.game, this.$store.state.userId)
     },
-    handleResize(e) {
+    handleResize (e) {
       this.gameContainer.app.renderer.resize(
         window.innerWidth,
         window.innerHeight
-      );
+      )
     },
-    onStarClicked(e) {
-      this.$emit('onStarClicked', e);
+    onStarClicked (e) {
+      this.$emit('onStarClicked', e)
     }
   },
 
   watch: {
-    game(newGame, oldGame) {
-      this.loadGame(newGame);
-      this.drawGame(newGame);
+    game (newGame, oldGame) {
+      this.loadGame(newGame)
+      this.drawGame(newGame)
     }
   }
-};
+}
 </script>
-
 
 <style scoped>
 div {

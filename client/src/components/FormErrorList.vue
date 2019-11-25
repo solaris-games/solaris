@@ -8,12 +8,10 @@
 </template>
 
 <script>
-import router from '../router';
-
 export default {
-    props: {
-        errors: Array
-    }
+  props: {
+    errors: Array
+  }
 }
 </script>
 

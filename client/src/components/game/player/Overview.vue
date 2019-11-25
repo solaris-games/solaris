@@ -57,63 +57,63 @@
 
 <script>
 export default {
-    props: {
-        game: Object,
-        player: Object
+  props: {
+    game: Object,
+    player: Object
+  },
+  methods: {
+    isUserPlayer () {
+      return this.getUserPlayer()._id === this.player._id
     },
-    methods: {
-        isUserPlayer() {
-            return this.getUserPlayer()._id === this.player._id;
-        },
-        getUserPlayer() {
-            return this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
-        },
-        getUserStars() {
-            let userPlayer = this.getUserPlayer();
+    getUserPlayer () {
+      return this.game.galaxy.players.find(x => x.userId === this.$store.state.userId)
+    },
+    getUserStars () {
+      let userPlayer = this.getUserPlayer()
 
-            if (!userPlayer) {
-                return [];
-            }
+      if (!userPlayer) {
+        return []
+      }
 
-            return this.game.galaxy.stars.filter(x => x.ownedByPlayerId === userPlayer._id);
-        },
-        getUserCarriers() {
-            let userPlayer = this.getUserPlayer();
+      return this.game.galaxy.stars.filter(x => x.ownedByPlayerId === userPlayer._id)
+    },
+    getUserCarriers () {
+      let userPlayer = this.getUserPlayer()
 
-            if (!userPlayer) {
-                return [];
-            }
+      if (!userPlayer) {
+        return []
+      }
 
-            return userPlayer.carriers;
-        },
+      return userPlayer.carriers
+    },
 
-        getStarCount() {
-            return this.game.galaxy.stars.filter(x => x.ownedByPlayerId === this.player._id).length;
-        },
-        getMyStarCount() {
-            return this.getUserStars().length;
-        },
-        getCarrierCount() {
-            return this.player.carriers.length;
-        },
-        getMyCarrierCount() {
-            return this.getUserCarriers().length;
-        },
-        getShipsCount() {
-            let starGarrison = this.game.galaxy.stars.filter(x => x.ownedByPlayerId === this.player._id)
-                                                        .reduce((sum, s) => sum += s.garrison || 0, 0);
-                    
-            let carrierGarrison = this.player.carriers.reduce((sum, s) => sum += s.ships, 0);
+    getStarCount () {
+      return this.game.galaxy.stars.filter(x => x.ownedByPlayerId === this.player._id).length
+    },
+    getMyStarCount () {
+      return this.getUserStars().length
+    },
+    getCarrierCount () {
+      return this.player.carriers.length
+    },
+    getMyCarrierCount () {
+      return this.getUserCarriers().length
+    },
+    getShipsCount () {
+      let starGarrison = this.game.galaxy.stars.filter(x => x.ownedByPlayerId === this.player._id)
+        .reduce((sum, s) => { sum += s.garrison || 0 }, 0)
 
-            return starGarrison + carrierGarrison;
-        },
-        getMyShipsCount() {
-            let starGarrison = this.getUserStars().reduce((sum, s) => sum += s.garrison || 0, 0);
-            let carrierGarrison = this.getUserCarriers().reduce((sum, s) => sum += s.ships, 0);
+      let carrierGarrison = this.player.carriers.reduce((sum, s) => { sum += s.ships }, 0)
 
-            return starGarrison + carrierGarrison;
-        }
+      return starGarrison + carrierGarrison
+    },
+    getMyShipsCount () {
+      let starGarrison = this.getUserStars().reduce((sum, s) => { sum += s.garrison || 0 }, 0)
+      let carrierGarrison = this.getUserCarriers().reduce((sum, s) => { sum += s.ships }, 0)
+
+      return starGarrison + carrierGarrison
     }
+  }
 }
 </script>
 

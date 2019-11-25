@@ -11,17 +11,17 @@
 
 <script>
 export default {
-    props: {
-        players: Array
+  props: {
+    players: Array
+  },
+  methods: {
+    getFriendlyColour (colour) {
+      return colour.replace('0x', '#')
     },
-    methods: {
-        getFriendlyColour(colour) {
-            return colour.replace('0x', '#');
-        },
-        onPlayerSelected(player) {
-            this.$emit('onPlayerSelected', player);
-        }
+    onPlayerSelected (player) {
+      this.$emit('onPlayerSelected', player)
     }
+  }
 }
 </script>
 

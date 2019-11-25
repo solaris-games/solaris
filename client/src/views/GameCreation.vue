@@ -512,70 +512,70 @@
           </select>
         </div>
       </div>
-      
+
     </form>
   </div>
 </template>
 
 <script>
-import ViewTitle from "../components/ViewTitle";
-import ViewSubtitle from "../components/ViewSubtitle";
-import FormErrorList from "../components/FormErrorList";
-import apiService from '../services/apiService';
-import router from '../router';
+import ViewTitle from '../components/ViewTitle'
+import ViewSubtitle from '../components/ViewSubtitle'
+import FormErrorList from '../components/FormErrorList'
+import apiService from '../services/apiService'
+import router from '../router'
 
 export default {
   components: {
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
-    "form-error-list": FormErrorList
+    'form-error-list': FormErrorList
   },
-  data() {
+  data () {
     return {
       errors: [],
       settings: null,
       options: null
-    };
+    }
   },
-  async mounted() {
+  async mounted () {
     try {
-      let response = await apiService.getDefaultGameSettings();
+      let response = await apiService.getDefaultGameSettings()
 
-      this.settings = response.data.settings;
-      this.options = response.data.options;
-    } catch(err) {
-      console.error(err);
+      this.settings = response.data.settings
+      this.options = response.data.options
+    } catch (err) {
+      console.error(err)
     }
   },
   methods: {
-    async handleSubmit(e) {
-      this.errors = [];
+    async handleSubmit (e) {
+      this.errors = []
 
       if (!this.settings.general.name) {
-        this.errors.push("Game name required.");
+        this.errors.push('Game name required.')
       }
 
       if (!this.settings.general.description) {
-        this.errors.push("Game description required.");
+        this.errors.push('Game description required.')
       }
 
-      e.preventDefault();
+      e.preventDefault()
 
-      if (this.errors.length) return;
+      if (this.errors.length) return
 
       try {
         // Call the login API endpoint
-        let response = await apiService.createGame(this.settings);
-        
+        let response = await apiService.createGame(this.settings)
+
         if (response.status === 201) {
-          router.push({ name: "game-detail", query: { id: response.data } });
+          router.push({ name: 'game-detail', query: { id: response.data } })
         }
-      } catch(err) {
-        this.errors = err.response.data.errors || [];
+      } catch (err) {
+        this.errors = err.response.data.errors || []
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

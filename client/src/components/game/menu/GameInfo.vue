@@ -42,76 +42,74 @@
 </template>
 
 <script>
-import router from '../../../router';
-import { setInterval } from 'timers';
-import MENU_STATES from '../../data/menuStates';
-import GameContainer from '../../../game/container';
+import router from '../../../router'
+import { setInterval } from 'timers'
+import MENU_STATES from '../../data/menuStates'
+import GameContainer from '../../../game/container'
 
 export default {
-    props: {
-        credits: Number,
-        nextProduction: Date,
-        onMenuStateChanged: Function
-    },
-    data() {
-        return {
-            forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
-            MENU_STATES: MENU_STATES
-        };
-    },
-    mounted() {
-        setInterval(() => {
-            this.forceRecomputeCounter++;
-        }, 1000);
-    },
-    computed: {
-        timeRemaining: function() {
-            this.forceRecomputeCounter;
-
-            let t = new Date(this.nextProduction) - new Date();
-
-            let days = Math.floor(t / (1000 * 60 * 60 * 24));
-            let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60));
-            let secs = Math.floor((t % (1000 * 60)) / 1000);
-
-            let str = '';
-
-            if (days > 0) {
-                str += `${days}d `;
-            }
-
-            if (hours > 0) {
-                str += `${hours}h `;
-            }
-
-            if (mins > 0) {
-                str += `${mins}m `;
-            }
-
-            str += `${secs}s`;
-
-            return str;
-        }
-    },
-    methods: {
-        setMenuState(state, args) {
-            this.$emit('onMenuStateChanged', {
-                state,
-                args
-            });
-        },
-        goToMainMenu() {
-            router.push({ name: 'main-menu' });
-        },
-        fitGalaxy() {
-            GameContainer.viewport.fitWorld();
-            this.zoomByPercent(-0.1);
-        },
-        zoomByPercent(percent) {
-            GameContainer.viewport.zoomPercent(percent, true);
-        }
+  props: {
+    credits: Number,
+    nextProduction: Date,
+    onMenuStateChanged: Function
+  },
+  data () {
+    return {
+      forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
+      MENU_STATES: MENU_STATES
     }
+  },
+  mounted () {
+    setInterval(() => {
+      this.forceRecomputeCounter++
+    }, 1000)
+  },
+  computed: {
+    timeRemaining: function () {
+      let t = new Date(this.nextProduction) - new Date()
+
+      let days = Math.floor(t / (1000 * 60 * 60 * 24))
+      let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60))
+      let secs = Math.floor((t % (1000 * 60)) / 1000)
+
+      let str = ''
+
+      if (days > 0) {
+        str += `${days}d `
+      }
+
+      if (hours > 0) {
+        str += `${hours}h `
+      }
+
+      if (mins > 0) {
+        str += `${mins}m `
+      }
+
+      str += `${secs}s`
+
+      return str
+    }
+  },
+  methods: {
+    setMenuState (state, args) {
+      this.$emit('onMenuStateChanged', {
+        state,
+        args
+      })
+    },
+    goToMainMenu () {
+      router.push({ name: 'main-menu' })
+    },
+    fitGalaxy () {
+      GameContainer.viewport.fitWorld()
+      this.zoomByPercent(-0.1)
+    },
+    zoomByPercent (percent) {
+      GameContainer.viewport.zoomPercent(percent, true)
+    }
+  }
 }
 </script>
 

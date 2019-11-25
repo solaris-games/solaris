@@ -19,44 +19,44 @@
 </template>
 
 <script>
-import router from "../router";
-import ViewTitle from "../components/ViewTitle";
-import FormErrorList from "../components/FormErrorList";
-import apiService from '../services/apiService';
+import router from '../router'
+import ViewTitle from '../components/ViewTitle'
+import FormErrorList from '../components/FormErrorList'
+import apiService from '../services/apiService'
 
 export default {
   components: {
-    "view-title": ViewTitle,
-    "form-error-list": FormErrorList
+    'view-title': ViewTitle,
+    'form-error-list': FormErrorList
   },
-  data() {
+  data () {
     return {
       errors: [],
       email: null
-    };
+    }
   },
   methods: {
-    async handleSubmit(e) {
-      this.errors = [];
+    async handleSubmit (e) {
+      this.errors = []
 
       if (!this.email) {
-        this.errors.push("Email address required.");
+        this.errors.push('Email address required.')
       }
 
-      e.preventDefault();
+      e.preventDefault()
 
-      if (this.errors.length) return;
+      if (this.errors.length) return
 
       try {
-        await apiService.updateEmailAddress(this.email);
+        await apiService.updateEmailAddress(this.email)
 
-        router.push({ name: "main-menu" });
-      } catch(err) {
-        this.errors = err.response.data.errors || [];
+        router.push({ name: 'main-menu' })
+      } catch (err) {
+        this.errors = err.response.data.errors || []
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

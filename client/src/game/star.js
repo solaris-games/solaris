@@ -1,238 +1,229 @@
-import * as PIXI from 'pixi.js';
-import Carrier from './carrier';
-import EventEmitter from 'events';
+import * as PIXI from 'pixi.js'
+import Carrier from './carrier'
+import EventEmitter from 'events'
 
 class Star extends EventEmitter {
-    constructor() {
-        super();
-        
-        this.container = new PIXI.Container();
-        this.container.interactive = true;
-        this.container.buttonMode = true;
+  constructor () {
+    super()
 
-        this.container.on('pointerdown', this.onClicked.bind(this));
+    this.container = new PIXI.Container()
+    this.container.interactive = true
+    this.container.buttonMode = true
 
-        this.isSelected = false;
-    }
-    
-    _getStarPlayer() {
-        return this.players.find(x => x._id === this.data.ownedByPlayerId);
-    }
+    this.container.on('pointerdown', this.onClicked.bind(this))
 
-    _getStarCarriers() {
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-                
-        if (!player)
-            return [];
+    this.isSelected = false
+  }
 
-        let carriersAtStar = player.carriers.filter(x => x.orbiting === this.data._id);
+  _getStarPlayer () {
+    return this.players.find(x => x._id === this.data.ownedByPlayerId)
+  }
 
-        return carriersAtStar;
-    }
+  _getStarCarriers () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
 
-    _isOutOfScanningRange() {
-        // These may be undefined, if so it means that they are out of scanning range.
-        return typeof this.data.economy === 'undefined' || 
-            typeof this.data.industry === 'undefined' || 
-            typeof this.data.science === 'undefined';
-    }
+    if (!player) { return [] }
 
-    setup(data, players) {
-        this.data = data;
-        this.players = players;
-    }
+    let carriersAtStar = player.carriers.filter(x => x.orbiting === this.data._id)
 
-    draw() {
-        this.container.removeChildren();
+    return carriersAtStar
+  }
 
-        if (this.data.warpGate) {
-            this.drawWarpGate();
-        }
+  _isOutOfScanningRange () {
+    // These may be undefined, if so it means that they are out of scanning range.
+    return typeof this.data.economy === 'undefined' ||
+            typeof this.data.industry === 'undefined' ||
+            typeof this.data.science === 'undefined'
+  }
 
-        this.drawColour();
+  setup (data, players) {
+    this.data = data
+    this.players = players
+  }
 
-        // If the star has a carrier, draw that instead of the star circle.
-        if (this._getStarCarriers().length)
-            this.drawCarrier();
-        else
-            this.drawStar();
+  draw () {
+    this.container.removeChildren()
 
-        this.drawHalo();
-        this.drawName();
-        this.drawGarrison();
-        //this.drawPlayerName();
-        
-        if (this.isSelected) {
-            this.drawInfrastructure();
-            this.drawScanningRange();
-            this.drawHyperspaceRange();
-        }
+    if (this.data.warpGate) {
+      this.drawWarpGate()
     }
 
-    drawStar() {
-        let graphics = new PIXI.Graphics();
+    this.drawColour()
 
-        if (this._isOutOfScanningRange()) {
-            graphics.lineStyle(1, 0xFFFFFF);
-            graphics.beginFill(0x000000);
-        } else {
-            graphics.lineStyle(0);
-            graphics.beginFill(0xFFFFFF);
-        }
+    // If the star has a carrier, draw that instead of the star circle.
+    if (this._getStarCarriers().length) { this.drawCarrier() } else { this.drawStar() }
 
-        graphics.drawCircle(this.data.location.x, this.data.location.y, 2);
-        graphics.endFill();
-        
-        this.container.addChild(graphics);
+    this.drawHalo()
+    this.drawName()
+    this.drawGarrison()
+    // this.drawPlayerName();
+
+    if (this.isSelected) {
+      this.drawInfrastructure()
+      this.drawScanningRange()
+      this.drawHyperspaceRange()
+    }
+  }
+
+  drawStar () {
+    let graphics = new PIXI.Graphics()
+
+    if (this._isOutOfScanningRange()) {
+      graphics.lineStyle(1, 0xFFFFFF)
+      graphics.beginFill(0x000000)
+    } else {
+      graphics.lineStyle(0)
+      graphics.beginFill(0xFFFFFF)
     }
 
-    drawColour() {
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-        
-        if (!player)
-            return;
-            
-        let graphics = new PIXI.Graphics();
+    graphics.drawCircle(this.data.location.x, this.data.location.y, 2)
+    graphics.endFill()
 
-        graphics.lineStyle(2, player.colour.value);
-        graphics.drawCircle(this.data.location.x, this.data.location.y, 4);
+    this.container.addChild(graphics)
+  }
 
-        this.container.addChild(graphics);
-    }
-    
-    drawWarpGate() {
-        let graphics = new PIXI.Graphics();
+  drawColour () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
 
-        graphics.lineStyle(1, 0xFFFFFF);
-        graphics.drawStar(this.data.location.x, this.data.location.y, 12, 6, 5);
+    if (!player) { return }
 
-        this.container.addChild(graphics);
-    }
+    let graphics = new PIXI.Graphics()
 
-    drawCarrier() {
-        let starCarriers = this._getStarCarriers();
+    graphics.lineStyle(2, player.colour.value)
+    graphics.drawCircle(this.data.location.x, this.data.location.y, 4)
 
-        if (!starCarriers.length)
-            return;
-            
-        let carrier = new Carrier(this.container, starCarriers[0]);
+    this.container.addChild(graphics)
+  }
 
-        carrier.draw();
-    }
+  drawWarpGate () {
+    let graphics = new PIXI.Graphics()
 
-    drawHalo() {
-        let graphics = new PIXI.Graphics();
+    graphics.lineStyle(1, 0xFFFFFF)
+    graphics.drawStar(this.data.location.x, this.data.location.y, 12, 6, 5)
 
-        graphics.lineStyle(1, 0xFFFFFF, 0.1);
-        graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2);
+    this.container.addChild(graphics)
+  }
 
-        this.container.addChild(graphics);
-    }
+  drawCarrier () {
+    let starCarriers = this._getStarCarriers()
 
-    drawName() {
-        let text = new PIXI.Text(this.data.name, {
-            fontSize: 4,
-            fill: 0xFFFFFF
-        });
+    if (!starCarriers.length) { return }
 
-        text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 7;
-        text.resolution = 10;
+    let carrier = new Carrier(this.container, starCarriers[0])
 
-        this.container.addChild(text);
-    }
+    carrier.draw()
+  }
 
-    drawGarrison() {
-        if (!this.data.garrison) return;
+  drawHalo () {
+    let graphics = new PIXI.Graphics()
 
-        let text = new PIXI.Text(this.data.garrison, {
-            fontSize: 4,
-            fill: 0xFFFFFF
-        });
+    graphics.lineStyle(1, 0xFFFFFF, 0.1)
+    graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2)
 
-        text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 12;
-        text.resolution = 10;
+    this.container.addChild(graphics)
+  }
 
-        this.container.addChild(text);
-    }
+  drawName () {
+    let text = new PIXI.Text(this.data.name, {
+      fontSize: 4,
+      fill: 0xFFFFFF
+    })
 
-    drawInfrastructure() {
-        if (!this.data.ownedByPlayerId) return; // TODO Does abandoning stars destroy ALL infrastructure?
-        if (this._isOutOfScanningRange()) return;
+    text.x = this.data.location.x - (text.width / 2)
+    text.y = this.data.location.y + 7
+    text.resolution = 10
 
-        let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
-            fontSize: 4,
-            fill: 0xFFFFFF
-        });
+    this.container.addChild(text)
+  }
 
-        text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y - 12;
-        text.resolution = 10;
+  drawGarrison () {
+    if (!this.data.garrison) return
 
-        this.container.addChild(text);
-    }
+    let text = new PIXI.Text(this.data.garrison, {
+      fontSize: 4,
+      fill: 0xFFFFFF
+    })
 
-    drawPlayerName() {
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-        
-        if (!player)
-            return;
+    text.x = this.data.location.x - (text.width / 2)
+    text.y = this.data.location.y + 12
+    text.resolution = 10
 
-        let text = new PIXI.Text(player.alias, {
-            fontSize: 4,
-            fill: 0xFFFFFF
-        });
+    this.container.addChild(text)
+  }
 
-        text.x = this.data.location.x - (text.width / 2);
-        text.y = this.data.location.y + 22;
-        text.resolution = 10;
+  drawInfrastructure () {
+    if (!this.data.ownedByPlayerId) return // TODO Does abandoning stars destroy ALL infrastructure?
+    if (this._isOutOfScanningRange()) return
 
-        this.container.addChild(text);
-    }
+    let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
+      fontSize: 4,
+      fill: 0xFFFFFF
+    })
 
-    drawScanningRange() {
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-        
-        if (!player)
-            return;
-            
-        let graphics = new PIXI.Graphics();
+    text.x = this.data.location.x - (text.width / 2)
+    text.y = this.data.location.y - 12
+    text.resolution = 10
 
-        let radius = (((player.research.scanning || 1) + 2) * 30) / 2;
+    this.container.addChild(text)
+  }
 
-        graphics.lineStyle(1, 0xFFFFFF, 0.3);
-        graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1);
+  drawPlayerName () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
 
-        this.container.addChild(graphics);
-    }
+    if (!player) { return }
 
-    drawHyperspaceRange() {
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-        
-        if (!player)
-            return;
-            
-        let graphics = new PIXI.Graphics();
+    let text = new PIXI.Text(player.alias, {
+      fontSize: 4,
+      fill: 0xFFFFFF
+    })
 
-        let radius = (((player.research.hyperspace || 1) + 3) * 30) / 2;
+    text.x = this.data.location.x - (text.width / 2)
+    text.y = this.data.location.y + 22
+    text.resolution = 10
 
-        graphics.lineStyle(1, 0xFFFFFF, 0.3);
-        graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2);
+    this.container.addChild(text)
+  }
 
-        this.container.addChild(graphics);
-    }
+  drawScanningRange () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
 
-    onClicked(e) {
-        this.isSelected = !this.isSelected;
-        
-        this.emit('onStarClicked', this);
-    }
+    if (!player) { return }
+
+    let graphics = new PIXI.Graphics()
+
+    let radius = (((player.research.scanning || 1) + 2) * 30) / 2
+
+    graphics.lineStyle(1, 0xFFFFFF, 0.3)
+    graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1)
+
+    this.container.addChild(graphics)
+  }
+
+  drawHyperspaceRange () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
+
+    if (!player) { return }
+
+    let graphics = new PIXI.Graphics()
+
+    let radius = (((player.research.hyperspace || 1) + 3) * 30) / 2
+
+    graphics.lineStyle(1, 0xFFFFFF, 0.3)
+    graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
+
+    this.container.addChild(graphics)
+  }
+
+  onClicked (e) {
+    this.isSelected = !this.isSelected
+
+    this.emit('onStarClicked', this)
+  }
 }
 
-export default Star;
+export default Star

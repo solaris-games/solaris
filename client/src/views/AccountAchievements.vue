@@ -39,7 +39,7 @@
         <p>For the toughest opponents. Let other players be warned, this player shows a level of commitment that goes above and beyond.</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-chess-king"></i></h1>
@@ -49,7 +49,7 @@
         <p>For players who had a plan and executed it with aplomb. Be they allies or enemies, some players deserve a little recognition for their achievements. </p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-pen-fancy"></i></h1>
@@ -59,7 +59,7 @@
         <p>For the players who breathe life and flavor into the game with their commitment to roleplaying. Good show chaps!</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-paw"></i></h1>
@@ -69,7 +69,7 @@
         <p>For players who show great courage in the face of adversity, holding on against all odds to support the alliance in victory! </p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-dice"></i></h1>
@@ -79,7 +79,7 @@
         <p>Great tactics, awesome strategy, or just one lucky son-of-a-gun. For the player whose stars were aligned. They won't be so lucky next time!</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-pizza-slice"></i></h1>
@@ -89,7 +89,7 @@
         <p>Had a great game but can't decide which badge is right? Buy a slice of cheese. Who doesn't like pizza?</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-fish"></i></h1>
@@ -99,7 +99,7 @@
         <p>Hard places breed hard men, and hard men rule the world. Award this badge to the Ironborn of the universe.</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-fighter-jet"></i></h1>
@@ -109,7 +109,7 @@
         <p>For the player who shoots first and asks questions later. Whether they deliver a hammer blow or are massacred, such a bold move deserves some recognition.</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-satellite"></i></h1>
@@ -119,7 +119,7 @@
         <p>Some players are always watching, just waiting for you to make that one crucial mistake. Why not buy that player who never seems to sleep the sentinel badge?</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-atom"></i></h1>
@@ -129,7 +129,7 @@
         <p>For those who love the feel of a lab coat against the skin. Reward those who claim galactic dominance by pushing their research teams to the limit!</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-question"></i></h1>
@@ -139,7 +139,7 @@
         <p>We all seek to anticipate our opponents’ moves, but sometimes their actions defy all predictions. Why not buy them this badge to show them how confused you are by their judgements.</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-biohazard"></i></h1>
@@ -149,7 +149,7 @@
         <p>Some players just make your blood boil. Vent your spleen and label them toxic.</p>
       </div>
     </div>
-    
+
     <div class="row container">
       <div class="">
         <h1><i class="fas fa-user-friends"></i></h1>
@@ -163,10 +163,10 @@
 </template>
 
 <script>
-import ViewTitle from '../components/ViewTitle';
-import ViewSubtitle from '../components/ViewSubtitle';
-import Achievements from '../components/game/player/Achievements';
-import apiService from '../services/apiService';
+import ViewTitle from '../components/ViewTitle'
+import ViewSubtitle from '../components/ViewSubtitle'
+import Achievements from '../components/game/player/Achievements'
+import apiService from '../services/apiService'
 
 export default {
   components: {
@@ -174,21 +174,21 @@ export default {
     'view-subtitle': ViewSubtitle,
     'achievements': Achievements
   },
-  data() {
+  data () {
     return {
       achievements: null
-    };
+    }
   },
-  async mounted() {
+  async mounted () {
     try {
-      let response = await apiService.getMyUserInfo();
+      let response = await apiService.getMyUserInfo()
 
-      this.achievements = response.data.achievements;
-    } catch(err) {
-      console.error(err);
+      this.achievements = response.data.achievements
+    } catch (err) {
+      console.error(err)
     }
   }
-};
+}
 </script>
 
 <style scoped>

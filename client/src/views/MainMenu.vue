@@ -25,22 +25,20 @@
 </template>
 
 <script>
-import axios from 'axios';
-import router from "../router";
-import store from '../store';
-import apiService from '../services/apiService';
+import router from '../router'
+import apiService from '../services/apiService'
 
 export default {
   methods: {
-    async logout() {
-      this.$store.commit('clearUserId');
+    async logout () {
+      this.$store.commit('clearUserId')
 
-      await apiService.logout();
-      
-      router.push({ name: "home" });
+      await apiService.logout()
+
+      router.push({ name: 'home' })
     }
   }
-};
+}
 </script>
 
 <style scoped>

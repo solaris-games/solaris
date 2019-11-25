@@ -6,14 +6,14 @@
         <h4>{{game.settings.general.name}}</h4>
         <img :src="getServerGameImage(game.settings.general.name)">
         <p>{{game.state.playerCount}} of {{game.settings.general.playerLimit}} Players</p>
-         
+
         <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
     </div>
 
     <hr>
 
     <h3>User Created Games</h3>
-    
+
     <table>
         <thead>
             <tr>
@@ -36,42 +36,42 @@
 </template>
 
 <script>
-import ViewTitle from "../components/ViewTitle";
-import apiService from '../services/apiService';
+import ViewTitle from '../components/ViewTitle'
+import apiService from '../services/apiService'
 
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle
   },
-  data() {
-      return {
-          serverGames: [],
-          userGames: []
-      };
+  data () {
+    return {
+      serverGames: [],
+      userGames: []
+    }
   },
-  async mounted() {
-      try {
-        let response = await apiService.listOfficialGames();
-        this.serverGames = response.data;
+  async mounted () {
+    try {
+      let response = await apiService.listOfficialGames()
+      this.serverGames = response.data
 
-        response = await apiService.listUserGames();
-        this.userGames = response.data;
-      } catch(err) {
-          console.error(err);
-      }
+      response = await apiService.listUserGames()
+      this.userGames = response.data
+    } catch (err) {
+      console.error(err)
+    }
   },
   methods: {
-      getServerGameImage(name) {
-          try {
-            return require('../assets/cards/' + name.replace(/\s/g, '') + '.jpg');
-          } catch(err) {
-            console.error(err);
+    getServerGameImage (name) {
+      try {
+        return require('../assets/cards/' + name.replace(/\s/g, '') + '.jpg')
+      } catch (err) {
+        console.error(err)
 
-            return '';
-          }
+        return ''
       }
+    }
   }
-};
+}
 </script>
 
 <style scoped>

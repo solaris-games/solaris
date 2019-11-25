@@ -29,58 +29,58 @@
 </template>
 
 <script>
-import router from "../router";
-import ViewTitle from "../components/ViewTitle";
-import FormErrorList from "../components/FormErrorList";
-import apiService from '../services/apiService';
+import router from '../router'
+import ViewTitle from '../components/ViewTitle'
+import FormErrorList from '../components/FormErrorList'
+import apiService from '../services/apiService'
 
 export default {
   components: {
-    "view-title": ViewTitle,
-    "form-error-list": FormErrorList
+    'view-title': ViewTitle,
+    'form-error-list': FormErrorList
   },
-  data() {
+  data () {
     return {
       errors: [],
       currentPassword: null,
       newPassword: null,
       newPasswordConfirm: null
-    };
+    }
   },
   methods: {
-    async handleSubmit(e) {
-      this.errors = [];
+    async handleSubmit (e) {
+      this.errors = []
 
       if (!this.currentPassword) {
-        this.errors.push("Current password required.");
+        this.errors.push('Current password required.')
       }
 
       if (!this.newPassword) {
-        this.errors.push("New password required.");
+        this.errors.push('New password required.')
       }
 
       if (!this.newPasswordConfirm) {
-        this.errors.push("New password confirmation required.");
+        this.errors.push('New password confirmation required.')
       }
 
       if (this.newPassword !== this.newPasswordConfirm) {
-        this.errors.push("Passwords must match.");
+        this.errors.push('Passwords must match.')
       }
 
-      e.preventDefault();
+      e.preventDefault()
 
-      if (this.errors.length) return;
+      if (this.errors.length) return
 
       try {
-        await apiService.updatePassword(this.currentPassword, this.newPassword);
+        await apiService.updatePassword(this.currentPassword, this.newPassword)
 
-        router.push({ name: "main-menu" });
-      } catch(err) {
-        this.errors = err.response.data.errors || [];
+        router.push({ name: 'main-menu' })
+      } catch (err) {
+        this.errors = err.response.data.errors || []
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

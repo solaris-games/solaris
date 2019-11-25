@@ -10,19 +10,19 @@
 </template>
 
 <script>
-import router from '../router';
+import router from '../router'
 
 export default {
-    props: {
-        title: String,
-        navigation: { type:String, default: 'main-menu' },
-        icon: { type: String, default: 'home' }
-    },
-    methods: {
-        navigate() {
-            router.push({ name: this.navigation });
-        }
+  props: {
+    title: String,
+    navigation: { type: String, default: 'main-menu' },
+    icon: { type: String, default: 'home' }
+  },
+  methods: {
+    navigate () {
+      router.push({ name: this.navigation })
     }
+  }
 }
 </script>
 

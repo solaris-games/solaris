@@ -19,74 +19,74 @@
 </template>
 
 <script>
-import apiService from '../../../services/apiService';
+import apiService from '../../../services/apiService'
 
-import FormErrorListVue from '../../FormErrorList';
-import SelectRaceVue from './SelectRace.vue';
-import SelectAliasVue from './SelectAlias.vue';
-import SelectLocationVue from './SelectLocation.vue';
+import FormErrorListVue from '../../FormErrorList'
+import SelectRaceVue from './SelectRace.vue'
+import SelectAliasVue from './SelectAlias.vue'
+import SelectLocationVue from './SelectLocation.vue'
 
 export default {
-    components: {
-        'form-error-list': FormErrorListVue,
-        'select-race': SelectRaceVue,
-        'select-alias': SelectAliasVue,
-        'select-location': SelectLocationVue
-    },
-    props: {
-        game: Object
-    },
-    data() {
-        return {
-            domain: '',
-            errors: [],
-            _alias: '',
-            _race: 38
-        };
-    },
-    mounted() {
-        this.protocol = window.location.protocol;
-        this.domain = window.location.host;
-    },
-    methods: {
-        onAliasChanged(e) {
-            this._alias = e;
-        },
-        onRaceChanged(e) {
-            this._race = e;
-        },
-        async onJoinRequested(playerId) {
-            this.errors = [];
-
-            if (!this._alias) {
-                this.errors.push("Alias is required.");
-            }
-
-            if (this._alias && this._alias.length < 3) {
-                this.errors.push("Alias must be 3 characters or more.");
-            }
-
-            if (this._alias && this._alias.length > 24) {
-                this.errors.push("Alias must less than 24 characters.");
-            }
-
-            if (!this._race) {
-                this.errors.push("Race is required.");
-            }
-
-            if (this.errors.length) return;
-            
-            try {
-                let response = await apiService.joinGame(this.game._id, playerId, this._race, this._alias);
-
-                if (response.status === 200) {
-                    this.$emit('onGameJoined', playerId);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
+  components: {
+    'form-error-list': FormErrorListVue,
+    'select-race': SelectRaceVue,
+    'select-alias': SelectAliasVue,
+    'select-location': SelectLocationVue
+  },
+  props: {
+    game: Object
+  },
+  data () {
+    return {
+      domain: '',
+      errors: [],
+      alias: '',
+      race: 38
     }
+  },
+  mounted () {
+    this.protocol = window.location.protocol
+    this.domain = window.location.host
+  },
+  methods: {
+    onAliasChanged (e) {
+      this.alias = e
+    },
+    onRaceChanged (e) {
+      this.race = e
+    },
+    async onJoinRequested (playerId) {
+      this.errors = []
+
+      if (!this.alias) {
+        this.errors.push('Alias is required.')
+      }
+
+      if (this.alias && this.alias.length < 3) {
+        this.errors.push('Alias must be 3 characters or more.')
+      }
+
+      if (this.alias && this.alias.length > 24) {
+        this.errors.push('Alias must less than 24 characters.')
+      }
+
+      if (!this.race) {
+        this.errors.push('Race is required.')
+      }
+
+      if (this.errors.length) return
+
+      try {
+        let response = await apiService.joinGame(this.game._id, playerId, this.race, this.alias)
+
+        if (response.status === 200) {
+          this.$emit('onGameJoined', playerId)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }
 }
 </script>
 

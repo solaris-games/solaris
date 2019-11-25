@@ -47,34 +47,33 @@
 </template>
 
 <script>
-import axios from 'axios';
-import ViewTitle from "../components/ViewTitle";
-import apiService from '../services/apiService';
+import ViewTitle from '../components/ViewTitle'
+import apiService from '../services/apiService'
 
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle
   },
-  data() {
+  data () {
     return {
       info: null
-    };
+    }
   },
-  async mounted() {
-    let response = await apiService.getMyUserInfo();
-      
+  async mounted () {
+    let response = await apiService.getMyUserInfo()
+
     if (response.status === 200) {
-      this.info = response.data;
+      this.info = response.data
     }
   },
   methods: {
-    async toggleEmailNotifications(enabled) {
-      this.info.emailEnabled = enabled;
+    async toggleEmailNotifications (enabled) {
+      this.info.emailEnabled = enabled
 
-      await apiService.toggleEmailNotifications(this.info.emailEnabled);
+      await apiService.toggleEmailNotifications(this.info.emailEnabled)
     }
   }
-};
+}
 </script>
 
 <style scoped>

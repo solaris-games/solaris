@@ -1,7 +1,7 @@
 <template>
 <div class="container bg-secondary">
     <h3 class="pt-2">{{star.data.name}}</h3>
-    
+
     <p v-if="star.data.ownedByPlayerId == currentPlayerId">A star under your command</p>
     <p v-if="star.data.ownedByPlayerId != null && star.data.ownedByPlayerId != currentPlayerId">This star is controlled by [{{getStarOwningPlayer().alias}}]</p>
     <p v-if="star.data.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself</p>
@@ -39,26 +39,26 @@
 
 <script>
 export default {
-    components: {
-        
-    },
-    props: {
-        game: Object,
-        star: Object
-    },
-    data() {
-        return {
-            currentPlayerId: this.getUserPlayer()._id
-        };
-    },
-    methods: {
-        getUserPlayer() {
-            return this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
-        },
-        getStarOwningPlayer() {
-            return this.game.galaxy.players.find(x => x._id === this.star.data.ownedByPlayerId);
-        }
+  components: {
+
+  },
+  props: {
+    game: Object,
+    star: Object
+  },
+  data () {
+    return {
+      currentPlayerId: this.getUserPlayer()._id
     }
+  },
+  methods: {
+    getUserPlayer () {
+      return this.game.galaxy.players.find(x => x.userId === this.$store.state.userId)
+    },
+    getStarOwningPlayer () {
+      return this.game.galaxy.players.find(x => x._id === this.star.data.ownedByPlayerId)
+    }
+  }
 }
 </script>
 

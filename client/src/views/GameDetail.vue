@@ -16,47 +16,46 @@
 </template>
 
 <script>
-import ViewTitle from "../components/ViewTitle";
-import ViewSubtitle from "../components/ViewSubtitle";
-import router from '../router';
-import apiService from '../services/apiService';
+import ViewTitle from '../components/ViewTitle'
+import ViewSubtitle from '../components/ViewSubtitle'
+import apiService from '../services/apiService'
 
 export default {
   components: {
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle
   },
-  data() {
-      return {
-          game: {
-            _id: null,
-            settings: {
-              general: {
-                name: null,
-                description: null
-              }
-            }
+  data () {
+    return {
+      game: {
+        _id: null,
+        settings: {
+          general: {
+            name: null,
+            description: null
           }
+        }
       }
+    }
   },
-  created() {
-      this.game._id = this.$route.query.id;
+  created () {
+    this.game._id = this.$route.query.id
   },
-  async mounted() {
+  async mounted () {
     try {
-      let response = await apiService.getGameInfo(this.game._id);
+      let response = await apiService.getGameInfo(this.game._id)
 
-      this.game = response.data;
-    } catch(err) {
-      console.error(err);
+      this.game = response.data
+    } catch (err) {
+      console.error(err)
     }
   },
   methods: {
-      getServerGameImage() {
-          return require('../assets/cards/npg_large.jpg');
-      }
+    getServerGameImage () {
+      return require('../assets/cards/npg_large.jpg')
+    }
   }
-};
+}
 </script>
 
 <style scoped>

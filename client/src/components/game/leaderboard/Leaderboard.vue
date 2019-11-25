@@ -70,38 +70,38 @@
 </template>
 
 <script>
-import apiService from '../../../services/apiService';
+import apiService from '../../../services/apiService'
 
-import Map from '../../../game/map';
+import Map from '../../../game/map'
 
 export default {
-    props: {
-        game: Object
+  props: {
+    game: Object
+  },
+  methods: {
+    zoomToPlayer (player) {
+      Map.zoomToPlayer(this.game, player)
     },
-    methods: {
-        zoomToPlayer(player) {
-            Map.zoomToPlayer(this.game, player);
-        },
-        getUserPlayer() {
-            let userId = this.$store.state.userId;
+    getUserPlayer () {
+      let userId = this.$store.state.userId
 
-            return this.game.galaxy.players.find(p => p.userId === userId);
-        },
-        getPlayerStarCount(player) {
-            return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length;
-        },
-        async concedeDefeat() {
-            try {
-                let response = await apiService.concedeDefeat(this.game._id);
+      return this.game.galaxy.players.find(p => p.userId === userId)
+    },
+    getPlayerStarCount (player) {
+      return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length
+    },
+    async concedeDefeat () {
+      try {
+        let response = await apiService.concedeDefeat(this.game._id)
 
-                if (response.status === 200) {
-                    alert('Defeated');
-                }
-            } catch(err) {
-                console.error(err);
-            }
+        if (response.status === 200) {
+          alert('Defeated')
         }
+      } catch (err) {
+        console.error(err)
+      }
     }
+  }
 }
 </script>
 
@@ -119,7 +119,7 @@ img {
     padding: 0;
 }
 
-.table td.fit, 
+.table td.fit,
 .table th.fit {
     white-space: nowrap;
     width: 1%;

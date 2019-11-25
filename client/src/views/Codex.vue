@@ -5,13 +5,13 @@
 </template>
 
 <script>
-import ViewTitle from "../components/ViewTitle";
+import ViewTitle from '../components/ViewTitle'
 
 export default {
   components: {
-    "view-title": ViewTitle
+    'view-title': ViewTitle
   }
-};
+}
 </script>
 
 <style scoped>

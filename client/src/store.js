@@ -14,15 +14,15 @@ export default new Vuex.Store({
     userId: null
   },
   mutations: {
-    setUserId(state, id) {
-      state.userId = id;
+    setUserId (state, id) {
+      state.userId = id
     },
-    clearUserId(state) {
-      state.userId = null;
+    clearUserId (state) {
+      state.userId = null
     }
   },
   actions: {
-    
+
   },
   plugins: [vuexPersist.plugin]
 })

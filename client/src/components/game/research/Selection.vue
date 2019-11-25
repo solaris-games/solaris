@@ -45,9 +45,9 @@
 
 <script>
 export default {
-    props: {
-        game: Object
-    }
+  props: {
+    game: Object
+  }
 }
 </script>
 

@@ -10,17 +10,17 @@
 </template>
 
 <script>
-import Selection from './Selection';
-import ProgressSummary from './ProgressSummary';
+import Selection from './Selection'
+import ProgressSummary from './ProgressSummary'
 
 export default {
-    components: {
-        'selection': Selection,
-        'progress-summary': ProgressSummary
-    },
-    props: {
-        game: Object
-    }
+  components: {
+    'selection': Selection,
+    'progress-summary': ProgressSummary
+  },
+  props: {
+    game: Object
+  }
 }
 </script>
 

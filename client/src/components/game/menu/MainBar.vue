@@ -9,7 +9,7 @@
     <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
     <div v-if="menuState == MENU_STATES.HELP">HELP</div>
     <div v-if="menuState == MENU_STATES.INBOX">INBOX</div>
-    
+
     <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
     <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :player="menuArguments" :key="menuArguments._id"/>
@@ -19,53 +19,52 @@
 </template>
 
 <script>
-import MENU_STATES from '../../data/menuStates';
-import GameInfoVue from './GameInfo.vue';
-import PlayerListVue from './PlayerList.vue';
-import LeaderboardVue from '../leaderboard/Leaderboard.vue';
-import PlayerVue from '../player/Player.vue';
-import WelcomeVue from '../welcome/Welcome.vue';
-import ResearchVue from '../research/Research.vue';
-import StarDetailVue from '../star/StarDetail.vue';
-import apiService from '../../../services/apiService';
+import MENU_STATES from '../../data/menuStates'
+import GameInfoVue from './GameInfo.vue'
+import PlayerListVue from './PlayerList.vue'
+import LeaderboardVue from '../leaderboard/Leaderboard.vue'
+import PlayerVue from '../player/Player.vue'
+import WelcomeVue from '../welcome/Welcome.vue'
+import ResearchVue from '../research/Research.vue'
+import StarDetailVue from '../star/StarDetail.vue'
 
 export default {
-    components: {
-        'game-info': GameInfoVue,
-        'welcome': WelcomeVue,
-        'player-list': PlayerListVue,
-        'leaderboard': LeaderboardVue,
-        'player': PlayerVue,
-        'research': ResearchVue,
-        'star-detail': StarDetailVue
-    },
-    props: {
-        game: Object,
-        menuState: String,
-        menuArguments: Object
-    },
-    data() {
-        return {
-            MENU_STATES: MENU_STATES
-        };
-    },
-    mounted() {
-        // Check if the user is in this game, if not then show the welcome screen.
-        let userPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId);
-
-        this.menuState = userPlayer ? 'leaderboard' : 'welcome';
-    },
-    methods: {
-        onMenuStateChanged(e) {
-            this.$emit('onMenuStateChanged', e);
-        },
-        onPlayerSelected(e) {
-            this.$emit('onPlayerSelected', e);
-        },
-        onGameJoined(e) {
-            this.$emit('onGameJoined', e);
-        }
+  components: {
+    'game-info': GameInfoVue,
+    'welcome': WelcomeVue,
+    'player-list': PlayerListVue,
+    'leaderboard': LeaderboardVue,
+    'player': PlayerVue,
+    'research': ResearchVue,
+    'star-detail': StarDetailVue
+  },
+  props: {
+    game: Object,
+    menuState: String,
+    menuArguments: Object
+  },
+  data () {
+    return {
+      MENU_STATES: MENU_STATES
     }
+  },
+  mounted () {
+    // Check if the user is in this game, if not then show the welcome screen.
+    let userPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId)
+
+    this.menuState = userPlayer ? 'leaderboard' : 'welcome'
+  },
+  methods: {
+    onMenuStateChanged (e) {
+      this.$emit('onMenuStateChanged', e)
+    },
+    onPlayerSelected (e) {
+      this.$emit('onPlayerSelected', e)
+    },
+    onGameJoined (e) {
+      this.$emit('onGameJoined', e)
+    }
+  }
 }
 </script>
 

@@ -30,20 +30,20 @@
 </template>
 
 <script>
-import Map from '../../../game/map';
+import Map from '../../../game/map'
 
 export default {
-    props: {
-        game: Object
+  props: {
+    game: Object
+  },
+  methods: {
+    onJoinRequested (player) {
+      this.$emit('onJoinRequested', player._id)
     },
-    methods: {
-        onJoinRequested(player) {
-            this.$emit('onJoinRequested', player._id);
-        },
-        zoomToPlayer(player) {
-            Map.zoomToPlayer(this.game, player);
-        }
+    zoomToPlayer (player) {
+      Map.zoomToPlayer(this.game, player)
     }
+  }
 }
 </script>
 
@@ -61,7 +61,7 @@ img {
     padding: 0;
 }
 
-.table td.fit, 
+.table td.fit,
 .table th.fit {
     white-space: nowrap;
     width: 1%;

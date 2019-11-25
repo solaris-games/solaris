@@ -30,23 +30,23 @@
 
 <script>
 export default {
-    data() {
-        return {
-            race: 38
-        };
-    },
-    methods: {
-        nextRace() {
-            this.race++;
-            
-            this.$emit('onRaceChanged', this.race);
-        },
-        prevRace() {
-            this.race--;
-            
-            this.$emit('onRaceChanged', this.race);
-        }
+  data () {
+    return {
+      race: 38
     }
+  },
+  methods: {
+    nextRace () {
+      this.race++
+
+      this.$emit('onRaceChanged', this.race)
+    },
+    prevRace () {
+      this.race--
+
+      this.$emit('onRaceChanged', this.race)
+    }
+  }
 }
 </script>
 

@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-import 'bootstrap';
+import 'bootstrap'
 import 'bootswatch/dist/darkly/bootstrap.min.css'
 
 import 'pixi.js'

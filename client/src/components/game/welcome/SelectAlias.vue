@@ -30,16 +30,16 @@
 
 <script>
 export default {
-    data() {
-        return {
-            alias: ''
-        }
-    },
-    methods: {
-        onAliasChanged(e) {
-            this.$emit('onAliasChanged', this.alias);
-        }
+  data () {
+    return {
+      alias: ''
     }
+  },
+  methods: {
+    onAliasChanged (e) {
+      this.$emit('onAliasChanged', this.alias)
+    }
+  }
 }
 </script>
 
