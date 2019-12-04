@@ -52,10 +52,6 @@ class Star extends EventEmitter {
   draw () {
     this.container.removeChildren()
 
-    if (this.data.warpGate) {
-      this.drawWarpGate()
-    }
-
     this.drawColour()
 
     // If the star has a carrier, draw that instead of the star circle.
@@ -89,7 +85,14 @@ class Star extends EventEmitter {
       graphics.beginFill(0xFFFFFF)
     }
 
-    graphics.drawCircle(this.data.location.x, this.data.location.y, 2)
+    // If its a warp gate then draw a filled square.
+    // Otherwise draw a filled circle.
+    if (this.data.warpGate) {
+      graphics.drawRect(this.data.location.x - 2, this.data.location.y - 2, 4, 4)
+    } else {
+      graphics.drawCircle(this.data.location.x, this.data.location.y, 2)
+    }
+
     graphics.endFill()
 
     this.container.addChild(graphics)
@@ -104,16 +107,14 @@ class Star extends EventEmitter {
     let graphics = new PIXI.Graphics()
 
     graphics.lineStyle(2, player.colour.value)
-    graphics.drawCircle(this.data.location.x, this.data.location.y, 4)
 
-    this.container.addChild(graphics)
-  }
-
-  drawWarpGate () {
-    let graphics = new PIXI.Graphics()
-
-    graphics.lineStyle(1, 0xFFFFFF)
-    graphics.drawStar(this.data.location.x, this.data.location.y, 12, 6, 5)
+    // If its a warp gate then draw a rectangle.
+    // Otherwise draw a circle.
+    if (this.data.warpGate) {
+      graphics.drawRect(this.data.location.x - 4, this.data.location.y - 4, 8, 8)
+    } else {
+      graphics.drawCircle(this.data.location.x, this.data.location.y, 4)
+    }
 
     this.container.addChild(graphics)
   }
