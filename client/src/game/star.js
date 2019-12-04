@@ -11,8 +11,11 @@ class Star extends EventEmitter {
     this.container.buttonMode = true
 
     this.container.on('pointerdown', this.onClicked.bind(this))
+    this.container.on('mouseover', this.onMouseOver.bind(this))
+    this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.isSelected = false
+    this.isMouseOver = false
   }
 
   _getStarPlayer () {
@@ -54,7 +57,10 @@ class Star extends EventEmitter {
     // If the star has a carrier, draw that instead of the star circle.
     if (this._getStarCarriers().length) { this.drawCarrier() } else { this.drawStar() }
 
-    this.drawHalo()
+    if (this.isMouseOver) {
+      this.drawHalo()
+    }
+
     this.drawName()
     this.drawGarrison()
     // this.drawPlayerName();
@@ -223,6 +229,22 @@ class Star extends EventEmitter {
     this.isSelected = !this.isSelected
 
     this.emit('onStarClicked', this)
+  }
+
+  onMouseOver (e) {
+    this.isMouseOver = true
+
+    this.draw()
+
+    this.emit('onStarMouseOver', this)
+  }
+
+  onMouseOut (e) {
+    this.isMouseOver = false
+
+    this.draw()
+
+    this.emit('onStarMouseOut', this)
   }
 }
 
