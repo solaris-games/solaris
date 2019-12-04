@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
+
 export default {
   props: {
     game: Object,
@@ -66,7 +68,7 @@ export default {
       return this.getUserPlayer()._id === this.player._id
     },
     getUserPlayer () {
-      return this.game.galaxy.players.find(x => x.userId === this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
     }
   }
 }

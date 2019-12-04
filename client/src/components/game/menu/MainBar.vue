@@ -27,6 +27,7 @@ import PlayerVue from '../player/Player.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -50,7 +51,7 @@ export default {
   },
   mounted () {
     // Check if the user is in this game, if not then show the welcome screen.
-    let userPlayer = this.game.galaxy.players.find(x => x.userId === this.$store.state.userId)
+    let userPlayer = GameHelper.getUserPlayer(this.game, this.$store.state.userId)
 
     this.menuState = userPlayer ? 'leaderboard' : 'welcome'
   },

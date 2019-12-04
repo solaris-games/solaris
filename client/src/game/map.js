@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js'
 import gameContainer from './container'
 import Star from './star'
 import EventEmitter from 'events'
+import GameHelper from '../services/gameHelper'
 
 class Map extends EventEmitter {
   constructor () {
@@ -52,7 +53,7 @@ class Map extends EventEmitter {
   }
 
   zoomToUser (game, userId) {
-    let player = game.galaxy.players.find(x => x.userId === userId)
+    let player = GameHelper.getUserPlayer(game, userId)
 
     if (!player) {
       return

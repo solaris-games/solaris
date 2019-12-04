@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
+
 export default {
   components: {
 
@@ -53,10 +55,10 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return this.game.galaxy.players.find(x => x.userId === this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
     },
     getStarOwningPlayer () {
-      return this.game.galaxy.players.find(x => x._id === this.star.data.ownedByPlayerId)
+      return GameHelper.getStarOwningPlayer(this.game, this.star.data)
     }
   }
 }

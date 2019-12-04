@@ -71,6 +71,7 @@
 
 <script>
 import apiService from '../../../services/apiService'
+import GameHelper from '../../../services/gameHelper'
 import gameContainer from '../../../game/container'
 
 export default {
@@ -82,9 +83,7 @@ export default {
       gameContainer.map.zoomToPlayer(this.game, player)
     },
     getUserPlayer () {
-      let userId = this.$store.state.userId
-
-      return this.game.galaxy.players.find(p => p.userId === userId)
+        return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
     },
     getPlayerStarCount (player) {
       return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length
