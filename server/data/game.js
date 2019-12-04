@@ -183,17 +183,55 @@ module.exports = {
             // Note that we don't need to consider dark mode
             // because carriers can only be seen if they are in range.
             doc.galaxy.players.forEach(p => {
-                if (p._id.equals(player._id)) return; // Ignore the current player.
+                // Calculate statistics such as how many carriers they have
+                // and what the total number of ships are.
+                let totalShips = playerStars.reduce((sum, s) => sum + s.garrison, 0) + p.carriers.reduce((sum, c) => sum + c.ships, 0);
 
-                p.carriers = p.carriers.filter(c => {
-                    // Get the closest player star to this carrier.
-                    let closest = mapHelper.getClosestLocation(c.location, playerStarLocations);
-                    let distance = mapHelper.getDistanceBetweenLocations(c.location, closest);
+                p.stats = {
+                    totalStars: playerStars.length,
+                    totalCarriers: p.carriers.length,
+                    totalShips,
+                    newShips: 0
+                };
 
-                    let inRange = distance <= scanningRangeDistance;
+                // For other players, filter out carriers that the current player cannot see.
+                if (!p._id.equals(player._id)) {
+                    p.carriers = p.carriers.filter(c => {
+                        // Get the closest player star to this carrier.
+                        let closest = mapHelper.getClosestLocation(c.location, playerStarLocations);
+                        let distance = mapHelper.getDistanceBetweenLocations(c.location, closest);
+    
+                        let inRange = distance <= scanningRangeDistance;
+    
+                        return inRange;
+                    });
+                }
+            });
 
-                    return inRange;
-                });
+            // Sanitize other players by only returning basic info about them.
+            // We don't want players snooping on others via api responses containing sensitive info.
+            doc.galaxy.players = doc.galaxy.players.map(p => {
+                // If the user is in the game and it is the current
+                // player we are looking at then return everything.
+                if (player && p._id == player._id) {
+                    return p;
+                }
+
+                // Return a subset of the user, key info only.
+                return {
+                    colour: p.colour,
+                    research: p.research,
+                    userId: p.userId,
+                    raceId: p.raceId,
+                    defeated: p.defeated,
+                    ready: p.ready,
+                    missedTurns: p.missedTurns,
+                    carriers: p.carriers,
+                    _id: p._id,
+                    alias: p.alias,
+                    homeStarId: p.homeStarId,
+                    stats: p.stats
+                };
             });
 
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
