@@ -127,7 +127,7 @@ module.exports = {
                 return callback(null, doc);
             }
 
-            let scanningRangeDistance = mapHelper.getScanningDistance(player.research.scanning);
+            let scanningRangeDistance = mapHelper.getScanningDistance(player.research.scanning.level);
 
             // Get all of the players stars.
             let playerStars = doc.galaxy.stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
@@ -140,7 +140,7 @@ module.exports = {
                     if (s.ownedByPlayerId) {
                         let owningPlayer = doc.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
 
-                        s.terraformedResources = starHelper.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming);
+                        s.terraformedResources = starHelper.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming.level);
                     }
 
                     // Ignore stars the player owns, they will always be visible.
@@ -220,7 +220,15 @@ module.exports = {
                 // Return a subset of the user, key info only.
                 return {
                     colour: p.colour,
-                    research: p.research,
+                    research: {
+                        scanning: { level: p.research.scanning.level },
+                        hyperspaceRange: { level: p.research.hyperspaceRange.level },
+                        terraforming: { level: p.research.terraforming.level },
+                        experimentation: { level: p.research.experimentation.level },
+                        weapons: { level: p.research.weapons.level },
+                        banking: { level: p.research.banking.level },
+                        manufacturing: { level: p.research.manufacturing.level },
+                    },
                     userId: p.userId,
                     raceId: p.raceId,
                     defeated: p.defeated,

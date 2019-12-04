@@ -22,13 +22,34 @@ const schema = new Schema({
     karmaToGive: { type: Types.Number, required: true, default: 8 },
     apiCode: { type: Types.String, required: false },
     research: {
-        scanning: { type: Types.Number, required: true, default: 1 },
-        hyperspaceRange: { type: Types.Number, required: true, default: 1 },
-        terraforming: { type: Types.Number, required: true, default: 1 },
-        experimentation: { type: Types.Number, required: true, default: 1 },
-        weapons: { type: Types.Number, required: true, default: 1 },
-        banking: { type: Types.Number, required: true, default: 1 },
-        manufacturing: { type: Types.Number, required: true, default: 1 }
+        scanning: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        hyperspaceRange: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        terraforming: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        experimentation: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        weapons: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        banking: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        manufacturing: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        }
     },
     carriers: [carrierSchema],
     messages: [messageSchema]

@@ -46,13 +46,13 @@ module.exports = {
             cash: gameSettings.player.startingCash,
             carriers: [],
             research: {
-                terraforming: gameSettings.technology.startingTechnologyLevel.terraforming,
-                experimentation: gameSettings.technology.startingTechnologyLevel.experimentation,
-                scanning: gameSettings.technology.startingTechnologyLevel.scanning,
-                hyperspace: gameSettings.technology.startingTechnologyLevel.hyperspace,
-                manufacturing: gameSettings.technology.startingTechnologyLevel.manufacturing,
-                banking: gameSettings.technology.startingTechnologyLevel.banking,
-                weapons: gameSettings.technology.startingTechnologyLevel.weapons
+                terraforming: { level: gameSettings.technology.startingTechnologyLevel.terraforming },
+                experimentation: { level: gameSettings.technology.startingTechnologyLevel.experimentation },
+                scanning: { level: gameSettings.technology.startingTechnologyLevel.scanning },
+                hyperspace: { level: gameSettings.technology.startingTechnologyLevel.hyperspace },
+                manufacturing: { level: gameSettings.technology.startingTechnologyLevel.manufacturing },
+                banking: { level: gameSettings.technology.startingTechnologyLevel.banking },
+                weapons: { level: gameSettings.technology.startingTechnologyLevel.weapons }
             }
         };
     },

@@ -63,7 +63,7 @@ function assertNewPlayer(newPlayer, colour) {
     expect(newPlayer.colour).toBe(colour);
 
     for(var key in newPlayer.research) {
-        const res1 = newPlayer.research[key];
+        const res1 = newPlayer.research[key].level;
         const res2 = gameSettings.technology.startingTechnologyLevel[key];
         expect(res1).toEqual(res2);
     }
