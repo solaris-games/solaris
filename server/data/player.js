@@ -7,8 +7,6 @@ const mapHelper = require('./map');
 const starHelper = require('./star');
 const carrierHelper = require('./carrier');
 
-const Player = require('./db/models/schemas/player');
-
 function isTooCloseStartingPosition(distanceAllowed, homeStar, stars) {
     let closestStar = mapHelper.getClosestOwnedStars(homeStar, stars, 1)[0];
 

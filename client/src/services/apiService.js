@@ -98,6 +98,20 @@ class ApiService {
     return axios.post('http://localhost:3000/api/game/' + gameId + '/concedeDefeat', null,
       { withCredentials: true })
   }
+
+  updateResearchNow(gameId, preference) {
+    return axios.post('http://localhost:3000/api/player/' + gameId + '/research/now', {
+      preference
+    },
+    { withCredentials: true })
+  }
+
+  updateResearchNext(gameId, preference) {
+    return axios.post('http://localhost:3000/api/player/' + gameId + '/research/next', {
+      preference
+    },
+    { withCredentials: true })
+  }
 }
 
 export default new ApiService()
