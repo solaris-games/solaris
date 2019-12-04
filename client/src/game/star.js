@@ -70,7 +70,7 @@ class Star extends EventEmitter {
     if (this.isMouseOver || this.isSelected) {
       this.drawName()
       this.drawGarrison()
-      // this.drawPlayerName();
+      this.drawPlayerName()
     }
   }
 
@@ -189,7 +189,7 @@ class Star extends EventEmitter {
     })
 
     text.x = this.data.location.x - (text.width / 2)
-    text.y = this.data.location.y + 22
+    text.y = this.data.location.y + 17
     text.resolution = 10
 
     this.container.addChild(text)
