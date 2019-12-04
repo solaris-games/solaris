@@ -61,14 +61,16 @@ class Star extends EventEmitter {
       this.drawHalo()
     }
 
-    this.drawName()
-    this.drawGarrison()
-    // this.drawPlayerName();
-
     if (this.isSelected) {
       this.drawInfrastructure()
       this.drawScanningRange()
       this.drawHyperspaceRange()
+    }
+
+    if (this.isMouseOver || this.isSelected) {
+      this.drawName()
+      this.drawGarrison()
+      // this.drawPlayerName();
     }
   }
 
