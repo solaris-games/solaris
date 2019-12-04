@@ -33,6 +33,10 @@ class Star extends EventEmitter {
     return carriersAtStar
   }
 
+  _getStarCarrierGarrison () {
+    return this._getStarCarriers().reduce((sum, c) => sum + c.ships, 0)
+  }
+
   _isOutOfScanningRange () {
     // These may be undefined, if so it means that they are out of scanning range.
     return typeof this.data.economy === 'undefined' ||
@@ -147,9 +151,11 @@ class Star extends EventEmitter {
   }
 
   drawGarrison () {
-    if (!this.data.garrison) return
+    let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
-    let text = new PIXI.Text(this.data.garrison, {
+    if (!totalGarrison) return
+
+    let text = new PIXI.Text(totalGarrison, {
       fontSize: 4,
       fill: 0xFFFFFF
     })
