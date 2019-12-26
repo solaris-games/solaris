@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-const researchHelper = require('../data/research');
+const playerHelper = require('../data/player');
 
 router.post('/:gameId/research/now', middleware.authenticate, (req, res, next) => {
-    researchHelper.updateResearchNow(req.params.gameId, req.session.userId, req.body.preference, (err) => {
+    playerHelper.research.updateResearchNow(req.params.gameId, req.session.userId, req.body.preference, (err) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -14,7 +14,7 @@ router.post('/:gameId/research/now', middleware.authenticate, (req, res, next) =
 });
 
 router.post('/:gameId/research/next', middleware.authenticate, (req, res, next) => {
-    researchHelper.updateResearchNext(req.params.gameId, req.session.userId, req.body.preference, (err) => {
+    playerHelper.research.updateResearchNext(req.params.gameId, req.session.userId, req.body.preference, (err) => {
         if (err) {
             return res.status(401).json(err);
         }
