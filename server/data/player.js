@@ -104,7 +104,10 @@ module.exports = {
     },
 
     calculateTotalShipsForPlayer(stars, player) {
-        return stars.reduce((sum, s) => sum + s.garrison, 0) + player.carriers.reduce((sum, c) => sum + c.ships, 0);
+        let ownedStars = starHelper.listStarsOwnedByPlayer(stars, player._id);
+
+        return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
+            + player.carriers.reduce((sum, c) => sum + c.ships, 0);
     }
 
 }
