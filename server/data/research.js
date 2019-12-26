@@ -1,8 +1,47 @@
+const gameHelper = require('./game');
+
 module.exports = {
 
-    calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1) {
-        // A star produces Y*(X+5) ships every 24 ticks where X is your manufacturing tech level and Y is the amount of industry at a star.
-        return (industryLevel * (techLevel + 5) / 24) * ticks;
+    updateResearchNow(gameId, userId, preference, callback) {
+        gameHelper.getByIdAll(gameId, (err, game) => {
+            if (err) {
+                return callback(err);
+            }
+
+            // Get the user's player and update their research preference.
+            let userPlayer = game.galaxy.players.find(p => p.userId === userId);
+
+            userPlayer.researchingNow = preference;
+
+            game.save((err, doc) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                return callback(null);
+            });
+        });
+    },
+
+    updateResearchNext(gameId, userId, preference, callback) {
+        gameHelper.getByIdAll(gameId, (err, game) => {
+            if (err) {
+                return callback(err);
+            }
+
+            // Get the user's player and update their research preference.
+            let userPlayer = game.galaxy.players.find(p => p.userId === userId);
+
+            userPlayer.researchingNext = preference;
+
+            game.save((err, doc) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                return callback(null);
+            });
+        });
     },
 
 };

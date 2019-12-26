@@ -4,7 +4,6 @@ const Game = require('./db/models/Game');
 const mapHelper = require('./map');
 const playerHelper = require('./player');
 const starHelper = require('./star');
-const researchHelper = require('./research');
 
 const SELECTS = {
     INFO: {
@@ -113,7 +112,7 @@ module.exports = {
                 let totalShips = playerHelper.calculateTotalShipsForPlayer(doc.galaxy.stars, p);
 
                 // Calculate the manufacturing level for all of the stars the player owns.
-                playerStars.forEach(s => s.manufacturing = researchHelper.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
+                playerStars.forEach(s => s.manufacturing = starHelper.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
 
                 let totalManufacturing = playerStars.reduce((sum, s) => {
                     return sum + s.manufacturing;
