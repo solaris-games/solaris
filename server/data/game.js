@@ -101,6 +101,24 @@ module.exports = {
             // Check if the user is playing in this game.
             let player = doc.galaxy.players.find(x => x.userId === userId);
 
+            // TODO: If the game has started and the user is not in this game
+            // then they cannot view info about this game.
+
+            // Append the player stats to each player.
+            doc.galaxy.players.forEach(p => {
+                // Calculate statistics such as how many carriers they have
+                // and what the total number of ships are.
+                let playerStars = starHelper.listStarsOwnedByPlayer(doc.galaxy.stars, p._id);
+                let totalShips = playerHelper.calculateTotalShipsForPlayer(doc.galaxy.stars, p);
+
+                p.stats = {
+                    totalStars: playerStars.length,
+                    totalCarriers: p.carriers.length,
+                    totalShips,
+                    newShips: 0
+                };
+            });
+
             // if the user isn't playing this game, then only return
             // basic data about the stars, exclude any important info like garrisons.
             if (!player) {
@@ -117,7 +135,8 @@ module.exports = {
                         ownedByPlayerId: s.ownedByPlayerId,
                         location: s.location,
                         homeStar: s.homeStar,
-                        warpGate: s.warpGate
+                        warpGate: s.warpGate,
+                        stats: s.stats
                     }
                 });
 
@@ -130,7 +149,7 @@ module.exports = {
             let scanningRangeDistance = mapHelper.getScanningDistance(player.research.scanning.level);
 
             // Get all of the players stars.
-            let playerStars = doc.galaxy.stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+            let playerStars = starHelper.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
             let playerStarLocations = playerStars.map(s => s.location);
 
             // Work out which ones are not in scanning range and clear their data.
@@ -183,17 +202,6 @@ module.exports = {
             // Note that we don't need to consider dark mode
             // because carriers can only be seen if they are in range.
             doc.galaxy.players.forEach(p => {
-                // Calculate statistics such as how many carriers they have
-                // and what the total number of ships are.
-                let totalShips = playerStars.reduce((sum, s) => sum + s.garrison, 0) + p.carriers.reduce((sum, c) => sum + c.ships, 0);
-
-                p.stats = {
-                    totalStars: playerStars.length,
-                    totalCarriers: p.carriers.length,
-                    totalShips,
-                    newShips: 0
-                };
-
                 // For other players, filter out carriers that the current player cannot see.
                 if (!p._id.equals(player._id)) {
                     p.carriers = p.carriers.filter(c => {

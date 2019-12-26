@@ -54,6 +54,10 @@ module.exports = {
         homeStar.homeStar = true;
     },
 
+    listStarsOwnedByPlayer(stars, playerId) {
+        return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
+    },
+
     calculateTerraformedResources(naturalResources, terraforming) {
         return (terraforming * 5) + naturalResources;
     }

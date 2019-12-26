@@ -6,7 +6,9 @@ import Map from './map'
 class GameContainer {
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
+  }
 
+  setupApp() {
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
       height: window.innerHeight, // window.innerHeight,
@@ -31,6 +33,8 @@ class GameContainer {
   }
 
   setupViewport (game) {
+    this.setupApp()
+
     this.game = game
 
     console.log(game)
