@@ -22,7 +22,8 @@ module.exports = {
 
     listOfficialGames(callback) {
         Game.find({
-            'settings.general.createdByUserId': { $eq: null }
+            'settings.general.createdByUserId': { $eq: null },
+            'state.startDate': { $eq: null }
         })
             .select(SELECTS.INFO)
             .exec((err, docs) => {
@@ -36,7 +37,8 @@ module.exports = {
 
     listUserGames(callback) {
         Game.find({
-            'settings.general.createdByUserId': { $ne: null }
+            'settings.general.createdByUserId': { $ne: null },
+            'state.startDate': { $eq: null }
         })
             .select(SELECTS.INFO)
             .exec((err, docs) => {
@@ -51,6 +53,7 @@ module.exports = {
     listActiveGames(userId, callback) {
         Game.find({
             'galaxy.players': { $elemMatch: { userId } }
+            // TODO: Filter out finished games?
         })
             .select(SELECTS.INFO)
             .exec((err, docs) => {
