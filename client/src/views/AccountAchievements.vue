@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Achievements" />
 
     <achievements v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
@@ -159,10 +159,11 @@
         <p>For no other reason than that you enjoyed your game with this player.</p>
       </div>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import Achievements from '../components/game/player/Achievements'
@@ -170,6 +171,7 @@ import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
     'achievements': Achievements

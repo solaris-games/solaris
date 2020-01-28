@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light pb-3">
+  <view-container>
     <view-title title="Account" />
 
     <div class="row pt-3 pb-3 bg-info">
@@ -43,15 +43,17 @@
       <router-link to="/account/reset-email" tag="button" class="btn btn-primary">Change Email Address</router-link>
       <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle
   },
   data () {

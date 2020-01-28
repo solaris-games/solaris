@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Create Game" />
 
     <form @submit.prevent="handleSubmit" v-if="settings">
@@ -514,10 +514,11 @@
       </div>
 
     </form>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import FormErrorList from '../components/FormErrorList'
@@ -526,6 +527,7 @@ import router from '../router'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
     'form-error-list': FormErrorList

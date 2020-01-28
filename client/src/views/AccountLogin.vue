@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <view-container>
     <div class="row justify-content-center">
       <div class="col col-md-6 col-lg-5 bg-light">
         <view-title title="Login" navigation="home"/>
@@ -26,10 +26,11 @@
         </form>
       </div>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
@@ -37,6 +38,7 @@ import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },

@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Game Detail" navigation="main-menu"/>
 
     <img :src="getServerGameImage(game)">
@@ -12,16 +12,18 @@
       <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
       <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ml-1">Open Game <i class="fas fa-arrow-right"></i> </router-link>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
+import ViewContainer from '../components/ViewContainer'
 import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle
   },

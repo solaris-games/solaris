@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Active Games" />
 
     <div v-if="!games.length">
@@ -26,16 +26,18 @@
             </tr>
         </tbody>
     </table>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 
 import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle
   },
   data () {

@@ -1,34 +1,38 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <h1>Main Menu</h1>
 
     <div>
-      <router-link to="/game/active-games" tag="button" class="btn btn-success">My Games</router-link>
-      <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
-      <router-link to="/game/create" tag="button" class="btn btn-primary">Create Game</router-link>
+      <router-link to="/game/active-games" tag="button" class="btn btn-block btn-success">My Games</router-link>
+      <router-link to="/game/list" tag="button" class="btn btn-block btn-success">Join Game</router-link>
+      <router-link to="/game/create" tag="button" class="btn btn-block btn-primary">Create Game</router-link>
     </div>
 
-    <div>
-      <router-link to="/account/achievements" tag="button" class="btn btn-primary">Achievements</router-link>
-      <router-link to="/account/settings" tag="button" class="btn btn-primary">Account Settings</router-link>
-      <router-link to="/codex" tag="button" class="btn btn-primary">Help</router-link>
+    <div class="mt-3">
+      <router-link to="/account/achievements" tag="button" class="btn btn-block btn-primary">Achievements</router-link>
+      <router-link to="/account/settings" tag="button" class="btn btn-block btn-primary">Account Settings</router-link>
+      <router-link to="/codex" tag="button" class="btn btn-block btn-primary">Help</router-link>
     </div>
 
-    <div>
-      <router-link to="/premium-store" tag="button" class="btn btn-danger">Premium Store</router-link>
+    <div class="mt-3">
+      <router-link to="/premium-store" tag="button" class="btn btn-block btn-danger">Premium Store</router-link>
     </div>
 
-    <div>
-      <button @click="logout" class="btn btn-primary">Logout</button>
+    <div class="mt-3">
+      <button @click="logout" class="btn btn-block btn-primary">Logout</button>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
 import router from '../router'
 import apiService from '../services/apiService'
+import ViewContainer from '../components/ViewContainer'
 
 export default {
+  components: {
+    'view-container': ViewContainer
+  },
   methods: {
     async logout () {
       this.$store.commit('clearUserId')

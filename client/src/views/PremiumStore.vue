@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Premium Membership" />
 
     <h3>Premium Memberships</h3>
@@ -19,14 +19,16 @@
       <p>{{pack.caption}}</p>
       <button @click="buyCreditPack(pack)" class="btn btn-success">Buy Now</button>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
 import ViewTitle from '../components/ViewTitle'
+import ViewContainer from '../components/ViewContainer'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle
   },
   data () {

@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Forgot Password" navigation="home"/>
 
     <form-error-list v-bind:errors="errors"/>
@@ -15,16 +15,18 @@
         <button type="submit" class="btn btn-success ml-1">Reset Password</button>
       </div>
     </form>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },

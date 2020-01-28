@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <!-- DEV ONLY -->
     <router-link to="/main-menu" tag="button" class="btn btn-primary">Main Menu</router-link>
 
@@ -9,12 +9,16 @@
       <router-link to="/account/create" tag="button" class="btn btn-primary">Create A New Account</router-link>
       <router-link to="/account/login" tag="button" class="btn btn-success ml-1">Login</router-link>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
-export default {
+import ViewContainer from '../components/ViewContainer'
 
+export default {
+  components: {
+    'view-container': ViewContainer
+  }
 }
 </script>
 

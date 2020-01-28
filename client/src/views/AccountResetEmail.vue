@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Reset Email Address" />
 
     <form @submit.prevent="handleSubmit">
@@ -15,10 +15,11 @@
         <button type="submit" class="btn btn-success ml-1">Change Email</button>
       </div>
     </form>
-  </div>
+  </view-container>
 </template>
 
 <script>
+import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
@@ -26,6 +27,7 @@ import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },

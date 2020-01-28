@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-light">
+  <view-container>
     <view-title title="Game List" />
 
     <div v-for="game in serverGames" v-bind:key="game._id">
@@ -32,15 +32,17 @@
             </tr>
         </tbody>
     </table>
-  </div>
+  </view-container>
 </template>
 
 <script>
 import ViewTitle from '../components/ViewTitle'
+import ViewContainer from '../components/ViewContainer'
 import apiService from '../services/apiService'
 
 export default {
   components: {
+    'view-container': ViewContainer,
     'view-title': ViewTitle
   },
   data () {
