@@ -1,31 +1,27 @@
 <template>
   <view-container>
-    <div class="row justify-content-center">
-      <div class="col col-md-6 col-lg-5 bg-light">
-        <view-title title="Login" navigation="home"/>
+    <view-title title="Login" navigation="home"/>
 
-        <form @submit.prevent="handleSubmit">
-            <div class="form-group">
-                <input type="text" required="required" class="form-control" placeholder="Username" v-model="username" />
-            </div>
+    <form @submit.prevent="handleSubmit">
+        <div class="form-group">
+            <input type="text" required="required" class="form-control" placeholder="Username" v-model="username" />
+        </div>
 
-            <div class="form-group">
-                <input type="password" required="required" class="form-control" placeholder="Password" v-model="password" />
-            </div>
+        <div class="form-group">
+            <input type="password" required="required" class="form-control" placeholder="Password" v-model="password" />
+        </div>
 
-            <form-error-list v-bind:errors="errors"/>
+        <form-error-list v-bind:errors="errors"/>
 
-            <div class="form-group">
-                <router-link to="/" tag="button" type="button" class="btn btn-danger">Cancel</router-link>
-                <input type="submit" class="btn btn-success ml-1" value="Login" />
-            </div>
+        <div class="form-group">
+            <router-link to="/" tag="button" type="button" class="btn btn-danger">Cancel</router-link>
+            <input type="submit" class="btn btn-success ml-1" value="Login" />
+        </div>
 
-            <div class="form-group">
-                <router-link to="/account/forgot-password">Forgot Password?</router-link>
-            </div>
-        </form>
-      </div>
-    </div>
+        <div class="form-group">
+            <router-link to="/account/forgot-password">Forgot Password?</router-link>
+        </div>
+    </form>
   </view-container>
 </template>
 
