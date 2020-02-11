@@ -8,13 +8,13 @@
     <div v-if="menuState == MENU_STATES.INTEL">INTEL</div>
     <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
     <div v-if="menuState == MENU_STATES.HELP">HELP</div>
-    <div v-if="menuState == MENU_STATES.INBOX">INBOX</div>
 
     <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
     <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
     <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :player="menuArguments" :key="menuArguments._id"/>
     <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
     <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
+    <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
 </div>
 </template>
 
@@ -27,6 +27,7 @@ import PlayerVue from '../player/Player.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
+import InboxVue from '../inbox/Inbox.vue'
 import GameHelper from '../../../services/gameHelper'
 
 export default {
@@ -37,7 +38,8 @@ export default {
     'leaderboard': LeaderboardVue,
     'player': PlayerVue,
     'research': ResearchVue,
-    'star-detail': StarDetailVue
+    'star-detail': StarDetailVue,
+    'inbox': InboxVue
   },
   props: {
     game: Object,
