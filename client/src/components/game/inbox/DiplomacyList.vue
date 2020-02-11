@@ -6,7 +6,7 @@
         <button class="btn btn-primary float-right">Mark All Read</button>
     </div>
 
-    <div class="col text-center pt-2" v-if="!conversations.length">
+    <div class="text-center pt-2" v-if="!conversations.length">
         No Messages
     </div>
 

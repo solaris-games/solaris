@@ -18,7 +18,7 @@
             <diplomacy-list :game="game"/>
         </div>
         <div class="tab-pane fade" id="events">
-            events
+            <events-list :game="game"/>
         </div>
     </div>
 </div>
@@ -26,10 +26,12 @@
 
 <script>
 import DiplomacyListVue from './DiplomacyList'
+import EventsListVue from './EventsList'
 
 export default {
   components: {
-      'diplomacy-list': DiplomacyListVue
+      'diplomacy-list': DiplomacyListVue,
+      'events-list': EventsListVue
   },
   props: {
     game: Object
