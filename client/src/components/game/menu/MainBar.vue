@@ -4,7 +4,6 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div v-if="menuState == MENU_STATES.GALAXY">GALAXY</div>
     <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
     <div v-if="menuState == MENU_STATES.HELP">HELP</div>
 
@@ -15,6 +14,7 @@
     <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
     <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
     <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
+    <galaxy v-if="menuState == MENU_STATES.GALAXY"/>
 </div>
 </template>
 
@@ -29,6 +29,7 @@ import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import InboxVue from '../inbox/Inbox.vue'
 import IntelVue from '../intel/Intel.vue'
+import GalaxyVue from '../galaxy/Galaxy.vue'
 import GameHelper from '../../../services/gameHelper'
 
 export default {
@@ -41,7 +42,8 @@ export default {
     'research': ResearchVue,
     'star-detail': StarDetailVue,
     'inbox': InboxVue,
-    'intel': IntelVue
+    'intel': IntelVue,
+    'galaxy': GalaxyVue
   },
   props: {
     game: Object,
