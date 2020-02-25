@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
-import Background from './background'
 import Map from './map'
 
 class GameContainer {
@@ -65,25 +64,14 @@ class GameContainer {
   }
 
   setupUI () {
-    this.background = new Background(
-      this.starFieldRight - this.starFieldLeft,
-      this.starFieldBottom - this.starFieldTop
-    )
-
     this.map = new Map()
     this.map.setup(this.game)
 
-    this.viewport.addChild(this.background.container)
     this.viewport.addChild(this.map.container)
   }
 
   draw () {
-    this.background.draw()
     this.map.draw()
-
-    // Move the background so that it centers around the star map.
-    this.background.container.x = this.map.container.x - (this.background.container.width / 2)
-    this.background.container.y = this.map.container.y - (this.background.container.height / 2)
   }
 
   _calculateMinStarX (game) {
