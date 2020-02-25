@@ -38,10 +38,10 @@ class GameContainer {
 
     console.log(game)
 
-    this.starFieldLeft = this._calculateMinStarX(game) - 1000
-    this.starFieldRight = this._calculateMaxStarX(game) + 1000
-    this.starFieldTop = this._calculateMinStarY(game) - 1000
-    this.starFieldBottom = this._calculateMaxStarY(game) + 1000
+    this.starFieldLeft = this._calculateMinStarX(game) - 500
+    this.starFieldRight = this._calculateMaxStarX(game) + 500
+    this.starFieldTop = this._calculateMinStarY(game) - 250
+    this.starFieldBottom = this._calculateMaxStarY(game) + 250
 
     // activate plugins
     this.viewport
