@@ -1,4 +1,4 @@
-const starHelper = require('./star');
+const StarService = require('./star');
 const RandomService = require('./random');
 
 function isDuplicateStarPosition(star, stars) {
@@ -15,6 +15,7 @@ module.exports = class MapService {
 
     constructor() {
         this.randomService = new RandomService();
+        this.starService = new StarService();
     }
 
     DISTANCES = {
@@ -29,7 +30,7 @@ module.exports = class MapService {
         // Circle universe.
         const maxRadius = starCount * Math.PI;
 
-        const starNames = starHelper.getRandomStarNames(starCount);
+        const starNames = this.starService.getRandomStarNames(starCount);
 
         let index = 0;
 
@@ -39,7 +40,7 @@ module.exports = class MapService {
             
             const starName = starNames[index];
             
-            const star = starHelper.generateUnownedStar(starName, maxRadius);
+            const star = this.starService.generateUnownedStar(starName, maxRadius);
 
             if (isDuplicateStarPosition(star, stars))
                 continue;
