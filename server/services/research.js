@@ -1,9 +1,13 @@
-const gameHelper = require('./game');
+const GameService = require('./game');
 
-module.exports = {
+module.exports = class ResearchService {
+
+    constructor() {
+        this.gameService = new GameService();
+    }
 
     updateResearchNow(gameId, userId, preference, callback) {
-        gameHelper.getByIdAll(gameId, (err, game) => {
+        this.gameService.getByIdAll(gameId, (err, game) => {
             if (err) {
                 return callback(err);
             }
@@ -21,10 +25,10 @@ module.exports = {
                 return callback(null);
             });
         });
-    },
+    }
 
     updateResearchNext(gameId, userId, preference, callback) {
-        gameHelper.getByIdAll(gameId, (err, game) => {
+        this.gameService.getByIdAll(gameId, (err, game) => {
             if (err) {
                 return callback(err);
             }
@@ -42,6 +46,6 @@ module.exports = {
                 return callback(null);
             });
         });
-    },
+    }
 
 };

@@ -1,26 +1,26 @@
 const mongoose = require('mongoose');
 
 const colours = require('../config/game/colours');
-const random = require('./random');
 
-const mapHelper = require('./map');
-const starHelper = require('./star');
-const carrierHelper = require('./carrier');
+const RandomService = require('./random');
+const MapService = require('./map');
+const StarService = require('./star');
+const CarrierService = require('./carrier');
 
 function isTooCloseStartingPosition(distanceAllowed, homeStar, stars) {
-    let closestStar = mapHelper.getClosestOwnedStars(homeStar, stars, 1)[0];
+    let closestStar = this.mapService.getClosestOwnedStars(homeStar, stars, 1)[0];
 
     // If there is no closest owned star then we're all good, no need to check.
     if (!closestStar)
         return false;
 
-    let distanceToClosest = mapHelper.getDistanceBetweenStars(homeStar, closestStar);
+    let distanceToClosest = this.mapService.getDistanceBetweenStars(homeStar, closestStar);
     
     return distanceToClosest < distanceAllowed;
 }
 
 function calculateStartingDistance(gameSettings, stars) {
-    let galaxyDiameter = mapHelper.getGalaxyDiameter(stars);
+    let galaxyDiameter = this.mapService.getGalaxyDiameter(stars);
     let playerCount = gameSettings.general.playerLimit;
     let minDistance;
 
@@ -33,8 +33,15 @@ function calculateStartingDistance(gameSettings, stars) {
     return minDistance;
 }
 
-module.exports = {
+module.exports = class PlayerService {
     
+    constructor() {
+        this.randomService = new RandomService();
+        this.mapService = new MapService();
+        this.starService = new StarService();
+        this.carrierService = new CarrierService();
+    }
+
     createEmptyPlayer(gameSettings, colour) {
         return {
             _id: mongoose.Types.ObjectId(),
@@ -53,7 +60,7 @@ module.exports = {
                 weapons: { level: gameSettings.technology.startingTechnologyLevel.weapons }
             }
         };
-    },
+    }
 
     createEmptyPlayers(gameSettings, allStars) {
         let players = [];
@@ -64,7 +71,7 @@ module.exports = {
             // Set the players colour based on their index position in the array.
             let colour = colours[i];
 
-            player = module.exports.createEmptyPlayer(gameSettings, colour);
+            player = this.createEmptyPlayer(gameSettings, colour);
 
             let isTooClose = false;
         
@@ -73,23 +80,23 @@ module.exports = {
             let homeStar;
 
             do {
-                homeStar = allStars[random.getRandomNumberBetween(0, allStars.length)];
+                homeStar = allStars[this.randomService.getRandomNumberBetween(0, allStars.length)];
 
                 isTooClose = isTooCloseStartingPosition(minDistance, homeStar, allStars);
             }
             while (homeStar.ownedByPlayerId || isTooClose);
 
             // Set up the home star
-            starHelper.setupHomeStar(homeStar, player, gameSettings);
+            this.starService.setupHomeStar(homeStar, player, gameSettings);
 
             // Create a carrier for the home star.
-            let homeCarrier = carrierHelper.createAtStar(homeStar);
+            let homeCarrier = this.carrierService.createAtStar(homeStar);
 
             player.carriers.push(homeCarrier);
 
             // Get X closest stars to the home star and also give those to
             // the player.
-            let closestStarsToHome = mapHelper.getClosestUnownedStars(homeStar, allStars, gameSettings.player.startingStars - 1);
+            let closestStarsToHome = this.mapService.getClosestUnownedStars(homeStar, allStars, gameSettings.player.startingStars - 1);
 
             // Set up the closest stars.
             closestStarsToHome.forEach(s => {
@@ -101,13 +108,13 @@ module.exports = {
         }
 
         return players;
-    },
+    }
 
     calculateTotalShipsForPlayer(stars, player) {
-        let ownedStars = starHelper.listStarsOwnedByPlayer(stars, player._id);
+        let ownedStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
         return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
             + player.carriers.reduce((sum, c) => sum + c.ships, 0);
-    },
+    }
 
 }

@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-const gameHelper = require('../services/game');
+const GameService = require('../services/game');
+
+const gameService = new GameService();
 
 router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
     return res.status(200).json(require('../config/game/defaultGameSettings.json'));
@@ -10,7 +12,7 @@ router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
 router.post('/', middleware.authenticate, (req, res, next) => {
     req.body.general.createdByUserId = req.session.userId;
 
-    gameHelper.create(req.body, (err, game) => {
+    gameService.create(req.body, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -20,7 +22,7 @@ router.post('/', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/:id/info', middleware.authenticate, (req, res, next) => {
-    gameHelper.getByIdInfo(req.params.id, (err, game) => {
+    gameService.getByIdInfo(req.params.id, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -30,7 +32,7 @@ router.get('/:id/info', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/:id/galaxy', middleware.authenticate, (req, res, next) => {
-    gameHelper.getByIdGalaxy(req.params.id, req.session.userId, (err, game) => {
+    gameService.getByIdGalaxy(req.params.id, req.session.userId, (err, game) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -40,7 +42,7 @@ router.get('/:id/galaxy', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/list/official', middleware.authenticate, (req, res, next) => {
-    gameHelper.listOfficialGames((err, games) => {
+    gameService.listOfficialGames((err, games) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -50,7 +52,7 @@ router.get('/list/official', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/list/user', middleware.authenticate, (req, res, next) => {
-    gameHelper.listUserGames((err, games) => {
+    gameService.listUserGames((err, games) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -60,7 +62,7 @@ router.get('/list/user', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/list/active', middleware.authenticate, (req, res, next) => {
-    gameHelper.listActiveGames(req.session.userId, (err, games) => {
+    gameService.listActiveGames(req.session.userId, (err, games) => {
         if (err) {
             return res.status(401).json(err);
         }
@@ -70,7 +72,7 @@ router.get('/list/active', middleware.authenticate, (req, res, next) => {
 });
 
 router.post('/:gameId/join', middleware.authenticate, (req, res, next) => {
-    gameHelper.join(
+    gameService.join(
         req.params.gameId,
         req.session.userId,
         req.body.playerId,
@@ -86,7 +88,7 @@ router.post('/:gameId/join', middleware.authenticate, (req, res, next) => {
 });
 
 router.post('/:gameId/concedeDefeat', middleware.authenticate, (req, res, next) => {
-    gameHelper.concedeDefeat(
+    gameService.concedeDefeat(
         req.params.gameId,
         req.session.userId,
         (err) => {

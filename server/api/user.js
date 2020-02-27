@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-const userHelper = require('../services/user');
+const UserService = require('../services/user');
+
+const userService = new UserService();
 
 router.post('/', (req, res, next) => {
     let errors = [];
@@ -22,7 +24,7 @@ router.post('/', (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    userHelper.userExists(req.body.username, (err, exists) => {
+    userService.userExists(req.body.username, (err, exists) => {
         if (err) {
             return next(err);
         }
@@ -35,7 +37,7 @@ router.post('/', (req, res, next) => {
             });
         }
 
-        userHelper.create({
+        userService.create({
             email: req.body.email,
             username: req.body.username,
             password: req.body.password
@@ -53,7 +55,7 @@ router.post('/', (req, res, next) => {
 });
 
 router.get('/', middleware.authenticate, (req, res, next) => {
-    userHelper.getMe(req.session.userId, (err, user) => {
+    userService.getMe(req.session.userId, (err, user) => {
         if (err) {
             return next(err);
         }
@@ -63,7 +65,7 @@ router.get('/', middleware.authenticate, (req, res, next) => {
 });
 
 router.get('/:id', middleware.authenticate, (req, res, next) => {
-    userHelper.getById(req.params.id, (err, user) => {
+    userService.getById(req.params.id, (err, user) => {
         if (err) {
             return next(err);
         }
@@ -73,7 +75,7 @@ router.get('/:id', middleware.authenticate, (req, res, next) => {
 });
 
 router.post('/changeEmailPreference', middleware.authenticate, (req, res, next) => {
-    userHelper.updateEmailPreference(req.session.userId, req.body.enabled, (err) => {
+    userService.updateEmailPreference(req.session.userId, req.body.enabled, (err) => {
         if (err) {
             return next(err);
         }
@@ -93,7 +95,7 @@ router.post('/changeEmailAddress', middleware.authenticate, (req, res, next) => 
         return res.status(400).json({ errors: errors });
     }
 
-    userHelper.updateEmailAddress(req.session.userId, req.body.email, (err) => {
+    userService.updateEmailAddress(req.session.userId, req.body.email, (err) => {
         if (err) {
             return next(err);
         }
@@ -117,7 +119,7 @@ router.post('/changePassword', middleware.authenticate, (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    userHelper.updatePassword(
+    userService.updatePassword(
         req.session.userId, 
         req.body.currentPassword,
         req.body.newPassword,

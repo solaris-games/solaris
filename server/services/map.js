@@ -1,5 +1,5 @@
 const starHelper = require('./star');
-const random = require('./random');
+const RandomService = require('./random');
 
 function isDuplicateStarPosition(star, stars) {
     const samePositionStars = 
@@ -11,13 +11,17 @@ function isDuplicateStarPosition(star, stars) {
     return samePositionStars.length > 0;
 }
 
-module.exports = {
+module.exports = class MapService {
 
-    DISTANCES: {
+    constructor() {
+        this.randomService = new RandomService();
+    }
+
+    DISTANCES = {
         LIGHT_YEAR: 10,
         MIN_DISTANCE_BETWEEN_STARS: 5,
         BASE_SHIP_SPEED: 1  // 0.1 ly per tick
-    },
+    }
     
     generateStars(starCount, playerCount) {
         const stars = [];
@@ -45,9 +49,9 @@ module.exports = {
             // Stars must be at least 3 ly away from eachother.
             for(let i = 0; i < stars.length; i++) {
                 let otherStar = stars[i];
-                const distance = module.exports.getDistanceBetweenStars(star, otherStar);
+                const distance = this.getDistanceBetweenStars(star, otherStar);
 
-                if (distance < module.exports.DISTANCES.MIN_DISTANCE_BETWEEN_STARS) {
+                if (distance < this.DISTANCES.MIN_DISTANCE_BETWEEN_STARS) {
                     isTooClose = true;
                     break;
                 }
@@ -63,12 +67,12 @@ module.exports = {
 
         // We need to sanitize all star positions to make sure that all
         // x's and y's are positive integers otherwise rendering is a bitch.
-        module.exports.sanitizeStarPositions(stars);
+        this.sanitizeStarPositions(stars);
 
         // TODO: If random warp gates are enabled, pick a random selection of stars and add gates to them.
 
         return stars;
-    },
+    }
 
     generateGates(stars, type, playerCount) {
         let gateCount = 0;
@@ -80,7 +84,7 @@ module.exports = {
 
         // Pick stars at random and set them to be warp gates.
         do {
-            let star = stars[random.getRandomNumberBetween(0, stars.length - 1)];
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
 
             if (star.warpGate) {
                 gateCount++; // Increment because the while loop will decrement.
@@ -88,7 +92,7 @@ module.exports = {
                 star.warpGate = true;
             }
         } while (gateCount--);
-    },
+    }
 
     sanitizeStarPositions(stars) {
         // Get the min X and min Y and add them onto all stars.
@@ -104,7 +108,7 @@ module.exports = {
             star.location.x += minX;
             star.location.y += minY;
         }
-    },
+    }
 
     getDistanceBetweenLocations(loc1, loc2) {
         let xs = loc2.x - loc1.x,
@@ -114,81 +118,81 @@ module.exports = {
         ys *= ys;
 
         return Math.sqrt(xs + ys);
-    },
+    }
 
     getClosestLocations(loc, locs, amount) {
         let sorted = locs
             .filter(a => a.x !== loc.x && a.y !== loc.y) // Ignore the location passed in if it exists in the array.
             .sort((a, b) => {
-                return module.exports.getDistanceBetweenLocations(loc, a)
-                    - module.exports.getDistanceBetweenLocations(loc, b);
+                return this.getDistanceBetweenLocations(loc, a)
+                    - this.getDistanceBetweenLocations(loc, b);
             });
         
         return sorted.slice(0, amount);
-    },
+    }
 
     getClosestLocation(loc, locs) {
-        return module.exports.getClosestLocations(loc, locs, 1)[0];
-    },
+        return this.getClosestLocations(loc, locs, 1)[0];
+    }
 
     getFurthestLocations(loc, locs, amount) {
-        return module.exports.getClosestLocations(loc, locs, locs.length).reverse().slice(0, amount);
-    },
+        return this.getClosestLocations(loc, locs, locs.length).reverse().slice(0, amount);
+    }
 
     getFurthestLocation(loc, locs) {
-        return module.exports.getFurthestLocations(loc, locs, 1)[0];
-    },
+        return this.getFurthestLocations(loc, locs, 1)[0];
+    }
 
     getDistanceBetweenStars(star1, star2) {
-        return module.exports.getDistanceBetweenLocations(star1.location, star2.location);
-    },
+        return this.getDistanceBetweenLocations(star1.location, star2.location);
+    }
 
     getClosestStar(star, stars) {
-        return module.exports.getClosestStars(star, stars, 1)[0];
-    },
+        return this.getClosestStars(star, stars, 1)[0];
+    }
 
     getClosestStars(star, stars, amount) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .sort((a, b) => {
-                return module.exports.getDistanceBetweenStars(star, a)
-                    - module.exports.getDistanceBetweenStars(star, b);
+                return this.getDistanceBetweenStars(star, a)
+                    - this.getDistanceBetweenStars(star, b);
             });
         
         return sorted.slice(0, amount); // Slice 1 ignores the first star because it will be the current star.
-    },
+    }
 
     getClosestUnownedStars(star, stars, amount) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => !s.ownedByPlayerId)
             .sort((a, b) => {
-                return module.exports.getDistanceBetweenStars(star, a)
-                    - module.exports.getDistanceBetweenStars(star, b);
+                return this.getDistanceBetweenStars(star, a)
+                    - this.getDistanceBetweenStars(star, b);
             });
 
         return sorted.slice(0, amount);
-    },
+    }
 
     getClosestOwnedStars(star, stars, amount) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => s.ownedByPlayerId)
             .sort((a, b) => {
-                return module.exports.getDistanceBetweenStars(star, a)
-                    - module.exports.getDistanceBetweenStars(star, b);
+                return this.getDistanceBetweenStars(star, a)
+                    - this.getDistanceBetweenStars(star, b);
             });
 
         return sorted.slice(0, amount);
-    },
+    }
 
     getGalaxyDiameter(stars) {
         let starLocations = stars.map(s => s.location);
 
         // Calculate the furthest distance between two stars, that's the diameter.
         let diameter = stars.reduce((distance, star) => {
-            let furthest = module.exports.getFurthestLocation(star.location, starLocations);
-            let newDistance = module.exports.getDistanceBetweenLocations(star.location, furthest);
+            let furthest = this.getFurthestLocation(star.location, starLocations);
+            let newDistance = this.getDistanceBetweenLocations(star.location, furthest);
 
             if (newDistance > distance) {
                 distance = newDistance;
@@ -198,14 +202,14 @@ module.exports = {
         }, 0);
 
         return diameter;
-    },
+    }
 
     getScanningDistance(scanning) {
-        return ((scanning || 1) + 2) * module.exports.DISTANCES.LIGHT_YEAR;
-    },
+        return ((scanning || 1) + 2) * this.DISTANCES.LIGHT_YEAR;
+    }
     
     getHyperspaceDistance(hyperspace) {
-        return ((hyperspace || 1) + 3) * module.exports.DISTANCES.LIGHT_YEAR;
+        return ((hyperspace || 1) + 3) * this.DISTANCES.LIGHT_YEAR;
     }
 
 };

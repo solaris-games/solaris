@@ -1,9 +1,9 @@
 const moment = require('moment');
 const Game = require('../models/Game');
 
-const mapHelper = require('./map');
-const playerHelper = require('./player');
-const starHelper = require('./star');
+const MapService = require('./map');
+const PlayerService = require('./player');
+const StarService = require('./star');
 
 const SELECTS = {
     INFO: {
@@ -18,7 +18,13 @@ const SELECTS = {
     }
 };
 
-module.exports = {
+module.exports = class GameService {
+
+    constructor() {
+        this.mapService = new MapService();
+        this.playerService = new PlayerService();
+        this.starService = new StarService();
+    }
 
     listOfficialGames(callback) {
         Game.find({
@@ -33,7 +39,7 @@ module.exports = {
 
                 return callback(null, docs);
             });
-    },
+    }
 
     listUserGames(callback) {
         Game.find({
@@ -48,7 +54,7 @@ module.exports = {
 
                 return callback(null, docs);
             });
-    },
+    }
 
     listActiveGames(userId, callback) {
         Game.find({
@@ -63,7 +69,7 @@ module.exports = {
 
                 return callback(null, docs);
             });
-    },
+    }
 
     getById(id, select, callback) {
         Game.findById(id)
@@ -75,18 +81,18 @@ module.exports = {
 
                 return callback(null, doc);
             });
-    },
+    }
 
     getByIdAll(id, callback) {
-        return module.exports.getById(id, {}, callback);
-    },
+        return this.getById(id, {}, callback);
+    }
 
     getByIdInfo(id, callback) {
-        return module.exports.getById(id, SELECTS.INFO, callback);
-    },
+        return this.getById(id, SELECTS.INFO, callback);
+    }
 
     getByIdGalaxy(id, userId, callback) {
-        return module.exports.getById(id, {}, (err, doc) => {
+        return this.getById(id, {}, (err, doc) => {
             if (err) {
                 return callback(err);
             }
@@ -111,11 +117,11 @@ module.exports = {
             doc.galaxy.players.forEach(p => {
                 // Calculate statistics such as how many carriers they have
                 // and what the total number of ships are.
-                let playerStars = starHelper.listStarsOwnedByPlayer(doc.galaxy.stars, p._id);
-                let totalShips = playerHelper.calculateTotalShipsForPlayer(doc.galaxy.stars, p);
+                let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, p._id);
+                let totalShips = this.playerService.calculateTotalShipsForPlayer(doc.galaxy.stars, p);
 
                 // Calculate the manufacturing level for all of the stars the player owns.
-                playerStars.forEach(s => s.manufacturing = starHelper.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
+                playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
 
                 let totalManufacturing = playerStars.reduce((sum, s) => {
                     return sum + s.manufacturing;
@@ -156,10 +162,10 @@ module.exports = {
                 return callback(null, doc);
             }
 
-            let scanningRangeDistance = mapHelper.getScanningDistance(player.research.scanning.level);
+            let scanningRangeDistance = this.mapService.getScanningDistance(player.research.scanning.level);
 
             // Get all of the players stars.
-            let playerStars = starHelper.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+            let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
             let playerStarLocations = playerStars.map(s => s.location);
 
             // Work out which ones are not in scanning range and clear their data.
@@ -169,7 +175,7 @@ module.exports = {
                     if (s.ownedByPlayerId) {
                         let owningPlayer = doc.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
 
-                        s.terraformedResources = starHelper.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming.level);
+                        s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming.level);
                     }
 
                     // Ignore stars the player owns, they will always be visible.
@@ -180,8 +186,8 @@ module.exports = {
                     }
 
                     // Get the closest player star to this star.
-                    let closest = mapHelper.getClosestStar(s, playerStars);
-                    let distance = mapHelper.getDistanceBetweenStars(s, closest);
+                    let closest = this.mapService.getClosestStar(s, playerStars);
+                    let distance = this.mapService.getDistanceBetweenStars(s, closest);
 
                     let inRange = distance <= scanningRangeDistance;
 
@@ -216,8 +222,8 @@ module.exports = {
                 if (!p._id.equals(player._id)) {
                     p.carriers = p.carriers.filter(c => {
                         // Get the closest player star to this carrier.
-                        let closest = mapHelper.getClosestLocation(c.location, playerStarLocations);
-                        let distance = mapHelper.getDistanceBetweenLocations(c.location, closest);
+                        let closest = this.mapService.getClosestLocation(c.location, playerStarLocations);
+                        let distance = this.mapService.getDistanceBetweenLocations(c.location, closest);
     
                         let inRange = distance <= scanningRangeDistance;
     
@@ -265,7 +271,7 @@ module.exports = {
 
             return callback(null, doc);
         });
-    },
+    }
 
     create(settings, callback) {
         let game = new Game({
@@ -277,14 +283,14 @@ module.exports = {
         game._doc.state.starsForVictory = (game._doc.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
 
         // Create all of the stars required.
-        game._doc.galaxy.stars = mapHelper.generateStars(game._doc.state.stars, game._doc.settings.general.playerLimit);
+        game._doc.galaxy.stars = this.mapService.generateStars(game._doc.state.stars, game._doc.settings.general.playerLimit);
         
         if (game._doc.settings.specialGalaxy.randomGates !== 'none') {
-            mapHelper.generateGates(game._doc.galaxy.stars, game._doc.settings.specialGalaxy.randomGates, game._doc.settings.general.playerLimit);
+            this.mapService.generateGates(game._doc.galaxy.stars, game._doc.settings.specialGalaxy.randomGates, game._doc.settings.general.playerLimit);
         }
 
         // Setup players and assign to their starting positions.
-        game._doc.galaxy.players = playerHelper.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);
+        game._doc.galaxy.players = this.playerService.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);
 
         game.save((err, doc) => {
             if (err) {
@@ -293,10 +299,10 @@ module.exports = {
 
             callback(null, doc);
         });
-    },
+    }
 
     join(gameId, userId, playerId, raceId, alias, callback) {
-        module.exports.getById(gameId, {}, (err, game) => {
+        this.getById(gameId, {}, (err, game) => {
             if (err) {
                 return callback(err);
             }
@@ -357,11 +363,11 @@ module.exports = {
                 return callback(null, doc);
             });
         });
-    },
+    }
 
     concedeDefeat(gameId, userId, callback) {
         // Remove the player from the game.
-        module.exports.getById(gameId, {}, (err, game) => {
+        this.getById(gameId, {}, (err, game) => {
             if (err) {
                 return callback(err);
             }
@@ -389,7 +395,7 @@ module.exports = {
                 return callback(null, doc);
             });
         });
-    },
+    }
 
     clearData(callback) {
         Game.deleteMany({}, callback);

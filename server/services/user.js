@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
-module.exports = {
+module.exports = class UserService {
 
     getMe(id, callback) {
         User.findById(id, {
@@ -15,7 +15,7 @@ module.exports = {
     
             return callback(null, user);
         });
-    },
+    }
 
     getById(id, callback) {
         User.findById(id, {
@@ -33,7 +33,7 @@ module.exports = {
     
             return callback(null, user);
         });
-    },
+    }
 
     create(user, callback) {
         const newUser = new User(user);
@@ -53,7 +53,7 @@ module.exports = {
                 }
             });
         });
-    },
+    }
 
     userExists(username, callback) {
         User.findOne({
@@ -66,7 +66,7 @@ module.exports = {
     
             return callback(null, user != null);
         });
-    },
+    }
 
     updateEmailPreference(id, preference, callback) {
         User.findById(id, (err, user) => {
@@ -84,7 +84,7 @@ module.exports = {
                 return callback(null);
             });
         });
-    },
+    }
 
     updateEmailAddress(id, email, callback) {
         User.findById(id, (err, user) => {
@@ -102,7 +102,7 @@ module.exports = {
                 return callback(null);
             });
         });
-    },
+    }
 
     updatePassword(id, currentPassword, newPassword, callback) {
         User.findById(id, (err, user) => {
@@ -142,7 +142,7 @@ module.exports = {
                 }
             });
         });
-    },
+    }
 
     clearData(callback) {
         User.deleteMany({}, callback);

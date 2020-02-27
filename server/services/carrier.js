@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = class CarrierService {
 
     createAtStar(star, ships = 1) {
         if (!star.garrison) {
