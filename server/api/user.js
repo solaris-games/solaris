@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-const userHelper = require('../data/user');
+const userHelper = require('../services/user');
 
 router.post('/', (req, res, next) => {
     let errors = [];

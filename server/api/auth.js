@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
-const User = require('../data/db/models/User');
+const User = require('../models/User');
 
 router.post('/login', (req, res, next) => {
     let errors = [];
@@ -23,33 +23,33 @@ router.post('/login', (req, res, next) => {
     User.findOne({
         username: req.body.username
     })
-        .exec((err, user) => {
-            if (err) {
-                return next(err);
-            } else if (!user) {
+    .exec((err, user) => {
+        if (err) {
+            return next(err);
+        } else if (!user) {
+            return res.status(400).json({
+                errors: [
+                    'The username or password is incorrect.'
+                ]
+            });
+        }
+
+        // Compare the passwords and if they match then the user is authenticated.
+        bcrypt.compare(req.body.password, user.password, (err, result) => {
+            if (result) {
+                // Store the user id in the session.
+                req.session.userId = user._id;
+
+                return res.status(200).json({id: user._id});
+            } else {
                 return res.status(400).json({
                     errors: [
                         'The username or password is incorrect.'
                     ]
                 });
             }
-
-            // Compare the passwords and if they match then the user is authenticated.
-            bcrypt.compare(req.body.password, user.password, (err, result) => {
-                if (result) {
-                    // Store the user id in the session.
-                    req.session.userId = user._id;
-
-                    return res.status(200).json({id: user._id});
-                } else {
-                    return res.status(400).json({
-                        errors: [
-                            'The username or password is incorrect.'
-                        ]
-                    });
-                }
-            });
         });
+    });
 });
 
 router.post('/logout', (req, res, next) => {

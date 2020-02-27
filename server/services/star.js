@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const starNames = require('./db/misc/starNames');
+const starNames = require('../config/game/starNames');
 const random = require('./random');
-
-const Star = require('./db/models/schemas/star');
 
 module.exports = {
     DEFAULTS: {

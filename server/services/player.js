@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const colours = require('./db/misc/colours');
+const colours = require('../config/game/colours');
 const random = require('./random');
 
 const mapHelper = require('./map');

@@ -1,5 +1,5 @@
 const moment = require('moment');
-const Game = require('./db/models/Game');
+const Game = require('../models/Game');
 
 const mapHelper = require('./map');
 const playerHelper = require('./player');

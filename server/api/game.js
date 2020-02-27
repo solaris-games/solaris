@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-const gameHelper = require('../data/game');
+const gameHelper = require('../services/game');
 
 router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
-    return res.status(200).json(require('../data/db/misc/defaultGameSettings.json'));
+    return res.status(200).json(require('../config/game/defaultGameSettings.json'));
 });
 
 router.post('/', middleware.authenticate, (req, res, next) => {

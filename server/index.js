@@ -1,49 +1,20 @@
-const env = require('dotenv').config();
-
-const db = require('./data/db/connection');
-
 const express = require('express');
-const session = require('express-session');
-const app = express();
+const loaders = require('./loaders');
+const config = require('./config');
 
-const port = process.env.PORT;
+async function startServer() {
+  const app = express();
 
-app.use(require('body-parser').json());
+  await loaders.init(app);
 
-// Use sessions for tracking logins
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    cookie: { secure: false } // Requires HTTPS
-}));
+  app.listen(config.port, err => {
+    if (err) {
+      console.log(err);
+      return;
+    }
 
-// Enable CORS
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
+    console.log(`Server is running on port ${config.port}`);
+  });
+}
 
-// Register routes
-const auth = require('./api/auth');
-const user = require('./api/user');
-const game = require('./api/game');
-const player = require('./api/player');
-
-app.use('/api/auth', auth);
-app.use('/api/user', user);
-app.use('/api/game', game);
-app.use('/api/player', player);
-
-db.connect({
-    connectionString: process.env.CONNECTION_STRING
-})
-    .then(() => {
-        app.listen(port, () => console.log(`API server listening on ${port}.`));
-    })
-    .catch(err => {
-        console.error(err);
-    });
+startServer();
