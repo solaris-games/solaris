@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const AuthService = require('../services/auth');
 
-const User = require('../models/User');
+const userModel = require('../models/User');
+const authService = new AuthService(bcrypt, userModel);
 
 router.post('/login', async (req, res, next) => {
     let errors = [];
@@ -20,35 +22,17 @@ router.post('/login', async (req, res, next) => {
     }
 
     try {
-        // Try to find the user by username
-        let user = await User.findOne({
-            username: req.body.username
-        });
+        let userId = await authService.login(req.body.username, req.body.password);
+
+        // Store the user id in the session.
+        req.session.userId = userId;
         
-        if (!user) {
-            return res.status(400).json({
-                errors: [
-                    'The username or password is incorrect.'
-                ]
-            });
-        }
-
-        // Compare the passwords and if they match then the user is authenticated.
-        let result = await bcrypt.compare(req.body.password, user.password);
-
-        if (result) {
-            // Store the user id in the session.
-            req.session.userId = user._id;
-
-            return res.status(200).json({id: user._id});
-        } else {
-            return res.status(400).json({
-                errors: [
-                    'The username or password is incorrect.'
-                ]
-            });
-        }
+        return res.status(200).json({id: userId});
     } catch (err) {
+        // TODO: Need to implement some decent error handling here,
+        // the problem is that the login function above throws errors
+        // as part of the logic which should not be the case. We should
+        // never throw errors for logic.
         return next(err);
     }
 });
