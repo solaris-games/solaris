@@ -9,95 +9,93 @@ router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
     return res.status(200).json(require('../config/game/defaultGameSettings.json'));
 });
 
-router.post('/', middleware.authenticate, (req, res, next) => {
+router.post('/', middleware.authenticate, async (req, res, next) => {
     req.body.general.createdByUserId = req.session.userId;
 
-    gameService.create(req.body, (err, game) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+    try {
+        let game = await gameService.create(req.body);
 
         return res.status(201).json(game._id);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/:id/info', middleware.authenticate, (req, res, next) => {
-    gameService.getByIdInfo(req.params.id, (err, game) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.get('/:id/info', middleware.authenticate, async (req, res, next) => {
+    try {
+        let game = await gameService.getByIdInfo(req.params.id);
 
         return res.status(200).json(game);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/:id/galaxy', middleware.authenticate, (req, res, next) => {
-    gameService.getByIdGalaxy(req.params.id, req.session.userId, (err, game) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.get('/:id/galaxy', middleware.authenticate, async (req, res, next) => {
+    try {
+        let game = await gameService.getByIdGalaxy(req.params.id, req.session.userId);
 
         return res.status(200).json(game);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/list/official', middleware.authenticate, (req, res, next) => {
-    gameService.listOfficialGames((err, games) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.get('/list/official', middleware.authenticate, async (req, res, next) => {
+    try {
+        let games = await gameService.listOfficialGames();
 
         return res.status(200).json(games);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/list/user', middleware.authenticate, (req, res, next) => {
-    gameService.listUserGames((err, games) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.get('/list/user', middleware.authenticate, async (req, res, next) => {
+    try {
+        let games = await gameService.listUserGames();
 
         return res.status(200).json(games);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/list/active', middleware.authenticate, (req, res, next) => {
-    gameService.listActiveGames(req.session.userId, (err, games) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.get('/list/active', middleware.authenticate, async (req, res, next) => {
+    try {
+        let games = await gameService.listActiveGames();
 
         return res.status(200).json(games);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.post('/:gameId/join', middleware.authenticate, (req, res, next) => {
-    gameService.join(
-        req.params.gameId,
-        req.session.userId,
-        req.body.playerId,
-        req.body.raceId,
-        req.body.alias,
-        (err) => {
-            if (err) {
-                return res.status(401).json(err);
-            }
+router.post('/:gameId/join', middleware.authenticate, async (req, res, next) => {
+    try {
+        await gameService.join(
+            req.params.gameId,
+            req.session.userId,
+            req.body.playerId,
+            req.body.raceId,
+            req.body.alias);
 
-            return res.sendStatus(200);
-        });
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.post('/:gameId/concedeDefeat', middleware.authenticate, (req, res, next) => {
-    gameService.concedeDefeat(
-        req.params.gameId,
-        req.session.userId,
-        (err) => {
-            if (err) {
-                return res.status(401).json(err);
-            }
-
-            return res.sendStatus(200);
-        });
+router.post('/:gameId/concedeDefeat', middleware.authenticate, async (req, res, next) => {
+    try {
+        await gameService.concedeDefeat(
+            req.params.gameId,
+            req.session.userId);
+            
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
 });
 
 module.exports = router;

@@ -6,46 +6,26 @@ module.exports = class ResearchService {
         this.gameService = new GameService();
     }
 
-    updateResearchNow(gameId, userId, preference, callback) {
-        this.gameService.getByIdAll(gameId, (err, game) => {
-            if (err) {
-                return callback(err);
-            }
+    async updateResearchNow(gameId, userId, preference) {
+        let game = await this.gameService.getByIdAll(gameId);
 
-            // Get the user's player and update their research preference.
-            let userPlayer = game.galaxy.players.find(p => p.userId === userId);
+        // Get the user's player and update their research preference.
+        let userPlayer = game.galaxy.players.find(p => p.userId === userId);
 
-            userPlayer.researchingNow = preference;
+        userPlayer.researchingNow = preference;
 
-            game.save((err, doc) => {
-                if (err) {
-                    return callback(err);
-                }
-
-                return callback(null);
-            });
-        });
+        return await game.save();
     }
 
-    updateResearchNext(gameId, userId, preference, callback) {
-        this.gameService.getByIdAll(gameId, (err, game) => {
-            if (err) {
-                return callback(err);
-            }
+    async updateResearchNext(gameId, userId, preference) {
+        let game = this.gameService.getByIdAll(gameId);
 
-            // Get the user's player and update their research preference.
-            let userPlayer = game.galaxy.players.find(p => p.userId === userId);
+        // Get the user's player and update their research preference.
+        let userPlayer = game.galaxy.players.find(p => p.userId === userId);
 
-            userPlayer.researchingNext = preference;
+        userPlayer.researchingNext = preference;
 
-            game.save((err, doc) => {
-                if (err) {
-                    return callback(err);
-                }
-
-                return callback(null);
-            });
-        });
+        return await game.save();
     }
 
 };

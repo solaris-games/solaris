@@ -5,24 +5,24 @@ const ResearchService = require('../services/research');
 
 const researchService = new ResearchService();
 
-router.post('/:gameId/research/now', middleware.authenticate, (req, res, next) => {
-    researchService.updateResearchNow(req.params.gameId, req.session.userId, req.body.preference, (err) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.post('/:gameId/research/now', middleware.authenticate, async (req, res, next) => {
+    try {
+        await researchService.updateResearchNow(req.params.gameId, req.session.userId, req.body.preference);
 
         return res.sendStatus(200);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.post('/:gameId/research/next', middleware.authenticate, (req, res, next) => {
-    researchService.updateResearchNext(req.params.gameId, req.session.userId, req.body.preference, (err) => {
-        if (err) {
-            return res.status(401).json(err);
-        }
+router.post('/:gameId/research/next', middleware.authenticate, async (req, res, next) => {
+    try {
+        await researchService.updateResearchNext(req.params.gameId, req.session.userId, req.body.preference);
 
         return res.sendStatus(200);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
 module.exports = router;

@@ -23,7 +23,7 @@ module.exports = class UserService {
         });
     }
 
-    async create(user, callback) {
+    async create(user) {
         const newUser = new User(user);
     
         newUser.password = await bcrypt.hash(newUser.password, 10);
@@ -33,7 +33,7 @@ module.exports = class UserService {
         return doc._id;
     }
 
-    async userExists(username, callback) {
+    async userExists(username) {
         let user = await User.findOne({
             username: username
         });
@@ -41,7 +41,7 @@ module.exports = class UserService {
         return user != null;
     }
 
-    async updateEmailPreference(id, preference, callback) {
+    async updateEmailPreference(id, preference) {
         let user = await User.findById(id);
 
         user.emailEnabled = preference;
@@ -49,7 +49,7 @@ module.exports = class UserService {
         await user.save();
     }
 
-    async updateEmailAddress(id, email, callback) {
+    async updateEmailAddress(id, email) {
         let user = await User.findById(id);
         
         user.email = email;
@@ -57,7 +57,7 @@ module.exports = class UserService {
         await user.save();
     }
 
-    async updatePassword(id, currentPassword, newPassword, callback) {
+    async updatePassword(id, currentPassword, newPassword) {
         let user = await User.findById(id);
         
         // Make sure the current password matches.
@@ -75,8 +75,8 @@ module.exports = class UserService {
         }
     }
 
-    clearData(callback) {
-        User.deleteMany({}, callback);
+    async clearData() {
+        await User.deleteMany({});
     }
 
 };

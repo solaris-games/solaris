@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/User');
 
-router.post('/login', (req, res, next) => {
+router.post('/login', async (req, res, next) => {
     let errors = [];
 
     if (!req.body.username) {
@@ -19,14 +19,13 @@ router.post('/login', (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    // Try to find the user by username
-    User.findOne({
-        username: req.body.username
-    })
-    .exec((err, user) => {
-        if (err) {
-            return next(err);
-        } else if (!user) {
+    try {
+        // Try to find the user by username
+        let user = await User.findOne({
+            username: req.body.username
+        });
+        
+        if (!user) {
             return res.status(400).json({
                 errors: [
                     'The username or password is incorrect.'
@@ -35,21 +34,23 @@ router.post('/login', (req, res, next) => {
         }
 
         // Compare the passwords and if they match then the user is authenticated.
-        bcrypt.compare(req.body.password, user.password, (err, result) => {
-            if (result) {
-                // Store the user id in the session.
-                req.session.userId = user._id;
+        let result = await bcrypt.compare(req.body.password, user.password);
 
-                return res.status(200).json({id: user._id});
-            } else {
-                return res.status(400).json({
-                    errors: [
-                        'The username or password is incorrect.'
-                    ]
-                });
-            }
-        });
-    });
+        if (result) {
+            // Store the user id in the session.
+            req.session.userId = user._id;
+
+            return res.status(200).json({id: user._id});
+        } else {
+            return res.status(400).json({
+                errors: [
+                    'The username or password is incorrect.'
+                ]
+            });
+        }
+    } catch (err) {
+        return next(err);
+    }
 });
 
 router.post('/logout', (req, res, next) => {
