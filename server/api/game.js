@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
 const GameService = require('../services/game');
+const GameListService = require('../services/gameList');
 
+const gameModel = require('../models/Game');
 const gameService = new GameService();
+const gameListService = new GameListService(gameModel);
 
 router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
     return res.status(200).json(require('../config/game/defaultGameSettings.json'));
@@ -43,7 +46,7 @@ router.get('/:id/galaxy', middleware.authenticate, async (req, res, next) => {
 
 router.get('/list/official', middleware.authenticate, async (req, res, next) => {
     try {
-        let games = await gameService.listOfficialGames();
+        let games = await gameListService.listOfficialGames();
 
         return res.status(200).json(games);
     } catch (err) {
@@ -53,7 +56,7 @@ router.get('/list/official', middleware.authenticate, async (req, res, next) => 
 
 router.get('/list/user', middleware.authenticate, async (req, res, next) => {
     try {
-        let games = await gameService.listUserGames();
+        let games = await gameListService.listUserGames();
 
         return res.status(200).json(games);
     } catch (err) {
@@ -63,7 +66,7 @@ router.get('/list/user', middleware.authenticate, async (req, res, next) => {
 
 router.get('/list/active', middleware.authenticate, async (req, res, next) => {
     try {
-        let games = await gameService.listActiveGames();
+        let games = await gameListService.listActiveGames();
 
         return res.status(200).json(games);
     } catch (err) {

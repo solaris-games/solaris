@@ -5,52 +5,12 @@ const MapService = require('./map');
 const PlayerService = require('./player');
 const StarService = require('./star');
 
-const SELECTS = {
-    INFO: {
-        settings: 1,
-        state: 1
-    },
-    SETTINGS: {
-        settings: 1
-    },
-    GALAXY: {
-        galaxy: 1
-    }
-};
-
 module.exports = class GameService {
 
     constructor() {
         this.mapService = new MapService();
         this.playerService = new PlayerService();
         this.starService = new StarService();
-    }
-
-    async listOfficialGames() {
-        return await Game.find({
-            'settings.general.createdByUserId': { $eq: null },
-            'state.startDate': { $eq: null }
-        })
-        .select(SELECTS.INFO)
-        .exec();
-    }
-
-    async listUserGames() {
-        return await Game.find({
-            'settings.general.createdByUserId': { $ne: null },
-            'state.startDate': { $eq: null }
-        })
-        .select(SELECTS.INFO)
-        .exec();
-    }
-
-    async listActiveGames(userId) {
-        return await Game.find({
-            'galaxy.players': { $elemMatch: { userId } }
-            // TODO: Filter out finished games?
-        })
-        .select(SELECTS.INFO)
-        .exec();
     }
 
     async getById(id, select) {
