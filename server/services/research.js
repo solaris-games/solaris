@@ -1,9 +1,7 @@
-const GameService = require('./game');
-
 module.exports = class ResearchService {
 
-    constructor() {
-        this.gameService = new GameService();
+    constructor(gameService) {
+        this.gameService = gameService;
     }
 
     async updateResearchNow(gameId, userId, preference) {

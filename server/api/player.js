@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
+const GameService = require('../services/game');
 const ResearchService = require('../services/research');
 
-const researchService = new ResearchService();
+const gameService = new GameService();
+const researchService = new ResearchService(gameService);
 
 router.post('/:gameId/research/now', middleware.authenticate, async (req, res, next) => {
     try {
