@@ -1,10 +1,11 @@
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
-
 module.exports = class UserService {
+    constructor(bcrypt, userModel) {
+        this.bcrypt = bcrypt;
+        this.userModel = userModel;
+    }
 
     async getMe(id) {
-        return await User.findById(id, {
+        return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             premiumEndDate: 0
@@ -12,7 +13,7 @@ module.exports = class UserService {
     }
 
     async getById(id) {
-        return await User.findById(id, {
+        return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             premiumEndDate: 0,
@@ -24,9 +25,9 @@ module.exports = class UserService {
     }
 
     async create(user) {
-        const newUser = new User(user);
+        const newUser = new userModel(user);
     
-        newUser.password = await bcrypt.hash(newUser.password, 10);
+        newUser.password = await this.bcrypt.hash(newUser.password, 10);
 
         let doc = await newUser.save();
 
@@ -34,7 +35,7 @@ module.exports = class UserService {
     }
 
     async userExists(username) {
-        let user = await User.findOne({
+        let user = await this.userModel.findOne({
             username: username
         });
 
@@ -42,41 +43,41 @@ module.exports = class UserService {
     }
 
     async updateEmailPreference(id, preference) {
-        let user = await User.findById(id);
+        let user = await this.userModel.findById(id);
 
-        user.emailEnabled = preference;
+        this.userModel.emailEnabled = preference;
 
-        await user.save();
+        await this.userModel.save();
     }
 
     async updateEmailAddress(id, email) {
-        let user = await User.findById(id);
+        let user = await this.userModel.findById(id);
         
-        user.email = email;
+        this.userModel.email = email;
 
-        await user.save();
+        await this.userModel.save();
     }
 
     async updatePassword(id, currentPassword, newPassword) {
-        let user = await User.findById(id);
+        let user = await this.userModel.findById(id);
         
         // Make sure the current password matches.
-        let result = await bcrypt.compare(currentPassword, user.password);
+        let result = await this.bcrypt.compare(currentPassword, this.userModel.password);
 
         if (result) {
             // Update the current password to the new password.
-            let hash = await bcrypt.hash(newPassword, 10);
+            let hash = await this.bcrypt.hash(newPassword, 10);
             
-            user.password = hash;
+            this.userModel.password = hash;
 
-            await user.save();
+            await this.userModel.save();
         } else {
             throw new Error('The current password is incorrect.');
         }
     }
 
     async clearData() {
-        await User.deleteMany({});
+        await this.userModel.deleteMany({});
     }
 
 };

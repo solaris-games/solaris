@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
+
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
 const UserService = require('../services/user');
 
-const userService = new UserService();
+const userService = new UserService(bcrypt, User);
 
 router.post('/', async (req, res, next) => {
     let errors = [];
