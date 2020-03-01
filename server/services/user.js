@@ -3,22 +3,16 @@ const bcrypt = require('bcrypt');
 
 module.exports = class UserService {
 
-    getMe(id, callback) {
-        User.findById(id, {
+    async getMe(id) {
+        return await User.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             premiumEndDate: 0
-        }, (err, user) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            return callback(null, user);
         });
     }
 
-    getById(id, callback) {
-        User.findById(id, {
+    async getById(id) {
+        return await User.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             premiumEndDate: 0,
@@ -26,122 +20,59 @@ module.exports = class UserService {
             email: 0,
             emailEnabled: 0,
             username: 0
-        }, (err, user) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            return callback(null, user);
         });
     }
 
-    create(user, callback) {
+    async create(user, callback) {
         const newUser = new User(user);
     
-        bcrypt.hash(newUser.password, 10, (err, hash) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            newUser.password = hash;
-    
-            newUser.save((err, doc) => {
-                if (err) {
-                    return callback(err)
-                } else {
-                    return callback(null, {id: doc._id});
-                }
-            });
-        });
+        newUser.password = await bcrypt.hash(newUser.password, 10);
+
+        let doc = await newUser.save();
+
+        return doc._id;
     }
 
-    userExists(username, callback) {
-        User.findOne({
+    async userExists(username, callback) {
+        let user = await User.findOne({
             username: username
-        })
-        .exec((err, user) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            return callback(null, user != null);
         });
+
+        return user != null;
     }
 
-    updateEmailPreference(id, preference, callback) {
-        User.findById(id, (err, user) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            user.emailEnabled = preference;
-    
-            user.save((err, doc) => {
-                if (err) {
-                    return callback(err);
-                }
-    
-                return callback(null);
-            });
-        });
+    async updateEmailPreference(id, preference, callback) {
+        let user = await User.findById(id);
+
+        user.emailEnabled = preference;
+
+        await user.save();
     }
 
-    updateEmailAddress(id, email, callback) {
-        User.findById(id, (err, user) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            user.email = email;
-    
-            user.save((err, doc) => {
-                if (err) {
-                    return callback(err);
-                }
-    
-                return callback(null);
-            });
-        });
+    async updateEmailAddress(id, email, callback) {
+        let user = await User.findById(id);
+        
+        user.email = email;
+
+        await user.save();
     }
 
-    updatePassword(id, currentPassword, newPassword, callback) {
-        User.findById(id, (err, user) => {
-            if (err) {
-                return callback(err);
-            }
-    
-            // Make sure the current password matches.
-            bcrypt.compare(currentPassword, user.password, (err, result) => {
-                if (err) {
-                    return callback(err);
-                }
+    async updatePassword(id, currentPassword, newPassword, callback) {
+        let user = await User.findById(id);
+        
+        // Make sure the current password matches.
+        let result = await bcrypt.compare(currentPassword, user.password);
 
-                if (result) {
-                    // Update the current password to the new password.
-                    bcrypt.hash(newPassword, 10, (err, hash) => {
-                        if (err) {
-                            return callback(err);
-                        }
-                
-                        user.password = hash;
-                
-                        user.save((err, doc) => {
-                            if (err) {
-                                return callback(err)
-                            } else {
-                                return callback(null);
-                            }
-                        });
-                    });
-                } else {
-                    return callback({
-                        errors: [
-                            'The current password is incorrect.'
-                        ]
-                    });
-                }
-            });
-        });
+        if (result) {
+            // Update the current password to the new password.
+            let hash = await bcrypt.hash(newPassword, 10);
+            
+            user.password = hash;
+
+            await user.save();
+        } else {
+            throw new Error('The current password is incorrect.');
+        }
     }
 
     clearData(callback) {

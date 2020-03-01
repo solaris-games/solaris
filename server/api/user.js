@@ -5,7 +5,7 @@ const UserService = require('../services/user');
 
 const userService = new UserService();
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
     let errors = [];
 
     if (!req.body.email) {
@@ -24,10 +24,8 @@ router.post('/', (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    userService.userExists(req.body.username, (err, exists) => {
-        if (err) {
-            return next(err);
-        }
+    try {
+        let exists = await userService.userExists(req.body.username);
 
         if (exists) {
             return res.status(400).json({
@@ -36,55 +34,53 @@ router.post('/', (req, res, next) => {
                 ]
             });
         }
-
-        userService.create({
+        
+        let userId = await userService.create({
             email: req.body.email,
             username: req.body.username,
             password: req.body.password
-        }, (err, doc) => {
-            if (err) {
-                return next(err);
-            }
-
-            // Save the user ID to the session to log the user in.
-            req.session.userId = doc.id;
-
-            return res.status(201).json(doc);
         });
-    });
+
+        // Save the user ID to the session to log the user in.
+        req.session.userId = userId;
+
+        return res.status(201).json(userId);
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/', middleware.authenticate, (req, res, next) => {
-    userService.getMe(req.session.userId, (err, user) => {
-        if (err) {
-            return next(err);
-        }
+router.get('/', middleware.authenticate, async (req, res, next) => {
+    try {
+        let user = await userService.getMe(req.session.userId);
 
         return res.status(200).json(user);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.get('/:id', middleware.authenticate, (req, res, next) => {
-    userService.getById(req.params.id, (err, user) => {
-        if (err) {
-            return next(err);
-        }
+router.get('/:id', middleware.authenticate, async (req, res, next) => {
+    try {
+        let user = await userService.getById(req.params.id);
 
         return res.status(200).json(user);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.post('/changeEmailPreference', middleware.authenticate, (req, res, next) => {
-    userService.updateEmailPreference(req.session.userId, req.body.enabled, (err) => {
-        if (err) {
-            return next(err);
-        }
-
+router.post('/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
+    try {
+        userService.updateEmailPreference(req.session.userId, req.body.enabled);
+        
         return res.sendStatus(200);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.post('/changeEmailAddress', middleware.authenticate, (req, res, next) => {
+router.post('/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.email) {
@@ -95,16 +91,16 @@ router.post('/changeEmailAddress', middleware.authenticate, (req, res, next) => 
         return res.status(400).json({ errors: errors });
     }
 
-    userService.updateEmailAddress(req.session.userId, req.body.email, (err) => {
-        if (err) {
-            return next(err);
-        }
+    try {
+        userService.updateEmailAddress(req.session.userId, req.body.email);
 
         return res.sendStatus(200);
-    });
+    } catch (err) {
+        return next(err);
+    }
 });
 
-router.post('/changePassword', middleware.authenticate, (req, res, next) => {
+router.post('/changePassword', middleware.authenticate, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.currentPassword) {
@@ -119,17 +115,16 @@ router.post('/changePassword', middleware.authenticate, (req, res, next) => {
         return res.status(400).json({ errors: errors });
     }
 
-    userService.updatePassword(
-        req.session.userId, 
-        req.body.currentPassword,
-        req.body.newPassword,
-        (err) => {
-            if (err) {
-                return next(err);
-            }
-
-            return res.sendStatus(200);
-        });
+    try {
+        await userService.updatePassword(
+            req.session.userId, 
+            req.body.currentPassword,
+            req.body.newPassword);
+            
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
 });
 
 module.exports = router;
