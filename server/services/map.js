@@ -24,7 +24,7 @@ module.exports = class MapService {
         BASE_SHIP_SPEED: 1  // 0.1 ly per tick
     }
     
-    generateStars(starCount, playerCount) {
+    generateStars(starCount) {
         const stars = [];
 
         // Circle universe.
@@ -69,8 +69,6 @@ module.exports = class MapService {
         // We need to sanitize all star positions to make sure that all
         // x's and y's are positive integers otherwise rendering is a bitch.
         this.sanitizeStarPositions(stars);
-
-        // TODO: If random warp gates are enabled, pick a random selection of stars and add gates to them.
 
         return stars;
     }

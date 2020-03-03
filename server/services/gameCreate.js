@@ -16,8 +16,9 @@ module.exports = class GameCreateService {
         game._doc.state.starsForVictory = (game._doc.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
 
         // Create all of the stars required.
-        game._doc.galaxy.stars = this.mapService.generateStars(game._doc.state.stars, game._doc.settings.general.playerLimit);
+        game._doc.galaxy.stars = this.mapService.generateStars(game._doc.state.stars);
         
+        // If warp gates are enabled, assign random stars to start as warp gates.
         if (game._doc.settings.specialGalaxy.randomGates !== 'none') {
             this.mapService.generateGates(game._doc.galaxy.stars, game._doc.settings.specialGalaxy.randomGates, game._doc.settings.general.playerLimit);
         }

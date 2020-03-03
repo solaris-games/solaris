@@ -36,6 +36,7 @@ module.exports = class PlayerService {
         };
     }
 
+    // TODO: This needs to be refactored to not rely on objects being passed in as parameters
     createEmptyPlayers(gameSettings, allStars) {
         let players = [];
 
