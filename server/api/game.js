@@ -21,8 +21,7 @@ const gameService = new GameService(gameModel);
 const gameCreateService = new GameCreateService(
     gameModel, 
     mapService, 
-    playerService, 
-    starService
+    playerService
 );
 
 const gameGalaxyService = new GameGalaxyService(

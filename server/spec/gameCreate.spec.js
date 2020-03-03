@@ -52,10 +52,6 @@ const fakePlayerService = {
     }
 };
 
-const fakeStarService = {
-
-};
-
 describe('gameCreate', () => {
 
     let service;
@@ -63,7 +59,7 @@ describe('gameCreate', () => {
     let settings = null;
 
     beforeAll(() => {
-        service = new GameCreateService(fakeGameModel, fakeMapService, fakePlayerService, fakeStarService);
+        service = new GameCreateService(fakeGameModel, fakeMapService, fakePlayerService);
     });
 
     beforeEach(() => {
