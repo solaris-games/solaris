@@ -8,7 +8,7 @@ const fakeGameService = {
     }
 };
 
-describe('carrier', () => {
+describe('research', () => {
     let service;
 
     beforeAll(() => {

@@ -301,8 +301,4 @@ module.exports = class GameService {
         return await game.save();
     }
 
-    async clearData() {
-        await Game.deleteMany({});
-    }
-
 };

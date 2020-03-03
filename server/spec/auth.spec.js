@@ -18,7 +18,7 @@ const fakeUserModel = {
     }
 };
 
-describe('carrier', () => {
+describe('auth', () => {
     let service;
 
     beforeAll(() => {

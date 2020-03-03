@@ -15,7 +15,7 @@ const fakeGameModel = {
     }
 };
 
-describe('carrier', () => {
+describe('gameList', () => {
     let gameListService;
 
     beforeAll(() => {

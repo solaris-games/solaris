@@ -45,39 +45,35 @@ module.exports = class UserService {
     async updateEmailPreference(id, preference) {
         let user = await this.userModel.findById(id);
 
-        this.userModel.emailEnabled = preference;
+        user.emailEnabled = preference;
 
-        await this.userModel.save();
+        return await user.save();
     }
 
     async updateEmailAddress(id, email) {
         let user = await this.userModel.findById(id);
         
-        this.userModel.email = email;
+        user.email = email;
 
-        await this.userModel.save();
+        return await user.save();
     }
 
     async updatePassword(id, currentPassword, newPassword) {
         let user = await this.userModel.findById(id);
         
         // Make sure the current password matches.
-        let result = await this.bcrypt.compare(currentPassword, this.userModel.password);
+        let result = await this.bcrypt.compare(currentPassword, user.password);
 
         if (result) {
             // Update the current password to the new password.
             let hash = await this.bcrypt.hash(newPassword, 10);
             
-            this.userModel.password = hash;
+            user.password = hash;
 
-            await this.userModel.save();
+            return await user.save();
         } else {
             throw new Error('The current password is incorrect.');
         }
-    }
-
-    async clearData() {
-        await this.userModel.deleteMany({});
     }
 
 };
