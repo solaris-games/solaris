@@ -3,11 +3,8 @@ const Game = require('../models/Game');
 
 module.exports = class GameService {
 
-    constructor(gameModel, mapService, playerService, starService) {
+    constructor(gameModel) {
         this.gameModel = gameModel;
-        this.mapService = mapService;
-        this.playerService = playerService;
-        this.starService = starService;
     }
 
     async getById(id, select) {
@@ -25,28 +22,6 @@ module.exports = class GameService {
             settings: 1,
             state: 1
         });
-    }
-
-    async create(settings) {
-        let game = new this.gameModel({
-            settings
-        });
-
-        // Calculate how many stars we need.
-        game._doc.state.stars = game._doc.settings.galaxy.starsPerPlayer * game._doc.settings.general.playerLimit * 2.5;
-        game._doc.state.starsForVictory = (game._doc.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
-
-        // Create all of the stars required.
-        game._doc.galaxy.stars = this.mapService.generateStars(game._doc.state.stars, game._doc.settings.general.playerLimit);
-        
-        if (game._doc.settings.specialGalaxy.randomGates !== 'none') {
-            this.mapService.generateGates(game._doc.galaxy.stars, game._doc.settings.specialGalaxy.randomGates, game._doc.settings.general.playerLimit);
-        }
-
-        // Setup players and assign to their starting positions.
-        game._doc.galaxy.players = this.playerService.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);
-
-        return await game.save();
     }
 
     async join(gameId, userId, playerId, alias) {
@@ -111,9 +86,7 @@ module.exports = class GameService {
         //       or anything weird like that.
 
         // Get the player that is linked to this user.
-        let player = game.galaxy.players.find(x => {
-            return x.userId == userId;
-        });
+        let player = game.galaxy.players.find(x => x.userId == userId);
 
         if (!player) {
             throw new Error('The user is not participating in this game.');

@@ -4,6 +4,7 @@ const middleware = require('./middleware');
 const GameService = require('../services/game');
 const GameListService = require('../services/gameList');
 const GameGalaxyService = require('../services/gameGalaxy');
+const GameCreateService = require('../services/gameCreate');
 const MapService = require('../services/map');
 const PlayerService = require('../services/player');
 const StarService = require('../services/star');
@@ -15,12 +16,15 @@ const mapService = new MapService();
 const playerService = new PlayerService();
 const starService = new StarService();
 
-const gameService = new GameService(
+const gameService = new GameService(gameModel);
+
+const gameCreateService = new GameCreateService(
     gameModel, 
     mapService, 
     playerService, 
-    starService);
-    
+    starService
+);
+
 const gameGalaxyService = new GameGalaxyService(
     gameService,
     mapService,
@@ -36,7 +40,7 @@ router.post('/', middleware.authenticate, async (req, res, next) => {
     req.body.general.createdByUserId = req.session.userId;
 
     try {
-        let game = await gameService.create(req.body);
+        let game = await gameCreateService.create(req.body);
 
         return res.status(201).json(game._id);
     } catch (err) {
