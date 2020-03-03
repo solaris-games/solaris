@@ -80,7 +80,6 @@ router.post('/:gameId/join', middleware.authenticate, async (req, res, next) => 
             req.params.gameId,
             req.session.userId,
             req.body.playerId,
-            req.body.raceId,
             req.body.alias);
 
         return res.sendStatus(200);

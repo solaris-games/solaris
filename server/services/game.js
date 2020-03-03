@@ -187,7 +187,6 @@ module.exports = class GameService {
                     manufacturing: { level: p.research.manufacturing.level },
                 },
                 userId: p.userId,
-                raceId: p.raceId,
                 defeated: p.defeated,
                 ready: p.ready,
                 missedTurns: p.missedTurns,
@@ -227,7 +226,7 @@ module.exports = class GameService {
         return await game.save();
     }
 
-    async join(gameId, userId, playerId, raceId, alias) {
+    async join(gameId, userId, playerId, alias) {
         let game = await this.getById(gameId, {});
 
         // Only allow join if the game hasn't started.
@@ -263,7 +262,6 @@ module.exports = class GameService {
 
         // Assign the user to the player.
         player.userId = userId;
-        player.raceId = raceId;
         player.alias = alias;
 
         // If the max player count is reached then start the game.

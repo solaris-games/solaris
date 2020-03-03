@@ -7,7 +7,6 @@ const messageSchema = require('./message');
 
 const schema = new Schema({
     userId: { type: Types.String, required: false, default: null },
-    raceId: { type: Types.Number, required: true, default: 0 },
     alias: { type: Types.String, required: true },
     colour: {
         alias: { type: Types.String, required: true },

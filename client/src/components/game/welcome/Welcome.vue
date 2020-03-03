@@ -2,7 +2,6 @@
 <div class="container bg-secondary">
     <h3 class="pt-2">Welcome</h3>
 
-    <select-race v-on:onRaceChanged="onRaceChanged"/>
     <select-alias v-on:onAliasChanged="onAliasChanged"/>
 
     <form-error-list v-bind:errors="errors" class="mt-2"/>
@@ -22,14 +21,12 @@
 import apiService from '../../../services/apiService'
 
 import FormErrorListVue from '../../FormErrorList'
-import SelectRaceVue from './SelectRace.vue'
 import SelectAliasVue from './SelectAlias.vue'
 import SelectLocationVue from './SelectLocation.vue'
 
 export default {
   components: {
     'form-error-list': FormErrorListVue,
-    'select-race': SelectRaceVue,
     'select-alias': SelectAliasVue,
     'select-location': SelectLocationVue
   },
@@ -40,8 +37,7 @@ export default {
     return {
       domain: '',
       errors: [],
-      alias: '',
-      race: 38
+      alias: ''
     }
   },
   mounted () {
@@ -51,9 +47,6 @@ export default {
   methods: {
     onAliasChanged (e) {
       this.alias = e
-    },
-    onRaceChanged (e) {
-      this.race = e
     },
     async onJoinRequested (playerId) {
       this.errors = []
@@ -70,14 +63,10 @@ export default {
         this.errors.push('Alias must less than 24 characters.')
       }
 
-      if (!this.race) {
-        this.errors.push('Race is required.')
-      }
-
       if (this.errors.length) return
 
       try {
-        let response = await apiService.joinGame(this.game._id, playerId, this.race, this.alias)
+        let response = await apiService.joinGame(this.game._id, playerId, this.alias)
 
         if (response.status === 200) {
           this.$emit('onGameJoined', playerId)
