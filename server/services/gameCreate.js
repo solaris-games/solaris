@@ -1,9 +1,8 @@
 module.exports = class GameCreateService {
-    constructor(gameModel, mapService, playerService, starService) {
+    constructor(gameModel, mapService, playerService) {
         this.gameModel = gameModel;
         this.mapService = mapService;
         this.playerService = playerService;
-        this.starService = starService;
     }
 
     async create(settings) {
