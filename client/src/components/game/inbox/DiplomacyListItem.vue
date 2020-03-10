@@ -3,7 +3,7 @@
     <p class="float-right"><small>Sun 1 Jan 01:01</small></p>
     <div class="row">
         <div class="col-2 pl-0 pr-0">
-            <img src="../../../assets/avatars/0.jpg" width="60"/>
+            <img src="" width="60"/>
         </div>
         <!-- <div class="col-2 pl-1 pr-0">
             From:<br/>

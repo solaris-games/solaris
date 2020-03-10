@@ -10,8 +10,10 @@
 
     <div class="row">
         <div class="col-auto">
-            <div class="row col pl-0 pr-0">
-                <img src="../../../assets/avatars/0.jpg">
+            <div class="row col pt-4 pb-2">
+                <!-- TODO: Prefer images over font awesome icons? -->
+                <i class="far fa-user" style="font-size:100px;"></i>
+                <!-- <img src="" height="100"> -->
             </div>
             <div class="row bg-primary">
                 <div class="col pt-2 pb-2">

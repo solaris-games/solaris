@@ -22,7 +22,9 @@
                 <tr v-for="player in game.galaxy.players" :key="player._id">
                     <td :style="{'width': '8px', 'background-color':player.colour.value.replace('0x', '#')}"></td>
                     <td class="col-avatar">
-                        <img src="../../../assets/avatars/0.jpg">
+                        <!-- TODO: Prefer images over font awesome icons? -->
+                        <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
+                        <!-- <img src=""> -->
                     </td>
                     <td class="pl-2 pt-3 pb-2">
                         <h5>{{player.alias}} <span v-if="player.defeated">(DEFEATED)</span></h5>
@@ -83,7 +85,7 @@ export default {
       gameContainer.map.zoomToPlayer(this.game, player)
     },
     getUserPlayer () {
-        return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
     },
     getPlayerStarCount (player) {
       return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length

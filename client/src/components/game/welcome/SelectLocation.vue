@@ -13,7 +13,7 @@
                 <tr v-for="player in game.galaxy.players" v-bind:key="player._id">
                     <td :style="{'width': '8px', 'background-color':player.colour.value.replace('0x', '#')}"></td>
                     <td class="col-avatar">
-                        <img src="../../../assets/avatars/0.jpg">
+                        <img src="">
                     </td>
                     <td class="pl-2 pt-3 pb-2">
                         <h5 style="vertical-align: middle;">{{player.alias}}</h5>

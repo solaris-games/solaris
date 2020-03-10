@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     getServerGameImage () {
-      return require('../assets/cards/npg_large.jpg')
+      return '' // TODO
     }
   }
 }

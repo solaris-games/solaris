@@ -64,13 +64,7 @@ export default {
   },
   methods: {
     getServerGameImage (name) {
-      try {
-        return require('../assets/cards/' + name.replace(/\s/g, '') + '.jpg')
-      } catch (err) {
-        console.error(err)
-
-        return ''
-      }
+      return '' // TODO
     }
   }
 }
