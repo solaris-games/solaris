@@ -6,7 +6,6 @@ const schema = new Schema({
     ownedByPlayerId: { type: Types.ObjectId, required: false, default: null },
     name: { type: Types.String, required: true },
     naturalResources: { type: Types.Number, required: true },
-    terraformedResources: { type: Types.Number, required: true },
     garrison: { type: Types.Number, required: true, default: 0 },
     economy: { type: Types.Number, required: true, default: 0 },
     industry: { type: Types.Number, required: true, default: 0 },

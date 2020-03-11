@@ -46,7 +46,6 @@ describe('star', () => {
         expect(newStar.name).toEqual(name);
         expect(newStar.naturalResources).toBeGreaterThanOrEqual(starService.DEFAULTS.MIN_NATURAL_RESOURCES);
         expect(newStar.naturalResources).toBeLessThanOrEqual(starService.DEFAULTS.MAX_NATURAL_RESOURCES);
-        expect(newStar.terraformedResources).toEqual(0);
         expect(newStar.location).not.toBe(null);
     });
 

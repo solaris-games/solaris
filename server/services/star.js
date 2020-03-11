@@ -39,7 +39,6 @@ module.exports = class StarService {
             _id: mongoose.Types.ObjectId(),
             name: name,
             naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES),
-            terraformedResources: 0, // TODO: This is calculated based on the player's tech level.
             location: this.randomService.getRandomPositionInCircle(maxRadius)
         };
     }
