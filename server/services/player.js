@@ -2,18 +2,14 @@ const mongoose = require('mongoose');
 
 const colours = require('../config/game/colours');
 
-const RandomService = require('./random');
-const MapService = require('./map');
-const StarService = require('./star');
-const CarrierService = require('./carrier');
-
 module.exports = class PlayerService {
     
-    constructor() {
-        this.randomService = new RandomService();
-        this.mapService = new MapService();
-        this.starService = new StarService();
-        this.carrierService = new CarrierService();
+    constructor(randomService, mapService, starService, carrierService, starDistanceService) {
+        this.randomService = randomService;
+        this.mapService = mapService;
+        this.starService = starService;
+        this.carrierService = carrierService;
+        this.starDistanceService = starDistanceService;
     }
 
     createEmptyPlayer(gameSettings, colour) {
@@ -55,7 +51,7 @@ module.exports = class PlayerService {
             let homeStar;
 
             do {
-                homeStar = allStars[this.randomService.getRandomNumberBetween(0, allStars.length)];
+                homeStar = allStars[this.randomService.getRandomNumberBetween(0, allStars.length - 1)]; // star length - 1 because between is inclusive
 
                 isTooClose = this.isTooCloseStartingPosition(minDistance, homeStar, allStars);
             }
@@ -71,7 +67,7 @@ module.exports = class PlayerService {
 
             // Get X closest stars to the home star and also give those to
             // the player.
-            let closestStarsToHome = this.mapService.getClosestUnownedStars(homeStar, allStars, gameSettings.player.startingStars - 1);
+            let closestStarsToHome = this.starDistanceService.getClosestUnownedStars(homeStar, allStars, gameSettings.player.startingStars - 1);
 
             // Set up the closest stars.
             closestStarsToHome.forEach(s => {
@@ -93,13 +89,13 @@ module.exports = class PlayerService {
     }
 
     isTooCloseStartingPosition(distanceAllowed, homeStar, stars) {
-        let closestStar = this.mapService.getClosestOwnedStars(homeStar, stars, 1)[0];
+        let closestStar = this.starDistanceService.getClosestOwnedStars(homeStar, stars, 1)[0];
     
         // If there is no closest owned star then we're all good, no need to check.
         if (!closestStar)
             return false;
     
-        let distanceToClosest = this.mapService.getDistanceBetweenStars(homeStar, closestStar);
+        let distanceToClosest = this.starDistanceService.getDistanceBetweenStars(homeStar, closestStar);
         
         return distanceToClosest < distanceAllowed;
     }

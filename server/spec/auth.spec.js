@@ -25,10 +25,12 @@ describe('auth', () => {
         service = new AuthService(fakeBcrypt, fakeUserModel);
     });
 
-    it('should compare passwords of a user', async () => {
+    it('should compare passwords of a user', async (done) => {
         let result = await service.login('hello', 'test');
 
         expect(result).toBe(1);
+
+        done();
     });
 
     it('should fail if the passwords are not the same', async (done) => {

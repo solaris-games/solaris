@@ -12,6 +12,7 @@ const SELECTS = {
 };
 
 module.exports = class GameListService {
+    
     constructor(gameModel) {
         this.gameModel = gameModel;
     }

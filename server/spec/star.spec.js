@@ -1,38 +1,31 @@
 const StarService = require('../services/star');
 const starNames = require('../config/game/starNames');
 
+const fakeRandomService = {
+    getRandomNumber(max) {
+        return max;
+    },
+    getRandomNumberBetween(min, max) {
+        return max;
+    },
+    getRandomPositionInCircle(radius) {
+        return radius;
+    }
+};
+
+const fakeStarNameService = {
+    index: 0,
+    getRandomStarName() {
+        return `Test ${this.index++}`;
+    }
+};
+
 describe('star', () => {
 
     let starService;
 
     beforeEach(() => {
-        starService = new StarService();
-    });
-
-    it('should generate a random star name', () => {
-        const name = starService.getRandomStarName();
-
-        expect(name).toBeTruthy();
-        
-        const i = starNames.find(x => x == name);
-
-        expect(i).toBeTruthy();
-    });
-
-    it('should generate a list of random star names', () => {
-        const count = 100;
-
-        const names = starService.getRandomStarNames(100);
-
-        expect(names.length).toEqual(count);
-    });
-
-    it('should generate a list of random unique star names', () => {
-        const count = 100;
-        const names = starService.getRandomStarNames(100);
-        const distinct = [...new Set(names)];
-
-        expect(distinct.length).toEqual(count);
+        starService = new StarService(fakeRandomService, fakeStarNameService);
     });
 
     it('should generate an unowned star', () => {

@@ -20,7 +20,7 @@ const fakeUserModel = {
     }
 };
 
-describe('carrier', () => {
+describe('user', () => {
     let service;
 
     beforeAll(() => {
@@ -46,38 +46,48 @@ describe('carrier', () => {
         ];
     });
 
-    it('should get the current user by ID', async () => {
+    it('should get the current user by ID', async (done) => {
         let result = await service.getMe(1);
 
         expect(result._id).toBe(1);
+
+        done();
     });
 
-    it('should get a user by ID', async () => {
+    it('should get a user by ID', async (done) => {
         let result = await service.getById(2);
 
         expect(result._id).toBe(2);
+
+        done();
     });
 
-    it('should check if a user exists', async () => {
+    it('should check if a user exists', async (done) => {
         let result = await service.userExists('hello');
 
         expect(result).toBeTruthy();
+
+        done();
     });
 
-    it('should check if a user does not exist', async () => {
+    it('should check if a user does not exist', async (done) => {
         let result = await service.userExists('fffff');
 
         expect(result).toBeFalsy();
+
+        done();
     });
 
-    it('should update the email preference of a user', async () => {
+    it('should update the email preference of a user', async (done) => {
         let result = await service.updateEmailPreference(1, true);
 
         expect(result).toBeTruthy();
         expect(userList[0].emailEnabled).toBeTruthy();
+
+        done();
     });
 
-    it('should update the email address of a user', async () => {
+    it('should update the email address of a user', async (done) => {
         let email = 'test@test.com';
 
         let result = await service.updateEmailAddress(1, email);
@@ -86,9 +96,11 @@ describe('carrier', () => {
 
         expect(result).toBeTruthy();
         expect(user.email).toBe(email);
+
+        done();
     });
 
-    it('should update the password of a user', async () => {
+    it('should update the password of a user', async (done) => {
         let userId = 1;
         let oldPassword = 'test';
         let newPassword = 'xxxx';
@@ -99,17 +111,23 @@ describe('carrier', () => {
 
         expect(result).toBeTruthy();
         expect(user.password).toBe(newPassword);
+
+        done();
     });
 
-    it('should fail to update the password of a user if the passwords do not match', async () => {
+    it('should fail to update the password of a user if the passwords do not match', async (done) => {
         let userId = 1;
         let oldPassword = 'yyyy';
         let newPassword = 'xxxx';
 
         try {
             await service.updatePassword(userId, oldPassword, newPassword);
+
+            done();
         } catch (err) {
             expect(err.message).toBe('The current password is incorrect.');
+
+            done();
         }
     });
 

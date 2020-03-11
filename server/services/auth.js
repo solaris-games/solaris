@@ -1,4 +1,5 @@
 module.exports = class AuthService {
+    
     constructor(bcrypt, userModel) {
         this.bcrypt = bcrypt;
         this.userModel = userModel;

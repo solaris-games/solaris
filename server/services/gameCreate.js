@@ -1,4 +1,5 @@
 module.exports = class GameCreateService {
+    
     constructor(gameModel, mapService, playerService) {
         this.gameModel = gameModel;
         this.mapService = mapService;

@@ -1,10 +1,12 @@
 module.exports = class GameGalaxyService {
 
-    constructor(gameService, mapService, playerService, starService) {
+    constructor(gameService, mapService, playerService, starService, distanceService, starDistanceService) {
         this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
+        this.distanceService = distanceService;
+        this.starDistanceService = starDistanceService;
     }
 
     async getGalaxy(gameId, userId) {
@@ -119,7 +121,7 @@ module.exports = class GameGalaxyService {
     _setStarInfoDetailed(doc, player) { 
         const isDarkMode = this._isDarkMode(doc);
 
-        let scanningRangeDistance = this.mapService.getScanningDistance(player.research.scanning.level);
+        let scanningRangeDistance = this.distanceService.getScanningDistance(player.research.scanning.level);
 
         // Get all of the player's stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
@@ -142,8 +144,8 @@ module.exports = class GameGalaxyService {
             }
 
             // Get the closest player star to this star.
-            let closest = this.mapService.getClosestStar(s, playerStars);
-            let distance = this.mapService.getDistanceBetweenStars(s, closest);
+            let closest = this.starDistanceService.getClosestStar(s, playerStars);
+            let distance = this.starDistanceService.getDistanceBetweenStars(s, closest);
 
             let inRange = distance <= scanningRangeDistance;
 
@@ -172,7 +174,7 @@ module.exports = class GameGalaxyService {
     }
         
     _setCarrierInfoDetailed(doc, player) {
-        let scanningRangeDistance = this.mapService.getScanningDistance(player.research.scanning.level);
+        let scanningRangeDistance = this.distanceService.getScanningDistance(player.research.scanning.level);
 
         // Get all of the players stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
@@ -186,8 +188,8 @@ module.exports = class GameGalaxyService {
             if (!p._id.equals(player._id)) {
                 p.carriers = p.carriers.filter(c => {
                     // Get the closest player star to this carrier.
-                    let closest = this.mapService.getClosestLocation(c.location, playerStarLocations);
-                    let distance = this.mapService.getDistanceBetweenLocations(c.location, closest);
+                    let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
+                    let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
 
                     let inRange = distance <= scanningRangeDistance;
 

@@ -21,6 +21,8 @@ const schema = new Schema({
     karmaToGive: { type: Types.Number, required: true, default: 8 },
     apiCode: { type: Types.String, required: false },
     research: {
+        // TODO: This would be arguably better if it was just progress points and remove level
+        // and then we can calculate the level before sending it to the client.
         scanning: {
             level: { type: Types.Number, required: true, default: 1  },
             progress: { type: Types.Number, required: true, default: 0  },

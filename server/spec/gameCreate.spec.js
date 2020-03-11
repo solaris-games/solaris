@@ -78,7 +78,7 @@ describe('gameCreate', () => {
         };
     });
 
-    it('should create a game with X number of stars', async () => {
+    it('should create a game with X number of stars', async (done) => {
         // Arrange
         let starsPerPlayer = 10;
         let playerLimit = 8;
@@ -93,9 +93,11 @@ describe('gameCreate', () => {
         let expectedStarCount = starsPerPlayer * playerLimit * 2.5;
 
         expect(game._doc.state.stars).toBe(expectedStarCount);
+
+        done();
     });
 
-    it('should create a game with X number of stars for victory', async () => {
+    it('should create a game with X number of stars for victory', async (done) => {
         // Arrange
         let starsPerPlayer = 10;
         let playerLimit = 8;
@@ -112,9 +114,11 @@ describe('gameCreate', () => {
         let expectedStarsForVictory = (game._doc.state.stars / 100) * starVictoryPercentage;
 
         expect(game._doc.state.starsForVictory).toBe(expectedStarsForVictory);
+
+        done();
     });
 
-    it('should create a game with warp gates if enabled', async () => {
+    it('should create a game with warp gates if enabled', async (done) => {
         // Arrange
         settings.specialGalaxy.randomGates = 'random';
 
@@ -123,9 +127,11 @@ describe('gameCreate', () => {
 
         // Assert
         expect(game._doc.galaxy.stars[0].warpGate).toBeTruthy();
+
+        done();
     });
 
-    it('should not create a game with warp gates if disabled', async () => {
+    it('should not create a game with warp gates if disabled', async (done) => {
         // Arrange
         settings.specialGalaxy.randomGates = 'none';
 
@@ -134,9 +140,11 @@ describe('gameCreate', () => {
 
         // Assert
         expect(game._doc.galaxy.stars[0].warpGate).toBeFalsy();
+
+        done();
     });
 
-    it('should create X number of players', async () => {
+    it('should create X number of players', async (done) => {
         // Arrange
         let playerCount = 5;
 
@@ -147,6 +155,8 @@ describe('gameCreate', () => {
 
         // Assert
         expect(game._doc.galaxy.players.length).toBe(playerCount);
+
+        done();
     });
 
 });

@@ -1,3 +1,9 @@
+const DistanceService = require('../services/distance');
+const StarDistanceService = require('../services/starDistance');
+const MapService = require('../services/map');
+const RandomService = require('../services/random');
+const StarService = require('../services/star');
+const CarrierService = require('../services/carrier');
 const PlayerService = require('../services/player');
 
 const gameSettings = {
@@ -91,7 +97,14 @@ describe('player', () => {
     let playerService;
 
     beforeEach(() => {
-        playerService = new PlayerService();
+        // Use real services because I cannot fathom how to fake all this shit.
+        randomService = new RandomService();
+        distanceService = new DistanceService();
+        starDistanceService = new StarDistanceService(distanceService);
+        carrierService = new CarrierService();
+        starService = new StarService(randomService);
+        mapService = new MapService(randomService, starService, starDistanceService, distanceService);
+        playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
     });
 
     it('should create an empty player', () => {

@@ -4,7 +4,8 @@ const middleware = require('./middleware');
 const GameService = require('../services/game');
 const ResearchService = require('../services/research');
 
-const gameService = new GameService();
+const gameModel = require('../models/Game');
+const gameService = new GameService(gameModel);
 const researchService = new ResearchService(gameService);
 
 router.post('/:gameId/research/now', middleware.authenticate, async (req, res, next) => {

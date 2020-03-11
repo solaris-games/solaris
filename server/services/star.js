@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
-const starNames = require('../config/game/starNames');
-
-const RandomService = require('./random');
 
 module.exports = class StarService {
 
-    constructor() {
-        this.randomService = new RandomService();
+    constructor(randomService, starNameService) {
+        this.randomService = randomService;
+        this.starNameService = starNameService;
     }
 
     DEFAULTS = {
@@ -14,31 +12,11 @@ module.exports = class StarService {
         MAX_NATURAL_RESOURCES: 50
     }
 
-    starNames = starNames
-
-    getRandomStarName() {
-        return starNames[this.randomService.getRandomNumber(starNames.length)];
-    }
-
-    getRandomStarNames(count) {
-        const list = [];
-
-        do {
-            let nextName = this.getRandomStarName();
-    
-            if (!list.includes(nextName)) {
-                list.push(nextName);
-            }
-        } while (list.length < count);
-
-        return list;
-    }
-
     generateUnownedStar(name, maxRadius = 1000) {
         return {
             _id: mongoose.Types.ObjectId(),
             name: name,
-            naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES),
+            naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES - 1),
             location: this.randomService.getRandomPositionInCircle(maxRadius)
         };
     }

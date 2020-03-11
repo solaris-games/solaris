@@ -15,7 +15,7 @@ const fakeGameModel = {
     }
 };
 
-describe('gameList', () => {
+describe('game list', () => {
     let gameListService;
 
     beforeAll(() => {
