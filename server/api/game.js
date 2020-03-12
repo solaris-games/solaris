@@ -98,6 +98,16 @@ router.get('/list/active', middleware.authenticate, async (req, res, next) => {
     }
 });
 
+router.get('/list/completed', middleware.authenticate, async (req, res, next) => {
+    try {
+        let games = await gameListService.listCompletedGames(req.session.userId);
+
+        return res.status(200).json(games);
+    } catch (err) {
+        return next(err);
+    }
+});
+
 router.post('/:gameId/join', middleware.authenticate, async (req, res, next) => {
     try {
         await gameService.join(

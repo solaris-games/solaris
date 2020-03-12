@@ -37,10 +37,23 @@ module.exports = class GameListService {
 
     async listActiveGames(userId) {
         return await this.gameModel.find({
-            'galaxy.players': { $elemMatch: { userId } }
-            // TODO: Filter out finished games?
+            'galaxy.players': { $elemMatch: { userId } },
+            'state.endDate': { $eq: null }
         })
         .select(SELECTS.INFO)
         .exec();
     }
+
+    async listCompletedGames(userId) {
+        return await this.gameModel.find({
+            'galaxy.players': { $elemMatch: { userId } },
+            'state.endDate': { $ne: null }
+        })
+        .sort({
+            'state.endDate': -1 // Sort end date descending
+        })
+        .select(SELECTS.INFO)
+        .exec();
+    }
+
 };

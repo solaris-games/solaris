@@ -87,6 +87,11 @@ class ApiService {
       { withCredentials: true })
   }
 
+  listCompletedGames () {
+    return axios.get('http://localhost:3000/api/game/list/completed',
+      { withCredentials: true })
+  }
+
   joinGame (gameId, playerId, alias) {
     return axios.post('http://localhost:3000/api/game/' + gameId + '/join', {
       playerId, alias

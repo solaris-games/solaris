@@ -12,11 +12,11 @@
 
     <hr>
 
-    <h3>User Created Games</h3>
+    <h4>User Created Games</h4>
 
-    <table>
+    <table class="table table-striped table-hover">
         <thead>
-            <tr>
+            <tr class="bg-primary">
                 <td>Name</td>
                 <td>Players</td>
                 <td></td>
@@ -27,7 +27,7 @@
                 <td>{{game.settings.general.name}}</td>
                 <td>{{game.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
                 </td>
             </tr>
         </tbody>
