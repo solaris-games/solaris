@@ -90,7 +90,7 @@ router.get('/list/user', middleware.authenticate, async (req, res, next) => {
 
 router.get('/list/active', middleware.authenticate, async (req, res, next) => {
     try {
-        let games = await gameListService.listActiveGames();
+        let games = await gameListService.listActiveGames(req.session.userId);
 
         return res.status(200).json(games);
     } catch (err) {

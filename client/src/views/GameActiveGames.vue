@@ -8,24 +8,11 @@
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <td>Name</td>
-                <td>Players</td>
-                <td></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="game in games" v-bind:key="game._id">
-                <td>{{game.settings.general.name}}</td>
-                <td>{{game.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
-                <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <router-link 
+      v-for="game in games" v-bind:key="game._id"
+      :to="{ path: '/game/detail', query: { id: game._id } }" 
+      tag="button" 
+      class="btn btn-block btn-primary mb-2">{{game.settings.general.name}}</router-link>
   </view-container>
 </template>
 
