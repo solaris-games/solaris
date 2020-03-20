@@ -26,7 +26,7 @@ module.exports = class UserService {
     }
 
     async create(user) {
-        const newUser = new userModel(user);
+        const newUser = new this.userModel(user);
     
         newUser.password = await this.bcrypt.hash(newUser.password, 10);
 
