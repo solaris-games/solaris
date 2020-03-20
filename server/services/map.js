@@ -1,10 +1,10 @@
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, starNameService) {
+    constructor(randomService, starService, distanceService, starDistanceService, starNameService) {
         this.randomService = randomService;
         this.starService = starService;
-        this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.starDistanceService = starDistanceService;
         this.starNameService = starNameService;
     }
 

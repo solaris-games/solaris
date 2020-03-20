@@ -48,7 +48,7 @@ module.exports = class StarDistanceService {
     }
 
     isStarTooClose(star, otherStar) {
-        const distance = this.distanceService.getDistanceBetweenStars(star, otherStar);
+        const distance = this.getDistanceBetweenStars(star, otherStar);
 
         return distance < this.distanceService.DISTANCES.MIN_DISTANCE_BETWEEN_STARS;
     }

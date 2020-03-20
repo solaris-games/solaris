@@ -21,12 +21,12 @@ const gameListService = new GameListService(gameModel);
 
 // TODO: Need DI here.
 const randomService = new RandomService();
-const starNameService = new StarNameService(starNames);
+const starNameService = new StarNameService(starNames, randomService);
 const distanceService = new DistanceService();
 const starDistanceService = new StarDistanceService(distanceService);
 const carrierService = new CarrierService();
 const starService = new StarService(randomService, starNameService);
-const mapService = new MapService(randomService, starService, starDistanceService, distanceService, starNameService);
+const mapService = new MapService(randomService, starService, distanceService, starDistanceService, starNameService);
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const gameService = new GameService(gameModel);
 const gameCreateService = new GameCreateService(gameModel, mapService, playerService);

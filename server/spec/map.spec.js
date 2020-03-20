@@ -55,7 +55,7 @@ describe('map', () => {
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
-        mapService = new MapService(randomService, fakeStarService, fakeStarDistanceService, fakeDistanceService, fakeStarNameService);
+        mapService = new MapService(randomService, fakeStarService, fakeDistanceService, fakeStarDistanceService, fakeStarNameService);
     });
 
     it('should generate a given number of stars', () => {
