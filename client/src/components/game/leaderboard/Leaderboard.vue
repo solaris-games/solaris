@@ -1,5 +1,5 @@
 <template>
-<div class="container bg-secondary">
+<div class="container bg-secondary pb-2">
     <h3 class="pt-2">Leaderboard</h3>
 
     <div class="row bg-primary">
