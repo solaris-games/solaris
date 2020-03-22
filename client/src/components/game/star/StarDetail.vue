@@ -2,10 +2,14 @@
 <div class="container bg-secondary">
     <h3 class="pt-2">{{star.data.name}}</h3>
 
-    <p v-if="star.data.ownedByPlayerId == currentPlayerId">A star under your command</p>
-    <p v-if="star.data.ownedByPlayerId != null && star.data.ownedByPlayerId != currentPlayerId">This star is controlled by [{{getStarOwningPlayer().alias}}]</p>
-    <p v-if="star.data.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself</p>
-
+    <div class="row bg-light">
+      <div class="col text-center pt-3">
+        <p v-if="star.data.ownedByPlayerId == currentPlayerId">A star under your command.</p>
+        <p v-if="star.data.ownedByPlayerId != null && star.data.ownedByPlayerId != currentPlayerId">This star is controlled by [{{getStarOwningPlayer().alias}}].</p>
+        <p v-if="star.data.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
+      </div>
+    </div>
+    
     <div v-if="star.data.garrison" class="row mb-2 pt-2 pb-2 bg-primary">
         <div class="col">
             Ships
@@ -33,12 +37,66 @@
         </div>
     </div>
     
-    <infrastructure v-if="star.data.economy != null"
-      :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science" />
-    
-    <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
-      :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science" 
-      v-on:onInfrastructureUpgraded="onInfrastructureUpgraded" />
+    <div v-if="star.data.economy != null">
+      <h4 class="pt-2">Infrastructure</h4>
+
+      <infrastructure
+        :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science" />
+      
+      <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
+        :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science" 
+        v-on:onInfrastructureUpgraded="onInfrastructureUpgraded" />
+    </div>
+
+    <div class="row bg-secondary" v-if="star.data.shipsPerTick != null">
+      <div class="col text-center pt-3">
+        <p>This star builds <b>{{star.data.shipsPerTick}}</b> every tick.</p>
+      </div>
+    </div>
+
+    <!-- TODO: Turn these into components -->
+    <div v-if="getStarOwningPlayer() == getUserPlayer()" class="mt-3">
+      <div class="row">
+        <div class="col-8">
+          <p>Buy a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
+        </div>
+        <div class="col-4">
+          <button class="btn btn-block btn-primary">Buy for $0</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-8">
+          <p>Buy a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
+        </div>
+        <div class="col-4">
+          <button class="btn btn-block btn-primary">Buy for $0</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-8">
+          <p>Abandon this star for another player to claim. <a href="">Read More</a>.</p>
+        </div>
+        <div class="col-4">
+          <button class="btn btn-block btn-danger">Abandon Star</button>
+        </div>
+      </div>
+
+      <h4 class="pt-2 text-success">Premium Features</h4>
+
+      <div class="row">
+        <div class="col-8">
+          <!-- TODO: Wording -->
+          <p>Make your mark on the galaxy by renaming this star. <a href="">Read More</a>.</p>
+        </div>
+        <div class="col-4">
+          <button class="btn btn-block btn-primary">Rename</button>
+        </div>
+      </div>
+    </div>
+
+    <playerOverview :game="game" :player="getStarOwningPlayer()" />
 </div>
 </template>
 
@@ -46,11 +104,13 @@
 import GameHelper from '../../../services/gameHelper'
 import Infrastructure from './Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
+import PlayerOverview from '../player/Overview'
 
 export default {
   components: {
     'infrastructure': Infrastructure,
-    'infrastructureUpgrade': InfrastructureUpgrade
+    'infrastructureUpgrade': InfrastructureUpgrade,
+    'playerOverview': PlayerOverview
   },
   props: {
     game: Object,
