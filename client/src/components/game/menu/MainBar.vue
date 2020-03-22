@@ -1,6 +1,7 @@
 <template>
 <div class="menu">
-    <game-info v-bind:credits="500" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
+    <game-info v-if="getUserPlayer()" v-bind:credits="getUserPlayer().cash" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
+    <game-info v-if="!getUserPlayer()" v-bind:credits="0" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
@@ -57,11 +58,12 @@ export default {
   },
   mounted () {
     // Check if the user is in this game, if not then show the welcome screen.
-    let userPlayer = GameHelper.getUserPlayer(this.game, this.$store.state.userId)
-
-    this.menuState = userPlayer ? 'leaderboard' : 'welcome'
+    this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
   },
   methods: {
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+    },
     onMenuStateChanged (e) {
       this.$emit('onMenuStateChanged', e)
     },
@@ -69,6 +71,8 @@ export default {
       this.$emit('onPlayerSelected', e)
     },
     onGameJoined (e) {
+      this.menuState = 'leaderboard'
+
       this.$emit('onGameJoined', e)
     }
   }

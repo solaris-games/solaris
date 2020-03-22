@@ -32,17 +32,25 @@
             {{star.data.terraformedResources}} <i class="fas fa-globe ml-1"></i>
         </div>
     </div>
-
-    <h4>Infrastructure</h4>
+    
+    <infrastructure v-if="star.data.economy != null"
+      :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science" />
+    
+    <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
+      :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science" 
+      v-on:onInfrastructureUpgraded="onInfrastructureUpgraded" />
 </div>
 </template>
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import Infrastructure from './Infrastructure'
+import InfrastructureUpgrade from './InfrastructureUpgrade'
 
 export default {
   components: {
-
+    'infrastructure': Infrastructure,
+    'infrastructureUpgrade': InfrastructureUpgrade
   },
   props: {
     game: Object,
@@ -59,6 +67,12 @@ export default {
     },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.game, this.star.data)
+    },
+    onInfrastructureUpgraded(e) {
+      // TODO: Reload the current star to get new costs.
+      // TODO: Reload the player cash somehow?
+      this.star.data[e]++;
+      this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e];
     }
   }
 }

@@ -7,7 +7,7 @@ class GameHelper {
     }
 
     getStarOwningPlayer(game, star) {
-        return game.galaxy.players.find(x => x._id === star.data.ownedByPlayerId)
+        return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
     }
 
 }

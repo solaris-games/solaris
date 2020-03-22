@@ -139,7 +139,10 @@ module.exports = class GameGalaxyService {
             // Ignore stars the player owns, they will always be visible.
             let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
 
-            if (isOwnedByCurrentPlayer) {                        
+            if (isOwnedByCurrentPlayer) {    
+                // Calculate infrastructure upgrades for the star.
+                this._setUpgradeCosts(s);
+                
                 return s;
             }
 
@@ -236,6 +239,15 @@ module.exports = class GameGalaxyService {
 
     _clearPlayerCarriers(doc) {
         doc.galaxy.players.forEach(p => p.carriers = []);
+    }
+
+    _setUpgradeCosts(star) {
+        // TODO: Calculate upgrade costs for the star.
+        star.upgradeCosts = {
+            economy: 10,
+            industry: 20,
+            science: 30
+        };
     }
 
 };
