@@ -14,7 +14,7 @@ class GameContainer {
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1
     })
-
+    
     // create viewport
     this.viewport = new Viewport({
       screenWidth: window.innerWidth,
@@ -23,6 +23,10 @@ class GameContainer {
       // yolo
       worldWidth: Number.MAX_VALUE,
       worldHeight: Number.MAX_VALUE,
+
+      divWheel: document.getElementById('gameContainer'),
+      stopPropagation: true,
+      passiveWheel: true,
 
       interaction: this.app.renderer.plugins.interaction // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
     })

@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div id="gameContainer"></div>
 </template>
 
 <script>
@@ -71,7 +71,7 @@ export default {
 </script>
 
 <style scoped>
-div {
+#gameContainer {
   position: absolute;
   z-index: -1;
   left: 0;

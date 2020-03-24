@@ -5,17 +5,19 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
-    <div v-if="menuState == MENU_STATES.HELP">HELP</div>
+    <div class="menu-content">
+      <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
+      <div v-if="menuState == MENU_STATES.HELP">HELP</div>
 
-    <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
-    <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
-    <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :player="menuArguments" :key="menuArguments._id"/>
-    <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
-    <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
-    <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
-    <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
-    <galaxy v-if="menuState == MENU_STATES.GALAXY"/>
+      <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
+      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
+      <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :player="menuArguments" :key="menuArguments._id"/>
+      <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
+      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
+      <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
+      <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
+      <galaxy v-if="menuState == MENU_STATES.GALAXY"/>
+    </div>
 </div>
 </template>
 
@@ -83,6 +85,14 @@ export default {
 .menu {
     position:absolute; /* This is a must otherwise the div overlays the map */
     width: 473px;
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
 }
 
 @media(max-width: 473px) {
