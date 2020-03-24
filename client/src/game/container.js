@@ -8,6 +8,17 @@ class GameContainer {
   }
 
   setupApp () {
+    // Cleanup if the app already exists.
+    if (this.app) {
+      this.app.destroy(false, {
+        children: true
+      });
+    }
+
+    if (this.viewport) {
+      this.viewport.destroy();
+    }
+
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
       height: window.innerHeight, // window.innerHeight,
@@ -39,8 +50,6 @@ class GameContainer {
     this.setupApp()
 
     this.game = game
-
-    console.log(game)
 
     this.starFieldLeft = this._calculateMinStarX(game) - 500
     this.starFieldRight = this._calculateMaxStarX(game) + 500

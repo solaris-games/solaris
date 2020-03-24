@@ -2,8 +2,7 @@
 <div>
     <div class="row text-center bg-primary">
         <div class="col">
-            <p class="mb-0 mt-2">Select a colour and starting location.</p>
-            <p class="mb-2">(Step 3 of 3)</p>
+            <p class="mb-0 mt-2 mb-2">Select a colour and starting location.</p>
         </div>
     </div>
 

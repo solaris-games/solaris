@@ -42,13 +42,13 @@ export default {
 
   methods: {
     loadGame (game) {
-      this.gameContainer.setupViewport(this.game)
-      this.gameContainer.setupUI(this.game)
+      this.gameContainer.setupViewport(game)
+      this.gameContainer.setupUI(game)
     },
     drawGame (game) {
       this.gameContainer.draw()
 
-      this.gameContainer.map.zoomToUser(this.game, this.$store.state.userId)
+      this.gameContainer.map.zoomToUser(game, this.$store.state.userId)
     },
     handleResize (e) {
       this.gameContainer.app.renderer.resize(

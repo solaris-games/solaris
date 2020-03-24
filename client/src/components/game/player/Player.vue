@@ -42,8 +42,6 @@ export default {
         let response = await apiService.getUserInfo(this.player.userId)
 
         this.user = response.data
-
-        console.log(this.user)
       } catch (err) {
         console.error(err)
       }

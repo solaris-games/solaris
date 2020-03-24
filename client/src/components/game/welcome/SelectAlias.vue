@@ -2,8 +2,7 @@
 <div>
     <div class="row text-center bg-primary">
         <div class="col">
-            <p class="mb-0 mt-2">Select a name for your commander in chief.</p>
-            <p class="mb-2">(Step 2 of 3)</p>
+            <p class="mb-0 mt-2 mb-2">Select a name for your commander in chief.</p>
         </div>
     </div>
 

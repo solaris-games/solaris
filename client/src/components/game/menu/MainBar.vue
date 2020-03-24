@@ -73,8 +73,6 @@ export default {
       this.$emit('onPlayerSelected', e)
     },
     onGameJoined (e) {
-      this.menuState = 'leaderboard'
-
       this.$emit('onGameJoined', e)
     }
   }
@@ -85,7 +83,7 @@ export default {
 .menu {
     position:absolute; /* This is a must otherwise the div overlays the map */
     width: 473px;
-    height: 100%;
+    max-height: 100%;
     overflow: auto;
     overflow-x: hidden;
 }

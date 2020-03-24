@@ -80,7 +80,7 @@ function assertNewPlayer(newPlayer, colour) {
 
 function printStars(allStars) {
     console.log();
-        
+    
     for(let y = 0; y < 100; y += 10) {
         let starsOnY = allStars.filter(x => x.location.y == y);
 
