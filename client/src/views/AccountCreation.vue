@@ -90,7 +90,7 @@ export default {
         if (response.status === 201) {
           this.$store.commit('setUserId', response.data.id)
 
-          router.push({ name: 'main-menu' })
+          router.push({ name: 'account-login' })
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

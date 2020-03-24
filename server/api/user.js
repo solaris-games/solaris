@@ -44,10 +44,7 @@ router.post('/', async (req, res, next) => {
             password: req.body.password
         });
 
-        // Save the user ID to the session to log the user in.
-        req.session.userId = userId;
-
-        return res.status(201).json(userId);
+        return res.status(201).json({ id: userId });
     } catch (err) {
         return next(err);
     }
