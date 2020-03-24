@@ -79,7 +79,7 @@
           <p>Abandon this star for another player to claim. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <button class="btn btn-block btn-danger">Abandon Star</button>
+          <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger">Abandon Star</modalButton>
         </div>
       </div>
 
@@ -97,6 +97,11 @@
     </div>
 
     <playerOverview :game="game" :player="getStarOwningPlayer()" />
+
+    <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
+      <p>Are you sure you want to abandon <b>{{star.data.name}}</b>?</p>
+      <p>It's Economy, Industry and Science will remain, but all ships at this star will be destroyed.</p>
+    </dialogModal>
 </div>
 </template>
 
@@ -105,12 +110,16 @@ import GameHelper from '../../../services/gameHelper'
 import Infrastructure from './Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
 import PlayerOverview from '../player/Overview'
+import ModalButton from '../../modal/ModalButton'
+import DialogModal from '../../modal/DialogModal'
 
 export default {
   components: {
     'infrastructure': Infrastructure,
     'infrastructureUpgrade': InfrastructureUpgrade,
-    'playerOverview': PlayerOverview
+    'playerOverview': PlayerOverview,
+    'modalButton': ModalButton,
+    'dialogModal': DialogModal
   },
   props: {
     game: Object,
@@ -133,6 +142,10 @@ export default {
       // TODO: Reload the player cash somehow?
       this.star.data[e]++
       this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e]
+    },
+    confirmAbandonStar (e) {
+      // TODO: Call the API to abandon the star.
+      // TODO: Refresh the star afterwards
     }
   }
 }
