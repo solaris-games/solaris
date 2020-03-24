@@ -7,7 +7,7 @@ class GameContainer {
     PIXI.settings.SORTABLE_CHILDREN = true
   }
 
-  setupApp() {
+  setupApp () {
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
       height: window.innerHeight, // window.innerHeight,

@@ -8,10 +8,10 @@
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
 
-    <router-link 
+    <router-link
       v-for="game in activeGames" v-bind:key="game._id"
-      :to="{ path: '/game/detail', query: { id: game._id } }" 
-      tag="button" 
+      :to="{ path: '/game/detail', query: { id: game._id } }"
+      tag="button"
       class="btn btn-block btn-primary mb-2">{{game.settings.general.name}}</router-link>
 
     <div v-if="completedGames.length">
@@ -19,10 +19,10 @@
 
       <h4>Completed Games</h4>
 
-      <router-link 
+      <router-link
         v-for="game in completedGames" v-bind:key="game._id"
-        :to="{ path: '/game/detail', query: { id: game._id } }" 
-        tag="button" 
+        :to="{ path: '/game/detail', query: { id: game._id } }"
+        tag="button"
         class="btn btn-block btn-primary mb-2">{{game.settings.general.name}}</router-link>
     </div>
 

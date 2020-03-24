@@ -17,16 +17,16 @@ export default {
   props: {
     economy: Number,
     industry: Number,
-    science: Number,
+    science: Number
   },
   methods: {
-    upgradeEconomy() {
+    upgradeEconomy () {
       this.$emit('onInfrastructureUpgraded', 'economy')
     },
-    upgradeIndustry() {
+    upgradeIndustry () {
       this.$emit('onInfrastructureUpgraded', 'industry')
     },
-    upgradeScience() {
+    upgradeScience () {
       this.$emit('onInfrastructureUpgraded', 'science')
     }
   }

@@ -49,8 +49,8 @@ export default {
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
     },
-    userIsInGame() {
-        return this.getUserPlayer() != null
+    userIsInGame () {
+      return this.getUserPlayer() != null
     }
   }
 }

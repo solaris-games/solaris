@@ -30,8 +30,8 @@ import EventsListVue from './EventsList'
 
 export default {
   components: {
-      'diplomacy-list': DiplomacyListVue,
-      'events-list': EventsListVue
+    'diplomacy-list': DiplomacyListVue,
+    'events-list': EventsListVue
   },
   props: {
     game: Object

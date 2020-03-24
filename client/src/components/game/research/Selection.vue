@@ -14,7 +14,7 @@
                     {{ option.text }}
                 </option>
             </select>
-            
+
             <label v-if="loadingNow" class="col-form-label">Loading...</label>
         </div>
     </div>
@@ -47,48 +47,48 @@ export default {
   props: {
     game: Object
   },
-  data: function() {
-      return {
-        loadingNow: false,
-        loadingNext: false,
-        player: null,
-        options: [
-            { text: 'Scanning', value: 'scanning' },
-            { text: 'Hyperspace Range', value: 'hyperspaceRange' },
-            { text: 'Terraforming', value: 'terraforming' },
-            { text: 'Experimentation', value: 'experimentation' },
-            { text: 'Weapons', value: 'weapons' },
-            { text: 'Banking', value: 'banking' },
-            { text: 'Manufacturing', value: 'manufacturing' },
-        ]
-      }
+  data: function () {
+    return {
+      loadingNow: false,
+      loadingNext: false,
+      player: null,
+      options: [
+        { text: 'Scanning', value: 'scanning' },
+        { text: 'Hyperspace Range', value: 'hyperspaceRange' },
+        { text: 'Terraforming', value: 'terraforming' },
+        { text: 'Experimentation', value: 'experimentation' },
+        { text: 'Weapons', value: 'weapons' },
+        { text: 'Banking', value: 'banking' },
+        { text: 'Manufacturing', value: 'manufacturing' }
+      ]
+    }
   },
   mounted () {
     this.player = GameHelper.getUserPlayer(this.game, this.$store.state.userId)
   },
   methods: {
-      async updateResearchNow (e) {
-        this.loadingNow = true
+    async updateResearchNow (e) {
+      this.loadingNow = true
 
-        try {
-            let response = await ApiService.updateResearchNow(this.game._id, this.player.researchingNow)
-        } catch (err) {
-            console.error(err)
-        }
+      try {
+        await ApiService.updateResearchNow(this.game._id, this.player.researchingNow)
+      } catch (err) {
+        console.error(err)
+      }
 
-        this.loadingNow = false
-      },
-      async updateResearchNext (e) {
-        this.loadingNext = true
+      this.loadingNow = false
+    },
+    async updateResearchNext (e) {
+      this.loadingNext = true
 
-        try {
-            let response = await ApiService.updateResearchNext(this.game._id, this.player.researchingNext)
-        } catch (err) {
-            console.error(err)
-        }
-        
-        this.loadingNext = false
-      },
+      try {
+        await ApiService.updateResearchNext(this.game._id, this.player.researchingNext)
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.loadingNext = false
+    }
   }
 }
 </script>

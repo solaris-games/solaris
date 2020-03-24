@@ -9,7 +9,7 @@
         <p v-if="star.data.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
       </div>
     </div>
-    
+
     <div v-if="star.data.garrison" class="row mb-2 pt-2 pb-2 bg-primary">
         <div class="col">
             Ships
@@ -36,16 +36,16 @@
             {{star.data.terraformedResources}} <i class="fas fa-globe ml-1"></i>
         </div>
     </div>
-    
+
     <div v-if="star.data.economy != null">
       <h4 class="pt-2">Infrastructure</h4>
 
       <infrastructure
-        :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science" />
-      
+        :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science"/>
+
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
-        :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science" 
-        v-on:onInfrastructureUpgraded="onInfrastructureUpgraded" />
+        :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science"
+        v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
     <div class="row bg-secondary" v-if="star.data.shipsPerTick != null">
@@ -128,11 +128,11 @@ export default {
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.game, this.star.data)
     },
-    onInfrastructureUpgraded(e) {
+    onInfrastructureUpgraded (e) {
       // TODO: Reload the current star to get new costs.
       // TODO: Reload the player cash somehow?
-      this.star.data[e]++;
-      this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e];
+      this.star.data[e]++
+      this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e]
     }
   }
 }

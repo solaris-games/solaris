@@ -10,7 +10,7 @@
         No Messages
     </div>
 
-    <div> 
+    <div>
         <diplomacy-list-item :game="game" />
         <diplomacy-list-item :game="game" />
         <diplomacy-list-item :game="game" />
@@ -24,16 +24,16 @@ import DiplomacyListItemVue from './DiplomacyListItem'
 
 export default {
   components: {
-      'diplomacy-list-item': DiplomacyListItemVue
+    'diplomacy-list-item': DiplomacyListItemVue
   },
   props: {
     game: Object
   },
-  data: function() {
-      return {
-        conversations: []
-      }
-  },
+  data: function () {
+    return {
+      conversations: []
+    }
+  }
 }
 </script>
 

@@ -38,41 +38,41 @@ export default {
   props: {
     game: Object
   },
-  data() {
-      return {
-          datacollection: null,
-          dataoptions: {
-              legend: {
-                  display: false
-              }
-          }
+  data () {
+    return {
+      datacollection: null,
+      dataoptions: {
+        legend: {
+          display: false
+        }
       }
+    }
   },
   mounted () {
-      this.fillData()
-    },
+    this.fillData()
+  },
   methods: {
-      fillData() {
-        this.datacollection = {
-            labels: [this.getRandomInt(), this.getRandomInt()],
-            datasets: [
-                {
-                    label: 'Data One',
-                    borderColor: '#0000FF',
-                    fill: false,
-                    data: [this.getRandomInt(), this.getRandomInt()]
-                }, {
-                    label: 'Data One',
-                    borderColor: '#DF5F00',
-                    fill: false,
-                    data: [this.getRandomInt(), this.getRandomInt()]
-                }
-            ]
-        }
-      },
-      getRandomInt() {
-          return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+    fillData () {
+      this.datacollection = {
+        labels: [this.getRandomInt(), this.getRandomInt()],
+        datasets: [
+          {
+            label: 'Data One',
+            borderColor: '#0000FF',
+            fill: false,
+            data: [this.getRandomInt(), this.getRandomInt()]
+          }, {
+            label: 'Data One',
+            borderColor: '#DF5F00',
+            fill: false,
+            data: [this.getRandomInt(), this.getRandomInt()]
+          }
+        ]
       }
+    },
+    getRandomInt () {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+    }
   }
 }
 </script>

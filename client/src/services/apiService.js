@@ -104,14 +104,14 @@ class ApiService {
       { withCredentials: true })
   }
 
-  updateResearchNow(gameId, preference) {
+  updateResearchNow (gameId, preference) {
     return axios.post('http://localhost:3000/api/player/' + gameId + '/research/now', {
       preference
     },
     { withCredentials: true })
   }
 
-  updateResearchNext(gameId, preference) {
+  updateResearchNext (gameId, preference) {
     return axios.post('http://localhost:3000/api/player/' + gameId + '/research/next', {
       preference
     },

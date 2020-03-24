@@ -6,7 +6,8 @@ export default {
   mixins: [reactiveProp],
   props: ['options'],
   mounted () {
-    Chart.defaults.global.defaultFontColor = '#fff';
+    // eslint-disable-next-line
+    Chart.defaults.global.defaultFontColor = '#fff'
 
     // this.chartData is created in the mixin.
     // If you want to pass options please create a local options object

@@ -14,21 +14,19 @@
 import Overview from './Overview'
 import Achievements from './Achievements'
 import Badges from './Badges'
-import Statistics from './Statistics'
 import apiService from '../../../services/apiService'
 
 export default {
   components: {
     'overview': Overview,
     'achievements': Achievements,
-    'badges': Badges,
-    'statistics': Statistics
+    'badges': Badges
   },
   props: {
     game: Object,
     player: Object
   },
-  data() {
+  data () {
     return {
       user: null
     }

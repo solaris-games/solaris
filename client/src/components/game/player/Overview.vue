@@ -31,20 +31,18 @@
 </template>
 
 <script>
-import Badges from './Badges'
 import Statistics from './Statistics'
 import apiService from '../../../services/apiService'
 
 export default {
   components: {
-    'badges': Badges,
     'statistics': Statistics
   },
   props: {
     game: Object,
     player: Object
   },
-  data() {
+  data () {
     return {
       user: null
     }

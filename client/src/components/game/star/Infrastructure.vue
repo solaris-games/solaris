@@ -20,7 +20,7 @@ export default {
   props: {
     economy: Number,
     industry: Number,
-    science: Number,
+    science: Number
   }
 }
 </script>

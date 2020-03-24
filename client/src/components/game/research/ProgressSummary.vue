@@ -51,13 +51,13 @@ export default {
   props: {
     game: Object
   },
-  data: function() {
-      return {
-        research: null
-      }
+  data: function () {
+    return {
+      research: null
+    }
   },
   mounted () {
-      this.research = GameHelper.getUserPlayer(this.game, this.$store.state.userId).research
+    this.research = GameHelper.getUserPlayer(this.game, this.$store.state.userId).research
   }
 }
 </script>

@@ -5,7 +5,7 @@
         <span>Click on an event to mark is as read.</span>
     </div>
 
-    <div class="mt-4"> 
+    <div class="mt-4">
         <events-list-item :game="game" />
     </div>
 </div>
@@ -16,16 +16,16 @@ import EventsListItemVue from './EventsListItem'
 
 export default {
   components: {
-      'events-list-item': EventsListItemVue
+    'events-list-item': EventsListItemVue
   },
   props: {
     game: Object
   },
-  data: function() {
-      return {
-        events: []
-      }
-  },
+  data: function () {
+    return {
+      events: []
+    }
+  }
 }
 </script>
 

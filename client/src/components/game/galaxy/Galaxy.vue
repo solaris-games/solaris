@@ -37,9 +37,9 @@ import ShipsTableVue from './ShipsTable'
 
 export default {
   components: {
-      'stars-table': StarsTableVue,
-      'carriers-table': CarriersTableVue,
-      'ships-table': ShipsTableVue,
+    'stars-table': StarsTableVue,
+    'carriers-table': CarriersTableVue,
+    'ships-table': ShipsTableVue
   },
   props: {
     game: Object
