@@ -1,7 +1,5 @@
 <template>
 <div>
-    <h4 class="pt-2">Badges</h4>
-
     <div class="row bg-primary">
         <div v-if="!user.badges" class="col text-center pt-3">
             <p class="mb-3">No badges yet!</p>

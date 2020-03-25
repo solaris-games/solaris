@@ -2,9 +2,27 @@
 <div class="container bg-secondary">
     <overview :game="game" :player="player" />
 
+    <h4 class="mt-2">Infrastructure</h4>
+
+    <infrastructure :isTotal="true" 
+                    :economy="player.stats.totalEconomy"
+                    :industry="player.stats.totalIndustry"
+                    :science="player.stats.totalScience"/>
+
+    <yourInfrastructure v-if="player != userPlayer"
+                    :economy="userPlayer.stats.totalEconomy"
+                    :industry="userPlayer.stats.totalIndustry"
+                    :science="userPlayer.stats.totalScience"/>
+
+    <h4 class="mt-2">Technology</h4>
+
+    <h4 class="mt-2">Achievements</h4>
+
     <achievements v-if="user" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
+
+    <h4 class="mt-2">Badges</h4>
 
     <badges v-if="user" :user="user"/>
 </div>
@@ -12,6 +30,8 @@
 
 <script>
 import Overview from './Overview'
+import Infrastructure from '../shared/Infrastructure'
+import YourInfrastructure from './YourInfrastructure'
 import Achievements from './Achievements'
 import Badges from './Badges'
 import apiService from '../../../services/apiService'
@@ -19,12 +39,15 @@ import apiService from '../../../services/apiService'
 export default {
   components: {
     'overview': Overview,
+    'infrastructure': Infrastructure,
+    'yourInfrastructure': YourInfrastructure,
     'achievements': Achievements,
     'badges': Badges
   },
   props: {
     game: Object,
-    player: Object
+    player: Object,
+    userPlayer: Object
   },
   data () {
     return {

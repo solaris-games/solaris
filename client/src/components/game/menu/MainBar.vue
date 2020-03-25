@@ -11,7 +11,7 @@
 
       <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :player="menuArguments" :key="menuArguments._id"/>
+      <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>

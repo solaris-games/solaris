@@ -107,7 +107,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
-import Infrastructure from './Infrastructure'
+import Infrastructure from '../shared/Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
 import PlayerOverview from '../player/Overview'
 import ModalButton from '../../modal/ModalButton'

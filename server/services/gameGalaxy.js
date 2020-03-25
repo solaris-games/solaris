@@ -80,15 +80,20 @@ module.exports = class GameGalaxyService {
             // Calculate the manufacturing level for all of the stars the player owns.
             playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
 
-            let totalManufacturing = playerStars.reduce((sum, s) => {
-                return sum + s.manufacturing;
-            }, 0);
+            let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
+
+            let totalEconomy = playerStars.reduce((sum, s) => sum + s.economy, 0);
+            let totalIndustry = playerStars.reduce((sum, s) => sum + s.industry, 0);
+            let totalScience = playerStars.reduce((sum, s) => sum + s.science, 0);
 
             p.stats = {
                 totalStars: playerStars.length,
                 totalCarriers: p.carriers.length,
                 totalShips,
-                newShips: totalManufacturing
+                totalEconomy,
+                totalIndustry,
+                totalScience,
+                newShips: totalManufacturing,
             };
         });
     }
