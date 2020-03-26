@@ -25,11 +25,13 @@ module.exports = async (app) => {
     const auth = require('../api/auth');
     const user = require('../api/user');
     const game = require('../api/game');
+    const trade = require('../api/trade');
     const player = require('../api/player');
 
     app.use('/api/auth', auth);
     app.use('/api/user', user);
     app.use('/api/game', game);
+    app.use('/api/game', trade);
     app.use('/api/player', player);
 
     return app;

@@ -119,7 +119,15 @@ class ApiService {
   }
 
   sendCredits (gameId, toPlayerId, amount) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/send/credits', {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/trade/credits', {
+      toPlayerId,
+      amount
+    },
+    { withCredentials: true })
+  }
+
+  sendRenown (gameId, toPlayerId, amount = 1) {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/trade/renown', {
       toPlayerId,
       amount
     },

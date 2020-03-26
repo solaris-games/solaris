@@ -18,7 +18,7 @@ const schema = new Schema({
     defeated: { type: Types.Boolean, required: false, default: false },
     ready: { type: Types.Boolean, required: false, default: false },
     missedTurns: { type: Types.Number, required: false, default: 0 },
-    karmaToGive: { type: Types.Number, required: true, default: 8 },
+    renownToGive: { type: Types.Number, required: true, default: 8 },
     apiCode: { type: Types.String, required: false },
     research: {
         // TODO: This would be arguably better if it was just progress points and remove level

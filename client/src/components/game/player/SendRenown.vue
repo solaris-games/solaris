@@ -4,7 +4,7 @@
         <form>
             <div class="form-row">
               <div class="col-7">
-                  <p class="mb-2">{{userPlayer.renownToDistribute || 8}} Renown to distrubute.</p>
+                  <p class="mb-2">{{userPlayer.renownToGive || 8}} Renown to distrubute.</p>
               </div>
               <div class="col-5">
                   <button class="btn btn-success btn-block" @click="confirmAwardRenown">Award Renown</button>
@@ -16,15 +16,32 @@
 </template>
 
 <script>
+import ApiService from '../../../services/apiService'
+
 export default {
   props: {
     game: Object,
     player: Object,
     userPlayer: Object
   },
+  data () {
+    return {
+      amount: 1
+    }
+  },
   methods: {
-    confirmAwardRenown () {
-      // TODO: Call the API
+    async confirmAwardRenown () {
+      try {
+        let response = await ApiService.sendRenown(this.game._id, this.player._id, this.amount);
+
+        if (response.status == 200) {
+          this.$emit('onRenownSent', this.amount)
+
+          this.userPlayer.renownToGive -= this.amount
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }

@@ -229,7 +229,7 @@ module.exports = class GameGalaxyService {
                     banking: { level: p.research.banking.level },
                     manufacturing: { level: p.research.manufacturing.level },
                 },
-                userId: p.userId,
+                userId: p.userId, // TODO: Do we really need to send this?
                 defeated: p.defeated,
                 ready: p.ready,
                 missedTurns: p.missedTurns,
