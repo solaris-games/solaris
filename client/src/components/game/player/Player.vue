@@ -18,6 +18,12 @@
 
     <research :game="game" :player="player" :userPlayer="userPlayer"/>
 
+    <div v-if="player != userPlayer">
+      <h4 class="mt-2">Trade</h4>
+
+      <sendTechnology :game="game" :player="player"/>
+    </div>
+
     <h4 class="mt-2">Achievements</h4>
 
     <achievements v-if="user" :victories="user.achievements.victories"
@@ -35,6 +41,7 @@ import Overview from './Overview'
 import Infrastructure from '../shared/Infrastructure'
 import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
+import SendTechnology from './SendTechnology'
 import Achievements from './Achievements'
 import Badges from './Badges'
 import apiService from '../../../services/apiService'
@@ -45,6 +52,7 @@ export default {
     'infrastructure': Infrastructure,
     'yourInfrastructure': YourInfrastructure,
     'research': Research,
+    'sendTechnology': SendTechnology,
     'achievements': Achievements,
     'badges': Badges
   },
