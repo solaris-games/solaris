@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="col-auto ml-4 mr-2 text-center">
-                <span class="align-middle">Credits: ${{credits}}</span>
+                <span class="align-middle" v-if="getUserPlayer()">Credits: ${{getUserPlayer().cash}}</span>
             </div>
             <div class="col text-center">
                 <span class="align-middle">Production: {{timeRemaining}}</span>
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
 import router from '../../../router'
 import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
@@ -49,7 +50,7 @@ import GameContainer from '../../../game/container'
 
 export default {
   props: {
-    credits: Number,
+    game: Object,
     nextProduction: Date,
     onMenuStateChanged: Function
   },
@@ -93,6 +94,9 @@ export default {
     }
   },
   methods: {
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+    },
     setMenuState (state, args) {
       this.$emit('onMenuStateChanged', {
         state,

@@ -1,7 +1,6 @@
 <template>
 <div class="menu">
-    <game-info v-if="getUserPlayer()" v-bind:credits="getUserPlayer().cash" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
-    <game-info v-if="!getUserPlayer()" v-bind:credits="0" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
+    <game-info :game="game" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 

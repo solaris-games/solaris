@@ -117,6 +117,15 @@ class ApiService {
     },
     { withCredentials: true })
   }
+
+  sendCredits (gameId, toPlayerId, amount) {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/send/credits', {
+      toPlayerId,
+      amount
+    },
+    { withCredentials: true })
+  }
+
 }
 
 export default new ApiService()

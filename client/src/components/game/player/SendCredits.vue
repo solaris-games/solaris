@@ -6,7 +6,7 @@
         <form>
             <div class="form-row">
                 <div class="col-7">
-                    <input type="number" class="form-control" v-model="cash"/>
+                    <input type="number" class="form-control" v-model="amount"/>
                 </div>
                 <div class="col-5">
                     <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block">Send Credits</modalButton>
@@ -16,12 +16,13 @@
     </div>
 
     <dialogModal modalName="sendCreditsModal" titleText="Send Credits" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
-      <p>Are you sure you want to send <b>${{cash}}</b> to <b>{{player.alias}}</b>?</p>
+      <p>Are you sure you want to send <b>${{amount}}</b> to <b>{{player.alias}}</b>?</p>
     </dialogModal>
 </div>
 </template>
 
 <script>
+import ApiService from '../../../services/apiService'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 
@@ -37,12 +38,24 @@ export default {
   },
   data () {
       return {
-          cash: 0
+          amount: 0
       }
   },
   methods: {
-    confirmSendCredits () {
-      // TODO: Call the API
+    async confirmSendCredits () {
+      try {
+        let response = await ApiService.sendCredits(this.game._id, this.player._id, this.amount);
+
+        if (response.status == 200) {
+          this.$emit('onCreditsSent', this.amount)
+
+          this.player.cash += this.amount
+          this.userPlayer.cash -= this.amount
+          this.amount = 0
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }
