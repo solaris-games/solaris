@@ -31,6 +31,8 @@
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
+    <sendRenown :game="game" :player="player" :userPlayer="userPlayer"/>
+
     <h4 class="mt-2">Badges</h4>
 
     <badges v-if="user" :user="user"/>
@@ -45,6 +47,7 @@ import Research from './Research'
 import SendTechnology from './SendTechnology'
 import SendCredits from './SendCredits'
 import Achievements from './Achievements'
+import SendRenown from './SendRenown'
 import Badges from './Badges'
 import apiService from '../../../services/apiService'
 
@@ -57,6 +60,7 @@ export default {
     'sendTechnology': SendTechnology,
     'sendCredits': SendCredits,
     'achievements': Achievements,
+    'sendRenown': SendRenown,
     'badges': Badges
   },
   props: {
