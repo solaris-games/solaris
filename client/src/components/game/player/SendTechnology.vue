@@ -19,7 +19,7 @@
         </form>
     </div>
 
-    <dialogModal modalName="shareTechnologyModal" titleText="Share Technology" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
+    <dialogModal modalName="shareTechnologyModal" titleText="Share Technology" cancelText="No" confirmText="Yes" @onConfirm="confirmSendTechnology">
       <p>Are you sure you want to share <b>{{selectedTechnology}}</b> with <b>{{player.alias}}</b>?</p>
     </dialogModal>
 </div>
@@ -51,6 +51,11 @@ export default {
           }
         ]
       }
+  },
+  methods: {
+    confirmSendTechnology () {
+      // TODO: Call the API
+    }
   }
 }
 </script>

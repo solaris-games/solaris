@@ -21,7 +21,8 @@
     <div v-if="player != userPlayer">
       <h4 class="mt-2">Trade</h4>
 
-      <sendTechnology :game="game" :player="player"/>
+      <sendTechnology :game="game" :player="player" :userPlayer="userPlayer"/>
+      <sendCredits :game="game" :player="player" :userPlayer="userPlayer"/>
     </div>
 
     <h4 class="mt-2">Achievements</h4>
@@ -42,6 +43,7 @@ import Infrastructure from '../shared/Infrastructure'
 import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
 import SendTechnology from './SendTechnology'
+import SendCredits from './SendCredits'
 import Achievements from './Achievements'
 import Badges from './Badges'
 import apiService from '../../../services/apiService'
@@ -53,6 +55,7 @@ export default {
     'yourInfrastructure': YourInfrastructure,
     'research': Research,
     'sendTechnology': SendTechnology,
+    'sendCredits': SendCredits,
     'achievements': Achievements,
     'badges': Badges
   },
