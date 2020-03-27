@@ -31,6 +31,10 @@ module.exports = class TradeService {
         let fromPlayer = game.galaxy.players.find(x => x.userId === fromUserId);
         let toPlayer = game.galaxy.players.find(x => x.id === toPlayerId);
 
+        if (fromPlayer === toPlayer) {
+            throw new Error(`Cannot award renown to yourself.`);
+        }
+
         if (fromPlayer.renownToGive < amount) {
             throw new Error(`The player does not own ${amount} renown to award.`);
         }

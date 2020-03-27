@@ -86,10 +86,6 @@ router.post('/:gameId/trade/renown', async (req, res, next) => {
         errors.push('toPlayerId is required.');
     }
 
-    if (req.session.userId === req.body.toPlayerId) {
-        errors.push('Cannot award renown to yourself.');
-    }
-    
     req.body.amount = parseInt(req.body.amount || 0);
 
     if (!req.body.amount) {

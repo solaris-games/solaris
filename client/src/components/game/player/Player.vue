@@ -31,7 +31,7 @@
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown :game="game" :player="player" :userPlayer="userPlayer"/>
+    <sendRenown v-if="player != userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
 
     <h4 class="mt-2">Badges</h4>
 
