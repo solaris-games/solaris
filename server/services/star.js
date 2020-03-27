@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 
 module.exports = class StarService {
 
-    constructor(randomService, starNameService) {
+    constructor(randomService, starNameService, gameService) {
         this.randomService = randomService;
         this.starNameService = starNameService;
+        this.gameService = gameService;
     }
 
     DEFAULTS = {
@@ -46,6 +47,30 @@ module.exports = class StarService {
     calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1) {
         // A star produces Y*(X+5) ships every 24 ticks where X is your manufacturing tech level and Y is the amount of industry at a star.
         return (industryLevel * (techLevel + 5) / 24) * ticks;
+    }
+
+    async abandonStar(gameId, userId, starId) {
+        let game = await this.gameService.getById(gameId);
+
+        // Get the star.
+        let star = game.galaxy.stars.find(x => x.id === starId);
+
+        // Check whether the star is owned by the current user.
+        let userPlayer = game.galaxy.players.find(x => x.userId === userId);
+
+        if ((star.ownedByPlayerId || '').toString() !== userPlayer.id) {
+            throw new Error(`Cannot abandon a star that is not owned by the player.`);
+        }
+
+        star.ownedByPlayerId = null;
+        star.garrison = 0;
+        
+        // Find and destroy all carriers stationed at this star.
+        userPlayer.carriers = userPlayer.carriers.filter(x => x.orbiting.toString() != star.id);
+
+        // TODO: Do we need to do anything about the home star? Maybe move it to the nearest player star?
+        
+        await game.save();
     }
 
 }

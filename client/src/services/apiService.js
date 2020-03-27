@@ -148,6 +148,13 @@ class ApiService {
     { withCredentials: true })
   }
 
+  abandonStar (gameId, starId) {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/star/abandon', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
 }
 
 export default new ApiService()

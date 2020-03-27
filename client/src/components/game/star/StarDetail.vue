@@ -157,9 +157,20 @@ export default {
       this.star.data[e]++
       this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e]
     },
-    confirmAbandonStar (e) {
-      // TODO: Call the API to abandon the star.
-      // TODO: Refresh the star afterwards
+    async confirmAbandonStar (e) {
+      try {
+        let response = await ApiService.abandonStar(this.game._id, this.star.data._id);
+
+        if (response.status == 200) {
+          // TODO: Maybe a better way to refresh this?
+          this.star.data.ownedByPlayerId = null;
+          this.star.data.garrison = 0;
+
+          this.$emit('onStarAbandoned', this.star.data._id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
     },
     async confirmUpgradeWarpGate (e) {
       try {
