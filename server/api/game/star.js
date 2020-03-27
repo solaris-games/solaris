@@ -14,6 +14,7 @@ const CarrierService = require('../../services/carrier');
 const TradeService = require('../../services/trade');
 const StarNameService = require('../../services/starName');
 const UserService = require('../../services/user');
+const UpgradeStarService = require('../../services/upgradeStar');
 
 const starNames = require('../../config/game/starNames');
 
@@ -30,10 +31,32 @@ const starService = new StarService(randomService, starNameService);
 const mapService = new MapService(randomService, starService, distanceService, starDistanceService, starNameService);
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const gameService = new GameService(gameModel);
+const upgradeStarService = new UpgradeStarService(gameService, starService);
 
 const userService = new UserService(bcrypt, User);
 const tradeService = new TradeService(gameService, userService);
 
-// TODO: API Endpoints
+router.post('/:gameId/star/upgrade/warpgate', async (req, res, next) => {
+    let errors = [];
+
+    if (!req.body.starId) {
+        errors.push('starId is required.');
+    }
+
+    if (errors.length) {
+        return res.status(400).json({ errors: errors });
+    }
+
+    try {
+        await upgradeStarService.upgradeWarpGate(
+            req.params.gameId,
+            req.session.userId,
+            req.body.starId);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+});
 
 module.exports = router;

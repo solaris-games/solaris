@@ -70,7 +70,7 @@
           <p>Buy a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <button class="btn btn-block btn-primary">Buy for $0</button>
+          <modalButton modalName="upgradeWarpGateModal" classText="btn btn-block btn-primary">Buy for $0</modalButton>
         </div>
       </div>
 
@@ -98,6 +98,13 @@
 
     <playerOverview :game="game" :player="getStarOwningPlayer()" />
 
+    <!-- Modals -->
+
+    <dialogModal modalName="upgradeWarpGateModal" titleText="Update Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmUpgradeWarpGate">
+      <p>Are you sure you want buy a Warp Gate at <b>{{star.data.name}}</b>?</p>
+      <p>The upgrade will cost $0.</p>
+    </dialogModal>
+
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
       <p>Are you sure you want to abandon <b>{{star.data.name}}</b>?</p>
       <p>It's Economy, Industry and Science will remain, but all ships at this star will be destroyed.</p>
@@ -106,6 +113,7 @@
 </template>
 
 <script>
+import ApiService from '../../../services/apiService'
 import GameHelper from '../../../services/gameHelper'
 import Infrastructure from '../shared/Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
@@ -146,6 +154,21 @@ export default {
     confirmAbandonStar (e) {
       // TODO: Call the API to abandon the star.
       // TODO: Refresh the star afterwards
+    },
+    async confirmUpgradeWarpGate (e) {
+      try {
+        let response = await ApiService.upgradeWarpGate(this.game._id, this.star.data._id);
+
+        if (response.status == 200) {
+          // TODO: This doesn't refresh the UI for some reason.
+          // Maybe the solution is to put the warp gate value in data instead of a prop?
+          this.star.data.warpGate = true;
+
+          this.$emit('onUpgradedWarpGate', this.star.data._id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }

@@ -134,6 +134,13 @@ class ApiService {
     { withCredentials: true })
   }
 
+  upgradeWarpGate (gameId, starId) {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/star/upgrade/warpgate', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
 }
 
 export default new ApiService()

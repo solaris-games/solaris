@@ -20,7 +20,7 @@ const schema = new Schema({
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' }
         },
         specialGalaxy: {
-			buildWarpgates: { type: Types.String, required: true, enum: ['none', 'cheap', 'expensive'], default: 'cheap' },
+			buildWarpgates: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'cheap' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
         },
