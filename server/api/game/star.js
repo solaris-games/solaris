@@ -59,4 +59,27 @@ router.post('/:gameId/star/upgrade/warpgate', async (req, res, next) => {
     }
 });
 
+router.post('/:gameId/star/destroy/warpgate', async (req, res, next) => {
+    let errors = [];
+
+    if (!req.body.starId) {
+        errors.push('starId is required.');
+    }
+
+    if (errors.length) {
+        return res.status(400).json({ errors: errors });
+    }
+
+    try {
+        await upgradeStarService.destroyWarpGate(
+            req.params.gameId,
+            req.session.userId,
+            req.body.starId);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+});
+
 module.exports = router;

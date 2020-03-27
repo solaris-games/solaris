@@ -44,6 +44,7 @@
         :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science"/>
 
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
+        :availableCredits="getUserPlayer().cash"
         :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
@@ -70,7 +71,8 @@
           <p>Buy a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton modalName="upgradeWarpGateModal" classText="btn btn-block btn-primary">Buy for $0</modalButton>
+          <modalButton v-if="!star.data.warpGate" :disabled="getUserPlayer().cash < star.data.upgradeCosts.warpGate" modalName="upgradeWarpGateModal" classText="btn btn-block btn-primary">Buy for ${{star.data.upgradeCosts.warpGate}}</modalButton>
+          <modalButton v-if="star.data.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger">Destroy Gate</modalButton>
         </div>
       </div>
 
@@ -103,6 +105,10 @@
     <dialogModal modalName="upgradeWarpGateModal" titleText="Update Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmUpgradeWarpGate">
       <p>Are you sure you want buy a Warp Gate at <b>{{star.data.name}}</b>?</p>
       <p>The upgrade will cost $0.</p>
+    </dialogModal>
+
+    <dialogModal modalName="destroyWarpGateModal" titleText="Update Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmDestroyWarpGate">
+      <p>Are you sure you want destroy Warp Gate at <b>{{star.data.name}}</b>?</p>
     </dialogModal>
 
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
@@ -165,6 +171,19 @@ export default {
           this.star.data.warpGate = true;
 
           this.$emit('onUpgradedWarpGate', this.star.data._id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmDestroyWarpGate (e) {
+      try {
+        let response = await ApiService.destroyWarpGate(this.game._id, this.star.data._id);
+
+        if (response.status == 200) {
+          this.star.data.warpGate = false;
+
+          this.$emit('onDestroyedWarpGate', this.star.data._id)
         }
       } catch (err) {
         console.error(err)

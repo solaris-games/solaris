@@ -134,6 +134,10 @@
             "text": "Cheap"
           },
           {
+            "value": "standard",
+            "text": "Standard"
+          },
+          {
             "value": "expensive",
             "text": "Expensive"
           }

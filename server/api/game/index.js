@@ -13,7 +13,7 @@ const PlayerService = require('../../services/player');
 const RandomService = require('../../services/random');
 const StarService = require('../../services/star');
 const CarrierService = require('../../services/carrier');
-const TradeService = require('../../services/trade');
+const UpgradeStarService = require('../../services/upgradeStar');
 const StarNameService = require('../../services/starName');
 
 const starNames = require('../../config/game/starNames');
@@ -31,8 +31,8 @@ const mapService = new MapService(randomService, starService, distanceService, s
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const gameService = new GameService(gameModel);
 const gameCreateService = new GameCreateService(gameModel, mapService, playerService);
-const gameGalaxyService = new GameGalaxyService(gameService, mapService, playerService, starService, distanceService, starDistanceService);
-const tradeService = new TradeService(gameService);
+const upgradeStarService = new UpgradeStarService(gameService, starService);
+const gameGalaxyService = new GameGalaxyService(gameService, mapService, playerService, starService, distanceService, starDistanceService, upgradeStarService);
 
 router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
     return res.status(200).json(require('../config/game/defaultGameSettings.json'));

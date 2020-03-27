@@ -1,12 +1,13 @@
 module.exports = class GameGalaxyService {
 
-    constructor(gameService, mapService, playerService, starService, distanceService, starDistanceService) {
+    constructor(gameService, mapService, playerService, starService, distanceService, starDistanceService, upgradeStarService) {
         this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
+        this.upgradeStarService = upgradeStarService;
     }
 
     async getGalaxy(gameId, userId) {
@@ -146,7 +147,7 @@ module.exports = class GameGalaxyService {
 
             if (isOwnedByCurrentPlayer) {    
                 // Calculate infrastructure upgrades for the star.
-                this._setUpgradeCosts(s);
+                this._setUpgradeCosts(doc, s);
                 
                 return s;
             }
@@ -246,13 +247,16 @@ module.exports = class GameGalaxyService {
         doc.galaxy.players.forEach(p => p.carriers = []);
     }
 
-    _setUpgradeCosts(star) {
-        // TODO: Calculate upgrade costs for the star.
-        star.upgradeCosts = {
-            economy: 10,
-            industry: 20,
-            science: 30
-        };
+    _setUpgradeCosts(game, star) {
+        const expenseConfig = this.upgradeStarService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+
+        // Calculate upgrade costs for the star.
+        star.upgradeCosts = { };
+
+        star.upgradeCosts.economy = this.upgradeStarService.calculateEconomyCost(expenseConfig, star.economy, star.terraformedResources);
+        star.upgradeCosts.industry = this.upgradeStarService.calculateIndustryCost(expenseConfig, star.industry, star.terraformedResources);
+        star.upgradeCosts.science = this.upgradeStarService.calculateScienceCost(expenseConfig, star.science, star.terraformedResources);
+        star.upgradeCosts.warpGate = this.upgradeStarService.calculateWarpGateCost(expenseConfig, star.terraformedResources);
     }
 
 };

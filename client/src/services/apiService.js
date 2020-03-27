@@ -141,6 +141,13 @@ class ApiService {
     { withCredentials: true })
   }
 
+  destroyWarpGate (gameId, starId) {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/star/destroy/warpgate', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
 }
 
 export default new ApiService()
