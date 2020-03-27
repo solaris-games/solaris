@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const middleware = require('./middleware');
-const GameService = require('../services/game');
-const ResearchService = require('../services/research');
+const middleware = require('../middleware');
+const GameService = require('../../services/game');
+const ResearchService = require('../../services/research');
 
-const gameModel = require('../models/Game');
+const gameModel = require('../../models/Game');
 const gameService = new GameService(gameModel);
 const researchService = new ResearchService(gameService);
 

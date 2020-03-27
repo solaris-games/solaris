@@ -1,23 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const middleware = require('./middleware');
+const middleware = require('../middleware');
 
-const GameService = require('../services/game');
-const GameListService = require('../services/gameList');
-const GameGalaxyService = require('../services/gameGalaxy');
-const GameCreateService = require('../services/gameCreate');
-const DistanceService = require('../services/distance');
-const StarDistanceService = require('../services/starDistance');
-const MapService = require('../services/map');
-const PlayerService = require('../services/player');
-const RandomService = require('../services/random');
-const StarService = require('../services/star');
-const CarrierService = require('../services/carrier');
-const TradeService = require('../services/trade');
-const StarNameService = require('../services/starName');
+const GameService = require('../../services/game');
+const GameListService = require('../../services/gameList');
+const GameGalaxyService = require('../../services/gameGalaxy');
+const GameCreateService = require('../../services/gameCreate');
+const DistanceService = require('../../services/distance');
+const StarDistanceService = require('../../services/starDistance');
+const MapService = require('../../services/map');
+const PlayerService = require('../../services/player');
+const RandomService = require('../../services/random');
+const StarService = require('../../services/star');
+const CarrierService = require('../../services/carrier');
+const TradeService = require('../../services/trade');
+const StarNameService = require('../../services/starName');
 
-const starNames = require('../config/game/starNames');
-const gameModel = require('../models/Game');
+const starNames = require('../../config/game/starNames');
+const gameModel = require('../../models/Game');
 const gameListService = new GameListService(gameModel);
 
 // TODO: Need DI here.
