@@ -134,22 +134,43 @@ class ApiService {
     { withCredentials: true })
   }
 
+  upgradeEconomy (gameId, starId) {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/upgrade/economy', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
+  upgradeIndustry (gameId, starId) {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/upgrade/industry', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
+  upgradeScience (gameId, starId) {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/upgrade/science', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
   upgradeWarpGate (gameId, starId) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/star/upgrade/warpgate', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/upgrade/warpgate', {
       starId
     },
     { withCredentials: true })
   }
 
   destroyWarpGate (gameId, starId) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/star/destroy/warpgate', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/destroy/warpgate', {
       starId
     },
     { withCredentials: true })
   }
 
   abandonStar (gameId, starId) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/star/abandon', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/abandon', {
       starId
     },
     { withCredentials: true })

@@ -44,6 +44,8 @@
         :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science"/>
 
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
+        :gameId="game._id"
+        :starId="star.data._id"
         :availableCredits="getUserPlayer().cash"
         :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>

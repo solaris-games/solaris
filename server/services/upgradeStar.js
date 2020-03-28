@@ -5,6 +5,14 @@ const BASE_COSTS = {
     SCIENCE: 20
 };
 
+function getStar(game, starId) {
+    return game.galaxy.stars.find(x => x.id === starId);
+}
+
+function getUserPlayer(game, userId) {
+    return game.galaxy.players.find(x => x.userId === userId);
+}
+
 module.exports = class UpgradeStarService {
 
     EXPENSE_CONFIGS = {
@@ -22,10 +30,10 @@ module.exports = class UpgradeStarService {
         let game = await this.gameService.getById(gameId);
 
         // Get the star.
-        let star = game.galaxy.stars.find(x => x.id === starId);
+        let star = getStar(game, starId);
 
         // Check whether the star is owned by the current user.
-        let userPlayer = game.galaxy.players.find(x => x.userId === userId);
+        let userPlayer = getUserPlayer(game, userId);
 
         if (star.ownedByPlayerId.toString() !== userPlayer.id) {
             throw new Error(`Cannot upgrade, the star is not owned by the current player.`);
@@ -53,10 +61,10 @@ module.exports = class UpgradeStarService {
         let game = await this.gameService.getById(gameId);
 
         // Get the star.
-        let star = game.galaxy.stars.find(x => x.id === starId);
+        let star = getStar(game, starId);
 
         // Check whether the star is owned by the current user.
-        let userPlayer = game.galaxy.players.find(x => x.userId === userId);
+        let userPlayer = getUserPlayer(game, userId);
 
         if (star.ownedByPlayerId.toString() !== userPlayer.id) {
             throw new Error(`Cannot destroy warp gate, the star is not owned by the current player.`);
@@ -69,6 +77,45 @@ module.exports = class UpgradeStarService {
         star.warpGate = false;
 
         await game.save();
+    }
+
+    async _upgradeInfrastructure(gameId, userId, starId, economyType, calculateCostCallback) {
+        let game = await this.gameService.getById(gameId);
+
+        // Get the star.
+        let star = getStar(game, starId);
+
+        // Check whether the star is owned by the current user.
+        let userPlayer = getUserPlayer(game, userId);
+
+        if (star.ownedByPlayerId.toString() !== userPlayer.id) {
+            throw new Error(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
+        }
+
+        const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
+        const cost = calculateCostCallback(expenseConfig, star[economyType], terraformedResources);
+
+        if (userPlayer.cash < cost) {
+            throw new Error(`The player does not own enough credits to afford to upgrade.`);
+        }
+
+        star[economyType]++;
+        userPlayer.cash -= cost;
+
+        await game.save();
+    }
+
+    async upgradeEconomy(gameId, userId, starId) {
+        return await this._upgradeInfrastructure(gameId, userId, starId, 'economy', this.calculateEconomyCost.bind(this));
+    }
+
+    async upgradeIndustry(gameId, userId, starId) {
+        return await this._upgradeInfrastructure(gameId, userId, starId, 'industry', this.calculateIndustryCost.bind(this));
+    }
+
+    async upgradeScience(gameId, userId, starId) {
+        return await this._upgradeInfrastructure(gameId, userId, starId, 'science', this.calculateScienceCost.bind(this));
     }
 
     calculateWarpGateCost(expenseConfig, terraformedResources) {

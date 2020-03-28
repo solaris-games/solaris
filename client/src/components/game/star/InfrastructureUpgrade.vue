@@ -22,22 +22,50 @@
 </template>
 
 <script>
+import ApiService from '../../../services/apiService'
+
 export default {
   props: {
+    gameId: String,
+    starId: String,
     availableCredits: Number,
     economy: Number,
     industry: Number,
     science: Number
   },
   methods: {
-    upgradeEconomy () {
-      this.$emit('onInfrastructureUpgraded', 'economy')
+    async upgradeEconomy (e) {
+      try {
+        let response = await ApiService.upgradeEconomy(this.gameId, this.starId);
+
+        if (response.status == 200) {
+          this.$emit('onInfrastructureUpgraded', 'economy')
+        }
+      } catch (err) {
+        console.error(err)
+      }
     },
-    upgradeIndustry () {
-      this.$emit('onInfrastructureUpgraded', 'industry')
+    async upgradeIndustry (e) {
+      try {
+        let response = await ApiService.upgradeIndustry(this.gameId, this.starId);
+
+        if (response.status == 200) {
+          this.$emit('onInfrastructureUpgraded', 'industry')
+        }
+      } catch (err) {
+        console.error(err)
+      }
     },
-    upgradeScience () {
-      this.$emit('onInfrastructureUpgraded', 'science')
+    async upgradeScience (e) {
+      try {
+        let response = await ApiService.upgradeScience(this.gameId, this.starId);
+
+        if (response.status == 200) {
+          this.$emit('onInfrastructureUpgraded', 'science')
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }
