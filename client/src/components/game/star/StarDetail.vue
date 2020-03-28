@@ -51,9 +51,9 @@
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
-    <div class="row bg-secondary" v-if="star.data.shipsPerTick != null">
+    <div class="row bg-light mt-2" v-if="star.data.manufacturing != null">
       <div class="col text-center pt-3">
-        <p>This star builds <b>{{star.data.shipsPerTick}}</b> every tick.</p>
+        <p>This star builds <b>{{star.data.manufacturing}}</b> every tick.</p>
       </div>
     </div>
 

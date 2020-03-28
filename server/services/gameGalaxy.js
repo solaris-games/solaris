@@ -119,7 +119,8 @@ module.exports = class GameGalaxyService {
                 location: s.location,
                 homeStar: s.homeStar,
                 warpGate: s.warpGate,
-                stats: s.stats
+                stats: s.stats,
+                manufacturing: s.manufacturing
             }
         });
     }
