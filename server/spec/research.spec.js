@@ -2,17 +2,11 @@ const ResearchService = require('../services/research');
 
 let gameObject = null;
 
-const fakeGameService = {
-    getByIdAll(gameId) {
-        return gameObject;
-    }
-};
-
 describe('research', () => {
     let service;
 
     beforeAll(() => {
-        service = new ResearchService(fakeGameService);
+        service = new ResearchService();
     });
 
     beforeEach(() => {
@@ -40,9 +34,9 @@ describe('research', () => {
     });
     
     it('should save the document after updating the preference', async (done) => {
-        let gameId = 1, userId = 1, preference = 5;
+        let userId = 1, preference = 5;
 
-        let result = await service.updateResearchNow(gameId, userId, preference);
+        let result = await service.updateResearchNow(gameObject, userId, preference);
 
         expect(result).toBeTruthy(); // Expect save to be called.
 
@@ -50,9 +44,9 @@ describe('research', () => {
     });
 
     it('should update researching now of given player', async (done) => {
-        let gameId = 1, userId = 1, preference = 5;
+        let userId = 1, preference = 5;
 
-        await service.updateResearchNow(gameId, userId, preference);
+        await service.updateResearchNow(gameObject, userId, preference);
 
         expect(gameObject.galaxy.players[0].researchingNow).toBe(preference);
 
@@ -60,9 +54,9 @@ describe('research', () => {
     });
     
     it('should update researching now of a different given player', async (done) => {
-        let gameId = 1, userId = 2, preference = 100;
+        let userId = 2, preference = 100;
 
-        await service.updateResearchNow(gameId, userId, preference);
+        await service.updateResearchNow(gameObject, userId, preference);
 
         expect(gameObject.galaxy.players[1].researchingNow).toBe(preference);
 
@@ -70,9 +64,9 @@ describe('research', () => {
     });
 
     it('should update researching next of given player', async (done) => {
-        let gameId = 1, userId = 1, preference = 5;
+        let userId = 1, preference = 5;
 
-        await service.updateResearchNext(gameId, userId, preference);
+        await service.updateResearchNext(gameObject, userId, preference);
 
         expect(gameObject.galaxy.players[0].researchingNext).toBe(preference);
 
@@ -80,9 +74,9 @@ describe('research', () => {
     });
     
     it('should update researching next of a different given player', async (done) => {
-        let gameId = 1, userId = 2, preference = 100;
+        let userId = 2, preference = 100;
 
-        await service.updateResearchNext(gameId, userId, preference);
+        await service.updateResearchNext(gameObject, userId, preference);
 
         expect(gameObject.galaxy.players[1].researchingNext).toBe(preference);
 

@@ -33,15 +33,16 @@ const distanceService = new DistanceService();
 const randomService = new RandomService();
 const gameService = new GameService(GameModel);
 const gameListService = new GameListService(GameModel);
-const tradeService = new TradeService(gameService, userService);
+const researchService = new ResearchService();
+const tradeService = new TradeService(userService);
 const starNameService = new StarNameService(starNames, randomService);
-const starService = new StarService(randomService, starNameService, gameService);
+const starService = new StarService(randomService, starNameService);
 const starDistanceService = new StarDistanceService(distanceService);
 const mapService = new MapService(randomService, starService, distanceService, starDistanceService, starNameService);
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const gameCreateService = new GameCreateService(GameModel, mapService, playerService);
-const starUpgradeService = new StarUpgradeService(gameService, starService);
-const gameGalaxyService = new GameGalaxyService(gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService);
+const starUpgradeService = new StarUpgradeService(starService);
+const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService);
 
 module.exports = {
     authService,
@@ -54,6 +55,7 @@ module.exports = {
     mapService,
     playerService,
     randomService,
+    researchService,
     starService,
     starDistanceService,
     starNameService,

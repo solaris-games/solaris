@@ -12,10 +12,6 @@ module.exports = class GameService {
             .exec();
     }
 
-    async getByIdAll(id) {
-        return await this.getById(id, {});
-    }
-
     async getByIdInfo(id) {
         return await this.getById(id, {
             settings: 1,
@@ -23,9 +19,7 @@ module.exports = class GameService {
         });
     }
 
-    async join(gameId, userId, playerId, alias) {
-        let game = await this.getById(gameId, {});
-
+    async join(game, userId, playerId, alias) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {
             throw new Error('The game has already started.');
@@ -76,10 +70,7 @@ module.exports = class GameService {
         return await game.save();
     }
 
-    async concedeDefeat(gameId, userId) {
-        // Remove the player from the game.
-        let game = this.getById(gameId, {});
-    
+    async concedeDefeat(game, userId) {    
         // TODO: Disallow if they have already been defeated.
         // TODO: General checks to ensure that the game hasn't finished
         //       or anything weird like that.

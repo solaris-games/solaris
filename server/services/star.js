@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 
 module.exports = class StarService {
 
-    constructor(randomService, starNameService, gameService) {
+    constructor(randomService, starNameService) {
         this.randomService = randomService;
         this.starNameService = starNameService;
-        this.gameService = gameService;
     }
 
     DEFAULTS = {
@@ -49,9 +48,7 @@ module.exports = class StarService {
         return (industryLevel * (techLevel + 5) / 24) * ticks;
     }
 
-    async abandonStar(gameId, userId, starId) {
-        let game = await this.gameService.getById(gameId);
-
+    async abandonStar(game, userId, starId) {
         // Get the star.
         let star = game.galaxy.stars.find(x => x.id === starId);
 

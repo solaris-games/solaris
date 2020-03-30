@@ -27,9 +27,9 @@ router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, as
     }
 });
 
-router.get('/:gameId/galaxy', middleware.authenticate, async (req, res, next) => {
+router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
-        let game = await container.gameGalaxyService.getGalaxy(req.params.gameId, req.session.userId);
+        let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);
 
         return res.status(200).json(game);
     } catch (err) {
@@ -77,10 +77,10 @@ router.get('/list/completed', middleware.authenticate, async (req, res, next) =>
     }
 });
 
-router.post('/:gameId/join', middleware.authenticate, async (req, res, next) => {
+router.post('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.gameService.join(
-            req.params.gameId,
+            req.game,
             req.session.userId,
             req.body.playerId,
             req.body.alias);
@@ -91,10 +91,10 @@ router.post('/:gameId/join', middleware.authenticate, async (req, res, next) => 
     }
 });
 
-router.post('/:gameId/concedeDefeat', middleware.authenticate, async (req, res, next) => {
+router.post('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.gameService.concedeDefeat(
-            req.params.gameId,
+            req.game,
             req.session.userId);
             
         return res.sendStatus(200);

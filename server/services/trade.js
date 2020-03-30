@@ -2,14 +2,11 @@
 
 module.exports = class TradeService {
 
-    constructor(gameService, userService) {
-        this.gameService = gameService;
+    constructor(userService) {
         this.userService = userService;
     }
 
-    async sendCredits(gameId, fromUserId, toPlayerId, amount) {
-        let game = await this.gameService.getById(gameId);
-
+    async sendCredits(game, fromUserId, toPlayerId, amount) {
         // Get the players.
         let fromPlayer = game.galaxy.players.find(x => x.userId === fromUserId);
         let toPlayer = game.galaxy.players.find(x => x.id === toPlayerId);
@@ -24,9 +21,7 @@ module.exports = class TradeService {
         await game.save();
     }
 
-    async sendRenown(gameId, fromUserId, toPlayerId, amount) {
-        let game = await this.gameService.getById(gameId);
-
+    async sendRenown(game, fromUserId, toPlayerId, amount) {
         // Get the players.
         let fromPlayer = game.galaxy.players.find(x => x.userId === fromUserId);
         let toPlayer = game.galaxy.players.find(x => x.id === toPlayerId);

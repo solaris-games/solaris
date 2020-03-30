@@ -21,14 +21,11 @@ module.exports = class StarUpgradeService {
         expensive: 4
     };
 
-    constructor(gameService, starService) {
-        this.gameService = gameService;
+    constructor(starService) {
         this.starService = starService;
     }
 
-    async upgradeWarpGate(gameId, userId, starId) {
-        let game = await this.gameService.getById(gameId);
-
+    async upgradeWarpGate(game, userId, starId) {
         // Get the star.
         let star = getStar(game, starId);
 
@@ -57,9 +54,7 @@ module.exports = class StarUpgradeService {
         await game.save();
     }
 
-    async destroyWarpGate(gameId, userId, starId) {
-        let game = await this.gameService.getById(gameId);
-
+    async destroyWarpGate(game, userId, starId) {
         // Get the star.
         let star = getStar(game, starId);
 
@@ -79,9 +74,7 @@ module.exports = class StarUpgradeService {
         await game.save();
     }
 
-    async _upgradeInfrastructure(gameId, userId, starId, economyType, calculateCostCallback) {
-        let game = await this.gameService.getById(gameId);
-
+    async _upgradeInfrastructure(game, userId, starId, economyType, calculateCostCallback) {
         // Get the star.
         let star = getStar(game, starId);
 
@@ -106,16 +99,16 @@ module.exports = class StarUpgradeService {
         await game.save();
     }
 
-    async upgradeEconomy(gameId, userId, starId) {
-        return await this._upgradeInfrastructure(gameId, userId, starId, 'economy', this.calculateEconomyCost.bind(this));
+    async upgradeEconomy(game, userId, starId) {
+        return await this._upgradeInfrastructure(game, userId, starId, 'economy', this.calculateEconomyCost.bind(this));
     }
 
-    async upgradeIndustry(gameId, userId, starId) {
-        return await this._upgradeInfrastructure(gameId, userId, starId, 'industry', this.calculateIndustryCost.bind(this));
+    async upgradeIndustry(game, userId, starId) {
+        return await this._upgradeInfrastructure(game, userId, starId, 'industry', this.calculateIndustryCost.bind(this));
     }
 
-    async upgradeScience(gameId, userId, starId) {
-        return await this._upgradeInfrastructure(gameId, userId, starId, 'science', this.calculateScienceCost.bind(this));
+    async upgradeScience(game, userId, starId) {
+        return await this._upgradeInfrastructure(game, userId, starId, 'science', this.calculateScienceCost.bind(this));
     }
 
     calculateWarpGateCost(expenseConfig, terraformedResources) {

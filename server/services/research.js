@@ -1,12 +1,10 @@
 module.exports = class ResearchService {
 
-    constructor(gameService) {
-        this.gameService = gameService;
+    constructor() {
+        
     }
 
-    async updateResearchNow(gameId, userId, preference) {
-        let game = await this.gameService.getByIdAll(gameId);
-
+    async updateResearchNow(game, userId, preference) {
         // Get the user's player and update their research preference.
         let userPlayer = game.galaxy.players.find(p => p.userId === userId);
 
@@ -15,9 +13,7 @@ module.exports = class ResearchService {
         return await game.save();
     }
 
-    async updateResearchNext(gameId, userId, preference) {
-        let game = this.gameService.getByIdAll(gameId);
-
+    async updateResearchNext(game, userId, preference) {
         // Get the user's player and update their research preference.
         let userPlayer = game.galaxy.players.find(p => p.userId === userId);
 

@@ -3,7 +3,7 @@ const router = express.Router();
 const middleware = require('../middleware');
 const container = require('../container');
 
-router.post('/:gameId/trade/credits', middleware.authenticate, async (req, res, next) => {
+router.post('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.toPlayerId) {
@@ -30,7 +30,7 @@ router.post('/:gameId/trade/credits', middleware.authenticate, async (req, res, 
 
     try {
         await container.tradeService.sendCredits(
-            req.params.gameId,
+            req.game,
             req.session.userId,
             req.body.toPlayerId,
             req.body.amount);
@@ -41,7 +41,7 @@ router.post('/:gameId/trade/credits', middleware.authenticate, async (req, res, 
     }
 });
 
-router.post('/:gameId/trade/renown', middleware.authenticate, async (req, res, next) => {
+router.post('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.toPlayerId) {
@@ -64,7 +64,7 @@ router.post('/:gameId/trade/renown', middleware.authenticate, async (req, res, n
 
     try {
         await container.tradeService.sendRenown(
-            req.params.gameId,
+            req.game,
             req.session.userId,
             req.body.toPlayerId,
             req.body.amount);

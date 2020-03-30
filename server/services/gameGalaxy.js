@@ -1,7 +1,6 @@
 module.exports = class GameGalaxyService {
 
-    constructor(gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService) {
-        this.gameService = gameService;
+    constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -10,45 +9,37 @@ module.exports = class GameGalaxyService {
         this.starUpgradeService = starUpgradeService;
     }
 
-    async getGalaxy(gameId, userId) {
-        let doc = await this._getGalaxyObject(gameId);
+    async getGalaxy(game, userId) {
+        game = game.toObject();
         
         // Check if the user is playing in this game.
-        let player = this._getUserPlayer(doc, userId);
+        let player = this._getUserPlayer(game, userId);
         
         // TODO: If the game has started and the user is not in this game
         // then they cannot view info about this game.
 
         // Append the player stats to each player.
-        this._setPlayerStats(doc);
+        this._setPlayerStats(game);
 
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like garrisons.
         if (!player) {
-            this._setStarInfoBasic(doc);
+            this._setStarInfoBasic(game);
 
             // Also remove all carriers from players.
-            this._clearPlayerCarriers(doc);
+            this._clearPlayerCarriers(game);
         } else {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
-            this._setStarInfoDetailed(doc, player);
-            this._setCarrierInfoDetailed(doc, player);
-            this._setPlayerInfoBasic(doc, player);
+            this._setStarInfoDetailed(game, player);
+            this._setCarrierInfoDetailed(game, player);
+            this._setPlayerInfoBasic(game, player);
     
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
             // TODO: Can we get away with not sending other player's user ids?
         }
         
-        return doc;
-    }
-
-    async _getGalaxyObject(gameId) {
-        let doc = await this.gameService.getById(gameId, {});
-    
-        doc = doc.toObject();
-        
-        return doc;
+        return game;
     }
     
     _isDarkStart(doc) {
