@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const middleware = require('./middleware');
 const container = require('./container');
 
 router.post('/login', async (req, res, next) => {
@@ -31,7 +32,7 @@ router.post('/login', async (req, res, next) => {
         // never throw errors for logic.
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/logout', (req, res, next) => {
     if (req.session) {

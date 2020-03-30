@@ -19,19 +19,17 @@ router.post('/', middleware.authenticate, async (req, res, next) => {
     }
 });
 
-router.get('/:id/info', middleware.authenticate, async (req, res, next) => {
+router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
     try {
-        let game = await container.gameService.getByIdInfo(req.params.id);
-
-        return res.status(200).json(game);
+        return res.status(200).json(req.game);
     } catch (err) {
         return next(err);
     }
 });
 
-router.get('/:id/galaxy', middleware.authenticate, async (req, res, next) => {
+router.get('/:gameId/galaxy', middleware.authenticate, async (req, res, next) => {
     try {
-        let game = await container.gameGalaxyService.getGalaxy(req.params.id, req.session.userId);
+        let game = await container.gameGalaxyService.getGalaxy(req.params.gameId, req.session.userId);
 
         return res.status(200).json(game);
     } catch (err) {

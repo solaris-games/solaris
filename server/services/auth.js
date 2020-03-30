@@ -1,3 +1,5 @@
+const ValidationError = require('../errors/validation');
+
 module.exports = class AuthService {
     
     constructor(bcrypt, userModel) {
@@ -12,7 +14,7 @@ module.exports = class AuthService {
         });
         
         if (!user) {
-            throw new Error('The username or password is incorrect.');
+            throw new ValidationError('The username or password is incorrect.');
         }
 
         // Compare the passwords and if they match then the user is authenticated.
@@ -21,7 +23,7 @@ module.exports = class AuthService {
         if (result) {
             return user._id;
         } else {
-            throw new Error('The username or password is incorrect.');
+            throw new ValidationError('The username or password is incorrect.');
         }
     }
 }
