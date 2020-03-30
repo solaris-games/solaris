@@ -1,16 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('../middleware');
-const GameService = require('../../services/game');
-const ResearchService = require('../../services/research');
-
-const gameModel = require('../../models/Game');
-const gameService = new GameService(gameModel);
-const researchService = new ResearchService(gameService);
+const container = require('../container');
 
 router.post('/:gameId/research/now', middleware.authenticate, async (req, res, next) => {
     try {
-        await researchService.updateResearchNow(req.params.gameId, req.session.userId, req.body.preference);
+        await container.researchService.updateResearchNow(req.params.gameId, req.session.userId, req.body.preference);
 
         return res.sendStatus(200);
     } catch (err) {
@@ -20,7 +15,7 @@ router.post('/:gameId/research/now', middleware.authenticate, async (req, res, n
 
 router.post('/:gameId/research/next', middleware.authenticate, async (req, res, next) => {
     try {
-        await researchService.updateResearchNext(req.params.gameId, req.session.userId, req.body.preference);
+        await container.researchService.updateResearchNext(req.params.gameId, req.session.userId, req.body.preference);
 
         return res.sendStatus(200);
     } catch (err) {

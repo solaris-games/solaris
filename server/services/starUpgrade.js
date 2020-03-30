@@ -13,7 +13,7 @@ function getUserPlayer(game, userId) {
     return game.galaxy.players.find(x => x.userId === userId);
 }
 
-module.exports = class UpgradeStarService {
+module.exports = class StarUpgradeService {
 
     EXPENSE_CONFIGS = {
         cheap: 1,

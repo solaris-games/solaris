@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const AuthService = require('../services/auth');
-
-const userModel = require('../models/User');
-const authService = new AuthService(bcrypt, userModel);
+const container = require('./container');
 
 router.post('/login', async (req, res, next) => {
     let errors = [];
@@ -22,7 +18,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     try {
-        let userId = await authService.login(req.body.username, req.body.password);
+        let userId = await container.authService.login(req.body.username, req.body.password);
 
         // Store the user id in the session.
         req.session.userId = userId;

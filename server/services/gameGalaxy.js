@@ -1,13 +1,13 @@
 module.exports = class GameGalaxyService {
 
-    constructor(gameService, mapService, playerService, starService, distanceService, starDistanceService, upgradeStarService) {
+    constructor(gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService) {
         this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
-        this.upgradeStarService = upgradeStarService;
+        this.starUpgradeService = starUpgradeService;
     }
 
     async getGalaxy(gameId, userId) {
@@ -249,15 +249,15 @@ module.exports = class GameGalaxyService {
     }
 
     _setUpgradeCosts(game, star) {
-        const expenseConfig = this.upgradeStarService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+        const expenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
 
         // Calculate upgrade costs for the star.
         star.upgradeCosts = { };
 
-        star.upgradeCosts.economy = this.upgradeStarService.calculateEconomyCost(expenseConfig, star.economy, star.terraformedResources);
-        star.upgradeCosts.industry = this.upgradeStarService.calculateIndustryCost(expenseConfig, star.industry, star.terraformedResources);
-        star.upgradeCosts.science = this.upgradeStarService.calculateScienceCost(expenseConfig, star.science, star.terraformedResources);
-        star.upgradeCosts.warpGate = this.upgradeStarService.calculateWarpGateCost(expenseConfig, star.terraformedResources);
+        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(expenseConfig, star.economy, star.terraformedResources);
+        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(expenseConfig, star.industry, star.terraformedResources);
+        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(expenseConfig, star.science, star.terraformedResources);
+        star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(expenseConfig, star.terraformedResources);
     }
 
 };

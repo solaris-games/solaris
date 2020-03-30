@@ -1,12 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
-
-const bcrypt = require('bcrypt');
-const User = require('../models/User');
-const UserService = require('../services/user');
-
-const userService = new UserService(bcrypt, User);
+const container = require('./container');
 
 router.post('/', async (req, res, next) => {
     let errors = [];
@@ -28,7 +23,7 @@ router.post('/', async (req, res, next) => {
     }
 
     try {
-        let exists = await userService.userExists(req.body.username);
+        let exists = await container.userService.userExists(req.body.username);
 
         if (exists) {
             return res.status(400).json({
@@ -38,7 +33,7 @@ router.post('/', async (req, res, next) => {
             });
         }
         
-        let userId = await userService.create({
+        let userId = await container.userService.create({
             email: req.body.email,
             username: req.body.username,
             password: req.body.password
@@ -52,7 +47,7 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', middleware.authenticate, async (req, res, next) => {
     try {
-        let user = await userService.getMe(req.session.userId);
+        let user = await container.userService.getMe(req.session.userId);
 
         return res.status(200).json(user);
     } catch (err) {
@@ -62,7 +57,7 @@ router.get('/', middleware.authenticate, async (req, res, next) => {
 
 router.get('/:id', middleware.authenticate, async (req, res, next) => {
     try {
-        let user = await userService.getById(req.params.id);
+        let user = await container.userService.getById(req.params.id);
 
         return res.status(200).json(user);
     } catch (err) {
@@ -72,7 +67,7 @@ router.get('/:id', middleware.authenticate, async (req, res, next) => {
 
 router.post('/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
     try {
-        userService.updateEmailPreference(req.session.userId, req.body.enabled);
+        await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
         
         return res.sendStatus(200);
     } catch (err) {
@@ -92,7 +87,7 @@ router.post('/changeEmailAddress', middleware.authenticate, async (req, res, nex
     }
 
     try {
-        userService.updateEmailAddress(req.session.userId, req.body.email);
+        await container.userService.updateEmailAddress(req.session.userId, req.body.email);
 
         return res.sendStatus(200);
     } catch (err) {
@@ -116,7 +111,7 @@ router.post('/changePassword', middleware.authenticate, async (req, res, next) =
     }
 
     try {
-        await userService.updatePassword(
+        await container.userService.updatePassword(
             req.session.userId, 
             req.body.currentPassword,
             req.body.newPassword);
