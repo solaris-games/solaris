@@ -1,4 +1,4 @@
-
+const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService {
 
@@ -12,7 +12,7 @@ module.exports = class TradeService {
         let toPlayer = game.galaxy.players.find(x => x.id === toPlayerId);
 
         if (fromPlayer.cash < amount) {
-            throw new Error(`The player does not own ${amount} credits.`);
+            throw new ValidationError(`The player does not own ${amount} credits.`);
         }
 
         fromPlayer.cash -= amount;
@@ -27,11 +27,11 @@ module.exports = class TradeService {
         let toPlayer = game.galaxy.players.find(x => x.id === toPlayerId);
 
         if (fromPlayer === toPlayer) {
-            throw new Error(`Cannot award renown to yourself.`);
+            throw new ValidationError(`Cannot award renown to yourself.`);
         }
 
         if (fromPlayer.renownToGive < amount) {
-            throw new Error(`The player does not own ${amount} renown to award.`);
+            throw new ValidationError(`The player does not own ${amount} renown to award.`);
         }
 
         // Get the user of the player to award renown to.

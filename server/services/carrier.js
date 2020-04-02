@@ -1,8 +1,10 @@
+const ValidationError = require('../errors/validation');
+
 module.exports = class CarrierService {
 
     createAtStar(star, ships = 1) {
         if (!star.garrison) {
-            throw new Error('Star must have a garrison to build a carrier.');
+            throw new ValidationError('Star must have a garrison to build a carrier.');
         }
 
         let carrier = {

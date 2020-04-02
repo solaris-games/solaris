@@ -1,3 +1,5 @@
+const ValidationError = require('../errors/validation');
+
 const BASE_COSTS = {
     WARP_GATE: 100,
     ECONOMY: 2.5,
@@ -33,11 +35,11 @@ module.exports = class StarUpgradeService {
         let userPlayer = getUserPlayer(game, userId);
 
         if (star.ownedByPlayerId.toString() !== userPlayer.id) {
-            throw new Error(`Cannot upgrade, the star is not owned by the current player.`);
+            throw new ValidationError(`Cannot upgrade, the star is not owned by the current player.`);
         }
 
         if (star.warpGate) {
-            throw new Error(`The star already has a warp gate.`);
+            throw new ValidationError(`The star already has a warp gate.`);
         }
 
         const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
@@ -45,7 +47,7 @@ module.exports = class StarUpgradeService {
         const cost = this.calculateWarpGateCost(expenseConfig, terraformedResources);
 
         if (userPlayer.cash < cost) {
-            throw new Error(`The player does not own enough credits to afford to upgrade.`);
+            throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         star.warpGate = true;
@@ -62,11 +64,11 @@ module.exports = class StarUpgradeService {
         let userPlayer = getUserPlayer(game, userId);
 
         if (star.ownedByPlayerId.toString() !== userPlayer.id) {
-            throw new Error(`Cannot destroy warp gate, the star is not owned by the current player.`);
+            throw new ValidationError(`Cannot destroy warp gate, the star is not owned by the current player.`);
         }
 
         if (!star.warpGate) {
-            throw new Error(`The star does not have a warp gate to destroy.`);
+            throw new ValidationError(`The star does not have a warp gate to destroy.`);
         }
 
         star.warpGate = false;
@@ -82,7 +84,7 @@ module.exports = class StarUpgradeService {
         let userPlayer = getUserPlayer(game, userId);
 
         if (star.ownedByPlayerId.toString() !== userPlayer.id) {
-            throw new Error(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
+            throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
         const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
@@ -90,7 +92,7 @@ module.exports = class StarUpgradeService {
         const cost = calculateCostCallback(expenseConfig, star[economyType], terraformedResources);
 
         if (userPlayer.cash < cost) {
-            throw new Error(`The player does not own enough credits to afford to upgrade.`);
+            throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         star[economyType]++;

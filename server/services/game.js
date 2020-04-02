@@ -1,4 +1,5 @@
 const moment = require('moment');
+const ValidationError = require('../errors/validation');
 
 module.exports = class GameService {
 
@@ -22,31 +23,31 @@ module.exports = class GameService {
     async join(game, userId, playerId, alias) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {
-            throw new Error('The game has already started.');
+            throw new ValidationError('The game has already started.');
         }
 
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
-            throw new Error('The game has already finished.');
+            throw new ValidationError('The game has already finished.');
         }
 
         // Disallow if they are already in the game as another player.
         let existing = game.galaxy.players.find(x => x.userId === userId);
 
         if (existing) {
-            throw new Error('The user is already participating in this game.');
+            throw new ValidationError('The user is already participating in this game.');
         }
 
         // Get the player and update it to assign the user to the player.
         let player = game.galaxy.players.find(x => x._id.toString() === playerId);
 
         if (!player) {
-            throw new Error('The player does not exist in this game.');
+            throw new ValidationError('The player is not participating in this game.');
         }
 
         // Only allow if the player isn't already occupied.
         if (player && player.userId) {
-            throw new Error('This player has already been taken by another user.');
+            throw new ValidationError('This player spot has already been taken by another user.');
         }
 
         // TODO: Factor in player type setting. i.e premium players only.
@@ -79,7 +80,7 @@ module.exports = class GameService {
         let player = game.galaxy.players.find(x => x.userId == userId);
 
         if (!player) {
-            throw new Error('The user is not participating in this game.');
+            throw new ValidationError('The user is not participating in this game.');
         }
 
         player.defeated = true;

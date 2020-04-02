@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ValidationError = require('../errors/validation');
 
 module.exports = class StarService {
 
@@ -56,7 +57,7 @@ module.exports = class StarService {
         let userPlayer = game.galaxy.players.find(x => x.userId === userId);
 
         if ((star.ownedByPlayerId || '').toString() !== userPlayer.id) {
-            throw new Error(`Cannot abandon a star that is not owned by the player.`);
+            throw new ValidationError(`Cannot abandon a star that is not owned by the player.`);
         }
 
         star.ownedByPlayerId = null;

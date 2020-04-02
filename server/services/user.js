@@ -1,3 +1,5 @@
+const ValidationError = require('../errors/validation');
+
 module.exports = class UserService {
     
     constructor(bcrypt, userModel) {
@@ -73,7 +75,7 @@ module.exports = class UserService {
 
             return await user.save();
         } else {
-            throw new Error('The current password is incorrect.');
+            throw new ValidationError('The current password is incorrect.');
         }
     }
 
