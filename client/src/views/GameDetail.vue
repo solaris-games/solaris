@@ -2,8 +2,6 @@
   <view-container>
     <view-title title="Game Detail" navigation="main-menu"/>
 
-    <img :src="getServerGameImage(game)">
-
     <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
 
     <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
@@ -50,11 +48,6 @@ export default {
       this.game = response.data
     } catch (err) {
       console.error(err)
-    }
-  },
-  methods: {
-    getServerGameImage () {
-      return '' // TODO
     }
   }
 }

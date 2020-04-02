@@ -18,12 +18,12 @@
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
-                  <button class="btn btn-primary"><i class="fas fa-envelope"></i></button>
+                  <button class="btn btn-success"><i class="fas fa-envelope"></i></button>
                   <button class="btn btn-info ml-1"><i class="fas fa-chart-line"></i></button>
               </div>
           </div>
       </div>
-      <div class="col pr-0">
+      <div class="col pr-0 bg-secondary">
           <statistics :game="game" :player="player"/>
       </div>
   </div>

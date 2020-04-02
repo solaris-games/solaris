@@ -1,8 +1,8 @@
 <template>
-<div class="container bg-secondary">
+<div class="container">
     <h3 class="pt-2">{{star.data.name}}</h3>
 
-    <div class="row bg-light">
+    <div class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="star.data.ownedByPlayerId == currentPlayerId">A star under your command.</p>
         <p v-if="star.data.ownedByPlayerId != null && star.data.ownedByPlayerId != currentPlayerId">This star is controlled by [{{getStarOwningPlayer().alias}}].</p>
@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <div v-if="star.data.garrison" class="row mb-2 pt-2 pb-2 bg-primary">
+    <div v-if="star.data.garrison" class="row mb-0 pt-3 pb-3 bg-primary">
         <div class="col">
             Ships
         </div>
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <div v-if="star.data.naturalResources" class="row pt-1 pb-1">
+    <div v-if="star.data.naturalResources" class="row pt-1 pb-1 bg-secondary">
         <div class="col">
             Natural Resources
         </div>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <div v-if="star.data.terraformedResources" class="row mb-2 pt-1 pb-1">
+    <div v-if="star.data.terraformedResources" class="row mb-2 pt-1 pb-1 bg-secondary">
         <div class="col">
             Terraformed Resources
         </div>
@@ -51,26 +51,26 @@
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
-    <div class="row bg-light mt-2" v-if="star.data.manufacturing != null">
+    <div class="row bg-secondary mt-2" v-if="star.data.manufacturing != null">
       <div class="col text-center pt-3">
         <p>This star builds <b>{{star.data.manufacturing}}</b> every tick.</p>
       </div>
     </div>
 
     <!-- TODO: Turn these into components -->
-    <div v-if="getStarOwningPlayer() == getUserPlayer()" class="mt-3">
-      <div class="row">
+    <div v-if="getStarOwningPlayer() == getUserPlayer()" class="mt-2">
+      <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p>Buy a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
+          <p class="mb-2">Buy a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
           <button class="btn btn-block btn-primary">Buy for $0</button>
         </div>
       </div>
 
-      <div class="row">
+      <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p>Buy a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
+          <p class="mb-2">Buy a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
           <modalButton v-if="!star.data.warpGate" :disabled="getUserPlayer().cash < star.data.upgradeCosts.warpGate" modalName="upgradeWarpGateModal" classText="btn btn-block btn-primary">Buy for ${{star.data.upgradeCosts.warpGate}}</modalButton>
@@ -78,9 +78,9 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p>Abandon this star for another player to claim. <a href="">Read More</a>.</p>
+          <p class="mb-2">Abandon this star for another player to claim. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
           <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger">Abandon Star</modalButton>
@@ -93,7 +93,7 @@
       <div class="row">
         <div class="col-8">
           TODO: Wording
-          <p>Make your mark on the galaxy by renaming this star. <a href="">Read More</a>.</p>
+          <p class="mb-2">Make your mark on the galaxy by renaming this star. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
           <button class="btn btn-block btn-primary">Rename</button>

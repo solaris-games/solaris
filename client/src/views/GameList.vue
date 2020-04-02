@@ -4,17 +4,30 @@
 
     <h4>Official Games</h4>
 
-    <div v-if="!serverGames.length">
+    <p>These are official games and have standard settings.</p>
+
+    <p v-if="!serverGames.length" class="text-danger">
       There are no official games available.
     </div>
 
-    <div v-if="serverGames.length" v-for="game in serverGames" v-bind:key="game._id">
-        <h4>{{game.settings.general.name}}</h4>
-        <img :src="getServerGameImage(game.settings.general.name)">
-        <p>{{game.state.playerCount}} of {{game.settings.general.playerLimit}} Players</p>
-
-        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">Read More</router-link>
-    </div>
+    <table v-if="serverGames.length" class="table table-striped table-hover">
+        <thead>
+            <tr class="bg-primary">
+                <td>Name</td>
+                <td>Players</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="game in serverGames" v-bind:key="game._id">
+                <td>{{game.settings.general.name}}</td>
+                <td>{{game.state.playerCount}} of {{game.settings.general.playerLimit}}</td>
+                <td>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <hr>
 
@@ -70,11 +83,6 @@ export default {
       this.userGames = response.data
     } catch (err) {
       console.error(err)
-    }
-  },
-  methods: {
-    getServerGameImage (name) {
-      return '' // TODO
     }
   }
 }

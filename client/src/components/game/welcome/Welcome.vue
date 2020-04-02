@@ -1,14 +1,14 @@
 <template>
-<div class="container bg-secondary">
+<div class="container">
     <h3 class="pt-2">Welcome</h3>
 
     <select-alias v-on:onAliasChanged="onAliasChanged"/>
 
     <form-error-list v-bind:errors="errors" class="mt-2"/>
 
-    <select-location :game="game" v-on:onJoinRequested="onJoinRequested"/>
+    <select-colour :game="game" v-on:onJoinRequested="onJoinRequested"/>
 
-    <div class="text-center">
+    <div class="text-center pb-2">
         <p>Invite your friends and take on the Galaxy together!</p>
 
         <p class="mb-0">Send them this address!</p>
@@ -22,13 +22,13 @@ import apiService from '../../../services/apiService'
 
 import FormErrorListVue from '../../FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
-import SelectLocationVue from './SelectLocation.vue'
+import SelectColourVue from './SelectColour.vue'
 
 export default {
   components: {
     'form-error-list': FormErrorListVue,
     'select-alias': SelectAliasVue,
-    'select-location': SelectLocationVue
+    'select-colour': SelectColourVue
   },
   props: {
     game: Object

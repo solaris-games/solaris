@@ -1,5 +1,5 @@
 <template>
-<div class="bg-secondary">
+<div>
     <div class="container">
         <h3 class="pt-2">Galaxy</h3>
 

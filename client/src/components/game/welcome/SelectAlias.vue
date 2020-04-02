@@ -6,7 +6,7 @@
         </div>
     </div>
 
-    <div class="row bg-light">
+    <div class="row bg-secondary">
         <div class="col">
             <form @submit.prevent>
                 <div class="form-group mt-2 text-center">

@@ -1,5 +1,5 @@
 <template>
-<div class="container bg-secondary">
+<div class="container">
     <overview :game="game" :player="player" />
 
     <h4 class="mt-2">Infrastructure</h4>

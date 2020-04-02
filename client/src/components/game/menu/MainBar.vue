@@ -4,7 +4,7 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div class="menu-content">
+    <div class="menu-content bg-light">
       <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
       <div v-if="menuState == MENU_STATES.HELP">HELP</div>
 

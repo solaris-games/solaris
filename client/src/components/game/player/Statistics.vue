@@ -1,5 +1,5 @@
 <template>
-<table class="table table-sm mb-0">
+<table class="table table-sm mb-0 bg-secondary">
     <thead>
         <tr>
             <th></th>

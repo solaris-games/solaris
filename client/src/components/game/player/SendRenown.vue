@@ -1,5 +1,5 @@
 <template>
-<div class="row bg-secondary pt-2 pb-2">
+<div class="row pt-2 pb-2 bg-secondary">
     <div class="col">
         <form>
             <div class="form-row">

@@ -12,7 +12,9 @@
                 <tr v-for="player in game.galaxy.players" v-bind:key="player._id">
                     <td :style="{'width': '8px', 'background-color':player.colour.value.replace('0x', '#')}"></td>
                     <td class="col-avatar">
-                        <img src="">
+                        <!-- TODO: Prefer images over font awesome icons? -->
+                        <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
+                        <!-- <img src=""> -->
                     </td>
                     <td class="pl-2 pt-3 pb-2">
                         <h5 style="vertical-align: middle;">{{player.alias}}</h5>
