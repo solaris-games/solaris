@@ -1,8 +1,14 @@
 <template>
   <view-container>
-    <view-title title="Game List" />
+    <view-title title="Games" />
 
-    <div v-for="game in serverGames" v-bind:key="game._id">
+    <h4>Official Games</h4>
+
+    <div v-if="!serverGames.length">
+      There are no official games available.
+    </div>
+
+    <div v-if="serverGames.length" v-for="game in serverGames" v-bind:key="game._id">
         <h4>{{game.settings.general.name}}</h4>
         <img :src="getServerGameImage(game.settings.general.name)">
         <p>{{game.state.playerCount}} of {{game.settings.general.playerLimit}} Players</p>
@@ -14,7 +20,11 @@
 
     <h4>User Created Games</h4>
 
-    <table class="table table-striped table-hover">
+    <div v-if="!userGames.length">
+      There are no user created games available.
+    </div>
+
+    <table v-if="userGames.length" class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
