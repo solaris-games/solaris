@@ -2,6 +2,7 @@
   <view-container>
     <view-title title="Account" />
 
+    <!--
     <div class="row pt-3 pb-3 bg-info">
       <div class="col">
         <p>Galactic Credits</p>
@@ -10,6 +11,7 @@
         <p class="text-right">{{ info.credits }} Credits</p>
       </div>
     </div>
+    -->
 
     <div class="row pt-3 pb-3 bg-primary">
       <div class="col">

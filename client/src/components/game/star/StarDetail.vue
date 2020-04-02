@@ -87,17 +87,19 @@
         </div>
       </div>
 
+      <!--
       <h4 class="pt-2 text-success">Premium Features</h4>
 
       <div class="row">
         <div class="col-8">
-          <!-- TODO: Wording -->
+          TODO: Wording
           <p>Make your mark on the galaxy by renaming this star. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
           <button class="btn btn-block btn-primary">Rename</button>
         </div>
       </div>
+      -->
     </div>
 
     <playerOverview :game="game" :player="getStarOwningPlayer()" />

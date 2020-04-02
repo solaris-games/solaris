@@ -33,9 +33,11 @@
 
     <sendRenown v-if="player != userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
 
+    <!--
     <h4 class="mt-2">Badges</h4>
 
     <badges v-if="user" :user="user"/>
+    -->
 </div>
 </template>
 

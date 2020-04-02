@@ -11,15 +11,17 @@
     <div class="mt-3">
       <router-link to="/account/achievements" tag="button" class="btn btn-block btn-primary">Achievements</router-link>
       <router-link to="/account/settings" tag="button" class="btn btn-block btn-primary">Account Settings</router-link>
-      <router-link to="/codex" tag="button" class="btn btn-block btn-primary">Help</router-link>
+      <router-link to="/codex" tag="button" class="btn btn-block btn-info">Help</router-link>
     </div>
 
+    <!--
     <div class="mt-3">
       <router-link to="/premium-store" tag="button" class="btn btn-block btn-danger">Premium Store</router-link>
     </div>
+    -->
 
     <div class="mt-3">
-      <button @click="logout" class="btn btn-block btn-primary">Logout</button>
+      <button @click="logout" class="btn btn-block btn-danger">Logout</button>
     </div>
   </view-container>
 </template>

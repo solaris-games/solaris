@@ -23,7 +23,7 @@ module.exports = {
                 errors = [errors];
             }
 
-            return res.status(400).json({
+            return res.status(err.statusCode).json({
                 errors
             });
         }

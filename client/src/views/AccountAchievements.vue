@@ -2,10 +2,12 @@
   <view-container>
     <view-title title="Achievements" />
 
+    <!-- TODO: Will this look nicer on the main menu instead? -->
     <achievements v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
 
     <p class="text-center pt-3">Read more about <a href="">Victory, Rank and Renown</a>.</p>
 
+    <!--
     <view-subtitle title="Badges"/>
 
     <div class="container">
@@ -163,6 +165,7 @@
       </div>
 
     </div>
+    -->
   </view-container>
 </template>
 
