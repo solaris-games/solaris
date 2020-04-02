@@ -56,9 +56,9 @@ router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, m
     }
 });
 
-router.put('/:gameId/star/upgrade/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+router.put('/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
-        await container.starUpgradeService.upgradeWarpGate(
+        await container.starUpgradeService.buildWarpGate(
             req.game,
             req.session.userId,
             req.body.starId);
@@ -72,6 +72,19 @@ router.put('/:gameId/star/upgrade/warpgate', middleware.authenticate, validate, 
 router.put('/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.starUpgradeService.destroyWarpGate(
+            req.game,
+            req.session.userId,
+            req.body.starId);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+});
+
+router.put('/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+    try {
+        await container.starUpgradeService.buildCarrier(
             req.game,
             req.session.userId,
             req.body.starId);

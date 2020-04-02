@@ -8,9 +8,10 @@
         "playerLimit": 8,
         "playerType": "premium",
         "formalAlliances": "disabled",
-        "anonymity": "normal"
+        "anonymity": "standard"
       },
       "specialGalaxy": {
+        "buildCarriers": "standard",
         "buildWarpgates": "cheap",
         "randomGates": "none",
         "darkGalaxy": "start"
@@ -51,13 +52,13 @@
           "weapons": 1
         },
         "researchCosts": {
-          "terraforming": "normal",
-          "experimentation": "normal",
-          "scanning": "normal",
-          "hyperspace": "normal",
-          "manufacturing": "normal",
-          "banking": "normal",
-          "weapons": "normal"
+          "terraforming": "standard",
+          "experimentation": "standard",
+          "scanning": "standard",
+          "hyperspace": "standard",
+          "manufacturing": "standard",
+          "banking": "standard",
+          "weapons": "standard"
         }
       },
       "gameTime": {
@@ -114,8 +115,8 @@
         ],
         "anonymity": [
           {
-            "value": "normal",
-            "text": "Normal"
+            "value": "standard",
+            "text": "Standard"
           },
           {
             "value": "extra",
@@ -124,6 +125,20 @@
         ]
       },
       "specialGalaxy": {
+        "buildCarriers": [
+          {
+            "value": "cheap",
+            "text": "Cheap"
+          },
+          {
+            "value": "standard",
+            "text": "Standard"
+          },
+          {
+            "value": "expensive",
+            "text": "Expensive"
+          }
+        ],
         "buildWarpgates": [
           {
             "value": "none",
@@ -376,8 +391,8 @@
             "text": "Cheap"
           },
           {
-            "value": "normal",
-            "text": "Normal"
+            "value": "standard",
+            "text": "Standard"
           },
           {
             "value": "expensive",

@@ -20,14 +20,16 @@ module.exports = class StarUpgradeService {
     EXPENSE_CONFIGS = {
         cheap: 1,
         standard: 2,
-        expensive: 4
+        expensive: 4,
+        veryExpensive: 8,
+        crazyExpensive: 16
     };
 
     constructor(starService) {
         this.starService = starService;
     }
 
-    async upgradeWarpGate(game, userId, starId) {
+    async buildWarpGate(game, userId, starId) {
         // Get the star.
         let star = getStar(game, starId);
 
@@ -76,7 +78,54 @@ module.exports = class StarUpgradeService {
         await game.save();
     }
 
-    async _upgradeInfrastructure(game, userId, starId, economyType, calculateCostCallback) {
+    async buildCarrier(game, userId, starId) {
+        // Get the star.
+        let star = getStar(game, starId);
+
+        // Check whether the star is owned by the current user.
+        let userPlayer = getUserPlayer(game, userId);
+
+        if (star.ownedByPlayerId.toString() !== userPlayer.id) {
+            throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
+        }
+
+        const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildCarriers];
+        const cost = this.calculateCarrierCost(expenseConfig);
+
+        if (userPlayer.cash < cost) {
+            throw new ValidationError(`The player does not own enough credits to afford to build a carrier.`);
+        }
+
+        const ships = 1; // TODO: Need to get this from body?
+
+        if (star.garrison < ships) {
+            throw new ValidationError(`The star does not have enough ships garrisoned (${ships}) to build the carrier.`);
+        }
+
+        // We need a name for the carrier, so use the star name
+        // and add one to it until we find a name that isn't taken.
+        let i = 1;
+        let name = `${star.name} ${i}`;
+
+        while (userPlayer.carriers.find(c => c.name == name)) {
+            name = `${star.name} ${i++}`;
+        }
+
+        // Create the carrier at the star.
+        userPlayer.carriers.push({
+            orbiting: star._id,
+            name,
+            ships,
+            location: star.location
+        });
+
+        star.garrison -= ships;
+        userPlayer.cash -= cost;
+
+        await game.save();
+    }
+
+    async _upgradeInfrastructure(game, userId, starId, expenseConfigKey, economyType, calculateCostCallback) {
         // Get the star.
         let star = getStar(game, starId);
 
@@ -87,7 +136,7 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
-        const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+        const expenseConfig = this.EXPENSE_CONFIGS[expenseConfigKey];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
         const cost = calculateCostCallback(expenseConfig, star[economyType], terraformedResources);
 
@@ -102,15 +151,15 @@ module.exports = class StarUpgradeService {
     }
 
     async upgradeEconomy(game, userId, starId) {
-        return await this._upgradeInfrastructure(game, userId, starId, 'economy', this.calculateEconomyCost.bind(this));
+        return await this._upgradeInfrastructure(game, userId, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this));
     }
 
     async upgradeIndustry(game, userId, starId) {
-        return await this._upgradeInfrastructure(game, userId, starId, 'industry', this.calculateIndustryCost.bind(this));
+        return await this._upgradeInfrastructure(game, userId, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
     }
 
     async upgradeScience(game, userId, starId) {
-        return await this._upgradeInfrastructure(game, userId, starId, 'science', this.calculateScienceCost.bind(this));
+        return await this._upgradeInfrastructure(game, userId, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
     }
 
     calculateWarpGateCost(expenseConfig, terraformedResources) {
@@ -131,6 +180,10 @@ module.exports = class StarUpgradeService {
 
     _calculateInfrastructureCost(baseCost, expenseConfig, current, terraformedResources) {
         return Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100));
+    }
+
+    calculateCarrierCost(expenseConfig) {
+        return (expenseConfig * 10) + 5; // TODO: Is this right?
     }
 
 };

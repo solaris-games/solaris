@@ -240,15 +240,20 @@ module.exports = class GameGalaxyService {
     }
 
     _setUpgradeCosts(game, star) {
-        const expenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+        const economyExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.player.developmentCost.economy];
+        const industryExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.player.developmentCost.industry];
+        const scienceExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.player.developmentCost.science];
+        const warpGateExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+        const carrierExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildCarriers];
 
         // Calculate upgrade costs for the star.
         star.upgradeCosts = { };
 
-        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(expenseConfig, star.economy, star.terraformedResources);
-        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(expenseConfig, star.industry, star.terraformedResources);
-        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(expenseConfig, star.science, star.terraformedResources);
-        star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(expenseConfig, star.terraformedResources);
+        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(economyExpenseConfig, star.economy, star.terraformedResources);
+        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(industryExpenseConfig, star.industry, star.terraformedResources);
+        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(scienceExpenseConfig, star.science, star.terraformedResources);
+        star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(warpGateExpenseConfig, star.terraformedResources);
+        star.upgradeCosts.carriers = this.starUpgradeService.calculateCarrierCost(carrierExpenseConfig);
     }
 
 };

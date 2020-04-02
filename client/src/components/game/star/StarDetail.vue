@@ -61,19 +61,19 @@
     <div v-if="getStarOwningPlayer() == getUserPlayer()" class="mt-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p class="mb-2">Buy a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
+          <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <button class="btn btn-block btn-primary">Buy for $0</button>
+          <modalButton :disabled="getUserPlayer().cash < star.data.upgradeCosts.carriers" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.carriers}}</modalButton>
         </div>
       </div>
 
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p class="mb-2">Buy a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
+          <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton v-if="!star.data.warpGate" :disabled="getUserPlayer().cash < star.data.upgradeCosts.warpGate" modalName="upgradeWarpGateModal" classText="btn btn-block btn-primary">Buy for ${{star.data.upgradeCosts.warpGate}}</modalButton>
+          <modalButton v-if="!star.data.warpGate" :disabled="getUserPlayer().cash < star.data.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.warpGate}}</modalButton>
           <modalButton v-if="star.data.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger">Destroy Gate</modalButton>
         </div>
       </div>
@@ -106,12 +106,17 @@
 
     <!-- Modals -->
 
-    <dialogModal modalName="upgradeWarpGateModal" titleText="Update Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmUpgradeWarpGate">
-      <p>Are you sure you want buy a Warp Gate at <b>{{star.data.name}}</b>?</p>
-      <p>The upgrade will cost $0.</p>
+    <dialogModal modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
+      <p>Are you sure you want build a Carrier at <b>{{star.data.name}}</b>?</p>
+      <p>The carrier will cost ${{star.data.upgradeCosts.carriers}}.</p>
     </dialogModal>
 
-    <dialogModal modalName="destroyWarpGateModal" titleText="Update Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmDestroyWarpGate">
+    <dialogModal modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+      <p>Are you sure you want build a Warp Gate at <b>{{star.data.name}}</b>?</p>
+      <p>The upgrade will cost ${{star.data.upgradeCosts.warpGate}}.</p>
+    </dialogModal>
+
+    <dialogModal modalName="destroyWarpGateModal" titleText="Destroy Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmDestroyWarpGate">
       <p>Are you sure you want destroy Warp Gate at <b>{{star.data.name}}</b>?</p>
     </dialogModal>
 
@@ -161,6 +166,19 @@ export default {
       this.star.data[e]++
       this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e]
     },
+    async confirmBuildCarrier (e) {
+      try {
+        let response = await ApiService.buildCarrier(this.game._id, this.star.data._id);
+
+        if (response.status == 200) {
+          // TODO: Refresh somehow.
+
+          this.$emit('onCarrierBuilt', this.star.data._id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     async confirmAbandonStar (e) {
       try {
         let response = await ApiService.abandonStar(this.game._id, this.star.data._id);
@@ -176,9 +194,9 @@ export default {
         console.error(err)
       }
     },
-    async confirmUpgradeWarpGate (e) {
+    async confirmBuildWarpGate (e) {
       try {
-        let response = await ApiService.upgradeWarpGate(this.game._id, this.star.data._id);
+        let response = await ApiService.buildWarpGate(this.game._id, this.star.data._id);
 
         if (response.status == 200) {
           // TODO: This doesn't refresh the UI for some reason.

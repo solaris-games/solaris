@@ -72,6 +72,15 @@
       <view-subtitle title="Special Galaxy Settings"/>
 
       <div class="form-group">
+        <label for="buildCarriers" class="col-form-label">Build Carriers</label>
+        <select class="form-control" id="buildCarriers" v-model="settings.specialGalaxy.buildCarriers">
+          <option v-for="opt in options.specialGalaxy.buildCarriers" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }} Carriers
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="buildWarpgates" class="col-form-label">Build Warpgates</label>
         <select class="form-control" id="buildWarpgates" v-model="settings.specialGalaxy.buildWarpgates">
           <option v-for="opt in options.specialGalaxy.buildWarpgates" v-bind:key="opt.value" v-bind:value="opt.value">

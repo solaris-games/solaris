@@ -155,8 +155,8 @@ class ApiService {
     { withCredentials: true })
   }
 
-  upgradeWarpGate (gameId, starId) {
-    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/upgrade/warpgate', {
+  buildWarpGate (gameId, starId) {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/build/warpgate', {
       starId
     },
     { withCredentials: true })
@@ -171,6 +171,13 @@ class ApiService {
 
   abandonStar (gameId, starId) {
     return axios.put('http://localhost:3000/api/game/' + gameId + '/star/abandon', {
+      starId
+    },
+    { withCredentials: true })
+  }
+
+  buildCarrier (gameId, starId) {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/star/build/carrier', {
       starId
     },
     { withCredentials: true })
