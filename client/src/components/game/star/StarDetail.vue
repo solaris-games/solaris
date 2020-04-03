@@ -64,7 +64,7 @@
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton :disabled="getUserPlayer().cash < star.data.upgradeCosts.carriers" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.carriers}}</modalButton>
+          <modalButton :disabled="getUserPlayer().cash < star.data.upgradeCosts.carriers || star.data.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.carriers}}</modalButton>
         </div>
       </div>
 
