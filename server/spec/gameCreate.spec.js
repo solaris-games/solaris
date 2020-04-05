@@ -90,7 +90,7 @@ describe('gameCreate', () => {
         let game = await service.create(settings);
 
         // Assert
-        let expectedStarCount = starsPerPlayer * playerLimit * 2.5;
+        let expectedStarCount = starsPerPlayer * 2 * playerLimit;
 
         expect(game._doc.state.stars).toBe(expectedStarCount);
 

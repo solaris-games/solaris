@@ -12,7 +12,7 @@ module.exports = class GameCreateService {
         });
 
         // Calculate how many stars we need.
-        game._doc.state.stars = game._doc.settings.galaxy.starsPerPlayer * game._doc.settings.general.playerLimit * 2.5;
+        game._doc.state.stars = game._doc.settings.galaxy.starsPerPlayer * 2 * game._doc.settings.general.playerLimit;
         game._doc.state.starsForVictory = (game._doc.state.stars / 100) * game._doc.settings.general.starVictoryPercentage;
 
         // Create all of the stars required.
