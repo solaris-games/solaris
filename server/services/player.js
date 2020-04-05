@@ -65,17 +65,28 @@ module.exports = class PlayerService {
 
             player.carriers.push(homeCarrier);
 
-            // Get X closest stars to the home star and also give those to
-            // the player.
-            let closestStarsToHome = this.starDistanceService.getClosestUnownedStars(homeStar, allStars, gameSettings.player.startingStars - 1);
+            players.push(player);
+        }
 
-            // Set up the closest stars.
-            closestStarsToHome.forEach(s => {
+        // Now that all players have a home star, the fairest way to distribute stars to players is to
+        // iterate over each player and give them 1 star at a time, this is arguably the fairest way
+        // otherwise we'll end up with the last player potentially having a really bad position as their
+        // stars could be miles away from their home star.
+        let starsToDistribute = gameSettings.player.startingStars - 1;
+
+        while (starsToDistribute--) {
+            for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
+                let player = players[playerIndex];
+                let homeStar = allStars.find(s => player.homeStarId == s._id);
+
+                // Get X closest stars to the home star and also give those to
+                // the player.
+                let s = this.starDistanceService.getClosestUnownedStar(homeStar, allStars);
+
+                // Set up the closest star.
                 s.ownedByPlayerId = player._id;
                 s.garrison = gameSettings.player.startingShips;
-            });
-
-            players.push(player);
+            }
         }
 
         return players;

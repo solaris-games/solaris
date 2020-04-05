@@ -35,6 +35,10 @@ module.exports = class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
+    getClosestUnownedStar(star, stars) {
+        return this.getClosestUnownedStars(star, stars, 1)[0];
+    }
+
     getClosestOwnedStars(star, stars, amount) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
