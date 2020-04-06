@@ -19,13 +19,14 @@
             </tr>
         </thead>
         <tbody>
-            <star-row v-for="star in getTableData()" v-bind:key="star._id" :data="star" />
+            <star-row v-for="star in getTableData()" v-bind:key="star._id" :star="star" :game="game"/>
         </tbody>
     </table>
 </div>
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
 import StarRowVue from './StarRow'
 
 export default {
@@ -37,66 +38,23 @@ export default {
   },
   data: function () {
     return {
-      stars: [
-        {
-          _id: 1,
-          playerId: 1,
-          name: 'Test Star',
-          economy: 1,
-          industry: 2,
-          science: 0,
-          economyCost: 45,
-          industryCost: 79,
-          scienceCost: 153
-        },
-        {
-          _id: 2,
-          playerId: 1,
-          name: 'Test Star 2',
-          economy: 6,
-          industry: 3,
-          science: 2,
-          economyCost: 66,
-          industryCost: 234,
-          scienceCost: 400
-        },
-        {
-          _id: 3,
-          playerId: 2,
-          name: 'Test Star 3',
-          economy: 5,
-          industry: 5,
-          science: 3
-          // TODO: Are these known values when in scanning range?
-          // economyCost: 45,
-          // industryCost: 79,
-          // scienceCost: 153
-        },
-        {
-          _id: 4,
-          playerId: 2,
-          name: 'Test Star 3',
-          economy: '?',
-          industry: '?',
-          science: '?'
-          // TODO: Are these known values when in scanning range?
-          // economyCost: 45,
-          // industryCost: 79,
-          // scienceCost: 153
-        }
-      ],
       showAll: false
     }
   },
   methods: {
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+    },
     toggleShowAll () {
       this.showAll = !this.showAll
     },
     getTableData () {
+      let sorter = (a, b) => a.name.localeCompare(b.name)
+      
       if (this.showAll) {
-        return this.stars
+        return this.game.galaxy.stars.sort(sorter)
       } else {
-        return this.stars.filter(x => x.playerId === 1)
+        return this.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     }
   }

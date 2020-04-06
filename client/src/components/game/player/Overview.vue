@@ -2,7 +2,7 @@
 <div>
   <!-- TODO: Text for premium player and lifetime premium player -->
   <h3 class="pt-2">Player</h3>
-
+  
   <div class="row" :style="{'background-color':player.colour.value.replace('0x', '#')}">
       <div class="col">
           <h4 class="pt-2">{{player.alias}}</h4>

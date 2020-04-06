@@ -235,7 +235,7 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
-    this.isSelected = !this.isSelected
+    this.isSelected = true //!this.isSelected
 
     this.emit('onStarClicked', this)
   }

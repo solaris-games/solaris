@@ -1,23 +1,43 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle"></i>{{data.playerId}}</td>
-    <td>{{data.name}}</td>
-    <td><i class="far fa-eye"></i></td>
-    <td>{{data.economy}}</td>
-    <td>{{data.industry}}</td>
-    <td>{{data.science}}</td>
-    <td>{{data.economyCost}}</td>
-    <td>{{data.industryCost}}</td>
-    <td>{{data.scienceCost}}</td>
+    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': getColour() }"></i>{{star.playerId}}</td>
+    <td><a href="#" @click="clickStar">{{star.name}}</a></td>
+    <td><a href="#" @click="goToStar"><i class="far fa-eye"></i></a></td>
+    <td>{{star.economy}}</td>
+    <td>{{star.industry}}</td>
+    <td>{{star.science}}</td>
+    <td><span v-if="star.upgradeCosts">${{star.upgradeCosts.economy}}</span></td>
+    <td><span v-if="star.upgradeCosts">${{star.upgradeCosts.industry}}</span></td>
+    <td><span v-if="star.upgradeCosts">${{star.upgradeCosts.science}}</span></td>
 </tr>
 </template>
 
 <script>
+import gameContainer from '../../../game/container'
+
 export default {
   components: {
   },
   props: {
-    data: null
+    game: Object,
+    star: Object
+  },
+  methods: {
+    getColour () {
+      let owningPlayer = this.game.galaxy.players.find(x => x._id === this.star.ownedByPlayerId)
+
+      return owningPlayer.colour.value.replace('0x', '#')
+    },
+    clickStar (e) {
+      gameContainer.map.clickStar(this.star._id)
+
+      e.preventDefault()
+    },
+    goToStar (e) {
+      gameContainer.map.zoomToStar(this.star)
+
+      e.preventDefault()
+    }
   }
 }
 </script>

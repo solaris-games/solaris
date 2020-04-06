@@ -51,8 +51,7 @@ import GameContainer from '../../../game/container'
 export default {
   props: {
     game: Object,
-    nextProduction: Date,
-    onMenuStateChanged: Function
+    nextProduction: Date
   },
   data () {
     return {

@@ -54,7 +54,7 @@ export default {
       player: null,
       options: [
         { text: 'Scanning', value: 'scanning' },
-        { text: 'Hyperspace Range', value: 'hyperspaceRange' },
+        { text: 'Hyperspace Range', value: 'hyperspace' },
         { text: 'Terraforming', value: 'terraforming' },
         { text: 'Experimentation', value: 'experimentation' },
         { text: 'Weapons', value: 'weapons' },

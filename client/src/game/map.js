@@ -66,17 +66,33 @@ class Map extends EventEmitter {
     this.zoomToPlayer(game, player)
   }
 
-  onStarClicked (e) {
+  zoomToStar (star) {
+    gameContainer.viewport.fitWorld()
+    gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true)
+    gameContainer.viewport.moveCenter(star.location.x, star.location.y)
+  }
+
+  clickStar (starId) {
+    let star = this.stars.find(s => s.data._id === starId)
+
+    star.onClicked()
+  }
+
+  unselectAllStarsExcept (star) {
     this.stars
-      .filter(s => s.isSelected || s.data._id === e.data._id) // Get only stars that are selected or the e star.
+      .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
       .forEach(s => {
         // Set all other stars to unselected.
-        if (s.data._id !== e.data._id) {
+        if (s.data._id !== star.data._id) {
           s.isSelected = false
         }
 
         s.draw()
       })
+  }
+
+  onStarClicked (e) {
+    this.unselectAllStarsExcept(e)
 
     this.emit('onStarClicked', e)
   }

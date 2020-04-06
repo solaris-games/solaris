@@ -19,10 +19,10 @@
             </tr>
             <tr>
                 <td>Hyperspace Range</td>
-                <td class="text-right">{{player.research.hyperspaceRange.level}}</td>
+                <td class="text-right">{{player.research.hyperspace.level}}</td>
                 <td v-if="userPlayer && player != userPlayer" class="text-right"
-                    :class="{'text-success': userPlayer.research.hyperspaceRange.level > player.research.hyperspaceRange.level,
-                            'text-danger': userPlayer.research.hyperspaceRange.level < player.research.hyperspaceRange.level}">{{userPlayer.research.hyperspaceRange.level}}</td>
+                    :class="{'text-success': userPlayer.research.hyperspace.level > player.research.hyperspace.level,
+                            'text-danger': userPlayer.research.hyperspace.level < player.research.hyperspace.level}">{{userPlayer.research.hyperspace.level}}</td>
             </tr>
             <tr>
                 <td>Terraforming</td>

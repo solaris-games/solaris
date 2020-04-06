@@ -15,7 +15,7 @@
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
       <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
-      <galaxy v-if="menuState == MENU_STATES.GALAXY"/>
+      <galaxy v-if="menuState == MENU_STATES.GALAXY" :game="game"/>
     </div>
 </div>
 </template>

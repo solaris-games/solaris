@@ -102,16 +102,16 @@
       -->
     </div>
 
-    <playerOverview :game="game" :player="getStarOwningPlayer()" />
+    <playerOverview v-if="getStarOwningPlayer()" :game="game" :player="getStarOwningPlayer()" />
 
     <!-- Modals -->
 
-    <dialogModal modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
+    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer()" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
       <p>Are you sure you want build a Carrier at <b>{{star.data.name}}</b>?</p>
       <p>The carrier will cost ${{star.data.upgradeCosts.carriers}}.</p>
     </dialogModal>
 
-    <dialogModal modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer()" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
       <p>Are you sure you want build a Warp Gate at <b>{{star.data.name}}</b>?</p>
       <p>The upgrade will cost ${{star.data.upgradeCosts.warpGate}}.</p>
     </dialogModal>

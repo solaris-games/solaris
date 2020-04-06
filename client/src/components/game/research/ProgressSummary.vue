@@ -10,8 +10,8 @@
             </tr>
             <tr>
                 <td>Hyperspace Range</td>
-                <td>Level {{research.hyperspaceRange.level}}</td>
-                <td class="text-right">{{research.hyperspaceRange.progress}} of 0</td>
+                <td>Level {{research.hyperspace.level}}</td>
+                <td class="text-right">{{research.hyperspace.progress}} of 0</td>
             </tr>
             <tr>
                 <td>Terraforming</td>

@@ -137,7 +137,7 @@ module.exports = class GameGalaxyService {
             // Ignore stars the player owns, they will always be visible.
             let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
 
-            if (isOwnedByCurrentPlayer) {    
+            if (isOwnedByCurrentPlayer) {
                 // Calculate infrastructure upgrades for the star.
                 this._setUpgradeCosts(doc, s);
                 
@@ -215,7 +215,7 @@ module.exports = class GameGalaxyService {
                 colour: p.colour,
                 research: {
                     scanning: { level: p.research.scanning.level },
-                    hyperspaceRange: { level: p.research.hyperspaceRange.level },
+                    hyperspace: { level: p.research.hyperspace.level },
                     terraforming: { level: p.research.terraforming.level },
                     experimentation: { level: p.research.experimentation.level },
                     weapons: { level: p.research.weapons.level },

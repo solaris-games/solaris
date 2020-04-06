@@ -27,7 +27,7 @@ const schema = new Schema({
             level: { type: Types.Number, required: true, default: 1  },
             progress: { type: Types.Number, required: true, default: 0  },
         },
-        hyperspaceRange: {
+        hyperspace: {
             level: { type: Types.Number, required: true, default: 1  },
             progress: { type: Types.Number, required: true, default: 0  },
         },
