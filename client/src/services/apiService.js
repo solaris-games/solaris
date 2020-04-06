@@ -99,6 +99,11 @@ class ApiService {
     { withCredentials: true })
   }
 
+  quitGame (gameId) {
+    return axios.post('http://localhost:3000/api/game/' + gameId + '/quit', null,
+      { withCredentials: true })
+  }
+
   concedeDefeat (gameId) {
     return axios.post('http://localhost:3000/api/game/' + gameId + '/concedeDefeat', null,
       { withCredentials: true })

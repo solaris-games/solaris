@@ -71,16 +71,52 @@ module.exports = class GameService {
         return await game.save();
     }
 
-    async concedeDefeat(game, userId) {    
-        // TODO: Disallow if they have already been defeated.
-        // TODO: General checks to ensure that the game hasn't finished
-        //       or anything weird like that.
+    async quit(game, userId) {    
+        // TODO: Something to prevent the user from being able rejoin a game.
 
         // Get the player that is linked to this user.
         let player = game.galaxy.players.find(x => x.userId == userId);
 
         if (!player) {
             throw new ValidationError('The user is not participating in this game.');
+        }
+
+        if (game.state.startDate) {
+            throw new ValidationError('Cannot quit a game that has started.');
+        }
+
+        if (game.state.endDate) {
+            throw new ValidationError('Cannot quit a game that has finished.');
+        }
+
+        // TODO: Something to consider here is whether the player has done something
+        // to their empire, i.e upgrading stars etc, we should prevent the player from
+        // doing this otherwise we'd have to reset everything here which will be a pain.
+        player.userId = null;
+        player.alias = "Empty Slot";
+        game.state.playerCount--; // TODO: Is there a better way to do this? Some kind of computed column?
+
+        return await game.save();
+    }
+
+    async concedeDefeat(game, userId) {    
+        // Get the player that is linked to this user.
+        let player = game.galaxy.players.find(x => x.userId == userId);
+
+        if (!player) {
+            throw new ValidationError('The user is not participating in this game.');
+        }
+
+        if (player.defeated) {
+            throw new ValidationError('The player has already been defeated.');
+        }
+
+        if (!game.state.startDate) {
+            throw new ValidationError('Cannot concede defeat in a game that has not yet started.');
+        }
+
+        if (game.state.endDate) {
+            throw new ValidationError('Cannot concede defeat in a game that has finished.');
         }
 
         player.defeated = true;

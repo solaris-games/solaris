@@ -37,8 +37,18 @@ module.exports = class GameListService {
 
     async listActiveGames(userId) {
         return await this.gameModel.find({
-            'galaxy.players': { $elemMatch: { userId } },
-            'state.endDate': { $eq: null }
+            'galaxy.players': { $elemMatch: { userId } },   // User is in game
+            $and: [                                         // and (game is in progress AND user's player is not defeated)
+                { 'state.endDate': { $eq: null } },
+                { 
+                    'galaxy.players': { 
+                        $elemMatch: { 
+                            userId, 
+                            defeated: { $in: [ null, false ] } // Defeated either not set or is false.
+                        }
+                    }
+                }
+            ]
         })
         .select(SELECTS.INFO)
         .exec();
@@ -46,8 +56,11 @@ module.exports = class GameListService {
 
     async listCompletedGames(userId) {
         return await this.gameModel.find({
-            'galaxy.players': { $elemMatch: { userId } },
-            'state.endDate': { $ne: null }
+            'galaxy.players': { $elemMatch: { userId } },   // User is in game
+            $or: [                                          // and (game is in progress OR user's player is defeated)
+                { 'state.endDate': { $ne: null } },
+                { 'galaxy.players': { $elemMatch: { userId, defeated: true } } }
+            ]
         })
         .sort({
             'state.endDate': -1 // Sort end date descending

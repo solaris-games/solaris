@@ -40,45 +40,39 @@
         </table>
     </div>
 
-    <div class="row" v-if="getUserPlayer() != null && !getUserPlayer().defeated">
+    <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
         <div class="col text-right pr-2">
-            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#concedeDefeatModal">
-                Concede Defeat
-            </button>
+            <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">Quit Game</modalButton>
+            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger">Concede Defeat</modalButton>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="concedeDefeatModal" tabindex="-1" role="dialog" aria-labelledby="concedeDefeatModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="concedeDefeatModalLabel">Concede Defeat</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to concede defeat in this game?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" @click="concedeDefeat">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Modals -->
+    <dialogModal modalName="quitGameModal" titleText="Quit Game" cancelText="No" confirmText="Yes" @onConfirm="quitGame">
+      <p>Are you sure you want to quit this game? Your position will be opened again and you will <b>not</b> be able to rejoin.</p>
+    </dialogModal>
+
+    <dialogModal modalName="concedeDefeatModal" titleText="Concede Defeat" cancelText="No" confirmText="Yes" @onConfirm="concedeDefeat">
+      <p>Are you sure you want to concede defeat in this game?</p>
+    </dialogModal>
 </div>
 </template>
 
 <script>
+import router from '../../../router'
 import apiService from '../../../services/apiService'
 import GameHelper from '../../../services/gameHelper'
 import gameContainer from '../../../game/container'
+import ModalButton from '../../modal/ModalButton'
+import DialogModal from '../../modal/DialogModal'
 
 export default {
   props: {
     game: Object
+  },
+  components: {
+    'modalButton': ModalButton,
+    'dialogModal': DialogModal
   },
   methods: {
     zoomToPlayer (player) {
@@ -95,7 +89,18 @@ export default {
         let response = await apiService.concedeDefeat(this.game._id)
 
         if (response.status === 200) {
-          alert('Defeated')
+            router.push({ name: 'main-menu' })
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async quitGame () {
+      try {
+        let response = await apiService.quitGame(this.game._id)
+
+        if (response.status === 200) {
+            router.push({ name: 'main-menu' })
         }
       } catch (err) {
         console.error(err)

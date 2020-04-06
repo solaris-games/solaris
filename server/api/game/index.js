@@ -91,6 +91,18 @@ router.post('/:gameId/join', middleware.authenticate, middleware.loadGame, async
     }
 });
 
+router.post('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    try {
+        await container.gameService.quit(
+            req.game,
+            req.session.userId);
+            
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+});
+
 router.post('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.gameService.concedeDefeat(
