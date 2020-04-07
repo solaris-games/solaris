@@ -49,6 +49,18 @@ const fakePlayerService = {
         }
 
         return players;
+    },
+    createEmptyPlayerCarriers(stars, players) {
+        let carriers = [];
+
+        for (let i = 0; i < players.length; i++) {
+            carriers.push({
+                _id: i,
+                name: `Carrier ${i}`
+            });
+        }
+
+        return carriers;
     }
 };
 

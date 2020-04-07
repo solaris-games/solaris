@@ -130,9 +130,6 @@ describe('player', () => {
 
             assertNewPlayer(newPlayer);
 
-            // Assert player carriers.
-            expect(newPlayer.carriers.length).toEqual(1);
-
             // Assert owned stars.
             const starsOwned = allStars.filter(x => x.ownedByPlayerId === newPlayer._id);
 
@@ -146,7 +143,7 @@ describe('player', () => {
             // Assert home star.
             const homeStar = allStars.find(x => x._id === newPlayer.homeStarId);
             
-            expect(homeStar.garrison).toEqual(gameSettings.player.startingShips - 1); // -1 because of carrier at this star.
+            expect(homeStar.garrison).toEqual(gameSettings.player.startingShips);
         }
 
         //printStars(allStars);

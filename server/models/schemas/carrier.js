@@ -5,6 +5,7 @@ const Types = Schema.Types;
 const waypointSchema = require('./waypoint');
 
 const schema = new Schema({
+    ownedByPlayerId: { type: Types.ObjectId, required: true },
     orbiting: { type: Types.ObjectId, required: true },
     name: { type: Types.String, required: true },
     ships: { type: Types.Number, required: true },

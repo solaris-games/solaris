@@ -42,7 +42,7 @@ const mapService = new MapService(randomService, starService, distanceService, s
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const gameCreateService = new GameCreateService(GameModel, mapService, playerService);
 const starUpgradeService = new StarUpgradeService(starService);
-const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService);
+const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService);
 
 module.exports = {
     authService,

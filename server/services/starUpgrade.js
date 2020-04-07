@@ -107,12 +107,13 @@ module.exports = class StarUpgradeService {
         let i = 1;
         let name = `${star.name} ${i}`;
 
-        while (userPlayer.carriers.find(c => c.name == name)) {
+        while (game.galaxy.carriers.find(c => c.name == name)) {
             name = `${star.name} ${i++}`;
         }
 
         // Create the carrier at the star.
-        userPlayer.carriers.push({
+        game.galaxy.carriers.push({
+            ownedByPlayerId: userPlayer._id,
             orbiting: star._id,
             name,
             ships,

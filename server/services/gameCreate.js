@@ -25,6 +25,7 @@ module.exports = class GameCreateService {
 
         // Setup players and assign to their starting positions.
         game._doc.galaxy.players = this.playerService.createEmptyPlayers(game._doc.settings, game._doc.galaxy.stars);
+        game._doc.galaxy.carriers = this.playerService.createEmptyPlayerCarriers(game._doc.galaxy.stars, game._doc.galaxy.players);
 
         return await game.save();
     }

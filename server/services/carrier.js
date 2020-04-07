@@ -8,6 +8,7 @@ module.exports = class CarrierService {
         }
 
         let carrier = {
+            ownedByPlayerId: star.ownedByPlayerId,
             ships: ships,
             orbiting: star._id,
             location: star.location,
@@ -18,6 +19,10 @@ module.exports = class CarrierService {
         star.garrison -= ships;
 
         return carrier;
+    }
+
+    listCarriersOwnedByPlayer(carriers, playerId) {
+        return carriers.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
 };

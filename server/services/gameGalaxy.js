@@ -1,12 +1,13 @@
 module.exports = class GameGalaxyService {
 
-    constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService) {
+    constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.starUpgradeService = starUpgradeService;
+        this.carrierService = carrierService;
     }
 
     async getGalaxy(game, userId) {
@@ -67,7 +68,8 @@ module.exports = class GameGalaxyService {
             // Calculate statistics such as how many carriers they have
             // and what the total number of ships are.
             let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, p._id);
-            let totalShips = this.playerService.calculateTotalShipsForPlayer(doc.galaxy.stars, p);
+            let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(doc.galaxy.carriers, p._id);
+            let totalShips = this.playerService.calculateTotalShipsForPlayer(doc.galaxy.stars, doc.galaxy.carriers, p);
 
             // Calculate the manufacturing level for all of the stars the player owns.
             playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
@@ -80,7 +82,7 @@ module.exports = class GameGalaxyService {
 
             p.stats = {
                 totalStars: playerStars.length,
-                totalCarriers: p.carriers.length,
+                totalCarriers: playerCarriers.length,
                 totalShips,
                 totalEconomy,
                 totalIndustry,
@@ -179,6 +181,7 @@ module.exports = class GameGalaxyService {
 
         // Get all of the players stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(doc.galaxy.carriers, player._id);
         let playerStarLocations = playerStars.map(s => s.location);
 
         // Note that we don't need to consider dark mode
@@ -187,7 +190,7 @@ module.exports = class GameGalaxyService {
         doc.galaxy.players.forEach(p => {
             // For other players, filter out carriers that the current player cannot see.
             if (!p._id.equals(player._id)) {
-                p.carriers = p.carriers.filter(c => {
+                doc.galaxy.carriers = doc.galaxy.carriers.filter(c => {
                     // Get the closest player star to this carrier.
                     let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
                     let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
@@ -226,7 +229,6 @@ module.exports = class GameGalaxyService {
                 defeated: p.defeated,
                 ready: p.ready,
                 missedTurns: p.missedTurns,
-                carriers: p.carriers,
                 _id: p._id,
                 alias: p.alias,
                 homeStarId: p.homeStarId,
@@ -236,7 +238,7 @@ module.exports = class GameGalaxyService {
     }
 
     _clearPlayerCarriers(doc) {
-        doc.galaxy.players.forEach(p => p.carriers = []);
+        doc.galaxy.carriers = [];
     }
 
     _setUpgradeCosts(game, star) {

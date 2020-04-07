@@ -4,6 +4,7 @@ const Types = Schema.Types;
 
 const playerSchema = require('./player');
 const starSchema = require('./star');
+const carrierSchema = require('./carrier');
 const historySchema = require('./history');
 
 const schema = new Schema({
@@ -79,7 +80,8 @@ const schema = new Schema({
     },
     galaxy: {
         players: [playerSchema],
-        stars: [starSchema],
+		stars: [starSchema],
+		carriers: [carrierSchema],
         history: [historySchema]
     },
 	state: {

@@ -18,13 +18,14 @@
             </tr>
         </thead>
         <tbody>
-            <carrier-row v-for="carrier in getTableData()" v-bind:key="carrier._id" :data="carrier" />
+            <carrier-row v-for="carrier in getTableData()" v-bind:key="carrier._id" :carrier="carrier" :game="game"/>
         </tbody>
     </table>
 </div>
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
 import CarrierRowVue from './CarrierRow'
 
 export default {
@@ -36,47 +37,23 @@ export default {
   },
   data: function () {
     return {
-      carriers: [
-        {
-          _id: 1,
-          playerId: 1,
-          name: 'Test Carrier',
-          ships: 100,
-          waypoints: 3,
-          waypointsLooped: false,
-          eta: '5h',
-          totalEta: '10h'
-        },
-        {
-          _id: 2,
-          playerId: 1,
-          name: 'Test Carrier 2',
-          ships: 5,
-          waypoints: 1,
-          waypointsLooped: true,
-          eta: '1d 7h',
-          totalEta: '2d'
-        },
-        {
-          _id: 3,
-          playerId: 2,
-          name: 'Test Carrier 3',
-          ships: 420,
-          eta: '5h'
-        }
-      ],
       showAll: false
     }
   },
   methods: {
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+    },
     toggleShowAll () {
       this.showAll = !this.showAll
     },
     getTableData () {
+      let sorter = (a, b) => a.name.localeCompare(b.name)
+      
       if (this.showAll) {
-        return this.carriers
+        return this.game.galaxy.carriers.sort(sorter)
       } else {
-        return this.carriers.filter(x => x.playerId === 1)
+        return this.game.galaxy.carriers.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     }
   }

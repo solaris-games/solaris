@@ -60,11 +60,6 @@ module.exports = class PlayerService {
             // Set up the home star
             this.starService.setupHomeStar(homeStar, player, gameSettings);
 
-            // Create a carrier for the home star.
-            let homeCarrier = this.carrierService.createAtStar(homeStar);
-
-            player.carriers.push(homeCarrier);
-
             players.push(player);
         }
 
@@ -92,11 +87,33 @@ module.exports = class PlayerService {
         return players;
     }
 
-    calculateTotalShipsForPlayer(stars, player) {
+    createEmptyPlayerCarriers(allStars, players) {
+        let carriers = [];
+
+        for (let i = 0; i < players.length; i++) {
+            let player = players[i];
+
+            let homeStar = this.starService.getPlayerHomeStar(allStars, player._id);
+
+            if (!homeStar) {
+                throw new Error('The player must have a home star in order to set up a carrier');
+            }
+
+            // Create a carrier for the home star.
+            let homeCarrier = this.carrierService.createAtStar(homeStar);
+
+            carriers.push(homeCarrier);
+        }
+
+        return carriers;
+    }
+
+    calculateTotalShipsForPlayer(stars, carriers, player) {
         let ownedStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+        let ownedCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
 
         return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
-            + player.carriers.reduce((sum, c) => sum + c.ships, 0);
+            + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
     }
 
     isTooCloseStartingPosition(distanceAllowed, homeStar, stars) {

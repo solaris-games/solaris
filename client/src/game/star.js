@@ -23,12 +23,7 @@ class Star extends EventEmitter {
   }
 
   _getStarCarriers () {
-    // Get the player who owns the star.
-    let player = this._getStarPlayer()
-
-    if (!player) { return [] }
-
-    let carriersAtStar = player.carriers.filter(x => x.orbiting === this.data._id)
+    let carriersAtStar = this.carriers.filter(x => x.orbiting === this.data._id)
 
     return carriersAtStar
   }
@@ -44,9 +39,10 @@ class Star extends EventEmitter {
             typeof this.data.science === 'undefined'
   }
 
-  setup (data, players) {
+  setup (data, players, carriers) {
     this.data = data
     this.players = players
+    this.carriers = carriers
   }
 
   draw () {

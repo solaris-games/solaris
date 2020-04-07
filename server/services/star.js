@@ -36,6 +36,10 @@ module.exports = class StarService {
         homeStar.homeStar = true;
     }
 
+    getPlayerHomeStar(stars, playerId) {
+        return this.listStarsOwnedByPlayer(stars, playerId).find(s => s.homeStar);
+    }
+
     listStarsOwnedByPlayer(stars, playerId) {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
@@ -64,7 +68,7 @@ module.exports = class StarService {
         star.garrison = 0;
         
         // Find and destroy all carriers stationed at this star.
-        userPlayer.carriers = userPlayer.carriers.filter(x => x.orbiting.toString() != star.id);
+        game.galaxy.carriers = game.galaxy.carriers.filter(x => x.orbiting.toString() != star.id);
 
         // TODO: Do we need to do anything about the home star? Maybe move it to the nearest player star?
         
