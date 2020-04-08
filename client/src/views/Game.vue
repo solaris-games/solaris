@@ -10,7 +10,8 @@
                     @onPlayerSelected="onPlayerSelected"/>
 
         <game-container :game="game"
-                    @onStarClicked="onStarClicked"/>
+                    @onStarClicked="onStarClicked"
+                    @onCarrierClicked="onCarrierClicked"/>
     </div>
 </template>
 
@@ -78,7 +79,13 @@ export default {
       this.menuState = MENU_STATES.STAR_DETAIL
       this.menuArguments = e
 
-      this.$emit('onStarClicked', e)
+      //this.$emit('onStarClicked', e)
+    },
+    onCarrierClicked (e) {
+      this.menuState = MENU_STATES.CARRIER_DETAIL
+      this.menuArguments = e
+
+      //this.$emit('onCarrierClicked', e)
     }
 
     // --------------------

@@ -120,9 +120,14 @@ class Star extends EventEmitter {
 
     if (!starCarriers.length) { return }
 
-    let carrier = new Carrier(this.container, starCarriers[0])
+    let carrier = new Carrier()
+    carrier.setup(starCarriers[0])
 
     carrier.draw()
+
+    this.container.addChild(carrier.container)
+
+    carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
   }
 
   drawHalo () {
@@ -234,6 +239,12 @@ class Star extends EventEmitter {
     this.isSelected = true //!this.isSelected
 
     this.emit('onStarClicked', this)
+  }
+
+  onCarrierClicked (e) {
+    this.selected = false
+
+    this.emit('onCarrierClicked', e)
   }
 
   onMouseOver (e) {

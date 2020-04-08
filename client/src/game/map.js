@@ -26,6 +26,7 @@ class Map extends EventEmitter {
       this.container.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
+      star.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     }
   }
 
@@ -78,6 +79,14 @@ class Map extends EventEmitter {
     star.onClicked()
   }
 
+  unselectAllStars () {
+    this.stars
+    .forEach(s => {
+      s.isSelected = false
+      s.draw()
+    })
+  }
+
   unselectAllStarsExcept (star) {
     this.stars
       .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
@@ -91,15 +100,32 @@ class Map extends EventEmitter {
       })
   }
 
+  unselectAllCarriers () {
+    // this.carriers
+    // .forEach(s => {
+    //   s.isSelected = false
+    //   s.draw()
+    // })
+  }
+
+  unselectAllCarriersExcept (carrier) {
+
+  }
+
   onStarClicked (e) {
+    this.unselectAllCarriers()
     this.unselectAllStarsExcept(e)
 
     this.emit('onStarClicked', e)
   }
 
-  cleanup () {
-    this.stars.forEach(s => s.removeListener('onStarClicked', this.onStarClicked))
+  onCarrierClicked (e) {
+    this.unselectAllStars()
+    this.unselectAllCarriersExcept(e)
+
+    this.emit('onCarrierClicked', e)
   }
+
 }
 
 export default Map

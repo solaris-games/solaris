@@ -13,6 +13,7 @@
       <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" :game="game" :carrier="menuArguments"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
       <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" :game="game"/>
@@ -29,6 +30,7 @@ import PlayerVue from '../player/Player.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
+import CarrierDetailVue from '../carrier/CarrierDetail.vue'
 import InboxVue from '../inbox/Inbox.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
@@ -43,6 +45,7 @@ export default {
     'player': PlayerVue,
     'research': ResearchVue,
     'star-detail': StarDetailVue,
+    'carrier-detail': CarrierDetailVue,
     'inbox': InboxVue,
     'intel': IntelVue,
     'galaxy': GalaxyVue

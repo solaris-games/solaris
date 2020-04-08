@@ -1,12 +1,26 @@
 import * as PIXI from 'pixi.js'
+import EventEmitter from 'events'
 
-class Carrier {
-  constructor (container, data) {
-    this.container = container
+class Carrier extends EventEmitter {
+  constructor () {
+    super()
+
+    this.container = new PIXI.Container()
+    this.container.interactive = true
+    this.container.buttonMode = true
+
+    this.container.on('pointerdown', this.onClicked.bind(this))
+
+    this.isSelected = false
+  }
+
+  setup (data) {
     this.data = data
   }
 
   draw () {
+    this.container.removeChildren()
+
     let graphics = new PIXI.Graphics()
 
     graphics.lineStyle(0.3, 0x000000)
@@ -34,6 +48,12 @@ class Carrier {
     // TODO: Draw carrier waypoints.
 
     this.container.addChild(graphics)
+  }
+
+  onClicked (e) {
+    this.isSelected = true //!this.isSelected
+
+    this.emit('onCarrierClicked', this)
   }
 }
 

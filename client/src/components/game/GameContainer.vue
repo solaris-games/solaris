@@ -28,16 +28,11 @@ export default {
 
     // Bind to game events.
     this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this))
+    this.gameContainer.map.on('onCarrierClicked', this.onCarrierClicked.bind(this))
   },
 
   beforeDestroy () {
     window.removeEventListener('resize', this.handleResize)
-
-    // Remove game events.
-    this.gameContainer.map.removeListener('onStarClicked', this.onStarClicked)
-
-    // Call game cleanup to remove events.
-    this.gameContainer.map.cleanup()
   },
 
   methods: {
@@ -58,6 +53,9 @@ export default {
     },
     onStarClicked (e) {
       this.$emit('onStarClicked', e)
+    },
+    onCarrierClicked (e) {
+      this.$emit('onCarrierClicked', e)
     }
   },
 
