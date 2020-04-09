@@ -4,7 +4,7 @@
         <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Stars</button>
     </div>
 
-    <table class="table table-striped table-hover table-bordered">
+    <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>P</td>

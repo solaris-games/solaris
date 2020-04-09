@@ -1,22 +1,46 @@
 <template>
 <tr>
-    <td>{{data.playerId}}</td>
-    <td>{{data.name}}</td>
-    <td><i class="far fa-eye"></i></td>
+    <td><i class="fas fa-circle" v-if="ship.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
+    <td><a href="#" @click="clickShip">{{ship.name}}</a></td>
+    <td><a href="#" @click="goToShip"><i class="far fa-eye"></i></a></td>
     <td>
-      <i v-if="data.type === 0" class="fas fa-star"></i>
-      <i v-if="data.type === 1" class="fas fa-rocket"></i>
+      <i v-if="ship.type === 0" class="fas fa-star"></i>
+      <i v-if="ship.type === 1" class="fas fa-rocket"></i>
     </td>
-    <td>{{data.ships}}</td>
+    <td>{{ship.ships}}</td>
 </tr>
 </template>
 
 <script>
+import gameContainer from '../../../game/container'
+
 export default {
   components: {
   },
   props: {
-    data: null
+    game: Object,
+    ship: Object
+  },
+  methods: {
+    getColour () {
+      let owningPlayer = this.game.galaxy.players.find(x => x._id === this.ship.ownedByPlayerId)
+
+      return owningPlayer.colour.value.replace('0x', '#')
+    },
+    clickShip (e) {
+      if (this.ship.type == 0) {
+        gameContainer.map.clickStar(this.ship._id)
+      } else {
+        gameContainer.map.clickCarrier(this.ship._id)
+      }
+
+      e.preventDefault()
+    },
+    goToShip (e) {
+      gameContainer.map.zoomToLocation(this.ship.location)
+
+      e.preventDefault()
+    }
   }
 }
 </script>

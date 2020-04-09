@@ -1,6 +1,6 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': getColour() }"></i>{{star.playerId}}</td>
+    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
     <td><a href="#" @click="clickStar">{{star.name}}</a></td>
     <td><a href="#" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td>{{star.economy}}</td>
@@ -34,7 +34,7 @@ export default {
       e.preventDefault()
     },
     goToStar (e) {
-      gameContainer.map.zoomToStar(this.star.location)
+      gameContainer.map.zoomToLocation(this.star.location)
 
       e.preventDefault()
     }

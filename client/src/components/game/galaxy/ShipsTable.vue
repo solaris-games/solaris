@@ -4,7 +4,7 @@
         <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Ships</button>
     </div>
 
-    <table class="table table-striped table-hover table-bordered">
+    <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>P</td>
@@ -15,13 +15,14 @@
             </tr>
         </thead>
         <tbody>
-            <ship-row v-for="ship in getTableData()" v-bind:key="ship._id" :data="ship" />
+            <ship-row v-for="ship in getTableData()" v-bind:key="ship._id" :game="game" :ship="ship" />
         </tbody>
     </table>
 </div>
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
 import ShipRowVue from './ShipRow'
 
 export default {
@@ -33,41 +34,51 @@ export default {
   },
   data: function () {
     return {
-      ships: [
-        {
-          _id: 1,
-          playerId: 1,
-          name: 'Test Ship',
-          ships: 100,
-          type: 0 // 0 = star, 1 = carrier
-        },
-        {
-          _id: 2,
-          playerId: 1,
-          name: 'Test Ship 2',
-          ships: 30,
-          type: 1
-        },
-        {
-          _id: 1,
-          playerId: 2,
-          name: 'Test Ship 3',
-          ships: 420,
-          type: 0
-        }
-      ],
       showAll: false
     }
   },
   methods: {
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+    },
     toggleShowAll () {
       this.showAll = !this.showAll
     },
     getTableData () {
+      let sorter = (a, b) => a.name.localeCompare(b.name)
+
+      let starShips = this.game.galaxy.stars
+      .filter(s => s.garrison)
+      .map(s => {
+        return {
+          _id: s._id,
+          ownedByPlayerId: s.ownedByPlayerId,
+          name: s.name,
+          ships: s.garrison,
+          type: 0,
+          location: s.location
+        }
+      })
+
+      let carrierShips = this.game.galaxy.carriers
+      .filter(s => s.ships)
+      .map(c => {
+        return {
+          _id: c._id,
+          ownedByPlayerId: c.ownedByPlayerId,
+          name: c.name,
+          ships: c.ships,
+          type: 1,
+          location: c.location
+        }
+      })
+
+      let allShips = starShips.concat(carrierShips).sort(sorter)
+
       if (this.showAll) {
-        return this.ships
+        return allShips
       } else {
-        return this.ships.filter(x => x.playerId === 1)
+        return allShips.filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     }
   }
