@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import Carrier from './carrier'
 import EventEmitter from 'events'
 
 class Star extends EventEmitter {
@@ -50,8 +49,10 @@ class Star extends EventEmitter {
 
     this.drawColour()
 
-    // If the star has a carrier, draw that instead of the star circle.
-    if (this._getStarCarriers().length) { this.drawCarrier() } else { this.drawStar() }
+    // If the star doesn't have a carrier, draw the star circle.
+    if (!this._getStarCarriers().length) {
+      this.drawStar()
+    }
 
     if (this.isMouseOver) {
       this.drawHalo()
@@ -113,21 +114,6 @@ class Star extends EventEmitter {
     }
 
     this.container.addChild(graphics)
-  }
-
-  drawCarrier () {
-    let starCarriers = this._getStarCarriers()
-
-    if (!starCarriers.length) { return }
-
-    let carrier = new Carrier()
-    carrier.setup(starCarriers[0])
-
-    carrier.draw()
-
-    this.container.addChild(carrier.container)
-
-    carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
   }
 
   drawHalo () {
@@ -239,12 +225,6 @@ class Star extends EventEmitter {
     this.isSelected = true //!this.isSelected
 
     this.emit('onStarClicked', this)
-  }
-
-  onCarrierClicked (e) {
-    this.selected = false
-
-    this.emit('onCarrierClicked', e)
   }
 
   onMouseOver (e) {

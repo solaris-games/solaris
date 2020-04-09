@@ -34,7 +34,7 @@ export default {
       e.preventDefault()
     },
     goToStar (e) {
-      gameContainer.map.zoomToStar(this.star)
+      gameContainer.map.zoomToStar(this.star.location)
 
       e.preventDefault()
     }

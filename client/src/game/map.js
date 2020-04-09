@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import gameContainer from './container'
 import Star from './star'
+import Carrier from './carrier'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 
@@ -15,7 +16,9 @@ class Map extends EventEmitter {
     this.game = game
 
     this.stars = []
+    this.carriers = []
 
+    // Add stars
     for (let i = 0; i < this.game.galaxy.stars.length; i++) {
       let star = new Star()
 
@@ -26,19 +29,40 @@ class Map extends EventEmitter {
       this.container.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+    }
+
+    // Add carriers
+    for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
+      let carrier = new Carrier()
+
+      carrier.setup(this.game.galaxy.carriers[i])
+
+      this.carriers.push(carrier)
+
+      this.container.addChild(carrier.container)
+
+      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     }
   }
 
   draw () {
     this.drawStars()
+    this.drawCarriers()
   }
 
   drawStars () {
-    for (let i = 0; i < this.stars.length - 1; i++) {
+    for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
 
       star.draw()
+    }
+  }
+
+  drawCarriers () {
+    for (let i = 0; i < this.carriers.length; i++) {
+      let carrier = this.carriers[i]
+      
+      carrier.draw()
     }
   }
 
@@ -67,16 +91,22 @@ class Map extends EventEmitter {
     this.zoomToPlayer(game, player)
   }
 
-  zoomToStar (star) {
+  zoomToLocation (location) {
     gameContainer.viewport.fitWorld()
     gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true)
-    gameContainer.viewport.moveCenter(star.location.x, star.location.y)
+    gameContainer.viewport.moveCenter(location.x, location.y)
   }
 
   clickStar (starId) {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
+  }
+
+  clickCarrier (carrierId) {
+    let carrier = this.carriers.find(s => s.data._id === carrierId)
+
+    carrier.onClicked()
   }
 
   unselectAllStars () {
