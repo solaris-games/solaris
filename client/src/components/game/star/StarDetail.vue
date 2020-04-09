@@ -51,7 +51,7 @@
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
-    <div class="row bg-secondary mt-2" v-if="star.data.manufacturing != null">
+    <div class="row bg-secondary mt-2" v-if="getUserPlayer() && star.data.manufacturing != null">
       <div class="col text-center pt-3">
         <p>This star builds <b>{{star.data.manufacturing}}</b> every tick.</p>
       </div>
