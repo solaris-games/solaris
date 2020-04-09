@@ -6,7 +6,7 @@
         "password": null,
         "starsForVictoryPercentage": 50,
         "playerLimit": 8,
-        "playerType": "premium"
+        "playerType": "all"
       },
       "specialGalaxy": {
         "buildCarriers": "standard",

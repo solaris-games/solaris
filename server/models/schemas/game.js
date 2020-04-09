@@ -16,7 +16,7 @@ const schema = new Schema({
 			password: { type: Types.String, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 16 },
-			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'premium' }
+			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' }
         },
         specialGalaxy: {
 			buildCarriers: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
