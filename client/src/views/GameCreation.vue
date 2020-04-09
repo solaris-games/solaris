@@ -47,24 +47,6 @@
         </select>
       </div>
 
-      <div class="form-group">
-        <label for="formalAlliances" class="col-form-label">Formal Alliances</label>
-        <select class="form-control" id="formalAlliances" v-model="settings.general.formalAlliances">
-          <option v-for="opt in options.general.formalAlliances" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="anonymity" class="col-form-label">Anonymity</label>
-        <select class="form-control" id="anonymity" v-model="settings.general.anonymity">
-          <option v-for="opt in options.general.anonymity" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
       <form-error-list v-bind:errors="errors"/>
 
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block">Create Game</button>
@@ -110,45 +92,9 @@
       <view-subtitle title="Galaxy Settings"/>
 
       <div class="form-group">
-        <label for="galaxyType" class="col-form-label">Galaxy Type</label>
-        <select class="form-control" id="galaxyType" v-model="settings.galaxy.galaxyType">
-          <option v-for="opt in options.galaxy.galaxyType" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="starScatter" class="col-form-label">Star Scatter</label>
-        <select class="form-control" id="starScatter" v-model="settings.galaxy.starScatter">
-          <option v-for="opt in options.galaxy.starScatter" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
         <label for="starsPerPlayer" class="col-form-label">Stars per Player</label>
         <select class="form-control" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer">
           <option v-for="opt in options.galaxy.starsPerPlayer" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="startingDistance" class="col-form-label">Starting Distance</label>
-        <select class="form-control" id="startingDistance" v-model="settings.galaxy.startingDistance">
-          <option v-for="opt in options.galaxy.startingDistance" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="resources" class="col-form-label">Resources</label>
-        <select class="form-control" id="resources" v-model="settings.galaxy.resources">
-          <option v-for="opt in options.galaxy.resources" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
@@ -331,37 +277,10 @@
       <view-subtitle title="Game Time Settings"/>
 
       <div class="form-group">
-        <label for="gameTime" class="col-form-label">Game Time</label>
-        <select class="form-control" id="gameTime" v-model="settings.gameTime.time">
-          <option v-for="opt in options.gameTime.time" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.time === 'realTime'">
         <label for="gameSpeed" class="col-form-label">Game Speed</label>
         <select class="form-control" id="gameSpeed" v-model="settings.gameTime.speed">
           <option v-for="opt in options.gameTime.speed" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.time === 'turnBased'">
-        <label for="turnJumps" class="col-form-label">Turn Jumps</label>
-        <select class="form-control" id="turnJumps" v-model="settings.gameTime.turnJumps">
-          <option v-for="opt in options.gameTime.turnJumps" v-bind:key="opt" v-bind:value="opt">
-            {{ opt }} Tick Jumps
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.time === 1">
-        <label for="maxTurnWait" class="col-form-label">Max Turn Wait</label>
-        <select class="form-control" id="maxTurnWait" v-model="settings.gameTime.maxTurnWait">
-          <option v-for="opt in options.gameTime.maxTurnWait" v-bind:key="opt" v-bind:value="opt">
-            {{ opt }} Hours
           </option>
         </select>
       </div>

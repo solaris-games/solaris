@@ -33,9 +33,6 @@ const gameSettings = {
             banking: 1,
             weapons: 1
         }
-    },
-    galaxy: {
-        startingDistance: 'close'
     }
 };
 

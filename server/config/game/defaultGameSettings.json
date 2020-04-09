@@ -6,9 +6,7 @@
         "password": null,
         "starsForVictoryPercentage": 50,
         "playerLimit": 8,
-        "playerType": "premium",
-        "formalAlliances": "disabled",
-        "anonymity": "standard"
+        "playerType": "premium"
       },
       "specialGalaxy": {
         "buildCarriers": "standard",
@@ -17,11 +15,7 @@
         "darkGalaxy": "start"
       },
       "galaxy": {
-        "galaxyType": "hex",
-        "starScatter": "random",
         "starsPerPlayer": 8,
-        "startingDistance": "medium",
-        "resources": "standard",
         "productionTicks": 24
       },
       "player": {
@@ -62,10 +56,7 @@
         }
       },
       "gameTime": {
-        "time": "realTime",
-        "speed": 24,
-        "turnJumps": 8,
-        "maxTurnWait": 24
+        "speed": 24
       }
     },
     "options": {
@@ -101,26 +92,6 @@
           {
             "value": "premium",
             "text": "Premium Players Only"
-          }
-        ],
-        "formalAlliances": [
-          {
-            "value": "disabled",
-            "text": "No Formal Alliances"
-          },
-          {
-            "value": "enabled",
-            "text": "Formal Alliances Enabled"
-          }
-        ],
-        "anonymity": [
-          {
-            "value": "standard",
-            "text": "Standard"
-          },
-          {
-            "value": "extra",
-            "text": "Extra"
           }
         ]
       },
@@ -187,26 +158,6 @@
         ]
       },
       "galaxy": {
-        "galaxyType": [
-          {
-            "value": "hex",
-            "text": "Random Hex"
-          },
-          {
-            "value": "circular",
-            "text": "Circular"
-          }
-        ],
-        "starScatter": [
-          {
-            "value": "random",
-            "text": "Random Scatter"
-          },
-          {
-            "value": "rings",
-            "text": "Twin Rings (Symmetrical)"
-          }
-        ],
         "starsPerPlayer": [
           {
             "value": 8,
@@ -223,34 +174,6 @@
           {
             "value": 32,
             "text": "32 Stars (Large)"
-          }
-        ],
-        "startingDistance": [
-          {
-            "value": "close",
-            "text": "Close"
-          },
-          {
-            "value": "medium",
-            "text": "Medium"
-          },
-          {
-            "value": "far",
-            "text": "Far"
-          }
-        ],
-        "resources": [
-          {
-            "value": "sparse",
-            "text": "Sparse"
-          },
-          {
-            "value": "standard",
-            "text": "Standard"
-          },
-          {
-            "value": "plentiful",
-            "text": "Plentiful"
           }
         ],
         "productionTicks": [
@@ -409,16 +332,6 @@
         ]
       },
       "gameTime": {
-        "time": [
-          {
-            "value": "realTime",
-            "text": "Real Time"
-          },
-          {
-            "value": "turnBased",
-            "text": "Turn Based"
-          }
-        ],
         "speed": [
           {
             "value": 6,
@@ -436,23 +349,6 @@
             "value": 48,
             "text": "Slow Speed (1 Pay / 48h)"
           }
-        ],
-        "turnJumps": [
-          1,
-          6,
-          8,
-          12,
-          24
-        ],
-        "maxTurnWait": [
-          1,
-          6,
-          8,
-          10,
-          12,
-          18,
-          24,
-          48
         ]
       }
     }

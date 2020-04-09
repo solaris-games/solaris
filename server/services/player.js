@@ -36,26 +36,31 @@ module.exports = class PlayerService {
     createEmptyPlayers(gameSettings, allStars) {
         let players = [];
 
-        let minDistance = this.calculateStartingDistance(gameSettings, allStars);
+        // Divide the galaxy into equal chunks, each player will spawned
+        // at near equal distance from the center of the galaxy.
+        // Note: This logic assumes that the center of the galaxy is position 0,0
+        const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars) / 2 / 2;
+        const incrementAngle = 360 / (gameSettings.general.playerLimit);
+        let currentAngle = 0;
 
+        // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < gameSettings.general.playerLimit; i++) {
             // Set the players colour based on their index position in the array.
             let colour = colours[i];
 
             let player = this.createEmptyPlayer(gameSettings, colour);
 
-            let isTooClose = false;
-        
-            // Find a starting position for the player by picking a random
-            // home star.
-            let homeStar;
-
-            do {
-                homeStar = allStars[this.randomService.getRandomNumberBetween(0, allStars.length - 1)]; // star length - 1 because between is inclusive
-
-                isTooClose = this.isTooCloseStartingPosition(minDistance, homeStar, allStars);
+            // Get the desired player starting location.
+            // TODO: Seems to generate maps correctly but is this correct?
+            let startingLocation = {
+                x: distanceFromCenter * Math.cos(currentAngle),
+                y: distanceFromCenter * Math.sin(currentAngle)
             }
-            while (homeStar.ownedByPlayerId || isTooClose);
+
+            currentAngle += incrementAngle;
+
+            // Find the star that is closest to this location, that will be the player's home star.
+            let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, allStars);
 
             // Set up the home star
             this.starService.setupHomeStar(homeStar, player, gameSettings);
@@ -114,32 +119,6 @@ module.exports = class PlayerService {
 
         return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
-    }
-
-    isTooCloseStartingPosition(distanceAllowed, homeStar, stars) {
-        let closestStar = this.starDistanceService.getClosestOwnedStars(homeStar, stars, 1)[0];
-    
-        // If there is no closest owned star then we're all good, no need to check.
-        if (!closestStar)
-            return false;
-    
-        let distanceToClosest = this.starDistanceService.getDistanceBetweenStars(homeStar, closestStar);
-        
-        return distanceToClosest < distanceAllowed;
-    }
-    
-    calculateStartingDistance(gameSettings, stars) {
-        let galaxyDiameter = this.mapService.getGalaxyDiameter(stars);
-        let playerCount = gameSettings.general.playerLimit;
-        let minDistance;
-    
-        switch (gameSettings.galaxy.startingDistance) {
-            case 'close': minDistance = galaxyDiameter / (playerCount * 4); break;
-            case 'medium': minDistance = galaxyDiameter / (playerCount * 2); break;
-            case 'far': minDistance = galaxyDiameter / playerCount; break;
-        }
-    
-        return minDistance;
     }
 
 }

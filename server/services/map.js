@@ -19,10 +19,7 @@ module.exports = class MapService {
 
         let index = 0;
 
-        do {
-            // TODO: Figure out how to randomize resources and weight them.
-            // so that we can configure sparse, standard and plentiful resources.
-            
+        do {            
             const starName = starNames[index];
             
             const star = this.starService.generateUnownedStar(starName, maxRadius);
@@ -41,7 +38,7 @@ module.exports = class MapService {
 
         // We need to sanitize all star positions to make sure that all
         // x's and y's are positive integers otherwise rendering is a bitch.
-        this.starDistanceService.sanitizeStarPositions(stars);
+        //this.starDistanceService.sanitizeStarPositions(stars);
 
         return stars;
     }
@@ -91,6 +88,10 @@ module.exports = class MapService {
         }, 0);
 
         return diameter;
+    }
+
+    getGalaxyCenter(stars) {
+
     }
 
 };

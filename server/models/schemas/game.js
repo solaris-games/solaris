@@ -16,9 +16,7 @@ const schema = new Schema({
 			password: { type: Types.String, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 16 },
-			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'premium' },
-			formalAlliances: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			anonymity: { type: Types.String, required: true, enum: ['standard', 'extra'], default: 'standard' }
+			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'premium' }
         },
         specialGalaxy: {
 			buildCarriers: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -27,11 +25,7 @@ const schema = new Schema({
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
         },
         galaxy: {
-			galaxyType: { type: Types.String, required: true, enum: ['hex', 'circular'], default: 'hex' },
-			starScatter: { type: Types.String, required: true, enum: ['random', 'rings'], default: 'random' },
 			starsPerPlayer: { type: Types.Number, required: true, enum: [8, 16, 24, 32], default: 24 },
-			startingDistance: { type: Types.String, required: true, enum: ['close', 'medium', 'far'], default: 'medium' },
-			resources: { type: Types.String, required: true, enum: ['sparse', 'standard', 'plentiful'], default: 'standard' },
 			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
         player: {
@@ -72,10 +66,7 @@ const schema = new Schema({
 			}
 		},
 		gameTime: {
-			gameTime: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			gameSpeed: { type: Types.Number, required: true, enum: [6, 12, 24, 48], default: 24 },
-			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 }
+			speed: { type: Types.Number, required: true, enum: [6, 12, 24, 48], default: 24 }
 		}
     },
     galaxy: {

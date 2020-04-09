@@ -51,6 +51,25 @@ module.exports = class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
+    getClosestUnownedStarsFromLocation(location, stars, amount) {
+        let sorted = stars
+            .filter(s => !s.ownedByPlayerId)
+            .sort((a, b) => {
+                let star = {
+                    location
+                };
+
+                return this.getDistanceBetweenStars(star, a)
+                    - this.getDistanceBetweenStars(star, b);
+            });
+
+        return sorted.slice(0, amount);
+    }
+
+    getClosestUnownedStarFromLocation(location, stars) {
+        return this.getClosestUnownedStarsFromLocation(location, stars, 1)[0];
+    }
+
     isStarTooClose(star, otherStar) {
         const distance = this.getDistanceBetweenStars(star, otherStar);
 
