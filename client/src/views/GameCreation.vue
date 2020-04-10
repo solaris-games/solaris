@@ -329,10 +329,6 @@ export default {
         this.errors.push('Game name required.')
       }
 
-      if (!this.settings.general.description) {
-        this.errors.push('Game description required.')
-      }
-
       e.preventDefault()
 
       if (this.errors.length) return

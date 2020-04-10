@@ -8,7 +8,7 @@
 
     <p v-if="!serverGames.length" class="text-danger">
       There are no official games available.
-    </div>
+    </p>
 
     <table v-if="serverGames.length" class="table table-striped table-hover">
         <thead>
@@ -76,11 +76,11 @@ export default {
   },
   async mounted () {
     try {
-      let response = await apiService.listOfficialGames()
-      this.serverGames = response.data
+      let responseOfficial = await apiService.listOfficialGames()
+      this.serverGames = responseOfficial.data
 
-      response = await apiService.listUserGames()
-      this.userGames = response.data
+      let responseUser = await apiService.listUserGames()
+      this.userGames = responseUser.data
     } catch (err) {
       console.error(err)
     }

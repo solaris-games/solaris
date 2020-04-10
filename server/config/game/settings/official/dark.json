@@ -1,0 +1,60 @@
+{
+  "general": {
+    "name": "Dark Galaxy",
+    "description": null,
+    "password": null,
+    "starsForVictoryPercentage": 50,
+    "playerLimit": 8,
+    "playerType": "all"
+  },
+  "specialGalaxy": {
+    "buildCarriers": "standard",
+    "buildWarpgates": "cheap",
+    "randomGates": "none",
+    "darkGalaxy": "enabled"
+  },
+  "galaxy": {
+    "starsPerPlayer": 16,
+    "productionTicks": 24
+  },
+  "player": {
+    "startingStars": 6,
+    "startingCash": 500,
+    "startingShips": 10,
+    "startingInfrastructure": {
+      "economy": 5,
+      "industry": 5,
+      "science": 1
+    },
+    "developmentCost": {
+      "economy": "standard",
+      "industry": "standard",
+      "science": "standard"
+    },
+    "tradeCost": 15,
+    "tradeScanning": "all"
+  },
+  "technology": {
+    "startingTechnologyLevel": {
+      "terraforming": 1,
+      "experimentation": 1,
+      "scanning": 1,
+      "hyperspace": 1,
+      "manufacturing": 1,
+      "banking": 1,
+      "weapons": 1
+    },
+    "researchCosts": {
+      "terraforming": "standard",
+      "experimentation": "standard",
+      "scanning": "standard",
+      "hyperspace": "standard",
+      "manufacturing": "standard",
+      "banking": "standard",
+      "weapons": "standard"
+    }
+  },
+  "gameTime": {
+    "speed": 24
+  }
+}
