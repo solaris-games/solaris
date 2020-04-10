@@ -4,7 +4,10 @@ const middleware = require('../middleware');
 const container = require('../container');
 
 router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
-    return res.status(200).json(require('../../config/game/defaultGameSettings.json'));
+    return res.status(200).json({
+        settings: require('../../config/game/settings/user/standard.json'),
+        options: require('../../config/game/settings/options.json')
+    });
 });
 
 router.post('/', middleware.authenticate, async (req, res, next) => {
