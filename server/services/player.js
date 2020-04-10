@@ -45,8 +45,8 @@ module.exports = class PlayerService {
         // The desired distance from the center is half way from the galaxy center and the edge.
         const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars).x / 2 / 2;
 
-        const incrementAngle = 360 / (gameSettings.general.playerLimit);
-        let currentAngle = 0;
+        const incrementRadians = 360 / gameSettings.general.playerLimit * Math.PI / 180;
+        let currentRadians = 0;
 
         // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < gameSettings.general.playerLimit; i++) {
@@ -56,10 +56,9 @@ module.exports = class PlayerService {
             let player = this.createEmptyPlayer(gameSettings, colour);
 
             // Get the desired player starting location.
-            // TODO: Seems to generate maps correctly but is this correct?
             let startingLocation = {
-                x: distanceFromCenter * Math.cos(currentAngle),
-                y: distanceFromCenter * Math.sin(currentAngle)
+                x: distanceFromCenter * Math.cos(currentRadians),
+                y: distanceFromCenter * Math.sin(currentRadians)
             };
 
             // Add the galaxy center x and y so that the desired location is relative to the center.
@@ -75,7 +74,7 @@ module.exports = class PlayerService {
             players.push(player);
 
             // Increment the angle for the next player.
-            currentAngle += incrementAngle;
+            currentRadians += incrementRadians;
         }
 
         // Now that all players have a home star, the fairest way to distribute stars to players is to
