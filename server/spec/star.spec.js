@@ -10,6 +10,9 @@ const fakeRandomService = {
     },
     getRandomPositionInCircle(radius) {
         return radius;
+    },
+    getRandomPositionInCircleFromOrigin(originX, originY, radius) {
+        return radius;
     }
 };
 
@@ -20,19 +23,24 @@ const fakeStarNameService = {
     }
 };
 
+const fakeDistanceService = {
+    DISTANCES: {
+        MAX_DISTANCE_BETWEEN_STARS: 100
+    }
+}
+
 describe('star', () => {
 
     let starService;
 
     beforeEach(() => {
-        starService = new StarService(fakeRandomService, fakeStarNameService);
+        starService = new StarService(fakeRandomService, fakeStarNameService, fakeDistanceService);
     });
 
     it('should generate an unowned star', () => {
         const name = 'test star name';
-        const maxRadius = 10;
 
-        const newStar = starService.generateUnownedStar(name, maxRadius);
+        const newStar = starService.generateUnownedStar(name);
 
         expect(newStar).not.toBe(null);
         expect(newStar._id).not.toBe(null);

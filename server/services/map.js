@@ -19,10 +19,20 @@ module.exports = class MapService {
 
         let index = 0;
 
+        // To generate stars we do the following:
+        // - Create a star at a random angle and distance from the current position
+        // - Then pick a random star in the list of stars to be the new origin position.
+        // - Repeat until we have created all of the required stars.
+        let currentOrigin = {
+            x: 0,
+            y: 0
+        };
+
         do {            
             const starName = starNames[index];
             
-            const star = this.starService.generateUnownedStar(starName, maxRadius);
+            const star = this.starService.generateUnownedStar(starName, 
+                currentOrigin.x, currentOrigin.y);
 
             if (this.isStarADuplicatePosition(star, stars))
                 continue;
@@ -32,6 +42,9 @@ module.exports = class MapService {
                 continue;
 
             stars.push(star);
+
+            // Pick a new origin from a random star.
+            currentOrigin = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)].location;
 
             index++;
         } while (stars.length < starCount);
@@ -73,25 +86,27 @@ module.exports = class MapService {
     }
 
     getGalaxyDiameter(stars) {
-        let starLocations = stars.map(s => s.location);
+        let maxX = stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
+        let maxY = stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
+        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
+        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
 
-        // Calculate the furthest distance between two stars, that's the diameter.
-        let diameter = stars.reduce((distance, star) => {
-            let furthest = this.distanceService.getFurthestLocation(star.location, starLocations);
-            let newDistance = this.distanceService.getDistanceBetweenLocations(star.location, furthest);
-
-            if (newDistance > distance) {
-                distance = newDistance;
-            }
-
-            return distance;
-        }, 0);
-
-        return diameter;
+        return {
+            x: Math.abs(minX) + Math.abs(maxX),
+            y: Math.abs(minY) + Math.abs(maxY),
+        };
     }
 
     getGalaxyCenter(stars) {
+        let maxX = stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
+        let maxY = stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
+        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
+        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
 
+        return {
+            x: (minX + maxX) / 2,
+            y: (minY + maxY) / 2
+        };
     }
 
 };

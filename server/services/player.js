@@ -38,8 +38,13 @@ module.exports = class PlayerService {
 
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
-        // Note: This logic assumes that the center of the galaxy is position 0,0
-        const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars) / 2 / 2;
+
+        // Calculate the center point of the galaxy as we need to add it onto the starting location.
+        const galaxyCenter = this.mapService.getGalaxyCenter(allStars);
+
+        // The desired distance from the center is half way from the galaxy center and the edge.
+        const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars).x / 2 / 2;
+
         const incrementAngle = 360 / (gameSettings.general.playerLimit);
         let currentAngle = 0;
 
@@ -55,9 +60,11 @@ module.exports = class PlayerService {
             let startingLocation = {
                 x: distanceFromCenter * Math.cos(currentAngle),
                 y: distanceFromCenter * Math.sin(currentAngle)
-            }
+            };
 
-            currentAngle += incrementAngle;
+            // Add the galaxy center x and y so that the desired location is relative to the center.
+            startingLocation.x += galaxyCenter.x;
+            startingLocation.y += galaxyCenter.y;
 
             // Find the star that is closest to this location, that will be the player's home star.
             let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, allStars);
@@ -66,6 +73,9 @@ module.exports = class PlayerService {
             this.starService.setupHomeStar(homeStar, player, gameSettings);
 
             players.push(player);
+
+            // Increment the angle for the next player.
+            currentAngle += incrementAngle;
         }
 
         // Now that all players have a home star, the fairest way to distribute stars to players is to

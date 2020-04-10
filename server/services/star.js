@@ -3,9 +3,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService {
 
-    constructor(randomService, starNameService) {
+    constructor(randomService, starNameService, distanceService) {
         this.randomService = randomService;
         this.starNameService = starNameService;
+        this.distanceService = distanceService;
     }
 
     DEFAULTS = {
@@ -13,12 +14,12 @@ module.exports = class StarService {
         MAX_NATURAL_RESOURCES: 50
     }
 
-    generateUnownedStar(name, maxRadius = 1000) {
+    generateUnownedStar(name, originX, originY) {
         return {
             _id: mongoose.Types.ObjectId(),
             name: name,
             naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES - 1),
-            location: this.randomService.getRandomPositionInCircle(maxRadius)
+            location: this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, this.distanceService.DISTANCES.MAX_DISTANCE_BETWEEN_STARS)
         };
     }
 

@@ -23,5 +23,14 @@ module.exports = class RandomService {
             y: Math.sin(angle) * radiusY
         };
     }
+
+    getRandomPositionInCircleFromOrigin(originX, originY, radius) {
+        let position = this.getRandomPositionInCircle(radius);
+
+        position.x += originX;
+        position.y += originY;
+
+        return position;
+    }
     
 };

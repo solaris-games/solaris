@@ -4,7 +4,8 @@ module.exports = class DistanceService {
 
     DISTANCES = {
         LIGHT_YEAR: 10,
-        MIN_DISTANCE_BETWEEN_STARS: 5,
+        MIN_DISTANCE_BETWEEN_STARS: 10,
+        MAX_DISTANCE_BETWEEN_STARS: 100,
         BASE_SHIP_SPEED: 1  // 0.1 ly per tick
     }
     
