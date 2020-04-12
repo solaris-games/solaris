@@ -19,9 +19,6 @@ module.exports = class GameGalaxyService {
         // TODO: If the game has started and the user is not in this game
         // then they cannot view info about this game.
 
-        // Populate computed fields for the game.
-        this._setGameState(game);
-
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
@@ -32,6 +29,9 @@ module.exports = class GameGalaxyService {
 
             // Also remove all carriers from players.
             this._clearPlayerCarriers(game);
+
+            // We still need to filter the player data so that it's basic info.
+            this._setPlayerInfoBasic(game, null);
         } else {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
@@ -65,10 +65,6 @@ module.exports = class GameGalaxyService {
         return doc.galaxy.players.find(x => x.userId === userId);
     }
 
-    _setGameState(game) {
-        game.state.playerCount = game.galaxy.players.filter(p => p.userId).length;
-    }
-
     _setPlayerStats(doc) {
         doc.galaxy.players.forEach(p => {
             // Calculate statistics such as how many carriers they have
@@ -78,13 +74,13 @@ module.exports = class GameGalaxyService {
             let totalShips = this.playerService.calculateTotalShipsForPlayer(doc.galaxy.stars, doc.galaxy.carriers, p);
 
             // Calculate the manufacturing level for all of the stars the player owns.
-            playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(p.research.manufacturing.level, s.industry));
+            playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(p.research.manufacturing.level, s.infrastructure.industry));
 
             let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
 
-            let totalEconomy = playerStars.reduce((sum, s) => sum + s.economy, 0);
-            let totalIndustry = playerStars.reduce((sum, s) => sum + s.industry, 0);
-            let totalScience = playerStars.reduce((sum, s) => sum + s.science, 0);
+            let totalEconomy = playerStars.reduce((sum, s) => sum + s.infrastructure.economy, 0);
+            let totalIndustry = playerStars.reduce((sum, s) => sum + s.infrastructure.industry, 0);
+            let totalScience = playerStars.reduce((sum, s) => sum + s.infrastructure.science, 0);
 
             p.stats = {
                 totalStars: playerStars.length,
@@ -215,7 +211,7 @@ module.exports = class GameGalaxyService {
         doc.galaxy.players = doc.galaxy.players.map(p => {
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
-            if (p._id == player._id) {
+            if (player && p._id == player._id) {
                 return p;
             }
 
@@ -257,9 +253,9 @@ module.exports = class GameGalaxyService {
         // Calculate upgrade costs for the star.
         star.upgradeCosts = { };
 
-        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(economyExpenseConfig, star.economy, star.terraformedResources);
-        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(industryExpenseConfig, star.industry, star.terraformedResources);
-        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(scienceExpenseConfig, star.science, star.terraformedResources);
+        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
+        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
+        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
         star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(warpGateExpenseConfig, star.terraformedResources);
         star.upgradeCosts.carriers = this.starUpgradeService.calculateCarrierCost(carrierExpenseConfig);
     }

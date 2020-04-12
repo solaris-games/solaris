@@ -33,9 +33,7 @@ class Star extends EventEmitter {
 
   _isOutOfScanningRange () {
     // These may be undefined, if so it means that they are out of scanning range.
-    return typeof this.data.economy === 'undefined' ||
-            typeof this.data.industry === 'undefined' ||
-            typeof this.data.science === 'undefined'
+    return typeof this.data.infrastructure === 'undefined'
   }
 
   setup (data, players, carriers) {
@@ -159,7 +157,7 @@ class Star extends EventEmitter {
     if (!this.data.ownedByPlayerId) return
     if (this._isOutOfScanningRange()) return
 
-    let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
+    let text = new PIXI.Text(`${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`, {
       fontSize: 4,
       fill: 0xFFFFFF
     })

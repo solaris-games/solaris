@@ -81,9 +81,9 @@ describe('star', () => {
         expect(homeStar.ownedByPlayerId).toBe(newPlayer._id);
         expect(homeStar.garrison).toEqual(gameSettings.player.startingShips);
         expect(homeStar.naturalResources).toEqual(starService.DEFAULTS.MAX_NATURAL_RESOURCES);
-        expect(homeStar.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
-        expect(homeStar.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
-        expect(homeStar.science).toEqual(gameSettings.player.startingInfrastructure.science);
+        expect(homeStar.infrastructure.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
+        expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
+        expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);
         expect(homeStar.homeStar).toBeTruthy();
     });
 

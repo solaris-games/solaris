@@ -30,7 +30,8 @@ module.exports = class CarrierService {
     }
 
     generateCarrierName(star, carriers) {
-        let name;
+        let i = 1;
+        let name = `${star.name} ${i++}`;
         
         while (carriers.find(c => c.name == name)) {
             name = `${star.name} ${i++}`;

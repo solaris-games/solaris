@@ -38,11 +38,11 @@
         </div>
     </div>
 
-    <div v-if="star.data.economy != null">
+    <div v-if="star.data.infrastructure">
       <h4 class="pt-2">Infrastructure</h4>
 
       <infrastructure
-        :economy="star.data.economy" :industry="star.data.industry" :science="star.data.science"/>
+        :economy="star.data.infrastructure.economy" :industry="star.data.infrastructure.industry" :science="star.data.infrastructure.science"/>
 
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
         :gameId="game._id"

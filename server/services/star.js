@@ -19,7 +19,8 @@ module.exports = class StarService {
             _id: mongoose.Types.ObjectId(),
             name: name,
             naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES - 1),
-            location: this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, this.distanceService.DISTANCES.MAX_DISTANCE_BETWEEN_STARS)
+            location: this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, this.distanceService.DISTANCES.MAX_DISTANCE_BETWEEN_STARS),
+            infrastructure: { }
         };
     }
 
@@ -31,9 +32,9 @@ module.exports = class StarService {
         homeStar.naturalResources = this.DEFAULTS.MAX_NATURAL_RESOURCES; // Home stars should always get max resources.
         
         // ONLY the home star gets the starting infrastructure.
-        homeStar.economy = gameSettings.player.startingInfrastructure.economy;
-        homeStar.industry = gameSettings.player.startingInfrastructure.industry;
-        homeStar.science = gameSettings.player.startingInfrastructure.science;
+        homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
+        homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
+        homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
         homeStar.homeStar = true;
     }
 
