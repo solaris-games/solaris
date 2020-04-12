@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('../middleware');
 const container = require('../container');
+const ValidationError = require('../../errors/validation');
 
 function validate(req, res, next) {
     let errors = [];
@@ -11,7 +12,7 @@ function validate(req, res, next) {
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     return next();
@@ -28,7 +29,7 @@ router.put('/:gameId/star/upgrade/economy', middleware.authenticate, validate, m
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.put('/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -41,7 +42,7 @@ router.put('/:gameId/star/upgrade/industry', middleware.authenticate, validate, 
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -54,7 +55,7 @@ router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, m
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.put('/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -67,7 +68,7 @@ router.put('/:gameId/star/build/warpgate', middleware.authenticate, validate, mi
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.put('/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -80,7 +81,7 @@ router.put('/:gameId/star/destroy/warpgate', middleware.authenticate, validate, 
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.put('/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -93,7 +94,7 @@ router.put('/:gameId/star/build/carrier', middleware.authenticate, validate, mid
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.put('/:gameId/star/abandon', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -106,6 +107,6 @@ router.put('/:gameId/star/abandon', middleware.authenticate, validate, middlewar
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 module.exports = router;

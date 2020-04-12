@@ -79,7 +79,7 @@ export default {
       gameContainer.map.zoomToPlayer(this.game, player)
     },
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game)
     },
     getPlayerStarCount (player) {
       return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length

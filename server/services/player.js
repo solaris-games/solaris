@@ -18,7 +18,7 @@ module.exports = class PlayerService {
             userId: null,
             alias: 'Empty Slot',
             colour: colour,
-            cash: gameSettings.player.startingCash,
+            credits: gameSettings.player.startingCredits,
             carriers: [],
             research: {
                 terraforming: { level: gameSettings.technology.startingTechnologyLevel.terraforming },
@@ -114,7 +114,7 @@ module.exports = class PlayerService {
             }
 
             // Create a carrier for the home star.
-            let homeCarrier = this.carrierService.createAtStar(homeStar);
+            let homeCarrier = this.carrierService.createAtStar(homeStar, carriers);
 
             carriers.push(homeCarrier);
         }

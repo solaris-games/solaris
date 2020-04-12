@@ -36,9 +36,9 @@ export default {
   methods: {
     async upgradeEconomy (e) {
       try {
-        let response = await ApiService.upgradeEconomy(this.gameId, this.starId);
+        let response = await ApiService.upgradeEconomy(this.gameId, this.starId)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'economy')
         }
       } catch (err) {
@@ -47,9 +47,9 @@ export default {
     },
     async upgradeIndustry (e) {
       try {
-        let response = await ApiService.upgradeIndustry(this.gameId, this.starId);
+        let response = await ApiService.upgradeIndustry(this.gameId, this.starId)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'industry')
         }
       } catch (err) {
@@ -58,9 +58,9 @@ export default {
     },
     async upgradeScience (e) {
       try {
-        let response = await ApiService.upgradeScience(this.gameId, this.starId);
+        let response = await ApiService.upgradeScience(this.gameId, this.starId)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'science')
         }
       } catch (err) {

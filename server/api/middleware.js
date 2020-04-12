@@ -13,9 +13,9 @@ module.exports = {
     },
 
     handleError(err, req, res, next) {
-        // TODO: If there is an error in the pipleline
+        // If there is an error in the pipleline
         // then test to see what type of error it is. If its a validation
-        // error then return a bad request.
+        // error then return it with its status code.
         if (err instanceof ValidationError) {
             let errors = err.message;
 

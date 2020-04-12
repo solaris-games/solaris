@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
 const container = require('./container');
+const ValidationError = require('../errors/validation');
 
 router.post('/', async (req, res, next) => {
     let errors = [];
@@ -19,7 +20,7 @@ router.post('/', async (req, res, next) => {
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     try {
@@ -43,7 +44,7 @@ router.post('/', async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/', middleware.authenticate, async (req, res, next) => {
     try {
@@ -53,7 +54,7 @@ router.get('/', middleware.authenticate, async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/:id', middleware.authenticate, async (req, res, next) => {
     try {
@@ -63,7 +64,7 @@ router.get('/:id', middleware.authenticate, async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
     try {
@@ -73,7 +74,7 @@ router.post('/changeEmailPreference', middleware.authenticate, async (req, res, 
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
     let errors = [];
@@ -83,7 +84,7 @@ router.post('/changeEmailAddress', middleware.authenticate, async (req, res, nex
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     try {
@@ -93,7 +94,7 @@ router.post('/changeEmailAddress', middleware.authenticate, async (req, res, nex
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/changePassword', middleware.authenticate, async (req, res, next) => {
     let errors = [];
@@ -107,7 +108,7 @@ router.post('/changePassword', middleware.authenticate, async (req, res, next) =
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     try {
@@ -120,6 +121,6 @@ router.post('/changePassword', middleware.authenticate, async (req, res, next) =
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 module.exports = router;

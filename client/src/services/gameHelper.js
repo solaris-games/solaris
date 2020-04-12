@@ -1,7 +1,8 @@
 
 class GameHelper {
-  getUserPlayer (game, userId) {
-    return game.galaxy.players.find(p => p.userId === userId)
+  getUserPlayer (game) {
+    // The user's player will be the only player that has a user ID on the player object.
+    return game.galaxy.players.find(p => p.userId)
   }
 
   getStarOwningPlayer (game, star) {

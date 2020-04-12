@@ -1,7 +1,7 @@
 <template>
 <div class="row bg-secondary pt-2 pb-2">
     <div class="col">
-        <p class="mb-2">Give this player Credits. (You have ${{userPlayer.cash}})</p>
+        <p class="mb-2">Give this player Credits. (You have ${{userPlayer.credits}})</p>
 
         <form>
             <div class="form-row">
@@ -44,13 +44,13 @@ export default {
   methods: {
     async confirmSendCredits () {
       try {
-        let response = await ApiService.sendCredits(this.game._id, this.player._id, this.amount);
+        let response = await ApiService.sendCredits(this.game._id, this.player._id, this.amount)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.$emit('onCreditsSent', this.amount)
 
-          this.player.cash += this.amount
-          this.userPlayer.cash -= this.amount
+          this.player.credits += this.amount
+          this.userPlayer.credits -= this.amount
           this.amount = 0
         }
       } catch (err) {

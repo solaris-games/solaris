@@ -25,8 +25,9 @@ module.exports = class StarUpgradeService {
         crazyExpensive: 16
     };
 
-    constructor(starService) {
+    constructor(starService, carrierService) {
         this.starService = starService;
+        this.carrierService = carrierService;
     }
 
     async buildWarpGate(game, userId, starId) {
@@ -48,12 +49,12 @@ module.exports = class StarUpgradeService {
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
         const cost = this.calculateWarpGateCost(expenseConfig, terraformedResources);
 
-        if (userPlayer.cash < cost) {
+        if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         star.warpGate = true;
-        userPlayer.cash -= cost;
+        userPlayer.credits -= cost;
 
         await game.save();
     }
@@ -92,7 +93,7 @@ module.exports = class StarUpgradeService {
         const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildCarriers];
         const cost = this.calculateCarrierCost(expenseConfig);
 
-        if (userPlayer.cash < cost) {
+        if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to build a carrier.`);
         }
 
@@ -102,26 +103,13 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`The star does not have enough ships garrisoned (${ships}) to build the carrier.`);
         }
 
-        // We need a name for the carrier, so use the star name
-        // and add one to it until we find a name that isn't taken.
-        let i = 1;
-        let name = `${star.name} ${i}`;
+        // Create a carrier at the star.
+        let carrier = this.carrierService.createAtStar(star, game.galaxy.carriers, ships);
 
-        while (game.galaxy.carriers.find(c => c.name == name)) {
-            name = `${star.name} ${i++}`;
-        }
+        game.galaxy.carriers.push(carrier);
 
-        // Create the carrier at the star.
-        game.galaxy.carriers.push({
-            ownedByPlayerId: userPlayer._id,
-            orbiting: star._id,
-            name,
-            ships,
-            location: star.location
-        });
-
-        star.garrison -= ships;
-        userPlayer.cash -= cost;
+        // Deduct the cost of the carrier from the player's credits.
+        userPlayer.credits -= cost;
 
         await game.save();
     }
@@ -141,12 +129,12 @@ module.exports = class StarUpgradeService {
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
         const cost = calculateCostCallback(expenseConfig, star[economyType], terraformedResources);
 
-        if (userPlayer.cash < cost) {
+        if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         star[economyType]++;
-        userPlayer.cash -= cost;
+        userPlayer.credits -= cost;
 
         await game.save();
     }

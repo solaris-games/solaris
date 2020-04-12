@@ -13,12 +13,9 @@ const schema = new Schema({
     },
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
-    cash: { type: Types.Number, required: true },
+    credits: { type: Types.Number, required: true },
     defeated: { type: Types.Boolean, required: false, default: false },
-    ready: { type: Types.Boolean, required: false, default: false },
-    missedTurns: { type: Types.Number, required: false, default: 0 },
     renownToGive: { type: Types.Number, required: true, default: 8 },
-    apiCode: { type: Types.String, required: false },
     research: {
         // TODO: This would be arguably better if it was just progress points and remove level
         // and then we can calculate the level before sending it to the client.
@@ -51,7 +48,7 @@ const schema = new Schema({
             progress: { type: Types.Number, required: true, default: 0  },
         }
     },
-    messages: [messageSchema]
+    messages: [messageSchema] // TODO: This needs to be moved into the main game galaxy object.
 });
 
 module.exports = schema;

@@ -19,6 +19,9 @@ module.exports = class GameGalaxyService {
         // TODO: If the game has started and the user is not in this game
         // then they cannot view info about this game.
 
+        // Populate computed fields for the game.
+        this._setGameState(game);
+
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
@@ -37,7 +40,6 @@ module.exports = class GameGalaxyService {
             this._setPlayerInfoBasic(game, player);
     
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
-            // TODO: Can we get away with not sending other player's user ids?
         }
         
         return game;
@@ -61,6 +63,10 @@ module.exports = class GameGalaxyService {
 
     _getUserPlayer(doc, userId) {
         return doc.galaxy.players.find(x => x.userId === userId);
+    }
+
+    _setGameState(game) {
+        game.state.playerCount = game.galaxy.players.filter(p => p.userId).length;
     }
 
     _setPlayerStats(doc) {
@@ -225,7 +231,7 @@ module.exports = class GameGalaxyService {
                     banking: { level: p.research.banking.level },
                     manufacturing: { level: p.research.manufacturing.level },
                 },
-                userId: p.userId, // TODO: Do we really need to send this?
+                isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 defeated: p.defeated,
                 ready: p.ready,
                 missedTurns: p.missedTurns,

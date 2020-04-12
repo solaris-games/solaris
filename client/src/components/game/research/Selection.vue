@@ -64,7 +64,7 @@ export default {
     }
   },
   mounted () {
-    this.player = GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+    this.player = GameHelper.getUserPlayer(this.game)
   },
   methods: {
     async updateResearchNow (e) {

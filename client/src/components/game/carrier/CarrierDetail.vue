@@ -1,5 +1,6 @@
 <template>
 <div class="container">
+    <!-- TODO: These need to act off the carrier object itself instead of pixi object -->
     <h3 class="pt-2">{{carrier.data.name}}</h3>
 
     <div class="row bg-secondary">
@@ -122,8 +123,9 @@ export default {
     }
   },
   methods: {
+    // TODO: This method appears everywhere, is there a way to make it global?
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game)
     },
     getCarrierOwningPlayer () {
       return GameHelper.getCarrierOwningPlayer(this.game, this.carrier.data)

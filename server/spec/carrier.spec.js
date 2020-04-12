@@ -19,7 +19,7 @@ describe('carrier', () => {
         };
 
         const ships = 1;
-        const newCarrier = carrierService.createAtStar(star, ships);
+        const newCarrier = carrierService.createAtStar(star, [], ships);
 
         expect(newCarrier).not.toBe(null);
         expect(newCarrier.ships).toEqual(ships);
@@ -40,7 +40,7 @@ describe('carrier', () => {
         };
 
         const ships = 5;
-        const newCarrier = carrierService.createAtStar(star, ships);
+        const newCarrier = carrierService.createAtStar(star, [], ships);
 
         expect(newCarrier.ships).toEqual(ships);
         expect(star.garrison).toEqual(5);

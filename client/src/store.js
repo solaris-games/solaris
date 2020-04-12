@@ -11,7 +11,7 @@ const vuexPersist = new VuexPersist({
 
 export default new Vuex.Store({
   state: {
-    userId: null
+    userId: null // TODO: This doesn't appear to be used by the UI at all, do we still need this?
   },
   mutations: {
     setUserId (state, id) {

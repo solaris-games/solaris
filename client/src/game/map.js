@@ -81,8 +81,8 @@ class Map extends EventEmitter {
     gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y)
   }
 
-  zoomToUser (game, userId) {
-    let player = GameHelper.getUserPlayer(game, userId)
+  zoomToUser (game) {
+    let player = GameHelper.getUserPlayer(game)
 
     if (!player) {
       return

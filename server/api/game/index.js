@@ -8,7 +8,7 @@ router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
         settings: require('../../config/game/settings/user/standard.json'),
         options: require('../../config/game/settings/options.json')
     });
-});
+}, middleware.handleError);
 
 router.post('/', middleware.authenticate, async (req, res, next) => {
     req.body.general.createdByUserId = req.session.userId;
@@ -20,7 +20,7 @@ router.post('/', middleware.authenticate, async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
     try {
@@ -28,7 +28,7 @@ router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, as
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -38,7 +38,7 @@ router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, asyn
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/list/official', middleware.authenticate, async (req, res, next) => {
     try {
@@ -48,7 +48,7 @@ router.get('/list/official', middleware.authenticate, async (req, res, next) => 
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/list/user', middleware.authenticate, async (req, res, next) => {
     try {
@@ -58,7 +58,7 @@ router.get('/list/user', middleware.authenticate, async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/list/active', middleware.authenticate, async (req, res, next) => {
     try {
@@ -68,7 +68,7 @@ router.get('/list/active', middleware.authenticate, async (req, res, next) => {
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.get('/list/completed', middleware.authenticate, async (req, res, next) => {
     try {
@@ -78,7 +78,7 @@ router.get('/list/completed', middleware.authenticate, async (req, res, next) =>
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -92,7 +92,7 @@ router.post('/:gameId/join', middleware.authenticate, middleware.loadGame, async
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -104,7 +104,7 @@ router.post('/:gameId/quit', middleware.authenticate, middleware.loadGame, async
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -116,6 +116,19 @@ router.post('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGa
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
+
+router.get('/:gameId/player/:playerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    try {
+        let user = await container.gameService.getPlayerUser(
+            req.game,
+            req.params.playerId
+        );
+
+        return res.status(200).json(user);
+    } catch (err) {
+        return next(err);
+    }
+}, middleware.handleError);
 
 module.exports = router;

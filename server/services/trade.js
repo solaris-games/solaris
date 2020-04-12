@@ -11,12 +11,12 @@ module.exports = class TradeService {
         let fromPlayer = game.galaxy.players.find(x => x.userId === fromUserId);
         let toPlayer = game.galaxy.players.find(x => x.id === toPlayerId);
 
-        if (fromPlayer.cash < amount) {
+        if (fromPlayer.credits < amount) {
             throw new ValidationError(`The player does not own ${amount} credits.`);
         }
 
-        fromPlayer.cash -= amount;
-        toPlayer.cash += amount;
+        fromPlayer.credits -= amount;
+        toPlayer.credits += amount;
 
         await game.save();
     }

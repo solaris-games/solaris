@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('./middleware');
 const container = require('./container');
+const ValidationError = require('../errors/validation');
 
 router.post('/login', async (req, res, next) => {
     let errors = [];
@@ -15,7 +16,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     try {
@@ -26,11 +27,7 @@ router.post('/login', async (req, res, next) => {
         
         return res.status(200).json({id: userId});
     } catch (err) {
-        // TODO: Need to implement some decent error handling here,
-        // the problem is that the login function above throws errors
-        // as part of the logic which should not be the case. We should
-        // never throw errors for logic.
-        return next(err);
+        next(err);
     }
 }, middleware.handleError);
 
@@ -47,6 +44,6 @@ router.post('/logout', (req, res, next) => {
     } else {
         return res.sendStatus(200);
     }
-});
+}, middleware.handleError);
 
 module.exports = router;

@@ -57,7 +57,7 @@ export default {
     }
   },
   mounted () {
-    this.research = GameHelper.getUserPlayer(this.game, this.$store.state.userId).research
+    this.research = GameHelper.getUserPlayer(this.game).research
   }
 }
 </script>

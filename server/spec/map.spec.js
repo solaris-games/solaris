@@ -17,9 +17,6 @@ const fakeStarDistanceService = {
     isStarTooClose(star1, star2) {
         return false;
     },
-    sanitizeStarPositions(stars) {
-        // Do nothing
-    },
     isDuplicateStarPosition(star, stars) {
         return false;
     }

@@ -14,7 +14,7 @@ module.exports = class MapService {
         // Circle universe.
         const maxRadius = starCount * Math.PI;
 
-        // TODO: Do we have to do this here? Can the star service take care of it?
+        // Get an array of random star names for however many stars we want.
         const starNames = this.starNameService.getRandomStarNames(starCount);
 
         let index = 0;
@@ -48,10 +48,6 @@ module.exports = class MapService {
 
             index++;
         } while (stars.length < starCount);
-
-        // We need to sanitize all star positions to make sure that all
-        // x's and y's are positive integers otherwise rendering is a bitch.
-        //this.starDistanceService.sanitizeStarPositions(stars);
 
         return stars;
     }

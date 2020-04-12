@@ -32,9 +32,9 @@ export default {
   methods: {
     async confirmAwardRenown () {
       try {
-        let response = await ApiService.sendRenown(this.game._id, this.player._id, this.amount);
+        let response = await ApiService.sendRenown(this.game._id, this.player._id, this.amount)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           this.$emit('onRenownSent', this.amount)
 
           this.userPlayer.renownToGive -= this.amount

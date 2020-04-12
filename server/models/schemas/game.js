@@ -30,7 +30,7 @@ const schema = new Schema({
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
-			startingCash: { type: Types.Number, required: true, enum: [50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
+			startingCredits: { type: Types.Number, required: true, enum: [50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
 			startingShips: { type: Types.Number, required: true, enum: [0, 10, 50, 100], default: 10 },
 			startingInfrastructure: {
 				economy: { type: Types.Number, required: true, enum: [0, 5, 10, 20, 30], default: 5 },
@@ -84,8 +84,7 @@ const schema = new Schema({
 		lastTickDate: { type: Types.Date, required: false },
 		nextTickDate: { type: Types.Date, required: false },
 		stars: { type: Types.Number, required: true },
-		starsForVictory: { type: Types.Number, required: true },
-		playerCount: { type: Types.Number, required: true, default: 0 }
+		starsForVictory: { type: Types.Number, required: true }
 	}
 });
 

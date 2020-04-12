@@ -11,7 +11,7 @@ router.post('/:gameId/research/now', middleware.authenticate, middleware.loadGam
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/:gameId/research/next', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
@@ -21,6 +21,6 @@ router.post('/:gameId/research/next', middleware.authenticate, middleware.loadGa
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 module.exports = router;

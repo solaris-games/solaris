@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="col-auto ml-4 mr-2 text-center">
-                <span class="align-middle" v-if="getUserPlayer()">Credits: ${{getUserPlayer().cash}}</span>
+                <span class="align-middle" v-if="getUserPlayer()">Credits: ${{getUserPlayer().credits}}</span>
             </div>
             <div class="col text-center">
                 <span class="align-middle">Production: {{timeRemaining}}</span>
@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game)
     },
     setMenuState (state, args) {
       this.$emit('onMenuStateChanged', {

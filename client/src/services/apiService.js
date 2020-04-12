@@ -19,8 +19,8 @@ class ApiService {
     return axios.get('http://localhost:3000/api/user', { withCredentials: true })
   }
 
-  getUserInfo (userId) {
-    return axios.get('http://localhost:3000/api/user/' + userId, { withCredentials: true })
+  getPlayerUserInfo (gameId, playerId) {
+    return axios.get('http://localhost:3000/api/game/' + gameId + '/player/' + playerId, { withCredentials: true })
   }
 
   createUser (username, email, password) {

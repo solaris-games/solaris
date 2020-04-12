@@ -3,8 +3,9 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService {
 
-    constructor(gameModel) {
+    constructor(gameModel, userService) {
         this.gameModel = gameModel;
+        this.userService = userService;
     }
 
     async getById(id, select) {
@@ -57,15 +58,17 @@ module.exports = class GameService {
         player.alias = alias;
 
         // If the max player count is reached then start the game.
-        game.state.playerCount++;
+        let playerCount = game.galaxy.players.filter(p => p.userId).length;
 
-        if (game.state.playerCount === game.settings.general.playerLimit) {
+        if (playerCount === game.settings.general.playerLimit) {
             let start = moment();
 
             game.state.paused = false;
             game.state.startDate = start.toDate();
             game.state.lastTickDate = start.toDate();
             game.state.nextTickDate = start.add(10, 'm').toDate();
+
+            // TODO: Register a cron job for the first tick of the game.
         }
 
         return await game.save();
@@ -94,7 +97,6 @@ module.exports = class GameService {
         // doing this otherwise we'd have to reset everything here which will be a pain.
         player.userId = null;
         player.alias = "Empty Slot";
-        game.state.playerCount--; // TODO: Is there a better way to do this? Some kind of computed column?
 
         return await game.save();
     }
@@ -122,6 +124,12 @@ module.exports = class GameService {
         player.defeated = true;
 
         return await game.save();
+    }
+
+    async getPlayerUser(game, playerId) {
+        let player = game.galaxy.players.find(p => p.id === playerId);
+
+        return await this.userService.getById(player.userId);
     }
 
 };

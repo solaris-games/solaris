@@ -82,9 +82,10 @@ export default {
 
     // TODO: The result of this needs to cached or returned in the
     // main galaxy response.
-    if (this.player.userId) {
+    if (!this.player.isEmptySlot) {
+      console.log(this.player)
       try {
-        let response = await apiService.getUserInfo(this.player.userId)
+        let response = await apiService.getPlayerUserInfo(this.game._id, this.player._id)
 
         this.user = response.data
       } catch (err) {

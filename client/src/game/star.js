@@ -156,7 +156,7 @@ class Star extends EventEmitter {
   }
 
   drawInfrastructure () {
-    if (!this.data.ownedByPlayerId) return // TODO Does abandoning stars destroy ALL infrastructure?
+    if (!this.data.ownedByPlayerId) return
     if (this._isOutOfScanningRange()) return
 
     let text = new PIXI.Text(`${this.data.economy} ${this.data.industry} ${this.data.science}`, {
@@ -222,7 +222,7 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
-    this.isSelected = true //!this.isSelected
+    this.isSelected = true // !this.isSelected
 
     this.emit('onStarClicked', this)
   }

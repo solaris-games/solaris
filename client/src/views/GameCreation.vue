@@ -121,9 +121,9 @@
       </div>
 
       <div class="form-group">
-        <label for="startingCash" class="col-form-label">Starting Cash</label>
-        <select class="form-control" id="startingCash" v-model="settings.player.startingCash">
-          <option v-for="opt in options.player.startingCash" v-bind:key="opt" v-bind:value="opt">
+        <label for="startingCredits" class="col-form-label">Starting Credits</label>
+        <select class="form-control" id="startingCredits" v-model="settings.player.startingCredits">
+          <option v-for="opt in options.player.startingCredits" v-bind:key="opt" v-bind:value="opt">
             ${{ opt }}
           </option>
         </select>

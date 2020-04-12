@@ -2,17 +2,21 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    createAtStar(star, ships = 1) {
+    createAtStar(star, carriers, ships = 1) {
         if (!star.garrison) {
             throw new ValidationError('Star must have a garrison to build a carrier.');
         }
+
+        // Generate a name for the new carrier based on the star name but make sure
+        // this name isn't already taken by another carrier.
+        let name = this.generateCarrierName(star, carriers);
 
         let carrier = {
             ownedByPlayerId: star.ownedByPlayerId,
             ships: ships,
             orbiting: star._id,
             location: star.location,
-            name: star.name + ' 1' // TODO: Need to check if this name already exists.
+            name
         };
 
         // Reduce the star garrison by how many we have added to the carrier.
@@ -25,4 +29,13 @@ module.exports = class CarrierService {
         return carriers.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
+    generateCarrierName(star, carriers) {
+        let name;
+        
+        while (carriers.find(c => c.name == name)) {
+            name = `${star.name} ${i++}`;
+        }
+
+        return name;
+    }
 };

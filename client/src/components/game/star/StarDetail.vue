@@ -1,5 +1,6 @@
 <template>
 <div class="container">
+    <!-- TODO: These need to act off the star object itself instead of pixi object -->
     <h3 class="pt-2">{{star.data.name}}</h3>
 
     <div class="row bg-secondary">
@@ -46,7 +47,7 @@
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
         :gameId="game._id"
         :starId="star.data._id"
-        :availableCredits="getUserPlayer().cash"
+        :availableCredits="getUserPlayer().credits"
         :economy="star.data.upgradeCosts.economy" :industry="star.data.upgradeCosts.industry" :science="star.data.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
@@ -64,7 +65,7 @@
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton :disabled="getUserPlayer().cash < star.data.upgradeCosts.carriers || star.data.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.carriers}}</modalButton>
+          <modalButton :disabled="getUserPlayer().credits < star.data.upgradeCosts.carriers || star.data.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.carriers}}</modalButton>
         </div>
       </div>
 
@@ -73,7 +74,7 @@
           <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton v-if="!star.data.warpGate" :disabled="getUserPlayer().cash < star.data.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.warpGate}}</modalButton>
+          <modalButton v-if="!star.data.warpGate" :disabled="getUserPlayer().credits < star.data.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary">Build for ${{star.data.upgradeCosts.warpGate}}</modalButton>
           <modalButton v-if="star.data.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger">Destroy Gate</modalButton>
         </div>
       </div>
@@ -155,22 +156,22 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game)
     },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.game, this.star.data)
     },
     onInfrastructureUpgraded (e) {
       // TODO: Reload the current star to get new costs.
-      // TODO: Reload the player cash somehow?
+      // TODO: Reload the player credits somehow?
       this.star.data[e]++
-      this.getStarOwningPlayer().cash -= this.star.data.upgradeCosts[e]
+      this.getStarOwningPlayer().credits -= this.star.data.upgradeCosts[e]
     },
     async confirmBuildCarrier (e) {
       try {
-        let response = await ApiService.buildCarrier(this.game._id, this.star.data._id);
+        let response = await ApiService.buildCarrier(this.game._id, this.star.data._id)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // TODO: Refresh somehow.
 
           this.$emit('onCarrierBuilt', this.star.data._id)
@@ -181,12 +182,12 @@ export default {
     },
     async confirmAbandonStar (e) {
       try {
-        let response = await ApiService.abandonStar(this.game._id, this.star.data._id);
+        let response = await ApiService.abandonStar(this.game._id, this.star.data._id)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // TODO: Maybe a better way to refresh this?
-          this.star.data.ownedByPlayerId = null;
-          this.star.data.garrison = 0;
+          this.star.data.ownedByPlayerId = null
+          this.star.data.garrison = 0
 
           this.$emit('onStarAbandoned', this.star.data._id)
         }
@@ -196,12 +197,12 @@ export default {
     },
     async confirmBuildWarpGate (e) {
       try {
-        let response = await ApiService.buildWarpGate(this.game._id, this.star.data._id);
+        let response = await ApiService.buildWarpGate(this.game._id, this.star.data._id)
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // TODO: This doesn't refresh the UI for some reason.
           // Maybe the solution is to put the warp gate value in data instead of a prop?
-          this.star.data.warpGate = true;
+          this.star.data.warpGate = true
 
           this.$emit('onUpgradedWarpGate', this.star.data._id)
         }
@@ -211,10 +212,10 @@ export default {
     },
     async confirmDestroyWarpGate (e) {
       try {
-        let response = await ApiService.destroyWarpGate(this.game._id, this.star.data._id);
+        let response = await ApiService.destroyWarpGate(this.game._id, this.star.data._id)
 
-        if (response.status == 200) {
-          this.star.data.warpGate = false;
+        if (response.status === 200) {
+          this.star.data.warpGate = false
 
           this.$emit('onDestroyedWarpGate', this.star.data._id)
         }

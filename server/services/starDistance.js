@@ -85,22 +85,5 @@ module.exports = class StarDistanceService {
     
         return samePositionStars.length > 0;
     }
-
-    sanitizeStarPositions(stars) {
-        // TODO: Use Math.floor
-        
-        // Get the min X and min Y and add them onto all stars.
-        // This will ensure that all stars have a positive x and y coordinate.
-        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
-        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
-
-        if (minX < 0) minX *= -1;
-        if (minY < 0) minY *= -1;
-
-        for(let i = 0; i < stars.length; i++) {
-            let star = stars[i];
-            star.location.x += minX;
-            star.location.y += minY;
-        }
-    }
+    
 };

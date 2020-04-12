@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('../middleware');
 const container = require('../container');
+const ValidationError = require('../../errors/validation');
 
 router.post('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
@@ -25,7 +26,7 @@ router.post('/:gameId/trade/credits', middleware.authenticate, middleware.loadGa
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     try {
@@ -39,7 +40,7 @@ router.post('/:gameId/trade/credits', middleware.authenticate, middleware.loadGa
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 router.post('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
@@ -59,7 +60,7 @@ router.post('/:gameId/trade/renown', middleware.authenticate, middleware.loadGam
     }
 
     if (errors.length) {
-        return res.status(400).json({ errors: errors });
+        throw new ValidationError(errors);
     }
 
     try {
@@ -73,6 +74,6 @@ router.post('/:gameId/trade/renown', middleware.authenticate, middleware.loadGam
     } catch (err) {
         return next(err);
     }
-});
+}, middleware.handleError);
 
 module.exports = router;

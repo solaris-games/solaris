@@ -14,7 +14,7 @@ const gameSettings = {
         playerLimit: 4
     },
     player: {
-        startingCash: 500,
+        startingCredits: 500,
         startingShips: 10,
         startingStars: 3,
         startingInfrastructure: {
@@ -65,7 +65,7 @@ function assertNewPlayer(newPlayer, colour) {
     expect(newPlayer._id).not.toBe(null);
     expect(newPlayer.userId).toBe(null);
     expect(newPlayer.alias).not.toBe(null);
-    expect(newPlayer.cash).toEqual(gameSettings.player.startingCash);
+    expect(newPlayer.credits).toEqual(gameSettings.player.startingCredits);
     expect(newPlayer.colour).toBe(colour);
 
     for(var key in newPlayer.research) {

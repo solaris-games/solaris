@@ -1,8 +1,8 @@
 <template>
 <tr>
     <td><i class="fas fa-circle" v-if="carrier.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
-    <td><a href="#" @click="clickStar">{{carrier.name}}</a></td>
-    <td><a href="#" @click="goToStar"><i class="far fa-eye"></i></a></td>
+    <td><a href="#" @click="clickCarrier">{{carrier.name}}</a></td>
+    <td><a href="#" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
     <td>{{carrier.ships}}</td>
     <td>{{carrier.waypoints.length}}</td>
     <td>{{carrier.waypointsLooped}}</td>
@@ -27,13 +27,13 @@ export default {
 
       return owningPlayer.colour.value.replace('0x', '#')
     },
-    clickStar (e) {
-      gameContainer.map.clickCarrier(this.carrier._id) // TODO
+    clickCarrier (e) {
+      gameContainer.map.clickCarrier(this.carrier._id)
 
       e.preventDefault()
     },
-    goToStar (e) {
-      gameContainer.map.zoomToLocation(this.carrier.location) // TODO
+    goToCarrier (e) {
+      gameContainer.map.zoomToLocation(this.carrier.location)
 
       e.preventDefault()
     }

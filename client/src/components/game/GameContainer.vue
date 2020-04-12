@@ -43,7 +43,7 @@ export default {
     drawGame (game) {
       this.gameContainer.draw()
 
-      this.gameContainer.map.zoomToUser(game, this.$store.state.userId)
+      this.gameContainer.map.zoomToUser(game)
     },
     handleResize (e) {
       this.gameContainer.app.renderer.resize(

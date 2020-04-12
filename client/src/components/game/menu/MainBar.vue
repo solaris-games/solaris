@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game, this.$store.state.userId)
+      return GameHelper.getUserPlayer(this.game)
     },
     onMenuStateChanged (e) {
       this.$emit('onMenuStateChanged', e)
