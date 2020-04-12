@@ -50,7 +50,8 @@ function generateStarGrid() {
                 name: `Star ${i}`,
                 location: {
                     x, y
-                }
+                },
+                infrastructure: {}
             });
         }
     }
