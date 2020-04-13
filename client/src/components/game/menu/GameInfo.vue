@@ -16,22 +16,28 @@
                         <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-money-bill"></i></button>
                     </div>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)"><i class="fas fa-flask mr-2"></i>Research</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)"><i class="fas fa-star mr-2"></i>Galaxy</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
+                    <div v-if="!getUserPlayer()">
+                      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake mr-2"></i>Welcome</a>
+                    </div>
+                    <div v-if="getUserPlayer()">
+                      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
+                      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)"><i class="fas fa-flask mr-2"></i>Research</a>
+                      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)"><i class="fas fa-star mr-2"></i>Galaxy</a>
+                      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+                      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
+                    </div>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a>
                     <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
                 </div>
             </div>
-            <div class="col-auto ml-4 mr-2 text-center">
+            <div class="col-auto text-center pl-3">
                 <span class="align-middle" v-if="getUserPlayer()">Credits: ${{getUserPlayer().credits}}</span>
+                <span class="align-middle" v-if="!getUserPlayer()">{{game.settings.general.name}}</span>
             </div>
-            <div class="col text-center">
+            <div class="col text-right pr-3" v-if="getUserPlayer()">
                 <span class="align-middle">Production: {{timeRemaining}}</span>
             </div>
-            <div class="col-auto">
+            <div class="col-auto" v-if="getUserPlayer()">
                 <button class="btn btn-sm btn-info" v-on:click="setMenuState(MENU_STATES.INBOX)">
                     <i class="fas fa-inbox"></i>
                 </button>
