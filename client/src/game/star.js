@@ -2,6 +2,15 @@ import * as PIXI from 'pixi.js'
 import EventEmitter from 'events'
 
 class Star extends EventEmitter {
+
+  // TODO: This should come from the API somehow.
+  DISTANCES = {
+    LIGHT_YEAR: 30,
+    MIN_DISTANCE_BETWEEN_STARS: 30,
+    MAX_DISTANCE_BETWEEN_STARS: 300,
+    BASE_SHIP_SPEED: 3  // 0.1 ly per tick
+  }
+
   constructor () {
     super()
 
@@ -195,7 +204,7 @@ class Star extends EventEmitter {
 
     let graphics = new PIXI.Graphics()
 
-    let radius = (((player.research.scanning.level || 1) + 2) * 30) / 2 / 2
+    let radius = ((player.research.scanning.level || 1) + 2) * this.DISTANCES.LIGHT_YEAR
 
     graphics.lineStyle(1, 0xFFFFFF, 0.3)
     graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1)
@@ -211,7 +220,7 @@ class Star extends EventEmitter {
 
     let graphics = new PIXI.Graphics()
 
-    let radius = (((player.research.hyperspace.level || 1) + 3) * 30) / 2 / 2
+    let radius = ((player.research.hyperspace.level || 1) + 3) * this.DISTANCES.LIGHT_YEAR
 
     graphics.lineStyle(1, 0xFFFFFF, 0.3)
     graphics.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
