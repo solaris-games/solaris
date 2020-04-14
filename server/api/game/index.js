@@ -80,7 +80,7 @@ router.get('/list/completed', middleware.authenticate, async (req, res, next) =>
     }
 }, middleware.handleError);
 
-router.post('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.put('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.gameService.join(
             req.game,
@@ -94,7 +94,7 @@ router.post('/:gameId/join', middleware.authenticate, middleware.loadGame, async
     }
 }, middleware.handleError);
 
-router.post('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.put('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.gameService.quit(
             req.game,
@@ -106,7 +106,7 @@ router.post('/:gameId/quit', middleware.authenticate, middleware.loadGame, async
     }
 }, middleware.handleError);
 
-router.post('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.put('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         await container.gameService.concedeDefeat(
             req.game,

@@ -4,7 +4,7 @@ const middleware = require('../middleware');
 const container = require('../container');
 const ValidationError = require('../../errors/validation');
 
-router.post('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.put('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.toPlayerId) {
@@ -42,7 +42,7 @@ router.post('/:gameId/trade/credits', middleware.authenticate, middleware.loadGa
     }
 }, middleware.handleError);
 
-router.post('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.toPlayerId) {

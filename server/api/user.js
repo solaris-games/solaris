@@ -66,7 +66,7 @@ router.get('/:id', middleware.authenticate, async (req, res, next) => {
     }
 }, middleware.handleError);
 
-router.post('/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
+router.put('/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
     try {
         await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
         
@@ -76,7 +76,7 @@ router.post('/changeEmailPreference', middleware.authenticate, async (req, res, 
     }
 }, middleware.handleError);
 
-router.post('/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
+router.put('/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.email) {
@@ -96,7 +96,7 @@ router.post('/changeEmailAddress', middleware.authenticate, async (req, res, nex
     }
 }, middleware.handleError);
 
-router.post('/changePassword', middleware.authenticate, async (req, res, next) => {
+router.put('/changePassword', middleware.authenticate, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.currentPassword) {

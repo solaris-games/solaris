@@ -32,21 +32,21 @@ class ApiService {
   }
 
   toggleEmailNotifications (enabled) {
-    return axios.post('http://localhost:3000/api/user/changeEmailPreference', {
+    return axios.put('http://localhost:3000/api/user/changeEmailPreference', {
       enabled
     },
     { withCredentials: true })
   }
 
   updateEmailAddress (email) {
-    return axios.post('http://localhost:3000/api/user/changeEmailAddress', {
+    return axios.put('http://localhost:3000/api/user/changeEmailAddress', {
       email
     },
     { withCredentials: true })
   }
 
   updatePassword (currentPassword, newPassword) {
-    return axios.post('http://localhost:3000/api/user/changePassword', {
+    return axios.put('http://localhost:3000/api/user/changePassword', {
       currentPassword, newPassword
     },
     { withCredentials: true })
@@ -93,38 +93,38 @@ class ApiService {
   }
 
   joinGame (gameId, playerId, alias) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/join', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/join', {
       playerId, alias
     },
     { withCredentials: true })
   }
 
   quitGame (gameId) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/quit', null,
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/quit', null,
       { withCredentials: true })
   }
 
   concedeDefeat (gameId) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/concedeDefeat', null,
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/concedeDefeat', null,
       { withCredentials: true })
   }
 
   updateResearchNow (gameId, preference) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/research/now', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/research/now', {
       preference
     },
     { withCredentials: true })
   }
 
   updateResearchNext (gameId, preference) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/research/next', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/research/next', {
       preference
     },
     { withCredentials: true })
   }
 
   sendCredits (gameId, toPlayerId, amount) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/trade/credits', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/trade/credits', {
       toPlayerId,
       amount
     },
@@ -132,7 +132,7 @@ class ApiService {
   }
 
   sendRenown (gameId, toPlayerId, amount = 1) {
-    return axios.post('http://localhost:3000/api/game/' + gameId + '/trade/renown', {
+    return axios.put('http://localhost:3000/api/game/' + gameId + '/trade/renown', {
       toPlayerId,
       amount
     },
