@@ -23,7 +23,7 @@ import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
-import apiService from '../services/apiService'
+import userService from '../services/api/user'
 
 export default {
   components: {
@@ -50,7 +50,7 @@ export default {
       if (this.errors.length) return
 
       try {
-        await apiService.updateEmailAddress(this.email)
+        await userService.updateEmailAddress(this.email)
 
         router.push({ name: 'main-menu' })
       } catch (err) {

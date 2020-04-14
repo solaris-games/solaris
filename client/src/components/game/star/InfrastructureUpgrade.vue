@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import ApiService from '../../../services/apiService'
+import starService from '../../../services/api/star'
 
 export default {
   props: {
@@ -36,7 +36,7 @@ export default {
   methods: {
     async upgradeEconomy (e) {
       try {
-        let response = await ApiService.upgradeEconomy(this.gameId, this.starId)
+        let response = await starService.upgradeEconomy(this.gameId, this.starId)
 
         if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'economy')
@@ -47,7 +47,7 @@ export default {
     },
     async upgradeIndustry (e) {
       try {
-        let response = await ApiService.upgradeIndustry(this.gameId, this.starId)
+        let response = await starService.upgradeIndustry(this.gameId, this.starId)
 
         if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'industry')
@@ -58,7 +58,7 @@ export default {
     },
     async upgradeScience (e) {
       try {
-        let response = await ApiService.upgradeScience(this.gameId, this.starId)
+        let response = await starService.upgradeScience(this.gameId, this.starId)
 
         if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'science')

@@ -18,8 +18,7 @@
 </template>
 
 <script>
-import apiService from '../../../services/apiService'
-
+import gameService from '../../../services/api/game'
 import FormErrorListVue from '../../FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
 import SelectColourVue from './SelectColour.vue'
@@ -66,7 +65,7 @@ export default {
       if (this.errors.length) return
 
       try {
-        let response = await apiService.joinGame(this.game._id, playerId, this.alias)
+        let response = await gameService.joinGame(this.game._id, playerId, this.alias)
 
         if (response.status === 200) {
           this.$emit('onGameJoined', playerId)

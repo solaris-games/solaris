@@ -17,7 +17,7 @@
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
-import apiService from '../services/apiService'
+import gameService from '../services/api/game'
 
 export default {
   components: {
@@ -43,7 +43,7 @@ export default {
   },
   async mounted () {
     try {
-      let response = await apiService.getGameInfo(this.game._id)
+      let response = await gameService.getGameInfo(this.game._id)
 
       this.game = response.data
     } catch (err) {

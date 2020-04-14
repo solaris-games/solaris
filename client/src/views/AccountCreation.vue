@@ -38,7 +38,7 @@ import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
-import apiService from '../services/apiService'
+import userService from '../services/api/user'
 
 export default {
   components: {
@@ -85,7 +85,7 @@ export default {
 
       try {
         // Call the account create API endpoint
-        let response = await apiService.createUser(this.username, this.email, this.password)
+        let response = await userService.createUser(this.username, this.email, this.password)
 
         if (response.status === 201) {
           this.$store.commit('setUserId', response.data.id)

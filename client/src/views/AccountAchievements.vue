@@ -174,7 +174,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import Achievements from '../components/game/player/Achievements'
-import apiService from '../services/apiService'
+import userService from '../services/api/user'
 
 export default {
   components: {
@@ -190,7 +190,7 @@ export default {
   },
   async mounted () {
     try {
-      let response = await apiService.getMyUserInfo()
+      let response = await userService.getMyUserInfo()
 
       this.achievements = response.data.achievements
     } catch (err) {

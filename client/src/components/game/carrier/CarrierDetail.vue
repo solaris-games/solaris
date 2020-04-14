@@ -104,7 +104,6 @@
 </template>
 
 <script>
-import ApiService from '../../../services/apiService'
 import GameHelper from '../../../services/gameHelper'
 import PlayerOverview from '../player/Overview'
 

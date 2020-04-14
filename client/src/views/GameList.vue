@@ -61,7 +61,7 @@
 <script>
 import ViewTitle from '../components/ViewTitle'
 import ViewContainer from '../components/ViewContainer'
-import apiService from '../services/apiService'
+import gameService from '../services/api/game'
 
 export default {
   components: {
@@ -76,10 +76,10 @@ export default {
   },
   async mounted () {
     try {
-      let responseOfficial = await apiService.listOfficialGames()
+      let responseOfficial = await gameService.listOfficialGames()
       this.serverGames = responseOfficial.data
 
-      let responseUser = await apiService.listUserGames()
+      let responseUser = await gameService.listUserGames()
       this.userGames = responseUser.data
     } catch (err) {
       console.error(err)

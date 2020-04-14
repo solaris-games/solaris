@@ -32,7 +32,6 @@
 
 <script>
 import Statistics from './Statistics'
-import apiService from '../../../services/apiService'
 
 export default {
   components: {

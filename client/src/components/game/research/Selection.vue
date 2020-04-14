@@ -41,7 +41,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
-import ApiService from '../../../services/apiService'
+import researchService from '../../../services/api/research'
 
 export default {
   props: {
@@ -71,7 +71,7 @@ export default {
       this.loadingNow = true
 
       try {
-        await ApiService.updateResearchNow(this.game._id, this.player.researchingNow)
+        await researchService.updateResearchNow(this.game._id, this.player.researchingNow)
       } catch (err) {
         console.error(err)
       }
@@ -82,7 +82,7 @@ export default {
       this.loadingNext = true
 
       try {
-        await ApiService.updateResearchNext(this.game._id, this.player.researchingNext)
+        await researchService.updateResearchNext(this.game._id, this.player.researchingNext)
       } catch (err) {
         console.error(err)
       }

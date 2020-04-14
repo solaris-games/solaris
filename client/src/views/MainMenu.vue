@@ -28,7 +28,7 @@
 
 <script>
 import router from '../router'
-import apiService from '../services/apiService'
+import authService from '../services/api/auth'
 import ViewContainer from '../components/ViewContainer'
 
 export default {
@@ -39,7 +39,7 @@ export default {
     async logout () {
       this.$store.commit('clearUserId')
 
-      await apiService.logout()
+      await authService.logout()
 
       router.push({ name: 'home' })
     }

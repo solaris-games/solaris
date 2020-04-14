@@ -60,7 +60,7 @@
 
 <script>
 import router from '../../../router'
-import apiService from '../../../services/apiService'
+import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
 import gameContainer from '../../../game/container'
 import ModalButton from '../../modal/ModalButton'
@@ -86,7 +86,7 @@ export default {
     },
     async concedeDefeat () {
       try {
-        let response = await apiService.concedeDefeat(this.game._id)
+        let response = await gameService.concedeDefeat(this.game._id)
 
         if (response.status === 200) {
             router.push({ name: 'main-menu' })
@@ -97,7 +97,7 @@ export default {
     },
     async quitGame () {
       try {
-        let response = await apiService.quitGame(this.game._id)
+        let response = await gameService.quitGame(this.game._id)
 
         if (response.status === 200) {
             router.push({ name: 'main-menu' })

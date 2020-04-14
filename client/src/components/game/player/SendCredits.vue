@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import ApiService from '../../../services/apiService'
+import tradeService from '../../../services/api/trade'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 
@@ -44,7 +44,7 @@ export default {
   methods: {
     async confirmSendCredits () {
       try {
-        let response = await ApiService.sendCredits(this.game._id, this.player._id, this.amount)
+        let response = await tradeService.sendCredits(this.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
           this.$emit('onCreditsSent', this.amount)

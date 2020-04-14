@@ -294,7 +294,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import FormErrorList from '../components/FormErrorList'
-import apiService from '../services/apiService'
+import gameService from '../services/api/game'
 import router from '../router'
 
 export default {
@@ -313,7 +313,7 @@ export default {
   },
   async mounted () {
     try {
-      let response = await apiService.getDefaultGameSettings()
+      let response = await gameService.getDefaultGameSettings()
 
       this.settings = response.data.settings
       this.options = response.data.options
@@ -335,7 +335,7 @@ export default {
 
       try {
         // Call the login API endpoint
-        let response = await apiService.createGame(this.settings)
+        let response = await gameService.createGame(this.settings)
 
         if (response.status === 201) {
           router.push({ name: 'game-detail', query: { id: response.data } })

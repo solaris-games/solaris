@@ -30,7 +30,7 @@ import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
-import apiService from '../services/apiService'
+import authService from '../services/api/auth'
 
 export default {
   components: {
@@ -63,7 +63,7 @@ export default {
 
       try {
         // Call the login API endpoint
-        let response = await apiService.login(this.username, this.password)
+        let response = await authService.login(this.username, this.password)
 
         if (response.status === 200) {
           this.$store.commit('setUserId', response.data.id)

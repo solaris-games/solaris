@@ -129,7 +129,7 @@
 </template>
 
 <script>
-import ApiService from '../../../services/apiService'
+import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
 import Infrastructure from '../shared/Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
@@ -169,7 +169,7 @@ export default {
     },
     async confirmBuildCarrier (e) {
       try {
-        let response = await ApiService.buildCarrier(this.game._id, this.star.data._id)
+        let response = await starService.buildCarrier(this.game._id, this.star.data._id)
 
         if (response.status === 200) {
           // TODO: Refresh somehow.
@@ -182,7 +182,7 @@ export default {
     },
     async confirmAbandonStar (e) {
       try {
-        let response = await ApiService.abandonStar(this.game._id, this.star.data._id)
+        let response = await starService.abandonStar(this.game._id, this.star.data._id)
 
         if (response.status === 200) {
           // TODO: Maybe a better way to refresh this?
@@ -197,7 +197,7 @@ export default {
     },
     async confirmBuildWarpGate (e) {
       try {
-        let response = await ApiService.buildWarpGate(this.game._id, this.star.data._id)
+        let response = await starService.buildWarpGate(this.game._id, this.star.data._id)
 
         if (response.status === 200) {
           // TODO: This doesn't refresh the UI for some reason.
@@ -212,7 +212,7 @@ export default {
     },
     async confirmDestroyWarpGate (e) {
       try {
-        let response = await ApiService.destroyWarpGate(this.game._id, this.star.data._id)
+        let response = await starService.destroyWarpGate(this.game._id, this.star.data._id)
 
         if (response.status === 200) {
           this.star.data.warpGate = false

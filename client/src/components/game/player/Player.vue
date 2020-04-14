@@ -52,7 +52,7 @@ import SendCredits from './SendCredits'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import Badges from './Badges'
-import apiService from '../../../services/apiService'
+import gameService from '../../../services/api/game'
 
 export default {
   components: {
@@ -85,7 +85,7 @@ export default {
     if (!this.player.isEmptySlot) {
       console.log(this.player)
       try {
-        let response = await apiService.getPlayerUserInfo(this.game._id, this.player._id)
+        let response = await gameService.getPlayerUserInfo(this.game._id, this.player._id)
 
         this.user = response.data
       } catch (err) {

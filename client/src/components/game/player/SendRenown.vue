@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import ApiService from '../../../services/apiService'
+import tradeService from '../../../services/api/trade'
 
 export default {
   props: {
@@ -32,7 +32,7 @@ export default {
   methods: {
     async confirmAwardRenown () {
       try {
-        let response = await ApiService.sendRenown(this.game._id, this.player._id, this.amount)
+        let response = await tradeService.sendRenown(this.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
           this.$emit('onRenownSent', this.amount)

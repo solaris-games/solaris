@@ -32,8 +32,7 @@
 <script>
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
-
-import apiService from '../services/apiService'
+import gameService from '../services/api/game'
 
 export default {
   components: {
@@ -48,11 +47,11 @@ export default {
   },
   async mounted () {
     try {
-      let response = await apiService.listActiveGames()
+      let response = await gameService.listActiveGames()
 
       this.activeGames = response.data
 
-      response = await apiService.listCompletedGames()
+      response = await gameService.listCompletedGames()
 
       this.completedGames = response.data
     } catch (err) {

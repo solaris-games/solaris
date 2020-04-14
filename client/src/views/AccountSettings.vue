@@ -51,7 +51,7 @@
 <script>
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
-import apiService from '../services/apiService'
+import userService from '../services/api/user'
 
 export default {
   components: {
@@ -64,7 +64,7 @@ export default {
     }
   },
   async mounted () {
-    let response = await apiService.getMyUserInfo()
+    let response = await userService.getMyUserInfo()
 
     if (response.status === 200) {
       this.info = response.data
@@ -74,7 +74,7 @@ export default {
     async toggleEmailNotifications (enabled) {
       this.info.emailEnabled = enabled
 
-      await apiService.toggleEmailNotifications(this.info.emailEnabled)
+      await userService.toggleEmailNotifications(this.info.emailEnabled)
     }
   }
 }

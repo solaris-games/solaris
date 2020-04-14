@@ -19,7 +19,7 @@
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
-import apiService from '../services/apiService'
+import gameService from '../services/api/game'
 
 export default {
   components: {
@@ -40,8 +40,8 @@ export default {
   methods: {
     async reloadGame () {
       try {
-        let infoResponse = await apiService.getGameInfo(this.$route.query.id)
-        let galaxyResponse = await apiService.getGameGalaxy(this.$route.query.id)
+        let infoResponse = await gameService.getGameInfo(this.$route.query.id)
+        let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
 
         this.game = infoResponse.data // This will be passed to the game container component.
         this.game.galaxy = galaxyResponse.data.galaxy
