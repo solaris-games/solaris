@@ -45,8 +45,7 @@ module.exports = class PlayerService {
         // The desired distance from the center is half way from the galaxy center and the edge.
         const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars).x / 2 / 2;
 
-        const incrementRadians = 360 / gameSettings.general.playerLimit * Math.PI / 180;
-        let currentRadians = 0;
+        let radians = this._getPlayerStartingLocationRadians(gameSettings.general.playerLimit);
 
         // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < gameSettings.general.playerLimit; i++) {
@@ -55,15 +54,8 @@ module.exports = class PlayerService {
 
             let player = this.createEmptyPlayer(gameSettings, colour);
 
-            // Get the desired player starting location.
-            let startingLocation = {
-                x: distanceFromCenter * Math.cos(currentRadians),
-                y: distanceFromCenter * Math.sin(currentRadians)
-            };
-
-            // Add the galaxy center x and y so that the desired location is relative to the center.
-            startingLocation.x += galaxyCenter.x;
-            startingLocation.y += galaxyCenter.y;
+            // Get the player's starting location.
+            let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
 
             // Find the star that is closest to this location, that will be the player's home star.
             let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, allStars);
@@ -72,9 +64,6 @@ module.exports = class PlayerService {
             this.starService.setupHomeStar(homeStar, player, gameSettings);
 
             players.push(player);
-
-            // Increment the angle for the next player.
-            currentRadians += incrementRadians;
         }
 
         // Now that all players have a home star, the fairest way to distribute stars to players is to
@@ -99,6 +88,38 @@ module.exports = class PlayerService {
         }
 
         return players;
+    }
+
+    _getPlayerStartingLocationRadians(playerCount) {
+        const increment = 360 / playerCount * Math.PI / 180;
+        let current = 0;
+
+        let radians = [];
+
+        for (let i = 0; i < playerCount; i++) {
+            radians.push(current);
+            current += increment;
+        }
+
+        return radians;
+    }
+
+    _getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter) {
+        // Pick a random radian for the player's starting position.
+        let radianIndex = this.randomService.getRandomNumber(radians.length);
+        let currentRadians = radians.splice(radianIndex, 1)[0];
+
+        // Get the desired player starting location.
+        let startingLocation = {
+            x: distanceFromCenter * Math.cos(currentRadians),
+            y: distanceFromCenter * Math.sin(currentRadians)
+        };
+
+        // Add the galaxy center x and y so that the desired location is relative to the center.
+        startingLocation.x += galaxyCenter.x;
+        startingLocation.y += galaxyCenter.y;
+
+        return startingLocation;
     }
 
     createEmptyPlayerCarriers(allStars, players) {
