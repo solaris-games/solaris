@@ -105,4 +105,14 @@ module.exports = class MapService {
         };
     }
 
+    getGalaxyCenterOfMass(stars) {
+        let totalX = stars.reduce((total, s) => total += s.location.x, 0);
+        let totalY = stars.reduce((total, s) => total += s.location.y, 0);
+
+        return {
+            x: totalX / stars.length,
+            y: totalY / stars.length,
+        };
+    }
+
 };

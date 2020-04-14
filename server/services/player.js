@@ -40,7 +40,7 @@ module.exports = class PlayerService {
         // at near equal distance from the center of the galaxy.
 
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        const galaxyCenter = this.mapService.getGalaxyCenter(allStars);
+        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(allStars); // TODO: Is center of mass fairer?
 
         // The desired distance from the center is half way from the galaxy center and the edge.
         const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars).x / 2 / 2;

@@ -71,8 +71,8 @@ class GameContainer {
       .clampZoom({
         minWidth: 200,
         minHeight: 200,
-        maxWidth: 1000,
-        maxHeight: 1000
+        maxWidth: 2000,
+        maxHeight: 2000
       })
   }
 
