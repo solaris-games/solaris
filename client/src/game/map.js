@@ -2,10 +2,17 @@ import * as PIXI from 'pixi.js'
 import gameContainer from './container'
 import Star from './star'
 import Carrier from './carrier'
+import Waypoints from './waypoints'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 
 class Map extends EventEmitter {
+
+  // Represents the current game mode, these are as follows:
+  // galaxy - Normal galaxy view
+  // waypoints - Displays waypoints overlay for a given carrier
+  mode = 'galaxy'
+
   constructor () {
     super()
 
@@ -43,11 +50,32 @@ class Map extends EventEmitter {
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     }
+
+    this.waypoints = new Waypoints()
+    this.waypoints.setup(this.game)
+    this.container.addChild(this.waypoints.container)
   }
 
   draw () {
     this.drawStars()
     this.drawCarriers()
+
+    if (this.mode === 'waypoints') {
+      this.drawWaypoints()
+    }
+  }
+
+  setMode (mode, args) {
+    this.mode = mode
+    this.modeArgs = args
+
+    this.draw()
+  }
+
+  resetMode () {
+    this.mode = 'galaxy'
+
+    this.draw()
   }
 
   drawStars () {
@@ -64,6 +92,10 @@ class Map extends EventEmitter {
       
       carrier.draw()
     }
+  }
+
+  drawWaypoints () {
+    this.waypoints.draw(this.modeArgs)
   }
 
   zoomToPlayer (game, player) {

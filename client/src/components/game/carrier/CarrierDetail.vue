@@ -94,7 +94,7 @@
           <p v-if="carrier.data.waypoints.length" class="mb-2">ETA: 0d 0h 0m 0s (0h 0m 0s)</p>
         </div>
         <div class="col-4">
-          <button class="btn btn-block btn-success mb-2">Edit Waypoints</button>
+          <button class="btn btn-block btn-success mb-2" @click="editWaypoints()">Edit Waypoints</button>
         </div>
       </div>
     </div>
@@ -106,6 +106,7 @@
 <script>
 import GameHelper from '../../../services/gameHelper'
 import PlayerOverview from '../player/Overview'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -136,6 +137,9 @@ export default {
       this.showAction = !this.showAction
 
       e.preventDefault()
+    },
+    editWaypoints () {
+      GameContainer.map.setMode('waypoints', this.carrier.data)
     }
   }
 }
