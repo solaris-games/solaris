@@ -53,6 +53,9 @@ class Map extends EventEmitter {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(this.game)
+    this.waypoints.registerEvents(this.stars)
+    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+
     this.container.addChild(this.waypoints.container)
   }
 
@@ -175,17 +178,31 @@ class Map extends EventEmitter {
   }
 
   onStarClicked (e) {
-    this.unselectAllCarriers()
-    this.unselectAllStarsExcept(e)
-
-    this.emit('onStarClicked', e)
+    // Clicking stars should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      e.isSelected = true
+      
+      this.unselectAllCarriers()
+      this.unselectAllStarsExcept(e)
+  
+      this.emit('onStarClicked', e)
+    }
   }
 
   onCarrierClicked (e) {
-    this.unselectAllStars()
-    this.unselectAllCarriersExcept(e)
+    // Clicking carriers should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      e.isSelected = true
 
-    this.emit('onCarrierClicked', e)
+      this.unselectAllStars()
+      this.unselectAllCarriersExcept(e)
+
+      this.emit('onCarrierClicked', e)
+    }
+  }
+
+  onWaypointCreated (e) {
+    this.emit('onWaypointCreated', e)
   }
 
 }

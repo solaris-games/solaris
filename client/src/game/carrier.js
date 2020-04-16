@@ -51,8 +51,6 @@ class Carrier extends EventEmitter {
   }
 
   onClicked (e) {
-    this.isSelected = true // !this.isSelected
-
     this.emit('onCarrierClicked', this)
   }
 }

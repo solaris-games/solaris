@@ -39,8 +39,7 @@
       </div>
 
       <!-- TODO: This should be a component -->
-      <!-- v-if="carrier.data.waypoints.length" -->
-      <div class="row pt-0 pb-0 mb-0">
+      <div v-if="carrier.data.waypoints.length" class="row pt-0 pb-0 mb-0">
         <table class="table table-striped table-hover">
           <thead>
               <tr class="bg-primary">
@@ -54,8 +53,15 @@
               </tr>
           </thead>
           <tbody>
+              <tr v-for="waypoint in carrier.data.waypoints" v-bind:key="waypoint">
+                  <td>{{waypoint.delayTicks}}</td>
+                  <td>{{getStarName(waypoint.destination)}}</td>
+                  <td v-if="!showAction">1d 2h 3m 4s</td>
+                  <td v-if="showAction">{{getWaypointActionFriendlyText(waypoint)}}</td>
+                  <td class="text-right"><a href="">Edit</a></td>
+              </tr>
               <!-- TODO: Rows should be components -->
-              <tr>
+              <!-- <tr>
                   <td>0</td>
                   <td>Star 1</td>
                   <td v-if="!showAction">1d 2h 3m 4s</td>
@@ -75,7 +81,7 @@
                   <td v-if="!showAction">3m 4s</td>
                   <td v-if="showAction">Drop All Ships</td>
                   <td class="text-right"><a href="">Edit</a></td>
-              </tr>
+              </tr> -->
           </tbody>
         </table>
       </div>
@@ -122,6 +128,9 @@ export default {
       showAction: true
     }
   },
+  mounted () {
+    GameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+  },
   methods: {
     // TODO: This method appears everywhere, is there a way to make it global?
     getUserPlayer () {
@@ -140,6 +149,32 @@ export default {
     },
     editWaypoints () {
       GameContainer.map.setMode('waypoints', this.carrier.data)
+    },
+    onWaypointCreated (e) {
+      // this.carrier.data.waypoints.push(e)
+    },
+    getStarName (starId) {
+      return this.game.galaxy.stars.find(s => s._id === starId).name
+    },
+    getWaypointActionFriendlyText (waypoint) {
+      switch (waypoint.action) {
+        case 'nothing':
+          return 'Do Nothing'
+        case 'collectAll':
+          return 'Collect All Ships'
+        case 'dropAll':
+          return 'Drop All Ships'
+        case 'collect':
+          return `Collect ${waypoint.actionShips} Ships`
+        case 'drop':
+          return `Drop ${waypoint.actionShips} Ships`
+        case 'collectAllBut':
+          return `Collect All But ${waypoint.actionShips} Ships`
+        case 'dropAllBut':
+          return `Drop All But ${waypoint.actionShips} Ships`
+        case 'garrison':
+          return `Garrison ${waypoint.actionShips} Ships`
+      }
     }
   }
 }

@@ -29,6 +29,7 @@ export default {
     // Bind to game events.
     this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this))
     this.gameContainer.map.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+    this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
   },
 
   beforeDestroy () {
@@ -56,6 +57,9 @@ export default {
     },
     onCarrierClicked (e) {
       this.$emit('onCarrierClicked', e)
+    },
+    onWaypointCreated (e) {
+      this.$emit('onWaypointCreated', e)
     }
   },
 

@@ -16,6 +16,12 @@ class Waypoints extends EventEmitter {
     this.game = game
   }
 
+  registerEvents (stars) {
+    stars.forEach(s => {
+      s.on('onStarClicked', this.onStarClicked.bind(this))
+    })
+  }
+
   draw (carrier) {
     this.container.removeChildren()
 
@@ -40,7 +46,7 @@ class Waypoints extends EventEmitter {
     let lastLocation = this._getLastLocation()
 
     // Calculate which stars are in reach and draw highlights around them
-    let hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get the hyperspace level
+    const hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get the hyperspace level
 
     let stars = this.game.galaxy.stars.filter(s => {
         let distance = this._getDistanceBetweenLocations(lastLocation, s.location)
@@ -89,6 +95,45 @@ class Waypoints extends EventEmitter {
     graphics.drawStar(location.x, location.y, radius, radius, radius - 3)
 
     this.container.addChild(graphics)
+  }
+
+  onStarClicked (e) {
+    // If the star that was clicked is within hyperspace range then append
+    // a new waypoint to this star.
+    const hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get hyperspace level
+    
+    const lastLocation = this._getLastLocation()
+    const distance = this._getDistanceBetweenLocations(lastLocation, e.data.location)
+
+    if (distance <= hyperspaceDistance) {
+      let newWaypoint = {
+        destination: e.data._id,
+        action: 'collectAll',
+        actionShips: 0,
+        delayTicks: 0
+      }
+
+      // If the carrier has waypoints, create a new waypoint from the last destination.
+      if (this.carrier.waypoints.length) {
+        const lastWaypoint = this._getLastWaypoint()
+
+        newWaypoint.source = lastWaypoint.destination
+      }
+      // Otherwise use the current orbiting star
+      else {
+        newWaypoint.source = this.carrier.orbiting
+      }
+
+      this.carrier.waypoints.push(newWaypoint)
+
+      this.draw(this.carrier)
+
+      this.emit('onWaypointCreated', newWaypoint)
+    }
+  }
+
+  _getLastWaypoint () {
+    return this.carrier.waypoints[this.carrier.waypoints.length - 1]
   }
 
   _getLastLocation () {
