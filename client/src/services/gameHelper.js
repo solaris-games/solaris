@@ -16,6 +16,16 @@ class GameHelper {
   getCarrierOrbitingStar (game, carrier) {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting)
   }
+
+  isCarrierInTransit (carrier) {
+    return carrier.orbiting == null
+  }
+
+  isCarrierInTransitToWaypoint (carrier, waypoint) {
+    return this.isCarrierInTransit(carrier) 
+        && carrier.inTransitFrom === waypoint.source
+        && carrier.inTransitTo === waypoint.destination
+  }
 }
 
 export default new GameHelper()
