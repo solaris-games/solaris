@@ -1,19 +1,11 @@
 <template>
 <div class="container bg-primary pt-2 pb-1 mb-2">
-    <p class="float-right"><small>Sun 1 Jan 01:01</small></p>
+    <p class="float-right"><small>{{getDateString(conversation.lastMessageDate)}}</small></p>
     <div class="row">
-        <div class="col-2 pl-0 pr-0">
-            <img src="" width="60"/>
-        </div>
-        <!-- <div class="col-2 pl-1 pr-0">
-            From:<br/>
-            To:
-        </div> -->
         <div class="col pl-2 pr-2">
-            <i class="fas fa-user-circle"></i> Some alias<br/>
-            <i class="far fa-user-circle"></i> Some alias
+            <span><i class="fas fa-user-circle"></i> {{conversation.alias}}</span>
 
-            <p class="mt-2">Some message</p>
+            <p class="mt-2 mb-1">{{conversation.lastMessage}}</p>
         </div>
     </div>
 </div>
@@ -24,10 +16,22 @@ export default {
   components: {
   },
   props: {
-    game: Object
+    game: Object,
+    conversation: Object
+  },
+  methods: {
+      getDateString (date) {
+          let dayOfWeek = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+          let monthOfYear = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+          return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours()}:${date.getMinutes()}`
+      }
   }
 }
 </script>
 
 <style scoped>
+.container {
+    cursor: pointer;
+}
 </style>

@@ -10,11 +10,8 @@
         No Messages
     </div>
 
-    <div>
-        <diplomacy-list-item :game="game" />
-        <diplomacy-list-item :game="game" />
-        <diplomacy-list-item :game="game" />
-        <diplomacy-list-item :game="game" />
+    <div class="pt-2">
+        <diplomacy-list-item v-for="conversation in conversations" v-bind:key="conversation.alias" :game="game" :conversation="conversation" />
     </div>
 </div>
 </template>
@@ -29,9 +26,30 @@ export default {
   props: {
     game: Object
   },
-  data: function () {
+  data () {
     return {
-      conversations: []
+      conversations: [
+        {
+          alias: 'Player 1',
+          lastMessage: 'Hello world',
+          lastMessageDate: new Date()
+        },
+        {
+          alias: 'Player 2',
+          lastMessage: 'Hello world',
+          lastMessageDate: new Date()
+        },
+        {
+          alias: 'Player 3',
+          lastMessage: 'Hello world',
+          lastMessageDate: new Date()
+        },
+        {
+          alias: 'Player 4',
+          lastMessage: 'Hello world',
+          lastMessageDate: new Date()
+        }
+      ]
     }
   }
 }
