@@ -38,52 +38,8 @@
         </div>
       </div>
 
-      <!-- TODO: This should be a component -->
       <div v-if="carrier.data.waypoints.length" class="row pt-0 pb-0 mb-0">
-        <table class="table table-striped table-hover">
-          <thead>
-              <tr class="bg-primary">
-                  <td>Delay</td>
-                  <td>Destination</td>
-                  <td v-if="!showAction">ETA</td>
-                  <td v-if="showAction">Action</td>
-                  <td class="text-right">
-                    <a href="" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
-                  </td>
-              </tr>
-          </thead>
-          <tbody>
-              <tr v-for="waypoint in carrier.data.waypoints" v-bind:key="waypoint">
-                  <td>{{waypoint.delayTicks}}</td>
-                  <td>{{getStarName(waypoint.destination)}}</td>
-                  <td v-if="!showAction">1d 2h 3m 4s</td>
-                  <td v-if="showAction">{{getWaypointActionFriendlyText(waypoint)}}</td>
-                  <td class="text-right"><a href="">Edit</a></td>
-              </tr>
-              <!-- TODO: Rows should be components -->
-              <!-- <tr>
-                  <td>0</td>
-                  <td>Star 1</td>
-                  <td v-if="!showAction">1d 2h 3m 4s</td>
-                  <td v-if="showAction">Collect All Ships</td>
-                  <td class="text-right"><a href="">Edit</a></td>
-              </tr>
-              <tr>
-                  <td>4</td>
-                  <td>Star 2</td>
-                  <td v-if="!showAction">2h 3m 4s</td>
-                  <td v-if="showAction">Collect All Ships</td>
-                  <td class="text-right"><a href="">Edit</a></td>
-              </tr>
-              <tr>
-                  <td>0</td>
-                  <td>Star 3</td>
-                  <td v-if="!showAction">3m 4s</td>
-                  <td v-if="showAction">Drop All Ships</td>
-                  <td class="text-right"><a href="">Edit</a></td>
-              </tr> -->
-          </tbody>
-        </table>
+        <waypointTable :game="game" :carrier="carrier"/>
       </div>
 
       <div v-if="carrier.data.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
@@ -113,10 +69,12 @@
 import GameHelper from '../../../services/gameHelper'
 import PlayerOverview from '../player/Overview'
 import GameContainer from '../../../game/container'
+import WaypointTable from './WaypointTable'
 
 export default {
   components: {
     'playerOverview': PlayerOverview,
+    'waypointTable': WaypointTable
   },
   props: {
     game: Object,
@@ -124,8 +82,7 @@ export default {
   },
   data () {
     return {
-      currentPlayerId: this.getUserPlayer()._id,
-      showAction: true
+      currentPlayerId: this.getUserPlayer()._id
     }
   },
   mounted () {
@@ -142,39 +99,11 @@ export default {
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.game, this.carrier.data)
     },
-    toggleShowAction (e) {
-      this.showAction = !this.showAction
-
-      e.preventDefault()
-    },
     editWaypoints () {
       GameContainer.map.setMode('waypoints', this.carrier.data)
     },
     onWaypointCreated (e) {
       // this.carrier.data.waypoints.push(e)
-    },
-    getStarName (starId) {
-      return this.game.galaxy.stars.find(s => s._id === starId).name
-    },
-    getWaypointActionFriendlyText (waypoint) {
-      switch (waypoint.action) {
-        case 'nothing':
-          return 'Do Nothing'
-        case 'collectAll':
-          return 'Collect All Ships'
-        case 'dropAll':
-          return 'Drop All Ships'
-        case 'collect':
-          return `Collect ${waypoint.actionShips} Ships`
-        case 'drop':
-          return `Drop ${waypoint.actionShips} Ships`
-        case 'collectAllBut':
-          return `Collect All But ${waypoint.actionShips} Ships`
-        case 'dropAllBut':
-          return `Drop All But ${waypoint.actionShips} Ships`
-        case 'garrison':
-          return `Garrison ${waypoint.actionShips} Ships`
-      }
     }
   }
 }
