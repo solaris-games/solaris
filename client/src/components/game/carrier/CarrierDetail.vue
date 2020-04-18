@@ -39,14 +39,14 @@
       </div>
 
       <div v-if="carrier.data.waypoints.length" class="row pt-0 pb-0 mb-0">
-        <waypointTable :game="game" :carrier="carrier"/>
+        <waypointTable :game="game" :carrier="carrier" :isEditingWaypoints="isEditingWaypoints"/>
       </div>
 
       <div v-if="carrier.data.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2">Looping: {{carrier.data.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
-        <div class="col-4 mb-2">
+        <div class="col-4 mb-2" v-if="isEditingWaypoints">
           <button class="btn btn-block btn-success" v-if="!carrier.data.waypointsLooped" @click="toggleWaypointsLooped()">Enable</button>
           <button class="btn btn-block btn-danger" v-if="carrier.data.waypointsLooped" @click="toggleWaypointsLooped()">Disable</button>
         </div>
@@ -73,6 +73,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import CarrierApiService from '../../../services/api/carrier'
 import PlayerOverview from '../player/Overview'
 import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
@@ -111,9 +112,9 @@ export default {
       this.carrier.data.waypointsLooped = !this.carrier.data.waypointsLooped
     },
     editWaypoints () {
-      GameContainer.map.setMode('waypoints', this.carrier.data)
-
       this.isEditingWaypoints = true
+
+      GameContainer.map.setMode('waypoints', this.carrier.data)
     },
     onWaypointCreated (e) {
       // this.carrier.data.waypoints.push(e)
@@ -135,8 +136,18 @@ export default {
 
       GameContainer.map.draw()
     },
-    saveWaypoints () {
+    async saveWaypoints () {
       // Push the waypoints to the API.
+      try {
+        let result = await CarrierApiService.saveWaypoints(this.game._id, this.carrier.data._id, this.carrier.data.waypoints)
+
+        // TODO: Do something with the response...?
+        if (result.status === 200) {
+          this.isEditingWaypoints = false
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 }

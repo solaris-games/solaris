@@ -29,6 +29,7 @@ module.exports = async (app) => {
     const research = require('../api/game/research');
     const trade = require('../api/game/trade');
     const star = require('../api/game/star');
+    const carrier = require('../api/game/carrier');
 
     app.use('/api/auth', auth);
     app.use('/api/user', user);
@@ -37,6 +38,7 @@ module.exports = async (app) => {
     app.use('/api/game', research);
     app.use('/api/game', trade);
     app.use('/api/game', star);
+    app.use('/api/game', carrier);
 
     return app;
 };

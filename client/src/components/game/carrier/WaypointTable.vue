@@ -7,13 +7,14 @@
                 <td v-if="!showAction">ETA</td>
                 <td v-if="showAction">Action</td>
                 <td class="text-right">
-                <a href="" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
+                  <a href="" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
                 </td>
             </tr>
         </thead>
         <tbody>
             <waypointRow v-for="waypoint in carrier.data.waypoints" v-bind:key="waypoint"
-                        :game="game" :waypoint="waypoint" :showAction="showAction"/>
+                        :game="game" :waypoint="waypoint" :showAction="showAction"
+                        :isEditingWaypoints="isEditingWaypoints"/>
         </tbody>
     </table>
 </template>
@@ -27,7 +28,8 @@ export default {
   },
   props: {
     game: Object,
-    carrier: Object
+    carrier: Object,
+    isEditingWaypoints: Boolean
   },
   data () {
     return {

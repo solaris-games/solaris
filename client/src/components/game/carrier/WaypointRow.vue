@@ -4,9 +4,9 @@
         <td>{{getStarName(waypoint.destination)}}</td>
         <td v-if="!showAction">1d 2h 3m 4s</td>
         <td v-if="showAction">
-            <span v-if="!isEditing">{{getWaypointActionFriendlyText(waypoint)}}</span>
+            <span v-if="!isEditingWaypoints">{{getWaypointActionFriendlyText(waypoint)}}</span>
 
-            <select v-if="isEditing" class="form-control" id="waypointAction" v-model="waypoint.action">
+            <select v-if="isEditingWaypoints" class="form-control input-sm" id="waypointAction" v-model="waypoint.action">
                 <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(waypoint, 'nothing')}}</option>
                 <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(waypoint, 'collectAll')}}</option>
                 <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(waypoint, 'dropAll')}}</option>
@@ -16,7 +16,11 @@
                 <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(waypoint, 'garrison')}}</option>
             </select>
         </td>
-        <td class="text-right"><a href="" @click="toggleEdit">Edit</a></td>
+        <td class="text-right">
+          <!-- <span v-if="isEditingWaypoints">{{waypoint.actionShips}} ships</span> -->
+
+          <input v-if="isEditingWaypoints && showAction && isActionRequiresShips(waypoint.action)" class="form-control input-sm float-right" type="number" v-model="waypoint.actionShips"/>
+        </td>
     </tr>
 </template>
 
@@ -25,12 +29,8 @@ export default {
   props: {
     game: Object,
     waypoint: Object,
-    showAction: Boolean
-  },
-  data () {
-      return {
-          isEditing: false
-      }
+    showAction: Boolean,
+    isEditingWaypoints: Boolean
   },
   methods: {
     getStarName (starId) {
@@ -58,14 +58,24 @@ export default {
           return `Garrison ${waypoint.actionShips} Ships`
       }
     },
-    toggleEdit (e) {
-        this.isEditing = !this.isEditing
+    isActionRequiresShips (action) {
+      switch (action) {
+        case 'collect':
+        case 'drop':
+        case 'collectAllBut':
+        case 'dropAllBut':
+        case 'garrison':
+          return true
+      }
 
-        e.preventDefault()
+      return false
     }
   }
 }
 </script>
 
 <style scoped>
+input[type="number"] {
+  width: 80px;
+}
 </style>

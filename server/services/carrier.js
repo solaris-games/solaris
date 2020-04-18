@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
@@ -12,6 +13,7 @@ module.exports = class CarrierService {
         let name = this.generateCarrierName(star, carriers);
 
         let carrier = {
+            _id: mongoose.Types.ObjectId(),
             ownedByPlayerId: star.ownedByPlayerId,
             ships: ships,
             orbiting: star._id,

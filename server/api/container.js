@@ -19,6 +19,7 @@ const StarDistanceService = require('../services/starDistance');
 const StarNameService = require('../services/starName');
 const StarUpgradeService = require('../services/starUpgrade');
 const TradeService = require('../services/trade');
+const WaypointService = require('../services/waypoint');
 const UserService = require('../services/user');
 
 const starNames = require('../config/game/starNames');
@@ -35,6 +36,7 @@ const gameService = new GameService(GameModel, userService);
 const gameListService = new GameListService(GameModel);
 const researchService = new ResearchService();
 const tradeService = new TradeService(userService);
+const waypointService = new WaypointService();
 const starNameService = new StarNameService(starNames, randomService);
 const starService = new StarService(randomService, starNameService, distanceService);
 const starDistanceService = new StarDistanceService(distanceService);
@@ -62,4 +64,5 @@ module.exports = {
     starUpgradeService,
     tradeService,
     userService,
+    waypointService,
 };

@@ -32,7 +32,7 @@ module.exports = async () => {
     // ...
 
     // ------------------------------
-    
+
     agendajs.start();
 
     // Start server jobs

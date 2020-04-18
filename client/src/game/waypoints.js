@@ -98,6 +98,10 @@ class Waypoints extends EventEmitter {
   }
 
   onStarClicked (e) {
+    if (!this.carrier) {
+      return
+    }
+    
     // If the star that was clicked is within hyperspace range then append
     // a new waypoint to this star.
     const hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get hyperspace level
