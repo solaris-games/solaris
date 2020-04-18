@@ -50,4 +50,24 @@ module.exports = class DistanceService {
         return ((hyperspace || 1) + 3) * this.DISTANCES.LIGHT_YEAR;
     }
 
+    getCarrierTickDistance() {
+        return this.DISTANCES.LIGHT_YEAR / this.DISTANCES.BASE_SHIP_SPEED;
+    }
+
+    getAngleTowardsLocation(source, destination) {
+        let deltaX = destination.x - source.x;
+        let deltaY = destination.y - source.y;
+
+        return Math.atan2(deltaY, deltaX);
+    }
+
+    getNextLocationTowardsLocation(source, destination, distance) {
+        let angle = this.getAngleTowardsLocation(source, destination);
+
+        return {
+            x: source.x + (distance * Math.cos(angle)),
+            y: source.y + (distance * Math.sin(angle)),
+        };
+    }
+
 };

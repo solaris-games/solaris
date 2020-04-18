@@ -6,7 +6,7 @@ const waypointSchema = require('./waypoint');
 
 const schema = new Schema({
     ownedByPlayerId: { type: Types.ObjectId, required: true },
-    orbiting: { type: Types.ObjectId, required: true },
+    orbiting: { type: Types.ObjectId, required: false },
     inTransitFrom: { type: Types.ObjectId, required: false, default: null },
     inTransitTo: { type: Types.ObjectId, required: false, default: null },
     waypointsLooped: { type: Types.Boolean, required: true, default: false },

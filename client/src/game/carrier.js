@@ -14,8 +14,9 @@ class Carrier extends EventEmitter {
     this.isSelected = false
   }
 
-  setup (data) {
+  setup (data, stars) {
     this.data = data
+    this.stars = stars
   }
 
   draw () {
@@ -41,9 +42,16 @@ class Carrier extends EventEmitter {
     graphics.position.y = this.data.location.y
     graphics.scale.set(1)
 
-    // TODO: If the carrier has waypoints, get the first one and calculate the angle
+    // If the carrier has waypoints, get the first one and calculate the angle
     // between the carrier's current position and the destination.
-    // graphics.angle = 90;
+    if (this.data.waypoints.length) {
+      let waypoint = this.data.waypoints[0]
+      let destination = this.stars.find(s => s.data._id === waypoint.destination).data.location
+
+      let angle = this.getAngleTowardsLocation(this.data.location, destination)
+
+      graphics.angle = (angle * (180 / Math.PI)) + 90
+    }
 
     // TODO: Draw carrier waypoints.
 
@@ -52,6 +60,13 @@ class Carrier extends EventEmitter {
 
   onClicked (e) {
     this.emit('onCarrierClicked', this)
+  }
+
+  getAngleTowardsLocation(source, destination) {
+    let deltaX = destination.x - source.x;
+    let deltaY = destination.y - source.y;
+
+    return Math.atan2(deltaY, deltaX);
   }
 }
 

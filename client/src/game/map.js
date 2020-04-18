@@ -42,7 +42,7 @@ class Map extends EventEmitter {
     for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
       let carrier = new Carrier()
 
-      carrier.setup(this.game.galaxy.carriers[i])
+      carrier.setup(this.game.galaxy.carriers[i], this.stars)
 
       this.carriers.push(carrier)
 

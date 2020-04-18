@@ -69,4 +69,12 @@ module.exports = class GameListService {
         .exec();
     }
 
+    async listInProgressGames() {
+        return await this.gameModel.find({
+            'state.startDate': { $ne: null },
+            'state.endDate': { $eq: null }
+        })
+        .exec();
+    }
+
 };

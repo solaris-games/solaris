@@ -1,11 +1,19 @@
+const container = require('../api/container');
+
 module.exports = {
 
     async handler(job, done) {
-        // console.log(`Starting game-tick service handler...`);
+        let games = await container.gameListService.listInProgressGames();
 
-        // // TODO: Call service to do the game logic.
+        for (let i = 0; i < games.length; i++) {
+            let game = games[i];
 
-        // console.log(`game-tick service handler finished.`);
+            try {
+                await container.gameTickService.tick(game);
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
         done();
     }

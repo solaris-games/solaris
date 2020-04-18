@@ -10,6 +10,7 @@ const GameService = require('../services/game');
 const GameCreateService = require('../services/gameCreate');
 const GameGalaxyService = require('../services/gameGalaxy');
 const GameListService = require('../services/gameList');
+const GameTickService = require('../services/gameTick');
 const MapService = require('../services/map');
 const PlayerService = require('../services/player');
 const RandomService = require('../services/random');
@@ -45,6 +46,7 @@ const playerService = new PlayerService(randomService, mapService, starService, 
 const gameCreateService = new GameCreateService(GameModel, mapService, playerService);
 const starUpgradeService = new StarUpgradeService(starService, carrierService);
 const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService);
+const gameTickService = new GameTickService(distanceService);
 
 module.exports = {
     authService,
@@ -54,6 +56,7 @@ module.exports = {
     gameCreateService,
     gameGalaxyService,
     gameListService,
+    gameTickService,
     mapService,
     playerService,
     randomService,
