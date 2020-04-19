@@ -6,6 +6,7 @@ const playerSchema = require('./player');
 const starSchema = require('./star');
 const carrierSchema = require('./carrier');
 const historySchema = require('./history');
+const messageSchema = require('./message');
 
 const schema = new Schema({
     settings: {
@@ -74,7 +75,8 @@ const schema = new Schema({
 		stars: [starSchema],
 		carriers: [carrierSchema],
         history: [historySchema]
-    },
+	},
+    messages: [messageSchema],
 	state: {
 		tick: { type: Types.Number, required: true, default: 0 },
 		paused: { type: Types.Boolean, required: true, default: true },

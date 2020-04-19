@@ -9,47 +9,50 @@
     <div class="text-center pt-2" v-if="!conversations.length">
         No Messages
     </div>
-
+    
     <div class="pt-2">
-        <diplomacy-list-item v-for="conversation in conversations" v-bind:key="conversation.alias" :game="game" :conversation="conversation" />
+        <conversation-message v-for="conversation in conversations" 
+          v-bind:key="conversation.playerId" :game="game" 
+          :sender="getPlayer(conversation.playerId)" 
+          :message="conversation.lastMessage" 
+          @onConversationOpenRequested="onConversationOpenRequested"/>
     </div>
 </div>
 </template>
 
 <script>
-import DiplomacyListItemVue from './DiplomacyListItem'
+import MessageApiService from '../../../services/api/message'
+import ConversationMessageVue from './ConversationMessage'
 
 export default {
   components: {
-    'diplomacy-list-item': DiplomacyListItemVue
+    'conversation-message': ConversationMessageVue
   },
   props: {
     game: Object
   },
   data () {
     return {
-      conversations: [
-        {
-          alias: 'Player 1',
-          lastMessage: 'Hello world',
-          lastMessageDate: new Date()
-        },
-        {
-          alias: 'Player 2',
-          lastMessage: 'Hello world',
-          lastMessageDate: new Date()
-        },
-        {
-          alias: 'Player 3',
-          lastMessage: 'Hello world',
-          lastMessageDate: new Date()
-        },
-        {
-          alias: 'Player 4',
-          lastMessage: 'Hello world',
-          lastMessageDate: new Date()
-        }
-      ]
+      conversations: []
+    }
+  },
+  async mounted () {
+    try {
+      let result = await MessageApiService.getConversations(this.game._id)
+
+      if (result.status === 200) {
+        this.conversations = result.data
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  },
+  methods: {
+    getPlayer (playerId) {
+      return this.game.galaxy.players.find(p => p._id === playerId)
+    },
+    onConversationOpenRequested (e) {
+      this.$emit('onConversationOpenRequested', e)
     }
   }
 }

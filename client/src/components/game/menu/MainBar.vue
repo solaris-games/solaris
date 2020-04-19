@@ -14,7 +14,8 @@
       <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" :game="game" :carrier="menuArguments"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX" :game="game"/>
+      <inbox v-if="menuState == MENU_STATES.INBOX" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
+      <conversation v-if="menuState == MENU_STATES.CONVERSATION" :game="game" :fromPlayerId="menuArguments"/>
       <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" :game="game"/>
     </div>
@@ -32,6 +33,7 @@ import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
 import InboxVue from '../inbox/Inbox.vue'
+import ConversationVue from '../inbox/Conversation.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
 import GameHelper from '../../../services/gameHelper'
@@ -47,6 +49,7 @@ export default {
     'star-detail': StarDetailVue,
     'carrier-detail': CarrierDetailVue,
     'inbox': InboxVue,
+    'conversation': ConversationVue,
     'intel': IntelVue,
     'galaxy': GalaxyVue
   },
@@ -76,6 +79,10 @@ export default {
     },
     onGameJoined (e) {
       this.$emit('onGameJoined', e)
+    }, 
+    onConversationOpenRequested (e) {
+      this.menuState = 'conversation'
+      this.menuArguments = e
     }
   }
 }

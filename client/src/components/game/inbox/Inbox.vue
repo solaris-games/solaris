@@ -15,7 +15,7 @@
 
     <div class="tab-content pt-2">
         <div class="tab-pane fade show active" id="diplomacy">
-            <diplomacy-list :game="game"/>
+            <diplomacy-list :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
         </div>
         <div class="tab-pane fade" id="events">
             <events-list :game="game"/>
@@ -35,6 +35,11 @@ export default {
   },
   props: {
     game: Object
+  },
+  methods: {
+    onConversationOpenRequested (e) {
+      this.$emit('onConversationOpenRequested', e)
+    }
   }
 }
 </script>

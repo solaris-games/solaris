@@ -8,6 +8,7 @@ export default {
   OPTIONS: 'options',
   HELP: 'help',
   INBOX: 'inbox',
+  CONVERSATION: 'conversation',
   COMBAT_CALCULATOR: 'combatCalculator',
   NEW_MESSAGE: 'newMessage',
   MESSAGE: 'message',
