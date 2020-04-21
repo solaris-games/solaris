@@ -28,7 +28,8 @@ module.exports = class StarService {
         // Set up the home star
         player.homeStarId = homeStar._id;
         homeStar.ownedByPlayerId = player._id;
-        homeStar.garrison = gameSettings.player.startingShips;
+        homeStar.garrisonActual = gameSettings.player.startingShips;
+        homeStar.garrison = homeStar.garrisonActual;
         homeStar.naturalResources = this.DEFAULTS.MAX_NATURAL_RESOURCES; // Home stars should always get max resources.
         
         // ONLY the home star gets the starting infrastructure.
@@ -67,7 +68,8 @@ module.exports = class StarService {
         }
 
         star.ownedByPlayerId = null;
-        star.garrison = 0;
+        star.garrisonActual = 0;
+        star.garrison = star.garrisonActual;
         
         // Find and destroy all carriers stationed at this star.
         game.galaxy.carriers = game.galaxy.carriers.filter(x => x.orbiting.toString() != star.id);

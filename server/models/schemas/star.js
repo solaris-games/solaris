@@ -6,7 +6,8 @@ const schema = new Schema({
     ownedByPlayerId: { type: Types.ObjectId, required: false, default: null },
     name: { type: Types.String, required: true },
     naturalResources: { type: Types.Number, required: true },
-    garrison: { type: Types.Number, required: true, default: 0 },
+    garrison: { type: Types.Number, required: true, default: 0 }, // TODO: garrison could be a computed field or instead returned to the client floored.
+    garrisonActual: { type: Types.Number, required: true, default: 0 },
     infrastructure: {
         economy: { type: Types.Number, required: true, default: 0 },
         industry: { type: Types.Number, required: true, default: 0 },

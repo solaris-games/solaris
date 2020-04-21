@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 module.exports = class CarrierService {
 
     createAtStar(star, carriers, ships = 1) {
-        if (!star.garrison) {
+        if (!Math.floor(star.garrisonActual)) {
             throw new ValidationError('Star must have a garrison to build a carrier.');
         }
 
@@ -22,6 +22,7 @@ module.exports = class CarrierService {
         };
 
         // Reduce the star garrison by how many we have added to the carrier.
+        star.garrisonActual -= ships;
         star.garrison -= ships;
 
         return carrier;

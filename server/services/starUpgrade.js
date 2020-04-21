@@ -99,7 +99,7 @@ module.exports = class StarUpgradeService {
 
         const ships = 1; // TODO: Need to get this from body?
 
-        if (star.garrison < ships) {
+        if (Math.floor(star.garrisonActual) < ships) {
             throw new ValidationError(`The star does not have enough ships garrisoned (${ships}) to build the carrier.`);
         }
 
@@ -127,13 +127,13 @@ module.exports = class StarUpgradeService {
 
         const expenseConfig = this.EXPENSE_CONFIGS[expenseConfigKey];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
-        const cost = calculateCostCallback(expenseConfig, star[economyType], terraformedResources);
+        const cost = calculateCostCallback(expenseConfig, star.infrastructure[economyType], terraformedResources);
 
         if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
-        star[economyType]++;
+        star.infrastructure[economyType]++;
         userPlayer.credits -= cost;
 
         await game.save();

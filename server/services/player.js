@@ -83,7 +83,8 @@ module.exports = class PlayerService {
 
                 // Set up the closest star.
                 s.ownedByPlayerId = player._id;
-                s.garrison = gameSettings.player.startingShips;
+                s.garrisonActual = gameSettings.player.startingShips;
+                s.garrison = s.garrisonActual;
             }
         }
 
@@ -147,7 +148,7 @@ module.exports = class PlayerService {
         let ownedStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
         let ownedCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
 
-        return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
+        return ownedStars.reduce((sum, s) => sum + Math.floor(s.garrisonActual), 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
     }
 

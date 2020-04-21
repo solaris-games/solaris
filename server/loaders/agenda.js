@@ -36,7 +36,7 @@ module.exports = async () => {
     agendajs.start();
 
     // Start server jobs
-    agendajs.every('10 seconds', 'game-tick'); // TODO: Every minute?
+    agendajs.every('1 second', 'game-tick'); // TODO: Every minute?
     agendajs.every('10 seconds', 'new-player-game-check'); // TODO: Every minute?
 
     return agendajs;
