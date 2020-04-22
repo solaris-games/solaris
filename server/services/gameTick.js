@@ -101,15 +101,69 @@ module.exports = class GameTickService {
         // until there are no carriers left, in which case we attack the star
         // directly.
         let friendlyCarriers = game.galaxy.carriers
-            .filter(c => c.orbiting.equals(star._id))
+            .filter(c => c.orbiting.equals(star._id) && c.ownedByPlayerId.equals(defender._id))
             .sort((a, b) => b.ships - a.ships);
 
+        let defendPower = defender.research.weapons.level + 1;
+        let attackPower = attacker.research.weapons.level;
+
+        // Perform carrier to carrier combat.
         for (let i = 0; i < friendlyCarriers.length; i++) {
             let friendlyCarrier = friendlyCarriers[i];
 
-            while (friendlyCarrier.ships || enemyCarrier.ships) {
+            // Keep fighting until either carrier has no ships remaining.
+            while (friendlyCarrier.ships > 0 && enemyCarrier.ships > 0) {
                 // Friendly carrier attacks first with defender bonus.
+                enemyCarrier.ships -= defendPower;
+
+                // Enemy carrier attacks next if there are still ships remaining.
+                if (enemyCarrier.ships <= 0) {
+                    break;
+                }
+
+                friendlyCarrier.ships -= attackPower;
             }
+
+            // Destroy carriers if they have no ships left.
+            if (friendlyCarrier.ships <= 0) {
+                game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(friendlyCarrier), 1);
+            }
+
+            // If the enemy carrier has no ships, then carrier to carrier combat is finished.
+            if (enemyCarrier.ships <= 0) {
+                break;
+            }
+        }
+
+        // Perform star to carrier combat.
+        // If the enemy carrier still has ships left, then move onto attack the star's garrison.
+        while (Math.floor(star.garrisonActual) > 0 && enemyCarrier.ships > 0) {
+            // The star attacks first with defender bonus.
+            enemyCarrier.ships -= defendPower;
+
+            // Enemy carrier attacks next if there are still ships remaining.
+            if (enemyCarrier.ships <= 0) {
+                break;
+            }
+
+            star.garrisonActual -= attackPower;
+            star.garrison = Math.floor(star.garrisonActual);
+        }
+
+        // If the enemy carrier has no ships, then destroy the attacking carrier.
+        if (enemyCarrier.ships <= 0) {
+            game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(enemyCarrier), 1);
+        }
+
+        // If the star has no garrison and no defenders, then the attacker has won.
+        let defendersRemaining = friendlyCarriers.reduce((sum, c) => sum += c.ships, 0);
+
+        if (defendersRemaining <= 0 && star.garrisonActual <= 0) {
+            star.ownedByPlayerId = enemyCarrier.ownedByPlayerId;
+            attacker.credits += star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
+            star.infrastructure.economy = 0;
+
+            // TODO: Do carrier waypoint action here?
         }
     }
 

@@ -9,7 +9,7 @@ module.exports = async () => {
     // Set up the agenda instance.
     const agendajs = new Agenda()
         .database(config.connectionString)
-        .processEvery('10 seconds')
+        .processEvery('1 second')
         .maxConcurrency(20);
 
     await agendajs._ready;
