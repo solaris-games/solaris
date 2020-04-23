@@ -12,6 +12,10 @@ module.exports = class PlayerService {
         this.starDistanceService = starDistanceService;
     }
 
+    getByObjectId(game, playerId) {
+        return game.galaxy.players.find(p => p._id.equals(playerId));
+    }
+
     createEmptyPlayer(gameSettings, colour) {
         return {
             _id: mongoose.Types.ObjectId(),
@@ -144,12 +148,59 @@ module.exports = class PlayerService {
         return carriers;
     }
 
-    calculateTotalShipsForPlayer(stars, carriers, player) {
+    calculateTotalStars(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        return playerStars.length;
+    }
+
+    calculateTotalShips(player, stars, carriers) {
         let ownedStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
         let ownedCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
 
         return ownedStars.reduce((sum, s) => sum + Math.floor(s.garrisonActual), 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
+    }
+
+    calculateTotalEconomy(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        let totalEconomy = playerStars.reduce((sum, s) => sum + s.infrastructure.economy, 0);
+
+        return totalEconomy;
+    }
+
+    calculateTotalIndustry(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        let totalIndustry = playerStars.reduce((sum, s) => sum + s.infrastructure.industry, 0);
+
+        return totalIndustry;
+    }
+
+    calculateTotalScience(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        let totalScience = playerStars.reduce((sum, s) => sum + s.infrastructure.science, 0);
+
+        return totalScience;
+    }
+
+    calculateTotalManufacturing(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        // Calculate the manufacturing level for all of the stars the player owns.
+        playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, s.infrastructure.industry));
+
+        let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
+
+        return totalManufacturing;
+    }
+
+    calculateTotalCarriers(player, carriers) {
+        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
+
+        return playerCarriers.length;
     }
 
 }

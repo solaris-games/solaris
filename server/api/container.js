@@ -36,7 +36,7 @@ const distanceService = new DistanceService();
 const randomService = new RandomService();
 const gameService = new GameService(GameModel, userService);
 const gameListService = new GameListService(GameModel);
-const researchService = new ResearchService();
+const researchService = new ResearchService(randomService);
 const tradeService = new TradeService(userService);
 const waypointService = new WaypointService();
 const starNameService = new StarNameService(starNames, randomService);
@@ -47,7 +47,7 @@ const playerService = new PlayerService(randomService, mapService, starService, 
 const gameCreateService = new GameCreateService(GameModel, mapService, playerService);
 const starUpgradeService = new StarUpgradeService(starService, carrierService);
 const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService);
-const gameTickService = new GameTickService(distanceService, starService);
+const gameTickService = new GameTickService(distanceService, starService, researchService, playerService);
 const messageService = new MessageService();
 
 module.exports = {

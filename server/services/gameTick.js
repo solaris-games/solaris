@@ -1,8 +1,10 @@
 module.exports = class GameTickService {
     
-    constructor(distanceService, starService) {
+    constructor(distanceService, starService, researchService, playerService) {
         this.distanceService = distanceService;
         this.starService = starService;
+        this.researchService = researchService;
+        this.playerService = playerService;
     }
 
     async tick(game) {
@@ -14,6 +16,11 @@ module.exports = class GameTickService {
             5. If its the last tick in the galactic cycle, all players earn money and experimentation is done.
             6. Check to see if anyone has won the game.
         */
+
+       if (game.state.paused) {
+           throw new Error('Cannot perform a game tick on a paused game');
+       }
+
        this._moveCarriers(game);
        this._produceShips(game);
        this._conductResearch(game);
@@ -93,8 +100,8 @@ module.exports = class GameTickService {
     }
 
     _performCombatAtStar(game, star, enemyCarrier) {
-        let defender = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
-        let attacker = game.galaxy.players.find(p => p._id.equals(enemyCarrier.ownedByPlayerId));
+        let defender = this.playerService.getByObjectId(star.ownedByPlayerId);
+        let attacker = this.playerService.getByObjectId(enemyCarrier.ownedByPlayerId);
 
         // There may be multiple carriers at this star, we will attack
         // carriers in order of largest carrier first to smallest last
@@ -172,7 +179,7 @@ module.exports = class GameTickService {
             let star = game.galaxy.stars[i];
 
             if (star.ownedByPlayerId) {
-                let player = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
+                let player = this.playerService.getByObjectId(game, star.ownedByPlayerId);
     
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
                 star.garrisonActual += this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, star.infrastructure.industry);
@@ -182,22 +189,75 @@ module.exports = class GameTickService {
     }
 
     _conductResearch(game) {
-
+        // Add the current level of experimentation to the current 
+        // tech being researched.
+        for (let i = 0; i < game.galaxy.players.length; i++) {
+            let player = game.galaxy.players[i];
+            
+            this.researchService.conductResearch(player);
+        }
     }
 
     _endOfGalacticCycleCheck(game) {
+        game.state.tick++;
 
+        // Check if we have reached the production tick.
+        if (game.state.tick % game.settings.galaxy.productionTicks === 0) {
+            game.state.productionTick++;
+
+            this._givePlayersMoney(game);
+            this._conductExperiments(game);
+        }
     }
 
     _givePlayersMoney(game) {
+        for (let i = 0; i < game.galaxy.players.length; i++) {
+            let player = game.galaxy.players[i];
 
+            let totalEco = this.playerService.calculateTotalEconomy(player, game.galaxy.stars);
+
+            let creditsFromEconomy = totalEco * 10;
+            let creditsFromBanking = player.research.banking.level * 75;
+            let creditsTotal = creditsFromEconomy + creditsFromBanking;
+
+            player.credits += creditsTotal;
+        }
     }
 
     _conductExperiments(game) {
+        // Pick a random tech to research and add the current level of experimentation
+        // to its current research progress.
+        for (let i = 0; i < game.galaxy.players.length; i++) {
+            let player = game.galaxy.players[i];
 
+            this.researchService.conductExperiments(player);
+        }
     }
 
     _gameWinCheck(game) {
+        // Check to see if anyone has won the game.
+        // There could be more than one player who has reached
+        // the number of stars required at the same time.
+        // In this case we pick the player who has the most ships.
+        let winners = game.galaxy.players
+            .filter(p => {
+                let playerStars = this.playerService.calculateTotalStars(p, game.galaxy.stars);
 
+                return playerStars >= game.state.starsForVictory;
+            })
+            .sort((a, b) => {
+                let totalShipsA = this.playerService.calculateTotalShips(a, game.galaxy.stars, game.galaxy.carriers);
+                let totalShipsB = this.playerService.calculateTotalShips(b, game.galaxy.stars, game.galaxy.carriers);
+
+                return totalShipsB - totalShipsA;
+            });
+
+        if (winners.length) {
+            let winner = winners[0];
+
+            game.state.paused = true;
+            game.state.endDate = new Date();
+            game.state.winner = winner._id;
+        }
     }
 }

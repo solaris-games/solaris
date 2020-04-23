@@ -67,29 +67,15 @@ module.exports = class GameGalaxyService {
 
     _setPlayerStats(doc) {
         doc.galaxy.players.forEach(p => {
-            // Calculate statistics such as how many carriers they have
-            // and what the total number of ships are.
-            let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, p._id);
-            let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(doc.galaxy.carriers, p._id);
-            let totalShips = this.playerService.calculateTotalShipsForPlayer(doc.galaxy.stars, doc.galaxy.carriers, p);
-
-            // Calculate the manufacturing level for all of the stars the player owns.
-            playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(p.research.manufacturing.level, s.infrastructure.industry));
-
-            let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
-
-            let totalEconomy = playerStars.reduce((sum, s) => sum + s.infrastructure.economy, 0);
-            let totalIndustry = playerStars.reduce((sum, s) => sum + s.infrastructure.industry, 0);
-            let totalScience = playerStars.reduce((sum, s) => sum + s.infrastructure.science, 0);
-
+            // Get all of the player's statistics.
             p.stats = {
-                totalStars: playerStars.length,
-                totalCarriers: playerCarriers.length,
-                totalShips,
-                totalEconomy,
-                totalIndustry,
-                totalScience,
-                newShips: totalManufacturing,
+                totalStars: this.playerService.calculateTotalStars(p, doc.galaxy.stars),
+                totalCarriers: this.playerService.calculateTotalCarriers(p, doc.galaxy.carriers),
+                totalShips: this.playerService.calculateTotalShips(p, doc.galaxy.stars, doc.galaxy.carriers),
+                totalEconomy: this.playerService.calculateTotalEconomy(p, doc.galaxy.stars),
+                totalIndustry: this.playerService.calculateTotalIndustry(p, doc.galaxy.stars),
+                totalScience: this.playerService.calculateTotalScience(p, doc.galaxy.stars),
+                newShips: this.playerService.calculateTotalManufacturing(p, doc.galaxy.stars)
             };
         });
     }
