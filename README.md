@@ -1,6 +1,6 @@
-# Neptune's Pride Clone
+# Solaris
 
-This is an application that aims to loosely clone the game [Neptune's Pride](https://np.ironhelmet.com). It uses the following tech:
+This is a HTML5 game that aims to loosely clone the game [Neptune's Pride](https://np.ironhelmet.com). It uses the following tech:
 
 #### Server
 - [Node.js](https://nodejs.org/en/)
