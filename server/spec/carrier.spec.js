@@ -15,7 +15,8 @@ describe('carrier', () => {
                 y: 15
             },
             name: 'Super star',
-            garrison: 10
+            garrison: 10,
+            garrisonActual: 10
         };
 
         const ships = 1;
@@ -36,7 +37,8 @@ describe('carrier', () => {
                 y: 15
             },
             name: 'Super star',
-            garrison: 10
+            garrison: 10,
+            garrisonActual: 10
         };
 
         const ships = 5;
