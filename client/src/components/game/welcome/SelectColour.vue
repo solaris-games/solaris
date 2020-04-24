@@ -10,7 +10,7 @@
         <table class="table table-sm table-striped">
             <tbody>
                 <tr v-for="player in game.galaxy.players" v-bind:key="player._id">
-                    <td :style="{'width': '8px', 'background-color':player.colour.value.replace('0x', '#')}"></td>
+                    <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                     <td class="col-avatar">
                         <!-- TODO: Prefer images over font awesome icons? -->
                         <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
@@ -32,12 +32,16 @@
 
 <script>
 import gameContainer from '../../../game/container'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
     game: Object
   },
   methods: {
+    getFriendlyColour (colour) {
+      return gameHelper.getFriendlyColour(colour)
+    },
     onJoinRequested (player) {
       this.$emit('onJoinRequested', player._id)
     },

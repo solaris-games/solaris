@@ -3,7 +3,7 @@
   <!-- TODO: Text for premium player and lifetime premium player -->
   <h3 class="pt-2">Player</h3>
   
-  <div class="row" :style="{'background-color':player.colour.value.replace('0x', '#')}">
+  <div class="row" :style="{'background-color': getFriendlyColour(player.colour.value)}">
       <div class="col">
           <h4 class="pt-2">{{player.alias}}</h4>
       </div>
@@ -32,6 +32,7 @@
 
 <script>
 import Statistics from './Statistics'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -40,6 +41,11 @@ export default {
   props: {
     game: Object,
     player: Object
+  },
+  methods: {
+    getFriendlyColour (colour) {
+      return gameHelper.getFriendlyColour(colour)
+    }
   }
 }
 </script>

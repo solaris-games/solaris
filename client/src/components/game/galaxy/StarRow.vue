@@ -14,6 +14,7 @@
 
 <script>
 import gameContainer from '../../../game/container'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -24,9 +25,7 @@ export default {
   },
   methods: {
     getColour () {
-      let owningPlayer = this.game.galaxy.players.find(x => x._id === this.star.ownedByPlayerId)
-
-      return owningPlayer.colour.value.replace('0x', '#')
+      return gameHelper.getPlayerColour(this.star.ownedByPlayerId)
     },
     clickStar (e) {
       gameContainer.map.clickStar(this.star._id)

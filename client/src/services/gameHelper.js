@@ -5,6 +5,20 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
+  getPlayerById (playerId) {
+    return this.game.galaxy.players.find(x => x._id === playerId)
+  }
+
+  getPlayerColour (playerId) {
+    let player = this.getPlayerById(playerId)
+
+    return getFriendlyColour(player.colour.value)
+  }
+
+  getFriendlyColour (colour) {
+    return colour.replace('0x', '#')
+  }
+
   getStarById (game, starId) {
     return game.galaxy.stars.find(x => x._id === starId)
   }

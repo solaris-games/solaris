@@ -20,7 +20,7 @@
             <tbody>
                 <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
                 <tr v-for="player in game.galaxy.players" :key="player._id">
-                    <td :style="{'width': '8px', 'background-color':player.colour.value.replace('0x', '#')}"></td>
+                    <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                     <td class="col-avatar">
                         <!-- TODO: Prefer images over font awesome icons? -->
                         <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
@@ -65,6 +65,7 @@ import GameHelper from '../../../services/gameHelper'
 import gameContainer from '../../../game/container'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
@@ -83,6 +84,9 @@ export default {
     },
     getPlayerStarCount (player) {
       return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length
+    },
+    getFriendlyColour (colour) {
+      return gameHelper.getFriendlyColour(colour)
     },
     async concedeDefeat () {
       try {

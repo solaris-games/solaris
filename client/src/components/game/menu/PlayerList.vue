@@ -13,13 +13,15 @@
 </template>
 
 <script>
+import gameHelper from '../../../services/gameHelper'
+
 export default {
   props: {
     players: Array
   },
   methods: {
     getFriendlyColour (colour) {
-      return colour.replace('0x', '#')
+      return gameHelper.getFriendlyColour(colour)
     },
     onPlayerSelected (player) {
       this.$emit('onPlayerSelected', player)

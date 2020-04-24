@@ -20,6 +20,7 @@
 import MessageApiService from '../../../services/api/message'
 import ComposeMessage from './ComposeMessage'
 import ConversationMessageVue from './ConversationMessage'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -41,6 +42,9 @@ export default {
   methods: {
     getPlayer (playerId) {
       return this.game.galaxy.players.find(p => p._id === playerId)
+    },
+    getPlayerColour (playerId) {
+      return gameHelper.getPlayerColour(playerId)
     },
     async loadMessages () {
         try {
