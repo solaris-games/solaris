@@ -107,11 +107,11 @@ class Waypoints extends EventEmitter {
     const hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get hyperspace level
     
     const lastLocation = this._getLastLocation()
-    const distance = this._getDistanceBetweenLocations(lastLocation, e.data.location)
+    const distance = this._getDistanceBetweenLocations(lastLocation, e.location)
 
     if (distance <= hyperspaceDistance) {
       let newWaypoint = {
-        destination: e.data._id,
+        destination: e._id,
         action: 'collectAll',
         actionShips: 0,
         delayTicks: 0

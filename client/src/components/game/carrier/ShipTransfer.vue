@@ -43,13 +43,12 @@
 
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
-        <div class="col"> <!-- pr-0 -->
+        <div class="col pr-0">
             <button type="button" class="btn btn-success btn-block mr-1" :disabled="starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
         </div>
-        <!-- TODO: Click back to the waypoints page -->
-        <!-- <div class="col-auto pl-1">
-            <button type="button" class="btn btn-primary"><i class="fas fa-plus"></i></button>
-        </div> -->
+        <div class="col-auto pl-1">
+            <button type="button" class="btn btn-primary" @click="onOpenCarrierDetailRequested"><i class="fas fa-plus"></i></button>
+        </div>
     </div>
 </div>
 </template>
@@ -117,6 +116,9 @@ export default {
           } catch (err) {
               console.log(err)
           }
+      },
+      onOpenCarrierDetailRequested (e) {
+          this.$emit('onOpenCarrierDetailRequested', this.transfer.carrier)
       }
   }
 }
