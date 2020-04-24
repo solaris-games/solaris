@@ -59,9 +59,12 @@ module.exports = class GameTickService {
         carriers = carriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination);
 
         // 2. Iterate through each carrier, move it, then check for combat.
+        // (DO NOT do any combat yet as we have to wait for all of the carriers to move)
         // Because carriers are ordered by distance to their destination,
         // this means that always the carrier that is closest to its destination
         // will land first. This is important for unclaimed stars and defender bonuses.
+        let combatStars = [];
+
         let distancePerTick = this.distanceService.getCarrierTickDistance();
 
         for (let i = 0; i < carriers.length; i++) {
@@ -87,7 +90,10 @@ module.exports = class GameTickService {
 
                 // If the star is owned by another player, then perform combat.
                 if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    this._performCombatAtStar(game, destinationStar, carrier);
+                    this.combatStars.push({
+                        star: destinationStar,
+                        carrier
+                    });
                 }
             }
             // Otherwise, move X number of pixels in the direction of the star.
@@ -96,6 +102,13 @@ module.exports = class GameTickService {
 
                 carrier.location = nextLocation;
             }
+        }
+
+        // 3. Now that all carriers have finished moving, perform combat.
+        for (let i = 0; i < combatStars.length; i++) {
+            let combat = combatStars[i];
+
+            this._performCombatAtStar(game, combat.star, combat.carrier);
         }
     }
 
