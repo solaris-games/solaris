@@ -28,7 +28,7 @@
           <p class="mb-2 align-middle">Orbiting: <a href="">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-4">
-          <button class="btn btn-block btn-primary mb-2">Ship Transfer</button>
+          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested">Ship Transfer</button>
         </div>
       </div>
 
@@ -148,6 +148,12 @@ export default {
       } catch (e) {
         console.error(e)
       }
+    },
+    onShipTransferRequested (e) {
+      this.$emit('onShipTransferRequested', {
+        star: GameHelper.getStarById(this.game, this.carrier.data.orbiting),
+        carrier: this.carrier.data
+      })
     }
   }
 }

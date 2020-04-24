@@ -5,6 +5,10 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
+  getStarById (game, starId) {
+    return game.galaxy.stars.find(x => x._id === starId)
+  }
+
   getStarOwningPlayer (game, star) {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }

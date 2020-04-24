@@ -13,7 +13,8 @@
       <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" :game="game" :carrier="menuArguments"/>
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested"/>
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" :game="game" :transfer="menuArguments"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" :game="game" :fromPlayerId="menuArguments"/>
       <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
@@ -32,6 +33,7 @@ import WelcomeVue from '../welcome/Welcome.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
+import ShipTransferVue from '../carrier/ShipTransfer.vue'
 import InboxVue from '../inbox/Inbox.vue'
 import ConversationVue from '../inbox/Conversation.vue'
 import IntelVue from '../intel/Intel.vue'
@@ -48,6 +50,7 @@ export default {
     'research': ResearchVue,
     'star-detail': StarDetailVue,
     'carrier-detail': CarrierDetailVue,
+    'ship-transfer': ShipTransferVue,
     'inbox': InboxVue,
     'conversation': ConversationVue,
     'intel': IntelVue,
@@ -82,6 +85,10 @@ export default {
     }, 
     onConversationOpenRequested (e) {
       this.menuState = 'conversation'
+      this.menuArguments = e
+    },
+    onShipTransferRequested (e) {
+      this.menuState = 'shipTransfer'
       this.menuArguments = e
     }
   }
