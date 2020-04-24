@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-            <waypointRow v-for="waypoint in carrier.data.waypoints" v-bind:key="waypoint"
+            <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint"
                         :game="game" :waypoint="waypoint" :showAction="showAction"
                         :isEditingWaypoints="isEditingWaypoints"/>
         </tbody>

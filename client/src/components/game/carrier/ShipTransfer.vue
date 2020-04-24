@@ -104,15 +104,15 @@ export default {
       },
       async saveTransfer (e) {
           try {
-            let result = await CarrierApiService.transferShips(
+            let response = await CarrierApiService.transferShips(
                 this.game._id, 
                 this.transfer.carrier._id,
                 parseInt(this.carrierShips),
                 this.transfer.star._id,
                 parseInt(this.starShips))
 
-            if (result.status === 200) {
-                this.$emit('onShipsTransferred', this.transfer.carrier) // TODO: This won't work because the carrier screen looks at .data, needs to be refactored.
+            if (response.status === 200) {
+                this.$emit('onShipsTransferred', this.transfer.carrier)
             }
           } catch (err) {
               console.log(err)

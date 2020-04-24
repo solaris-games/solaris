@@ -154,10 +154,10 @@ class Map extends EventEmitter {
 
   unselectAllStarsExcept (star) {
     this.stars
-      .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
+      .filter(s => s.isSelected || s._id === star._id) // Get only stars that are selected or the e star.
       .forEach(s => {
         // Set all other stars to unselected.
-        if (s.data._id !== star.data._id) {
+        if (s._id !== star._id) {
           s.isSelected = false
         }
 

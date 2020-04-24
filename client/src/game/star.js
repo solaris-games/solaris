@@ -229,7 +229,7 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
-    this.emit('onStarClicked', this)
+    this.emit('onStarClicked', this.data)
   }
 
   onMouseOver (e) {
@@ -237,7 +237,7 @@ class Star extends EventEmitter {
 
     this.draw()
 
-    this.emit('onStarMouseOver', this)
+    this.emit('onStarMouseOver', this.data)
   }
 
   onMouseOut (e) {
@@ -245,7 +245,7 @@ class Star extends EventEmitter {
 
     this.draw()
 
-    this.emit('onStarMouseOut', this)
+    this.emit('onStarMouseOut', this.data)
   }
 }
 

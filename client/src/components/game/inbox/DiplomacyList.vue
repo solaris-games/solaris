@@ -38,10 +38,10 @@ export default {
   },
   async mounted () {
     try {
-      let result = await MessageApiService.getConversations(this.game._id)
+      let response = await MessageApiService.getConversations(this.game._id)
 
-      if (result.status === 200) {
-        this.conversations = result.data
+      if (response.status === 200) {
+        this.conversations = response.data
       }
     } catch (e) {
       console.error(e)

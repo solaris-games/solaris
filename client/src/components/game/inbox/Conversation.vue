@@ -44,10 +44,10 @@ export default {
     },
     async loadMessages () {
         try {
-            let result = await MessageApiService.getConversation(this.game._id, this.fromPlayerId)
+            let response = await MessageApiService.getConversation(this.game._id, this.fromPlayerId)
 
-            if (result.status === 200) {
-                this.messages = result.data
+            if (response.status === 200) {
+                this.messages = response.data
             }
         } catch (e) {
             console.error(e)

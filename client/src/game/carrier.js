@@ -59,7 +59,7 @@ class Carrier extends EventEmitter {
   }
 
   onClicked (e) {
-    this.emit('onCarrierClicked', this)
+    this.emit('onCarrierClicked', this.data)
   }
 
   getAngleTowardsLocation(source, destination) {

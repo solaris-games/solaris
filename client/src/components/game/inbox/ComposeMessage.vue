@@ -29,9 +29,9 @@ export default {
   methods: {
       async send () {
         try {
-            let result = await MessageApiService.send(this.game._id, this.toPlayerId, this.message)
+            let response = await MessageApiService.send(this.game._id, this.toPlayerId, this.message)
 
-            if (result.status === 200) {
+            if (response.status === 200) {
                 this.message = '';
                 
                 this.$emit('onMessageSent', {

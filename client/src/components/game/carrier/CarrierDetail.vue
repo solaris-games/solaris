@@ -1,29 +1,29 @@
 <template>
 <div class="container">
     <!-- TODO: These need to act off the carrier object itself instead of pixi object -->
-    <h3 class="pt-2">{{carrier.data.name}}</h3>
+    <h3 class="pt-2">{{carrier.name}}</h3>
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p v-if="carrier.data.ownedByPlayerId == currentPlayerId">A carrier under your command.<br/>Give it orders to capture more stars!</p>
-        <p v-if="carrier.data.ownedByPlayerId != null && carrier.data.ownedByPlayerId != currentPlayerId">This carrier is controlled by [{{getCarrierOwningPlayer().alias}}].</p>
+        <p v-if="carrier.ownedByPlayerId == currentPlayerId">A carrier under your command.<br/>Give it orders to capture more stars!</p>
+        <p v-if="carrier.ownedByPlayerId != null && carrier.ownedByPlayerId != currentPlayerId">This carrier is controlled by [{{getCarrierOwningPlayer().alias}}].</p>
       </div>
     </div>
 
     <!-- TODO: This should be a component -->
-    <div v-if="carrier.data.ships" class="row mb-0 pt-3 pb-3 bg-primary">
+    <div v-if="carrier.ships" class="row mb-0 pt-3 pb-3 bg-primary">
         <div class="col">
             Ships
         </div>
         <div class="col text-right">
-            {{carrier.data.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
         </div>
     </div>
 
     <h4 class="pt-2">Navigation</h4>
 
     <div v-if="getCarrierOwningPlayer() == getUserPlayer()" class="mt-2">
-      <div v-if="carrier.data.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
+      <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2 align-middle">Orbiting: <a href="">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
@@ -32,29 +32,29 @@
         </div>
       </div>
 
-      <div v-if="!carrier.data.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="!carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col">
           <p class="mb-2">Waypoints: None.</p>
         </div>
       </div>
 
-      <div v-if="carrier.data.waypoints.length" class="row pt-0 pb-0 mb-0">
+      <div v-if="carrier.waypoints.length" class="row pt-0 pb-0 mb-0">
         <waypointTable :game="game" :carrier="carrier" :isEditingWaypoints="isEditingWaypoints"/>
       </div>
 
-      <div v-if="carrier.data.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
-          <p class="mb-2">Looping: {{carrier.data.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
+          <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
         <div class="col-4 mb-2" v-if="isEditingWaypoints">
-          <button class="btn btn-block btn-success" v-if="!carrier.data.waypointsLooped" @click="toggleWaypointsLooped()">Enable</button>
-          <button class="btn btn-block btn-danger" v-if="carrier.data.waypointsLooped" @click="toggleWaypointsLooped()">Disable</button>
+          <button class="btn btn-block btn-success" v-if="!carrier.waypointsLooped" @click="toggleWaypointsLooped()">Enable</button>
+          <button class="btn btn-block btn-danger" v-if="carrier.waypointsLooped" @click="toggleWaypointsLooped()">Disable</button>
         </div>
       </div>
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">
-          <p v-if="carrier.data.waypoints.length" class="mb-2">ETA: 0d 0h 0m 0s (0h 0m 0s)</p>
+          <p v-if="carrier.waypoints.length" class="mb-2">ETA: 0d 0h 0m 0s (0h 0m 0s)</p>
         </div>
         <div class="col-4 mb-2" v-if="!isEditingWaypoints">
           <button class="btn btn-block btn-success" @click="editWaypoints()">Edit Waypoints</button>
@@ -102,47 +102,47 @@ export default {
       return GameHelper.getUserPlayer(this.game)
     },
     getCarrierOwningPlayer () {
-      return GameHelper.getCarrierOwningPlayer(this.game, this.carrier.data)
+      return GameHelper.getCarrierOwningPlayer(this.game, this.carrier)
     },
     getCarrierOrbitingStar () {
-      return GameHelper.getCarrierOrbitingStar(this.game, this.carrier.data)
+      return GameHelper.getCarrierOrbitingStar(this.game, this.carrier)
     },
     toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
-      this.carrier.data.waypointsLooped = !this.carrier.data.waypointsLooped
+      this.carrier.waypointsLooped = !this.carrier.waypointsLooped
     },
     editWaypoints () {
       this.isEditingWaypoints = true
 
-      GameContainer.map.setMode('waypoints', this.carrier.data)
+      GameContainer.map.setMode('waypoints', this.carrier)
     },
     onWaypointCreated (e) {
-      // this.carrier.data.waypoints.push(e)
+      // this.carrier.waypoints.push(e)
     },
     removeLastWaypoint () {
       // If the carrier is not currently in transit to the waypoint
       // then remove it.
-      let lastWaypoint = this.carrier.data.waypoints[this.carrier.data.waypoints.length - 1]
+      let lastWaypoint = this.carrier.waypoints[this.carrier.waypoints.length - 1]
 
-      if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier.data, lastWaypoint)) {
-        this.carrier.data.waypoints.splice(this.carrier.data.waypoints.indexOf(lastWaypoint), 1)
+      if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
+        this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
 
         GameContainer.map.draw()
       }
     },
     removeAllWaypoints () {
       // Remove all waypoints up to the last waypoint (if in transit)
-      this.carrier.data.waypoints = this.carrier.data.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier.data, w))
+      this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
 
       GameContainer.map.draw()
     },
     async saveWaypoints () {
       // Push the waypoints to the API.
       try {
-        let result = await CarrierApiService.saveWaypoints(this.game._id, this.carrier.data._id, this.carrier.data.waypoints)
+        let response = await CarrierApiService.saveWaypoints(this.game._id, this.carrier._id, this.carrier.waypoints)
 
         // TODO: Do something with the response...?
-        if (result.status === 200) {
+        if (response.status === 200) {
           this.isEditingWaypoints = false
         }
       } catch (e) {
@@ -151,8 +151,8 @@ export default {
     },
     onShipTransferRequested (e) {
       this.$emit('onShipTransferRequested', {
-        star: GameHelper.getStarById(this.game, this.carrier.data.orbiting),
-        carrier: this.carrier.data
+        star: GameHelper.getStarById(this.game, this.carrier.orbiting),
+        carrier: this.carrier
       })
     }
   }
