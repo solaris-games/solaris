@@ -31,7 +31,7 @@
             <button type="button" class="btn btn-primary" @click="onMinShipsClicked">Min</button>
         </div>
         <div class="col-3">
-            <button type="button" class="btn btn-primary float-right" @click="onTransferLeftClicked" :disabled="carrierShips <= 0"><i class="fas fa-chevron-left"></i></button>
+            <button type="button" class="btn btn-primary float-right" @click="onTransferLeftClicked" :disabled="carrierShips <= 1"><i class="fas fa-chevron-left"></i></button>
         </div>
         <div class="col-3">
             <button type="button" class="btn btn-primary" @click="onTransferRightClicked" :disabled="starShips <= 0"><i class="fas fa-chevron-right"></i></button>
@@ -43,12 +43,13 @@
 
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
-        <div class="col pr-0">
+        <div class="col"> <!-- pr-0 -->
             <button type="button" class="btn btn-success btn-block mr-1" :disabled="starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
         </div>
-        <div class="col-auto pl-1">
+        <!-- TODO: Click back to the waypoints page -->
+        <!-- <div class="col-auto pl-1">
             <button type="button" class="btn btn-primary"><i class="fas fa-plus"></i></button>
-        </div>
+        </div> -->
     </div>
 </div>
 </template>

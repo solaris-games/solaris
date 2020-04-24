@@ -16,6 +16,7 @@ router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, mid
     try {
         await container.waypointService.saveWaypoints(
             req.game,
+            req.session.userId,
             req.params.carrierId,
             req.body);
 
@@ -37,6 +38,7 @@ router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, midd
     try {
         await container.shipTransferService.transfer(
             req.game,
+            req.session.userId,
             req.params.carrierId,
             req.body.carrierShips,
             req.body.starId,

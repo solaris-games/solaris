@@ -16,6 +16,10 @@ module.exports = class PlayerService {
         return game.galaxy.players.find(p => p._id.equals(playerId));
     }
 
+    getByUserId(game, userId) {
+        return game.galaxy.players.find(p => p.userId.toString() === userId);
+    }
+
     createEmptyPlayer(gameSettings, colour) {
         return {
             _id: mongoose.Types.ObjectId(),
