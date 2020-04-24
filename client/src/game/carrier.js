@@ -42,6 +42,13 @@ class Carrier extends EventEmitter {
     graphics.position.y = this.data.location.y
     graphics.scale.set(1)
 
+    this._rotateCarrierTowardsWaypoint(graphics)
+    this._drawCarrierWaypoints()
+
+    this.container.addChild(graphics)
+  }
+
+  _rotateCarrierTowardsWaypoint (graphics) {
     // If the carrier has waypoints, get the first one and calculate the angle
     // between the carrier's current position and the destination.
     if (this.data.waypoints.length) {
@@ -52,8 +59,22 @@ class Carrier extends EventEmitter {
 
       graphics.angle = (angle * (180 / Math.PI)) + 90
     }
+  }
 
-    // TODO: Draw carrier waypoints.
+  _drawCarrierWaypoints () {
+    let graphics = new PIXI.Graphics()
+
+    graphics.moveTo(this.data.location.x, this.data.location.y)
+    graphics.lineStyle(1, 0xFFFFFF, 0.2)
+
+    for (let i = 0; i < this.data.waypoints.length; i++) {
+      let waypoint = this.data.waypoints[i]
+
+      // Draw a line to each destination along the waypoints.
+      let star = this.stars.find(s => s.data._id === waypoint.destination)
+        
+      graphics.lineTo(star.data.location.x, star.data.location.y)
+    }
 
     this.container.addChild(graphics)
   }
