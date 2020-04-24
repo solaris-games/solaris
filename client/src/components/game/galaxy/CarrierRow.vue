@@ -24,7 +24,7 @@ export default {
   },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.carrier.ownedByPlayerId)
+      return gameHelper.getPlayerColour(this.game, this.carrier.ownedByPlayerId)
     },
     clickCarrier (e) {
       gameContainer.map.clickCarrier(this.carrier._id)

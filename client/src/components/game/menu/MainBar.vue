@@ -74,6 +74,15 @@ export default {
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.game)
     },
+    changeMenuState (state, args) {
+      this.menuState = state
+      this.menuArguments = args
+
+      this.onMenuStateChanged({
+        state,
+        args
+      })
+    },
     onMenuStateChanged (e) {
       this.$emit('onMenuStateChanged', e)
     },
@@ -84,20 +93,16 @@ export default {
       this.$emit('onGameJoined', e)
     }, 
     onConversationOpenRequested (e) {
-      this.menuState = 'conversation'
-      this.menuArguments = e
+      this.changeMenuState('conversation', e)
     },
     onShipTransferRequested (e) {
-      this.menuState = 'shipTransfer'
-      this.menuArguments = e
+      this.changeMenuState('shipTransfer', e)
     },
     onShipsTransferred (e) {
-      this.menuState = 'carrierDetail'
-      this.menuArguments = e
+      this.changeMenuState('carrierDetail', e)
     },
     onOpenCarrierDetailRequested (e) {
-      this.menuState = 'carrierDetail'
-      this.menuArguments = e
+      this.changeMenuState('carrierDetail', e)
     }
   }
 }

@@ -1,8 +1,7 @@
 <template>
-<div>
-    <div class="container">
-        <button class="btn btn-primary"><i class="fas fa-envelope"></i></button>
-        <button class="btn btn-primary ml-1"><i class="fas fa-sync"></i></button>
+<div class="container pb-2">
+    <div>
+        <button class="btn btn-primary" @click="onRefreshClicked"><i class="fas fa-sync"></i></button>
         <button class="btn btn-primary float-right">Mark All Read</button>
     </div>
 
@@ -14,8 +13,10 @@
         <conversation-message v-for="conversation in conversations" 
           v-bind:key="conversation.playerId" :game="game" 
           :sender="getPlayer(conversation.playerId)" 
-          :message="conversation.lastMessage" 
-          @onConversationOpenRequested="onConversationOpenRequested"/>
+          :message="conversation.lastMessage"
+          :colour="getPlayerColour(conversation.playerId)"
+          @onConversationOpenRequested="onConversationOpenRequested"
+          class="mb-2"/>
     </div>
 </div>
 </template>
@@ -23,6 +24,7 @@
 <script>
 import MessageApiService from '../../../services/api/message'
 import ConversationMessageVue from './ConversationMessage'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -36,23 +38,32 @@ export default {
       conversations: []
     }
   },
-  async mounted () {
-    try {
-      let response = await MessageApiService.getConversations(this.game._id)
-
-      if (response.status === 200) {
-        this.conversations = response.data
-      }
-    } catch (e) {
-      console.error(e)
-    }
+  mounted () {
+    this.refreshList()
   },
   methods: {
     getPlayer (playerId) {
-      return this.game.galaxy.players.find(p => p._id === playerId)
+      return gameHelper.getPlayerById(this.game, playerId)
+    },
+    getPlayerColour (playerId) {
+      return gameHelper.getPlayerColour(this.game, playerId)
+    },
+    async refreshList () {
+      try {
+        let response = await MessageApiService.getConversations(this.game._id)
+
+        if (response.status === 200) {
+          this.conversations = response.data
+        }
+      } catch (e) {
+        console.error(e)
+      }
     },
     onConversationOpenRequested (e) {
       this.$emit('onConversationOpenRequested', e)
+    },
+    onRefreshClicked (e) {
+      this.refreshList()
     }
   }
 }

@@ -1,11 +1,11 @@
 <template>
 <form>
-    <div class="form-group">
-        <label for="txtMessage">Compose Message</label>
-        <textarea class="form-control" id="txtMessage" rows="3" v-model="message"></textarea>
+    <div class="form-group mb-2">
+        <!-- <label for="txtMessage">Compose Message</label> -->
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." v-model="message"></textarea>
     </div>
     <div class="form-group text-right">
-    <button type="button" class="btn btn-primary text-right" @click="send">Submit</button>
+        <button type="button" class="btn btn-success btn-block" @click="send">Submit</button>
     </div>
 </form>
 </template>
