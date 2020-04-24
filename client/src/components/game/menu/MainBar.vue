@@ -14,7 +14,7 @@
       <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" :game="game" :transfer="menuArguments"/>
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" :game="game" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" :game="game" :fromPlayerId="menuArguments"/>
       <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
@@ -89,6 +89,10 @@ export default {
     },
     onShipTransferRequested (e) {
       this.menuState = 'shipTransfer'
+      this.menuArguments = e
+    },
+    onShipsTransferred (e) {
+      this.menuState = 'carrierDetail'
       this.menuArguments = e
     }
   }

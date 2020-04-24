@@ -3,6 +3,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
+    getById(game, id) {
+        return game.galaxy.carriers.find(s => s._id.toString() === id);
+    }
+
     createAtStar(star, carriers, ships = 1) {
         if (!Math.floor(star.garrisonActual)) {
             throw new ValidationError('Star must have a garrison to build a carrier.');

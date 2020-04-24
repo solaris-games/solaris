@@ -22,6 +22,7 @@ const StarUpgradeService = require('../services/starUpgrade');
 const TradeService = require('../services/trade');
 const WaypointService = require('../services/waypoint');
 const MessageService = require('../services/message');
+const ShipTransferService = require('../services/shipTransfer');
 const UserService = require('../services/user');
 
 const starNames = require('../config/game/starNames');
@@ -49,6 +50,7 @@ const starUpgradeService = new StarUpgradeService(starService, carrierService);
 const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService);
 const gameTickService = new GameTickService(distanceService, starService, researchService, playerService);
 const messageService = new MessageService();
+const shipTransferService = new ShipTransferService(carrierService, starService);
 
 module.exports = {
     authService,
@@ -70,5 +72,6 @@ module.exports = {
     tradeService,
     userService,
     waypointService,
+    shipTransferService,
     messageService,
 };

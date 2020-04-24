@@ -44,7 +44,7 @@
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
         <div class="col pr-0">
-            <button type="button" class="btn btn-success btn-block mr-1" :disabled="starShips < 0 || carrierShips < 0">Transfer</button>
+            <button type="button" class="btn btn-success btn-block mr-1" :disabled="starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
         </div>
         <div class="col-auto pl-1">
             <button type="button" class="btn btn-primary"><i class="fas fa-plus"></i></button>
@@ -95,11 +95,27 @@ export default {
       },
       onTransferLeftClicked (e) {
           this.starShips++
-          this.carrierShips--;
+          this.carrierShips--
       },
       onTransferRightClicked (e) {
           this.carrierShips++
-          this.starShips--;
+          this.starShips--
+      },
+      async saveTransfer (e) {
+          try {
+            let result = await CarrierApiService.transferShips(
+                this.game._id, 
+                this.transfer.carrier._id,
+                parseInt(this.carrierShips),
+                this.transfer.star._id,
+                parseInt(this.starShips))
+
+            if (result.status === 200) {
+                this.$emit('onShipsTransferred', this.transfer.carrier) // TODO: This won't work because the carrier screen looks at .data, needs to be refactored.
+            }
+          } catch (err) {
+              console.log(err)
+          }
       }
   }
 }

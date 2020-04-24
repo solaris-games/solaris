@@ -24,6 +24,10 @@ module.exports = class StarService {
         };
     }
 
+    getById(game, id) {
+        return game.galaxy.stars.find(s => s._id.toString() === id);
+    }
+
     setupHomeStar(homeStar, player, gameSettings) {
         // Set up the home star
         player.homeStarId = homeStar._id;

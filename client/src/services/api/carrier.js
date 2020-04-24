@@ -9,6 +9,17 @@ class CarrierService extends BaseApiService {
     { withCredentials: true })
   }
 
+  transferShips (gameId, carrierId, carrierShips, starId, starShips) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/transfer', 
+        {
+          carrierId,
+          carrierShips,
+          starId,
+          starShips
+        },
+    { withCredentials: true })
+  }
+
 }
 
 export default new CarrierService()

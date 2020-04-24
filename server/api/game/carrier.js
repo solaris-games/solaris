@@ -25,4 +25,27 @@ router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, mid
     }
 }, middleware.handleError);
 
+router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    let errors = [];
+
+    // TODO: Validation
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    try {
+        await container.shipTransferService.transfer(
+            req.game,
+            req.params.carrierId,
+            req.body.carrierShips,
+            req.body.starId,
+            req.body.starShips);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+}, middleware.handleError);
+
 module.exports = router;
