@@ -16,6 +16,10 @@ module.exports = class PlayerService {
         return game.galaxy.players.find(p => p._id.equals(playerId));
     }
 
+    getById(game, playerId) {
+        return game.galaxy.players.find(p => p._id.toString() === playerId);
+    }
+
     getByUserId(game, userId) {
         return game.galaxy.players.find(p => p.userId.toString() === userId);
     }

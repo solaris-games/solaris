@@ -76,4 +76,49 @@ router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame
     }
 }, middleware.handleError);
 
+router.put('/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    let errors = [];
+
+    if (!req.body.toPlayerId) {
+        errors.push('toPlayerId is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    try {
+        await container.tradeService.sendTechnology(
+            req.game,
+            req.session.userId,
+            req.body.toPlayerId,
+            req.body.technology);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+}, middleware.handleError);
+
+router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    let errors = [];
+
+    // TODO: Validation?
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    try {
+        let techs = await container.tradeService.getTradeableTechnologies(
+            req.game,
+            req.session.userId,
+            req.params.toPlayerId);
+
+        return res.status(200).json(techs);
+    } catch (err) {
+        return next(err);
+    }
+}, middleware.handleError);
+
 module.exports = router;

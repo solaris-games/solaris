@@ -1,5 +1,5 @@
 <template>
-<div class="row bg-primary pt-2 pb-2">
+<div class="row bg-primary pt-2 pb-2" v-if="selectedTechnology">
     <div class="col">
         <p class="mb-2">Give this player Technology. (Costs $15 per tech level)</p>
 
@@ -28,6 +28,7 @@
 <script>
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
+import TradeApiService from '../../../services/api/trade'
 
 export default {
   props: {
@@ -40,21 +41,42 @@ export default {
     'dialogModal': DialogModal
   },
   data() {
-      // TODO: Get this data from the API.
       return {
-          selectedTechnology: 'Scanning',
-          availableTechnologies: [
-          {
-              name: 'Scanning',
-              level: 2,
-              cost: 30
-          }
-        ]
+          selectedTechnology: null,
+          availableTechnologies: []
       }
   },
+  mounted () {
+    this.getTradeableTechnologies()
+  },
   methods: {
-    confirmSendTechnology () {
-      // TODO: Call the API
+    async getTradeableTechnologies () {
+      try {
+        let response = await TradeApiService.getTradeableTechnologies(this.game._id, this.player._id)
+
+        if (response.status === 200) {
+          this.availableTechnologies = response.data
+          
+          if (this.availableTechnologies.length) {
+            this.selectedTechnology = this.availableTechnologies[0].name
+          }
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmSendTechnology () {
+      try {
+        let response = await TradeApiService.sendTechnology(this.game._id, this.player._id, this.selectedTechnology)
+
+        if (response.status === 200) {
+          console.log('Technology sent')
+
+          this.getTradeableTechnologies()
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }
