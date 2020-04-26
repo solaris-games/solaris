@@ -123,4 +123,9 @@ export default {
 </script>
 
 <style scoped>
+.dropdown-menu {
+  position:fixed !important;
+  left: 14px !important;
+  top: 8px !important;
+}
 </style>

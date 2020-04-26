@@ -1,7 +1,7 @@
 <template>
 <div class="bg-secondary pb-2">
     <div class="container">
-        <h3 class="pt-2">Intel</h3>
+        <menu-title title="Intel" @onCloseRequested="onCloseRequested"/>
 
         <select class="form-control input-sm" id="intelType" v-model="intelType" v-on:change="fillData" :disabled="history == null">
           <option key="totalStars" value="totalStars">Total Stars</option>
@@ -45,12 +45,14 @@
 </template>
 
 <script>
+import MenuTitle from '../MenuTitle'
 import LineChart from './LineChart.js'
 import GameHelper from '../../../services/gameHelper'
 import GameApiService from '../../../services/api/game'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'line-chart': LineChart
   },
   props: {
@@ -81,6 +83,9 @@ export default {
     }
   },
   methods: {
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+    },
     fillData () {
       if (!this.history) {
         return

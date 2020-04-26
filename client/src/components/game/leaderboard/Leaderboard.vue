@@ -1,6 +1,6 @@
 <template>
 <div class="container pb-2">
-    <h3 class="pt-2">Leaderboard</h3>
+    <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-primary">
         <div class="col">
@@ -66,16 +66,21 @@ import gameContainer from '../../../game/container'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import gameHelper from '../../../services/gameHelper'
+import MenuTitle from '../MenuTitle'
 
 export default {
   props: {
     game: Object
   },
   components: {
+    'menu-title': MenuTitle,
     'modalButton': ModalButton,
     'dialogModal': DialogModal
   },
   methods: {
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
+    },
     zoomToPlayer (player) {
       gameContainer.map.zoomToPlayer(this.game, player)
     },
@@ -109,6 +114,9 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    },
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
     }
   }
 }

@@ -1,7 +1,7 @@
 const ValidationError = require('../errors/validation');
 
 function getConversation(game, fromPlayerId, toPlayerId) {
-    return game.messages
+    return game.messages || []
         .filter(m => (m.fromPlayerId.toString() === fromPlayerId.toString()
                     && m.toPlayerId.toString() === toPlayerId.toString())
                     ||

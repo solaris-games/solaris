@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="container pb-2">
-        <h3 class="pt-2">Conversation</h3>
+        <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
 
         <div class="pt-0 mb-2" v-if="messages.length">
             <conversation-message v-for="message in messages" 
@@ -25,12 +25,14 @@
 
 <script>
 import MessageApiService from '../../../services/api/message'
+import MenuTitle from '../MenuTitle'
 import ComposeMessage from './ComposeMessage'
 import ConversationMessageVue from './ConversationMessage'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'compose-message': ComposeMessage,
     'conversation-message': ConversationMessageVue
   },
@@ -47,6 +49,9 @@ export default {
     this.loadMessages()
   },
   methods: {
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+    },
     getPlayer (playerId) {
       return this.game.galaxy.players.find(p => p._id === playerId)
     },

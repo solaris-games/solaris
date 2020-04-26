@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <h3 class="pt-2">Research</h3>
+    <menu-title title="Research" @onCloseRequested="onCloseRequested"/>
 
     <p>Each point of science on your stars contributes 1 point of research every tick towards your chosen technology.</p>
 
@@ -15,16 +15,23 @@
 </template>
 
 <script>
+import MenuTitle from '../MenuTitle'
 import Selection from './Selection'
 import ProgressSummary from './ProgressSummary'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'selection': Selection,
     'progress-summary': ProgressSummary
   },
   props: {
     game: Object
+  },
+  methods: {
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
+    }
   }
 }
 </script>

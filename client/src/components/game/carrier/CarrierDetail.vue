@@ -1,7 +1,6 @@
 <template>
 <div class="container">
-    <!-- TODO: These need to act off the carrier object itself instead of pixi object -->
-    <h3 class="pt-2">{{carrier.name}}</h3>
+    <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
@@ -74,12 +73,14 @@
 <script>
 import GameHelper from '../../../services/gameHelper'
 import CarrierApiService from '../../../services/api/carrier'
+import MenuTitle from '../MenuTitle'
 import PlayerOverview from '../player/Overview'
 import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'playerOverview': PlayerOverview,
     'waypointTable': WaypointTable
   },
@@ -97,6 +98,9 @@ export default {
     GameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
   },
   methods: {
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
+    },
     // TODO: This method appears everywhere, is there a way to make it global?
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.game)

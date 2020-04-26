@@ -1,7 +1,7 @@
 <template>
 <div>
   <!-- TODO: Text for premium player and lifetime premium player -->
-  <h3 class="pt-2">Player</h3>
+  <menu-title title="Player" @onCloseRequested="onCloseRequested"/>
   
   <div class="row" :style="{'background-color': getFriendlyColour(player.colour.value)}">
       <div class="col">
@@ -31,11 +31,13 @@
 </template>
 
 <script>
+import MenuTitle from '../MenuTitle'
 import Statistics from './Statistics'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'statistics': Statistics
   },
   props: {
@@ -43,6 +45,9 @@ export default {
     player: Object
   },
   methods: {
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+    },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     }

@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="container">
-        <h3 class="pt-2">Galaxy</h3>
+        <menu-title title="Galaxy" @onCloseRequested="onCloseRequested"/>
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
@@ -31,18 +31,25 @@
 </template>
 
 <script>
+import MenuTitle from '../MenuTitle'
 import StarsTableVue from './StarsTable'
 import CarriersTableVue from './CarriersTable'
 import ShipsTableVue from './ShipsTable'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'stars-table': StarsTableVue,
     'carriers-table': CarriersTableVue,
     'ships-table': ShipsTableVue
   },
   props: {
     game: Object
+  },
+  methods: {
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+    }
   }
 }
 </script>

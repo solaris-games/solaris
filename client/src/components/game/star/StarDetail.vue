@@ -1,7 +1,6 @@
 <template>
 <div class="container">
-    <!-- TODO: These need to act off the star object itself instead of pixi object -->
-    <h3 class="pt-2">{{star.name}}</h3>
+    <menu-title :title="star.name" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
@@ -131,6 +130,7 @@
 <script>
 import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
+import MenuTitle from '../MenuTitle'
 import Infrastructure from '../shared/Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
 import PlayerOverview from '../player/Overview'
@@ -139,6 +139,7 @@ import DialogModal from '../../modal/DialogModal'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'infrastructure': Infrastructure,
     'infrastructureUpgrade': InfrastructureUpgrade,
     'playerOverview': PlayerOverview,
@@ -155,6 +156,9 @@ export default {
     }
   },
   methods: {
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
+    },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.game)
     },

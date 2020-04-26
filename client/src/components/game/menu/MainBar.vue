@@ -4,21 +4,21 @@
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
-    <div class="menu-content bg-light">
+    <div class="menu-content bg-light" v-if="menuState">
       <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
       <div v-if="menuState == MENU_STATES.HELP">HELP</div>
 
-      <welcome v-if="menuState == MENU_STATES.WELCOME" :game="game" v-on:onGameJoined="onGameJoined"/>
-      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" :game="game"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
-      <research v-if="menuState == MENU_STATES.RESEARCH" :game="game"/>
-      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" :game="game" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
-      <conversation v-if="menuState == MENU_STATES.CONVERSATION" :game="game" :fromPlayerId="menuArguments"/>
-      <intel v-if="menuState == MENU_STATES.INTEL" :game="game"/>
-      <galaxy v-if="menuState == MENU_STATES.GALAXY" :game="game"/>
+      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested" :game="game" v-on:onGameJoined="onGameJoined"/>
+      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested" :game="game"/>
+      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
+      <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested" :game="game"/>
+      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :star="menuArguments"/>
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested"/>
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :game="game" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <inbox v-if="menuState == MENU_STATES.INBOX" @onCloseRequested="onCloseRequested" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
+      <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :game="game" :fromPlayerId="menuArguments"/>
+      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :game="game"/>
+      <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested" :game="game"/>
     </div>
 </div>
 </template>
@@ -85,6 +85,9 @@ export default {
     },
     onMenuStateChanged (e) {
       this.$emit('onMenuStateChanged', e)
+    },
+    onCloseRequested (e) {
+      this.changeMenuState(null, null)
     },
     onPlayerSelected (e) {
       this.$emit('onPlayerSelected', e)

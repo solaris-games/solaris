@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <h3 class="pt-2">Ship Transfer</h3>
+    <menu-title title="Ship Transfer" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary mb-2">
       <div class="col text-center pt-3">
@@ -56,11 +56,12 @@
 <script>
 import GameHelper from '../../../services/gameHelper'
 import CarrierApiService from '../../../services/api/carrier'
+import MenuTitle from '../MenuTitle'
 import GameContainer from '../../../game/container'
 
 export default {
   components: {
-      
+    'menu-title': MenuTitle
   },
   props: {
     game: Object,
@@ -77,6 +78,9 @@ export default {
       this.carrierShips = this.transfer.carrier.ships
   },
   methods: {
+      onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+      },
       onStarShipsChanged (e) {
         let difference = parseInt(this.starShips) - this.transfer.star.garrison
         this.carrierShips = this.transfer.carrier.ships - difference

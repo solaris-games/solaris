@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="container">
-        <h3 class="pt-2">Inbox</h3>
+        <menu-title title="Inbox" @onCloseRequested="onCloseRequested"/>
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
@@ -25,11 +25,13 @@
 </template>
 
 <script>
+import MenuTitle from '../MenuTitle'
 import DiplomacyListVue from './DiplomacyList'
 import EventsListVue from './EventsList'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'diplomacy-list': DiplomacyListVue,
     'events-list': EventsListVue
   },
@@ -37,6 +39,9 @@ export default {
     game: Object
   },
   methods: {
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+    },
     onConversationOpenRequested (e) {
       this.$emit('onConversationOpenRequested', e)
     }

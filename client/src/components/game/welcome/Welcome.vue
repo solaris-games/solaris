@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <h3 class="pt-2">Welcome</h3>
+    <menu-title title="Welcome" @onCloseRequested="onCloseRequested"/>
 
     <select-alias v-on:onAliasChanged="onAliasChanged"/>
 
@@ -19,12 +19,14 @@
 
 <script>
 import gameService from '../../../services/api/game'
+import MenuTitle from '../MenuTitle'
 import FormErrorListVue from '../../FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
 import SelectColourVue from './SelectColour.vue'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'form-error-list': FormErrorListVue,
     'select-alias': SelectAliasVue,
     'select-colour': SelectColourVue
@@ -44,6 +46,9 @@ export default {
     this.domain = window.location.host
   },
   methods: {
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
+    },
     onAliasChanged (e) {
       this.alias = e
     },
