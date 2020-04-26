@@ -113,7 +113,6 @@ export default {
     },
     fitGalaxy () {
       GameContainer.viewport.fitWorld()
-      this.zoomByPercent(-0.1)
     },
     zoomByPercent (percent) {
       GameContainer.viewport.zoomPercent(percent, true)
