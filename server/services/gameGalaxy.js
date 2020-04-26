@@ -12,7 +12,7 @@ module.exports = class GameGalaxyService {
 
     async getGalaxy(game, userId) {
         game = game.toObject();
-        
+
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
         
@@ -66,17 +66,9 @@ module.exports = class GameGalaxyService {
     }
 
     _setPlayerStats(doc) {
+        // Get all of the player's statistics.
         doc.galaxy.players.forEach(p => {
-            // Get all of the player's statistics.
-            p.stats = {
-                totalStars: this.playerService.calculateTotalStars(p, doc.galaxy.stars),
-                totalCarriers: this.playerService.calculateTotalCarriers(p, doc.galaxy.carriers),
-                totalShips: this.playerService.calculateTotalShips(p, doc.galaxy.stars, doc.galaxy.carriers),
-                totalEconomy: this.playerService.calculateTotalEconomy(p, doc.galaxy.stars),
-                totalIndustry: this.playerService.calculateTotalIndustry(p, doc.galaxy.stars),
-                totalScience: this.playerService.calculateTotalScience(p, doc.galaxy.stars),
-                newShips: this.playerService.calculateTotalManufacturing(p, doc.galaxy.stars)
-            };
+            p.stats = this.playerService.getStats(doc, p);
         });
     }
 

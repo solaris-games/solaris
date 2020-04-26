@@ -30,6 +30,14 @@ router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, as
     }
 }, middleware.handleError);
 
+router.get('/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
+    try {
+        return res.status(200).json(req.game.history);
+    } catch (err) {
+        return next(err);
+    }
+}, middleware.handleError);
+
 router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
         let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);

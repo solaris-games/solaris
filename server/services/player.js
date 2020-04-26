@@ -211,4 +211,16 @@ module.exports = class PlayerService {
         return playerCarriers.length;
     }
 
+    getStats(game, player) {
+        return {
+            totalStars: this.calculateTotalStars(player, game.galaxy.stars),
+            totalCarriers: this.calculateTotalCarriers(player, game.galaxy.carriers),
+            totalShips: this.calculateTotalShips(player, game.galaxy.stars, game.galaxy.carriers),
+            totalEconomy: this.calculateTotalEconomy(player, game.galaxy.stars),
+            totalIndustry: this.calculateTotalIndustry(player, game.galaxy.stars),
+            totalScience: this.calculateTotalScience(player, game.galaxy.stars),
+            newShips: this.calculateTotalManufacturing(player, game.galaxy.stars)
+        };
+    }
+
 }

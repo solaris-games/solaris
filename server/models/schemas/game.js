@@ -73,8 +73,7 @@ const schema = new Schema({
     galaxy: {
         players: [playerSchema],
 		stars: [starSchema],
-		carriers: [carrierSchema],
-        history: [historySchema]
+		carriers: [carrierSchema]
 	},
     messages: [messageSchema],
 	state: {
@@ -88,7 +87,8 @@ const schema = new Schema({
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		winner: { type: Types.ObjectId, required: false }
-	}
+	},
+	history: [historySchema]
 });
 
 module.exports = schema;

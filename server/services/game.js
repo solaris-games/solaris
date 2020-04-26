@@ -14,10 +14,26 @@ module.exports = class GameService {
             .exec();
     }
 
+    async getByIdGalaxy(id, select) {
+        return await this.getById(id, {
+            settings: 1,
+            state: 1,
+            galaxy: 1
+        });
+    }
+
     async getByIdInfo(id) {
         return await this.getById(id, {
             settings: 1,
             state: 1
+        });
+    }
+
+    async getByIdHistory(id) {
+        return await this.getById(id, {
+            settings: 1,
+            state: 1,
+            history: 1
         });
     }
 
