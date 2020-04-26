@@ -8,7 +8,7 @@
       <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
       <div v-if="menuState == MENU_STATES.HELP">HELP</div>
 
-      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested" :game="game" v-on:onGameJoined="onGameJoined"/>
+      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested" :game="game"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested" :game="game"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested" :game="game"/>
@@ -92,9 +92,6 @@ export default {
     onPlayerSelected (e) {
       this.$emit('onPlayerSelected', e)
     },
-    onGameJoined (e) {
-      this.$emit('onGameJoined', e)
-    }, 
     onConversationOpenRequested (e) {
       this.changeMenuState('conversation', e)
     },

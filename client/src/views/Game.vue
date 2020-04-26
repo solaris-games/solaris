@@ -6,7 +6,6 @@
                     :menuState="menuState"
                     :menuArguments="menuArguments"
                     @onMenuStateChanged="onMenuStateChanged"
-                    @onGameJoined="reloadGame"
                     @onPlayerSelected="onPlayerSelected"/>
 
         <game-container :game="game"
@@ -61,13 +60,6 @@ export default {
       this.menuArguments = e.args || null
 
       this.$emit('onMenuStateChanged', e)
-    },
-
-    onGameJoined (e) {
-      this.menuState = MENU_STATES.LEADERBOARD
-      this.menuArguments = null
-
-      this.$emit('onGameJoined', e)
     },
     onPlayerSelected (e) {
       this.menuState = MENU_STATES.PLAYER

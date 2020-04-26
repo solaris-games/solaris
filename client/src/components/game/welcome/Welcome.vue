@@ -73,7 +73,7 @@ export default {
         let response = await gameService.joinGame(this.game._id, playerId, this.alias)
 
         if (response.status === 200) {
-          this.$emit('onGameJoined', playerId)
+          location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.
         }
       } catch (err) {
         console.error(err)
