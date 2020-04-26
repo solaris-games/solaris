@@ -4,7 +4,7 @@ const middleware = require('../middleware');
 const container = require('../container');
 const ValidationError = require('../../errors/validation');
 
-router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
     try {
         let result = container.messageService.list(
             req.game,
@@ -17,7 +17,7 @@ router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticat
     }
 }, middleware.handleError);
 
-router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
     try {
         let result = container.messageService.summary(
             req.game,
@@ -29,7 +29,7 @@ router.get('/:gameId/message/conversations', middleware.authenticate, middleware
     }
 }, middleware.handleError);
 
-router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
     let errors = [];
 
     if (!req.body.toPlayerId) {

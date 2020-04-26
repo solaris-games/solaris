@@ -29,6 +29,15 @@ module.exports = class GameService {
         });
     }
 
+    async getByIdMessages(id) {
+        return await this.getById(id, {
+            settings: 1,
+            state: 1,
+            messages: 1,
+            'galaxy.players': 1
+        });
+    }
+
     async getByIdHistory(id) {
         return await this.getById(id, {
             settings: 1,

@@ -42,8 +42,6 @@ module.exports = {
     },
     
     async loadGameInfo(req, res, next) {
-        // If the request URL contains a game id then
-        // append it to the request object.
         if (req.params.gameId) {
             req.game = await container.gameService.getByIdInfo(req.params.gameId);
         }
@@ -51,9 +49,15 @@ module.exports = {
         return next();
     },
 
+    async loadGameMessages(req, res, next) {
+        if (req.params.gameId) {
+            req.game = await container.gameService.getByIdMessages(req.params.gameId);
+        }
+
+        return next();
+    },
+
     async loadGameHistory(req, res, next) {
-        // If the request URL contains a game id then
-        // append it to the request object.
         if (req.params.gameId) {
             req.game = await container.gameService.getByIdHistory(req.params.gameId);
         }

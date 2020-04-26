@@ -50,6 +50,10 @@ module.exports = class MessageService {
     
 
     async send(game, userId, toPlayerId, message) {
+        if (game.messages == null) {
+            game.messages = [];
+        }
+        
         let fromPlayer = game.galaxy.players.find(p => p.userId.toString() === userId);
         let toPlayer = game.galaxy.players.find(p => p.id === toPlayerId);
 
