@@ -15,7 +15,7 @@ function getConversation(game, fromPlayerId, toPlayerId) {
 module.exports = class MessageService {
     
     list(game, userId, fromPlayerId) {
-        let userPlayer = game.galaxy.players.find(p => p.userId.toString() === userId);
+        let userPlayer = game.galaxy.players.find(p => p.userId && p.userId.toString() === userId);
 
         if (!userPlayer) {
             throw new ValidationError('The user player does not exist.');
@@ -26,7 +26,7 @@ module.exports = class MessageService {
 
     summary(game, userId) {
         // Get the last message from all players, and null if there is none.
-        let userPlayer = game.galaxy.players.find(p => p.userId.toString() === userId);
+        let userPlayer = game.galaxy.players.find(p => p.userId && p.userId.toString() === userId);
 
         let conversations = [];
 
