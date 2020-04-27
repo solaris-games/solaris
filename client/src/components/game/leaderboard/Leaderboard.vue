@@ -8,10 +8,17 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
             <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
             <p>Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
+        </div>
+    </div>
+
+    <div class="row bg-success" v-if="game.state.endDate">
+        <div class="col text-center pt-2">
+            <h3>Game Over!</h3>
+            <p>Congratulations to the winner!</p>
         </div>
     </div>
 
@@ -19,7 +26,8 @@
         <table class="table table-sm table-striped">
             <tbody>
                 <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
-                <tr v-for="player in game.galaxy.players" :key="player._id">
+                <!-- TODO: Sort this list by number of stars owned -->
+                <tr v-for="player in getSortedLeaderboardPlayerList()" :key="player._id">
                     <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                     <td class="col-avatar">
                         <!-- TODO: Prefer images over font awesome icons? -->
@@ -92,6 +100,11 @@ export default {
     },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
+    },
+    getSortedLeaderboardPlayerList () {
+      // TODO: This needs to also sort by number of ships
+      return this.game.galaxy.players
+        .sort((a, b) => this.getPlayerStarCount(b) - this.getPlayerStarCount(a))
     },
     async concedeDefeat () {
       try {
