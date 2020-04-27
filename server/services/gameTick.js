@@ -287,7 +287,9 @@ module.exports = class GameTickService {
         // There could be more than one player who has reached
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
-        let winners = game.galaxy.players
+        let winner = null;
+
+        let starWinners = game.galaxy.players
             .filter(p => {
                 let playerStars = this.playerService.calculateTotalStars(p, game.galaxy.stars);
 
@@ -300,9 +302,21 @@ module.exports = class GameTickService {
                 return totalShipsB - totalShipsA;
             });
 
-        if (winners.length) {
-            let winner = winners[0];
+        if (starWinners.length) {
+            winner = starWinners[0];
+        }
 
+        // If there are no players who have reached required star count, then check if 
+        // there are any players who are last man standing.
+        if (!winner) {
+            let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+
+            if (undefeatedPlayers.length === 1) {
+                winner = undefeatedPlayers[0];
+            }
+        }
+
+        if (winner) {
             game.state.paused = true;
             game.state.endDate = new Date();
             game.state.winner = winner._id;

@@ -68,7 +68,7 @@ export default {
   },
   mounted () {
     this.recalculateTimeRemaining()
-    
+
     setInterval(() => {
       this.recalculateTimeRemaining()
     }, 1000)
@@ -93,6 +93,10 @@ export default {
       GameContainer.viewport.zoomPercent(percent, true)
     },
     recalculateTimeRemaining () {
+      if (this.game.state.paused) {
+        return
+      }
+
       let t = new Date(this.nextProduction) - new Date()
 
       let days = Math.floor(t / (1000 * 60 * 60 * 24))
