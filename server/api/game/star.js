@@ -59,13 +59,13 @@ router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, m
 
 router.put('/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     try {
-        await container.starUpgradeService.upgradeBulk(
+        let summary = await container.starUpgradeService.upgradeBulk(
             req.game,
             req.session.userId,
             req.body.infrastructure,
             +req.body.amount);
 
-        return res.sendStatus(200);
+        return res.status(200).json(summary);
     } catch (err) {
         return next(err);
     }

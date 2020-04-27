@@ -156,6 +156,11 @@ module.exports = class StarUpgradeService {
             throw new ValidationError('Could not find player for user.');
         }
 
+        let upgradeSummary = {
+            cost: 0,
+            upgraded: 0
+        };
+
         let expenseConfig;
         let calculateCostFunction;
         let upgradeFunction;
@@ -205,9 +210,14 @@ module.exports = class StarUpgradeService {
             let upgradedCost = await upgradeFunction(game, userId, upgradeStar._id);
 
             amount -= upgradedCost;
+
+            upgradeSummary.upgraded++;
+            upgradeSummary.cost += upgradedCost;
         }
 
         await game.save()
+
+        return upgradeSummary;
     }
 
     calculateWarpGateCost(expenseConfig, terraformedResources) {

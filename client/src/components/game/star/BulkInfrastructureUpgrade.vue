@@ -92,7 +92,9 @@ export default {
             amount: this.amount
           })
 
-          alert('Infrastructure upgraded')
+          alert(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`)
+        
+          // TODO: Update the player credits amount and update all stars.
         }
       } catch (err) {
         console.error(err)
