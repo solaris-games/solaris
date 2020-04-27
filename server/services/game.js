@@ -148,6 +148,20 @@ module.exports = class GameService {
 
         player.defeated = true;
 
+        // Do a winner check here for last man standing as it's possible that everyone might admit
+        // or be legit defeated on the same tick.
+        // TODO: This could be refactored into a new service as it's currently also being done in the game
+        // tick service.
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+
+        if (undefeatedPlayers.length === 1) {
+            let winner = undefeatedPlayers[0];
+
+            game.state.paused = true;
+            game.state.endDate = new Date();
+            game.state.winner = winner._id;
+        }
+
         return await game.save();
     }
 
