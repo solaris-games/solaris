@@ -19,6 +19,8 @@ module.exports = class GameGalaxyService {
         // TODO: If the game has started and the user is not in this game
         // then they cannot view info about this game.
 
+        // TODO: If the game is completed then show everything.
+
         // Append the player stats to each player.
         this._setPlayerStats(game);
 

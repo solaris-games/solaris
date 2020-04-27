@@ -3,10 +3,11 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService {
 
-    constructor(randomService, starNameService, distanceService) {
+    constructor(randomService, starNameService, distanceService, starDistanceService) {
         this.randomService = randomService;
         this.starNameService = starNameService;
         this.distanceService = distanceService;
+        this.starDistanceService = starDistanceService;
     }
 
     DEFAULTS = {
@@ -78,7 +79,14 @@ module.exports = class StarService {
         // Find and destroy all carriers stationed at this star.
         game.galaxy.carriers = game.galaxy.carriers.filter(x => x.orbiting.toString() != star.id);
 
-        // TODO: Do we need to do anything about the home star? Maybe move it to the nearest player star?
+        // If this was the player's home star, then we need to find a new home star.
+        if (star.homeStar) {
+            let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, userPlayer);
+
+            if (closestStars.length) {
+                closestStars[0].homeStar = true;
+            }
+        }
         
         await game.save();
     }

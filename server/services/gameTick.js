@@ -185,6 +185,8 @@ module.exports = class GameTickService {
             star.infrastructure.economy = 0;
 
             // TODO: Do carrier waypoint action here?
+            // TODO: If the home star is captured, find a new one.
+            // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
         }
     }
 

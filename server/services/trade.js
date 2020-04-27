@@ -12,6 +12,10 @@ module.exports = class TradeService {
         let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
+        if (fromPlayer === toPlayer) {
+            throw new ValidationError(`Cannot send credits to yourself.`);
+        }
+
         if (fromPlayer.credits < amount) {
             throw new ValidationError(`The player does not own ${amount} credits.`);
         }
@@ -49,6 +53,10 @@ module.exports = class TradeService {
         // Get the players.
         let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
+
+        if (fromPlayer === toPlayer) {
+            throw new ValidationError(`Cannot trade technology with yourself.`);
+        }
 
         let tradeTechs = this.getTradeableTechnologies(game, userId, toPlayerId);
 

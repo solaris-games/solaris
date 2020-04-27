@@ -8,6 +8,8 @@ module.exports = class MapService {
         this.starNameService = starNameService;
     }
 
+    // TODO: This needs to be refactored into new services so we can generate multiple different
+    // types of galaxies
     generateStars(starCount) {
         const stars = [];
 

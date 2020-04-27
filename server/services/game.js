@@ -93,7 +93,7 @@ module.exports = class GameService {
             game.state.lastTickDate = start.toDate();
             game.state.nextTickDate = start.add(10, 'm').toDate();
 
-            // TODO: Register a cron job for the first tick of the game.
+            // TODO: Register a cron job for the first tick of the game?
         }
 
         return await game.save();

@@ -10,30 +10,30 @@
       </div>
     </div>
 
-    <div v-if="star.garrison" class="row mb-0 pt-3 pb-3 bg-primary">
+    <div v-if="star.ownedByPlayerId" class="row mb-0 pt-3 pb-3 bg-primary">
         <div class="col">
             Ships
         </div>
         <div class="col text-right">
-            {{star.garrison}} <i class="fas fa-rocket ml-1"></i>
+            {{star.garrison || '???'}} <i class="fas fa-rocket ml-1"></i>
         </div>
     </div>
 
-    <div v-if="star.naturalResources" class="row pt-1 pb-1 bg-secondary">
+    <div class="row pt-1 pb-1 bg-secondary">
         <div class="col">
             Natural Resources
         </div>
         <div class="col text-right">
-            {{star.naturalResources}} <i class="fas fa-globe ml-1"></i>
+            {{star.naturalResources || '???'}} <i class="fas fa-globe ml-1"></i>
         </div>
     </div>
 
-    <div v-if="star.terraformedResources" class="row mb-2 pt-1 pb-1 bg-secondary">
+    <div v-if="star.ownedByPlayerId" class="row mb-2 pt-1 pb-1 bg-secondary">
         <div class="col">
             Terraformed Resources
         </div>
         <div class="col text-right">
-            {{star.terraformedResources}} <i class="fas fa-globe ml-1"></i>
+            {{star.terraformedResources || '???'}} <i class="fas fa-globe ml-1"></i>
         </div>
     </div>
 
