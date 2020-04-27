@@ -3,7 +3,9 @@
     <div class="container pb-2">
         <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
 
-        <div class="pt-0 mb-2" v-if="messages.length">
+        <player-overview :game="game" :player="getPlayer(fromPlayerId)"/>
+
+        <div class="pt-0 mb-2 mt-2" v-if="messages.length">
             <conversation-message v-for="message in messages" 
                 v-bind:key="message._id" 
                 :game="game"
@@ -14,7 +16,7 @@
 
         </div>
         
-        <div class="pt-0 mb-2" v-if="!messages.length">
+        <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
             <p class="mb-0" v-if="!messages.length">No messages.</p>
         </div>
 
@@ -26,6 +28,7 @@
 <script>
 import MessageApiService from '../../../services/api/message'
 import MenuTitle from '../MenuTitle'
+import PlayerOverview from '../player/Overview'
 import ComposeMessage from './ComposeMessage'
 import ConversationMessageVue from './ConversationMessage'
 import gameHelper from '../../../services/gameHelper'
@@ -34,7 +37,8 @@ export default {
   components: {
     'menu-title': MenuTitle,
     'compose-message': ComposeMessage,
-    'conversation-message': ConversationMessageVue
+    'conversation-message': ConversationMessageVue,
+    'player-overview': PlayerOverview
   },
   props: {
     game: Object,

@@ -1,6 +1,9 @@
 <template>
 <div class="container">
-    <overview :game="game" :player="player" />
+    <!-- TODO: Text for premium player and lifetime premium player -->
+    <menu-title title="Player" @onCloseRequested="onCloseRequested"/>
+  
+    <overview :game="game" :player="player" @onViewConversationRequested="onViewConversationRequested"/>
 
     <h4 v-if="userPlayer" class="mt-2">Infrastructure</h4>
 
@@ -43,6 +46,7 @@
 </template>
 
 <script>
+import MenuTitle from '../MenuTitle'
 import Overview from './Overview'
 import Infrastructure from '../shared/Infrastructure'
 import YourInfrastructure from './YourInfrastructure'
@@ -57,6 +61,7 @@ import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
+    'menu-title': MenuTitle,
     'overview': Overview,
     'infrastructure': Infrastructure,
     'yourInfrastructure': YourInfrastructure,
@@ -94,6 +99,14 @@ export default {
     }
 
     this.userPlayer = GameHelper.getUserPlayer(this.game)
+  },
+  methods: {
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
+    },
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', e)
+    }
   }
 }
 </script>

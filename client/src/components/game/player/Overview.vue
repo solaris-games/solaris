@@ -1,11 +1,8 @@
 <template>
 <div>
-  <!-- TODO: Text for premium player and lifetime premium player -->
-  <menu-title title="Player" @onCloseRequested="onCloseRequested"/>
-  
   <div class="row" :style="{'background-color': getFriendlyColour(player.colour.value)}">
       <div class="col">
-          <h4 class="pt-2">{{player.alias}}</h4>
+          <h4 class="pt-2">{{player.alias}} <span v-if="player.userId">(You)</span></h4>
       </div>
   </div>
 
@@ -18,8 +15,8 @@
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
-                  <button class="btn btn-success"><i class="fas fa-envelope"></i></button>
-                  <button class="btn btn-info ml-1"><i class="fas fa-chart-line"></i></button>
+                  <button class="btn btn-success" :disabled="player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button>
+                  <button class="btn btn-info ml-1" :disabled="player.userId"><i class="fas fa-chart-line"></i></button>
               </div>
           </div>
       </div>
@@ -31,13 +28,11 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
 import Statistics from './Statistics'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
-    'menu-title': MenuTitle,
     'statistics': Statistics
   },
   props: {
@@ -45,11 +40,11 @@ export default {
     player: Object
   },
   methods: {
-    onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
-    },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
+    },
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', this.player._id)
     }
   }
 }

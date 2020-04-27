@@ -5,7 +5,7 @@
     <td><a href="#" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
     <td>{{carrier.ships}}</td>
     <td>{{carrier.waypoints.length}}</td>
-    <td>{{carrier.waypointsLooped}}</td>
+    <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td>
     <td>{{carrier.eta}}</td>
     <td>{{carrier.totalEta}}</td>
 </tr>

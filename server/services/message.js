@@ -1,13 +1,14 @@
 const ValidationError = require('../errors/validation');
 
 function getConversation(game, fromPlayerId, toPlayerId) {
-    return game.messages || []
-        .filter(m => (m.fromPlayerId.toString() === fromPlayerId.toString()
+    return (game.messages || [])
+        .filter(m => {
+            return (m.fromPlayerId.toString() === fromPlayerId.toString()
                     && m.toPlayerId.toString() === toPlayerId.toString())
                     ||
                     (m.fromPlayerId.toString() === toPlayerId.toString()
-                    && m.toPlayerId.toString() === fromPlayerId.toString())
-                )
+                    && m.toPlayerId.toString() === fromPlayerId.toString());
+        })
         .sort((a, b) => a.sentDate - b.sentDate);
 }
 
@@ -63,6 +64,10 @@ module.exports = class MessageService {
 
         if (!toPlayer) {
             throw new ValidationError('The to player does not exist.');
+        }
+
+        if (fromPlayer == toPlayer) {
+            throw new ValidationError('Cannot send a message to yourself');
         }
 
         let newMessage = {

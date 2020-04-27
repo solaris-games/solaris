@@ -66,7 +66,7 @@
       </div>
     </div>
     
-    <playerOverview v-if="getCarrierOwningPlayer()" :game="game" :player="getCarrierOwningPlayer()" />
+    <playerOverview v-if="getCarrierOwningPlayer()" :game="game" :player="getCarrierOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
 </div>
 </template>
 
@@ -100,6 +100,9 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', e)
     },
     // TODO: This method appears everywhere, is there a way to make it global?
     getUserPlayer () {

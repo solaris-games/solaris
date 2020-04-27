@@ -35,7 +35,8 @@
                 <span class="align-middle" v-if="!getUserPlayer()">{{game.settings.general.name}}</span>
             </div>
             <div class="col text-right pr-3" v-if="getUserPlayer()">
-                <span class="align-middle">Production: {{timeRemaining}}</span>
+                <span class="align-middle" v-if="!game.state.paused">Production: {{timeRemaining}}</span>
+                <span class="align-middle" v-if="game.state.paused">Paused</span>
             </div>
             <div class="col-auto" v-if="getUserPlayer()">
                 <button class="btn btn-sm btn-info" v-on:click="setMenuState(MENU_STATES.INBOX)">

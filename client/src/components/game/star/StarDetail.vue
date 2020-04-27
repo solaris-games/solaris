@@ -102,7 +102,7 @@
       -->
     </div>
 
-    <playerOverview v-if="getStarOwningPlayer()" :game="game" :player="getStarOwningPlayer()" />
+    <playerOverview v-if="getStarOwningPlayer()" :game="game" :player="getStarOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
 
     <!-- Modals -->
 
@@ -158,6 +158,9 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', e)
     },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.game)
