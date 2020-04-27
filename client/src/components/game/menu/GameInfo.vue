@@ -11,6 +11,7 @@
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy"><i class="fas fa-compass"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomByPercent(0.5)"><i class="fas fa-search-plus"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomByPercent(-0.3)"><i class="fas fa-search-minus"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomToHomeStar()"><i class="fas fa-home"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-ruler"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-bolt"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-money-bill"></i></button>
@@ -92,6 +93,9 @@ export default {
     },
     zoomByPercent (percent) {
       GameContainer.viewport.zoomPercent(percent, true)
+    },
+    zoomToHomeStar () {
+      GameContainer.map.zoomToUser(this.game)
     },
     recalculateTimeRemaining () {
       if (this.game.state.paused) {

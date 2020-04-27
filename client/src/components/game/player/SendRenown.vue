@@ -4,7 +4,7 @@
         <form>
             <div class="form-row">
               <div class="col-7">
-                  <p class="mb-2">{{userPlayer.renownToGive || 8}} Renown to distrubute.</p>
+                  <p class="mb-2">{{userPlayer.renownToGive || 8}} Renown to distribute.</p>
               </div>
               <div class="col-5">
                   <button class="btn btn-success btn-block" @click="confirmAwardRenown">Award Renown</button>
