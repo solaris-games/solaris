@@ -1,6 +1,6 @@
 module.exports = class GameGalaxyService {
 
-    constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService) {
+    constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -8,6 +8,7 @@ module.exports = class GameGalaxyService {
         this.starDistanceService = starDistanceService;
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
+        this.waypointService = waypointService;
     }
 
     async getGalaxy(game, userId) {
@@ -166,6 +167,16 @@ module.exports = class GameGalaxyService {
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
         let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(doc.galaxy.carriers, player._id);
         let playerStarLocations = playerStars.map(s => s.location);
+
+        // TODO: If the current player doesn't own the carrier, then only display a waypoint
+        // if the carrier is travelling.
+
+        // Populate the number of ticks it will take for all waypoints.
+        playerCarriers.forEach(c => {
+            c.waypoints.forEach(w => {
+                w.ticks = this.waypointService.calculateWaypointTicks(doc, w);
+            });
+        });
 
         // Note that we don't need to consider dark mode
         // because carriers can only be seen if they are in range.

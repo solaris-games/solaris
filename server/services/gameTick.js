@@ -97,7 +97,7 @@ module.exports = class GameTickService {
                     });
                 }
             }
-            // Otherwise, move X number of pixels in the direction of the star.
+            // Otherwise, move X distance in the direction of the star.
             else {
                 let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 
@@ -289,6 +289,7 @@ module.exports = class GameTickService {
         // There could be more than one player who has reached
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
+        // If that's equal, then pick the player who has the most carriers.
         let winner = null;
 
         let starWinners = game.galaxy.players
@@ -302,6 +303,12 @@ module.exports = class GameTickService {
                 let totalShipsB = this.playerService.calculateTotalShips(b, game.galaxy.stars, game.galaxy.carriers);
 
                 return totalShipsB - totalShipsA;
+            })
+            .sort((a, b) => {
+                let totalCarriersA = this.playerService.calculateTotalCarriers(a, game.galaxy.carriers);
+                let totalCarriersB = this.playerService.calculateTotalCarriers(b, game.galaxy.carriers);
+
+                return totalCarriersB - totalCarriersA;
             });
 
         if (starWinners.length) {

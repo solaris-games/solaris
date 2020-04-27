@@ -17,11 +17,11 @@ module.exports = class PlayerService {
     }
 
     getById(game, playerId) {
-        return game.galaxy.players.find(p => p._id.toString() === playerId);
+        return game.galaxy.players.find(p => p._id.toString() === playerId.toString());
     }
 
     getByUserId(game, userId) {
-        return game.galaxy.players.find(p => p.userId.toString() === userId);
+        return game.galaxy.players.find(p => p.userId.toString() === userId.toString());
     }
 
     createEmptyPlayer(gameSettings, colour) {

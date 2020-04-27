@@ -1,0 +1,106 @@
+<template>
+  <div class="container">
+    <menu-title title="Bulk Upgrade" @onCloseRequested="onCloseRequested" />
+
+    <div class="row">
+      <div class="col-7">
+        <p>Select an amount of money to spend and the kind of infrastructure you would like to buy. The cheapest infrastructure will be purchased throughout your empire.</p>
+      </div>
+      <div class="col-5">
+        <form @submit.prevent>
+          <div class="form-group">
+            <input
+              class="form-control"
+              id="amount"
+              v-model="amount"
+              type="number"
+              required="required"
+            />
+          </div>
+          <div class="form-group">
+            <select class="form-control" id="infrastructureType" v-model="selectedType">
+              <option
+                v-for="opt in types"
+                v-bind:key="opt.key"
+                v-bind:value="opt.key"
+              >{{ opt.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-success btn-block" @click="upgrade">Upgrade</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import MenuTitle from "../MenuTitle"
+import starService from "../../../services/api/star"
+import GameHelper from "../../../services/gameHelper"
+
+export default {
+  components: {
+    "menu-title": MenuTitle
+  },
+  props: {
+    game: Object
+  },
+  data() {
+    return {
+      amount: 0,
+      selectedType: "economy",
+      types: [
+        {
+          key: "economy",
+          name: "Economy"
+        },
+        {
+          key: "industry",
+          name: "Industry"
+        },
+        {
+          key: "science",
+          name: "Science"
+        }
+      ]
+    }
+  },
+  mounted() {
+    this.amount = GameHelper.getUserPlayer(this.game).credits
+  },
+  methods: {
+    onCloseRequested(e) {
+      this.$emit("onCloseRequested", e)
+    },
+    async upgrade() {
+      if (this.amount <= 0) {
+        return
+      }
+
+      try {
+        let response = await starService.bulkInfrastructureUpgrade(
+          this.game._id,
+          this.selectedType,
+          this.amount
+        )
+
+        if (response.status === 200) {
+          this.$emit("onBulkInfrastructureUpgraded", {
+            type: this.selectedType,
+            amount: this.amount
+          })
+
+          alert('Infrastructure upgraded')
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+</style>

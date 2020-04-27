@@ -25,8 +25,12 @@ module.exports = class StarService {
         };
     }
 
+    getByObjectId(game, id) {
+        return game.galaxy.stars.find(s => s._id.equals(id));
+    }
+
     getById(game, id) {
-        return game.galaxy.stars.find(s => s._id.toString() === id);
+        return game.galaxy.stars.find(s => s._id.toString() === id.toString());
     }
 
     setupHomeStar(homeStar, player, gameSettings) {

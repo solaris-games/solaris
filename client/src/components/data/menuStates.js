@@ -27,5 +27,6 @@ export default {
   CARRIER_WAYPOINTS: 'carrierWaypoints',
   CARRIER_WAYPOINT_DETAIL: 'carrierWaypointDetail',
   CARRIER_RENAME: 'carrierRename',
-  SHIP_TRANSFER: 'shipTransfer'
+  SHIP_TRANSFER: 'shipTransfer',
+  BULK_INFRASTRUCTURE_UPGRADE: 'bulkInfrastructureUpgrade'
 }

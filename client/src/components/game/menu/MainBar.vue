@@ -19,6 +19,7 @@
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :game="game" :fromPlayerId="menuArguments"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :game="game"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested" :game="game"/>
+      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested" :game="game"/>
     </div>
 </div>
 </template>
@@ -38,6 +39,7 @@ import InboxVue from '../inbox/Inbox.vue'
 import ConversationVue from '../inbox/Conversation.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
+import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
 import GameHelper from '../../../services/gameHelper'
 
 export default {
@@ -54,7 +56,8 @@ export default {
     'inbox': InboxVue,
     'conversation': ConversationVue,
     'intel': IntelVue,
-    'galaxy': GalaxyVue
+    'galaxy': GalaxyVue,
+    'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue
   },
   props: {
     game: Object,

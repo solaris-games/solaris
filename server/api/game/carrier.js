@@ -7,10 +7,8 @@ const ValidationError = require('../../errors/validation');
 router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
 
-    if (!req.body.waypoints) {
-        errors.push('waypoints is required.');
-    }
-
+    // TODO: Validation?
+    
     if (errors.length) {
         throw new ValidationError(errors);
     }
