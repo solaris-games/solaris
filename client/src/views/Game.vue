@@ -19,6 +19,7 @@ import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
 import gameService from '../services/api/game'
+import GameHelper from '../services/gameHelper'
 
 export default {
   components: {
@@ -34,7 +35,10 @@ export default {
     }
   },
   async mounted () {
-    this.reloadGame()
+    await this.reloadGame()
+
+    // Check if the user is in this game, if not then show the welcome screen.
+    this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
   },
   methods: {
     async reloadGame () {
@@ -47,6 +51,9 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    },
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game)
     },
 
     // MENU

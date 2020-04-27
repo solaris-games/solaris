@@ -10,7 +10,7 @@
 
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested" :game="game"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested" :game="game"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :game="game" :userPlayer="getUserPlayer()" :player="menuArguments" :key="menuArguments._id"/>
+      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :game="game" :player="menuArguments" :key="menuArguments._id"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested" :game="game"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :star="menuArguments"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested"/>
@@ -66,18 +66,8 @@ export default {
       MENU_STATES: MENU_STATES
     }
   },
-  mounted () {
-    // Check if the user is in this game, if not then show the welcome screen.
-    this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
-  },
   methods: {
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
-    },
     changeMenuState (state, args) {
-      this.menuState = state
-      this.menuArguments = args
-
       this.onMenuStateChanged({
         state,
         args

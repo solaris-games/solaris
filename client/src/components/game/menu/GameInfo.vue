@@ -57,21 +57,42 @@ import GameContainer from '../../../game/container'
 export default {
   props: {
     game: Object,
-    nextProduction: Date
+    nextProduction: String
   },
   data () {
     return {
       forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
-      MENU_STATES: MENU_STATES
+      MENU_STATES: MENU_STATES,
+      timeRemaining: null
     }
   },
   mounted () {
+    this.recalculateTimeRemaining()
+    
     setInterval(() => {
-      this.forceRecomputeCounter++
+      this.recalculateTimeRemaining()
     }, 1000)
   },
-  computed: {
-    timeRemaining: function () {
+  methods: {
+    getUserPlayer () {
+      return GameHelper.getUserPlayer(this.game)
+    },
+    setMenuState (state, args) {
+      this.$emit('onMenuStateChanged', {
+        state,
+        args
+      })
+    },
+    goToMainMenu () {
+      router.push({ name: 'main-menu' })
+    },
+    fitGalaxy () {
+      GameContainer.viewport.fitWorld()
+    },
+    zoomByPercent (percent) {
+      GameContainer.viewport.zoomPercent(percent, true)
+    },
+    recalculateTimeRemaining () {
       let t = new Date(this.nextProduction) - new Date()
 
       let days = Math.floor(t / (1000 * 60 * 60 * 24))
@@ -95,27 +116,7 @@ export default {
 
       str += `${secs}s`
 
-      return str
-    }
-  },
-  methods: {
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
-    },
-    setMenuState (state, args) {
-      this.$emit('onMenuStateChanged', {
-        state,
-        args
-      })
-    },
-    goToMainMenu () {
-      router.push({ name: 'main-menu' })
-    },
-    fitGalaxy () {
-      GameContainer.viewport.fitWorld()
-    },
-    zoomByPercent (percent) {
-      GameContainer.viewport.zoomPercent(percent, true)
+      this.timeRemaining = str
     }
   }
 }

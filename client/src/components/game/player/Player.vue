@@ -53,6 +53,7 @@ import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import Badges from './Badges'
 import gameService from '../../../services/api/game'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -68,12 +69,12 @@ export default {
   },
   props: {
     game: Object,
-    player: Object,
-    userPlayer: Object
+    player: Object
   },
   data () {
     return {
-      user: null
+      user: null,
+      userPlayer: null
     }
   },
   async mounted () {
@@ -83,7 +84,6 @@ export default {
     // TODO: The result of this needs to cached or returned in the
     // main galaxy response.
     if (!this.player.isEmptySlot) {
-      console.log(this.player)
       try {
         let response = await gameService.getPlayerUserInfo(this.game._id, this.player._id)
 
@@ -92,6 +92,8 @@ export default {
         console.error(err)
       }
     }
+
+    this.userPlayer = GameHelper.getUserPlayer(this.game)
   }
 }
 </script>
