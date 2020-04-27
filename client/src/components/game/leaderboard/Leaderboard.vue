@@ -38,7 +38,7 @@
                         <h5>{{player.alias}} <span v-if="player.defeated">(DEFEATED)</span></h5>
                     </td>
                     <td class="fit pt-3 pr-2">
-                        <span>{{getPlayerStarCount(player)}} Stars</span>
+                        <span>{{player.stats.totalStars}} Stars</span>
                     </td>
                     <td class="fit pt-2 pb-2 pr-2">
                         <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -95,16 +95,15 @@ export default {
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.game)
     },
-    getPlayerStarCount (player) {
-      return this.game.galaxy.stars.filter(s => s.ownedByPlayerId === player._id).length
-    },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
     getSortedLeaderboardPlayerList () {
-      // TODO: This needs to also sort by number of ships
+      // Sort by total number of stars, then by total ships, then by total carriers.
       return this.game.galaxy.players
-        .sort((a, b) => this.getPlayerStarCount(b) - this.getPlayerStarCount(a))
+        .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
+        .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
+        .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
     },
     async concedeDefeat () {
       try {

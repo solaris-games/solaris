@@ -291,25 +291,20 @@ module.exports = class GameTickService {
         // In this case we pick the player who has the most ships.
         // If that's equal, then pick the player who has the most carriers.
         let winner = null;
+    
+        let playerStats = game.galaxy.players.map(p => {
+            return {
+                player: p,
+                stats: this.playerService.getStats(game, p)
+            }
+        });
 
-        let starWinners = game.galaxy.players
-            .filter(p => {
-                let playerStars = this.playerService.calculateTotalStars(p, game.galaxy.stars);
-
-                return playerStars >= game.state.starsForVictory;
-            })
-            .sort((a, b) => {
-                let totalShipsA = this.playerService.calculateTotalShips(a, game.galaxy.stars, game.galaxy.carriers);
-                let totalShipsB = this.playerService.calculateTotalShips(b, game.galaxy.stars, game.galaxy.carriers);
-
-                return totalShipsB - totalShipsA;
-            })
-            .sort((a, b) => {
-                let totalCarriersA = this.playerService.calculateTotalCarriers(a, game.galaxy.carriers);
-                let totalCarriersB = this.playerService.calculateTotalCarriers(b, game.galaxy.carriers);
-
-                return totalCarriersB - totalCarriersA;
-            });
+        let starWinners = playerStats
+            .filter(p => p.stats.totalStars >= game.state.starsForVictory)
+            .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
+            .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
+            .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
+            .map(p => p.player);
 
         if (starWinners.length) {
             winner = starWinners[0];
