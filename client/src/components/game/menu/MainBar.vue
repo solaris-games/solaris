@@ -5,8 +5,8 @@
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
     <div class="menu-content bg-light" v-if="menuState">
-      <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
-      <div v-if="menuState == MENU_STATES.HELP">HELP</div>
+      <!-- <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
+      <div v-if="menuState == MENU_STATES.HELP">HELP</div> -->
 
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested" :game="game"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested" :game="game"/>
