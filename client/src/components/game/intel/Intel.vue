@@ -1,11 +1,13 @@
 <template>
 <div class="bg-secondary pb-2">
-  <loading-spinner :loading="!history"/>
+  <div class="container">
+    <menu-title title="Intel" @onCloseRequested="onCloseRequested"/>
+
+    <loading-spinner :loading="!history"/>
+  </div>
 
   <div v-if="history">
     <div class="container">
-        <menu-title title="Intel" @onCloseRequested="onCloseRequested"/>
-
         <select class="form-control input-sm" id="intelType" v-model="intelType" v-on:change="fillData" :disabled="history == null">
           <option key="totalStars" value="totalStars">Total Stars</option>
           <option key="totalEconomy" value="totalEconomy">Total Economy</option>
@@ -34,13 +36,17 @@
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <button class="btn btn-primary">All</button>
-                <button class="btn btn-primary ml-1 mr-3">None</button>
+                <button class="btn btn-primary" @click="showAll">All</button>
+                <button class="btn btn-primary ml-1 mr-3" @click="showNone">None</button>
             </div>
 
             <div class="col">
-                <button class="btn btn-primary mr-1 mb-1"><i class="far fa-circle"></i></button>
-                <button class="btn btn-primary mr-1 mb-1"><i class="far fa-circle"></i></button>
+              <button v-for="playerFilter in playerFilters" :key="playerFilter._id" 
+                class="btn mr-1 mb-1"
+                :class="{'btn-primary': playerFilter.enabled}"
+                @click="togglePlayerFilter(playerFilter)">
+                <i class="far fa-circle" :style="{'color': playerFilter.colour}"></i>
+              </button>
             </div>
         </div>
     </div>
@@ -73,10 +79,19 @@ export default {
         legend: {
           display: false
         }
-      }
+      },
+      playerFilters: []
     }
   },
   async mounted () {
+    this.playerFilters = this.game.galaxy.players.map(p => {
+      return {
+        enabled: true,
+        playerId: p._id,
+        colour: GameHelper.getPlayerColour(this.game, p._id)
+      }
+    })
+
     try {
       let response = await GameApiService.getGameHistory(this.game._id)
       
@@ -91,6 +106,26 @@ export default {
   methods: {
     onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
+    },
+    getPlayerColour (player) {
+      return GameHelper.getPlayerColour(this.game, player._id)
+    },
+    togglePlayerFilter (playerFilter) {
+      playerFilter.enabled = !playerFilter.enabled
+
+      this.fillData()
+    },
+    showAll () {
+      this.playerFilters.forEach(f => f.enabled = true)
+
+      this.fillData()
+    },
+    showNone () {
+      let userPlayer = GameHelper.getUserPlayer(this.game)
+
+      this.playerFilters.forEach(f => f.enabled = (f.playerId === userPlayer._id))
+
+      this.fillData()
     },
     fillData () {
       if (!this.history) {
@@ -108,6 +143,11 @@ export default {
 
       for (let i = 0; i < this.game.galaxy.players.length; i++) {
         let player = this.game.galaxy.players[i]
+        let playerFilter = this.playerFilters.find(f => f.playerId === player._id)
+
+        if (!playerFilter.enabled) {
+          continue
+        }
 
         let dataset = {
           label: player.alias,
