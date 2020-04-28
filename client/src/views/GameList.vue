@@ -6,11 +6,13 @@
 
     <p>These are official games and have standard settings.</p>
 
-    <p v-if="!serverGames.length" class="text-danger">
+    <loading-spinner :loading="isLoadingServerGames"/>
+
+    <p v-if="!isLoadingServerGames && !serverGames.length" class="text-danger">
       There are no official games available.
     </p>
 
-    <table v-if="serverGames.length" class="table table-striped table-hover">
+    <table v-if="!isLoadingServerGames && serverGames.length" class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
@@ -33,11 +35,13 @@
 
     <h4>User Created Games</h4>
 
-    <div v-if="!userGames.length">
+    <loading-spinner :loading="isLoadingUserGames"/>
+    
+    <div v-if="!isLoadingUserGames && !userGames.length">
       There are no user created games available.
     </div>
 
-    <table v-if="userGames.length" class="table table-striped table-hover">
+    <table v-if="!isLoadingUserGames && userGames.length" class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
@@ -59,28 +63,34 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewTitle from '../components/ViewTitle'
 import ViewContainer from '../components/ViewContainer'
 import gameService from '../services/api/game'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle
   },
   data () {
     return {
       serverGames: [],
-      userGames: []
+      userGames: [],
+      isLoadingServerGames: true,
+      isLoadingUserGames: true
     }
   },
   async mounted () {
     try {
       let responseOfficial = await gameService.listOfficialGames()
       this.serverGames = responseOfficial.data
+      this.isLoadingServerGames = false
 
       let responseUser = await gameService.listUserGames()
       this.userGames = responseUser.data
+      this.isLoadingUserGames = false
     } catch (err) {
       console.error(err)
     }

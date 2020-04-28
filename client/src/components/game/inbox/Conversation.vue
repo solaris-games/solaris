@@ -1,31 +1,34 @@
 <template>
-<div>
-    <div class="container pb-2">
-        <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
+<div class="container pb-2">
+  <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
 
-        <player-overview :game="game" :player="getPlayer(fromPlayerId)"/>
+  <player-overview :game="game" :player="getPlayer(fromPlayerId)"/>
 
-        <div class="pt-0 mb-2 mt-2" v-if="messages.length">
-            <conversation-message v-for="message in messages" 
-                v-bind:key="message._id" 
-                :game="game"
-                :sender="getPlayer(message.fromPlayerId)" 
-                :message="message"
-                :colour="getPlayerColour(message.fromPlayerId)"
-                class="mb-1"/>
+  <loading-spinner :loading="!messages"/>
 
-        </div>
-        
-        <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
-            <p class="mb-0" v-if="!messages.length">No messages.</p>
-        </div>
+  <div v-if="messages">
+    <div class="pt-0 mb-2 mt-2" v-if="messages.length">
+        <conversation-message v-for="message in messages" 
+            v-bind:key="message._id" 
+            :game="game"
+            :sender="getPlayer(message.fromPlayerId)" 
+            :message="message"
+            :colour="getPlayerColour(message.fromPlayerId)"
+            class="mb-1"/>
 
-        <compose-message :game="game" :toPlayerId="fromPlayerId" @onMessageSent="onMessageSent"/>
     </div>
+    
+    <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
+        <p class="mb-0">No messages.</p>
+    </div>
+
+    <compose-message :game="game" :toPlayerId="fromPlayerId" @onMessageSent="onMessageSent"/>
+  </div>
 </div>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
 import MenuTitle from '../MenuTitle'
 import PlayerOverview from '../player/Overview'
@@ -35,6 +38,7 @@ import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'menu-title': MenuTitle,
     'compose-message': ComposeMessage,
     'conversation-message': ConversationMessageVue,
@@ -46,7 +50,7 @@ export default {
   },
   data () {
       return {
-          messages: []
+          messages: null
       }
   },
   mounted () {

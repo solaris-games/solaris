@@ -2,8 +2,10 @@
   <view-container>
     <view-title title="Achievements" />
 
+    <loading-spinner :loading="!achievements"/>
+    
     <!-- TODO: Will this look nicer on the main menu instead? -->
-    <achievements v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
+    <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
 
     <p class="text-center pt-3 mb-0">Read more about <a href="">Victory, Rank and Renown</a>.</p>
 
@@ -170,6 +172,7 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
@@ -178,6 +181,7 @@ import userService from '../services/api/user'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,

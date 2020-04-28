@@ -1,4 +1,7 @@
 <template>
+  <div>
+    <loading-spinner :loading="!game"/>
+    
     <div v-if="game">
         <span class="d-none">{{ game._id}}</span>
 
@@ -12,9 +15,11 @@
                     @onStarClicked="onStarClicked"
                     @onCarrierClicked="onCarrierClicked"/>
     </div>
+  </div>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
@@ -23,6 +28,7 @@ import GameHelper from '../services/gameHelper'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
     'main-bar': MainBar
   },

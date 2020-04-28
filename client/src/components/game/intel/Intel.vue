@@ -1,5 +1,8 @@
 <template>
 <div class="bg-secondary pb-2">
+  <loading-spinner :loading="!history"/>
+
+  <div v-if="history">
     <div class="container">
         <menu-title title="Intel" @onCloseRequested="onCloseRequested"/>
 
@@ -41,10 +44,12 @@
             </div>
         </div>
     </div>
+  </div>
 </div>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MenuTitle from '../MenuTitle'
 import LineChart from './LineChart.js'
 import GameHelper from '../../../services/gameHelper'
@@ -52,6 +57,7 @@ import GameApiService from '../../../services/api/game'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'menu-title': MenuTitle,
     'line-chart': LineChart
   },

@@ -2,42 +2,46 @@
   <view-container>
     <view-title title="Account" />
 
-    <!--
-    <div class="row pt-3 pb-3 bg-info">
-      <div class="col">
-        <p>Galactic Credits</p>
+    <loading-spinner :loading="!info"/>
+    
+    <div v-if="info">
+      <!--
+      <div class="row pt-3 pb-3 bg-info">
+        <div class="col">
+          <p>Galactic Credits</p>
+        </div>
+        <div class="col">
+          <p class="text-right">{{ info.credits }} Credits</p>
+        </div>
       </div>
-      <div class="col">
-        <p class="text-right">{{ info.credits }} Credits</p>
-      </div>
-    </div>
-    -->
+      -->
 
-    <div class="row pt-3 pb-3 bg-primary">
-      <div class="col">
-        <p>Username</p>
+      <div class="row pt-3 pb-3 bg-primary">
+        <div class="col">
+          <p>Username</p>
+        </div>
+        <div class="col">
+          <p class="text-right">{{ info.username }}</p>
+        </div>
       </div>
-      <div class="col">
-        <p class="text-right">{{ info.username }}</p>
-      </div>
-    </div>
 
-    <div class="row pt-3 pb-3 bg-secondary">
-      <div class="col">
-        <p>Email Address</p>
+      <div class="row pt-3 pb-3 bg-secondary">
+        <div class="col">
+          <p>Email Address</p>
+        </div>
+        <div class="col">
+          <p class="text-right">{{ info.email }}</p>
+        </div>
       </div>
-      <div class="col">
-        <p class="text-right">{{ info.email }}</p>
-      </div>
-    </div>
 
-    <div class="row pt-3 pb-3 bg-primary">
-      <div class="col">
-        <p>Email Notifications</p>
-      </div>
-      <div class="col text-right">
-        <button v-if="info.emailEnabled" @click="toggleEmailNotifications(false)" class="btn btn-success">Enabled</button>
-        <button v-if="!info.emailEnabled" @click="toggleEmailNotifications(true)" class="btn btn-danger">Disabled</button>
+      <div class="row pt-3 pb-3 bg-primary">
+        <div class="col">
+          <p>Email Notifications</p>
+        </div>
+        <div class="col text-right">
+          <button v-if="info.emailEnabled" @click="toggleEmailNotifications(false)" class="btn btn-success">Enabled</button>
+          <button v-if="!info.emailEnabled" @click="toggleEmailNotifications(true)" class="btn btn-danger">Disabled</button>
+        </div>
       </div>
     </div>
 
@@ -49,12 +53,14 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import userService from '../services/api/user'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle
   },

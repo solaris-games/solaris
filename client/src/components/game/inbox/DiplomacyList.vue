@@ -1,5 +1,8 @@
 <template>
 <div class="container pb-2">
+  <loading-spinner :loading="!conversations"/>
+    
+  <div v-if="conversations">
     <div>
         <button class="btn btn-primary" @click="onRefreshClicked"><i class="fas fa-sync"></i></button>
         <button class="btn btn-primary float-right">Mark All Read</button>
@@ -18,16 +21,19 @@
           @onConversationOpenRequested="onConversationOpenRequested"
           class="mb-2"/>
     </div>
+  </div>
 </div>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
 import ConversationMessageVue from './ConversationMessage'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'conversation-message': ConversationMessageVue
   },
   props: {
@@ -35,7 +41,7 @@ export default {
   },
   data () {
     return {
-      conversations: []
+      conversations: null
     }
   },
   mounted () {

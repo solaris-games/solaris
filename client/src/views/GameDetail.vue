@@ -2,9 +2,13 @@
   <view-container>
     <view-title title="Game Detail" navigation="main-menu"/>
 
-    <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
+    <loading-spinner :loading="isLoadingGame"/>
+    
+    <div v-if="!isLoadingGame">
+      <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
 
-    <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
+      <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
+    </div>
 
     <div>
       <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
@@ -14,6 +18,7 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
@@ -21,12 +26,14 @@ import gameService from '../services/api/game'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle
   },
   data () {
     return {
+      isLoadingGame: true,
       game: {
         _id: null,
         settings: {
@@ -46,6 +53,7 @@ export default {
       let response = await gameService.getGameInfo(this.game._id)
 
       this.game = response.data
+      this.isLoadingGame = false
     } catch (err) {
       console.error(err)
     }

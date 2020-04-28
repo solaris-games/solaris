@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Create Game" />
 
+    <loading-spinner :loading="!settings"/>
+    
     <form @submit.prevent="handleSubmit" v-if="settings">
       <view-subtitle title="Game Settings"/>
 
@@ -290,6 +292,7 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
@@ -299,6 +302,7 @@ import router from '../router'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
