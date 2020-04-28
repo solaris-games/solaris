@@ -51,7 +51,7 @@ module.exports = class DistanceService {
     }
 
     getCarrierTickDistance() {
-        return this.DISTANCES.LIGHT_YEAR / this.DISTANCES.BASE_SHIP_SPEED;
+        return this.DISTANCES.BASE_SHIP_SPEED;
     }
 
     getAngleTowardsLocation(source, destination) {
