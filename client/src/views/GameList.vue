@@ -86,14 +86,15 @@ export default {
     try {
       let responseOfficial = await gameService.listOfficialGames()
       this.serverGames = responseOfficial.data
-      this.isLoadingServerGames = false
 
       let responseUser = await gameService.listUserGames()
       this.userGames = responseUser.data
-      this.isLoadingUserGames = false
     } catch (err) {
       console.error(err)
     }
+
+    this.isLoadingServerGames = false
+    this.isLoadingUserGames = false
   }
 }
 </script>

@@ -4,28 +4,31 @@
 
     <form @submit.prevent="handleSubmit">
         <div class="form-group">
-            <input type="text" required="required" class="form-control" placeholder="Username" v-model="username" />
+            <input type="text" required="required" class="form-control" placeholder="Username" v-model="username" :disabled="isLoading"/>
         </div>
 
         <div class="form-group">
-            <input type="password" required="required" class="form-control" placeholder="Password" v-model="password" />
+            <input type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
         </div>
 
         <form-error-list v-bind:errors="errors"/>
 
         <div class="form-group">
             <router-link to="/" tag="button" type="button" class="btn btn-danger">Cancel</router-link>
-            <input type="submit" class="btn btn-success ml-1" value="Login" />
+            <input type="submit" class="btn btn-success ml-1" value="Login" :disabled="isLoading"/>
         </div>
 
         <div class="form-group">
             <router-link to="/account/forgot-password">Forgot Password?</router-link>
         </div>
     </form>
+
+    <loading-spinner :loading="isLoading"/>
   </view-container>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
@@ -34,12 +37,14 @@ import authService from '../services/api/auth'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
   data () {
     return {
+      isLoading: false,
       errors: [],
       username: null,
       password: null
@@ -62,6 +67,8 @@ export default {
       if (this.errors.length) return
 
       try {
+        this.isLoading = true
+
         // Call the login API endpoint
         let response = await authService.login(this.username, this.password)
 
@@ -73,6 +80,8 @@ export default {
       } catch (err) {
         this.errors = err.response.data.errors || []
       }
+
+      this.isLoading = false
     }
   }
 }

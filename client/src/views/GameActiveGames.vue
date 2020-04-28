@@ -64,15 +64,16 @@ export default {
       let response = await gameService.listActiveGames()
 
       this.activeGames = response.data
-      this.isLoadingActiveGames = false
 
       response = await gameService.listCompletedGames()
 
       this.completedGames = response.data
-      this.isLoadingCompletedGames = false
     } catch (err) {
       console.error(err)
     }
+
+    this.isLoadingActiveGames = false
+    this.isLoadingCompletedGames = false
   }
 }
 </script>

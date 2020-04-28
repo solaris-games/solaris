@@ -21,25 +21,38 @@
     -->
 
     <div class="mt-3">
-      <button @click="logout" class="btn btn-block btn-danger">Logout</button>
+      <button @click="logout" class="btn btn-block btn-danger" :disabled="isLoggingOut">Logout</button>
     </div>
+
+    <loading-spinner :loading="isLoggingOut"/>
   </view-container>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import router from '../router'
 import authService from '../services/api/auth'
 import ViewContainer from '../components/ViewContainer'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer
+  },
+  data () {
+    return {
+      isLoggingOut: false
+    }
   },
   methods: {
     async logout () {
       this.$store.commit('clearUserId')
 
+      this.isLoggingOut = true
+
       await authService.logout()
+
+      this.isLoggingOut = false
 
       router.push({ name: 'home' })
     }

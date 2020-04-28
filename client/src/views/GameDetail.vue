@@ -53,10 +53,11 @@ export default {
       let response = await gameService.getGameInfo(this.game._id)
 
       this.game = response.data
-      this.isLoadingGame = false
     } catch (err) {
       console.error(err)
     }
+
+    this.isLoadingGame = false
   }
 }
 </script>

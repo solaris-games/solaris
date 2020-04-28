@@ -7,33 +7,36 @@
     <form @submit="handleSubmit">
       <div class="form-group">
         <label for="username">Username</label>
-        <input type="text" required="required" class="form-control" name="username" v-model="username">
+        <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading">
       </div>
 
       <div class="form-group">
         <label for="email">Email Address</label>
-        <input type="email" required="required" class="form-control" name="email" v-model="email">
+        <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" required="required" class="form-control" name="password" v-model="password">
+        <input type="password" required="required" class="form-control" name="password" v-model="password" :disabled="isLoading">
       </div>
 
       <div class="form-group">
         <label for="passwordConfirm">Re-enter Password</label>
-        <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm">
+        <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm" :disabled="isLoading">
       </div>
 
       <div>
         <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success ml-1">Create Account</button>
+        <button type="submit" class="btn btn-success ml-1" :disabled="isLoading">Create Account</button>
       </div>
     </form>
+
+    <loading-spinner :loading="isLoading"/>
   </view-container>
 </template>
 
 <script>
+import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
@@ -42,12 +45,14 @@ import userService from '../services/api/user'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
   data () {
     return {
+      isLoading: false,
       errors: [],
       username: null,
       email: null,
@@ -84,6 +89,8 @@ export default {
       if (this.errors.length) return
 
       try {
+        this.isLoading = true
+
         // Call the account create API endpoint
         let response = await userService.createUser(this.username, this.email, this.password)
 
@@ -95,6 +102,8 @@ export default {
       } catch (err) {
         this.errors = err.response.data.errors || []
       }
+
+      this.isLoading = false
     }
   }
 }
