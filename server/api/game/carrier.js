@@ -26,6 +26,30 @@ router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, mid
     }
 }, middleware.handleError);
 
+router.put('/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    let errors = [];
+
+    if (req.body.loop == null) {
+        errors.push('loop field is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    try {
+        await container.waypointService.loopWaypoints(
+            req.game,
+            req.session.userId,
+            req.params.carrierId,
+            req.body.loop);
+
+        return res.sendStatus(200);
+    } catch (err) {
+        return next(err);
+    }
+}, middleware.handleError);
+
 router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
     let errors = [];
 

@@ -46,8 +46,8 @@
           <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
         <div class="col-4 mb-2">
-          <button class="btn btn-block btn-success" v-if="!carrier.waypointsLooped" @click="toggleWaypointsLooped()">Enable</button>
-          <button class="btn btn-block btn-danger" v-if="carrier.waypointsLooped" @click="toggleWaypointsLooped()">Disable</button>
+          <button class="btn btn-block btn-success" v-if="!carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">Enable</button>
+          <button class="btn btn-block btn-danger" v-if="carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">Disable</button>
         </div>
       </div>
 
@@ -85,7 +85,8 @@ export default {
   },
   data () {
     return {
-      currentPlayerId: this.getUserPlayer()._id
+      currentPlayerId: this.getUserPlayer()._id,
+      isLoopingWaypoints: false
     }
   },
   mounted () {
@@ -108,9 +109,20 @@ export default {
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.game, this.carrier)
     },
-    toggleWaypointsLooped () {
+    async toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
-      this.carrier.waypointsLooped = !this.carrier.waypointsLooped
+      try {
+        this.isLoopingWaypoints = true
+        let response = await CarrierApiService.loopWaypoints(this.game._id, this.carrier._id, !this.carrier.waypointsLooped)
+
+        if (response.status === 200) {
+          this.carrier.waypointsLooped = !this.carrier.waypointsLooped
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoopingWaypoints = false
     },
     editWaypoints () {
       this.$emit('onEditWaypointsRequested', this.carrier)

@@ -8,6 +8,12 @@ class CarrierService extends BaseApiService {
         waypoints,
     { withCredentials: true })
   }
+  
+  loopWaypoints (gameId, carrierId, loop) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/waypoints/loop', 
+      loop,
+    { withCredentials: true })
+  }
 
   transferShips (gameId, carrierId, carrierShips, starId, starShips) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/transfer', 
