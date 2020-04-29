@@ -45,7 +45,7 @@
                 class="btn mr-1 mb-1"
                 :class="{'btn-primary': playerFilter.enabled}"
                 @click="togglePlayerFilter(playerFilter)">
-                <i class="far fa-circle" :style="{'color': playerFilter.colour}"></i>
+                <i class="fas fa-circle" :style="{'color': playerFilter.colour}"></i>
               </button>
             </div>
         </div>

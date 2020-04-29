@@ -44,4 +44,23 @@ img {
 .colour-bar {
     min-height: 8px;
 }
+
+ul {
+  overflow: auto;
+  white-space: nowrap;
+}
+
+li {
+  display: inline-block;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #303030;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #375a7f;
+}
 </style>

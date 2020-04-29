@@ -188,7 +188,14 @@ class Star extends EventEmitter {
     })
 
     text.x = this.data.location.x - (text.width / 2)
-    text.y = this.data.location.y + 17
+
+    if (this.data.garrison == null) {
+      text.y = this.data.location.y + 12
+    } 
+    else {
+      text.y = this.data.location.y + 17
+    }
+    
     text.resolution = 10
 
     this.container.addChild(text)
