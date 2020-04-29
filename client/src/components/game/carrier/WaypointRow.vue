@@ -4,9 +4,9 @@
         <td>{{getStarName(waypoint.destination)}}</td>
         <td v-if="!showAction">1d 2h 3m 4s</td>
         <td v-if="showAction">
-            <span v-if="!isEditingWaypoints">{{getWaypointActionFriendlyText(waypoint)}}</span>
+            <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
 
-            <select v-if="isEditingWaypoints" class="form-control input-sm" id="waypointAction" v-model="waypoint.action">
+            <!-- <select v-if="isEditingWaypoints" class="form-control input-sm" id="waypointAction" v-model="waypoint.action">
                 <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(waypoint, 'nothing')}}</option>
                 <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(waypoint, 'collectAll')}}</option>
                 <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(waypoint, 'dropAll')}}</option>
@@ -14,12 +14,12 @@
                 <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(waypoint, 'collectAllBut')}}</option>
                 <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(waypoint, 'dropAllBut')}}</option>
                 <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(waypoint, 'garrison')}}</option>
-            </select>
+            </select> -->
         </td>
         <td class="text-right">
-          <!-- <span v-if="isEditingWaypoints">{{waypoint.actionShips}} ships</span> -->
+          <a href="" @click="editWaypoint">Edit</a>
 
-          <input v-if="isEditingWaypoints && showAction && isActionRequiresShips(waypoint.action)" class="form-control input-sm float-right" type="number" v-model="waypoint.actionShips"/>
+          <!-- <input v-if="showAction && isActionRequiresShips(waypoint.action)" class="form-control input-sm float-right" type="number" v-model="waypoint.actionShips"/> -->
         </td>
     </tr>
 </template>
@@ -29,12 +29,14 @@ export default {
   props: {
     game: Object,
     waypoint: Object,
-    showAction: Boolean,
-    isEditingWaypoints: Boolean
+    showAction: Boolean
   },
   methods: {
     getStarName (starId) {
       return this.game.galaxy.stars.find(s => s._id === starId).name
+    },
+    editWaypoint () {
+      this.$emit('onEditWaypointRequested', this.waypoint)
     },
     getWaypointActionFriendlyText (waypoint, action) {
       action = action || waypoint.action

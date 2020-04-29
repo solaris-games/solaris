@@ -14,7 +14,7 @@
         <tbody>
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint"
                         :game="game" :waypoint="waypoint" :showAction="showAction"
-                        :isEditingWaypoints="isEditingWaypoints"/>
+                        @onEditWaypointRequested="onEditWaypointRequested"/>
         </tbody>
     </table>
 </template>
@@ -28,8 +28,7 @@ export default {
   },
   props: {
     game: Object,
-    carrier: Object,
-    isEditingWaypoints: Boolean
+    carrier: Object
   },
   data () {
     return {
@@ -41,6 +40,9 @@ export default {
       this.showAction = !this.showAction
 
       e.preventDefault()
+    },
+    onEditWaypointRequested (e) {
+      this.$emit('onEditWaypointRequested', e)
     }
   }
 }
