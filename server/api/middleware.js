@@ -59,7 +59,7 @@ module.exports = {
 
     async loadGameHistory(req, res, next) {
         if (req.params.gameId) {
-            req.game = await container.gameService.getByIdHistory(req.params.gameId);
+            req.history = await container.historyService.listByGameId(req.params.gameId);
         }
 
         return next();

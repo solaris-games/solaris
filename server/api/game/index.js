@@ -32,7 +32,7 @@ router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, as
 
 router.get('/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
     try {
-        return res.status(200).json(req.game.history);
+        return res.status(200).json(req.history);
     } catch (err) {
         return next(err);
     }

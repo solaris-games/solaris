@@ -38,14 +38,6 @@ module.exports = class GameService {
         });
     }
 
-    async getByIdHistory(id) {
-        return await this.getById(id, {
-            settings: 1,
-            state: 1,
-            history: 1
-        });
-    }
-
     async join(game, userId, playerId, alias) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {

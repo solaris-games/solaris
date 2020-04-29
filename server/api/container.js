@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 
 const GameModel = require('../models/Game');
 const UserModel = require('../models/User');
+const HistoryModel = require('../models/History');
 
 const AuthService = require('../services/auth');
 const CarrierService = require('../services/carrier');
@@ -24,6 +25,7 @@ const WaypointService = require('../services/waypoint');
 const MessageService = require('../services/message');
 const ShipTransferService = require('../services/shipTransfer');
 const UserService = require('../services/user');
+const HistoryService = require('../services/history');
 
 const starNames = require('../config/game/starNames');
 
@@ -48,7 +50,8 @@ const waypointService = new WaypointService(carrierService, playerService, starS
 const gameCreateService = new GameCreateService(GameModel, mapService, playerService);
 const starUpgradeService = new StarUpgradeService(starService, carrierService, playerService);
 const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService);
-const gameTickService = new GameTickService(distanceService, starService, researchService, playerService);
+const historyService = new HistoryService(HistoryModel, playerService);
+const gameTickService = new GameTickService(distanceService, starService, researchService, playerService, historyService);
 const messageService = new MessageService();
 const shipTransferService = new ShipTransferService(carrierService, starService, playerService);
 
@@ -74,4 +77,5 @@ module.exports = {
     waypointService,
     shipTransferService,
     messageService,
+    historyService,
 };

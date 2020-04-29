@@ -1,10 +1,11 @@
 module.exports = class GameTickService {
     
-    constructor(distanceService, starService, researchService, playerService) {
+    constructor(distanceService, starService, researchService, playerService, historyService) {
         this.distanceService = distanceService;
         this.starService = starService;
         this.researchService = researchService;
         this.playerService = playerService;
+        this.historyService = historyService;
     }
 
     async tick(game) {
@@ -251,37 +252,7 @@ module.exports = class GameTickService {
     }
 
     _logHistory(game) {
-        let history = {
-            tick: game.state.tick,
-            players: []
-        };
-
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
-
-            let stats = this.playerService.getStats(game, player);
-
-            history.players.push({
-                playerId: player._id,
-                statistics: {
-                    totalStars: stats.totalStars,
-                    totalEconomy: stats.totalEconomy,
-                    totalIndustry: stats.totalIndustry,
-                    totalScience: stats.totalScience,
-                    totalShips: stats.totalShips,
-                    totalCarriers: stats.totalCarriers,
-                    weapons: player.research.weapons.level,
-                    banking: player.research.banking.level,
-                    manufacturing: player.research.manufacturing.level,
-                    hyperspace: player.research.hyperspace.level,
-                    scanning: player.research.scanning.level,
-                    experimentation: player.research.experimentation.level,
-                    terraforming: player.research.terraforming.level
-                }
-            })
-        }
-
-        game.history.push(history);
+        this.historyService.log(game);
     }
 
     _gameWinCheck(game) {

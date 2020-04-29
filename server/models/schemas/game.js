@@ -87,8 +87,7 @@ const schema = new Schema({
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		winner: { type: Types.ObjectId, required: false }
-	},
-	history: [historySchema]
+	}
 });
 
 module.exports = schema;

@@ -2,10 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
-// TODO: This should be in it's own collection instead of in the game object.
-
 const schema = new Schema({
-    // gameId: { type: Types.ObjectId, required: true },
+    gameId: { type: Types.ObjectId, required: true },
     tick: { type: Types.Number, required: true },
     players: [
         {
