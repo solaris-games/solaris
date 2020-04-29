@@ -8,6 +8,11 @@ module.exports = class TradeService {
     }
 
     async sendCredits(game, userId, toPlayerId, amount) {
+        // TODO: Maybe this validation needs to be in the middleware?
+        if (!game.startDate) {
+            throw new ValidationError(`Cannot award renown, the game has not started yet.`);
+        }
+        
         // Get the players.
         let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
@@ -27,6 +32,11 @@ module.exports = class TradeService {
     }
 
     async sendRenown(game, userId, toPlayerId, amount) {
+        // TODO: Maybe this validation needs to be in the middleware?
+        if (!game.startDate) {
+            throw new ValidationError(`Cannot award renown, the game has not started yet.`);
+        }
+
         // Get the players.
         let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
@@ -37,6 +47,10 @@ module.exports = class TradeService {
 
         if (fromPlayer.renownToGive < amount) {
             throw new ValidationError(`The player does not own ${amount} renown to award.`);
+        }
+
+        if (!toPlayer.userId) {
+            throw new ValidationError(`Cannot award renown to an empty slot.`);
         }
 
         // Get the user of the player to award renown to.

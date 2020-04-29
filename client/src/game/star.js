@@ -56,25 +56,23 @@ class Star extends EventEmitter {
 
     this.drawColour()
 
-    // If the star doesn't have a carrier, draw the star circle.
-    if (!this._getStarCarriers().length) {
-      this.drawStar()
-    }
-
-    if (this.isMouseOver) {
-      this.drawHalo()
-    }
-
     if (this.isSelected) {
-      this.drawInfrastructure()
       this.drawScanningRange()
       this.drawHyperspaceRange()
     }
 
+    this.drawName()
+    this.drawGarrison()
+
     if (this.isMouseOver || this.isSelected) {
-      this.drawName()
-      this.drawGarrison()
+      this.drawHalo()
+      this.drawInfrastructure()
       this.drawPlayerName()
+    }
+
+    // If the star doesn't have a carrier, draw the star circle.
+    if (!this._getStarCarriers().length) {
+      this.drawStar()
     }
   }
 

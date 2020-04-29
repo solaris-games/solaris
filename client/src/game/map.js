@@ -167,10 +167,10 @@ class Map extends EventEmitter {
 
   unselectAllStarsExcept (star) {
     this.stars
-      .filter(s => s.isSelected || s._id === star._id) // Get only stars that are selected or the e star.
+      .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
       .forEach(s => {
         // Set all other stars to unselected.
-        if (s._id !== star._id) {
+        if (s.data._id !== star.data._id) {
           s.isSelected = false
         }
 
@@ -178,25 +178,13 @@ class Map extends EventEmitter {
       })
   }
 
-  unselectAllCarriers () {
-    // this.carriers
-    // .forEach(s => {
-    //   s.isSelected = false
-    //   s.draw()
-    // })
-  }
-
-  unselectAllCarriersExcept (carrier) {
-
-  }
-
   onStarClicked (e) {
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
-      e.isSelected = true
+      let selectedStar = this.stars.find(x => x.data._id === e._id)
+      selectedStar.isSelected = true
       
-      this.unselectAllCarriers()
-      this.unselectAllStarsExcept(e)
+      this.unselectAllStarsExcept(selectedStar)
   
       this.emit('onStarClicked', e)
     }
@@ -205,10 +193,7 @@ class Map extends EventEmitter {
   onCarrierClicked (e) {
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
-      e.isSelected = true
-
       this.unselectAllStars()
-      this.unselectAllCarriersExcept(e)
 
       this.emit('onCarrierClicked', e)
     }

@@ -6,6 +6,8 @@
 
     <form-error-list v-bind:errors="errors" class="mt-2"/>
 
+    <loading-spinner :loading="isJoiningGame"/>
+
     <select-colour :game="game" v-on:onJoinRequested="onJoinRequested"/>
 
     <div class="text-center pb-2">
@@ -18,6 +20,7 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../../LoadingSpinner'
 import gameService from '../../../services/api/game'
 import MenuTitle from '../MenuTitle'
 import FormErrorListVue from '../../FormErrorList'
@@ -26,6 +29,7 @@ import SelectColourVue from './SelectColour.vue'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'menu-title': MenuTitle,
     'form-error-list': FormErrorListVue,
     'select-alias': SelectAliasVue,
@@ -36,6 +40,7 @@ export default {
   },
   data () {
     return {
+      isJoiningGame: false,
       domain: '',
       errors: [],
       alias: ''
@@ -70,6 +75,8 @@ export default {
       if (this.errors.length) return
 
       try {
+        this.isJoiningGame = true
+
         let response = await gameService.joinGame(this.game._id, playerId, this.alias)
 
         if (response.status === 200) {
@@ -78,6 +85,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isJoiningGame = false
     }
   }
 }

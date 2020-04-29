@@ -7,7 +7,7 @@
                   <p class="mb-2">{{userPlayer.renownToGive || 8}} Renown to distribute.</p>
               </div>
               <div class="col-5">
-                  <button class="btn btn-success btn-block" @click="confirmAwardRenown">Award Renown</button>
+                  <button type="button" class="btn btn-success btn-block" @click="confirmAwardRenown" :disabled="isAwardingRenown">Award Renown</button>
               </div>
             </div>
         </form>
@@ -26,12 +26,15 @@ export default {
   },
   data () {
     return {
+      isAwardingRenown: false,
       amount: 1
     }
   },
   methods: {
     async confirmAwardRenown () {
       try {
+        this.isAwardingRenown = true
+
         let response = await tradeService.sendRenown(this.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
@@ -42,6 +45,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isAwardingRenown = false
     }
   }
 }

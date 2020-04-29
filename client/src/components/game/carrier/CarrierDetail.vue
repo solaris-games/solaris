@@ -5,7 +5,7 @@
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="carrier.ownedByPlayerId == currentPlayerId">A carrier under your command.<br/>Give it orders to capture more stars!</p>
-        <p v-if="carrier.ownedByPlayerId != null && carrier.ownedByPlayerId != currentPlayerId">This carrier is controlled by [{{getCarrierOwningPlayer().alias}}].</p>
+        <p v-if="carrier.ownedByPlayerId != null && carrier.ownedByPlayerId != currentPlayerId">This carrier is controlled by <a href="" @click="onOpenPlayerDetailRequested">{{getCarrierOwningPlayer().alias}}</a>.</p>
       </div>
     </div>
 
@@ -24,7 +24,7 @@
     <div v-if="getCarrierOwningPlayer() == getUserPlayer()" class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">
-          <p class="mb-2 align-middle">Orbiting: <a href="">{{getCarrierOrbitingStar().name}}</a></p>
+          <p class="mb-2 align-middle">Orbiting: <a href="" @click="onOpenStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-4">
           <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested">Ship Transfer</button>
@@ -109,6 +109,11 @@ export default {
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.game, this.carrier)
     },
+    onOpenPlayerDetailRequested (e) {
+      e.preventDefault()
+
+      this.$emit('onOpenPlayerDetailRequested', this.getCarrierOwningPlayer())
+    },
     async toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
       try {
@@ -141,6 +146,11 @@ export default {
         carrier: this.carrier,
         waypoint: e
       })
+    },
+    onOpenStarDetailRequested (e) {
+      e.preventDefault()
+
+      this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar())
     }
   }
 }

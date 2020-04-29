@@ -11,10 +11,10 @@
 				<p>ETA: 0d 0h 0m 0s</p>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-danger" @click="removeLastWaypoint()"><i class="fas fa-minus"></i></button>
-				<button class="btn btn-danger ml-1" @click="removeAllWaypoints()"><i class="fas fa-times"></i></button>
-				<button class="btn btn-success ml-1" @click="saveWaypoints()">Save</button>
-				<button class="btn btn-success ml-1" @click="saveWaypoints(true)">Save &amp; Edit</button>
+				<button class="btn btn-danger" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-minus"></i></button>
+				<button class="btn btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-times"></i></button>
+				<button class="btn btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">Save</button>
+				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">Save &amp; Edit</button>
 			</div>
 		</div>
 	</div>
@@ -39,6 +39,11 @@ export default {
 	},
 	destroyed () {
 		GameContainer.map.resetMode()
+	},
+	data () {
+		return {
+			isSavingWaypoints: false
+		}
 	},
 	methods: {
 		onCloseRequested (e) {
@@ -74,6 +79,7 @@ export default {
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.
 			try {
+				this.isSavingWaypoints = true
 				let response = await CarrierApiService.saveWaypoints(this.game._id, this.carrier._id, this.carrier.waypoints)
 
 				// TODO: Do something with the response...?
@@ -87,6 +93,8 @@ export default {
 			} catch (e) {
 				console.error(e)
 			}
+
+			this.isSavingWaypoints = false
 		}
 	}
 }

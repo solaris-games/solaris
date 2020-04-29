@@ -22,20 +22,22 @@
 
     <research v-if="userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
 
-    <div v-if="userPlayer && player != userPlayer">
+    <div v-if="game.startDate && userPlayer && player != userPlayer">
       <h4 class="mt-2">Trade</h4>
 
       <sendTechnology :game="game" :player="player" :userPlayer="userPlayer"/>
       <sendCredits :game="game" :player="player" :userPlayer="userPlayer"/>
     </div>
 
-    <h4 class="mt-2" v-if="user || userPlayer">Achievements</h4>
+    <loading-spinner :loading="!player.isEmptySlot && !user"/>
+
+    <h4 class="mt-2" v-if="!player.isEmptySlot && (user || userPlayer)">Achievements</h4>
 
     <achievements v-if="user" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="userPlayer && player != userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
+    <sendRenown v-if="game.startDate && userPlayer && player != userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
 
     <!--
     <h4 class="mt-2">Badges</h4>
@@ -46,6 +48,7 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../../LoadingSpinner'
 import MenuTitle from '../MenuTitle'
 import Overview from './Overview'
 import Infrastructure from '../shared/Infrastructure'
@@ -61,6 +64,7 @@ import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
+    'loading-spinner': LoadingSpinnerVue,
     'menu-title': MenuTitle,
     'overview': Overview,
     'infrastructure': Infrastructure,

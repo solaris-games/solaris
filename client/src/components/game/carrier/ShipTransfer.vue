@@ -44,7 +44,7 @@
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
         <div class="col pr-0">
-            <button type="button" class="btn btn-success btn-block mr-1" :disabled="starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
+            <button type="button" class="btn btn-success btn-block mr-1" :disabled="isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
         </div>
         <div class="col-auto pl-1">
             <button type="button" class="btn btn-primary" @click="onOpenCarrierDetailRequested"><i class="fas fa-plus"></i></button>
@@ -70,7 +70,8 @@ export default {
   data () {
       return {
           starShips: 0,
-          carrierShips: 0
+          carrierShips: 0,
+          isTransferringShips: false
       }
   },
   mounted () {
@@ -107,6 +108,8 @@ export default {
       },
       async saveTransfer (e) {
           try {
+            this.isTransferringShips = true
+
             let response = await CarrierApiService.transferShips(
                 this.game._id, 
                 this.transfer.carrier._id,
@@ -120,6 +123,8 @@ export default {
           } catch (err) {
               console.log(err)
           }
+
+          this.isTransferringShips = false
       },
       onOpenCarrierDetailRequested (e) {
           this.$emit('onOpenCarrierDetailRequested', this.transfer.carrier)

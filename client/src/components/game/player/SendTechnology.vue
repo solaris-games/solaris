@@ -6,14 +6,14 @@
         <form>
             <div class="form-row">
                 <div class="col-7">
-                    <select class="form-control" id="technologySelection" v-model="selectedTechnology">
+                    <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
                         <option v-for="opt in availableTechnologies" v-bind:key="opt.name" v-bind:value="opt.name">
                             {{ opt.name }} ({{opt.level}} - ${{opt.cost}})
                         </option>
                     </select>
                 </div>
                 <div class="col-5">
-                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block">Share Technology</modalButton>
+                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" :disabled="!availableTechnologies.length">Share Technology</modalButton>
                 </div>
             </div>
         </form>

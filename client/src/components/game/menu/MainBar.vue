@@ -12,8 +12,17 @@
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested" :game="game"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :game="game" :player="menuArguments" :key="menuArguments._id" @onViewConversationRequested="onConversationOpenRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested" :game="game"/>
-      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :star="menuArguments" @onViewConversationRequested="onConversationOpenRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested" @onEditWaypointsRequested="onEditWaypointsRequested" @onEditWaypointRequested="onEditWaypointRequested" @onViewConversationRequested="onConversationOpenRequested"/>
+      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"
+        @onCloseRequested="onCloseRequested" 
+        @onViewConversationRequested="onConversationOpenRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" 
+        @onShipTransferRequested="onShipTransferRequested" 
+        @onEditWaypointsRequested="onEditWaypointsRequested" 
+        @onEditWaypointRequested="onEditWaypointRequested" 
+        @onViewConversationRequested="onConversationOpenRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :game="game" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
@@ -102,6 +111,12 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
       this.changeMenuState('carrierDetail', e)
+    },
+    onOpenStarDetailRequested (e) {
+      this.changeMenuState(MENU_STATES.STAR_DETAIL, e)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.changeMenuState(MENU_STATES.PLAYER, e)
     },
     onEditWaypointsRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_WAYPOINTS, e)

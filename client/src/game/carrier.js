@@ -10,8 +10,6 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = true
 
     this.container.on('pointerdown', this.onClicked.bind(this))
-
-    this.isSelected = false
   }
 
   setup (data, stars) {

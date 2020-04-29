@@ -27,7 +27,7 @@
             </select>
           </div>
           <div class="form-group">
-            <button class="btn btn-success btn-block" @click="upgrade">Upgrade</button>
+            <button class="btn btn-success btn-block" @click="upgrade" :disabled="isUpgrading">Upgrade</button>
           </div>
         </form>
       </div>
@@ -49,6 +49,7 @@ export default {
   },
   data() {
     return {
+      isUpgrading: false,
       amount: 0,
       selectedType: "economy",
       types: [
@@ -74,12 +75,14 @@ export default {
     onCloseRequested(e) {
       this.$emit("onCloseRequested", e)
     },
-    async upgrade() {
+    async upgrade () {
       if (this.amount <= 0) {
         return
       }
 
       try {
+        this.isUpgrading = true
+
         let response = await starService.bulkInfrastructureUpgrade(
           this.game._id,
           this.selectedType,
@@ -92,6 +95,7 @@ export default {
             amount: this.amount
           })
 
+          // TODO: A better modal.
           alert(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`)
         
           // TODO: Update the player credits amount and update all stars.
@@ -99,6 +103,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isUpgrading = false
     }
   }
 }

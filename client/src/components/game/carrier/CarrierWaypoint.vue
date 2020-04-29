@@ -42,11 +42,11 @@
 
 		<div class="row bg-secondary pt-2 pb-2">
 			<div class="col-8">
-				<button class="btn btn-primary" @click="previousWaypoint()"><i class="fas fa-chevron-left"></i></button>
-				<button class="btn btn-primary ml-1" @click="nextWaypoint()"><i class="fas fa-chevron-right"></i></button>
+				<button class="btn btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-chevron-left"></i></button>
+				<button class="btn btn-primary ml-1" @click="nextWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-chevron-right"></i></button>
 			</div>
 			<div class="col-4">
-				<button class="btn btn-success btn-block" @click="saveWaypoints()">Save</button>
+				<button class="btn btn-success btn-block" @click="saveWaypoints()" :disabled="isSavingWaypoints">Save</button>
 			</div>
 		</div>
 	</div>
@@ -66,7 +66,12 @@ export default {
 		game: Object,
         carrier: Object,
         waypoint: Object
-	},
+    },
+    data () {
+        return {
+            isSavingWaypoints: false
+        }
+    },
 	methods: {
 		onCloseRequested (e) {
 			this.$emit('onCloseRequested', e)
@@ -133,6 +138,7 @@ export default {
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.
 			try {
+                this.isSavingWaypoints = true
 				let response = await CarrierApiService.saveWaypoints(this.game._id, this.carrier._id, this.carrier.waypoints)
 
 				// TODO: Do something with the response...?
@@ -141,7 +147,9 @@ export default {
 				}
 			} catch (e) {
 				console.error(e)
-			}
+            }
+            
+            this.isSavingWaypoints = false
 		}
 	}
 }

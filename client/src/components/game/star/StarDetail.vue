@@ -5,7 +5,7 @@
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="star.ownedByPlayerId == currentPlayerId">A star under your command.</p>
-        <p v-if="star.ownedByPlayerId != null && star.ownedByPlayerId != currentPlayerId">This star is controlled by [{{getStarOwningPlayer().alias}}].</p>
+        <p v-if="star.ownedByPlayerId != null && star.ownedByPlayerId != currentPlayerId">This star is controlled by <a href="" @click="onOpenPlayerDetailRequested">{{getStarOwningPlayer().alias}}</a>.</p>
         <p v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
       </div>
     </div>
@@ -173,6 +173,11 @@ export default {
       // TODO: Reload the player credits somehow?
       this.star[e]++
       this.getStarOwningPlayer().credits -= this.star.upgradeCosts[e]
+    },
+    onOpenPlayerDetailRequested (e) {
+      e.preventDefault()
+
+      this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer())
     },
     async confirmBuildCarrier (e) {
       try {

@@ -3,19 +3,19 @@
         <div class="col text-center bg-secondary pt-2 pb-2">
             <button class="btn btn-block" 
               :class="{'btn-success': availableCredits >= economy, 'btn-secondary': availableCredits < economy}" 
-              :disabled="availableCredits < economy" 
+              :disabled="isUpgradingEconomy || availableCredits < economy" 
               @click="upgradeEconomy">Buy for ${{economy}}</button>
         </div>
         <div class="col text-center bg-primary pt-2 pb-2">
             <button class="btn btn-block" 
               :class="{'btn-success': availableCredits >= industry, 'btn-secondary': availableCredits < industry}" 
-              :disabled="availableCredits < industry" 
+              :disabled="isUpgradingIndustry || availableCredits < industry" 
               @click="upgradeIndustry">Buy for ${{industry}}</button>
         </div>
         <div class="col text-center bg-secondary pt-2 pb-2">
             <button class="btn btn-block" 
               :class="{'btn-success': availableCredits >= science, 'btn-secondary': availableCredits < science}" 
-              :disabled="availableCredits < science" 
+              :disabled="isUpgradingScience || availableCredits < science" 
               @click="upgradeScience">Buy for ${{science}}</button>
         </div>
     </div>
@@ -33,9 +33,18 @@ export default {
     industry: Number,
     science: Number
   },
+  data () {
+    return {
+      isUpgradingEconomy: false,
+      isUpgradingIndustry: false,
+      isUpgradingScience: false
+    }
+  },
   methods: {
     async upgradeEconomy (e) {
       try {
+        this.isUpgradingEconomy = true
+
         let response = await starService.upgradeEconomy(this.gameId, this.starId)
 
         if (response.status === 200) {
@@ -44,9 +53,13 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isUpgradingEconomy = false
     },
     async upgradeIndustry (e) {
       try {
+        this.isUpgradingIndustry = true
+
         let response = await starService.upgradeIndustry(this.gameId, this.starId)
 
         if (response.status === 200) {
@@ -55,9 +68,13 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isUpgradingIndustry = false
     },
     async upgradeScience (e) {
       try {
+        this.isUpgradingScience = true
+
         let response = await starService.upgradeScience(this.gameId, this.starId)
 
         if (response.status === 200) {
@@ -66,6 +83,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isUpgradingScience = false
     }
   }
 }
