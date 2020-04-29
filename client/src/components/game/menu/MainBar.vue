@@ -15,6 +15,7 @@
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :star="menuArguments" @onViewConversationRequested="onConversationOpenRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onShipTransferRequested="onShipTransferRequested" @onEditWaypointsRequested="onEditWaypointsRequested" @onEditWaypointRequested="onEditWaypointRequested" @onViewConversationRequested="onConversationOpenRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :game="game" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" @onCloseRequested="onCloseRequested" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :game="game" :fromPlayerId="menuArguments"/>
@@ -36,6 +37,7 @@ import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
 import CarrierWaypointsVue from '../carrier/CarrierWaypoints.vue'
+import CarrierWaypointVue from '../carrier/CarrierWaypoint.vue'
 import ShipTransferVue from '../carrier/ShipTransfer.vue'
 import InboxVue from '../inbox/Inbox.vue'
 import ConversationVue from '../inbox/Conversation.vue'
@@ -55,6 +57,7 @@ export default {
     'star-detail': StarDetailVue,
     'carrier-detail': CarrierDetailVue,
     'carrier-waypoints': CarrierWaypointsVue,
+    'carrier-waypoint': CarrierWaypointVue,
     'ship-transfer': ShipTransferVue,
     'inbox': InboxVue,
     'conversation': ConversationVue,
