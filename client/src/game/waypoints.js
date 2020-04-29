@@ -70,10 +70,15 @@ class Waypoints extends EventEmitter {
 
     let graphics = new PIXI.Graphics()
     
-    // Find where we are travelling from and start the line there.
-    let star = this.game.galaxy.stars.find(s => s._id === this.carrier.waypoints[0].source)
+    // Start the line from where the carrier currently is.
+    let star// = this.game.galaxy.stars.find(s => s._id === this.carrier.waypoints[0].source)
 
-    graphics.moveTo(star.location.x, star.location.y)
+    // if (this.carrier.waypointsLooped) {
+    //   graphics.moveTo(star.location.x, star.location.y)
+    // } else {
+      graphics.moveTo(this.carrier.location.x, this.carrier.location.y)
+    // }
+
     graphics.lineStyle(1, 0xFFFFFF, 0.8)
 
     // Draw a line to each destination along the waypoints.

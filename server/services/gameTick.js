@@ -83,6 +83,7 @@ module.exports = class GameTickService {
                 // Remove the current waypoint as we have arrived at the destination.
                 let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
 
+                // TODO: Looping
                 // TODO: Perform carrier waypoint action.
 
                 // If the star is unclaimed, then claim it.

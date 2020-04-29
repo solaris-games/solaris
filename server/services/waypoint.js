@@ -18,14 +18,42 @@ module.exports = class WaypointService {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        // TODO: Validate new waypoints.
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(userPlayer.research.hyperspace.level);
+
+        // If the carrier is currently in transit then double check that the first waypoint
+        // matches the source and destination.
+        if (!carrier.orbiting) {
+            let currentWaypoint = carrier.waypoints[0];
+            let newFirstWaypoint = waypoints[0];
+
+            if (!newFirstWaypoint 
+                || currentWaypoint.source.toString() !== newFirstWaypoint.source
+                || currentWaypoint.destination.toString() !== newFirstWaypoint.destination) {
+                    throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
+                }
+        }
+
+        // Validate new waypoints.
+        for (let i = 0; i < waypoints.length; i++) {
+            let waypoint = waypoints[i];
+
+            let sourceStar = this.starService.getByObjectId(game, waypoint.source);
+            let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+            let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
+
+            if (distanceBetweenStars > hyperspaceDistance) {
+                throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} exceeds hyperspace range.`);
+            }
+        }
         
         carrier.waypoints = waypoints;
+        carrier.waypointsLooped = false;
 
         return await game.save();
     }
 
-    loopWaypoints(game, userId, carrierId, loop) {
+    async loopWaypoints(game, userId, carrierId, loop) {
         let userPlayer = this.playerService.getByUserId(game, userId);
         let carrier = this.carrierService.getById(game, carrierId);
         
@@ -34,7 +62,7 @@ module.exports = class WaypointService {
         }
 
         if (loop) {
-            if (!carrier.waypoints.length < 1) {
+            if (carrier.waypoints.length < 1) {
                 throw new ValidationError('The carrier must have 2 or more waypoints to loop');
             }
 
@@ -55,7 +83,7 @@ module.exports = class WaypointService {
         
         carrier.waypointsLooped = loop;
 
-        return await game.save();
+        await game.save();
     }
 
     calculateWaypointTicks(game, waypoint) {
