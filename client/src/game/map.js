@@ -17,6 +17,13 @@ class Map extends EventEmitter {
     super()
 
     this.container = new PIXI.Container()
+    this.starContainer = new PIXI.Container()
+    this.carrierContainer = new PIXI.Container()
+    this.waypointContainer = new PIXI.Container()
+
+    this.container.addChild(this.starContainer)
+    this.container.addChild(this.carrierContainer)
+    this.container.addChild(this.waypointContainer)
   }
 
   setup (game) {
@@ -33,7 +40,7 @@ class Map extends EventEmitter {
 
       this.stars.push(star)
 
-      this.container.addChild(star.container)
+      this.starContainer.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
     }
@@ -46,7 +53,7 @@ class Map extends EventEmitter {
 
       this.carriers.push(carrier)
 
-      this.container.addChild(carrier.container)
+      this.carrierContainer.addChild(carrier.container)
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     }
@@ -56,7 +63,7 @@ class Map extends EventEmitter {
     this.waypoints.registerEvents(this.stars)
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
-    this.container.addChild(this.waypoints.container)
+    this.waypointContainer.addChild(this.waypoints.container)
   }
 
   draw () {
@@ -65,6 +72,8 @@ class Map extends EventEmitter {
 
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
+    } else {
+      this.clearWaypoints()
     }
   }
 
@@ -99,6 +108,10 @@ class Map extends EventEmitter {
 
   drawWaypoints () {
     this.waypoints.draw(this.modeArgs)
+  }
+
+  clearWaypoints () {
+    this.waypoints.container.removeChildren()
   }
 
   zoomToPlayer (game, player) {
