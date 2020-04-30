@@ -13,7 +13,7 @@
     "bootswatch": "^4.3.1",
     "chart.js": "^2.9.3",
     "core-js": "^2.6.5",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "pixi-viewport": "^4.0.0-beta.0",
     "pixi.js": "^5.0.3",
     "popper.js": "^1.15.0",
