@@ -74,16 +74,24 @@ module.exports = class StarDistanceService {
     }
 
     isStarTooClose(star, otherStar) {
-        const distance = this.getDistanceBetweenStars(star, otherStar);
+        return this.isStarLocationTooClose(star.location, otherStar);
+    }
+
+    isStarLocationTooClose(location, otherStar) {
+        return this.isLocationTooClose(location, otherStar.location);
+    }
+
+    isLocationTooClose(location, otherLocation) {
+        const distance = this.distanceService.getDistanceBetweenLocations(location, otherLocation);
 
         return distance < this.distanceService.DISTANCES.MIN_DISTANCE_BETWEEN_STARS;
     }
 
-    isDuplicateStarPosition(star, stars) {
+    isDuplicateStarPosition(location, stars) {
         const samePositionStars = 
             stars.filter((star2) => {
-                return star.location.x === star2.location.x
-                    && star.location.y === star2.location.y;
+                return location.x === star2.location.x
+                    && location.y === star2.location.y;
             });
     
         return samePositionStars.length > 0;

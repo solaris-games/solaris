@@ -15,14 +15,22 @@ module.exports = class StarService {
         MAX_NATURAL_RESOURCES: 50
     }
 
-    generateUnownedStar(name, originX, originY) {
+    generateUnownedStar(name, location) {
         return {
             _id: mongoose.Types.ObjectId(),
-            name: name,
+            name,
             naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES - 1),
-            location: this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, this.distanceService.DISTANCES.MAX_DISTANCE_BETWEEN_STARS),
+            location,
             infrastructure: { }
         };
+    }
+
+    generateStarPosition(originX, originY, radius) {
+        if (radius == null) {
+            radius = this.distanceService.DISTANCES.MAX_DISTANCE_BETWEEN_STARS;
+        }
+
+        return this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, radius);
     }
 
     getByObjectId(game, id) {

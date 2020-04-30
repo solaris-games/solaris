@@ -1,63 +1,41 @@
 module.exports = class StandardMapService {
 
-    constructor(randomService, starService, starNameService, starDistanceService) {
+    constructor(randomService, starService, starDistanceService) {
         this.randomService = randomService;
         this.starService = starService;
-        this.starNameService = starNameService;
         this.starDistanceService = starDistanceService;
     }
 
-    generate(starCount) {
-        const stars = [];
+    generateLocations(starCount) {
+        const locations = [];
 
-        // Circle universe.
-        const maxRadius = starCount * Math.PI;
-
-        // Get an array of random star names for however many stars we want.
-        const starNames = this.starNameService.getRandomStarNames(starCount);
-
-        let index = 0;
-
-        // To generate stars we do the following:
-        // - Create a star at a random angle and distance from the current position
-        // - Then pick a random star in the list of stars to be the new origin position.
-        // - Repeat until we have created all of the required stars.
+        // To generate locations we do the following:
+        // - Create a location at a random angle and distance from the current position
+        // - Then pick a random location in the list of locations to be the new origin position.
+        // - Repeat until we have created all of the required locations.
         let currentOrigin = {
             x: 0,
             y: 0
         };
 
         do {            
-            const starName = starNames[index];
-            
-            const star = this.starService.generateUnownedStar(starName, 
-                currentOrigin.x, currentOrigin.y);
-
-            if (this.isStarADuplicatePosition(star, stars))
-                continue;
+            const location = this.starService.generateStarPosition(currentOrigin.x, currentOrigin.y);
 
             // Stars must not be too close to eachother.
-            if (this.isStarTooCloseToOthers(star, stars))
+            if (this.isLocationTooCloseToOthers(location, locations))
                 continue;
 
-            stars.push(star);
+            locations.push(location);
 
             // Pick a new origin from a random star.
-            currentOrigin = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)].location;
+            currentOrigin = locations[this.randomService.getRandomNumberBetween(0, locations.length - 1)];
+        } while (locations.length < starCount);
 
-            index++;
-        } while (stars.length < starCount);
-
-        return stars;
+        return locations;
     }
 
-    isStarADuplicatePosition(star, stars) {
-        return this.starDistanceService.isDuplicateStarPosition(star, stars);
-    }
-
-    isStarTooCloseToOthers(star, stars) {
-        return stars.find(s => 
-            this.starDistanceService.isStarTooClose(star, s)) != null;
+    isLocationTooCloseToOthers(location, locations) {
+        return locations.find(l => this.starDistanceService.isLocationTooClose(location, l)) != null;
     }
 
 };

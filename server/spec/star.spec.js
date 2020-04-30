@@ -91,5 +91,5 @@ describe('star', () => {
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);
         expect(homeStar.homeStar).toBeTruthy();
     });
-
+    
 });

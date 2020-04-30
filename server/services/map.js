@@ -1,13 +1,30 @@
 module.exports = class MapService {
 
-    constructor(randomService, starDistanceService, starMapService) {
+    constructor(randomService, starService, starDistanceService, starNameService, starMapService) {
         this.randomService = randomService;
+        this.starService = starService;
         this.starDistanceService = starDistanceService;
+        this.starNameService = starNameService;
         this.starMapService = starMapService;
     }
 
     generateStars(starCount, playerLimit, warpGatesSetting) {
-        let stars = this.starMapService.generate(starCount, warpGatesSetting);
+        const stars = [];
+
+        // Get an array of random star names for however many stars we want.
+        const starNames = this.starNameService.getRandomStarNames(starCount);
+
+        // Generate all of the locations for stars.
+        const starLocations = this.starMapService.generateLocations(starCount);
+
+        // Iterate over all star locations
+        // Note: We need to iterate over the locations because there is no guarantee that
+        // the map service will generate all of the locations we want.
+        for (let i = 0; i < starLocations.length; i++) {
+            const star = this.starService.generateUnownedStar(starNames[i], starLocations[i]);
+
+            stars.push(star);
+        }
 
         // If warp gates are enabled, assign random stars to start as warp gates.
         if (warpGatesSetting !== 'none') {

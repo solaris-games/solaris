@@ -28,6 +28,7 @@ const UserService = require('../services/user');
 const HistoryService = require('../services/history');
 
 const StandardMapService = require('../services/maps/standard');
+const CircularMapService = require('../services/maps/circular');
 
 const starNames = require('../config/game/starNames');
 
@@ -45,8 +46,10 @@ const researchService = new ResearchService(randomService);
 const starNameService = new StarNameService(starNames, randomService);
 const starDistanceService = new StarDistanceService(distanceService);
 const starService = new StarService(randomService, starNameService, distanceService, starDistanceService);
-const standardMapService = new StandardMapService(randomService, starService, starNameService), starDistanceService;
-const mapService = new MapService(randomService, starDistanceService, standardMapService);
+const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
+const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
+// const mapService = new MapService(randomService, starService, starDistanceService, starNameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
+const mapService = new MapService(randomService, starService, starDistanceService, starNameService, circularMapService);
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const tradeService = new TradeService(userService, playerService);
 const waypointService = new WaypointService(carrierService, playerService, starService, distanceService, starDistanceService);
