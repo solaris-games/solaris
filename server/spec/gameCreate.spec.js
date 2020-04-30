@@ -130,18 +130,18 @@ describe('gameCreate', () => {
         done();
     });
 
-    it('should create a game with warp gates if enabled', async (done) => {
-        // Arrange
-        settings.specialGalaxy.randomGates = 'random';
+    // it('should create a game with warp gates if enabled', async (done) => {
+    //     // Arrange
+    //     settings.specialGalaxy.randomGates = 'random';
 
-        // Act
-        let game = await service.create(settings);
+    //     // Act
+    //     let game = await service.create(settings);
 
-        // Assert
-        expect(game._doc.galaxy.stars[0].warpGate).toBeTruthy();
+    //     // Assert
+    //     expect(game._doc.galaxy.stars[0].warpGate).toBeTruthy();
 
-        done();
-    });
+    //     done();
+    // });
 
     it('should not create a game with warp gates if disabled', async (done) => {
         // Arrange

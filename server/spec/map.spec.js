@@ -1,5 +1,6 @@
 const RandomService = require('../services/random');
 const MapService = require('../services/map');
+const StandardMapService = require('../services/maps/standard')
 
 const fakeStarService = {
     generateUnownedStar(name) {
@@ -48,11 +49,13 @@ describe('map', () => {
     const starCount = 10;
     const playerCount = 2;
     let mapService;
+    let starMapService;
 
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
-        mapService = new MapService(randomService, fakeStarService, fakeDistanceService, fakeStarDistanceService, fakeStarNameService);
+        starMapService = new StandardMapService(randomService, fakeStarService, fakeStarNameService, fakeStarDistanceService);
+        mapService = new MapService(randomService, fakeStarDistanceService, starMapService);
     });
 
     it('should generate a given number of stars', () => {
@@ -81,7 +84,7 @@ describe('map', () => {
 
         fakeStarDistanceService.isStarTooClose = () => false;
 
-        let result = mapService.isStarTooCloseToOthers(star, otherStars);
+        let result = starMapService.isStarTooCloseToOthers(star, otherStars);
 
         expect(result).toBeFalsy();
     });
@@ -92,7 +95,7 @@ describe('map', () => {
 
         fakeStarDistanceService.isStarTooClose = () => true;
 
-        let result = mapService.isStarTooCloseToOthers(star, otherStars);
+        let result = starMapService.isStarTooCloseToOthers(star, otherStars);
 
         expect(result).toBeTruthy();
     });

@@ -27,6 +27,8 @@ const ShipTransferService = require('../services/shipTransfer');
 const UserService = require('../services/user');
 const HistoryService = require('../services/history');
 
+const StandardMapService = require('../services/maps/standard');
+
 const starNames = require('../config/game/starNames');
 
 // Poor man's dependency injection.
@@ -43,7 +45,8 @@ const researchService = new ResearchService(randomService);
 const starNameService = new StarNameService(starNames, randomService);
 const starDistanceService = new StarDistanceService(distanceService);
 const starService = new StarService(randomService, starNameService, distanceService, starDistanceService);
-const mapService = new MapService(randomService, starService, distanceService, starDistanceService, starNameService);
+const standardMapService = new StandardMapService(randomService, starService, starNameService), starDistanceService;
+const mapService = new MapService(randomService, starDistanceService, standardMapService);
 const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
 const tradeService = new TradeService(userService, playerService);
 const waypointService = new WaypointService(carrierService, playerService, starService, distanceService, starDistanceService);
