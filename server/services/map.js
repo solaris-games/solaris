@@ -18,8 +18,6 @@ module.exports = class MapService {
         const starLocations = this.starMapService.generateLocations(starCount);
 
         // Iterate over all star locations
-        // Note: We need to iterate over the locations because there is no guarantee that
-        // the map service will generate all of the locations we want.
         for (let i = 0; i < starLocations.length; i++) {
             const star = this.starService.generateUnownedStar(starNames[i], starLocations[i]);
 

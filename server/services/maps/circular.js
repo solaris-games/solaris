@@ -17,8 +17,7 @@ module.exports = class CircularMapService {
         let radiusStep = this.distanceService.DISTANCES.MIN_DISTANCE_BETWEEN_STARS;
         let maxTries = 5;
 
-        // Try to create each location once.
-        for (let s = 0; s < starCount; s++) {
+        do {
             let createdLocation = false;
 
             // Try to find the star location X number of times.
@@ -38,7 +37,7 @@ module.exports = class CircularMapService {
             if (!createdLocation) {
                 currentRadius += radiusStep;
             }
-        }
+        } while (locations.length < starCount)
 
         return locations;
     }

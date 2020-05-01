@@ -12,7 +12,7 @@ module.exports = class GameCreateService {
         });
 
         // Calculate how many stars we need.
-        let desiredStarCount = game._doc.settings.galaxy.starsPerPlayer * 2 * game._doc.settings.general.playerLimit;
+        let desiredStarCount = game._doc.settings.galaxy.starsPerPlayer * game._doc.settings.general.playerLimit;
         
         // Create all of the stars required.
         game._doc.galaxy.stars = this.mapService.generateStars(

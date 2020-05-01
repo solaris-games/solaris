@@ -26,7 +26,7 @@ const schema = new Schema({
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
         },
         galaxy: {
-			starsPerPlayer: { type: Types.Number, required: true, enum: [8, 12, 16, 24, 32], default: 24 },
+			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30], default: 20 },
 			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
         player: {
@@ -67,7 +67,7 @@ const schema = new Schema({
 			}
 		},
 		gameTime: {
-			speed: { type: Types.Number, required: true, enum: [6, 12, 24, 48], default: 24 }
+			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 10 }
 		}
     },
     galaxy: {

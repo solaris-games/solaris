@@ -12,7 +12,6 @@ const schema = new Schema({
     waypointsLooped: { type: Types.Boolean, required: true, default: false },
     name: { type: Types.String, required: true },
     ships: { type: Types.Number, required: true },
-    speed: { type: Types.Number, required: true, default: 1 },
     location: {
         x: { type: Types.Number, required: true },
         y: { type: Types.Number, required: true }
