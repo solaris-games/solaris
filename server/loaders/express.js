@@ -1,5 +1,5 @@
 const session = require('express-session');
-const config = require('../config')
+const config = require('../config');
 
 module.exports = async (app) => {
     app.use(require('body-parser').json());

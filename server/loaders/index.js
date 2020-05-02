@@ -1,10 +1,11 @@
 const expressLoader = require('./express');
 const mongooseLoader = require('./mongoose');
 const agendaLoader = require('./agenda');
+const socketLoader = require('./sockets');
 
 module.exports = {
   
-  async init(expressApp) {
+  async init(expressApp, expressServer) {
     await mongooseLoader();
     console.log('MongoDB Intialized');
   
@@ -14,7 +15,8 @@ module.exports = {
     await agendaLoader();
     console.log('Agenda Initialized');
   
-    // ... More loaders
+    socketLoader(expressServer);
+    console.log('Sockets Initialized');
   }
 
 };
