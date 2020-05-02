@@ -1,7 +1,3 @@
-const express = require('express');
-const router = express.Router();
-const middleware = require('../middleware');
-const container = require('../container');
 const ValidationError = require('../../errors/validation');
 
 function validate(req, res, next) {
@@ -18,109 +14,115 @@ function validate(req, res, next) {
     return next();
 }
 
-router.put('/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starUpgradeService.upgradeEconomy(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+module.exports = (router, io, container) => {
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    const middleware = require('../middleware')(container);
 
-router.put('/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starUpgradeService.upgradeIndustry(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+    router.put('/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starUpgradeService.upgradeEconomy(
+                req.game,
+                req.session.userId,
+                req.body.starId);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starUpgradeService.upgradeScience(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+    router.put('/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starUpgradeService.upgradeIndustry(
+                req.game,
+                req.session.userId,
+                req.body.starId);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.put('/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    try {
-        let summary = await container.starUpgradeService.upgradeBulk(
-            req.game,
-            req.session.userId,
-            req.body.infrastructure,
-            +req.body.amount);
+    router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starUpgradeService.upgradeScience(
+                req.game,
+                req.session.userId,
+                req.body.starId);
 
-        return res.status(200).json(summary);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.put('/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starUpgradeService.buildWarpGate(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+    router.put('/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            let summary = await container.starUpgradeService.upgradeBulk(
+                req.game,
+                req.session.userId,
+                req.body.infrastructure,
+                +req.body.amount);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.status(200).json(summary);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.put('/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starUpgradeService.destroyWarpGate(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+    router.put('/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starUpgradeService.buildWarpGate(
+                req.game,
+                req.session.userId,
+                req.body.starId);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.put('/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starUpgradeService.buildCarrier(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+    router.put('/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starUpgradeService.destroyWarpGate(
+                req.game,
+                req.session.userId,
+                req.body.starId);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.put('/:gameId/star/abandon', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.starService.abandonStar(
-            req.game,
-            req.session.userId,
-            req.body.starId);
+    router.put('/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starUpgradeService.buildCarrier(
+                req.game,
+                req.session.userId,
+                req.body.starId);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-module.exports = router;
+    router.put('/:gameId/star/abandon', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.starService.abandonStar(
+                req.game,
+                req.session.userId,
+                req.body.starId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    return router;
+
+};

@@ -1,77 +1,79 @@
-const express = require('express');
-const router = express.Router();
-const middleware = require('../middleware');
-const container = require('../container');
 const ValidationError = require('../../errors/validation');
 
-router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+module.exports = (router, io, container) => {
 
-    // TODO: Validation?
-    
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+    const middleware = require('../middleware')(container);
 
-    try {
-        await container.waypointService.saveWaypoints(
-            req.game,
-            req.session.userId,
-            req.params.carrierId,
-            req.body);
+    router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        // TODO: Validation?
+        
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-router.put('/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+        try {
+            await container.waypointService.saveWaypoints(
+                req.game,
+                req.session.userId,
+                req.params.carrierId,
+                req.body);
 
-    if (req.body.loop == null) {
-        errors.push('loop field is required.');
-    }
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+    router.put('/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-    try {
-        await container.waypointService.loopWaypoints(
-            req.game,
-            req.session.userId,
-            req.params.carrierId,
-            req.body.loop);
+        if (req.body.loop == null) {
+            errors.push('loop field is required.');
+        }
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+        try {
+            await container.waypointService.loopWaypoints(
+                req.game,
+                req.session.userId,
+                req.params.carrierId,
+                req.body.loop);
 
-    // TODO: Validation
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+    router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-    try {
-        await container.shipTransferService.transfer(
-            req.game,
-            req.session.userId,
-            req.params.carrierId,
-            req.body.carrierShips,
-            req.body.starId,
-            req.body.starShips);
+        // TODO: Validation
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-module.exports = router;
+        try {
+            await container.shipTransferService.transfer(
+                req.game,
+                req.session.userId,
+                req.params.carrierId,
+                req.body.carrierShips,
+                req.body.starId,
+                req.body.starShips);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    return router;
+
+};

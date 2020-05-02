@@ -1,124 +1,126 @@
-const express = require('express');
-const router = express.Router();
-const middleware = require('../middleware');
-const container = require('../container');
 const ValidationError = require('../../errors/validation');
 
-router.put('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+module.exports = (router, io, container) => {
 
-    if (!req.body.toPlayerId) {
-        errors.push('toPlayerId is required.');
-    }
+    const middleware = require('../middleware')(container);
 
-    if (req.session.userId === req.body.toPlayerId) {
-        errors.push('Cannot send credits to yourself.');
-    }
-    
-    req.body.amount = parseInt(req.body.amount || 0);
+    router.put('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-    if (!req.body.amount) {
-        errors.push('amount is required.');
-    }
-    
-    if (req.body.amount <= 0) {
-        errors.push('amount must be greater than 0.');
-    }
+        if (!req.body.toPlayerId) {
+            errors.push('toPlayerId is required.');
+        }
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+        if (req.session.userId === req.body.toPlayerId) {
+            errors.push('Cannot send credits to yourself.');
+        }
+        
+        req.body.amount = parseInt(req.body.amount || 0);
 
-    try {
-        await container.tradeService.sendCredits(
-            req.game,
-            req.session.userId,
-            req.body.toPlayerId,
-            req.body.amount);
+        if (!req.body.amount) {
+            errors.push('amount is required.');
+        }
+        
+        if (req.body.amount <= 0) {
+            errors.push('amount must be greater than 0.');
+        }
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+        try {
+            await container.tradeService.sendCredits(
+                req.game,
+                req.session.userId,
+                req.body.toPlayerId,
+                req.body.amount);
 
-    if (!req.body.toPlayerId) {
-        errors.push('toPlayerId is required.');
-    }
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-    req.body.amount = parseInt(req.body.amount || 0);
+    router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-    if (!req.body.amount) {
-        errors.push('amount is required.');
-    }
-    
-    if (req.body.amount <= 0) {
-        errors.push('amount must be greater than 0.');
-    }
+        if (!req.body.toPlayerId) {
+            errors.push('toPlayerId is required.');
+        }
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+        req.body.amount = parseInt(req.body.amount || 0);
 
-    try {
-        await container.tradeService.sendRenown(
-            req.game,
-            req.session.userId,
-            req.body.toPlayerId,
-            req.body.amount);
+        if (!req.body.amount) {
+            errors.push('amount is required.');
+        }
+        
+        if (req.body.amount <= 0) {
+            errors.push('amount must be greater than 0.');
+        }
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-router.put('/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+        try {
+            await container.tradeService.sendRenown(
+                req.game,
+                req.session.userId,
+                req.body.toPlayerId,
+                req.body.amount);
 
-    if (!req.body.toPlayerId) {
-        errors.push('toPlayerId is required.');
-    }
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+    router.put('/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-    try {
-        await container.tradeService.sendTechnology(
-            req.game,
-            req.session.userId,
-            req.body.toPlayerId,
-            req.body.technology);
+        if (!req.body.toPlayerId) {
+            errors.push('toPlayerId is required.');
+        }
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    let errors = [];
+        try {
+            await container.tradeService.sendTechnology(
+                req.game,
+                req.session.userId,
+                req.body.toPlayerId,
+                req.body.technology);
 
-    // TODO: Validation?
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+    router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        let errors = [];
 
-    try {
-        let techs = await container.tradeService.getTradeableTechnologies(
-            req.game,
-            req.session.userId,
-            req.params.toPlayerId);
+        // TODO: Validation?
 
-        return res.status(200).json(techs);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-module.exports = router;
+        try {
+            let techs = await container.tradeService.getTradeableTechnologies(
+                req.game,
+                req.session.userId,
+                req.params.toPlayerId);
+
+            return res.status(200).json(techs);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    return router;
+
+};

@@ -1,11 +1,11 @@
 const Agenda = require('agenda');
 const config = require('../config');
 
-const gameTickJob = require('../jobs/gameTick');
-const officialGamesCheckJob = require('../jobs/officialGamesCheck');
+module.exports = async (container) => {
 
-module.exports = async () => {
-
+    const gameTickJob = require('../jobs/gameTick')(container);
+    const officialGamesCheckJob = require('../jobs/officialGamesCheck')(container);
+    
     // Set up the agenda instance.
     const agendajs = new Agenda()
         .database(config.connectionString)

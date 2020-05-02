@@ -1,21 +1,23 @@
-const container = require('../api/container');
+module.exports = (container) => {
 
-module.exports = {
+    return {
 
-    async handler(job, done) {
-        let games = await container.gameListService.listInProgressGames();
+        async handler(job, done) {
+            let games = await container.gameListService.listInProgressGames();
 
-        for (let i = 0; i < games.length; i++) {
-            let game = games[i];
+            for (let i = 0; i < games.length; i++) {
+                let game = games[i];
 
-            try {
-                await container.gameTickService.tick(game);
-            } catch (e) {
-                console.error(e);
+                try {
+                    await container.gameTickService.tick(game);
+                } catch (e) {
+                    console.error(e);
+                }
             }
+
+            done();
         }
 
-        done();
-    }
-
+    };
+    
 };

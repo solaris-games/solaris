@@ -9,7 +9,7 @@
     <div class="row">
         <table class="table table-sm table-striped">
             <tbody>
-                <tr v-for="player in game.galaxy.players" v-bind:key="player._id">
+                <tr v-for="player in players" v-bind:key="player._id">
                     <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                     <td class="col-avatar">
                         <!-- TODO: Prefer images over font awesome icons? -->
@@ -38,6 +38,16 @@ export default {
   props: {
     game: Object
   },
+
+  data () {
+      return {
+          players: []
+      }
+  },
+  mounted () {
+      this.players = this.game.galaxy.players
+  },
+
   methods: {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
@@ -48,6 +58,27 @@ export default {
     zoomToPlayer (player) {
       gameContainer.map.zoomToPlayer(this.game, player)
     }
+  },
+
+  created () {
+    this.sockets.listener.subscribe('joined', (data) => {
+      // TODO: This needs to go into a service.
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.isEmptySlot = false
+      player.alias = data.alias
+    })
+
+    this.sockets.listener.subscribe('quit', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.isEmptySlot = true
+      player.alias = 'Empty Slot'
+    })
+  },
+  destroyed () {
+    this.sockets.listener.unsubscribe('joined')
+    this.sockets.listener.unsubscribe('quit')
   }
 }
 </script>

@@ -12,12 +12,20 @@ export default {
 
   created () {
     window.addEventListener('resize', this.handleResize)
+
+    this.sockets.listener.subscribe('tick', (data) => {
+      console.log('Game ticked')
+
+      // TODO: Reload the game.
+    })
   },
 
   beforeMount () {
     this.gameContainer = GameContainer
 
     this.loadGame(this.game)
+
+    this.$socket.emit('join', this.game._id)
   },
 
   mounted () {
@@ -34,6 +42,12 @@ export default {
 
   beforeDestroy () {
     window.removeEventListener('resize', this.handleResize)
+  },
+
+  destroyed () {
+    this.$socket.emit('leave')
+
+    this.sockets.listener.unsubscribe('tick')
   },
 
   methods: {

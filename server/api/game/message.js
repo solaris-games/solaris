@@ -1,60 +1,62 @@
-const express = require('express');
-const router = express.Router();
-const middleware = require('../middleware');
-const container = require('../container');
 const ValidationError = require('../../errors/validation');
 
-router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
-    try {
-        let result = container.messageService.list(
-            req.game,
-            req.session.userId,
-            req.params.fromPlayerId);
+module.exports = (router, io, container) => {
 
-        return res.status(200).json(result);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    const middleware = require('../middleware')(container);
 
-router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
-    try {
-        let result = container.messageService.summary(
-            req.game,
-            req.session.userId);
+    router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
+        try {
+            let result = container.messageService.list(
+                req.game,
+                req.session.userId,
+                req.params.fromPlayerId);
 
-        return res.status(200).json(result);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
-    let errors = [];
+    router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
+        try {
+            let result = container.messageService.summary(
+                req.game,
+                req.session.userId);
 
-    if (!req.body.toPlayerId) {
-        errors.push('toPlayerId is required.');
-    }
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-    if (!req.body.message || !req.body.message.length) {
-        errors.push('message is required.');
-    }
+    router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
+        let errors = [];
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
+        if (!req.body.toPlayerId) {
+            errors.push('toPlayerId is required.');
+        }
 
-    try {
-        await container.messageService.send(
-            req.game,
-            req.session.userId,
-            req.body.toPlayerId,
-            req.body.message);
+        if (!req.body.message || !req.body.message.length) {
+            errors.push('message is required.');
+        }
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
 
-module.exports = router;
+        try {
+            await container.messageService.send(
+                req.game,
+                req.session.userId,
+                req.body.toPlayerId,
+                req.body.message);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    return router;
+
+};

@@ -85,6 +85,16 @@ export default {
     'modalButton': ModalButton,
     'dialogModal': DialogModal
   },
+
+  data () {
+      return {
+          players: []
+      }
+  },
+  mounted () {
+      this.players = this.game.galaxy.players
+  },
+
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
@@ -100,7 +110,7 @@ export default {
     },
     getSortedLeaderboardPlayerList () {
       // Sort by total number of stars, then by total ships, then by total carriers.
-      return this.game.galaxy.players
+      return this.players
         .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
         .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
         .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
@@ -130,6 +140,26 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     }
+  },
+
+  created () {
+    this.sockets.listener.subscribe('joined', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.isEmptySlot = false
+      player.alias = data.alias
+    })
+
+    this.sockets.listener.subscribe('quit', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.isEmptySlot = true
+      player.alias = 'Empty Slot'
+    })
+  },
+  destroyed () {
+    this.sockets.listener.unsubscribe('joined')
+    this.sockets.listener.unsubscribe('quit')
   }
 }
 </script>

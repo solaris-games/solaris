@@ -115,7 +115,9 @@ module.exports = class GameService {
         player.userId = null;
         player.alias = "Empty Slot";
 
-        return await game.save();
+        await game.save();
+
+        return player;
     }
 
     async concedeDefeat(game, userId) {    

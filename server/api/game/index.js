@@ -1,142 +1,154 @@
-const express = require('express');
-const router = express.Router();
-const middleware = require('../middleware');
-const container = require('../container');
+module.exports = (router, io, container) => {
 
-router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
-    return res.status(200).json({
-        settings: require('../../config/game/settings/user/standard.json'),
-        options: require('../../config/game/settings/options.json')
-    });
-}, middleware.handleError);
+    const middleware = require('../middleware')(container);
 
-router.post('/', middleware.authenticate, async (req, res, next) => {
-    req.body.general.createdByUserId = req.session.userId;
+    router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
+        return res.status(200).json({
+            settings: require('../../config/game/settings/user/standard.json'),
+            options: require('../../config/game/settings/options.json')
+        });
+    }, middleware.handleError);
 
-    try {
-        let game = await container.gameCreateService.create(req.body);
+    router.post('/', middleware.authenticate, async (req, res, next) => {
+        req.body.general.createdByUserId = req.session.userId;
 
-        return res.status(201).json(game._id);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+        try {
+            let game = await container.gameCreateService.create(req.body);
 
-router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
-    try {
-        return res.status(200).json(req.game);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.status(201).json(game._id);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.get('/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
-    try {
-        return res.status(200).json(req.history);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
+        try {
+            return res.status(200).json(req.game);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    try {
-        let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);
+    router.get('/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
+        try {
+            return res.status(200).json(req.history);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-        return res.status(200).json(game);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);
 
-router.get('/list/official', middleware.authenticate, async (req, res, next) => {
-    try {
-        let games = await container.gameListService.listOfficialGames();
+            return res.status(200).json(game);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-        return res.status(200).json(games);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.get('/list/official', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listOfficialGames();
 
-router.get('/list/user', middleware.authenticate, async (req, res, next) => {
-    try {
-        let games = await container.gameListService.listUserGames();
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-        return res.status(200).json(games);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.get('/list/user', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listUserGames();
 
-router.get('/list/active', middleware.authenticate, async (req, res, next) => {
-    try {
-        let games = await container.gameListService.listActiveGames(req.session.userId);
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-        return res.status(200).json(games);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.get('/list/active', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listActiveGames(req.session.userId);
 
-router.get('/list/completed', middleware.authenticate, async (req, res, next) => {
-    try {
-        let games = await container.gameListService.listCompletedGames(req.session.userId);
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-        return res.status(200).json(games);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.get('/list/completed', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listCompletedGames(req.session.userId);
 
-router.put('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.gameService.join(
-            req.game,
-            req.session.userId,
-            req.body.playerId,
-            req.body.alias);
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+    router.put('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.gameService.join(
+                req.game,
+                req.session.userId,
+                req.body.playerId,
+                req.body.alias);
 
-router.put('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.gameService.quit(
-            req.game,
-            req.session.userId);
-            
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            // TODO: Need to figure out the best way to emit these. Possibly via a service?
+            io.to(req.game.id).emit('joined', {
+                playerId: req.body.playerId,
+                alias: req.body.alias
+            });
 
-router.put('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    try {
-        await container.gameService.concedeDefeat(
-            req.game,
-            req.session.userId);
-            
-        return res.sendStatus(200);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-router.get('/:gameId/player/:playerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-    try {
-        let user = await container.gameService.getPlayerUser(
-            req.game,
-            req.params.playerId
-        );
+    router.put('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            let player = await container.gameService.quit(
+                req.game,
+                req.session.userId);
+                
+            // TODO: Need to figure out the best way to emit these. Possibly via a service?
+            io.to(req.game.id).emit('quit', {
+                playerId: player.id
+            });
 
-        return res.status(200).json(user);
-    } catch (err) {
-        return next(err);
-    }
-}, middleware.handleError);
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-module.exports = router;
+    router.put('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.gameService.concedeDefeat(
+                req.game,
+                req.session.userId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/:gameId/player/:playerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            let user = await container.gameService.getPlayerUser(
+                req.game,
+                req.params.playerId
+            );
+
+            return res.status(200).json(user);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    return router;
+
+};
