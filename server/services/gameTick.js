@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 module.exports = class GameTickService {
     
     constructor(distanceService, starService, researchService, playerService, historyService) {
@@ -22,6 +24,10 @@ module.exports = class GameTickService {
            throw new Error('Cannot perform a game tick on a paused game');
        }
 
+       if (!this._canTick(game)) {
+           return;
+       }
+
        this._moveCarriers(game);
        this._produceShips(game);
        this._conductResearch(game);
@@ -29,7 +35,18 @@ module.exports = class GameTickService {
        this._logHistory(game);
        this._gameWinCheck(game);
 
+       game.state.lastTickDate = moment();
+       game.state.nextTickDate = moment().add(game.settings.gameTime.speed, 'm'); // TODO: Do we really need to do this?
+
        await game.save();
+    }
+
+    _canTick(game) {
+        let mins = game.settings.gameTime.speed;
+        let lastTick = moment(game.state.lastTickDate);
+        let nextTick = moment(lastTick).add(mins, 'm');
+
+        return nextTick <= moment();
     }
 
     _moveCarriers(game) {

@@ -101,20 +101,20 @@
         "galaxy": {
         "starsPerPlayer": [
             {
-            "value": 8,
-            "text": "8 Stars (Tiny)"
+            "value": 5,
+            "text": "5 Stars (Tiny)"
             },
             {
-            "value": 16,
-            "text": "16 Stars (Small)"
+            "value": 10,
+            "text": "10 Stars (Small)"
             },
             {
-            "value": 24,
-            "text": "24 Stars (Medium)"
+            "value": 20,
+            "text": "20 Stars (Medium)"
             },
             {
-            "value": 32,
-            "text": "32 Stars (Large)"
+            "value": 30,
+            "text": "30 Stars (Large)"
             }
         ],
         "productionTicks": [
@@ -275,20 +275,24 @@
         "gameTime": {
         "speed": [
             {
-            "value": 6,
-            "text": "Quad Speed (4 Pays / 24h)"
+                "value": 1,
+                "text": "Blitz (1 tick = 1 minute)"
             },
             {
-            "value": 12,
-            "text": "Double Speed (2 Pays / 24h)"
+                "value": 5,
+                "text": "Bullet (1 tick = 5 minutes)"
             },
             {
-            "value": 24,
-            "text": "Normal Speed (1 Pay / 24h)"
+                "value": 10,
+                "text": "Standard (1 tick = 10 minutes)"
             },
             {
-            "value": 48,
-            "text": "Slow Speed (1 Pay / 48h)"
+                "value": 30,
+                "text": "Slow Speed (1 tick = 30 minutes)"
+            },
+            {
+                "value": 60,
+                "text": "Legacy Speed (1 tick = 1 hour)"
             }
         ]
     }

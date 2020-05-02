@@ -14,7 +14,7 @@
     "darkGalaxy": "disabled"
   },
   "galaxy": {
-    "starsPerPlayer": 8,
+    "starsPerPlayer": 20,
     "productionTicks": 24
   },
   "player": {
@@ -55,6 +55,6 @@
     }
   },
   "gameTime": {
-    "speed": 24
+    "speed": 10
   }
 }

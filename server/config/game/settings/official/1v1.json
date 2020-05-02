@@ -14,11 +14,11 @@
     "darkGalaxy": "disabled"
   },
   "galaxy": {
-    "starsPerPlayer": 16,
+    "starsPerPlayer": 10,
     "productionTicks": 24
   },
   "player": {
-    "startingStars": 6,
+    "startingStars": 3,
     "startingCredits": 500,
     "startingShips": 10,
     "startingInfrastructure": {
@@ -55,6 +55,6 @@
     }
   },
   "gameTime": {
-    "speed": 24
+    "speed": 10
   }
 }
