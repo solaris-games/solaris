@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const colours = require('../config/game/colours');
-
 module.exports = class PlayerService {
     
     constructor(randomService, mapService, starService, carrierService, starDistanceService) {
@@ -59,10 +57,12 @@ module.exports = class PlayerService {
 
         let radians = this._getPlayerStartingLocationRadians(gameSettings.general.playerLimit);
 
+        let colours = require('../config/game/colours').slice();
+
         // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < gameSettings.general.playerLimit; i++) {
-            // Set the players colour based on their index position in the array.
-            let colour = colours[i];
+            // Get a random colour to assign to the player.
+            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
 
             let player = this.createEmptyPlayer(gameSettings, colour);
 
