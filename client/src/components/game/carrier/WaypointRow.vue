@@ -2,7 +2,7 @@
     <tr>
         <td>{{waypoint.delayTicks}}</td>
         <td>{{getStarName(waypoint.destination)}}</td>
-        <td v-if="!showAction">1d 2h 3m 4s</td>
+        <td v-if="!showAction">{{getEtaString()}}</td>
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
+
 export default {
   props: {
     game: Object,
@@ -49,6 +51,9 @@ export default {
         case 'garrison':
           return `Garrison ${waypoint.actionShips} Ships`
       }
+    },
+    getEtaString () {
+      return GameHelper.getCountdownTimeString(this.waypoint.eta)
     }
   }
 }

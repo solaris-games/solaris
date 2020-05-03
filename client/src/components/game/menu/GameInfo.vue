@@ -104,30 +104,7 @@ export default {
         return
       }
 
-      let t = new Date(this.nextProduction) - new Date()
-
-      let days = Math.floor(t / (1000 * 60 * 60 * 24))
-      let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-      let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60))
-      let secs = Math.floor((t % (1000 * 60)) / 1000)
-
-      let str = ''
-
-      if (days > 0) {
-        str += `${days}d `
-      }
-
-      if (hours > 0) {
-        str += `${hours}h `
-      }
-
-      if (mins > 0) {
-        str += `${mins}m `
-      }
-
-      str += `${secs}s`
-
-      this.timeRemaining = str
+      this.timeRemaining = GameHelper.getCountdownTimeString(this.nextProduction)
     }
   }
 }

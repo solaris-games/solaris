@@ -44,6 +44,37 @@ class GameHelper {
         && carrier.inTransitFrom === waypoint.source
         && carrier.inTransitTo === waypoint.destination
   }
+
+  getCountdownTimeString (date) {
+    let t = new Date(date) - new Date()
+
+    let days = Math.floor(t / (1000 * 60 * 60 * 24))
+    let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60))
+    let secs = Math.floor((t % (1000 * 60)) / 1000)
+
+    let str = ''
+    let showDays = false,
+      showHours = false
+
+    if (days > 0) {
+      str += `${days}d `
+      showDays = true
+    }
+
+    if (showDays || hours > 0) {
+      str += `${hours}h `
+      showHours = true
+    }
+
+    if (showHours || mins > 0) {
+      str += `${mins}m `
+    }
+
+    str += `${secs}s`
+
+    return str
+  }
 }
 
 export default new GameHelper()

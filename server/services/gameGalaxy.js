@@ -174,8 +174,23 @@ module.exports = class GameGalaxyService {
         // Populate the number of ticks it will take for all waypoints.
         playerCarriers.forEach(c => {
             c.waypoints.forEach(w => {
-                w.ticks = this.waypointService.calculateWaypointTicks(doc, w);
+                w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
+
+                // TODO: This has to take into account all of ticks of previous waypoints.
+                w.eta = this.distanceService.calculateTimeByTicks(w.ticks, doc.settings.gameTime.speed, doc.state.lastTickDate);
             });
+
+            if (c.waypoints.length) {
+                c.eta = c.waypoints[0].eta;
+                
+                // TODO: This will probably need refactoring after the above TODO is addressed.
+                let totalTicks = c.waypoints.reduce((sum, w) => sum += w.ticks, 0);
+                
+                c.etaTotal = this.distanceService.calculateTimeByTicks(totalTicks, doc.settings.gameTime.speed, doc.state.lastTickDate);
+            } else {
+                c.eta = null;
+                c.etaTotal = null;
+            }
         });
 
         // Note that we don't need to consider dark mode

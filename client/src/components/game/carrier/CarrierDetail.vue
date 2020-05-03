@@ -53,7 +53,7 @@
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">
-          <p v-if="carrier.waypoints.length" class="mb-2">ETA: 0d 0h 0m 0s (0h 0m 0s)</p>
+          <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{getEtaString()}} ({{getTotalEtaString()}})</p>
         </div>
         <div class="col-4 mb-2">
           <button class="btn btn-block btn-success" @click="editWaypoints()">Edit Waypoints</button>
@@ -108,6 +108,12 @@ export default {
     },
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.game, this.carrier)
+    },
+    getEtaString () {
+      return GameHelper.getCountdownTimeString(this.carrier.eta)
+    },
+    getTotalEtaString () {
+      return GameHelper.getCountdownTimeString(this.carrier.etaTotal)
     },
     onOpenPlayerDetailRequested (e) {
       e.preventDefault()

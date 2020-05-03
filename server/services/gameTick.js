@@ -55,6 +55,10 @@ module.exports = class GameTickService {
     _moveCarriers(game) {
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
+        // Note, we order by distance ascending for 2 reasons:
+        //  1. To prevent carriers hopping over combat.
+        //  2. To ensure that carriers who are closest to their destinations
+        // land before any other carriers due to land in the same tick.
         let carriers = [];
 
         let carriersWithWaypoints = game.galaxy.carriers.filter(c => c.waypoints.length);
