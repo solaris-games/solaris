@@ -74,7 +74,9 @@ export default {
   mounted () {
     this.recalculateTimeRemaining()
 
-    this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+    if (!this.game.state.paused) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
   },
   destroyed () {
     clearInterval(this.intervalFunction)

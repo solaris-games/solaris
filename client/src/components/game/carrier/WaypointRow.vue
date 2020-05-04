@@ -2,7 +2,7 @@
     <tr>
         <td>{{waypoint.delayTicks}}</td>
         <td>{{getStarName(waypoint.destination)}}</td>
-        <td v-if="!showAction">{{getEtaString()}}</td>
+        <td v-if="!showAction">{{timeRemainingEta}}</td>
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
@@ -20,6 +20,21 @@ export default {
     game: Object,
     waypoint: Object,
     showAction: Boolean
+  },
+  data () {
+    return {
+      timeRemainingEta: null
+    }
+  },
+  mounted () {
+    this.recalculateTimeRemaining()
+
+    if (!this.game.state.paused) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
   },
   methods: {
     getStarName (starId) {
@@ -52,8 +67,8 @@ export default {
           return `Garrison ${waypoint.actionShips} Ships`
       }
     },
-    getEtaString () {
-      return GameHelper.getCountdownTimeString(this.waypoint.eta)
+    recalculateTimeRemaining () {
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.waypoint.eta)
     }
   }
 }

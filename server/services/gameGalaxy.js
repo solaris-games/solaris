@@ -165,47 +165,60 @@ module.exports = class GameGalaxyService {
 
         // Get all of the players stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
-        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(doc.galaxy.carriers, player._id);
         let playerStarLocations = playerStars.map(s => s.location);
 
-        // TODO: If the current player doesn't own the carrier, then only display a waypoint
-        // if the carrier is travelling.
+        // Filter out any carriers that are outside of scanning range.
+        // NOTE: We don't need to consider dark mode
+        // because carriers can only be seen if they are in range.
+        doc.galaxy.carriers = doc.galaxy.carriers
+            .filter(c => {
+                // Get the closest player star to this carrier.
+                let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
+                let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
 
-        // Populate the number of ticks it will take for all waypoints.
-        playerCarriers.forEach(c => {
-            c.waypoints.forEach(w => {
-                w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
-                w.ticksEta = this.waypointService.calculateWaypointTicksEta(doc, c, w);
+                let inRange = distance <= scanningRangeDistance;
 
-                w.eta = this.distanceService.calculateTimeByTicks(w.ticksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
+                return inRange;
             });
 
-            if (c.waypoints.length) {
-                c.eta = c.waypoints[0].eta;
-                c.etaTotal = c.waypoints[c.waypoints.length - 1].eta;
-            } else {
-                c.eta = null;
-                c.etaTotal = null;
-            }
-        });
+        // Remove all waypoints (except those in transit) for all carriers that do not belong
+        // to the player.
+        doc.galaxy.carriers
+            .filter(c => !c.ownedByPlayerId.equals(player._id))
+            .forEach(c => {
+                if (!c.orbiting) {
+                    c.waypoints = c.waypoints.slice(0, 1);
+                } else {
+                    c.waypoints = [];
+                }
 
-        // Note that we don't need to consider dark mode
-        // because carriers can only be seen if they are in range.
-
-        doc.galaxy.players.forEach(p => {
-            // For other players, filter out carriers that the current player cannot see.
-            if (!p._id.equals(player._id)) {
-                doc.galaxy.carriers = doc.galaxy.carriers.filter(c => {
-                    // Get the closest player star to this carrier.
-                    let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
-                    let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
-
-                    let inRange = distance <= scanningRangeDistance;
-
-                    return inRange;
+                // Return only key data about the waypoints.
+                c.waypoints = c.waypoints.map(w => {
+                    return {
+                        source: w.source,
+                        destination: w.destination
+                    };
                 });
-            }
-        });
+            });
+
+        // Populate the number of ticks it will take for all waypoints.
+        doc.galaxy.carriers
+            .forEach(c => {
+                c.waypoints.forEach(w => {
+                    w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
+                    w.ticksEta = this.waypointService.calculateWaypointTicksEta(doc, c, w);
+
+                    w.eta = this.distanceService.calculateTimeByTicks(w.ticksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
+                });
+
+                if (c.waypoints.length) {
+                    c.eta = c.waypoints[0].eta;
+                    c.etaTotal = c.waypoints[c.waypoints.length - 1].eta;
+                } else {
+                    c.eta = null;
+                    c.etaTotal = null;
+                }
+            });
     }
 
     _setPlayerInfoBasic(doc, player) {

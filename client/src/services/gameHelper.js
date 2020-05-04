@@ -45,8 +45,10 @@ class GameHelper {
         && carrier.inTransitTo === waypoint.destination
   }
 
-  getCountdownTimeString (date) {
-    let t = new Date(date) - new Date()
+  getCountdownTimeString (date, relativeTo) {
+    relativeTo = relativeTo || new Date()
+
+    let t = new Date(date) - relativeTo
 
     let days = Math.floor(t / (1000 * 60 * 60 * 24))
     let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))

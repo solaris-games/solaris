@@ -97,7 +97,9 @@ export default {
 
     this.recalculateTimeRemaining()
 
-    this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+    if (!this.game.state.paused) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
   },
   destroyed () {
     clearInterval(this.intervalFunction)
@@ -118,12 +120,6 @@ export default {
     },
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.game, this.carrier)
-    },
-    getEtaString () {
-      return GameHelper.getCountdownTimeString(this.carrier.eta)
-    },
-    getTotalEtaString () {
-      return GameHelper.getCountdownTimeString(this.carrier.etaTotal)
     },
     onOpenPlayerDetailRequested (e) {
       e.preventDefault()
@@ -169,10 +165,6 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar())
     },
     recalculateTimeRemaining () {
-      if (this.game.state.paused) {
-        return
-      }
-
       this.timeRemainingEta = GameHelper.getCountdownTimeString(this.carrier.eta)
       this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.carrier.etaTotal)
     }
