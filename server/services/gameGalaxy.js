@@ -175,18 +175,14 @@ module.exports = class GameGalaxyService {
         playerCarriers.forEach(c => {
             c.waypoints.forEach(w => {
                 w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
+                w.ticksEta = this.waypointService.calculateWaypointTicksEta(doc, c, w);
 
-                // TODO: This has to take into account all of ticks of previous waypoints.
-                w.eta = this.distanceService.calculateTimeByTicks(w.ticks, doc.settings.gameTime.speed, doc.state.lastTickDate);
+                w.eta = this.distanceService.calculateTimeByTicks(w.ticksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
             });
 
             if (c.waypoints.length) {
                 c.eta = c.waypoints[0].eta;
-                
-                // TODO: This will probably need refactoring after the above TODO is addressed.
-                let totalTicks = c.waypoints.reduce((sum, w) => sum += w.ticks, 0);
-                
-                c.etaTotal = this.distanceService.calculateTimeByTicks(totalTicks, doc.settings.gameTime.speed, doc.state.lastTickDate);
+                c.etaTotal = c.waypoints[c.waypoints.length - 1].eta;
             } else {
                 c.eta = null;
                 c.etaTotal = null;

@@ -103,4 +103,20 @@ module.exports = class WaypointService {
         return ticks;
     }
 
+    calculateWaypointTicksEta(game, carrier, waypoint) {
+        let totalTicks = 0;
+
+        for (let i = 0; i < carrier.waypoints.length; i++) {
+            let cwaypoint = carrier.waypoints[i];
+            
+            totalTicks += this.calculateWaypointTicks(game, carrier, waypoint);
+
+            if (cwaypoint._id.equals(waypoint._id)) {
+                break;
+            }
+        }
+
+        return totalTicks;
+    }
+
 };
