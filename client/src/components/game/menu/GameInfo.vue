@@ -67,15 +67,17 @@ export default {
     return {
       forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
       MENU_STATES: MENU_STATES,
-      timeRemaining: null
+      timeRemaining: null,
+      intervalFunction: null
     }
   },
   mounted () {
     this.recalculateTimeRemaining()
 
-    setInterval(() => {
-      this.recalculateTimeRemaining()
-    }, 1000)
+    this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
   },
   methods: {
     getUserPlayer () {

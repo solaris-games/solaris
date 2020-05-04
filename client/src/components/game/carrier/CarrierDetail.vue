@@ -53,7 +53,7 @@
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">
-          <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{getEtaString()}} ({{getTotalEtaString()}})</p>
+          <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} ({{timeRemainingEtaTotal}})</p>
         </div>
         <div class="col-4 mb-2">
           <button class="btn btn-block btn-success" @click="editWaypoints()">Edit Waypoints</button>
@@ -86,11 +86,21 @@ export default {
   data () {
     return {
       currentPlayerId: this.getUserPlayer()._id,
-      isLoopingWaypoints: false
+      isLoopingWaypoints: false,
+      timeRemainingEta: null,
+      timeRemainingEtaTotal: null,
+      intervalFunction: null
     }
   },
   mounted () {
     GameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+
+    this.recalculateTimeRemaining()
+
+    this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
   },
   methods: {
     onCloseRequested (e) {
@@ -157,6 +167,14 @@ export default {
       e.preventDefault()
 
       this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar())
+    },
+    recalculateTimeRemaining () {
+      if (this.game.state.paused) {
+        return
+      }
+
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.carrier.eta)
+      this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.carrier.etaTotal)
     }
   }
 }
