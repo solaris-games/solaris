@@ -31,7 +31,7 @@
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :game="game"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested" :game="game"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested" :game="game"/>
-      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :game="game" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointRequested="onEditWaypointRequested"/>
+      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :game="game" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
     </div>
 </div>
 </template>

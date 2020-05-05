@@ -78,6 +78,14 @@ export default {
       dataoptions: {
         legend: {
           display: false
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: false,
+                    precision: 0
+                }
+            }]
         }
       },
       playerFilters: []
@@ -168,9 +176,6 @@ export default {
       }
 
       this.datacollection = dataCollection
-    },
-    getRandomInt () {
-      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
     }
   }
 }

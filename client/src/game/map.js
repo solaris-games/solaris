@@ -60,7 +60,7 @@ class Map extends EventEmitter {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(this.game)
-    this.waypoints.registerEvents(this.stars)
+    this.waypoints.registerEvents(this.stars, this.carriers)
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
@@ -111,6 +111,7 @@ class Map extends EventEmitter {
   }
 
   clearWaypoints () {
+    this.waypoints.unregisterEvents(this.stars, this.carriers)
     this.waypoints.container.removeChildren()
   }
 

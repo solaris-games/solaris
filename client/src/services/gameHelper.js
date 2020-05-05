@@ -40,7 +40,8 @@ class GameHelper {
   }
 
   isCarrierInTransitToWaypoint (carrier, waypoint) {
-    return this.isCarrierInTransit(carrier) 
+    return carrier.waypoints.indexOf(waypoint) === 0
+        && this.isCarrierInTransit(carrier) 
         && carrier.inTransitFrom === waypoint.source
         && carrier.inTransitTo === waypoint.destination
   }

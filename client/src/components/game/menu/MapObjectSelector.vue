@@ -3,11 +3,11 @@
         <table class="table">
             <tbody>
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
-                    <td :style="{'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
-                    <td v-if="mapObject.type === 'star'" class="col-auto">
+                    <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
+                    <td v-if="mapObject.type === 'star'" class="col-auto text-center">
                         <h5><i class="fas fa-star"></i></h5>
                     </td>
-                    <td v-if="mapObject.type === 'carrier'" class="col-auto">
+                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center">
                         <h5><i class="fas fa-rocket"></i></h5>
                     </td>
                     <td v-if="mapObject.type === 'star'" class="bg-secondary text-center">
@@ -23,7 +23,7 @@
                         <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
                         <button type="button" class="btn btn-primary"><i class="fas fa-chevron-down"></i></button>
                         <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary"><i class="fas fa-rocket"></i></button> -->
-                        <button v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary ml-1" @click="onEditWaypointRequested(mapObject)"><i class="fas fa-plus"></i></button>
+                        <button v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
                         <button type="button" class="btn btn-primary ml-1" @click="onViewObjectRequested(mapObject)">View</button>
                     </td>
                 </tr>
@@ -79,8 +79,8 @@ export default {
                 break
         }
     },
-    onEditWaypointRequested (mapObject) {
-        this.$emit('onEditWaypointRequested', mapObject.data)
+    onEditWaypointsRequested (mapObject) {
+        this.$emit('onEditWaypointsRequested', mapObject.data)
     }
   }
 }
@@ -88,6 +88,6 @@ export default {
 
 <style scoped>
 td {
-  vertical-align: middle; /* TODO: Middle align all td everywhere in the app? */
+  vertical-align: middle !important; /* TODO: Middle align all td everywhere in the app? */
 }
 </style>

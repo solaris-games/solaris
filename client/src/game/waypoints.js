@@ -16,10 +16,17 @@ class Waypoints extends EventEmitter {
     this.game = game
   }
 
-  registerEvents (stars) {
+  registerEvents (stars, carriers) {
     stars.forEach(s => {
       s.on('onStarClicked', this.onStarClicked.bind(this))
     })
+    carriers.forEach(s => {
+      s.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+    })
+  }
+
+  unregisterEvents (stars, carriers) {
+    // TODO: This needs to be wired up somehow.
   }
 
   draw (carrier) {
@@ -71,14 +78,9 @@ class Waypoints extends EventEmitter {
     let graphics = new PIXI.Graphics()
     
     // Start the line from where the carrier currently is.
-    let star// = this.game.galaxy.stars.find(s => s._id === this.carrier.waypoints[0].source)
+    let star
 
-    // if (this.carrier.waypointsLooped) {
-    //   graphics.moveTo(star.location.x, star.location.y)
-    // } else {
-      graphics.moveTo(this.carrier.location.x, this.carrier.location.y)
-    // }
-
+    graphics.moveTo(this.carrier.location.x, this.carrier.location.y)
     graphics.lineStyle(1, 0xFFFFFF, 0.8)
 
     // Draw a line to each destination along the waypoints.
@@ -106,17 +108,31 @@ class Waypoints extends EventEmitter {
     if (!this.carrier) {
       return
     }
-    
+
+    this._createWaypoint(e.location, e._id)
+  }
+
+  onCarrierClicked (e) {
+    if (!this.carrier) {
+      return
+    }
+
+    if (e.orbiting) {
+      this._createWaypoint(e.location, e.orbiting)
+    }
+  }
+
+  _createWaypoint(desiredLocation, starId) {
     // If the star that was clicked is within hyperspace range then append
     // a new waypoint to this star.
     const hyperspaceDistance = GameHelper.getHyperspaceDistance(1) // TODO: Get hyperspace level
     
     const lastLocation = this._getLastLocation()
-    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, e.location)
+    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)
 
     if (distance <= hyperspaceDistance) {
       let newWaypoint = {
-        destination: e._id,
+        destination: starId,
         action: 'collectAll',
         actionShips: 0,
         delayTicks: 0
@@ -125,6 +141,11 @@ class Waypoints extends EventEmitter {
       // If the carrier has waypoints, create a new waypoint from the last destination.
       if (this.carrier.waypoints.length) {
         const lastWaypoint = this._getLastWaypoint()
+
+        // The waypoint cannot be the same as the previous waypoint.
+        if (newWaypoint.destination === lastWaypoint.destination) {
+          return
+        }
 
         newWaypoint.source = lastWaypoint.destination
       }

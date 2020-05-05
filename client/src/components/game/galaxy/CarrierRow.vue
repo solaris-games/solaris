@@ -6,14 +6,14 @@
     <td>{{carrier.ships}}</td>
     <td>{{carrier.waypoints.length}}</td>
     <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td>
-    <td>{{carrier.eta}}</td>
-    <td>{{carrier.totalEta}}</td>
+    <td><span v-if="carrier.waypoints.length">{{timeRemainingEta}}</span></td>
+    <!-- <td><span v-if="carrier.waypoints.length">{{timeRemainingEtaTotal}}</span></td> -->
 </tr>
 </template>
 
 <script>
 import gameContainer from '../../../game/container'
-import gameHelper from '../../../services/gameHelper'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -22,9 +22,23 @@ export default {
     game: Object,
     carrier: Object
   },
+  data () {
+    return {
+      timeRemainingEta: null,
+      timeRemainingEtaTotal: null,
+      intervalFunction: null
+    }
+  },
+  mounted () {
+    this.recalculateTimeRemaining()
+
+    if (!this.game.state.paused) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
+  },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.game, this.carrier.ownedByPlayerId)
+      return GameHelper.getPlayerColour(this.game, this.carrier.ownedByPlayerId)
     },
     clickCarrier (e) {
       gameContainer.map.clickCarrier(this.carrier._id)
@@ -35,6 +49,10 @@ export default {
       gameContainer.map.zoomToLocation(this.carrier.location)
 
       e.preventDefault()
+    },
+    recalculateTimeRemaining () {
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.carrier.eta)
+      // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.carrier.etaTotal)
     }
   }
 }

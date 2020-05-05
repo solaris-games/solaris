@@ -14,7 +14,7 @@
                 <td>W</td>
                 <td></td>
                 <td>ETA</td>
-                <td>Total ETA</td>
+                <!-- <td>Total ETA</td> -->
             </tr>
         </thead>
         <tbody>
