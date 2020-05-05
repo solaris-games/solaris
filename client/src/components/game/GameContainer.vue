@@ -38,6 +38,7 @@ export default {
     this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this))
     this.gameContainer.map.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+    this.gameContainer.map.on('onObjectsClicked', this.onObjectsClicked.bind(this))
   },
 
   beforeDestroy () {
@@ -74,6 +75,9 @@ export default {
     },
     onWaypointCreated (e) {
       this.$emit('onWaypointCreated', e)
+    },
+    onObjectsClicked (e) {
+      this.$emit('onObjectsClicked', e)
     }
   },
 

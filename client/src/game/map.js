@@ -186,7 +186,9 @@ class Map extends EventEmitter {
       
       this.unselectAllStarsExcept(selectedStar)
   
-      this.emit('onStarClicked', e)
+      if (!this.tryMultiSelect(e.location)) {
+        this.emit('onStarClicked', e)
+      }
     }
   }
 
@@ -195,12 +197,53 @@ class Map extends EventEmitter {
     if (this.mode === 'galaxy') {
       this.unselectAllStars()
 
-      this.emit('onCarrierClicked', e)
+      if (!this.tryMultiSelect(e.location)) {
+        this.emit('onCarrierClicked', e)
+      }
     }
   }
 
   onWaypointCreated (e) {
     this.emit('onWaypointCreated', e)
+  }
+
+  tryMultiSelect (location) {
+    // See if there are any other objects close by, if so then
+    // we want to allow the user to select which one they want as there might be 
+    // objects on the map that are on top of eachother or very close together.
+    const distance = 10
+    
+    let closeStars = this.stars
+      .map(s => {
+        return {
+          type: 'star',
+          distance: GameHelper.getDistanceBetweenLocations(location, s.data.location),
+          data: s.data
+        }
+      })
+      .filter(s => s.distance <= distance);
+
+    let closeCarriers = this.carriers
+      .map(s => {
+        return {
+          type: 'carrier',
+          distance: GameHelper.getDistanceBetweenLocations(location, s.data.location),
+          data: s.data
+        }
+      })
+      .filter(s => s.distance <= distance);
+
+    // Combine the arrays and order by closest first.
+    let closeObjects = closeStars.concat(closeCarriers)
+      .sort((a, b) => a.distance - b.distance)
+
+    if (closeObjects.length > 1) {
+      this.emit('onObjectsClicked', closeObjects)
+
+      return true
+    }
+
+    return false
   }
 
 }

@@ -13,7 +13,8 @@
 
         <game-container :game="game"
                     @onStarClicked="onStarClicked"
-                    @onCarrierClicked="onCarrierClicked"/>
+                    @onCarrierClicked="onCarrierClicked"
+                    @onObjectsClicked="onObjectsClicked"/>
     </div>
   </div>
 </template>
@@ -91,6 +92,10 @@ export default {
       this.menuArguments = e
 
       //this.$emit('onCarrierClicked', e)
+    },
+    onObjectsClicked (e) {
+      this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
+      this.menuArguments = e
     }
 
     // --------------------

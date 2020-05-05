@@ -45,6 +45,20 @@ class GameHelper {
         && carrier.inTransitTo === waypoint.destination
   }
 
+  getHyperspaceDistance (hyperspace) {
+    return ((hyperspace || 1) + 3) * 30 // TODO: Need a global constant for light year
+  }
+
+  getDistanceBetweenLocations (loc1, loc2) {
+    let xs = loc2.x - loc1.x,
+        ys = loc2.y - loc1.y
+
+    xs *= xs;
+    ys *= ys;
+
+    return Math.sqrt(xs + ys)
+  }
+
   getCountdownTimeString (date, relativeTo) {
     relativeTo = relativeTo || new Date()
 

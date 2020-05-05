@@ -46,10 +46,10 @@ class Waypoints extends EventEmitter {
     let lastLocation = this._getLastLocation()
 
     // Calculate which stars are in reach and draw highlights around them
-    const hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get the hyperspace level
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(1) // TODO: Get the hyperspace level
 
     let stars = this.game.galaxy.stars.filter(s => {
-        let distance = this._getDistanceBetweenLocations(lastLocation, s.location)
+        let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
 
         return distance <= hyperspaceDistance
     })
@@ -109,10 +109,10 @@ class Waypoints extends EventEmitter {
     
     // If the star that was clicked is within hyperspace range then append
     // a new waypoint to this star.
-    const hyperspaceDistance = this._getHyperspaceDistance(1) // TODO: Get hyperspace level
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(1) // TODO: Get hyperspace level
     
     const lastLocation = this._getLastLocation()
-    const distance = this._getDistanceBetweenLocations(lastLocation, e.location)
+    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, e.location)
 
     if (distance <= hyperspaceDistance) {
       let newWaypoint = {
@@ -155,20 +155,6 @@ class Waypoints extends EventEmitter {
     }
 
     return lastLocation
-  }
-
-  _getHyperspaceDistance (hyperspace) {
-    return ((hyperspace || 1) + 3) * 30 // TODO: Need a global constant for light year
-  }
-
-  _getDistanceBetweenLocations (loc1, loc2) {
-    let xs = loc2.x - loc1.x,
-        ys = loc2.y - loc1.y
-
-    xs *= xs;
-    ys *= ys;
-
-    return Math.sqrt(xs + ys)
   }
   
 }

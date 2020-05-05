@@ -31,6 +31,7 @@
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :game="game"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested" :game="game"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested" :game="game"/>
+      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :game="game" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointRequested="onEditWaypointRequested"/>
     </div>
 </div>
 </template>
@@ -53,6 +54,7 @@ import ConversationVue from '../inbox/Conversation.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
 import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
+import MapObjectSelectorVue from './MapObjectSelector.vue'
 import GameHelper from '../../../services/gameHelper'
 
 export default {
@@ -72,7 +74,8 @@ export default {
     'conversation': ConversationVue,
     'intel': IntelVue,
     'galaxy': GalaxyVue,
-    'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue
+    'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
+    'map-object-selector': MapObjectSelectorVue
   },
   props: {
     game: Object,

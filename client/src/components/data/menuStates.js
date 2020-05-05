@@ -28,5 +28,6 @@ export default {
   CARRIER_WAYPOINT_DETAIL: 'carrierWaypointDetail',
   CARRIER_RENAME: 'carrierRename',
   SHIP_TRANSFER: 'shipTransfer',
-  BULK_INFRASTRUCTURE_UPGRADE: 'bulkInfrastructureUpgrade'
+  BULK_INFRASTRUCTURE_UPGRADE: 'bulkInfrastructureUpgrade',
+  MAP_OBJECT_SELECTOR: 'mapObjectSelector'
 }
