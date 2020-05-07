@@ -191,18 +191,49 @@ module.exports = class WaypointService {
     }
 
     _performWaypointActionDropAllBut(carrier, star, waypoint) {
-        // TODO
-        this._performWaypointActionCollectAll(carrier, star, waypoint);
+        // Calculate the difference between how many ships we currently have
+        // and how many need to remain after.
+        let difference = carrier.ships - waypoint.actionShips;
+
+        // If we have more than enough ships to transfer, then transfer
+        // the desired amount. Otherwise do not drop anything.
+        if (difference >= carrier.ships - 1) {
+            star.garrison += difference;
+            carrier.ships -= difference;
+        }
     }
 
     _performWaypointActionCollectAllBut(carrier, star, waypoint) {
-        // TODO
-        this._performWaypointActionCollectAll(carrier, star, waypoint);
+        // Calculate the difference between how many ships we currently have
+        // and how many need to remain after.
+        let difference = star.garrison - waypoint.actionShips;
+
+        // If we have more than enough ships to transfer, then transfer
+        // the desired amount. Otherwise do not drop anything.
+        if (difference >= star.garrison) {
+            star.garrison -= difference;
+            carrier.ships += difference;
+        }
     }
 
     _performWaypointActionGarrison(carrier, star, waypoint) {
-        // TODO
-        this._performWaypointActionCollectAll(carrier, star, waypoint);
+        // Calculate how many ships need to be dropped or collected
+        // in order to garrison the star.
+        let difference = star.garrison - waypoint.actionShips;
+
+        // If the difference is above 0 then move ships
+        // from the star to the carrier, otherwise do the opposite.
+        if (difference > 0) {
+            let allowed = Math.min(difference, star.garrison);
+
+            star.garrison -= allowed;
+            carrier.ships += allowed;
+        } else {
+            let allowed = Math.min(difference, carrier.ships - 1);
+
+            star.garrison += allowed;
+            carrier.ships -= allowed;
+        }
     }
 
 };
