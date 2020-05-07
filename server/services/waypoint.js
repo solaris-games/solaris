@@ -224,12 +224,12 @@ module.exports = class WaypointService {
         // If the difference is above 0 then move ships
         // from the star to the carrier, otherwise do the opposite.
         if (difference > 0) {
-            let allowed = Math.min(difference, star.garrison);
+            let allowed = Math.abs(Math.min(difference, star.garrison));
 
             star.garrison -= allowed;
             carrier.ships += allowed;
         } else {
-            let allowed = Math.min(difference, carrier.ships - 1);
+            let allowed = Math.abs(Math.min(difference, carrier.ships - 1));
 
             star.garrison += allowed;
             carrier.ships -= allowed;
