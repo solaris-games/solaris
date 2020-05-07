@@ -2,13 +2,14 @@ const moment = require('moment');
 
 module.exports = class GameTickService {
     
-    constructor(io, distanceService, starService, researchService, playerService, historyService) {
+    constructor(io, distanceService, starService, researchService, playerService, historyService, waypointService) {
         this.io = io;
         this.distanceService = distanceService;
         this.starService = starService;
         this.researchService = researchService;
         this.playerService = playerService;
         this.historyService = historyService;
+        this.waypointService = waypointService;
     }
 
     async tick(game) {
@@ -163,35 +164,11 @@ module.exports = class GameTickService {
 
     _performWaypointActions(game, actionWaypoints) {
         // TODO: Order the waypoints by action, so that drops occur before collects.
-        // TODO: Put this into a service. WaypointService?
         for (let i = 0; i < actionWaypoints.length; i++) {
             let actionWaypoint = actionWaypoints[i];
 
-            switch (actionWaypoint.waypoint.action) {
-                case 'dropAll':
-                    actionWaypoint.star.garrison += (actionWaypoint.carrier.ships - 1)
-                    actionWaypoint.carrier.ships = 1;
-                    break;
-                case 'drop':
-
-                    break;
-                case 'dropAllBut':
-                    
-                    break;
-                case 'collectAll':
-                    actionWaypoint.carrier.ships += actionWaypoint.star.ships || 0;
-                    actionWaypoint.star.garrison = 0
-                    break;
-                case 'collect':
-
-                    break;
-                case 'collectAllBut':
-                    
-                    break;
-                case 'garrison':
-                    
-                    break;
-            }
+            this.waypointService.performWaypointAction(actionWaypoint.carrier, 
+                actionWaypoint.star, actionWaypoint.waypoint);
         }
     }
 

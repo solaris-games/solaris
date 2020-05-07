@@ -128,4 +128,81 @@ module.exports = class WaypointService {
         return totalTicks;
     }
 
+    performWaypointAction(carrier, star, waypoint) {
+        switch (waypoint.action) {
+            case 'dropAll':
+                this._performWaypointActionDropAll(carrier, star, waypoint);
+                break;
+            case 'drop':
+                this._performWaypointActionDrop(carrier, star, waypoint);
+                break;
+            case 'dropAllBut':
+                this._performWaypointActionDropAllBut(carrier, star, waypoint);
+                break;
+            case 'collectAll':
+                this._performWaypointActionCollectAll(carrier, star, waypoint);
+                break;
+            case 'collect':
+                this._performWaypointActionCollect(carrier, star, waypoint);
+                break;
+            case 'collectAllBut':
+                this._performWaypointActionCollectAllBut(carrier, star, waypoint);
+                break;
+            case 'garrison':
+                this._performWaypointActionGarrison(carrier, star, waypoint);
+                break;
+        }
+    }
+
+    _performWaypointActionDropAll(carrier, star, waypoint) {
+        star.garrison += (carrier.ships - 1)
+        carrier.ships = 1;
+    }
+
+    _performWaypointActionCollectAll(carrier, star, waypoint) {
+        carrier.ships += star.ships || 0;
+        star.garrison = 0
+    }
+
+    _performWaypointActionDrop(carrier, star, waypoint) {
+        // If the carrier has more ships than needs to be dropped, then drop
+        // however many are configured in the waypoint.
+        if (carrier.ships - 1 >= waypoint.actionShips) {
+            star.garrison += waypoint.actionShips;
+            carrier.ships -= waypoint.actionShips;
+        }
+        else {
+            // If there aren't enough ships, then do a drop all.
+            this._performWaypointActionDropAll(carrier, star, waypoint);
+        }
+    }
+
+    _performWaypointActionCollect(carrier, star, waypoint) {
+        // If the star has more ships than needs to be collected, then collect
+        // however many are configured in the waypoint.
+        if (star.garrison >= waypoint.actionShips) {
+            star.garrison += waypoint.actionShips;
+            carrier.ships -= waypoint.actionShips;
+        }
+        else {
+            // If there aren't enough ships, then do a collect all.
+            this._performWaypointActionCollectAll(carrier, star, waypoint);
+        }
+    }
+
+    _performWaypointActionDropAllBut(carrier, star, waypoint) {
+        // TODO
+        this._performWaypointActionCollectAll(carrier, star, waypoint);
+    }
+
+    _performWaypointActionCollectAllBut(carrier, star, waypoint) {
+        // TODO
+        this._performWaypointActionCollectAll(carrier, star, waypoint);
+    }
+
+    _performWaypointActionGarrison(carrier, star, waypoint) {
+        // TODO
+        this._performWaypointActionCollectAll(carrier, star, waypoint);
+    }
+
 };
