@@ -98,7 +98,16 @@ module.exports = class WaypointService {
 
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
 
-        let ticks = Math.ceil(distance / this.distanceService.getCarrierTickDistance());
+        let tickDistance = this.distanceService.getCarrierTickDistance();
+
+        // If the carrier is moving between warp gates then
+        // the tick distance is x3
+        if (source.warpGate && destination.warpGate
+            && source.ownedByPlayerId && destination.ownedByPlayerId) {
+                tickDistance *= 3;
+            }
+
+        let ticks = Math.ceil(distance / tickDistance);
 
         return ticks;
     }

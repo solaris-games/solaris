@@ -90,13 +90,22 @@ module.exports = class GameTickService {
         // this means that always the carrier that is closest to its destination
         // will land first. This is important for unclaimed stars and defender bonuses.
         let combatStars = [];
+        let actionWaypoints = [];
 
         let distancePerTick = this.distanceService.getCarrierTickDistance();
 
         for (let i = 0; i < carriers.length; i++) {
             let carrier = carriers[i];
             let waypoint = carrier.waypoints[0];
+            let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
             let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+
+            // If we are travelling to and from a warp gate, then we
+            // travel 3 times faster.
+            if (sourceStar.warpGate && destinationStar.warpGate
+                && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
+                distancePerTick *= 3;
+            }
 
             if (carrier.distanceToDestination <= distancePerTick) {
                 carrier.inTransitFrom = null;
@@ -106,6 +115,13 @@ module.exports = class GameTickService {
 
                 // Remove the current waypoint as we have arrived at the destination.
                 let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
+
+                // Append it to the array of action waypoints so that we can deal with it after combat.
+                actionWaypoints.push({
+                    star: destinationStar,
+                    carrier,
+                    waypoint: currentWaypoint
+                });
 
                 // TODO: Looping
                 // TODO: Perform carrier waypoint action.
@@ -136,6 +152,46 @@ module.exports = class GameTickService {
             let combat = combatStars[i];
 
             this._performCombatAtStar(game, combat.star, combat.carrier);
+        }
+
+        // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
+        actionWaypoints = actionWaypoints.filter(x => x.carrier.ships > 0);
+
+        // 4. Now that combat is done, perform any carrier waypoint actions.
+        this._performWaypointActions(game, actionWaypoints);
+    }
+
+    _performWaypointActions(game, actionWaypoints) {
+        // TODO: Order the waypoints by action, so that drops occur before collects.
+        // TODO: Put this into a service. WaypointService?
+        for (let i = 0; i < actionWaypoints.length; i++) {
+            let actionWaypoint = actionWaypoints[i];
+
+            switch (actionWaypoint.waypoint.action) {
+                case 'dropAll':
+                    actionWaypoint.star.garrison += (actionWaypoint.carrier.ships - 1)
+                    actionWaypoint.carrier.ships = 1;
+                    break;
+                case 'drop':
+
+                    break;
+                case 'dropAllBut':
+                    
+                    break;
+                case 'collectAll':
+                    actionWaypoint.carrier.ships += actionWaypoint.star.ships || 0;
+                    actionWaypoint.star.garrison = 0
+                    break;
+                case 'collect':
+
+                    break;
+                case 'collectAllBut':
+                    
+                    break;
+                case 'garrison':
+                    
+                    break;
+            }
         }
     }
 
@@ -210,7 +266,6 @@ module.exports = class GameTickService {
             attacker.credits += star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
             star.infrastructure.economy = 0;
 
-            // TODO: Do carrier waypoint action here?
             // TODO: If the home star is captured, find a new one.
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
         }
