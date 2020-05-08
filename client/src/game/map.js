@@ -36,7 +36,7 @@ class Map extends EventEmitter {
     for (let i = 0; i < this.game.galaxy.stars.length; i++) {
       let star = new Star()
 
-      star.setup(this.game.galaxy.stars[i], this.game.galaxy.players, this.game.galaxy.carriers)
+      star.setup(this.game, this.game.galaxy.stars[i], this.game.galaxy.players, this.game.galaxy.carriers)
 
       this.stars.push(star)
 

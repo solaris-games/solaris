@@ -26,10 +26,9 @@
         <table class="table table-sm table-striped">
             <tbody>
                 <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
-                <!-- TODO: Sort this list by number of stars owned -->
                 <tr v-for="player in getSortedLeaderboardPlayerList()" :key="player._id">
                     <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                    <td class="col-avatar">
+                    <td class="col-avatar" :title="player.colour.alias">
                         <!-- TODO: Prefer images over font awesome icons? -->
                         <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
                         <!-- <img src=""> -->

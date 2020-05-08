@@ -6,7 +6,7 @@ module.exports = class StandardMapService {
         this.starDistanceService = starDistanceService;
     }
 
-    generateLocations(starCount) {
+    generateLocations(game, starCount) {
         const locations = [];
 
         // To generate locations we do the following:
@@ -19,10 +19,10 @@ module.exports = class StandardMapService {
         };
 
         do {            
-            const location = this.starService.generateStarPosition(currentOrigin.x, currentOrigin.y);
+            const location = this.starService.generateStarPosition(game, currentOrigin.x, currentOrigin.y);
 
             // Stars must not be too close to eachother.
-            if (this.isLocationTooCloseToOthers(location, locations))
+            if (this.isLocationTooCloseToOthers(game, location, locations))
                 continue;
 
             locations.push(location);
@@ -34,8 +34,8 @@ module.exports = class StandardMapService {
         return locations;
     }
 
-    isLocationTooCloseToOthers(location, locations) {
-        return locations.find(l => this.starDistanceService.isLocationTooClose(location, l)) != null;
+    isLocationTooCloseToOthers(game, location, locations) {
+        return locations.find(l => this.starDistanceService.isLocationTooClose(game, location, l)) != null;
     }
 
 };

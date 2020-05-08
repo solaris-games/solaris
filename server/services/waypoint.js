@@ -18,7 +18,7 @@ module.exports = class WaypointService {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(userPlayer.research.hyperspace.level);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, userPlayer.research.hyperspace.level);
 
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
@@ -74,7 +74,7 @@ module.exports = class WaypointService {
             let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.destination);
 
             let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
-            let hyperspaceDistance = this.distanceService.getHyperspaceDistance(userPlayer.research.hyperspace.level);
+            let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, userPlayer.research.hyperspace.level);
 
             if (distanceBetweenStars > hyperspaceDistance) {
                 throw new ValidationError('The last waypoint star is out of hyperspace range of the first waypoint star.');
@@ -98,7 +98,7 @@ module.exports = class WaypointService {
 
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
 
-        let tickDistance = this.distanceService.getCarrierTickDistance();
+        let tickDistance = game.constants.distances.shipSpeed;
 
         // If the carrier is moving between warp gates then
         // the tick distance is x3

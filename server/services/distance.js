@@ -1,13 +1,6 @@
 const moment = require('moment');
 
 module.exports = class DistanceService {
-
-    DISTANCES = {
-        LIGHT_YEAR: 30,
-        MIN_DISTANCE_BETWEEN_STARS: 30,
-        MAX_DISTANCE_BETWEEN_STARS: 300,
-        BASE_SHIP_SPEED: 3  // 0.1 ly per tick
-    }
     
     getDistanceBetweenLocations(loc1, loc2) {
         let xs = loc2.x - loc1.x,
@@ -42,16 +35,12 @@ module.exports = class DistanceService {
         return this.getFurthestLocations(loc, locs, 1)[0];
     }
 
-    getScanningDistance(scanning) {
-        return ((scanning || 1) + 2) * this.DISTANCES.LIGHT_YEAR;
+    getScanningDistance(game, scanning) {
+        return ((scanning || 1) + 2) * game.constants.distances.lightYear;
     }
     
-    getHyperspaceDistance(hyperspace) {
-        return ((hyperspace || 1) + 3) * this.DISTANCES.LIGHT_YEAR;
-    }
-
-    getCarrierTickDistance() {
-        return this.DISTANCES.BASE_SHIP_SPEED;
+    getHyperspaceDistance(game, hyperspace) {
+        return ((hyperspace || 1) + 3) * game.constants.distances.lightYear;
     }
 
     getAngleTowardsLocation(source, destination) {

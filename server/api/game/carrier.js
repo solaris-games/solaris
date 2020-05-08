@@ -7,8 +7,6 @@ module.exports = (router, io, container) => {
     router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         let errors = [];
 
-        // TODO: Validation?
-        
         if (errors.length) {
             throw new ValidationError(errors);
         }
@@ -53,7 +51,17 @@ module.exports = (router, io, container) => {
     router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         let errors = [];
 
-        // TODO: Validation
+        if (req.body.carrierShips == null) {
+            errors.push('carrierShips is required.');
+        }
+
+        if (req.body.starShips == null) {
+            errors.push('starShips is required.');
+        }
+
+        if (!req.body.starId) {
+            errors.push('starId is required.');
+        }
 
         if (errors.length) {
             throw new ValidationError(errors);

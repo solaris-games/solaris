@@ -10,24 +10,19 @@ module.exports = class StarService {
         this.starDistanceService = starDistanceService;
     }
 
-    DEFAULTS = {
-        MIN_NATURAL_RESOURCES: 10,
-        MAX_NATURAL_RESOURCES: 50
-    }
-
-    generateUnownedStar(name, location) {
+    generateUnownedStar(game, name, location) {
         return {
             _id: mongoose.Types.ObjectId(),
             name,
-            naturalResources: this.randomService.getRandomNumberBetween(this.DEFAULTS.MIN_NATURAL_RESOURCES, this.DEFAULTS.MAX_NATURAL_RESOURCES - 1),
+            naturalResources: this.randomService.getRandomNumberBetween(game.constants.star.resources.minNaturalResources, game.constants.star.resources.maxNaturalResources - 1),
             location,
             infrastructure: { }
         };
     }
 
-    generateStarPosition(originX, originY, radius) {
+    generateStarPosition(game, originX, originY, radius) {
         if (radius == null) {
-            radius = this.distanceService.DISTANCES.MAX_DISTANCE_BETWEEN_STARS;
+            radius = game.constants.distances.maxDistanceBetweenStars;
         }
 
         return this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, radius);
@@ -41,13 +36,13 @@ module.exports = class StarService {
         return game.galaxy.stars.find(s => s._id.toString() === id.toString());
     }
 
-    setupHomeStar(homeStar, player, gameSettings) {
+    setupHomeStar(game, homeStar, player, gameSettings) {
         // Set up the home star
         player.homeStarId = homeStar._id;
         homeStar.ownedByPlayerId = player._id;
         homeStar.garrisonActual = gameSettings.player.startingShips;
         homeStar.garrison = homeStar.garrisonActual;
-        homeStar.naturalResources = this.DEFAULTS.MAX_NATURAL_RESOURCES; // Home stars should always get max resources.
+        homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;

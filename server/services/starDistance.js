@@ -73,18 +73,18 @@ module.exports = class StarDistanceService {
         return this.getClosestUnownedStarsFromLocation(location, stars, 1)[0];
     }
 
-    isStarTooClose(star, otherStar) {
-        return this.isStarLocationTooClose(star.location, otherStar);
+    isStarTooClose(game, star, otherStar) {
+        return this.isStarLocationTooClose(game, star.location, otherStar);
     }
 
-    isStarLocationTooClose(location, otherStar) {
-        return this.isLocationTooClose(location, otherStar.location);
+    isStarLocationTooClose(game, location, otherStar) {
+        return this.isLocationTooClose(game, location, otherStar.location);
     }
 
-    isLocationTooClose(location, otherLocation) {
+    isLocationTooClose(game, location, otherLocation) {
         const distance = this.distanceService.getDistanceBetweenLocations(location, otherLocation);
 
-        return distance < this.distanceService.DISTANCES.MIN_DISTANCE_BETWEEN_STARS;
+        return distance < game.constants.distances.minDistanceBetweenStars;
     }
 
     isDuplicateStarPosition(location, stars) {

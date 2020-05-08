@@ -125,7 +125,7 @@ module.exports = class TradeService {
                 tradeTechs.push({
                     name: techKey,
                     level: techFromPlayer.level,
-                    cost: techFromPlayer.level * 15
+                    cost: techFromPlayer.level * game.constants.trade.costPerLevel
                 });
             }
         }

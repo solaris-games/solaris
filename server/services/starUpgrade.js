@@ -1,21 +1,6 @@
 const ValidationError = require('../errors/validation');
 
-const BASE_COSTS = {
-    WARP_GATE: 100,
-    ECONOMY: 2.5,
-    INDUSTRY: 5,
-    SCIENCE: 20
-};
-
 module.exports = class StarUpgradeService {
-
-    EXPENSE_CONFIGS = {
-        cheap: 1,
-        standard: 2,
-        expensive: 4,
-        veryExpensive: 8,
-        crazyExpensive: 16
-    };
 
     constructor(starService, carrierService, playerService) {
         this.starService = starService;
@@ -38,9 +23,9 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`The star already has a warp gate.`);
         }
 
-        const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildWarpgates];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
-        const cost = this.calculateWarpGateCost(expenseConfig, terraformedResources);
+        const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
 
         if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
@@ -83,8 +68,8 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
         }
 
-        const expenseConfig = this.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildCarriers];
-        const cost = this.calculateCarrierCost(expenseConfig);
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildCarriers];
+        const cost = this.calculateCarrierCost(game, expenseConfig);
 
         if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to build a carrier.`);
@@ -118,9 +103,9 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
-        const expenseConfig = this.EXPENSE_CONFIGS[expenseConfigKey];
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
-        const cost = calculateCostCallback(expenseConfig, star.infrastructure[economyType], terraformedResources);
+        const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
         if (userPlayer.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
@@ -169,17 +154,17 @@ module.exports = class StarUpgradeService {
             case 'economy': 
                 calculateCostFunction = this.calculateEconomyCost.bind(this);
                 upgradeFunction = this.upgradeEconomy.bind(this);
-                expenseConfig = this.EXPENSE_CONFIGS[game.settings.player.developmentCost.economy];
+                expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
                 break;
             case 'industry': 
                 calculateCostFunction = this.calculateIndustryCost.bind(this);
                 upgradeFunction = this.upgradeIndustry.bind(this);
-                expenseConfig = this.EXPENSE_CONFIGS[game.settings.player.developmentCost.industry];
+                expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
                 break;
             case 'science': 
                 calculateCostFunction = this.calculateScienceCost.bind(this);
                 upgradeFunction = this.upgradeScience.bind(this);
-                expenseConfig = this.EXPENSE_CONFIGS[game.settings.player.developmentCost.science];
+                expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
                 break;
         }
 
@@ -192,13 +177,13 @@ module.exports = class StarUpgradeService {
                 .filter(a => {
                     let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, userPlayer.research.terraforming.level);
                     
-                    return calculateCostFunction(expenseConfig, a.infrastructure[infrastructureType], terraformedResources) <= amount;
+                    return calculateCostFunction(game, expenseConfig, a.infrastructure[infrastructureType], terraformedResources) <= amount;
                 })
                 .sort((a, b) => {
                     let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, userPlayer.research.terraforming.level);
 
-                    let costA = calculateCostFunction(expenseConfig, a.infrastructure[infrastructureType], terraformedResources);
-                    let costB = calculateCostFunction(expenseConfig, b.infrastructure[infrastructureType], terraformedResources);
+                    let costA = calculateCostFunction(game, expenseConfig, a.infrastructure[infrastructureType], terraformedResources);
+                    let costB = calculateCostFunction(game, expenseConfig, b.infrastructure[infrastructureType], terraformedResources);
 
                     return costA - costB;
                 })[0];
@@ -220,28 +205,28 @@ module.exports = class StarUpgradeService {
         return upgradeSummary;
     }
 
-    calculateWarpGateCost(expenseConfig, terraformedResources) {
-        return this._calculateInfrastructureCost(BASE_COSTS.WARP_GATE, expenseConfig, 0, terraformedResources);
+    calculateWarpGateCost(game, expenseConfig, terraformedResources) {
+        return this._calculateInfrastructureCost(game.constants.star.infrastructureCostMultipliers.warpGate, expenseConfig, 0, terraformedResources);
     }
 
-    calculateEconomyCost(expenseConfig, current, terraformedResources) {
-        return this._calculateInfrastructureCost(BASE_COSTS.ECONOMY, expenseConfig, current, terraformedResources);
+    calculateEconomyCost(game, expenseConfig, current, terraformedResources) {
+        return this._calculateInfrastructureCost(game.constants.star.infrastructureCostMultipliers.economy, expenseConfig, current, terraformedResources);
     }
 
-    calculateIndustryCost(expenseConfig, current, terraformedResources) {
-        return this._calculateInfrastructureCost(BASE_COSTS.INDUSTRY, expenseConfig, current, terraformedResources);
+    calculateIndustryCost(game, expenseConfig, current, terraformedResources) {
+        return this._calculateInfrastructureCost(game.constants.star.infrastructureCostMultipliers.industry, expenseConfig, current, terraformedResources);
     }
 
-    calculateScienceCost(expenseConfig, current, terraformedResources) {
-        return this._calculateInfrastructureCost(BASE_COSTS.SCIENCE, expenseConfig, current, terraformedResources);
+    calculateScienceCost(game, expenseConfig, current, terraformedResources) {
+        return this._calculateInfrastructureCost(game.constants.star.infrastructureCostMultipliers.science, expenseConfig, current, terraformedResources);
     }
 
     _calculateInfrastructureCost(baseCost, expenseConfig, current, terraformedResources) {
         return Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100));
     }
 
-    calculateCarrierCost(expenseConfig) {
-        return (expenseConfig * 10) + 5; // TODO: Is this right?
+    calculateCarrierCost(game, expenseConfig) {
+        return (expenseConfig * game.constants.star.infrastructureCostMultipliers.carrier) + 5;
     }
 
 };

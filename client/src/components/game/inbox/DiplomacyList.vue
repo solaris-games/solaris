@@ -55,6 +55,8 @@ export default {
       return gameHelper.getPlayerColour(this.game, playerId)
     },
     async refreshList () {
+      this.conversations = null
+      
       try {
         let response = await MessageApiService.getConversations(this.game._id)
 

@@ -2,14 +2,22 @@ const RandomService = require('../services/random');
 const MapService = require('../services/map');
 const StandardMapService = require('../services/maps/standard')
 
+const game = {
+    constants: {
+        distances: {
+            maxDistanceBetweenStars: 300
+        }
+    }
+}
+
 const fakeStarService = {
-    generateUnownedStar(name, location) {
+    generateUnownedStar(game, name, location) {
         return {
             name,
             location
         }
     },
-    generateStarPosition(x, y) {
+    generateStarPosition(game, x, y) {
         return {
             x: 10,
             y: 10
@@ -18,16 +26,16 @@ const fakeStarService = {
 };
 
 const fakeStarDistanceService = {
-    isStarTooClose(star1, star2) {
+    isStarTooClose(game, star1, star2) {
         return false;
     },
     isDuplicateStarPosition(location, stars) {
         return false;
     },
-    isStarLocationTooClose(location, stars) {
+    isStarLocationTooClose(game, location, stars) {
         return false;
     },
-    isLocationTooClose(location, locations) {
+    isLocationTooClose(game, location, locations) {
         return false;
     }
 };
@@ -68,14 +76,14 @@ describe('map', () => {
     });
 
     it('should generate a given number of stars', () => {
-        const stars = mapService.generateStars(starCount, playerCount);
+        const stars = mapService.generateStars(game, starCount, playerCount);
         
         expect(stars).toBeTruthy();
         expect(stars.length).toEqual(starCount);
     });
 
     it('should generate stars with no duplicate names.', () => {
-        const stars = mapService.generateStars(starCount, playerCount);
+        const stars = mapService.generateStars(game, starCount, playerCount);
         
         for(let i = 0; i < stars.length; i++) {
             let star = stars[i];

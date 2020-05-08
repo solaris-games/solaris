@@ -1,9 +1,5 @@
 module.exports = class ResearchService {
 
-    CONSTANTS = {
-        REQUIRED_RESEARCH_PROGRESS_MULTIPLIER: 100
-    }
-
     constructor(randomService) {
         this.randomService = randomService;
     }
@@ -26,14 +22,14 @@ module.exports = class ResearchService {
         return await game.save();
     }
 
-    conductResearch(player) {
+    conductResearch(game, player) {
         let tech = player.research[player.researchingNow];
             
         tech.progress += player.research.experimentation.level;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = tech.level * this.CONSTANTS.REQUIRED_RESEARCH_PROGRESS_MULTIPLIER;
+        let requiredProgress = tech.level * game.constants.research.progressMultiplier;
 
         if (tech.progress >= requiredProgress) {
             tech.level++;
@@ -42,7 +38,7 @@ module.exports = class ResearchService {
         }
     }
 
-    conductExperiments(player) {
+    conductExperiments(game, player) {
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
         });
@@ -52,11 +48,11 @@ module.exports = class ResearchService {
         let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)];
         let tech = player.research[techKey];
 
-        tech.progress += player.research.experimentation.level * (this.CONSTANTS.REQUIRED_RESEARCH_PROGRESS_MULTIPLIER / 2);
+        tech.progress += player.research.experimentation.level * (game.constants.research.progressMultiplier / 2);
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = tech.level * this.CONSTANTS.REQUIRED_RESEARCH_PROGRESS_MULTIPLIER;
+        let requiredProgress = tech.level * game.constants.research.progressMultiplier;
 
         while (tech.progress >= requiredProgress) {
             tech.level++;

@@ -41,7 +41,7 @@
         <waypointTable :game="game" :carrier="carrier" @onEditWaypointRequested="onEditWaypointRequested"/>
       </div>
 
-      <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <!-- <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
@@ -49,7 +49,7 @@
           <button class="btn btn-block btn-success" v-if="!carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">Enable</button>
           <button class="btn btn-block btn-danger" v-if="carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">Disable</button>
         </div>
-      </div>
+      </div> -->
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">

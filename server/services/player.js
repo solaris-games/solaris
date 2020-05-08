@@ -22,49 +22,49 @@ module.exports = class PlayerService {
         return game.galaxy.players.find(p => p.userId.toString() === userId.toString());
     }
 
-    createEmptyPlayer(gameSettings, colour) {
+    createEmptyPlayer(game, colour) {
         return {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
             colour: colour,
-            credits: gameSettings.player.startingCredits,
+            credits: game.settings.player.startingCredits,
             carriers: [],
             research: {
-                terraforming: { level: gameSettings.technology.startingTechnologyLevel.terraforming },
-                experimentation: { level: gameSettings.technology.startingTechnologyLevel.experimentation },
-                scanning: { level: gameSettings.technology.startingTechnologyLevel.scanning },
-                hyperspace: { level: gameSettings.technology.startingTechnologyLevel.hyperspace },
-                manufacturing: { level: gameSettings.technology.startingTechnologyLevel.manufacturing },
-                banking: { level: gameSettings.technology.startingTechnologyLevel.banking },
-                weapons: { level: gameSettings.technology.startingTechnologyLevel.weapons }
+                terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },
+                experimentation: { level: game.settings.technology.startingTechnologyLevel.experimentation },
+                scanning: { level: game.settings.technology.startingTechnologyLevel.scanning },
+                hyperspace: { level: game.settings.technology.startingTechnologyLevel.hyperspace },
+                manufacturing: { level: game.settings.technology.startingTechnologyLevel.manufacturing },
+                banking: { level: game.settings.technology.startingTechnologyLevel.banking },
+                weapons: { level: game.settings.technology.startingTechnologyLevel.weapons }
             }
         };
     }
 
-    // TODO: This needs to be refactored to not rely on objects being passed in as parameters
-    createEmptyPlayers(gameSettings, allStars) {
+    // TODO: Refactor as game already contains game settings.
+    createEmptyPlayers(game, allStars) {
         let players = [];
 
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
 
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(allStars); // TODO: Is center of mass fairer?
+        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(allStars);
 
         // The desired distance from the center is half way from the galaxy center and the edge.
         const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars).x / 2 / 2;
 
-        let radians = this._getPlayerStartingLocationRadians(gameSettings.general.playerLimit);
+        let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
         let colours = require('../config/game/colours').slice();
 
         // Create each player starting at angle 0 at a distance of half the galaxy radius
-        for(let i = 0; i < gameSettings.general.playerLimit; i++) {
+        for(let i = 0; i < game.settings.general.playerLimit; i++) {
             // Get a random colour to assign to the player.
             let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
 
-            let player = this.createEmptyPlayer(gameSettings, colour);
+            let player = this.createEmptyPlayer(game, colour);
 
             // Get the player's starting location.
             let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
@@ -73,7 +73,7 @@ module.exports = class PlayerService {
             let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, allStars);
 
             // Set up the home star
-            this.starService.setupHomeStar(homeStar, player, gameSettings);
+            this.starService.setupHomeStar(game, homeStar, player, game.settings);
 
             players.push(player);
         }
@@ -82,7 +82,7 @@ module.exports = class PlayerService {
         // iterate over each player and give them 1 star at a time, this is arguably the fairest way
         // otherwise we'll end up with the last player potentially having a really bad position as their
         // stars could be miles away from their home star.
-        let starsToDistribute = gameSettings.player.startingStars - 1;
+        let starsToDistribute = game.settings.player.startingStars - 1;
 
         while (starsToDistribute--) {
             for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
@@ -95,7 +95,7 @@ module.exports = class PlayerService {
 
                 // Set up the closest star.
                 s.ownedByPlayerId = player._id;
-                s.garrisonActual = gameSettings.player.startingShips;
+                s.garrisonActual = game.settings.player.startingShips;
                 s.garrison = s.garrisonActual;
             }
         }

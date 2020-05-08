@@ -70,6 +70,10 @@ class GameHelper {
     let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60))
     let secs = Math.floor((t % (1000 * 60)) / 1000)
 
+    if (secs < 0) {
+      return 'Pending...'
+    }
+
     let str = ''
     let showDays = false,
       showHours = false

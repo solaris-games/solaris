@@ -50,11 +50,9 @@ export default {
   methods: {
     async reloadGame () {
       try {
-        let infoResponse = await gameService.getGameInfo(this.$route.query.id)
         let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
 
-        this.game = infoResponse.data // This will be passed to the game container component.
-        this.game.galaxy = galaxyResponse.data.galaxy
+        this.game = galaxyResponse.data // This will be passed to the game container component.
       } catch (err) {
         console.error(err)
       }

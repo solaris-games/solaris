@@ -101,14 +101,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
-        let errors = [];
-
-        // TODO: Validation?
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let techs = await container.tradeService.getTradeableTechnologies(
                 req.game,

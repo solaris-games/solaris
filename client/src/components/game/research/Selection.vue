@@ -3,7 +3,7 @@
     <div class="form-group row mb-0 bg-primary">
         <label class="col col-form-label">Total Science:</label>
         <div class="col text-right">
-            <label class="col-form-label">0</label>
+            <label class="col-form-label">{{player.stats.totalScience}}</label>
         </div>
     </div>
     <div class="form-group row pt-2 pb-2 mb-0 bg-secondary">

@@ -24,14 +24,23 @@ const fakeStarNameService = {
 };
 
 const fakeDistanceService = {
-    DISTANCES: {
-        MAX_DISTANCE_BETWEEN_STARS: 100
-    }
+
 }
 
 const fakeStarDistanceService = {
 
 }
+
+const game = {
+    constants: {
+        star: {
+            resources: {
+                minNaturalResources: 10,
+                maxNaturalResources: 50
+            }
+        }
+    }
+};
 
 describe('star', () => {
 
@@ -44,13 +53,13 @@ describe('star', () => {
     it('should generate an unowned star', () => {
         const name = 'test star name';
 
-        const newStar = starService.generateUnownedStar(name);
+        const newStar = starService.generateUnownedStar(game, name);
 
         expect(newStar).not.toBe(null);
         expect(newStar._id).not.toBe(null);
         expect(newStar.name).toEqual(name);
-        expect(newStar.naturalResources).toBeGreaterThanOrEqual(starService.DEFAULTS.MIN_NATURAL_RESOURCES);
-        expect(newStar.naturalResources).toBeLessThanOrEqual(starService.DEFAULTS.MAX_NATURAL_RESOURCES);
+        expect(newStar.naturalResources).toBeGreaterThanOrEqual(game.constants.star.resources.minNaturalResources);
+        expect(newStar.naturalResources).toBeLessThanOrEqual(game.constants.star.resources.maxNaturalResources);
         expect(newStar.location).not.toBe(null);
     });
 
@@ -81,11 +90,11 @@ describe('star', () => {
             }
         };
 
-        starService.setupHomeStar(homeStar, newPlayer, gameSettings);
+        starService.setupHomeStar(game, homeStar, newPlayer, gameSettings);
 
         expect(homeStar.ownedByPlayerId).toBe(newPlayer._id);
         expect(homeStar.garrison).toEqual(gameSettings.player.startingShips);
-        expect(homeStar.naturalResources).toEqual(starService.DEFAULTS.MAX_NATURAL_RESOURCES);
+        expect(homeStar.naturalResources).toEqual(game.constants.star.resources.maxNaturalResources);
         expect(homeStar.infrastructure.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);

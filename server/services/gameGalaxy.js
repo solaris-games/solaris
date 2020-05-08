@@ -1,3 +1,5 @@
+const ValidationError = require('../errors/validation');
+
 module.exports = class GameGalaxyService {
 
     constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService) {
@@ -17,15 +19,18 @@ module.exports = class GameGalaxyService {
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
         
-        // TODO: If the game has started and the user is not in this game
+        // If the game has started and the user is not in this game
         // then they cannot view info about this game.
+        if (game.state.startDate && !player) {
+            throw new ValidationError('Cannot view information about this game, you are not playing.');
+        }
 
         // TODO: If the game is completed then show everything.
 
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
-        // if the user isn't playing this game, then only return
+        // if the user isn't playing this game yet, then only return
         // basic data about the stars, exclude any important info like garrisons.
         if (!player) {
             this._setStarInfoBasic(game);
@@ -105,7 +110,7 @@ module.exports = class GameGalaxyService {
     _setStarInfoDetailed(doc, player) { 
         const isDarkMode = this._isDarkMode(doc);
 
-        let scanningRangeDistance = this.distanceService.getScanningDistance(player.research.scanning.level);
+        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
 
         // Get all of the player's stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
@@ -161,7 +166,7 @@ module.exports = class GameGalaxyService {
     }
         
     _setCarrierInfoDetailed(doc, player) {
-        let scanningRangeDistance = this.distanceService.getScanningDistance(player.research.scanning.level);
+        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
 
         // Get all of the players stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
@@ -260,20 +265,20 @@ module.exports = class GameGalaxyService {
     }
 
     _setUpgradeCosts(game, star) {
-        const economyExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.player.developmentCost.economy];
-        const industryExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.player.developmentCost.industry];
-        const scienceExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.player.developmentCost.science];
-        const warpGateExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildWarpgates];
-        const carrierExpenseConfig = this.starUpgradeService.EXPENSE_CONFIGS[game.settings.specialGalaxy.buildCarriers];
+        const economyExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
+        const industryExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
+        const scienceExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
+        const warpGateExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildWarpgates];
+        const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildCarriers];
 
         // Calculate upgrade costs for the star.
         star.upgradeCosts = { };
 
-        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
-        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
-        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
-        star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(warpGateExpenseConfig, star.terraformedResources);
-        star.upgradeCosts.carriers = this.starUpgradeService.calculateCarrierCost(carrierExpenseConfig);
+        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
+        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
+        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
+        star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
+        star.upgradeCosts.carriers = this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
 };

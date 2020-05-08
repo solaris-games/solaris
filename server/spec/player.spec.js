@@ -9,32 +9,47 @@ const StarNameService = require('../services/starName');
 
 const starNames = require('../config/game/starNames');
 
-const gameSettings = {
-    general: {
-        playerLimit: 4
-    },
-    player: {
-        startingCredits: 500,
-        startingShips: 10,
-        startingStars: 3,
-        startingInfrastructure: {
-            economy: 5,
-            industry: 5,
-            science: 1
+const game = {
+    settings: {
+        general: {
+            playerLimit: 4
+        },
+        player: {
+            startingCredits: 500,
+            startingShips: 10,
+            startingStars: 3,
+            startingInfrastructure: {
+                economy: 5,
+                industry: 5,
+                science: 1
+            }
+        },
+        technology: {
+            startingTechnologyLevel: {
+                terraforming: 1,
+                experimentation: 1,
+                scanning: 1,
+                hyperspace: 1,
+                manufacturing: 1,
+                banking: 1,
+                weapons: 1
+            }
         }
     },
-    technology: {
-        startingTechnologyLevel: {
-            terraforming: 1,
-            experimentation: 1,
-            scanning: 1,
-            hyperspace: 1,
-            manufacturing: 1,
-            banking: 1,
-            weapons: 1
+    constants: {
+        distances: {
+            lightYear: 30,
+            minDistanceBetweenStars: 30,
+            maxDistanceBetweenStars: 300
+        },
+        star: {
+            resources: {
+                minNaturalResources: 10,
+                maxNaturalResources: 50
+            }
         }
     }
-};
+}
 
 function generateStarGrid() {
     let stars = [];
@@ -66,12 +81,12 @@ function assertNewPlayer(newPlayer, colour) {
     expect(newPlayer._id).not.toBe(null);
     expect(newPlayer.userId).toBe(null);
     expect(newPlayer.alias).not.toBe(null);
-    expect(newPlayer.credits).toEqual(gameSettings.player.startingCredits);
+    expect(newPlayer.credits).toEqual(game.settings.player.startingCredits);
     expect(newPlayer.colour).toBe(colour);
 
     for(var key in newPlayer.research) {
         const res1 = newPlayer.research[key].level;
-        const res2 = gameSettings.technology.startingTechnologyLevel[key];
+        const res2 = game.settings.technology.startingTechnologyLevel[key];
         expect(res1).toEqual(res2);
     }
 }
@@ -112,16 +127,16 @@ describe('player', () => {
     it('should create an empty player', () => {
         const yellow = { alias: 'Yellow', value: '0xFFC000' };
 
-        const newPlayer = playerService.createEmptyPlayer(gameSettings, yellow);
+        const newPlayer = playerService.createEmptyPlayer(game, yellow);
 
         assertNewPlayer(newPlayer, yellow);
     });
 
     it('should create a list of empty players', () => {
         const allStars = generateStarGrid();
-        const players = playerService.createEmptyPlayers(gameSettings, allStars);
+        const players = playerService.createEmptyPlayers(game, allStars);
 
-        expect(players.length).toEqual(gameSettings.general.playerLimit);
+        expect(players.length).toEqual(game.settings.general.playerLimit);
 
         for(let i = 0; i < players.length; i++) {
             let newPlayer = players[i];
@@ -131,17 +146,17 @@ describe('player', () => {
             // Assert owned stars.
             const starsOwned = allStars.filter(x => x.ownedByPlayerId === newPlayer._id);
 
-            expect(starsOwned.length).toEqual(gameSettings.player.startingStars);
+            expect(starsOwned.length).toEqual(game.settings.player.startingStars);
 
             // Assert non-home star garrisons.
             starsOwned.filter(x => !x.homeStar).forEach(s => {
-                expect(s.garrison).toEqual(gameSettings.player.startingShips);
+                expect(s.garrison).toEqual(game.settings.player.startingShips);
             });
 
             // Assert home star.
             const homeStar = allStars.find(x => x._id === newPlayer.homeStarId);
             
-            expect(homeStar.garrison).toEqual(gameSettings.player.startingShips);
+            expect(homeStar.garrison).toEqual(game.settings.player.startingShips);
         }
 
         //printStars(allStars);

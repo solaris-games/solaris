@@ -93,7 +93,7 @@ module.exports = class GameTickService {
         let combatStars = [];
         let actionWaypoints = [];
 
-        let distancePerTick = this.distanceService.getCarrierTickDistance();
+        let distancePerTick = game.constants.distances.shipSpeed;
 
         for (let i = 0; i < carriers.length; i++) {
             let carrier = carriers[i];
@@ -125,7 +125,6 @@ module.exports = class GameTickService {
                 });
 
                 // TODO: Looping
-                // TODO: Perform carrier waypoint action.
 
                 // If the star is unclaimed, then claim it.
                 if (destinationStar.ownedByPlayerId == null) {
@@ -268,7 +267,7 @@ module.exports = class GameTickService {
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
             
-            this.researchService.conductResearch(player);
+            this.researchService.conductResearch(game, player);
         }
     }
 
@@ -304,7 +303,7 @@ module.exports = class GameTickService {
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
 
-            this.researchService.conductExperiments(player);
+            this.researchService.conductExperiments(game, player);
         }
     }
 

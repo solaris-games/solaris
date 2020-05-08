@@ -9,7 +9,7 @@ module.exports = async (container) => {
     // Set up the agenda instance.
     const agendajs = new Agenda()
         .database(config.connectionString)
-        .processEvery('1 second')
+        .processEvery('10 seconds')
         .maxConcurrency(20);
 
     await agendajs._ready;
@@ -36,8 +36,8 @@ module.exports = async (container) => {
     agendajs.start();
 
     // Start server jobs
-    agendajs.every('1 second', 'game-tick'); // TODO: Every minute?
-    agendajs.every('10 seconds', 'new-player-game-check'); // TODO: Every minute?
+    agendajs.every('1 minute', 'game-tick');
+    agendajs.every('10 seconds', 'new-player-game-check');
 
     return agendajs;
 };

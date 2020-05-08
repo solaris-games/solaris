@@ -18,7 +18,8 @@ module.exports = class GameService {
         return await this.getById(id, {
             settings: 1,
             state: 1,
-            galaxy: 1
+            galaxy: 1,
+            constants: 1
         });
     }
 
@@ -83,9 +84,9 @@ module.exports = class GameService {
             game.state.paused = false;
             game.state.startDate = start.toDate();
             game.state.lastTickDate = start.toDate();
-            game.state.nextTickDate = start.add(10, 'm').toDate();
-
-            // TODO: Register a cron job for the first tick of the game?
+            // TODO: When the game first begins, should we start at normal game speed?
+            // Or should we have a wait period before the game actually starts?
+            game.state.nextTickDate = start.add(game.settings.gameTime.speed, 'm').toDate();
         }
 
         return await game.save();

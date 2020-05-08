@@ -5,7 +5,6 @@ const Types = Schema.Types;
 const playerSchema = require('./player');
 const starSchema = require('./star');
 const carrierSchema = require('./carrier');
-const historySchema = require('./history');
 const messageSchema = require('./message');
 
 const schema = new Schema({
@@ -87,6 +86,40 @@ const schema = new Schema({
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		winner: { type: Types.ObjectId, required: false }
+	},
+	constants: {
+		distances: {
+			lightYear: { type: Types.Number, required: true, default: 30 },
+			minDistanceBetweenStars: { type: Types.Number, required: true, default: 30 },
+			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 300 },
+			shipSpeed: { type: Types.Number, required: true, default: 3 }
+		},
+		research: {
+			progressMultiplier: { type: Types.Number, required: true, default: 100 }
+		},
+		star: {
+			resources: {
+				minNaturalResources: { type: Types.Number, required: true, default: 10 },
+				maxNaturalResources: { type: Types.Number, required: true, default: 50 }
+			},
+			infrastructureCostMultipliers: {
+				warpGate: { type: Types.Number, required: true, default: 100 },
+				economy: { type: Types.Number, required: true, default: 2.5 },
+				industry: { type: Types.Number, required: true, default: 5 },
+				science: { type: Types.Number, required: true, default: 20 },
+				carrier: { type: Types.Number, required: true, default: 10 }
+			},
+			infrastructureExpenseMultipliers: {
+				cheap: { type: Types.Number, required: true, default: 1 },
+				standard: { type: Types.Number, required: true, default: 2 },
+				expensive: { type: Types.Number, required: true, default: 4 },
+				veryExpensive: { type: Types.Number, required: true, default: 8 },
+				crazyExpensive: { type: Types.Number, required: true, default: 16 }
+			}
+		},
+		trade: {
+			costPerLevel: { type: Types.Number, required: true, default: 15 }
+		}
 	}
 });
 

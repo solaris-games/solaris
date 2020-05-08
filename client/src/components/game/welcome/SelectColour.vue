@@ -11,7 +11,7 @@
             <tbody>
                 <tr v-for="player in players" v-bind:key="player._id">
                     <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                    <td class="col-avatar">
+                    <td class="col-avatar" :title="player.colour.alias">
                         <!-- TODO: Prefer images over font awesome icons? -->
                         <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
                         <!-- <img src=""> -->
@@ -62,8 +62,7 @@ export default {
 
   created () {
     this.sockets.listener.subscribe('joined', (data) => {
-      // TODO: This needs to go into a service.
-      let player = this.players.find(p => p._id === data.playerId)
+      let player = gameHelper.getPlayerById(this.game, data.playerId)
 
       player.isEmptySlot = false
       player.alias = data.alias
