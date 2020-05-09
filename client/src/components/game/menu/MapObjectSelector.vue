@@ -34,6 +34,7 @@
 
 <script>
 import gameHelper from '../../../services/gameHelper'
+import gameContainer from '../../../game/container'
 
 export default {
   props: {
@@ -71,7 +72,8 @@ export default {
     },
     onViewObjectRequested (mapObject) {
         switch (mapObject.type) {
-            case 'star': 
+            case 'star':
+                gameContainer.map.clickStar(mapObject.data._id)
                 this.$emit('onOpenStarDetailRequested', mapObject.data) 
                 break
             case 'carrier': 
