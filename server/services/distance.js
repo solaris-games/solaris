@@ -1,7 +1,7 @@
 const moment = require('moment');
 
 module.exports = class DistanceService {
-    
+
     getDistanceBetweenLocations(loc1, loc2) {
         let xs = loc2.x - loc1.x,
             ys = loc2.y - loc1.y;
@@ -57,16 +57,6 @@ module.exports = class DistanceService {
             x: source.x + (distance * Math.cos(angle)),
             y: source.y + (distance * Math.sin(angle)),
         };
-    }
-
-    calculateTimeByTicks(ticks, speedInMins, relativeTo = null) {
-        if (relativeTo == null) {
-            relativeTo = moment();
-        } else {
-            relativeTo = moment(relativeTo);
-        }
-
-        return relativeTo.add(ticks * speedInMins, 'm');
     }
 
 };

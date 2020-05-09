@@ -21,7 +21,7 @@
     <div class="form-group row mb-0 bg-primary">
         <label class="col col-form-label">Current Research ETA:</label>
         <div class="col text-right">
-            <label class="col-form-label">0d 0h 0m 0s</label>
+            <label class="col-form-label">{{timeRemainingEta}}</label>
         </div>
     </div>
     <div class="form-group row pt-2 pb-2 mb-2 bg-secondary">
@@ -60,18 +60,31 @@ export default {
         { text: 'Weapons', value: 'weapons' },
         { text: 'Banking', value: 'banking' },
         { text: 'Manufacturing', value: 'manufacturing' }
-      ]
+      ],
+      timeRemainingEta: null,
+      intervalFunction: null
     }
   },
   mounted () {
     this.player = GameHelper.getUserPlayer(this.game)
+
+    this.recalculateTimeRemaining()
+
+    if (!this.game.state.paused) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
   },
   methods: {
     async updateResearchNow (e) {
       this.loadingNow = true
 
       try {
-        await researchService.updateResearchNow(this.game._id, this.player.researchingNow)
+        let result = await researchService.updateResearchNow(this.game._id, this.player.researchingNow)
+
+        if (result.status === 200) {
+          this.player.currentResearchEta = result.data.etaTime
+          this.recalculateTimeRemaining()
+        }
       } catch (err) {
         console.error(err)
       }
@@ -88,6 +101,9 @@ export default {
       }
 
       this.loadingNext = false
+    },
+    recalculateTimeRemaining () {
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.player.currentResearchEta)
     }
   }
 }

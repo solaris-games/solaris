@@ -1,7 +1,9 @@
 module.exports = class ResearchService {
 
-    constructor(randomService) {
+    constructor(randomService, playerService, timeService) {
         this.randomService = randomService;
+        this.playerService = playerService;
+        this.timeService = timeService;
     }
 
     async updateResearchNow(game, userId, preference) {
@@ -10,7 +12,15 @@ module.exports = class ResearchService {
 
         userPlayer.researchingNow = preference;
 
-        return await game.save();
+        await game.save();
+
+        let eta = this.calculateCurrentResearchETAInTicks(game, userPlayer);
+        let etaTime = this.timeService.calculateTimeByTicks(eta, game.settings.gameTime.speed, game.state.lastTickDate);
+
+        return {
+            eta,
+            etaTime
+        };
     }
 
     async updateResearchNext(game, userId, preference) {
@@ -58,6 +68,17 @@ module.exports = class ResearchService {
             tech.level++;
             tech.progress -= requiredProgress;
         }
+    }
+
+    calculateCurrentResearchETAInTicks(game, player) {
+        let tech = player.research[player.researchingNow];
+
+        let requiredProgress = tech.level * game.constants.research.progressMultiplier;
+        let remainingPoints = requiredProgress - tech.progress;
+
+        let totalScience = this.playerService.calculateTotalScience(player, game.galaxy.stars);
+
+        return Math.ceil(remainingPoints / totalScience);
     }
 
 };

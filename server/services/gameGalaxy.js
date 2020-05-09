@@ -2,7 +2,9 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService) {
+    constructor(mapService, playerService, starService, distanceService, 
+        starDistanceService, starUpgradeService, carrierService, 
+        waypointService, researchService, timeService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -11,6 +13,8 @@ module.exports = class GameGalaxyService {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.waypointService = waypointService;
+        this.researchService = researchService;
+        this.timeService = timeService;
     }
 
     async getGalaxy(game, userId) {
@@ -213,7 +217,7 @@ module.exports = class GameGalaxyService {
                     w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
                     w.ticksEta = this.waypointService.calculateWaypointTicksEta(doc, c, w);
 
-                    w.eta = this.distanceService.calculateTimeByTicks(w.ticksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
+                    w.eta = this.timeService.calculateTimeByTicks(w.ticksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
                 });
 
                 if (c.waypoints.length) {
@@ -233,6 +237,9 @@ module.exports = class GameGalaxyService {
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
+                player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
+                player.currentResearchEta = this.timeService.calculateTimeByTicks(player.currentResearchTicksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
+
                 return p;
             }
 
@@ -246,7 +253,7 @@ module.exports = class GameGalaxyService {
                     experimentation: { level: p.research.experimentation.level },
                     weapons: { level: p.research.weapons.level },
                     banking: { level: p.research.banking.level },
-                    manufacturing: { level: p.research.manufacturing.level },
+                    manufacturing: { level: p.research.manufacturing.level }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 defeated: p.defeated,
