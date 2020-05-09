@@ -2,8 +2,8 @@ const moment = require('moment');
 
 module.exports = class GameTickService {
     
-    constructor(io, distanceService, starService, researchService, playerService, historyService, waypointService) {
-        this.io = io;
+    constructor(broadcastService, distanceService, starService, researchService, playerService, historyService, waypointService) {
+        this.broadcastService = broadcastService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.researchService = researchService;
@@ -42,7 +42,7 @@ module.exports = class GameTickService {
 
        await game.save();
 
-       this._broadcast(game);
+       this.broadcastService.gameTick(game);
     }
 
     _canTick(game) {
@@ -352,10 +352,5 @@ module.exports = class GameTickService {
             game.state.endDate = new Date();
             game.state.winner = winner._id;
         }
-    }
-
-    _broadcast(game) {
-        // TODO: This should definitely be in a service.
-        this.io.to(game.id).emit('tick', game);
     }
 }

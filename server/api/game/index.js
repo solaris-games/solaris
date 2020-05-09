@@ -95,11 +95,7 @@ module.exports = (router, io, container) => {
                 req.body.playerId,
                 req.body.alias);
 
-            // TODO: Need to figure out the best way to emit these. Possibly via a service?
-            io.to(req.game.id).emit('joined', {
-                playerId: req.body.playerId,
-                alias: req.body.alias
-            });
+            container.broadcastService.gameJoined(req.game, req.body.playerId, req.body.alias);
 
             return res.sendStatus(200);
         } catch (err) {
@@ -113,10 +109,7 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.session.userId);
                 
-            // TODO: Need to figure out the best way to emit these. Possibly via a service?
-            io.to(req.game.id).emit('quit', {
-                playerId: player.id
-            });
+            container.broadcastService.gamePlayerQuit(req.game, player);
 
             return res.sendStatus(200);
         } catch (err) {
