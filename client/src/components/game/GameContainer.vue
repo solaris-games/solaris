@@ -68,7 +68,6 @@ export default {
 
   watch: {
     game (newGame, oldGame) {
-      debugger
       this.loadGame(newGame)
       this.drawGame(newGame)
     }
