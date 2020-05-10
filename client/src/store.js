@@ -11,14 +11,14 @@ const vuexPersist = new VuexPersist({
 
 export default new Vuex.Store({
   state: {
-    userId: null // TODO: This doesn't appear to be used by the UI at all, do we still need this?
+    game: null
   },
   mutations: {
-    setUserId (state, id) {
-      state.userId = id
+    setGame (state, game) {
+      state.game = game
     },
-    clearUserId (state) {
-      state.userId = null
+    clearGame (state) {
+      state.game = null
     }
   },
   actions: {

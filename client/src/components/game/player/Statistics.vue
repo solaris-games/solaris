@@ -37,7 +37,6 @@ import GameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
-    game: Object,
     player: Object
   },
   methods: {
@@ -47,7 +46,7 @@ export default {
       return userPlayer && userPlayer._id === this.player._id
     },
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     userIsInGame () {
       return this.getUserPlayer() != null

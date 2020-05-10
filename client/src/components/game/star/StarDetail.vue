@@ -44,7 +44,6 @@
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
-        :gameId="game._id"
         :starId="star._id"
         :availableCredits="getUserPlayer().credits"
         :economy="star.upgradeCosts.economy" :industry="star.upgradeCosts.industry" :science="star.upgradeCosts.science"
@@ -102,7 +101,7 @@
       -->
     </div>
 
-    <playerOverview v-if="getStarOwningPlayer()" :game="game" :player="getStarOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
+    <playerOverview v-if="getStarOwningPlayer()" :player="getStarOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
 
     <!-- Modals -->
 
@@ -147,7 +146,6 @@ export default {
     'dialogModal': DialogModal
   },
   props: {
-    game: Object,
     star: Object
   },
   data () {
@@ -163,10 +161,10 @@ export default {
       this.$emit('onViewConversationRequested', e)
     },
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     getStarOwningPlayer () {
-      return GameHelper.getStarOwningPlayer(this.game, this.star)
+      return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
     },
     onInfrastructureUpgraded (e) {
       // TODO: Reload the current star to get new costs.
@@ -181,7 +179,7 @@ export default {
     },
     async confirmBuildCarrier (e) {
       try {
-        let response = await starService.buildCarrier(this.game._id, this.star._id)
+        let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           // TODO: Refresh somehow.
@@ -194,7 +192,7 @@ export default {
     },
     async confirmAbandonStar (e) {
       try {
-        let response = await starService.abandonStar(this.game._id, this.star._id)
+        let response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           // TODO: Maybe a better way to refresh this?
@@ -209,7 +207,7 @@ export default {
     },
     async confirmBuildWarpGate (e) {
       try {
-        let response = await starService.buildWarpGate(this.game._id, this.star._id)
+        let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           // TODO: This doesn't refresh the UI for some reason.
@@ -224,7 +222,7 @@ export default {
     },
     async confirmDestroyWarpGate (e) {
       try {
-        let response = await starService.destroyWarpGate(this.game._id, this.star._id)
+        let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.star.warpGate = false

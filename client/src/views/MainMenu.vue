@@ -46,8 +46,6 @@ export default {
   },
   methods: {
     async logout () {
-      this.$store.commit('clearUserId')
-
       this.isLoggingOut = true
 
       await authService.logout()

@@ -63,7 +63,6 @@ export default {
     	'menu-title': MenuTitle,
 	},
 	props: {
-		game: Object,
         carrier: Object,
         waypoint: Object
     },
@@ -77,7 +76,7 @@ export default {
 			this.$emit('onCloseRequested', e)
 		},
 		getStarName (starId) {
-			return this.game.galaxy.stars.find(s => s._id === starId).name
+			return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
 		},
         getWaypointActionFriendlyText (waypoint, action) {
             action = action || waypoint.action
@@ -139,7 +138,7 @@ export default {
 			// Push the waypoints to the API.
 			try {
                 this.isSavingWaypoints = true
-				let response = await CarrierApiService.saveWaypoints(this.game._id, this.carrier._id, this.carrier.waypoints)
+				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints)
 
 				// TODO: Do something with the response...?
 				if (response.status === 200) {

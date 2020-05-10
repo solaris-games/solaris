@@ -19,12 +19,11 @@ export default {
   components: {
   },
   props: {
-    game: Object,
     ship: Object
   },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.game, this.ship.ownedByPlayerId)
+      return gameHelper.getPlayerColour(this.$store.state.game, this.ship.ownedByPlayerId)
     },
     clickShip (e) {
       if (this.ship.type == 0) {

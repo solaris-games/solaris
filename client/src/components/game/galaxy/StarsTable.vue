@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            <star-row v-for="star in getTableData()" v-bind:key="star._id" :star="star" :game="game"/>
+            <star-row v-for="star in getTableData()" v-bind:key="star._id" :star="star"/>
         </tbody>
     </table>
 </div>
@@ -33,9 +33,6 @@ export default {
   components: {
     'star-row': StarRowVue
   },
-  props: {
-    game: Object
-  },
   data: function () {
     return {
       showAll: false
@@ -43,7 +40,7 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     toggleShowAll () {
       this.showAll = !this.showAll
@@ -52,9 +49,9 @@ export default {
       let sorter = (a, b) => a.name.localeCompare(b.name)
       
       if (this.showAll) {
-        return this.game.galaxy.stars.sort(sorter)
+        return this.$store.state.game.galaxy.stars.sort(sorter)
       } else {
-        return this.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
+        return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     }
   }

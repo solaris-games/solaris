@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            <carrier-row v-for="carrier in getTableData()" v-bind:key="carrier._id" :carrier="carrier" :game="game"/>
+            <carrier-row v-for="carrier in getTableData()" v-bind:key="carrier._id" :carrier="carrier"/>
         </tbody>
     </table>
 </div>
@@ -32,9 +32,6 @@ export default {
   components: {
     'carrier-row': CarrierRowVue
   },
-  props: {
-    game: Object
-  },
   data: function () {
     return {
       showAll: false
@@ -42,7 +39,7 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     toggleShowAll () {
       this.showAll = !this.showAll
@@ -51,9 +48,9 @@ export default {
       let sorter = (a, b) => a.name.localeCompare(b.name)
       
       if (this.showAll) {
-        return this.game.galaxy.carriers.sort(sorter)
+        return this.$store.state.game.galaxy.carriers.sort(sorter)
       } else {
-        return this.game.galaxy.carriers.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
+        return this.$store.state.game.galaxy.carriers.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     }
   }

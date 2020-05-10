@@ -20,12 +20,11 @@ export default {
   components: {
   },
   props: {
-    game: Object,
     star: Object
   },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.game, this.star.ownedByPlayerId)
+      return gameHelper.getPlayerColour(this.$store.state.game, this.star.ownedByPlayerId)
     },
     clickStar (e) {
       gameContainer.map.clickStar(this.star._id)

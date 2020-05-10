@@ -32,7 +32,6 @@ import TradeApiService from '../../../services/api/trade'
 
 export default {
   props: {
-    game: Object,
     player: Object,
     userPlayer: Object
   },
@@ -52,7 +51,7 @@ export default {
   methods: {
     async getTradeableTechnologies () {
       try {
-        let response = await TradeApiService.getTradeableTechnologies(this.game._id, this.player._id)
+        let response = await TradeApiService.getTradeableTechnologies(this.$store.state.game._id, this.player._id)
 
         if (response.status === 200) {
           this.availableTechnologies = response.data
@@ -67,7 +66,7 @@ export default {
     },
     async confirmSendTechnology () {
       try {
-        let response = await TradeApiService.sendTechnology(this.game._id, this.player._id, this.selectedTechnology)
+        let response = await TradeApiService.sendTechnology(this.$store.state.game._id, this.player._id, this.selectedTechnology)
 
         if (response.status === 200) {
           console.log('Technology sent')

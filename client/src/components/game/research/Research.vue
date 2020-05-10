@@ -4,11 +4,11 @@
 
     <p>Each point of science on your stars contributes 1 point of research every tick towards your chosen technology.</p>
 
-    <selection :game="game"/>
+    <selection/>
 
     <h4>Research Progress</h4>
 
-    <progress-summary :game="game"/>
+    <progress-summary/>
 
     <!-- TODO: Explanations of each research type -->
 </div>
@@ -24,9 +24,6 @@ export default {
     'menu-title': MenuTitle,
     'selection': Selection,
     'progress-summary': ProgressSummary
-  },
-  props: {
-    game: Object
   },
   methods: {
     onCloseRequested (e) {

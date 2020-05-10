@@ -68,7 +68,6 @@
 <script>
 export default {
   props: {
-    game: Object,
     player: Object,
     userPlayer: Object
   }

@@ -3,7 +3,7 @@
     <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested"/>
   
-    <overview :game="game" :player="player" @onViewConversationRequested="onViewConversationRequested"/>
+    <overview :player="player" @onViewConversationRequested="onViewConversationRequested"/>
 
     <h4 v-if="userPlayer" class="mt-2">Infrastructure</h4>
 
@@ -20,13 +20,13 @@
 
     <h4 v-if="userPlayer" class="mt-2">Technology</h4>
 
-    <research v-if="userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
+    <research v-if="userPlayer" :player="player" :userPlayer="userPlayer"/>
 
     <div v-if="game.startDate && userPlayer && player != userPlayer">
       <h4 class="mt-2">Trade</h4>
 
-      <sendTechnology :game="game" :player="player" :userPlayer="userPlayer"/>
-      <sendCredits :game="game" :player="player" :userPlayer="userPlayer"/>
+      <sendTechnology :player="player" :userPlayer="userPlayer"/>
+      <sendCredits :player="player" :userPlayer="userPlayer"/>
     </div>
 
     <loading-spinner :loading="!player.isEmptySlot && !user"/>
@@ -37,7 +37,7 @@
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="game.startDate && userPlayer && player != userPlayer" :game="game" :player="player" :userPlayer="userPlayer"/>
+    <sendRenown v-if="game.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"/>
 
     <!--
     <h4 class="mt-2">Badges</h4>
@@ -77,7 +77,6 @@ export default {
     'badges': Badges
   },
   props: {
-    game: Object,
     player: Object
   },
   data () {
@@ -94,7 +93,7 @@ export default {
     // main galaxy response.
     if (!this.player.isEmptySlot) {
       try {
-        let response = await gameService.getPlayerUserInfo(this.game._id, this.player._id)
+        let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 
         this.user = response.data
       } catch (err) {
@@ -102,7 +101,7 @@ export default {
       }
     }
 
-    this.userPlayer = GameHelper.getUserPlayer(this.game)
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
   },
   methods: {
     onCloseRequested (e) {
@@ -110,6 +109,11 @@ export default {
     },
     onViewConversationRequested (e) {
       this.$emit('onViewConversationRequested', e)
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
     }
   }
 }

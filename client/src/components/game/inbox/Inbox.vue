@@ -15,10 +15,10 @@
 
     <div class="tab-content pt-2">
         <div class="tab-pane fade show active" id="diplomacy">
-            <diplomacy-list :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
+            <diplomacy-list @onConversationOpenRequested="onConversationOpenRequested"/>
         </div>
         <div class="tab-pane fade" id="events">
-            <events-list :game="game"/>
+            <events-list/>
         </div>
     </div>
 </div>
@@ -34,9 +34,6 @@ export default {
     'menu-title': MenuTitle,
     'diplomacy-list': DiplomacyListVue,
     'events-list': EventsListVue
-  },
-  props: {
-    game: Object
   },
   methods: {
     onCloseRequested (e) {

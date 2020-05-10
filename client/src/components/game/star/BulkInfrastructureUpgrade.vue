@@ -44,9 +44,6 @@ export default {
   components: {
     "menu-title": MenuTitle
   },
-  props: {
-    game: Object
-  },
   data() {
     return {
       isUpgrading: false,
@@ -69,7 +66,7 @@ export default {
     }
   },
   mounted() {
-    this.amount = GameHelper.getUserPlayer(this.game).credits
+    this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
   },
   methods: {
     onCloseRequested(e) {
@@ -84,7 +81,7 @@ export default {
         this.isUpgrading = true
 
         let response = await starService.bulkInfrastructureUpgrade(
-          this.game._id,
+          this.$store.state.game._id,
           this.selectedType,
           this.amount
         )

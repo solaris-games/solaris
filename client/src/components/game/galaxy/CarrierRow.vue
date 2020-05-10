@@ -19,7 +19,6 @@ export default {
   components: {
   },
   props: {
-    game: Object,
     carrier: Object
   },
   data () {
@@ -32,13 +31,13 @@ export default {
   mounted () {
     this.recalculateTimeRemaining()
 
-    if (!this.game.state.paused) {
+    if (!this.$store.state.game.state.paused) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
   methods: {
     getColour () {
-      return GameHelper.getPlayerColour(this.game, this.carrier.ownedByPlayerId)
+      return GameHelper.getPlayerColour(this.$store.state.game, this.carrier.ownedByPlayerId)
     },
     clickCarrier (e) {
       gameContainer.map.clickCarrier(this.carrier._id)

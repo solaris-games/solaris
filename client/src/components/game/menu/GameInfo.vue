@@ -60,7 +60,6 @@ import GameContainer from '../../../game/container'
 
 export default {
   props: {
-    game: Object,
     nextProduction: String
   },
   data () {
@@ -74,7 +73,7 @@ export default {
   mounted () {
     this.recalculateTimeRemaining()
 
-    if (!this.game.state.paused) {
+    if (!this.$store.state.game.state.paused) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
@@ -83,7 +82,7 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     setMenuState (state, args) {
       this.$emit('onMenuStateChanged', {
@@ -101,14 +100,19 @@ export default {
       GameContainer.viewport.zoomPercent(percent, true)
     },
     zoomToHomeStar () {
-      GameContainer.map.zoomToUser(this.game)
+      GameContainer.map.zoomToUser(this.$store.state.game)
     },
     recalculateTimeRemaining () {
-      if (this.game.state.paused) {
+      if (this.$store.state.game.state.paused) {
         return
       }
 
       this.timeRemaining = GameHelper.getCountdownTimeString(this.nextProduction)
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
     }
   }
 }

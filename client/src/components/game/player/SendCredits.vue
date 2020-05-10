@@ -28,7 +28,6 @@ import DialogModal from '../../modal/DialogModal'
 
 export default {
   props: {
-    game: Object,
     player: Object,
     userPlayer: Object
   },
@@ -44,7 +43,7 @@ export default {
   methods: {
     async confirmSendCredits () {
       try {
-        let response = await tradeService.sendCredits(this.game._id, this.player._id, this.amount)
+        let response = await tradeService.sendCredits(this.$store.state.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
           this.$emit('onCreditsSent', this.amount)

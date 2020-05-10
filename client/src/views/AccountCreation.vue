@@ -95,8 +95,6 @@ export default {
         let response = await userService.createUser(this.username, this.email, this.password)
 
         if (response.status === 201) {
-          this.$store.commit('setUserId', response.data.id)
-
           router.push({ name: 'account-login' })
         }
       } catch (err) {

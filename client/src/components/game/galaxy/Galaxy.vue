@@ -18,13 +18,13 @@
 
     <div class="tab-content pt-2 pb-2">
         <div class="tab-pane fade show active" id="stars">
-            <stars-table :game="game"/>
+            <stars-table/>
         </div>
         <div class="tab-pane fade" id="carriers">
-            <carriers-table :game="game"/>
+            <carriers-table/>
         </div>
         <div class="tab-pane fade" id="ships">
-            <ships-table :game="game"/>
+            <ships-table/>
         </div>
     </div>
 </div>
@@ -42,9 +42,6 @@ export default {
     'stars-table': StarsTableVue,
     'carriers-table': CarriersTableVue,
     'ships-table': ShipsTableVue
-  },
-  props: {
-    game: Object
   },
   methods: {
     onCloseRequested (e) {

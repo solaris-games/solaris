@@ -76,9 +76,6 @@ import gameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 
 export default {
-  props: {
-    game: Object
-  },
   components: {
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
@@ -91,7 +88,7 @@ export default {
       }
   },
   mounted () {
-      this.players = this.game.galaxy.players
+      this.players = this.$store.state.game.galaxy.players
   },
 
   methods: {
@@ -99,10 +96,10 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     zoomToPlayer (player) {
-      gameContainer.map.zoomToPlayer(this.game, player)
+      gameContainer.map.zoomToPlayer(this.$store.state.game, player)
     },
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
@@ -116,7 +113,7 @@ export default {
     },
     async concedeDefeat () {
       try {
-        let response = await gameService.concedeDefeat(this.game._id)
+        let response = await gameService.concedeDefeat(this.$store.state.game._id)
 
         if (response.status === 200) {
             router.push({ name: 'main-menu' })
@@ -127,7 +124,7 @@ export default {
     },
     async quitGame () {
       try {
-        let response = await gameService.quitGame(this.game._id)
+        let response = await gameService.quitGame(this.$store.state.game._id)
 
         if (response.status === 200) {
             router.push({ name: 'main-menu' })
@@ -159,6 +156,12 @@ export default {
   destroyed () {
     this.sockets.listener.unsubscribe('joined')
     this.sockets.listener.unsubscribe('quit')
+  },
+  
+  computed: {
+    game () {
+      return this.$store.state.game
+    }
   }
 }
 </script>

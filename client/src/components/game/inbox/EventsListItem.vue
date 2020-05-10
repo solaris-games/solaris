@@ -13,11 +13,7 @@
 
 <script>
 export default {
-  components: {
-  },
-  props: {
-    game: Object
-  }
+  
 }
 </script>
 

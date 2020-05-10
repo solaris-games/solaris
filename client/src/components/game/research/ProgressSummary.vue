@@ -48,16 +48,13 @@
 import GameHelper from '../../../services/gameHelper'
 
 export default {
-  props: {
-    game: Object
-  },
   data: function () {
     return {
       research: null
     }
   },
   mounted () {
-    this.research = GameHelper.getUserPlayer(this.game).research
+    this.research = GameHelper.getUserPlayer(this.$store.state.game).research
   },
   methods: {
     getRequiredTotal(tech) {

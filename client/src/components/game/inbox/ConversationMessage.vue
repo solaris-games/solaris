@@ -26,7 +26,6 @@ export default {
   components: {
   },
   props: {
-    game: Object,
     message: Object,
     sender: Object,
     colour: String

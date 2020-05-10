@@ -38,17 +38,16 @@ import gameContainer from '../../../game/container'
 
 export default {
   props: {
-    game: Object,
     mapObjects: Array
   },
   methods: {
     getObjectOwningPlayer (mapObject) {
         switch (mapObject.type) {
             case 'star': 
-                return gameHelper.getStarOwningPlayer(this.game, mapObject.data)
+                return gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
                 break
             case 'carrier': 
-                return gameHelper.getCarrierOwningPlayer(this.game, mapObject.data)
+                return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
                 break
         }
     },
@@ -57,10 +56,10 @@ export default {
 
         switch (mapObject.type) {
             case 'star': 
-                owningPlayer = gameHelper.getStarOwningPlayer(this.game, mapObject.data)
+                owningPlayer = gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
                 break
             case 'carrier': 
-                owningPlayer = gameHelper.getCarrierOwningPlayer(this.game, mapObject.data)
+                owningPlayer = gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
                 break
         }
 

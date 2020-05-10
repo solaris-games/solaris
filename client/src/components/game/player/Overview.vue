@@ -21,7 +21,7 @@
           </div>
       </div>
       <div class="col pr-0 bg-secondary">
-          <statistics :game="game" :player="player"/>
+          <statistics :player="player"/>
       </div>
   </div>
 </div>
@@ -36,7 +36,6 @@ export default {
     'statistics': Statistics
   },
   props: {
-    game: Object,
     player: Object
   },
   methods: {

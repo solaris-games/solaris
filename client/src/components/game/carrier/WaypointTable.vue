@@ -13,7 +13,7 @@
         </thead>
         <tbody>
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint"
-                        :game="game" :waypoint="waypoint" :showAction="showAction"
+                        :waypoint="waypoint" :showAction="showAction"
                         @onEditWaypointRequested="onEditWaypointRequested"/>
         </tbody>
     </table>
@@ -27,7 +27,6 @@ export default {
     'waypointRow': WaypointRow
   },
   props: {
-    game: Object,
     carrier: Object
   },
   data () {

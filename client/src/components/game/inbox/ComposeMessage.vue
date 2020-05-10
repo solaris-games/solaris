@@ -18,7 +18,6 @@ export default {
       
   },
   props: {
-    game: Object,
     toPlayerId: String
   },
   data () {
@@ -32,7 +31,7 @@ export default {
         try {
             this.isSendingMessage = true
 
-            let response = await MessageApiService.send(this.game._id, this.toPlayerId, this.message)
+            let response = await MessageApiService.send(this.$store.state.game._id, this.toPlayerId, this.message)
 
             if (response.status === 200) {
                 this.message = '';

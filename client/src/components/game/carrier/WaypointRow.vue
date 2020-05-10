@@ -17,7 +17,6 @@ import GameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
-    game: Object,
     waypoint: Object,
     showAction: Boolean
   },
@@ -29,7 +28,7 @@ export default {
   mounted () {
     this.recalculateTimeRemaining()
 
-    if (!this.game.state.paused) {
+    if (!this.$store.state.game.state.paused) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
@@ -38,7 +37,7 @@ export default {
   },
   methods: {
     getStarName (starId) {
-      return this.game.galaxy.stars.find(s => s._id === starId).name
+      return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
     },
     editWaypoint (e) {
       e.preventDefault()

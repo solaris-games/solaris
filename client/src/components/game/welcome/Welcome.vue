@@ -8,7 +8,7 @@
 
     <loading-spinner :loading="isJoiningGame"/>
 
-    <select-colour :game="game" v-on:onJoinRequested="onJoinRequested"/>
+    <select-colour v-on:onJoinRequested="onJoinRequested"/>
 
     <div class="text-center pb-2">
         <p>Invite your friends and take on the Galaxy together!</p>
@@ -34,9 +34,6 @@ export default {
     'form-error-list': FormErrorListVue,
     'select-alias': SelectAliasVue,
     'select-colour': SelectColourVue
-  },
-  props: {
-    game: Object
   },
   data () {
     return {
@@ -77,7 +74,7 @@ export default {
       try {
         this.isJoiningGame = true
 
-        let response = await gameService.joinGame(this.game._id, playerId, this.alias)
+        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias)
 
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.

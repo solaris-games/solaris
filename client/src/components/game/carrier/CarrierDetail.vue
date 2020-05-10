@@ -38,7 +38,7 @@
       </div>
 
       <div v-if="carrier.waypoints.length" class="row pt-0 pb-0 mb-0">
-        <waypointTable :game="game" :carrier="carrier" @onEditWaypointRequested="onEditWaypointRequested"/>
+        <waypointTable :carrier="carrier" @onEditWaypointRequested="onEditWaypointRequested"/>
       </div>
 
       <!-- <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
@@ -61,7 +61,7 @@
       </div>
     </div>
     
-    <playerOverview v-if="getCarrierOwningPlayer()" :game="game" :player="getCarrierOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
+    <playerOverview v-if="getCarrierOwningPlayer()" :player="getCarrierOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
 </div>
 </template>
 
@@ -80,7 +80,6 @@ export default {
     'waypointTable': WaypointTable
   },
   props: {
-    game: Object,
     carrier: Object
   },
   data () {
@@ -97,7 +96,7 @@ export default {
 
     this.recalculateTimeRemaining()
 
-    if (!this.game.state.paused) {
+    if (!this.$store.state.game.state.paused) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
@@ -113,13 +112,13 @@ export default {
     },
     // TODO: This method appears everywhere, is there a way to make it global?
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     getCarrierOwningPlayer () {
-      return GameHelper.getCarrierOwningPlayer(this.game, this.carrier)
+      return GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
     },
     getCarrierOrbitingStar () {
-      return GameHelper.getCarrierOrbitingStar(this.game, this.carrier)
+      return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
     },
     onOpenPlayerDetailRequested (e) {
       e.preventDefault()
@@ -130,7 +129,7 @@ export default {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
       try {
         this.isLoopingWaypoints = true
-        let response = await CarrierApiService.loopWaypoints(this.game._id, this.carrier._id, !this.carrier.waypointsLooped)
+        let response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
 
         if (response.status === 200) {
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
@@ -149,7 +148,7 @@ export default {
     },
     onShipTransferRequested (e) {
       this.$emit('onShipTransferRequested', {
-        star: GameHelper.getStarById(this.game, this.carrier.orbiting),
+        star: GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting),
         carrier: this.carrier
       })
     },

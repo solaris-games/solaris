@@ -44,9 +44,6 @@ import GameHelper from '../../../services/gameHelper'
 import researchService from '../../../services/api/research'
 
 export default {
-  props: {
-    game: Object
-  },
   data: function () {
     return {
       loadingNow: false,
@@ -66,11 +63,11 @@ export default {
     }
   },
   mounted () {
-    this.player = GameHelper.getUserPlayer(this.game)
+    this.player = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.recalculateTimeRemaining()
 
-    if (!this.game.state.paused) {
+    if (!this.$store.state.game.state.paused) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
@@ -79,7 +76,7 @@ export default {
       this.loadingNow = true
 
       try {
-        let result = await researchService.updateResearchNow(this.game._id, this.player.researchingNow)
+        let result = await researchService.updateResearchNow(this.$store.state.game._id, this.player.researchingNow)
 
         if (result.status === 200) {
           this.player.currentResearchEta = result.data.etaTime
@@ -95,7 +92,7 @@ export default {
       this.loadingNext = true
 
       try {
-        await researchService.updateResearchNext(this.game._id, this.player.researchingNext)
+        await researchService.updateResearchNext(this.$store.state.game._id, this.player.researchingNext)
       } catch (err) {
         console.error(err)
       }

@@ -64,7 +64,6 @@ export default {
     'menu-title': MenuTitle
   },
   props: {
-    game: Object,
     transfer: Object
   },
   data () {
@@ -111,7 +110,7 @@ export default {
             this.isTransferringShips = true
 
             let response = await CarrierApiService.transferShips(
-                this.game._id, 
+                this.$store.state.game._id, 
                 this.transfer.carrier._id,
                 parseInt(this.carrierShips),
                 this.transfer.star._id,

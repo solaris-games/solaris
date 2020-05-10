@@ -7,7 +7,7 @@ import GameContainer from '../../game/container'
 
 export default {
   props: {
-    game: Object
+    
   },
 
   created () {
@@ -22,17 +22,17 @@ export default {
 
   beforeMount () {
     this.gameContainer = GameContainer
+    
+    this.loadGame(this.$store.state.game)
 
-    this.loadGame(this.game)
-
-    this.$socket.emit('join', this.game._id)
+    this.$socket.emit('join', this.$store.state.game._id)
   },
 
   mounted () {
     // Add the game canvas to the screen.
     this.$el.appendChild(this.gameContainer.app.view) // Add the pixi canvas to the element.
 
-    this.drawGame(this.game)
+    this.drawGame(this.$store.state.game)
 
     // Bind to game events.
     this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this))

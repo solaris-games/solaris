@@ -2,7 +2,7 @@
 <div class="container pb-2">
   <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
 
-  <player-overview :game="game" :player="getPlayer(fromPlayerId)"/>
+  <player-overview :player="getPlayer(fromPlayerId)"/>
 
   <loading-spinner :loading="!messages"/>
 
@@ -10,7 +10,7 @@
     <div class="pt-0 mb-2 mt-2" v-if="messages.length">
         <conversation-message v-for="message in messages" 
             v-bind:key="message._id" 
-            :game="game"
+           
             :sender="getPlayer(message.fromPlayerId)" 
             :message="message"
             :colour="getPlayerColour(message.fromPlayerId)"
@@ -22,7 +22,7 @@
         <p class="mb-0">No messages.</p>
     </div>
 
-    <compose-message :game="game" :toPlayerId="fromPlayerId" @onMessageSent="onMessageSent"/>
+    <compose-message :toPlayerId="fromPlayerId" @onMessageSent="onMessageSent"/>
   </div>
 </div>
 </template>
@@ -45,7 +45,6 @@ export default {
     'player-overview': PlayerOverview
   },
   props: {
-    game: Object,
     fromPlayerId: String
   },
   data () {
@@ -61,14 +60,14 @@ export default {
         this.$emit('onCloseRequested', e)
     },
     getPlayer (playerId) {
-      return this.game.galaxy.players.find(p => p._id === playerId)
+      return this.$store.state.game.galaxy.players.find(p => p._id === playerId)
     },
     getPlayerColour (playerId) {
-      return gameHelper.getPlayerColour(this.game, playerId)
+      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
     async loadMessages () {
         try {
-            let response = await MessageApiService.getConversation(this.game._id, this.fromPlayerId)
+            let response = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
 
             if (response.status === 200) {
                 this.messages = response.data

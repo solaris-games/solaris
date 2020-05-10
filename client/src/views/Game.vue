@@ -1,18 +1,16 @@
 <template>
   <div>
-    <loading-spinner :loading="!game"/>
+    <loading-spinner :loading="!hasGame"/>
     
-    <div v-if="game">
-        <span class="d-none">{{ game._id}}</span>
+    <div v-if="hasGame">
+        <span class="d-none">{{ gameId }}</span>
 
-        <main-bar :game="game"
-                    :menuState="menuState"
-                    :menuArguments="menuArguments"
-                    @onMenuStateChanged="onMenuStateChanged"
-                    @onPlayerSelected="onPlayerSelected"/>
+        <main-bar :menuState="menuState"
+                  :menuArguments="menuArguments"
+                  @onMenuStateChanged="onMenuStateChanged"
+                  @onPlayerSelected="onPlayerSelected"/>
 
-        <game-container :game="game"
-                    @onStarClicked="onStarClicked"
+        <game-container @onStarClicked="onStarClicked"
                     @onCarrierClicked="onCarrierClicked"
                     @onObjectsClicked="onObjectsClicked"/>
     </div>
@@ -41,7 +39,9 @@ export default {
       MENU_STATES: MENU_STATES
     }
   },
-  async mounted () {
+  async created () {
+    this.$store.commit('clearGame')
+
     await this.reloadGame()
 
     // Check if the user is in this game, if not then show the welcome screen.
@@ -52,13 +52,13 @@ export default {
       try {
         let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
 
-        this.game = galaxyResponse.data // This will be passed to the game container component.
+        this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
       } catch (err) {
         console.error(err)
       }
     },
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
 
     // MENU
@@ -97,6 +97,14 @@ export default {
     }
 
     // --------------------
+  },
+  computed: {
+    gameId () {
+      return this.$store.state.game._id
+    },
+    hasGame () {
+      return this.$store.state.game
+    }
   }
 }
 </script>

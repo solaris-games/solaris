@@ -1,6 +1,6 @@
 <template>
 <div class="menu">
-    <game-info :game="game" v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
+    <game-info v-bind:nextProduction="game.state.nextTickDate" @onMenuStateChanged="onMenuStateChanged"/>
 
     <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
 
@@ -8,30 +8,30 @@
       <!-- <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
       <div v-if="menuState == MENU_STATES.HELP">HELP</div> -->
 
-      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested" :game="game"/>
-      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested" :game="game"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :game="game" :player="menuArguments" :key="menuArguments._id" @onViewConversationRequested="onConversationOpenRequested"/>
-      <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested" :game="game"/>
-      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :game="game" :star="menuArguments"
+      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"/>
+      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"/>
+      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :player="menuArguments" :key="menuArguments._id" @onViewConversationRequested="onConversationOpenRequested"/>
+      <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
+      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :star="menuArguments"
         @onCloseRequested="onCloseRequested" 
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" 
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrier="menuArguments" 
         @onShipTransferRequested="onShipTransferRequested" 
         @onEditWaypointsRequested="onEditWaypointsRequested" 
         @onEditWaypointRequested="onEditWaypointRequested" 
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :game="game" :carrier="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :game="game" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX" @onCloseRequested="onCloseRequested" :game="game" @onConversationOpenRequested="onConversationOpenRequested"/>
-      <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :game="game" :fromPlayerId="menuArguments"/>
-      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :game="game"/>
-      <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested" :game="game"/>
-      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested" :game="game"/>
-      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :game="game" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
+      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" @onCloseRequested="onCloseRequested" :carrier="menuArguments" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :carrier="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <inbox v-if="menuState == MENU_STATES.INBOX" @onCloseRequested="onCloseRequested" @onConversationOpenRequested="onConversationOpenRequested"/>
+      <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"/>
+      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested"/>
+      <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested"/>
+      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested"/>
+      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
     </div>
 </div>
 </template>
@@ -78,7 +78,6 @@ export default {
     'map-object-selector': MapObjectSelectorVue
   },
   props: {
-    game: Object,
     menuState: String,
     menuArguments: Object
   },
@@ -126,6 +125,11 @@ export default {
     },
     onEditWaypointRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_WAYPOINT_DETAIL, e)
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
     }
   }
 }

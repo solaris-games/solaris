@@ -67,9 +67,6 @@ export default {
     'menu-title': MenuTitle,
     'line-chart': LineChart
   },
-  props: {
-    game: Object
-  },
   data () {
     return {
       intelType: 'totalStars',
@@ -92,16 +89,16 @@ export default {
     }
   },
   async mounted () {
-    this.playerFilters = this.game.galaxy.players.map(p => {
+    this.playerFilters = this.$store.state.game.galaxy.players.map(p => {
       return {
         enabled: true,
         playerId: p._id,
-        colour: GameHelper.getPlayerColour(this.game, p._id)
+        colour: GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
     })
 
     try {
-      let response = await GameApiService.getGameHistory(this.game._id)
+      let response = await GameApiService.getGameHistory(this.$store.state.game._id)
       
       if (response.status === 200) {
         this.history = response.data
@@ -116,7 +113,7 @@ export default {
         this.$emit('onCloseRequested', e)
     },
     getPlayerColour (player) {
-      return GameHelper.getPlayerColour(this.game, player._id)
+      return GameHelper.getPlayerColour(this.$store.state.game, player._id)
     },
     togglePlayerFilter (playerFilter) {
       playerFilter.enabled = !playerFilter.enabled
@@ -129,7 +126,7 @@ export default {
       this.fillData()
     },
     showNone () {
-      let userPlayer = GameHelper.getUserPlayer(this.game)
+      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
       this.playerFilters.forEach(f => f.enabled = (f.playerId === userPlayer._id))
 
@@ -149,8 +146,8 @@ export default {
 
       dataCollection.labels = this.history.map(h => h.tick)
 
-      for (let i = 0; i < this.game.galaxy.players.length; i++) {
-        let player = this.game.galaxy.players[i]
+      for (let i = 0; i < this.$store.state.game.galaxy.players.length; i++) {
+        let player = this.$store.state.game.galaxy.players[i]
         let playerFilter = this.playerFilters.find(f => f.playerId === player._id)
 
         if (!playerFilter.enabled) {

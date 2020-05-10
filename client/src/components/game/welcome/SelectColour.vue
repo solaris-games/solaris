@@ -35,17 +35,13 @@ import gameContainer from '../../../game/container'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
-  props: {
-    game: Object
-  },
-
   data () {
       return {
           players: []
       }
   },
   mounted () {
-      this.players = this.game.galaxy.players
+      this.players = this.$store.state.game.galaxy.players
   },
 
   methods: {
@@ -56,13 +52,13 @@ export default {
       this.$emit('onJoinRequested', player._id)
     },
     zoomToPlayer (player) {
-      gameContainer.map.zoomToPlayer(this.game, player)
+      gameContainer.map.zoomToPlayer(this.$store.state.game, player)
     }
   },
 
   created () {
     this.sockets.listener.subscribe('joined', (data) => {
-      let player = gameHelper.getPlayerById(this.game, data.playerId)
+      let player = gameHelper.getPlayerById(this.$store.state.game, data.playerId)
 
       player.isEmptySlot = false
       player.alias = data.alias

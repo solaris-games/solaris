@@ -14,7 +14,7 @@
     
     <div class="pt-2">
         <conversation-message v-for="conversation in conversations" 
-          v-bind:key="conversation.playerId" :game="game" 
+          v-bind:key="conversation.playerId" 
           :sender="getPlayer(conversation.playerId)" 
           :message="conversation.lastMessage"
           :colour="getPlayerColour(conversation.playerId)"
@@ -36,9 +36,6 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'conversation-message': ConversationMessageVue
   },
-  props: {
-    game: Object
-  },
   data () {
     return {
       conversations: null
@@ -49,16 +46,16 @@ export default {
   },
   methods: {
     getPlayer (playerId) {
-      return gameHelper.getPlayerById(this.game, playerId)
+      return gameHelper.getPlayerById(this.$store.state.game, playerId)
     },
     getPlayerColour (playerId) {
-      return gameHelper.getPlayerColour(this.game, playerId)
+      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
     async refreshList () {
       this.conversations = null
       
       try {
-        let response = await MessageApiService.getConversations(this.game._id)
+        let response = await MessageApiService.getConversations(this.$store.state.game._id)
 
         if (response.status === 200) {
           this.conversations = response.data

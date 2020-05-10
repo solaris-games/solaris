@@ -20,7 +20,6 @@ import tradeService from '../../../services/api/trade'
 
 export default {
   props: {
-    game: Object,
     player: Object,
     userPlayer: Object
   },
@@ -35,7 +34,7 @@ export default {
       try {
         this.isAwardingRenown = true
 
-        let response = await tradeService.sendRenown(this.game._id, this.player._id, this.amount)
+        let response = await tradeService.sendRenown(this.$store.state.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
           this.$emit('onRenownSent', this.amount)

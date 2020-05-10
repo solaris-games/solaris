@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-            <ship-row v-for="ship in getTableData()" v-bind:key="ship._id" :game="game" :ship="ship" />
+            <ship-row v-for="ship in getTableData()" v-bind:key="ship._id" :ship="ship" />
         </tbody>
     </table>
 </div>
@@ -29,9 +29,6 @@ export default {
   components: {
     'ship-row': ShipRowVue
   },
-  props: {
-    game: Object
-  },
   data: function () {
     return {
       showAll: false
@@ -39,7 +36,7 @@ export default {
   },
   methods: {
     getUserPlayer () {
-      return GameHelper.getUserPlayer(this.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
     toggleShowAll () {
       this.showAll = !this.showAll
@@ -47,7 +44,7 @@ export default {
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
 
-      let starShips = this.game.galaxy.stars
+      let starShips = this.$store.state.game.galaxy.stars
       .filter(s => s.garrison)
       .map(s => {
         return {
@@ -60,7 +57,7 @@ export default {
         }
       })
 
-      let carrierShips = this.game.galaxy.carriers
+      let carrierShips = this.$store.state.game.galaxy.carriers
       .filter(s => s.ships)
       .map(c => {
         return {

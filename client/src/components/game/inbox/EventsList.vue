@@ -6,7 +6,7 @@
     </div>
 
     <div class="mt-4">
-        <events-list-item :game="game" />
+        <events-list-item />
     </div>
 </div>
 </template>
@@ -17,9 +17,6 @@ import EventsListItemVue from './EventsListItem'
 export default {
   components: {
     'events-list-item': EventsListItemVue
-  },
-  props: {
-    game: Object
   },
   data: function () {
     return {
