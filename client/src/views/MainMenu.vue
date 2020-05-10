@@ -50,6 +50,8 @@ export default {
 
       await authService.logout()
 
+      this.$store.commit('clearUserId')
+          
       this.isLoggingOut = false
 
       router.push({ name: 'home' })

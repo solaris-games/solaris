@@ -73,6 +73,8 @@ export default {
         let response = await authService.login(this.username, this.password)
 
         if (response.status === 200) {
+          this.$store.commit('setUserId', response.data.id)
+
           router.push({ name: 'main-menu' })
         }
       } catch (err) {

@@ -25,7 +25,10 @@ export default {
     
     this.loadGame(this.$store.state.game)
 
-    this.$socket.emit('gameRoomJoined', this.$store.state.game._id)
+    this.$socket.emit('gameRoomJoined', {
+      gameId: this.$store.state.game._id,
+      userId: this.$store.state.userId
+    })
   },
 
   mounted () {
