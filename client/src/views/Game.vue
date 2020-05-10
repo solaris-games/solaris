@@ -60,7 +60,6 @@ export default {
   },
   methods: {
     async reloadGame () {
-      debugger
       try {
         let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
 
