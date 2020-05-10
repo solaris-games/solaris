@@ -44,7 +44,7 @@
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
-        :starId="star._id"
+        :star="star"
         :availableCredits="getUserPlayer().credits"
         :economy="star.upgradeCosts.economy" :industry="star.upgradeCosts.industry" :science="star.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
@@ -169,7 +169,7 @@ export default {
     onInfrastructureUpgraded (e) {
       // TODO: Reload the current star to get new costs.
       // TODO: Reload the player credits somehow?
-      this.star[e]++
+      // this.star[e]++
       this.getStarOwningPlayer().credits -= this.star.upgradeCosts[e]
     },
     onOpenPlayerDetailRequested (e) {

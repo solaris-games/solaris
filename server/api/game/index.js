@@ -95,7 +95,7 @@ module.exports = (router, io, container) => {
                 req.body.playerId,
                 req.body.alias);
 
-            container.broadcastService.gameJoined(req.game, req.body.playerId, req.body.alias);
+            container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias);
 
             return res.sendStatus(200);
         } catch (err) {

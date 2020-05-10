@@ -13,7 +13,7 @@ export default {
   created () {
     window.addEventListener('resize', this.handleResize)
 
-    this.sockets.listener.subscribe('tick', (data) => {
+    this.sockets.listener.subscribe('gameTicked', (data) => {
       console.log('Game ticked')
 
       // TODO: Reload the game.
@@ -25,7 +25,7 @@ export default {
     
     this.loadGame(this.$store.state.game)
 
-    this.$socket.emit('join', this.$store.state.game._id)
+    this.$socket.emit('gameRoomJoined', this.$store.state.game._id)
   },
 
   mounted () {
@@ -46,9 +46,9 @@ export default {
   },
 
   destroyed () {
-    this.$socket.emit('leave')
+    this.$socket.emit('gameRoomLeft')
 
-    this.sockets.listener.unsubscribe('tick')
+    this.sockets.listener.unsubscribe('gameTicked')
   },
 
   methods: {

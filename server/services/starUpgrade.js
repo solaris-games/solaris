@@ -103,6 +103,7 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
+        // Calculate how much the upgrade will cost.
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
@@ -111,12 +112,19 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
+        // Upgrade infrastructure.
         star.infrastructure[economyType]++;
         userPlayer.credits -= cost;
 
         await game.save();
 
-        return cost;
+        // Return a report of what just went down.
+        return {
+            playerId: userPlayer._id,
+            starId: star._id,
+            infrastructure: star.infrastructure[economyType],
+            cost
+        };
     }
 
     async upgradeEconomy(game, userId, starId) {

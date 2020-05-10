@@ -42,10 +42,15 @@ export default {
   async created () {
     this.$store.commit('clearGame')
 
+    this.subscribeToSockets()
+
     await this.reloadGame()
 
     // Check if the user is in this game, if not then show the welcome screen.
     this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
+  },
+  destroyed () {
+    this.unsubscribeToSockets()
   },
   methods: {
     async reloadGame () {
@@ -94,9 +99,20 @@ export default {
     onObjectsClicked (e) {
       this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
       this.menuArguments = e
-    }
+    },
 
     // --------------------
+    // Sockets
+    subscribeToSockets () {
+      this.sockets.listener.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
+      this.sockets.listener.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
+      this.sockets.listener.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
+    },
+    unsubscribeToSockets () {
+      this.sockets.listener.unsubscribe('gameStarEconomyUpgraded')
+      this.sockets.listener.unsubscribe('gameStarIndustryUpgraded')
+      this.sockets.listener.unsubscribe('gameStarScienceUpgraded')
+    }
   },
   computed: {
     gameId () {

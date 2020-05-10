@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
+import GameHelper from './services/gameHelper'
 
 Vue.use(Vuex)
 
@@ -19,7 +20,27 @@ export default new Vuex.Store({
     },
     clearGame (state) {
       state.game = null
-    }
+    },
+
+    // ----------------
+    // Sockets
+
+    gameStarEconomyUpgraded (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.infrastructure.economy = data.infrastructure
+    },
+    gameStarIndustryUpgraded (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.infrastructure.industry = data.infrastructure
+    },
+    gameStarScienceUpgraded (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.infrastructure.science = data.infrastructure
+    },
+
   },
   actions: {
 

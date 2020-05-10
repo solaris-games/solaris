@@ -20,12 +20,14 @@ module.exports = (router, io, container) => {
 
     router.put('/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
         try {
-            await container.starUpgradeService.upgradeEconomy(
+            let report = await container.starUpgradeService.upgradeEconomy(
                 req.game,
                 req.session.userId,
                 req.body.starId);
 
-            return res.sendStatus(200);
+            container.broadcastService.gameStarEconomyUpgraded(req.game, req.body.starId, report.infrastructure);
+
+            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }
@@ -33,12 +35,14 @@ module.exports = (router, io, container) => {
 
     router.put('/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
         try {
-            await container.starUpgradeService.upgradeIndustry(
+            let report = await container.starUpgradeService.upgradeIndustry(
                 req.game,
                 req.session.userId,
                 req.body.starId);
 
-            return res.sendStatus(200);
+            container.broadcastService.gameStarIndustryUpgraded(req.game, req.body.starId, report.infrastructure);
+
+            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }
@@ -46,12 +50,14 @@ module.exports = (router, io, container) => {
 
     router.put('/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGame, async (req, res, next) => {
         try {
-            await container.starUpgradeService.upgradeScience(
+            let report = await container.starUpgradeService.upgradeScience(
                 req.game,
                 req.session.userId,
                 req.body.starId);
 
-            return res.sendStatus(200);
+            container.broadcastService.gameStarScienceUpgraded(req.game, req.body.starId, report.infrastructure);
+
+            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }

@@ -139,14 +139,14 @@ export default {
   },
 
   created () {
-    this.sockets.listener.subscribe('joined', (data) => {
+    this.sockets.listener.subscribe('gamePlayerJoined', (data) => {
       let player = this.players.find(p => p._id === data.playerId)
 
       player.isEmptySlot = false
       player.alias = data.alias
     })
 
-    this.sockets.listener.subscribe('quit', (data) => {
+    this.sockets.listener.subscribe('gamePlayerQuit', (data) => {
       let player = this.players.find(p => p._id === data.playerId)
 
       player.isEmptySlot = true
@@ -154,8 +154,8 @@ export default {
     })
   },
   destroyed () {
-    this.sockets.listener.unsubscribe('joined')
-    this.sockets.listener.unsubscribe('quit')
+    this.sockets.listener.unsubscribe('gamePlayerJoined')
+    this.sockets.listener.unsubscribe('gamePlayerQuit')
   },
   
   computed: {

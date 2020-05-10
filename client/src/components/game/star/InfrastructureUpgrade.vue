@@ -26,8 +26,7 @@ import starService from '../../../services/api/star'
 
 export default {
   props: {
-    gameId: String,
-    starId: String,
+    star: Object,
     availableCredits: Number,
     economy: Number,
     industry: Number,
@@ -45,7 +44,7 @@ export default {
       try {
         this.isUpgradingEconomy = true
 
-        let response = await starService.upgradeEconomy(this.$store.state.game._id, this.starId)
+        let response = await starService.upgradeEconomy(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'economy')
@@ -60,7 +59,7 @@ export default {
       try {
         this.isUpgradingIndustry = true
 
-        let response = await starService.upgradeIndustry(this.$store.state.game._id, this.starId)
+        let response = await starService.upgradeIndustry(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'industry')
@@ -75,7 +74,7 @@ export default {
       try {
         this.isUpgradingScience = true
 
-        let response = await starService.upgradeScience(this.$store.state.game._id, this.starId)
+        let response = await starService.upgradeScience(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$emit('onInfrastructureUpgraded', 'science')

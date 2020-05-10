@@ -68,6 +68,7 @@ module.exports = (io) => {
 
     return {
         authService,
+        broadcastService,
         carrierService,
         distanceService,
         gameService,
