@@ -33,7 +33,6 @@ export default {
   },
   data () {
     return {
-      game: null,
       menuState: null,
       menuArguments: null,
       MENU_STATES: MENU_STATES
@@ -46,14 +45,22 @@ export default {
 
     await this.reloadGame()
 
+    this.$socket.emit('gameRoomJoined', {
+      gameId: this.$store.state.game._id,
+      userId: this.$store.state.userId
+    })
+
     // Check if the user is in this game, if not then show the welcome screen.
     this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
   },
   destroyed () {
     this.unsubscribeToSockets()
+    
+    this.$socket.emit('gameRoomLeft')
   },
   methods: {
     async reloadGame () {
+      debugger
       try {
         let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
 
@@ -104,14 +111,27 @@ export default {
     // --------------------
     // Sockets
     subscribeToSockets () {
+      this.sockets.listener.subscribe('gameTicked', this.reloadGame)
+
       this.sockets.listener.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.listener.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
       this.sockets.listener.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
+      this.sockets.listener.subscribe('gameStarBulkUpgraded', (data) => this.$store.commit('gameStarBulkUpgraded', data))
+      this.sockets.listener.subscribe('gameStarWarpGateBuilt', (data) => this.$store.commit('gameStarWarpGateBuilt', data))
+      this.sockets.listener.subscribe('gameStarWarpGateDestroyed', (data) => this.$store.commit('gameStarWarpGateDestroyed', data))
+      this.sockets.listener.subscribe('gameStarCarrierBuilt', (data) => this.$store.commit('gameStarCarrierBuilt', data))
+      this.sockets.listener.subscribe('gameStarAbandoned', (data) => this.$store.commit('gameStarAbandoned', data))
     },
     unsubscribeToSockets () {
+      this.sockets.listener.unsubscribe('gameTicked')
       this.sockets.listener.unsubscribe('gameStarEconomyUpgraded')
       this.sockets.listener.unsubscribe('gameStarIndustryUpgraded')
       this.sockets.listener.unsubscribe('gameStarScienceUpgraded')
+      this.sockets.listener.unsubscribe('gameStarBulkUpgraded')
+      this.sockets.listener.unsubscribe('gameStarWarpGateBuilt')
+      this.sockets.listener.unsubscribe('gameStarWarpGateDestroyed')
+      this.sockets.listener.unsubscribe('gameStarCarrierBuilt')
+      this.sockets.listener.unsubscribe('gameStarAbandoned')
     }
   },
   computed: {

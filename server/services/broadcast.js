@@ -48,4 +48,32 @@ module.exports = class BroadcastService {
         });
     }
 
+    gameStarBulkUpgraded(game, summary) {
+        this.io.to(game.id).emit('gameStarBulkUpgraded', summary);
+    }
+
+    gameStarWarpGateBuilt(game, starId) {
+        this.io.to(game.id).emit('gameStarWarpGateBuilt', {
+            starId
+        });
+    }
+
+    gameStarWarpGateDestroyed(game, starId) {
+        this.io.to(game.id).emit('gameStarWarpGateDestroyed', {
+            starId
+        });
+    }
+
+    gameStarCarrierBuilt(game, starId) {
+        this.io.to(game.id).emit('gameStarCarrierBuilt', {
+            starId
+        });
+    }
+
+    gameStarAbandoned(game, starId) {
+        this.io.to(game.id).emit('gameStarAbandoned', {
+            starId
+        });
+    }
+
 };

@@ -150,8 +150,10 @@ module.exports = class StarUpgradeService {
         }
 
         let upgradeSummary = {
+            stars: [],
             cost: 0,
-            upgraded: 0
+            upgraded: 0,
+            infrastructureType
         };
 
         let expenseConfig;
@@ -202,10 +204,23 @@ module.exports = class StarUpgradeService {
 
             let upgradedCost = await upgradeFunction(game, userId, upgradeStar._id);
 
-            amount -= upgradedCost;
+            amount -= upgradedCost.cost;
 
             upgradeSummary.upgraded++;
-            upgradeSummary.cost += upgradedCost;
+            upgradeSummary.cost += upgradedCost.cost;
+
+            // Add the star that we upgraded to the summary result.
+            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar._id));
+
+            if (!summaryStar) {
+                summaryStar = {
+                    starId: upgradeStar._id
+                }
+
+                upgradeSummary.stars.push(summaryStar);
+            }
+
+            summaryStar.infrastructure = upgradeStar.infrastructure[infrastructureType];
         }
 
         await game.save()

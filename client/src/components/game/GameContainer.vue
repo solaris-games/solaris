@@ -3,32 +3,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import GameContainer from '../../game/container'
 
 export default {
-  props: {
-    
-  },
-
   created () {
     window.addEventListener('resize', this.handleResize)
-
-    this.sockets.listener.subscribe('gameTicked', (data) => {
-      console.log('Game ticked')
-
-      // TODO: Reload the game.
-    })
   },
 
   beforeMount () {
     this.gameContainer = GameContainer
     
     this.loadGame(this.$store.state.game)
-
-    this.$socket.emit('gameRoomJoined', {
-      gameId: this.$store.state.game._id,
-      userId: this.$store.state.userId
-    })
   },
 
   mounted () {
@@ -46,12 +32,6 @@ export default {
 
   beforeDestroy () {
     window.removeEventListener('resize', this.handleResize)
-  },
-
-  destroyed () {
-    this.$socket.emit('gameRoomLeft')
-
-    this.sockets.listener.unsubscribe('gameTicked')
   },
 
   methods: {
@@ -84,8 +64,11 @@ export default {
     }
   },
 
+  computed: mapState(['game']),
+
   watch: {
     game (newGame, oldGame) {
+      debugger
       this.loadGame(newGame)
       this.drawGame(newGame)
     }

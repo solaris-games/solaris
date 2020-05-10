@@ -71,6 +71,8 @@ module.exports = (router, io, container) => {
                 req.body.infrastructure,
                 +req.body.amount);
 
+            container.broadcastService.gameStarBulkUpgraded(req.game, summary);
+
             return res.status(200).json(summary);
         } catch (err) {
             return next(err);
@@ -83,6 +85,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.session.userId,
                 req.body.starId);
+
+            container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId);
 
             return res.sendStatus(200);
         } catch (err) {
@@ -97,6 +101,8 @@ module.exports = (router, io, container) => {
                 req.session.userId,
                 req.body.starId);
 
+            container.broadcastService.gameStarWarpGateDestroyed(req.game, req.body.starId);
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -110,6 +116,8 @@ module.exports = (router, io, container) => {
                 req.session.userId,
                 req.body.starId);
 
+            container.broadcastService.gameStarCarrierBuilt(req.game, req.body.starId);
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -122,6 +130,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.session.userId,
                 req.body.starId);
+
+            container.broadcastService.gameStarAbandoned(req.game, req.body.starId);
 
             return res.sendStatus(200);
         } catch (err) {

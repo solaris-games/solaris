@@ -48,6 +48,33 @@ export default new Vuex.Store({
 
       star.infrastructure.science = data.infrastructure
     },
+    gameStarBulkUpgraded (state, data) {
+      data.stars.forEach(s => {
+        let star = GameHelper.getStarById(state.game, s.starId)
+
+        star.infrastructure[data.infrastructureType] = s.infrastructure
+      })
+    },
+    gameStarWarpGateBuilt (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.warpGate = true
+    },
+    gameStarWarpGateDestroyed (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.warpGate = false
+    },
+    gameStarCarrierBuilt (state, data) {
+
+    },
+    gameStarAbandoned (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.ownedByPlayerId = null
+      star.garrison = 0
+      star.garrisonActual = 0
+    },
 
   },
   actions: {

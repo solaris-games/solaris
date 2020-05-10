@@ -182,9 +182,7 @@ export default {
         let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          // TODO: Refresh somehow.
-
-          this.$emit('onCarrierBuilt', this.star._id)
+          // this.$emit('onCarrierBuilt', this.star._id)
         }
       } catch (err) {
         console.error(err)
@@ -195,11 +193,7 @@ export default {
         let response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          // TODO: Maybe a better way to refresh this?
-          this.star.ownedByPlayerId = null
-          this.star.garrison = 0
-
-          this.$emit('onStarAbandoned', this.star._id)
+          // this.$emit('onStarAbandoned', this.star._id)
         }
       } catch (err) {
         console.error(err)
@@ -210,11 +204,7 @@ export default {
         let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          // TODO: This doesn't refresh the UI for some reason.
-          // Maybe the solution is to put the warp gate value in data instead of a prop?
-          this.star.warpGate = true
-
-          this.$emit('onUpgradedWarpGate', this.star._id)
+          // this.$emit('onUpgradedWarpGate', this.star._id)
         }
       } catch (err) {
         console.error(err)
@@ -225,9 +215,7 @@ export default {
         let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.star.warpGate = false
-
-          this.$emit('onDestroyedWarpGate', this.star._id)
+          // this.$emit('onDestroyedWarpGate', this.star._id)
         }
       } catch (err) {
         console.error(err)
