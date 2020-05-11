@@ -45,11 +45,13 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.messageService.send(
+            let message = await container.messageService.send(
                 req.game,
                 req.session.userId,
                 req.body.toPlayerId,
                 req.body.message);
+
+            container.broadcastService.gameMessageSent(req.game, message, message.toUserId)
 
             return res.sendStatus(200);
         } catch (err) {

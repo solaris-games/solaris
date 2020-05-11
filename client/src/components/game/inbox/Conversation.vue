@@ -10,12 +10,10 @@
     <div class="pt-0 mb-2 mt-2" v-if="messages.length">
         <conversation-message v-for="message in messages" 
             v-bind:key="message._id" 
-           
             :sender="getPlayer(message.fromPlayerId)" 
             :message="message"
             :colour="getPlayerColour(message.fromPlayerId)"
             class="mb-1"/>
-
     </div>
     
     <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
@@ -55,6 +53,12 @@ export default {
   mounted () {
     this.loadMessages()
   },
+  created () {
+      this.sockets.listener.subscribe('gameMessageSent', this.onMessageReceived)
+  },
+  destroyed () {
+    this.sockets.listener.unsubscribe('gameMessageSent')
+  },
   methods: {
     onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
@@ -78,6 +82,9 @@ export default {
     },
     onMessageSent (e) {
         this.loadMessages()
+    },
+    onMessageReceived (e) {
+      this.messages.push(e)
     }
   }
 }

@@ -76,4 +76,10 @@ module.exports = class BroadcastService {
         });
     }
 
+    gameMessageSent(game, message, toUserId) {
+        delete message.toUserId; // TODO: Find a better place to do this.
+
+        this.io.to(toUserId).emit('gameMessageSent', message);
+    }
+
 };
