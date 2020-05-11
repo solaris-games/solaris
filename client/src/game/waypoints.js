@@ -16,21 +16,12 @@ class Waypoints extends EventEmitter {
     this.game = game
   }
 
-  registerEvents (stars, carriers) {
-    stars.forEach(s => {
-      s.on('onStarClicked', this.onStarClicked.bind(this))
-    })
-    carriers.forEach(s => {
-      s.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-    })
-  }
-
-  unregisterEvents (stars, carriers) {
-    // TODO: This needs to be wired up somehow.
+  clear () {
+    this.container.removeChildren()
   }
 
   draw (carrier) {
-    this.container.removeChildren()
+    this.clear()
 
     this.carrier = carrier
     

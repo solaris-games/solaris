@@ -78,7 +78,6 @@ class Map extends EventEmitter {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(this.game)
-    this.waypoints.registerEvents(this.stars, this.carriers)
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
@@ -129,8 +128,7 @@ class Map extends EventEmitter {
   }
 
   clearWaypoints () {
-    this.waypoints.unregisterEvents(this.stars, this.carriers)
-    this.waypoints.container.removeChildren()
+    this.waypoints.clear()
   }
 
   zoomToPlayer (game, player) {
@@ -208,6 +206,8 @@ class Map extends EventEmitter {
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onStarClicked', e)
       }
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onStarClicked(e)
     }
   }
 
@@ -219,6 +219,8 @@ class Map extends EventEmitter {
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       }
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onCarrierClicked(e)
     }
   }
 
