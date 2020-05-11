@@ -24,7 +24,7 @@
 
     <loading-spinner :loading="isLoadingCompletedGames"/>
     
-    <div v-if="!isLoadingActiveGames && !activeGames.length">
+    <div v-if="!isLoadingActiveGames && !completedGames.length">
         <p>You have not completed any games yet.</p>
 
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
