@@ -44,11 +44,13 @@ class GameContainer {
 
     // add the viewport to the stage
     this.app.stage.addChild(this.viewport)
+
+    // Add a new map to the viewport
+    this.map = new Map()
+    this.viewport.addChild(this.map.container)
   }
 
   setupViewport (game) {
-    this.setupApp()
-
     this.game = game
 
     this.starFieldLeft = this._calculateMinStarX(game) - 500
@@ -76,11 +78,8 @@ class GameContainer {
       })
   }
 
-  setupUI () {
-    this.map = new Map()
+  setup () {
     this.map.setup(this.game)
-
-    this.viewport.addChild(this.map.container)
   }
 
   draw () {

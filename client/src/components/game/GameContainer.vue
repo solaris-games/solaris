@@ -13,7 +13,7 @@ export default {
 
   beforeMount () {
     this.gameContainer = GameContainer
-    
+    this.gameContainer.setupApp()
     this.loadGame(this.$store.state.game)
   },
 
@@ -37,12 +37,14 @@ export default {
   methods: {
     loadGame (game) {
       this.gameContainer.setupViewport(game)
-      this.gameContainer.setupUI(game)
+      this.gameContainer.setup()
     },
-    drawGame (game) {
+    drawGame (game, zoomToUser = true) {
       this.gameContainer.draw()
 
-      this.gameContainer.map.zoomToUser(game)
+      if (zoomToUser) {
+        this.gameContainer.map.zoomToUser(game)
+      }
     },
     handleResize (e) {
       this.gameContainer.app.renderer.resize(
@@ -69,7 +71,7 @@ export default {
   watch: {
     game (newGame, oldGame) {
       this.loadGame(newGame)
-      this.drawGame(newGame)
+      this.drawGame(newGame, false)
     }
   }
 }

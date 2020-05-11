@@ -46,13 +46,13 @@ export default {
     }
   },
   created () {
-    this.$store.state.game._id = this.$route.query.id
+    this.game._id = this.$route.query.id
   },
   async mounted () {
     try {
-      let response = await gameService.getGameInfo(this.$store.state.game._id)
+      let response = await gameService.getGameInfo(this.game._id)
 
-      this.$store.state.game = response.data
+      this.game = response.data
     } catch (err) {
       console.error(err)
     }

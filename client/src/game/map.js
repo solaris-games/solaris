@@ -17,6 +17,12 @@ class Map extends EventEmitter {
     super()
 
     this.container = new PIXI.Container()
+
+    this.stars = []
+    this.carriers = []
+  }
+
+  _setupContainers () {
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
@@ -27,8 +33,16 @@ class Map extends EventEmitter {
   }
 
   setup (game) {
+    // Cleanup events
+    this.stars.forEach(s => s.removeAllListeners())
+    this.carriers.forEach(s => s.removeAllListeners())
+
+    this.container.removeChildren()
+    this._setupContainers()
+
     this.game = game
 
+    // Reset the canvas
     this.stars = []
     this.carriers = []
 
@@ -58,10 +72,14 @@ class Map extends EventEmitter {
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     }
 
+    if (this.waypoints) {
+      this.waypoints.removeAllListeners()
+    }
+
     this.waypoints = new Waypoints()
     this.waypoints.setup(this.game)
     this.waypoints.registerEvents(this.stars, this.carriers)
-    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+    this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
   }
