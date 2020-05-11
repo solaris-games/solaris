@@ -30,15 +30,15 @@ module.exports = class GameTickService {
            return;
        }
 
+       game.state.lastTickDate = moment();
+       game.state.nextTickDate = moment().add(game.settings.gameTime.speed, 'm'); // TODO: Do we really need to do this?
+
        this._moveCarriers(game);
        this._produceShips(game);
        this._conductResearch(game);
        this._endOfGalacticCycleCheck(game);
        this._logHistory(game);
        this._gameWinCheck(game);
-
-       game.state.lastTickDate = moment();
-       game.state.nextTickDate = moment().add(game.settings.gameTime.speed, 'm'); // TODO: Do we really need to do this?
 
        await game.save();
 
