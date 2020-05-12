@@ -95,6 +95,8 @@ export default {
     },
     fitGalaxy () {
       GameContainer.viewport.fitWorld()
+      GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
+      GameContainer.viewport.moveCenter(0,0)
     },
     zoomByPercent (percent) {
       GameContainer.viewport.zoomPercent(percent, true)

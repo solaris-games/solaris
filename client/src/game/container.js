@@ -23,7 +23,8 @@ class GameContainer {
       width: window.innerWidth, // window.innerWidth,
       height: window.innerHeight, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
-      resolution: window.devicePixelRatio || 1
+      resolution: window.devicePixelRatio || 1,
+      autoResize: true
     })
     
     // create viewport
@@ -73,8 +74,8 @@ class GameContainer {
       .clampZoom({
         minWidth: 200,
         minHeight: 200,
-        maxWidth: 2000,
-        maxHeight: 2000
+        maxWidth: Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight),
+        maxHeight: Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop)
       })
   }
 
