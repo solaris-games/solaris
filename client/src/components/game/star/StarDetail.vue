@@ -15,7 +15,7 @@
             Ships
         </div>
         <div class="col text-right">
-            {{star.garrison || '???'}} <i class="fas fa-rocket ml-1"></i>
+            {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
         </div>
     </div>
 
@@ -43,21 +43,21 @@
       <infrastructure
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
-      <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer()"
+      <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated"
         :star="star"
         :availableCredits="getUserPlayer().credits"
         :economy="star.upgradeCosts.economy" :industry="star.upgradeCosts.industry" :science="star.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
-    <div class="row bg-secondary mt-2" v-if="getUserPlayer() && star.manufacturing != null">
+    <div class="row bg-secondary mt-2 mb-2" v-if="getUserPlayer() && star.manufacturing != null">
       <div class="col text-center pt-3">
         <p>This star builds <b>{{star.manufacturing}}</b> every tick.</p>
       </div>
     </div>
 
     <!-- TODO: Turn these into components -->
-    <div v-if="getStarOwningPlayer() == getUserPlayer()" class="mt-2">
+    <div v-if="getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated" class="mb-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>

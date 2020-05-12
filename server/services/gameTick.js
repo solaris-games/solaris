@@ -327,7 +327,7 @@ module.exports = class GameTickService {
         });
 
         let starWinners = playerStats
-            .filter(p => p.stats.totalStars >= game.state.starsForVictory)
+            .filter(p => !p.player.defeated && p.stats.totalStars >= game.state.starsForVictory)
             .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
             .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
             .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)

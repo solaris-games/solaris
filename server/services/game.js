@@ -143,6 +143,8 @@ module.exports = class GameService {
             game.state.winner = winner._id;
         }
 
+        // TODO: Remove all carrier waypoints (unless in transit)
+
         return await game.save();
     }
 

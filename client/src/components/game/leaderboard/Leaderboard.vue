@@ -34,6 +34,7 @@
                         <!-- <img src=""> -->
                     </td>
                     <td class="pl-2 pt-3 pb-2">
+                        <!-- Text styling for defeated players? -->
                         <h5>{{player.alias}} <span v-if="player.defeated">(DEFEATED)</span></h5>
                     </td>
                     <td class="fit pt-3 pr-2">

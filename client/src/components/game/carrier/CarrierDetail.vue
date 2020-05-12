@@ -27,7 +27,7 @@
           <p class="mb-2 align-middle">Orbiting: <a href="" @click="onOpenStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-4">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested">Ship Transfer</button>
+          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="!getUserPlayer().defeated">Ship Transfer</button>
         </div>
       </div>
 
@@ -56,7 +56,7 @@
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} ({{timeRemainingEtaTotal}})</p>
         </div>
         <div class="col-4 mb-2">
-          <button class="btn btn-block btn-success" @click="editWaypoints()">Edit Waypoints</button>
+          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="!getUserPlayer().defeated">Edit Waypoints</button>
         </div>
       </div>
     </div>

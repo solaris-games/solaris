@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         try {
             let result = container.messageService.list(
                 req.game,
@@ -17,7 +17,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         try {
             let result = container.messageService.summary(
                 req.game,
@@ -29,7 +29,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {

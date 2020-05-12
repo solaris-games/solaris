@@ -23,7 +23,7 @@
                         <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
                         <button type="button" class="btn btn-primary"><i class="fas fa-chevron-down"></i></button>
                         <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary"><i class="fas fa-rocket"></i></button> -->
-                        <button v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
+                        <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
                         <button type="button" class="btn btn-primary ml-1" @click="onViewObjectRequested(mapObject)">View</button>
                     </td>
                 </tr>

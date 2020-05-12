@@ -27,6 +27,11 @@ module.exports = class ResearchService {
     }
 
     conductResearch(game, player) {
+        // TODO: Defeated players do not conduct research or experiments?
+        if (player.defeated) {
+            return;
+        }
+
         let tech = player.research[player.researchingNow];
             
         tech.progress += player.research.experimentation.level;
@@ -43,6 +48,11 @@ module.exports = class ResearchService {
     }
 
     conductExperiments(game, player) {
+        // TODO: Defeated players do not conduct research or experiments?
+        if (player.defeated) {
+            return;
+        }
+
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
         });

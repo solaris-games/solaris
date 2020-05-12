@@ -6,7 +6,7 @@
 
     <selection/>
 
-    <h4>Research Progress</h4>
+    <h4 class="mt-2">Research Progress</h4>
 
     <progress-summary/>
 

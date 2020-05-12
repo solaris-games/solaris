@@ -24,7 +24,7 @@
 
     <research v-if="userPlayer" :player="player" :userPlayer="userPlayer"/>
 
-    <div v-if="game.startDate && userPlayer && player != userPlayer">
+    <div v-if="game.startDate && userPlayer && player != userPlayer && !userPlayer.defeated">
       <h4 class="mt-2">Trade</h4>
 
       <sendTechnology :player="player" :userPlayer="userPlayer"/>

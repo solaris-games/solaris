@@ -15,7 +15,7 @@
                           <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomToHomeStar()"><i class="fas fa-home"></i></button>
                           <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-ruler"></i></button>
                           <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-bolt"></i></button>
-                          <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)"><i class="fas fa-money-bill"></i></button>
+                          <button class="btn btn-primary btn-sm mr-1 mb-1" v-if="!getUserPlayer().defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)"><i class="fas fa-money-bill"></i></button>
                         </div>
                     </div>
                     <div class="dropdown-divider"></div>
