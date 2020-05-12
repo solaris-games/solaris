@@ -2,23 +2,21 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(carrierService, playerService, starService, distanceService, starDistanceService) {
+    constructor(carrierService, starService, distanceService, starDistanceService) {
         this.carrierService = carrierService;
-        this.playerService = playerService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
     }
 
-    async saveWaypoints(game, userId, carrierId, waypoints) {
-        let userPlayer = this.playerService.getByUserId(game, userId);
+    async saveWaypoints(game, player, carrierId, waypoints) {
         let carrier = this.carrierService.getById(game, carrierId);
         
-        if (!carrier.ownedByPlayerId.equals(userPlayer._id)) {
+        if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, userPlayer.research.hyperspace.level);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
 
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
@@ -53,11 +51,10 @@ module.exports = class WaypointService {
         return await game.save();
     }
 
-    async loopWaypoints(game, userId, carrierId, loop) {
-        let userPlayer = this.playerService.getByUserId(game, userId);
+    async loopWaypoints(game, player, carrierId, loop) {
         let carrier = this.carrierService.getById(game, carrierId);
         
-        if (!carrier.ownedByPlayerId.equals(userPlayer._id)) {
+        if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
@@ -74,7 +71,7 @@ module.exports = class WaypointService {
             let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.destination);
 
             let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
-            let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, userPlayer.research.hyperspace.level);
+            let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
 
             if (distanceBetweenStars > hyperspaceDistance) {
                 throw new ValidationError('The last waypoint star is out of hyperspace range of the first waypoint star.');

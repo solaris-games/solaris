@@ -103,11 +103,11 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/quit', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/quit', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let player = await container.gameService.quit(
                 req.game,
-                req.session.userId);
+                req.player);
                 
             container.broadcastService.gamePlayerQuit(req.game, player);
 
@@ -117,11 +117,11 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.gameService.concedeDefeat(
                 req.game,
-                req.session.userId);
+                req.player);
                 
             return res.sendStatus(200);
         } catch (err) {

@@ -2,22 +2,20 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ShipTransferService {
 
-    constructor(carrierService, starService, playerService) {
+    constructor(carrierService, starService) {
         this.carrierService = carrierService;
         this.starService = starService;
-        this.playerService = playerService;
     }
 
-    async transfer(game, userId, carrierId, carrierShips, starId, starShips) {
-        let userPlayer = this.playerService.getByUserId(game, userId);
+    async transfer(game, player, carrierId, carrierShips, starId, starShips) {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
-        if (!carrier.ownedByPlayerId.equals(userPlayer._id)) {
+        if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        if (!star.ownedByPlayerId.equals(userPlayer._id)) {
+        if (!star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 

@@ -2,20 +2,17 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService {
 
-    constructor(starService, carrierService, playerService) {
+    constructor(starService, carrierService) {
         this.starService = starService;
         this.carrierService = carrierService;
-        this.playerService = playerService;
     }
 
-    async buildWarpGate(game, userId, starId) {
+    async buildWarpGate(game, player, starId) {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
-        // Check whether the star is owned by the current user.
-        let userPlayer = this.playerService.getByUserId(game, userId);
-
-        if (star.ownedByPlayerId.toString() !== userPlayer.id) {
+        // Check whether the star is owned by the player.
+        if (star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot upgrade, the star is not owned by the current player.`);
         }
 
@@ -24,27 +21,25 @@ module.exports = class StarUpgradeService {
         }
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildWarpgates];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
+        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level);
         const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
 
-        if (userPlayer.credits < cost) {
+        if (player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         star.warpGate = true;
-        userPlayer.credits -= cost;
+        player.credits -= cost;
 
         await game.save();
     }
 
-    async destroyWarpGate(game, userId, starId) {
+    async destroyWarpGate(game, player, starId) {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
-        // Check whether the star is owned by the current user.
-        let userPlayer = this.playerService.getByUserId(game, userId);
-
-        if (star.ownedByPlayerId.toString() !== userPlayer.id) {
+        // Check whether the star is owned by the player
+        if (star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot destroy warp gate, the star is not owned by the current player.`);
         }
 
@@ -57,21 +52,19 @@ module.exports = class StarUpgradeService {
         await game.save();
     }
 
-    async buildCarrier(game, userId, starId) {
+    async buildCarrier(game, player, starId) {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
-        // Check whether the star is owned by the current user.
-        let userPlayer = this.playerService.getByUserId(game, userId);
-
-        if (star.ownedByPlayerId.toString() !== userPlayer.id) {
+        // Check whether the star is owned by the player.
+        if (star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
         }
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildCarriers];
         const cost = this.calculateCarrierCost(game, expenseConfig);
 
-        if (userPlayer.credits < cost) {
+        if (player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to build a carrier.`);
         }
 
@@ -87,68 +80,59 @@ module.exports = class StarUpgradeService {
         game.galaxy.carriers.push(carrier);
 
         // Deduct the cost of the carrier from the player's credits.
-        userPlayer.credits -= cost;
+        player.credits -= cost;
 
         await game.save();
     }
 
-    async _upgradeInfrastructure(game, userId, starId, expenseConfigKey, economyType, calculateCostCallback) {
+    async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback) {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
-        // Check whether the star is owned by the current user.
-        let userPlayer = this.playerService.getByUserId(game, userId);
-
-        if (star.ownedByPlayerId.toString() !== userPlayer.id) {
+        if (star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
         // Calculate how much the upgrade will cost.
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, userPlayer.research.terraforming.level);
+        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level);
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
-        if (userPlayer.credits < cost) {
+        if (player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         // Upgrade infrastructure.
         star.infrastructure[economyType]++;
-        userPlayer.credits -= cost;
+        player.credits -= cost;
 
         await game.save();
 
         // Return a report of what just went down.
         return {
-            playerId: userPlayer._id,
+            playerId: player._id,
             starId: star._id,
             infrastructure: star.infrastructure[economyType],
             cost
         };
     }
 
-    async upgradeEconomy(game, userId, starId) {
-        return await this._upgradeInfrastructure(game, userId, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this));
+    async upgradeEconomy(game, player, starId) {
+        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this));
     }
 
-    async upgradeIndustry(game, userId, starId) {
-        return await this._upgradeInfrastructure(game, userId, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
+    async upgradeIndustry(game, player, starId) {
+        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
     }
 
-    async upgradeScience(game, userId, starId) {
-        return await this._upgradeInfrastructure(game, userId, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
+    async upgradeScience(game, player, starId) {
+        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
     }
 
     // TODO: This method is absolutely insane and needs to be refactored.
     // It is really really inefficient because it calculates the upgrade costs
     // like 10 times per star.
-    async upgradeBulk(game, userId, infrastructureType, amount) {
-        let userPlayer = this.playerService.getByUserId(game, userId);
-
-        if (!userPlayer) {
-            throw new ValidationError('Could not find player for user.');
-        }
-
+    async upgradeBulk(game, player, infrastructureType, amount) {
         let upgradeSummary = {
             stars: [],
             cost: 0,
@@ -183,14 +167,14 @@ module.exports = class StarUpgradeService {
         }
 
         while (amount) {
-            let upgradeStar = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, userPlayer._id)
+            let upgradeStar = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
                 .filter(a => {
-                    let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, userPlayer.research.terraforming.level);
+                    let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, player.research.terraforming.level);
                     
                     return calculateCostFunction(game, expenseConfig, a.infrastructure[infrastructureType], terraformedResources) <= amount;
                 })
                 .sort((a, b) => {
-                    let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, userPlayer.research.terraforming.level);
+                    let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, player.research.terraforming.level);
 
                     let costA = calculateCostFunction(game, expenseConfig, a.infrastructure[infrastructureType], terraformedResources);
                     let costB = calculateCostFunction(game, expenseConfig, b.infrastructure[infrastructureType], terraformedResources);
@@ -202,7 +186,7 @@ module.exports = class StarUpgradeService {
                 break;
             }
 
-            let upgradedCost = await upgradeFunction(game, userId, upgradeStar._id);
+            let upgradedCost = await upgradeFunction(game, player, upgradeStar._id);
 
             amount -= upgradedCost.cost;
 

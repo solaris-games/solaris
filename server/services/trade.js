@@ -7,14 +7,13 @@ module.exports = class TradeService {
         this.playerService = playerService;
     }
 
-    async sendCredits(game, userId, toPlayerId, amount) {
+    async sendCredits(game, fromPlayer, toPlayerId, amount) {
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
         }
         
         // Get the players.
-        let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
         if (fromPlayer === toPlayer) {
@@ -31,14 +30,13 @@ module.exports = class TradeService {
         await game.save();
     }
 
-    async sendRenown(game, userId, toPlayerId, amount) {
+    async sendRenown(game, fromPlayer, toPlayerId, amount) {
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
         }
 
         // Get the players.
-        let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
         if (fromPlayer === toPlayer) {
@@ -63,16 +61,15 @@ module.exports = class TradeService {
         await toUser.save();
     }
 
-    async sendTechnology(game, userId, toPlayerId, technology) {
+    async sendTechnology(game, fromPlayer, toPlayerId, technology) {
         // Get the players.
-        let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot trade technology with yourself.`);
         }
 
-        let tradeTechs = this.getTradeableTechnologies(game, userId, toPlayerId);
+        let tradeTechs = this.getTradeableTechnologies(game, fromPlayer, toPlayerId);
 
         let tradeTech = tradeTechs.find(t => t.name === technology);
 
@@ -98,9 +95,8 @@ module.exports = class TradeService {
         await game.save();
     }
 
-    getTradeableTechnologies(game, userId, toPlayerId) {
+    getTradeableTechnologies(game, fromPlayer, toPlayerId) {
         // Get the players.
-        let fromPlayer = this.playerService.getByUserId(game, userId);
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
         if (fromPlayer._id.equals(toPlayer._id)) {

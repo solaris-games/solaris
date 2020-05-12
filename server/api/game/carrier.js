@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -14,7 +14,7 @@ module.exports = (router, io, container) => {
         try {
             await container.waypointService.saveWaypoints(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.params.carrierId,
                 req.body);
 
@@ -24,7 +24,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (req.body.loop == null) {
@@ -38,7 +38,7 @@ module.exports = (router, io, container) => {
         try {
             await container.waypointService.loopWaypoints(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.params.carrierId,
                 req.body.loop);
 
@@ -48,7 +48,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (req.body.carrierShips == null) {
@@ -70,7 +70,7 @@ module.exports = (router, io, container) => {
         try {
             await container.shipTransferService.transfer(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.params.carrierId,
                 req.body.carrierShips,
                 req.body.starId,

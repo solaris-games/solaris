@@ -4,11 +4,11 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
+    router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let result = container.messageService.list(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.params.fromPlayerId);
 
             return res.status(200).json(result);
@@ -17,11 +17,11 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
+    router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let result = container.messageService.summary(
                 req.game,
-                req.session.userId);
+                req.player);
 
             return res.status(200).json(result);
         } catch (err) {
@@ -29,7 +29,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, async (req, res, next) => {
+    router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -47,7 +47,7 @@ module.exports = (router, io, container) => {
         try {
             let message = await container.messageService.send(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.body.toPlayerId,
                 req.body.message);
 

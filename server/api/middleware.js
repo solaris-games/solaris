@@ -62,6 +62,26 @@ module.exports = (container) => {
             }
 
             return next();
+        },
+
+        loadPlayer(req, res, next) {
+            let player = container.playerService.getByUserId(req.game, req.session.userId);
+
+            if (!player) {
+                throw new ValidationError('You are not participating in this game.');
+            }
+
+            req.player = player;
+
+            return next();
+        },
+
+        validateUndefeatedPlayer(req, res, next) {
+            if (req.player.defeated) {
+                throw new ValidationError('You cannot participate in this game, you have been defeated.');
+            }
+
+            return next();
         }
     }
 

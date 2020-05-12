@@ -68,14 +68,12 @@ module.exports = class StarService {
         return +((industryLevel * (techLevel + 5) / 24) * ticks).toFixed(2);
     }
 
-    async abandonStar(game, userId, starId) {
+    async abandonStar(game, player, starId) {
         // Get the star.
         let star = game.galaxy.stars.find(x => x.id === starId);
 
-        // Check whether the star is owned by the current user.
-        let userPlayer = game.galaxy.players.find(x => x.userId === userId);
-
-        if ((star.ownedByPlayerId || '').toString() !== userPlayer.id) {
+        // Check whether the star is owned by the player
+        if ((star.ownedByPlayerId || '').toString() !== player.id) {
             throw new ValidationError(`Cannot abandon a star that is not owned by the player.`);
         }
 
@@ -88,7 +86,7 @@ module.exports = class StarService {
 
         // If this was the player's home star, then we need to find a new home star.
         if (star.homeStar) {
-            let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, userPlayer);
+            let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, player);
 
             if (closestStars.length) {
                 closestStars[0].homeStar = true;

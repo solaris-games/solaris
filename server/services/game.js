@@ -92,16 +92,9 @@ module.exports = class GameService {
         return await game.save();
     }
 
-    async quit(game, userId) {    
+    async quit(game, player) {    
         // TODO: Something to prevent the user from being able rejoin a game.
-
-        // Get the player that is linked to this user.
-        let player = game.galaxy.players.find(x => x.userId == userId);
-
-        if (!player) {
-            throw new ValidationError('The user is not participating in this game.');
-        }
-
+        
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
         }
@@ -121,14 +114,7 @@ module.exports = class GameService {
         return player;
     }
 
-    async concedeDefeat(game, userId) {    
-        // Get the player that is linked to this user.
-        let player = game.galaxy.players.find(x => x.userId == userId);
-
-        if (!player) {
-            throw new ValidationError('The user is not participating in this game.');
-        }
-
+    async concedeDefeat(game, player) {
         if (player.defeated) {
             throw new ValidationError('The player has already been defeated.');
         }

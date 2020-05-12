@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -32,7 +32,7 @@ module.exports = (router, io, container) => {
         try {
             await container.tradeService.sendCredits(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.body.toPlayerId,
                 req.body.amount);
 
@@ -42,7 +42,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -66,7 +66,7 @@ module.exports = (router, io, container) => {
         try {
             await container.tradeService.sendRenown(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.body.toPlayerId,
                 req.body.amount);
 
@@ -76,7 +76,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -90,7 +90,7 @@ module.exports = (router, io, container) => {
         try {
             await container.tradeService.sendTechnology(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.body.toPlayerId,
                 req.body.technology);
 
@@ -100,11 +100,11 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let techs = await container.tradeService.getTradeableTechnologies(
                 req.game,
-                req.session.userId,
+                req.player,
                 req.params.toPlayerId);
 
             return res.status(200).json(techs);

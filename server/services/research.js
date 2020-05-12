@@ -6,15 +6,12 @@ module.exports = class ResearchService {
         this.timeService = timeService;
     }
 
-    async updateResearchNow(game, userId, preference) {
-        // Get the user's player and update their research preference.
-        let userPlayer = game.galaxy.players.find(p => p.userId === userId);
-
-        userPlayer.researchingNow = preference;
+    async updateResearchNow(game, player, preference) {
+        player.researchingNow = preference;
 
         await game.save();
 
-        let eta = this.calculateCurrentResearchETAInTicks(game, userPlayer);
+        let eta = this.calculateCurrentResearchETAInTicks(game, player);
         let etaTime = this.timeService.calculateTimeByTicks(eta, game.settings.gameTime.speed, game.state.lastTickDate);
 
         return {
@@ -23,11 +20,8 @@ module.exports = class ResearchService {
         };
     }
 
-    async updateResearchNext(game, userId, preference) {
-        // Get the user's player and update their research preference.
-        let userPlayer = game.galaxy.players.find(p => p.userId === userId);
-
-        userPlayer.researchingNext = preference;
+    async updateResearchNext(game, player, preference) {
+        player.researchingNext = preference;
 
         return await game.save();
     }
