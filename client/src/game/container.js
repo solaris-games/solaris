@@ -72,8 +72,8 @@ class GameContainer {
         bottom: this.starFieldBottom
       })
       .clampZoom({
-        minWidth: 200,
-        minHeight: 200,
+        minWidth: 150,
+        minHeight: 150,
         maxWidth: Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight),
         maxHeight: Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop)
       })
