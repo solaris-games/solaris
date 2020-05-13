@@ -76,7 +76,7 @@ module.exports = class ResearchService {
 
     calculateCurrentResearchETAInTicks(game, player) {
         let tech = player.research[player.researchingNow];
-
+console.log(player.researchingNow)
         let requiredProgress = tech.level * game.constants.research.progressMultiplier;
         let remainingPoints = requiredProgress - tech.progress;
 
