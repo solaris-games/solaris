@@ -25,14 +25,14 @@ module.exports = async (app, io, container) => {
     });
 
     // Register routes
-    const auth = require('../api/auth')(router, io, container);
-    const user = require('../api/user')(router, io, container);
     const game = require('../api/game')(router, io, container);
     const research = require('../api/game/research')(router, io, container);
     const trade = require('../api/game/trade')(router, io, container);
     const star = require('../api/game/star')(router, io, container);
     const carrier = require('../api/game/carrier')(router, io, container);
     const message = require('../api/game/message')(router, io, container);
+    const auth = require('../api/auth')(router, io, container);
+    const user = require('../api/user')(router, io, container);
 
     app.use('/api/auth', auth);
     app.use('/api/user', user);
