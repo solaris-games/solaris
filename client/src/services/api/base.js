@@ -3,10 +3,9 @@ import router from '../../router'
 
 class BaseApiService {
 
-    // TODO: Needs to be in an env config setting.
-    BASE_URL = 'http://localhost:3000/api/'
-
     constructor () {
+        this.BASE_URL = process.env.VUE_APP_API_HOST + '/api/'
+        console.log(this.BASE_URL)
         axios.interceptors.response.use(
             response => {
                 return response
@@ -19,6 +18,7 @@ class BaseApiService {
                 return Promise.reject({ ...error })
             })
     }
+
 }
 
 export default BaseApiService

@@ -14,7 +14,7 @@ Vue.config.productionTip = false
 
 Vue.use(new VueSocketio({
   debug: true,
-  connection: `//localhost:3000`, // TODO: Needs to be an environment variable.
+  connection: `//${process.env.VUE_APP_SOCKETS_HOST}`,
   vuex: {
       store,
       actionPrefix: 'SOCKET_',

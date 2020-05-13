@@ -20,9 +20,10 @@ This is a HTML5 game that aims to loosely clone the game [Neptune's Pride](https
 3. Checkout `master`.
 4. `npm install` in both `client/` and `server/` directories.
 5. Create a `.env` file in `server/` (See `.env.example`).
-6. `npm start` in `server/`
-7. `npm run serve` in `client/`
-8. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
+6. Create a `.env` file in `client/` (See `.env.example`).
+7. `npm start` in `server/`
+8. `npm run serve` in `client/`
+9. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
 
 *Note: Development work is to be based on the `master` branch, for a new feature or bug fix, create a branch from `master`.*
 
