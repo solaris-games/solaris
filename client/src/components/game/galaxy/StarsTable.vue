@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            <star-row v-for="star in getTableData()" v-bind:key="star._id" :star="star"/>
+            <star-row v-for="star in tableData" v-bind:key="star._id" :star="star"/>
         </tbody>
     </table>
 </div>
@@ -35,8 +35,12 @@ export default {
   },
   data: function () {
     return {
-      showAll: false
+      showAll: false,
+      tableData: []
     }
+  },
+  mounted () {
+    this.tableData = this.getTableData()
   },
   methods: {
     getUserPlayer () {

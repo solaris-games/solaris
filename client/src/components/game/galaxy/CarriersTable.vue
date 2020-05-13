@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            <carrier-row v-for="carrier in getTableData()" v-bind:key="carrier._id" :carrier="carrier"/>
+            <carrier-row v-for="carrier in tableData" v-bind:key="carrier._id" :carrier="carrier"/>
         </tbody>
     </table>
 </div>
@@ -34,8 +34,12 @@ export default {
   },
   data: function () {
     return {
-      showAll: false
+      showAll: false,
+      tableData: []
     }
+  },
+  mounted () {
+    this.tableData = this.getTableData()
   },
   methods: {
     getUserPlayer () {

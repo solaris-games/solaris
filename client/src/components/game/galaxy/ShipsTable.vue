@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-            <ship-row v-for="ship in getTableData()" v-bind:key="ship._id" :ship="ship" />
+            <ship-row v-for="ship in tableData" v-bind:key="ship._id" :ship="ship" />
         </tbody>
     </table>
 </div>
@@ -31,8 +31,12 @@ export default {
   },
   data: function () {
     return {
-      showAll: false
+      showAll: false,
+      tableData: []
     }
+  },
+  mounted () {
+    this.tableData = this.getTableData()
   },
   methods: {
     getUserPlayer () {

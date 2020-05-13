@@ -43,6 +43,9 @@ class Carrier extends EventEmitter {
     this._rotateCarrierTowardsWaypoint(graphics)
     this._drawCarrierWaypoints()
 
+    // Add a larger hit radius so that the star is easily clickable
+    graphics.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+
     this.container.addChild(graphics)
   }
 
