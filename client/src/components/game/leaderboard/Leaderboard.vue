@@ -26,7 +26,7 @@
         <table class="table table-sm table-striped">
             <tbody>
                 <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
-                <tr v-for="player in getSortedLeaderboardPlayerList()" :key="player._id">
+                <tr v-for="player in sortedPlayers" :key="player._id">
                     <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                     <td class="col-avatar" :title="player.colour.alias">
                         <!-- TODO: Prefer images over font awesome icons? -->
@@ -85,11 +85,13 @@ export default {
 
   data () {
       return {
-          players: []
+          players: [],
+          sortedPlayers: []
       }
   },
   mounted () {
       this.players = this.$store.state.game.galaxy.players
+      this.sortedPlayers = this.getSortedLeaderboardPlayerList()
   },
 
   methods: {
