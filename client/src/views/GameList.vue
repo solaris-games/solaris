@@ -16,15 +16,14 @@
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
-                <td>Players</td>
+                <td class="text-center">Players</td>
                 <td></td>
             </tr>
         </thead>
         <tbody>
             <tr v-for="game in serverGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
-                <!-- TODO: Would be nice to have current players in the game -->
-                <td>{{game.settings.general.playerLimit}}</td>
+                <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
                 </td>
@@ -46,14 +45,14 @@
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
-                <td>Players</td>
+                <td class="text-center">Players</td>
                 <td></td>
             </tr>
         </thead>
         <tbody>
             <tr v-for="game in userGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
-                <td>{{game.settings.general.playerLimit}}</td> <!-- TODO: Would be nice to have current players in the game -->
+                <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
                 </td>

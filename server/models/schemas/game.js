@@ -85,6 +85,7 @@ const schema = new Schema({
 		nextTickDate: { type: Types.Date, required: false },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
+		players: { type: Types.Number, required: true, default: 0 },
 		winner: { type: Types.ObjectId, required: false }
 	},
 	constants: {

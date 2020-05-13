@@ -76,9 +76,9 @@ module.exports = class GameService {
         player.alias = alias;
 
         // If the max player count is reached then start the game.
-        let playerCount = game.galaxy.players.filter(p => p.userId).length;
+        game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
-        if (playerCount === game.settings.general.playerLimit) {
+        if (game.state.players === game.settings.general.playerLimit) {
             let start = moment();
 
             game.state.paused = false;
@@ -108,6 +108,8 @@ module.exports = class GameService {
         // doing this otherwise we'd have to reset everything here which will be a pain.
         player.userId = null;
         player.alias = "Empty Slot";
+
+        game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
         await game.save();
 
