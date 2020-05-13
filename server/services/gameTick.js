@@ -133,7 +133,7 @@ module.exports = class GameTickService {
 
                 // If the star is owned by another player, then perform combat.
                 if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    this.combatStars.push({
+                    combatStars.push({
                         star: destinationStar,
                         carrier
                     });
@@ -172,8 +172,8 @@ module.exports = class GameTickService {
     }
 
     _performCombatAtStar(game, star, enemyCarrier) {
-        let defender = this.playerService.getByObjectId(star.ownedByPlayerId);
-        let attacker = this.playerService.getByObjectId(enemyCarrier.ownedByPlayerId);
+        let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
+        let attacker = this.playerService.getByObjectId(game, enemyCarrier.ownedByPlayerId);
 
         // There may be multiple carriers at this star, we will attack
         // carriers in order of largest carrier first to smallest last

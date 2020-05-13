@@ -204,6 +204,7 @@ module.exports = class GameGalaxyService {
                 // Return only key data about the waypoints.
                 c.waypoints = c.waypoints.map(w => {
                     return {
+                        _id: w._id,
                         source: w.source,
                         destination: w.destination
                     };
