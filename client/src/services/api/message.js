@@ -12,6 +12,11 @@ class MessageService extends BaseApiService {
         return axios.get(this.BASE_URL + 'game/' + gameId + '/message/conversations',
         { withCredentials: true })
     }
+
+    markAllConversationsAsRead (gameId) {
+        return axios.put(this.BASE_URL + 'game/' + gameId + '/message/markallread', { },
+        { withCredentials: true })
+    }
   
     send (gameId, toPlayerId, message) {
         return axios.post(this.BASE_URL + 'game/' + gameId + '/message/send', 

@@ -6,7 +6,7 @@ module.exports = (router, io, container) => {
 
     router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         try {
-            let result = container.messageService.list(
+            let result = await container.messageService.getConversation(
                 req.game,
                 req.player,
                 req.params.fromPlayerId);
@@ -24,6 +24,18 @@ module.exports = (router, io, container) => {
                 req.player);
 
             return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/:gameId/message/markallread', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.messageService.markAllAsRead(
+                req.game,
+                req.player);
+
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }

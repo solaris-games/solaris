@@ -7,7 +7,7 @@
   <loading-spinner :loading="!messages"/>
 
   <div v-if="messages">
-    <div class="pt-0 mb-2 mt-2" v-if="messages.length">
+    <div class="pt-0 mb-2 mt-2 messages-container" v-if="messages.length">
         <conversation-message v-for="message in messages" 
             v-bind:key="message._id" 
             :sender="getPlayer(message.fromPlayerId)" 
@@ -70,11 +70,22 @@ export default {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
     async loadMessages () {
+      this.messages = []
+
         try {
             let response = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
 
             if (response.status === 200) {
                 this.messages = response.data
+
+                // This doesn't seem to work inline, have to wait 100ms so that the UI can update itself
+                // before scrolling the div container to the bottom.
+                setTimeout(() => {
+                  if (this.messages.length) {
+                    const messagesContainer = this.$el.querySelector('.messages-container')
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight
+                  }
+                }, 100)
             }
         } catch (e) {
             console.error(e)
@@ -91,4 +102,8 @@ export default {
 </script>
 
 <style scoped>
+.messages-container {
+  max-height: 400px;
+  overflow: auto;
+}
 </style>

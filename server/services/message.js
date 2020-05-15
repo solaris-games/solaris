@@ -1,6 +1,6 @@
 const ValidationError = require('../errors/validation');
 
-function getConversation(game, fromPlayerId, toPlayerId) {
+function filterForConversation(game, fromPlayerId, toPlayerId) {
     return (game.messages || [])
         .filter(m => {
             return (m.fromPlayerId.toString() === fromPlayerId.toString()
@@ -14,8 +14,19 @@ function getConversation(game, fromPlayerId, toPlayerId) {
 
 module.exports = class MessageService {
     
-    list(game, toPlayer, fromPlayerId) {
-        return getConversation(game, fromPlayerId, toPlayer._id);
+    async getConversation(game, toPlayer, fromPlayerId, markAsRead = true) {
+        let conversation = filterForConversation(game, fromPlayerId, toPlayer._id);
+
+        // Mark each message as read in the conversation that hasn't been read by the toPlayer
+        let unread = conversation.filter(m => m.toPlayerId.equals(toPlayer._id) && !m.read);
+
+        if (markAsRead && unread.length) {
+            unread.forEach(m => m.read = true);
+
+            await game.save();
+        }
+
+        return conversation;
     }
 
     summary(game, player) {
@@ -29,18 +40,29 @@ module.exports = class MessageService {
                 continue;
             }
 
-            let conversation = getConversation(game, p._id, player._id);
+            let conversation = filterForConversation(game, p._id, player._id);
             let lastMessage = conversation[conversation.length - 1] || null;
+            let hasUnread = conversation.find(m => m.toPlayerId.equals(player._id) && !m.read) != null;
 
             conversations.push({
                 playerId: p._id,
-                lastMessage
+                lastMessage,
+                hasUnread
             })
         }
 
         return conversations;
     }
-    
+
+    async markAllAsRead(game, player) {
+        let allUnread = game.messages.filter(m => {
+            return !m.read && m.toPlayerId.equals(player._id)
+        });
+
+        allUnread.forEach(m => m.read = true);
+
+        await game.save();
+    }
 
     async send(game, fromPlayer, toPlayerId, message) {
         if (game.messages == null) {

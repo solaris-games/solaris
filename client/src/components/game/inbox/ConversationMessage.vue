@@ -3,6 +3,9 @@
 <div class="container bg-primary pt-2" @click="openConversation">
     <div class="row">
         <div class="col">
+            <span v-if="!message.read && getUserPlayer()._id === message.toPlayerId" class="mr-1">
+                <i class="fas fa-envelope"></i>
+            </span>
             <span>
                 <i class="fas fa-circle" :style="{'color': colour}"></i> 
                 {{sender.alias}}
@@ -22,15 +25,21 @@
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
+
 export default {
   components: {
   },
   props: {
     message: Object,
     sender: Object,
-    colour: String
+    colour: String,
+    isUnread: Boolean
   },
   methods: {
+    getUserPlayer () {
+        return GameHelper.getUserPlayer(this.$store.state.game)
+    },
       getDateString (date) {
           date = new Date(date)
           
