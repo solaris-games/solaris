@@ -1,8 +1,8 @@
 <template>
 <tr>
     <td><i class="fas fa-circle" v-if="ship.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
-    <td><a href="#" @click="clickShip">{{ship.name}}</a></td>
-    <td><a href="#" @click="goToShip"><i class="far fa-eye"></i></a></td>
+    <td><a href="javascript:;" @click="clickShip">{{ship.name}}</a></td>
+    <td><a href="javascript:;" @click="goToShip"><i class="far fa-eye"></i></a></td>
     <td>
       <i v-if="ship.type === 0" class="fas fa-star"></i>
       <i v-if="ship.type === 1" class="fas fa-rocket"></i>
@@ -31,8 +31,6 @@ export default {
       } else {
         gameContainer.map.clickCarrier(this.ship._id)
       }
-
-      e.preventDefault()
     },
     goToShip (e) {
       gameContainer.map.zoomToLocation(this.ship.location)

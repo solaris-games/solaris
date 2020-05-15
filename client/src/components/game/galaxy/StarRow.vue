@@ -1,8 +1,8 @@
 <template>
 <tr>
     <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
-    <td><a href="#" @click="clickStar">{{star.name}}</a></td>
-    <td><a href="#" @click="goToStar"><i class="far fa-eye"></i></a></td>
+    <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
+    <td><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td><span v-if="star.upgradeCosts">{{star.infrastructure.economy}}</span></td>
     <td><span v-if="star.upgradeCosts">{{star.infrastructure.industry}}</span></td>
     <td><span v-if="star.upgradeCosts">{{star.infrastructure.science}}</span></td>
@@ -28,13 +28,9 @@ export default {
     },
     clickStar (e) {
       gameContainer.map.clickStar(this.star._id)
-
-      e.preventDefault()
     },
     goToStar (e) {
       gameContainer.map.zoomToLocation(this.star.location)
-
-      e.preventDefault()
     }
   }
 }

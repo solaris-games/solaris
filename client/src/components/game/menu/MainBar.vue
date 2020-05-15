@@ -15,7 +15,8 @@
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :star="menuArguments"
         @onCloseRequested="onCloseRequested" 
         @onViewConversationRequested="onConversationOpenRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrier="menuArguments" 
         @onShipTransferRequested="onShipTransferRequested" 
         @onEditWaypointsRequested="onEditWaypointsRequested" 

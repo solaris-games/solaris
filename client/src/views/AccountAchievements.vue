@@ -7,7 +7,7 @@
     <!-- TODO: Will this look nicer on the main menu instead? -->
     <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
 
-    <p class="text-center pt-3 mb-0">Read more about <a href="">Victory, Rank and Renown</a>.</p>
+    <p class="text-center pt-3 mb-0">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
 
     <!--
     <view-subtitle title="Badges"/>

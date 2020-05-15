@@ -35,6 +35,10 @@ class GameHelper {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting)
   }
 
+  getCarriersOrbitingStar (game, star) {
+    return game.galaxy.carriers.filter(x => x.orbiting === star._id)
+  }
+
   isCarrierInTransit (carrier) {
     return carrier.orbiting == null
   }

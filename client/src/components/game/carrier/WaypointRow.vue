@@ -7,7 +7,7 @@
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
         <td class="text-right">
-          <a href="" @click="editWaypoint">Edit</a>
+          <a href="javascript:;" @click="editWaypoint">Edit</a>
         </td>
     </tr>
 </template>
@@ -40,8 +40,6 @@ export default {
       return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
     },
     editWaypoint (e) {
-      e.preventDefault()
-
       this.$emit('onEditWaypointRequested', this.waypoint)
     },
     getWaypointActionFriendlyText (waypoint, action) {

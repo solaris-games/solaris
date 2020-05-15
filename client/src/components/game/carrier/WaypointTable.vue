@@ -7,7 +7,7 @@
                 <td v-if="!showAction">ETA</td>
                 <td v-if="showAction">Action</td>
                 <td class="text-right">
-                  <a href="" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
+                  <a href="javascript:;" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
                 </td>
             </tr>
         </thead>
@@ -37,8 +37,6 @@ export default {
   methods: {
     toggleShowAction (e) {
       this.showAction = !this.showAction
-
-      e.preventDefault()
     },
     onEditWaypointRequested (e) {
       this.$emit('onEditWaypointRequested', e)

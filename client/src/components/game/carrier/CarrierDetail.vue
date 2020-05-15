@@ -24,7 +24,7 @@
     <div v-if="getCarrierOwningPlayer() == getUserPlayer()" class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-8">
-          <p class="mb-2 align-middle">Orbiting: <a href="" @click="onOpenStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
+          <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-4">
           <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="!getUserPlayer().defeated">Ship Transfer</button>
@@ -159,8 +159,6 @@ export default {
       })
     },
     onOpenStarDetailRequested (e) {
-      e.preventDefault()
-
       this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar())
     },
     recalculateTimeRemaining () {

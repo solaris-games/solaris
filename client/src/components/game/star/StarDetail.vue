@@ -5,7 +5,7 @@
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="star.ownedByPlayerId == currentPlayerId">A star under your command.</p>
-        <p v-if="star.ownedByPlayerId != null && star.ownedByPlayerId != currentPlayerId">This star is controlled by <a href="" @click="onOpenPlayerDetailRequested">{{getStarOwningPlayer().alias}}</a>.</p>
+        <p v-if="star.ownedByPlayerId != null && star.ownedByPlayerId != currentPlayerId">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getStarOwningPlayer().alias}}</a>.</p>
         <p v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
       </div>
     </div>
@@ -37,6 +37,19 @@
         </div>
     </div>
 
+    <div v-if="getCarriersInOrbit().length">
+      <h4 class="pt-2">Carriers</h4>
+
+      <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-2 pt-1 pb-1 bg-secondary">
+          <div class="col">
+            <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
+          </div>
+          <div class="col text-right">
+              {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+          </div>
+      </div>
+    </div>
+
     <div v-if="star.infrastructure">
       <h4 class="pt-2">Infrastructure</h4>
 
@@ -60,7 +73,7 @@
     <div v-if="getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated" class="mb-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="">Read More</a>.</p>
+          <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
           <modalButton :disabled="getUserPlayer().credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.upgradeCosts.carriers}}</modalButton>
@@ -69,7 +82,7 @@
 
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="">Read More</a>.</p>
+          <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
           <modalButton v-if="!star.warpGate" :disabled="getUserPlayer().credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
@@ -79,7 +92,7 @@
 
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
-          <p class="mb-2">Abandon this star for another player to claim. <a href="">Read More</a>.</p>
+          <p class="mb-2">Abandon this star for another player to claim. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
           <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger">Abandon Star</modalButton>
@@ -92,7 +105,7 @@
       <div class="row">
         <div class="col-8">
           TODO: Wording
-          <p class="mb-2">Make your mark on the galaxy by renaming this star. <a href="">Read More</a>.</p>
+          <p class="mb-2">Make your mark on the galaxy by renaming this star. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
           <button class="btn btn-block btn-primary">Rename</button>
@@ -166,6 +179,9 @@ export default {
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
     },
+    getCarriersInOrbit () {
+      return GameHelper.getCarriersOrbitingStar(this.$store.state.game, this.star)
+    },
     onInfrastructureUpgraded (e) {
       // TODO: Reload the current star to get new costs.
       // TODO: Reload the player credits somehow?
@@ -173,9 +189,10 @@ export default {
       this.getStarOwningPlayer().credits -= this.star.upgradeCosts[e]
     },
     onOpenPlayerDetailRequested (e) {
-      e.preventDefault()
-
       this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer())
+    },
+    onOpenCarrierDetailRequested (carrier) {
+      this.$emit('onOpenCarrierDetailRequested', carrier)
     },
     async confirmBuildCarrier (e) {
       try {
