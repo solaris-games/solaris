@@ -3,7 +3,7 @@
 <div class="container bg-primary pt-2" @click="openConversation">
     <div class="row">
         <div class="col">
-            <span v-if="!message.read && getUserPlayer()._id === message.toPlayerId" class="mr-1">
+            <span v-if="message && !message.read && getUserPlayer()._id === message.toPlayerId" class="mr-1">
                 <i class="fas fa-envelope"></i>
             </span>
             <span>
