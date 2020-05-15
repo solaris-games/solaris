@@ -47,6 +47,8 @@ export default {
     },
     toggleShowAll () {
       this.showAll = !this.showAll
+
+      this.tableData = this.getTableData()
     },
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
