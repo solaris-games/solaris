@@ -49,17 +49,22 @@ export default {
 	},
 	mounted () {
 		GameContainer.map.setMode('waypoints', this.carrier)
+
+		this.oldWaypoints = this.carrier.waypoints.slice(0)
 	},
 	destroyed () {
 		GameContainer.map.resetMode()
 	},
 	data () {
 		return {
-			isSavingWaypoints: false
+			isSavingWaypoints: false,
+			oldWaypoints: []
 		}
 	},
 	methods: {
 		onCloseRequested (e) {
+			this.carrier.waypoints = this.oldWaypoints
+
 			this.$emit('onCloseRequested', e)
 		},
 		getStarName (starId) {
@@ -95,13 +100,15 @@ export default {
 				this.isSavingWaypoints = true
 				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints)
 
-				// TODO: Do something with the response...?
 				if (response.status === 200) {
+					this.oldWaypoints = this.carrier.waypoints
+
 					if (saveAndEdit) {
 						this.$emit('onOpenCarrierDetailRequested', this.carrier)
 					} else {
 						this.onCloseRequested()
 					}
+
 				}
 			} catch (e) {
 				console.error(e)

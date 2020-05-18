@@ -17,27 +17,27 @@
             </div>
         </div>
 
-        <div class="row no-gutters mb-2">
+        <div class="row no-gutters mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
-                <input type="number" class="form-control input-sm" v-model="waypoint.delayTicks">
+                <input type="number" class="form-control input-sm" v-model="currentWaypoint.delayTicks">
             </div>
             <div class="col-3 text-center pt-1">
-                <span>{{getStarName(waypoint.destination)}}</span>
+                <span>{{getStarName(currentWaypoint.destination)}}</span>
             </div>
             <div class="col-5 text-center">
-                <select class="form-control input-sm" id="waypointAction" v-model="waypoint.action">
-                    <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(waypoint, 'nothing')}}</option>
-                    <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(waypoint, 'collectAll')}}</option>
-                    <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(waypoint, 'dropAll')}}</option>
-                    <option key="collect" value="collect">{{getWaypointActionFriendlyText(waypoint, 'collect')}}</option>
-                    <option key="drop" value="drop">{{getWaypointActionFriendlyText(waypoint, 'drop')}}</option>
-                    <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(waypoint, 'collectAllBut')}}</option>
-                    <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(waypoint, 'dropAllBut')}}</option>
-                    <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(waypoint, 'garrison')}}</option>
+                <select class="form-control input-sm" id="waypointAction" v-model="currentWaypoint.action">
+                    <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(currentWaypoint, 'nothing')}}</option>
+                    <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAll')}}</option>
+                    <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAll')}}</option>
+                    <option key="collect" value="collect">{{getWaypointActionFriendlyText(currentWaypoint, 'collect')}}</option>
+                    <option key="drop" value="drop">{{getWaypointActionFriendlyText(currentWaypoint, 'drop')}}</option>
+                    <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAllBut')}}</option>
+                    <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAllBut')}}</option>
+                    <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(currentWaypoint, 'garrison')}}</option>
                 </select>
             </div>
             <div class="col-2 text-center">
-                <input v-if="isActionRequiresShips(waypoint.action)" class="form-control input-sm" type="number" v-model="waypoint.actionShips"/>
+                <input v-if="isActionRequiresShips(currentWaypoint.action)" class="form-control input-sm" type="number" v-model="currentWaypoint.actionShips"/>
             </div>
         </div>
 
@@ -69,8 +69,16 @@ export default {
     },
     data () {
         return {
-            isSavingWaypoints: false
+            isSavingWaypoints: false,
+            currentWaypoint: null,
+            waypoints: []
         }
+    },
+    mounted () {
+        // Make a copy of the carriers waypoints.
+        this.waypoints = JSON.parse(JSON.stringify(this.carrier.waypoints))
+        this.currentWaypoint = this.waypoints.find(x => x._id === this.waypoint._id)
+        this.zoomToWaypoint()
     },
 	methods: {
 		onCloseRequested (e) {
@@ -114,35 +122,43 @@ export default {
             return false
         },
         previousWaypoint () {
-            let index = this.carrier.waypoints.indexOf(this.waypoint)
+            let index = this.waypoints.indexOf(this.currentWaypoint)
 
             index--
 
             if (index < 0) {
-                index = this.carrier.waypoints.length - 1
+                index = this.waypoints.length - 1
             }
 
-            this.waypoint = this.carrier.waypoints[index]
+            this.currentWaypoint = this.waypoints[index]
+            this.zoomToWaypoint()
         },
         nextWaypoint () {
-            let index = this.carrier.waypoints.indexOf(this.waypoint)
+            let index = this.waypoints.indexOf(this.currentWaypoint)
 
             index++
 
-            if (index > this.carrier.waypoints.length - 1) {
+            if (index > this.waypoints.length - 1) {
                 index = 0
             }
 
-            this.waypoint = this.carrier.waypoints[index]
+            this.currentWaypoint = this.waypoints[index]
+            this.zoomToWaypoint()
+        },
+        zoomToWaypoint () {
+            let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
+
+            GameContainer.map.zoomToLocation(star.location)
         },
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.
 			try {
                 this.isSavingWaypoints = true
-				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints)
+				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.waypoints)
 
-				// TODO: Do something with the response...?
 				if (response.status === 200) {
+                    this.carrier.waypoints = this.waypoints
+                    
                     this.$emit('onOpenCarrierDetailRequested', this.carrier)
 				}
 			} catch (e) {
