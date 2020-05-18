@@ -67,6 +67,14 @@ module.exports = class GameTickService {
         for (let i = 0; i < carriersWithWaypoints.length; i++) {
             let carrier = carriersWithWaypoints[i];
             let waypoint = carrier.waypoints[0];
+
+            // If the waypoint has a delay on it, then
+            // we need to wait until there are no more delay ticks.
+            if (waypoint.delayTicks) {
+                waypoint.delayTicks--;
+                continue;
+            }
+
             let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
 
             // If we are currently in orbit then this is the first movement, we
