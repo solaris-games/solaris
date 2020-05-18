@@ -29,6 +29,7 @@
                     <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(waypoint, 'nothing')}}</option>
                     <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(waypoint, 'collectAll')}}</option>
                     <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(waypoint, 'dropAll')}}</option>
+                    <option key="collect" value="collect">{{getWaypointActionFriendlyText(waypoint, 'collect')}}</option>
                     <option key="drop" value="drop">{{getWaypointActionFriendlyText(waypoint, 'drop')}}</option>
                     <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(waypoint, 'collectAllBut')}}</option>
                     <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(waypoint, 'dropAllBut')}}</option>

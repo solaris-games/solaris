@@ -2,9 +2,23 @@
 	<div class="container">
     	<menu-title :title="carrier.name" @onCloseRequested="onCloseRequested"/>
 
-		<p>
-			Waypoints: {{getWaypointsString()}}
-		</p>
+		Waypoints:
+		<ul class="pl-4 mt-2">
+			<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
+				{{getStarName(waypoint.destination)}}
+
+				<i class="ml-2" :class="{
+					'fas fa-angle-double-up text-success': waypoint.action == 'collectAll',
+					'fas fa-angle-double-down text-danger': waypoint.action == 'dropAll',
+					'fas fa-caret-up text-success': waypoint.action == 'collect',
+					'fas fa-caret-down text-danger': waypoint.action == 'drop',
+					'fas fa-angle-up text-success': waypoint.action == 'collectAllBut',
+					'fas fa-angle-down text-danger': waypoint.action == 'dropAllBut',
+					'fas fa-star text-warning': waypoint.action == 'garrison'
+				}"></i> 
+				<span v-if="waypoint.actionShips"> {{waypoint.actionShips}}</span>
+			</li>
+		</ul>
 
 		<div class="row bg-secondary pt-2 pb-2">
 			<div class="col">
@@ -100,4 +114,7 @@ export default {
 </script>
 
 <style scoped>
+li {
+	list-style-type: none;
+}
 </style>
