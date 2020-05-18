@@ -2,14 +2,14 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/defaultSettings', middleware.authenticate, (req, res, next) => {
+    router.get('/api/game/defaultSettings', middleware.authenticate, (req, res, next) => {
         return res.status(200).json({
             settings: require('../../config/game/settings/user/standard.json'),
             options: require('../../config/game/settings/options.json')
         });
     }, middleware.handleError);
 
-    router.post('/', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/game/', middleware.authenticate, async (req, res, next) => {
         req.body.general.createdByUserId = req.session.userId;
 
         try {
@@ -21,7 +21,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
+    router.get('/api/game/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
         try {
             return res.status(200).json(req.game);
         } catch (err) {
@@ -29,7 +29,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
+    router.get('/api/game/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
         try {
             return res.status(200).json(req.history);
         } catch (err) {
@@ -37,7 +37,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.get('/api/game/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         try {
             let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);
 
@@ -47,7 +47,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/list/official', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/official', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listOfficialGames();
 
@@ -57,7 +57,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/list/user', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/user', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listUserGames();
 
@@ -67,7 +67,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/list/active', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/active', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listActiveGames(req.session.userId);
 
@@ -77,7 +77,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/list/completed', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/completed', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listCompletedGames(req.session.userId);
 
@@ -87,7 +87,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         try {
             await container.gameService.join(
                 req.game,
@@ -103,7 +103,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/quit', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let player = await container.gameService.quit(
                 req.game,
@@ -117,7 +117,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.gameService.concedeDefeat(
                 req.game,
@@ -129,7 +129,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/player/:playerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.get('/api/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         try {
             let user = await container.gameService.getPlayerUser(
                 req.game,

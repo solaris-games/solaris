@@ -34,8 +34,6 @@ export default {
     },
     goToShip (e) {
       gameContainer.map.zoomToLocation(this.ship.location)
-
-      e.preventDefault()
     }
   }
 }

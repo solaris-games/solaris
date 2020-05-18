@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('./middleware')(container);
 
-    router.post('/login', async (req, res, next) => {        
+    router.post('/api/auth/login', async (req, res, next) => {        
         let errors = [];
     
         if (!req.body.username) {
@@ -31,7 +31,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
     
-    router.post('/logout', (req, res, next) => {
+    router.post('/api/auth/logout', (req, res, next) => {
         if (req.session) {
             // Delete the session object.
             req.session.destroy((err) => {

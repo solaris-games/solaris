@@ -34,15 +34,14 @@ module.exports = async (app, io, container) => {
     const auth = require('../api/auth')(router, io, container);
     const user = require('../api/user')(router, io, container);
 
-    app.use('/api/auth', auth);
-    app.use('/api/user', user);
-
-    app.use('/api/game', game);
-    app.use('/api/game', research);
-    app.use('/api/game', trade);
-    app.use('/api/game', star);
-    app.use('/api/game', carrier);
-    app.use('/api/game', message);
+    app.use(auth);
+    app.use(user);
+    app.use(game);
+    app.use(research);
+    app.use(trade);
+    app.use(star);
+    app.use(carrier);
+    app.use(message);
 
     return app;
 };

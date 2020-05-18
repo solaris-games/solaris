@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -42,7 +42,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -76,7 +76,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -100,7 +100,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let techs = await container.tradeService.getTradeableTechnologies(
                 req.game,

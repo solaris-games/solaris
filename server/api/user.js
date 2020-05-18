@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('./middleware')(container);
 
-    router.post('/', async (req, res, next) => {
+    router.post('/api/user/', async (req, res, next) => {
         let errors = [];
 
         if (!req.body.email) {
@@ -46,7 +46,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {
             let user = await container.userService.getMe(req.session.userId);
 
@@ -56,7 +56,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:id', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/:id', middleware.authenticate, async (req, res, next) => {
         try {
             let user = await container.userService.getById(req.params.id);
 
@@ -66,7 +66,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
         try {
             await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
             
@@ -76,7 +76,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.email) {
@@ -96,7 +96,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/changePassword', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changePassword', middleware.authenticate, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.currentPassword) {

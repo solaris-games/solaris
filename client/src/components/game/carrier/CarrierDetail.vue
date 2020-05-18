@@ -5,7 +5,7 @@
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="carrier.ownedByPlayerId == currentPlayerId">A carrier under your command.<br/>Give it orders to capture more stars!</p>
-        <p v-if="carrier.ownedByPlayerId != null && carrier.ownedByPlayerId != currentPlayerId">This carrier is controlled by <a href="" @click="onOpenPlayerDetailRequested">{{getCarrierOwningPlayer().alias}}</a>.</p>
+        <p v-if="carrier.ownedByPlayerId != null && carrier.ownedByPlayerId != currentPlayerId">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getCarrierOwningPlayer().alias}}</a>.</p>
       </div>
     </div>
 
@@ -121,8 +121,6 @@ export default {
       return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
     },
     onOpenPlayerDetailRequested (e) {
-      e.preventDefault()
-
       this.$emit('onOpenPlayerDetailRequested', this.getCarrierOwningPlayer())
     },
     async toggleWaypointsLooped () {

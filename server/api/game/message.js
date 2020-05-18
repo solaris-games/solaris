@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         try {
             let result = await container.messageService.getConversation(
                 req.game,
@@ -17,7 +17,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         try {
             let result = container.messageService.summary(
                 req.game,
@@ -29,7 +29,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/:gameId/message/markallread', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/message/markallread', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         try {
             await container.messageService.markAllAsRead(
                 req.game,
@@ -41,7 +41,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.post('/api/game/:gameId/message/send', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
