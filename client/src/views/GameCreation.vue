@@ -54,6 +54,26 @@
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>
 
       <loading-spinner :loading="isCreatingGame"/>
+
+      <view-subtitle title="Galaxy Settings"/>
+
+      <div class="form-group">
+        <label for="starsPerPlayer" class="col-form-label">Stars per Player</label>
+        <select class="form-control" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
+          <option v-for="opt in options.galaxy.starsPerPlayer" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="productionTicks" class="col-form-label">Production Ticks</label>
+        <select class="form-control" id="productionTicks" v-model="settings.galaxy.productionTicks" :disabled="isCreatingGame">
+          <option v-for="opt in options.galaxy.productionTicks" v-bind:key="opt" v-bind:value="opt">
+            {{ opt }} Ticks
+          </option>
+        </select>
+      </div>
     
       <view-subtitle title="Special Galaxy Settings"/>
 
@@ -89,26 +109,6 @@
         <select class="form-control" id="darkGalaxy" v-model="settings.specialGalaxy.darkGalaxy" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.darkGalaxy" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <view-subtitle title="Galaxy Settings"/>
-
-      <div class="form-group">
-        <label for="starsPerPlayer" class="col-form-label">Stars per Player</label>
-        <select class="form-control" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
-          <option v-for="opt in options.galaxy.starsPerPlayer" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="productionTicks" class="col-form-label">Production Ticks</label>
-        <select class="form-control" id="productionTicks" v-model="settings.galaxy.productionTicks" :disabled="isCreatingGame">
-          <option v-for="opt in options.galaxy.productionTicks" v-bind:key="opt" v-bind:value="opt">
-            {{ opt }} Ticks
           </option>
         </select>
       </div>
