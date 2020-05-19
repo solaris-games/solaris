@@ -111,14 +111,14 @@ module.exports = (router, io, container) => {
 
     router.put('/api/game/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.starUpgradeService.buildCarrier(
+            let carrier = await container.starUpgradeService.buildCarrier(
                 req.game,
                 req.player,
                 req.body.starId);
 
-            container.broadcastService.gameStarCarrierBuilt(req.game, req.body.starId);
+            container.broadcastService.gameStarCarrierBuilt(req.game, carrier);
 
-            return res.sendStatus(200);
+            return res.status(200).json(carrier);
         } catch (err) {
             return next(err);
         }

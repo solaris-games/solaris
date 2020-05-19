@@ -83,6 +83,8 @@ module.exports = class StarUpgradeService {
         player.credits -= cost;
 
         await game.save();
+
+        return carrier;
     }
 
     async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback) {
