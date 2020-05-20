@@ -30,7 +30,7 @@ module.exports = class WaypointService {
                     throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
                 }
 
-            if (newFirstWaypoint.delayTicks) {
+            if (+newFirstWaypoint.delayTicks) {
                 throw new ValidationError('The first waypoint cannot have delay ticks if mid-flight.');
             }
         }
