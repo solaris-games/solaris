@@ -68,9 +68,9 @@ module.exports = class GameTickService {
             let carrier = carriersWithWaypoints[i];
             let waypoint = carrier.waypoints[0];
 
-            // If the waypoint has a delay on it, then
-            // we need to wait until there are no more delay ticks.
-            if (waypoint.delayTicks) {
+            // If the waypoint has a delay on it for a carrier that is stationed
+            // at a star, then we need to wait until there are no more delay ticks.
+            if (waypoint.delayTicks && carrier.orbiting) {
                 waypoint.delayTicks--;
                 continue;
             }

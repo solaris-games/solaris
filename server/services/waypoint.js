@@ -29,6 +29,10 @@ module.exports = class WaypointService {
                 || currentWaypoint.destination.toString() !== newFirstWaypoint.destination) {
                     throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
                 }
+
+            if (newFirstWaypoint.delayTicks) {
+                throw new ValidationError('The first waypoint cannot have delay ticks if mid-flight.');
+            }
         }
 
         // Validate new waypoints.
