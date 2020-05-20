@@ -7,6 +7,15 @@ import { mapState } from 'vuex';
 import GameContainer from '../../game/container'
 
 export default {
+  data () {
+    return {
+      onStarClickedHandler: null,
+      onCarrierClickedHandler: null,
+      onWaypointCreatedHandler: null,
+      onObjectsClickedHandler: null
+    }
+  },
+
   created () {
     window.addEventListener('resize', this.handleResize)
   },
@@ -24,10 +33,22 @@ export default {
     this.drawGame(this.$store.state.game)
 
     // Bind to game events.
-    this.gameContainer.map.on('onStarClicked', this.onStarClicked.bind(this))
-    this.gameContainer.map.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-    this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
-    this.gameContainer.map.on('onObjectsClicked', this.onObjectsClicked.bind(this))
+    this.onStarClickedHandler = this.onStarClicked.bind(this)
+    this.onCarrierClickedHandler = this.onCarrierClicked.bind(this)
+    this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
+    this.onObjectsClickedHandler = this.onObjectsClicked.bind(this)
+
+    this.gameContainer.map.on('onStarClicked', this.onStarClickedHandler)
+    this.gameContainer.map.on('onCarrierClicked', this.onCarrierClickedHandler)
+    this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
+    this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
+  },
+
+  destroyed () {
+    this.gameContainer.map.off('onStarClicked', this.onStarClickedHandler)
+    this.gameContainer.map.off('onCarrierClicked', this.onCarrierClickedHandler)
+    this.gameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
+    this.gameContainer.map.off('onObjectsClicked', this.onObjectsClickedHandler)
   },
 
   beforeDestroy () {

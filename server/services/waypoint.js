@@ -47,6 +47,10 @@ module.exports = class WaypointService {
             if (distanceBetweenStars > hyperspaceDistance) {
                 throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} exceeds hyperspace range.`);
             }
+
+            if (+waypoint.actionShips < 0) {
+                throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} cannot have action ships less than 0.`);
+            }
         }
         
         carrier.waypoints = waypoints;

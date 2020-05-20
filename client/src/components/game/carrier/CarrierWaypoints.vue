@@ -22,7 +22,7 @@
 
 		<div class="row bg-secondary pt-2 pb-2">
 			<div class="col">
-				<p>ETA: 0d 0h 0m 0s</p>
+				<p v-if="totalEtaTimeString">ETA: {{totalEtaTimeString}}</p>
 			</div>
 			<div class="col-auto">
 				<button class="btn btn-danger" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-minus"></i></button>
@@ -50,15 +50,22 @@ export default {
 	mounted () {
 		GameContainer.map.setMode('waypoints', this.carrier)
 
+		this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
+    	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
+
 		this.oldWaypoints = this.carrier.waypoints.slice(0)
 	},
 	destroyed () {
 		GameContainer.map.resetMode()
+
+		GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
 	},
 	data () {
 		return {
 			isSavingWaypoints: false,
-			oldWaypoints: []
+			oldWaypoints: [],
+			totalEtaTimeString: null,
+			waypointCreatedHandler: null
 		}
 	},
 	methods: {
@@ -87,12 +94,27 @@ export default {
 
 				GameContainer.map.draw()
 			}
+
+			if (!this.carrier.waypoints.length) {
+				this.totalEtaTimeString = null
+			}
 		},
 		removeAllWaypoints () {
 			// Remove all waypoints up to the last waypoint (if in transit)
 			this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
 
 			GameContainer.map.draw()
+
+			this.totalEtaTimeString = null
+		},
+		onWaypointCreated () {
+			let totalEtaTicks = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
+				this.carrier.waypoints[this.carrier.waypoints.length - 1])
+
+			let totalEtaTime = GameHelper.calculateTimeByTicks(totalEtaTicks, 
+				this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+			this.totalEtaTimeString = GameHelper.getCountdownTimeString(totalEtaTime.toDate(), new Date(this.$store.state.game.state.lastTickDate))
 		},
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.

@@ -88,11 +88,14 @@ export default {
       isLoopingWaypoints: false,
       timeRemainingEta: null,
       timeRemainingEtaTotal: null,
-      intervalFunction: null
+      intervalFunction: null,
+      onWaypointCreatedHandler: null
     }
   },
   mounted () {
-    GameContainer.map.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+    this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
+
+    GameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
 
     this.recalculateTimeRemaining()
 
@@ -101,6 +104,8 @@ export default {
     }
   },
   destroyed () {
+    GameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
+    
     clearInterval(this.intervalFunction)
   },
   methods: {

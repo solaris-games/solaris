@@ -9,6 +9,7 @@ class Carrier extends EventEmitter {
     this.container.interactive = true
     this.container.buttonMode = true
 
+    // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
     this.container.on('pointerdown', this.onClicked.bind(this))
   }
 

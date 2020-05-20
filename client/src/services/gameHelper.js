@@ -1,3 +1,4 @@
+import moment from 'moment'
 
 class GameHelper {
   getUserPlayer (game) {
@@ -58,8 +59,8 @@ class GameHelper {
     let xs = loc2.x - loc1.x,
         ys = loc2.y - loc1.y
 
-    xs *= xs;
-    ys *= ys;
+    xs *= xs
+    ys *= ys
 
     return Math.sqrt(xs + ys)
   }
@@ -99,6 +100,60 @@ class GameHelper {
     str += `${secs}s`
 
     return str
+  }
+
+  // TODO: This has all been copy/pasted from the API services
+  // is there a way to share these functions in a core library?
+  calculateWaypointTicks(game, carrier, waypoint) {
+    let source = game.galaxy.stars.find(x => x._id === waypoint.source).location
+    let destination = game.galaxy.stars.find(x => x._id === waypoint.destination).location
+
+    // If the carrier is already en-route, then the number of ticks will be relative
+    // to where the carrier is currently positioned.
+    if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
+        source = carrier.location
+    }
+
+    let distance = this.getDistanceBetweenLocations(source, destination)
+
+    let tickDistance = game.constants.distances.shipSpeed
+
+    // If the carrier is moving between warp gates then
+    // the tick distance is x3
+    if (source.warpGate && destination.warpGate
+        && source.ownedByPlayerId && destination.ownedByPlayerId) {
+            tickDistance *= 3
+        }
+
+    let ticks = Math.ceil(distance / tickDistance)
+
+    return ticks
+  }
+
+  calculateWaypointTicksEta(game, carrier, waypoint) {
+    let totalTicks = 0
+
+    for (let i = 0; i < carrier.waypoints.length; i++) {
+        let cwaypoint = carrier.waypoints[i]
+        
+        totalTicks += this.calculateWaypointTicks(game, carrier, waypoint);
+
+        if (cwaypoint === waypoint) {
+            break
+        }
+    }
+
+    return totalTicks
+  }
+
+  calculateTimeByTicks(ticks, speedInMins, relativeTo = null) {
+    if (relativeTo == null) {
+        relativeTo = moment();
+    } else {
+        relativeTo = moment(relativeTo);
+    }
+
+    return relativeTo.add(ticks * speedInMins, 'm');
   }
 }
 
