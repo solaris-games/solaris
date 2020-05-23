@@ -2,14 +2,16 @@ const moment = require('moment');
 
 module.exports = class GameTickService {
     
-    constructor(broadcastService, distanceService, starService, researchService, playerService, historyService, waypointService) {
+    constructor(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService) {
         this.broadcastService = broadcastService;
         this.distanceService = distanceService;
         this.starService = starService;
+        this.carrierService = carrierService;
         this.researchService = researchService;
         this.playerService = playerService;
         this.historyService = historyService;
         this.waypointService = waypointService;
+        this.combatService = combatService;
     }
 
     async tick(game) {
@@ -38,6 +40,7 @@ module.exports = class GameTickService {
        this._conductResearch(game);
        this._endOfGalacticCycleCheck(game);
        this._logHistory(game);
+       this._gameLoseCheck(game);
        this._gameWinCheck(game);
 
        await game.save();
@@ -101,9 +104,9 @@ module.exports = class GameTickService {
         let combatStars = [];
         let actionWaypoints = [];
 
-        let distancePerTick = game.constants.distances.shipSpeed;
-
         for (let i = 0; i < carriers.length; i++) {
+            let distancePerTick = game.constants.distances.shipSpeed;
+    
             let carrier = carriers[i];
             let waypoint = carrier.waypoints[0];
             let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
@@ -191,25 +194,20 @@ module.exports = class GameTickService {
             .filter(c => c.orbiting.equals(star._id) && c.ownedByPlayerId.equals(defender._id))
             .sort((a, b) => b.ships - a.ships);
 
-        let defendPower = defender.research.weapons.level + 1;
-        let attackPower = attacker.research.weapons.level;
-
         // Perform carrier to carrier combat.
         for (let i = 0; i < friendlyCarriers.length; i++) {
             let friendlyCarrier = friendlyCarriers[i];
 
-            // Keep fighting until either carrier has no ships remaining.
-            while (friendlyCarrier.ships > 0 && enemyCarrier.ships > 0) {
-                // Friendly carrier attacks first with defender bonus.
-                enemyCarrier.ships -= defendPower;
-
-                // Enemy carrier attacks next if there are still ships remaining.
-                if (enemyCarrier.ships <= 0) {
-                    break;
-                }
-
-                friendlyCarrier.ships -= attackPower;
-            }
+            let combatResult = this.combatService.calculate({
+                weaponsLevel: defender.research.weapons.level,
+                ships: friendlyCarrier.ships
+            }, {
+                weaponsLevel: attacker.research.weapons.level,
+                ships: enemyCarrier.ships
+            });
+            
+            friendlyCarrier.ships = combatResult.defenderShips;
+            enemyCarrier.ships = combatResult.attackerShips;
 
             // Destroy carriers if they have no ships left.
             if (friendlyCarrier.ships <= 0) {
@@ -222,18 +220,22 @@ module.exports = class GameTickService {
             }
         }
 
-        // Perform star to carrier combat.
-        // If the enemy carrier still has ships left, then move onto attack the star's garrison.
-        while (Math.floor(star.garrisonActual) > 0 && enemyCarrier.ships > 0) {
-            // The star attacks first with defender bonus.
-            enemyCarrier.ships -= defendPower;
+        // Perform star to carrier combat if there is a garrison at the star
+        // and the enemy carrier has ships remaining.
+        let starGarrison = Math.floor(star.garrisonActual);
 
-            // Enemy carrier attacks next if there are still ships remaining.
-            if (enemyCarrier.ships <= 0) {
-                break;
-            }
+        if (starGarrison && enemyCarrier.ships) {
+            let starGarrisonFraction = star.garrisonActual - starGarrison; // Save the fractional amount of ships so we can add it back on after combat.
 
-            star.garrisonActual -= attackPower;
+            let starCombatResult = this.combatService.calculate({
+                weaponsLevel: defender.research.weapons.level,
+                ships: starGarrison
+            }, {
+                weaponsLevel: attacker.research.weapons.level,
+                ships: enemyCarrier.ships
+            });
+
+            star.garrisonActual = starCombatResult.defenderShips + starGarrisonFraction;
             star.garrison = Math.floor(star.garrisonActual);
         }
 
@@ -317,6 +319,21 @@ module.exports = class GameTickService {
 
     _logHistory(game) {
         this.historyService.log(game);
+    }
+
+    _gameLoseCheck(game) {
+        // Check to see if anyone has been defeated.
+        // A player is defeated if they have no stars and no carriers remaining.
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+
+        for (let i = 0; i < undefeatedPlayers.length; i++) {
+            let player = undefeatedPlayers[i];
+
+            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+            let carriers = this.carrierService = listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+
+            player.defeated = stars.length === 0 && carriers.length === 0;
+        }
     }
 
     _gameWinCheck(game) {

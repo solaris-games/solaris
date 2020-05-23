@@ -82,6 +82,56 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
+        let errors = [];
+
+        if (req.body.defender.ships == null) {
+            errors.push('defender.ships is required.');
+        }
+
+        if (+req.body.defender.ships <= 0) {
+            errors.push('defender.ships must be greater than 0.');
+        }
+
+        if (req.body.defender.weaponsLevel == null) {
+            errors.push('defender.weaponsLevel is required.');
+        }
+
+        if (+req.body.defender.weaponsLevel <= 0) {
+            errors.push('defender.weaponsLevel must be greater than 0.');
+        }
+
+        if (req.body.attacker.ships == null) {
+            errors.push('attacker.ships is required.');
+        }
+
+        if (+req.body.attacker.ships <= 0) {
+            errors.push('attacker.ships must be greater than 0.');
+        }
+
+        if (req.body.attacker.weaponsLevel == null) {
+            errors.push('attacker.weaponsLevel is required.');
+        }
+
+        if (+req.body.attacker.weaponsLevel <= 0) {
+            errors.push('attacker.weaponsLevel must be greater than 0.');
+        }
+
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
+
+        try {
+            let result = container.combatService.calculate(
+                req.body.defender,
+                req.body.attacker);
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

@@ -7,6 +7,7 @@ const HistoryModel = require('../models/History');
 const AuthService = require('../services/auth');
 const BroadcastService = require('../services/broadcast');
 const CarrierService = require('../services/carrier');
+const CombatService = require('../services/combat');
 const DistanceService = require('../services/distance');
 const GameService = require('../services/game');
 const GameCreateService = require('../services/gameCreate');
@@ -42,6 +43,7 @@ module.exports = (io) => {
 
     const broadcastService = new BroadcastService(io);
     const carrierService = new CarrierService();
+    const combatService = new CombatService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const timeService = new TimeService();
@@ -62,7 +64,7 @@ module.exports = (io) => {
     const starUpgradeService = new StarUpgradeService(starService, carrierService);
     const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, timeService);
     const historyService = new HistoryService(HistoryModel, playerService);
-    const gameTickService = new GameTickService(broadcastService, distanceService, starService, researchService, playerService, historyService, waypointService);
+    const gameTickService = new GameTickService(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService);
     const messageService = new MessageService();
     const shipTransferService = new ShipTransferService(carrierService, starService);
 
@@ -70,6 +72,7 @@ module.exports = (io) => {
         authService,
         broadcastService,
         carrierService,
+        combatService,
         distanceService,
         gameService,
         gameCreateService,
