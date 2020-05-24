@@ -64,7 +64,7 @@ module.exports = (container) => {
             return next();
         },
 
-        loadPlayer(req, res, next) {
+        async loadPlayer(req, res, next) {
             let player = container.playerService.getByUserId(req.game, req.session.userId);
 
             if (!player) {
@@ -72,6 +72,8 @@ module.exports = (container) => {
             }
 
             req.player = player;
+
+            await container.playerService.updateLastSeen(req.game, player);
 
             return next();
         },

@@ -223,4 +223,10 @@ module.exports = class PlayerService {
         };
     }
 
+    async updateLastSeen(game, player) {
+        player.lastSeen = new Date();
+
+        await game.save();
+    }
+
 }

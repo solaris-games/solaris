@@ -9,6 +9,7 @@ const schema = new Schema({
         alias: { type: Types.String, required: true },
         value: { type: Types.String, required: true }
     },
+    lastSeen: { type: Types.Date, required: false },
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },

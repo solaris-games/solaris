@@ -329,10 +329,18 @@ module.exports = class GameTickService {
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-            let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+            // Check if the player has been AFK for over 48 hours.
+            let isAfk = moment(player.lastSeen) > moment().subtract(2, 'days');
 
-            player.defeated = stars.length === 0 && carriers.length === 0;
+            player.defeated = !isAfk;
+
+            // Check if the player has been defeated by conquest.
+            if (!player.defeated) {
+                let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+    
+                player.defeated = stars.length === 0 && carriers.length === 0;
+            }
         }
     }
 
