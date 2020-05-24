@@ -21,8 +21,8 @@
       <form-error-list v-bind:errors="errors"/>
 
       <div>
-        <router-link to="/account/settings" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success ml-1" :disabled="isLoading">Change Password</button>
+        <button type="submit" class="btn btn-success" :disabled="isLoading">Change Password</button>
+        <router-link to="/account/settings" tag="button" class="btn btn-danger ml-1">Cancel</router-link>
       </div>
     </form>
 

@@ -14,8 +14,8 @@
         <form-error-list v-bind:errors="errors"/>
 
         <div class="form-group">
-            <router-link to="/" tag="button" type="button" class="btn btn-danger">Cancel</router-link>
-            <input type="submit" class="btn btn-success ml-1" value="Login" :disabled="isLoading"/>
+            <input type="submit" class="btn btn-success" value="Login" :disabled="isLoading"/>
+            <router-link to="/" tag="button" type="button" class="btn btn-danger ml-1">Cancel</router-link>
         </div>
 
         <div class="form-group">

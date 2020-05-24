@@ -11,8 +11,8 @@
       </div>
 
       <div>
-        <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success ml-1" :disabled="isLoading">Reset Password</button>
+        <button type="submit" class="btn btn-success" :disabled="isLoading">Reset Password</button>
+        <router-link to="/" tag="button" class="btn btn-danger ml-1">Cancel</router-link>
       </div>
     </form>
 

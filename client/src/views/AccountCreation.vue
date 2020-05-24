@@ -26,8 +26,8 @@
       </div>
 
       <div>
-        <router-link to="/" tag="button" class="btn btn-danger">Cancel</router-link>
-        <button type="submit" class="btn btn-success ml-1" :disabled="isLoading">Create Account</button>
+        <button type="submit" class="btn btn-success" :disabled="isLoading">Create Account</button>
+        <router-link to="/" tag="button" class="btn btn-danger ml-1">Cancel</router-link>
       </div>
     </form>
 
@@ -62,6 +62,7 @@ export default {
   },
   methods: {
     async handleSubmit (e) {
+      debugger
       this.errors = []
 
       if (!this.username) {
