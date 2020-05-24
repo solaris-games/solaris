@@ -330,7 +330,7 @@ module.exports = class GameTickService {
             let player = undefeatedPlayers[i];
 
             let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-            let carriers = this.carrierService = listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+            let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
             player.defeated = stars.length === 0 && carriers.length === 0;
         }

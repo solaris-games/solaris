@@ -186,8 +186,8 @@ module.exports = class WaypointService {
         // If the star has more ships than needs to be collected, then collect
         // however many are configured in the waypoint.
         if (star.garrison >= waypoint.actionShips) {
-            star.garrison += waypoint.actionShips;
-            carrier.ships -= waypoint.actionShips;
+            star.garrison -= waypoint.actionShips;
+            carrier.ships += waypoint.actionShips;
         }
         else {
             // If there aren't enough ships, then do a collect all.
@@ -202,7 +202,7 @@ module.exports = class WaypointService {
 
         // If we have more than enough ships to transfer, then transfer
         // the desired amount. Otherwise do not drop anything.
-        if (difference >= carrier.ships - 1) {
+        if (difference > 0 && difference <= carrier.ships - 1) {
             star.garrison += difference;
             carrier.ships -= difference;
         }
@@ -215,7 +215,7 @@ module.exports = class WaypointService {
 
         // If we have more than enough ships to transfer, then transfer
         // the desired amount. Otherwise do not drop anything.
-        if (difference >= star.garrison) {
+        if (difference > 0 && difference <= star.garrison) {
             star.garrison -= difference;
             carrier.ships += difference;
         }
@@ -234,7 +234,7 @@ module.exports = class WaypointService {
             star.garrison -= allowed;
             carrier.ships += allowed;
         } else {
-            let allowed = Math.abs(Math.min(difference, carrier.ships - 1));
+            let allowed = Math.min(Math.abs(difference), carrier.ships - 1);
 
             star.garrison += allowed;
             carrier.ships -= allowed;
