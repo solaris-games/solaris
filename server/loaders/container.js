@@ -3,12 +3,14 @@ const bcrypt = require('bcrypt');
 const GameModel = require('../models/Game');
 const UserModel = require('../models/User');
 const HistoryModel = require('../models/History');
+const EventModel = require('../models/Event');
 
 const AuthService = require('../services/auth');
 const BroadcastService = require('../services/broadcast');
 const CarrierService = require('../services/carrier');
 const CombatService = require('../services/combat');
 const DistanceService = require('../services/distance');
+const EventService = require('../services/event');
 const GameService = require('../services/game');
 const GameCreateService = require('../services/gameCreate');
 const GameGalaxyService = require('../services/gameGalaxy');
@@ -42,6 +44,7 @@ module.exports = (io) => {
     const userService = new UserService(bcrypt, UserModel);
 
     const broadcastService = new BroadcastService(io);
+    const eventService = new EventService(EventModel);
     const carrierService = new CarrierService();
     const combatService = new CombatService();
     const distanceService = new DistanceService();
@@ -74,6 +77,7 @@ module.exports = (io) => {
         carrierService,
         combatService,
         distanceService,
+        eventService,
         gameService,
         gameCreateService,
         gameGalaxyService,
