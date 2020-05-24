@@ -61,8 +61,9 @@ module.exports = class ResearchService {
 
         let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)];
         let tech = player.research[techKey];
+        let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier / 2);
 
-        tech.progress += player.research.experimentation.level * (game.constants.research.progressMultiplier / 2);
+        tech.progress += researchAmount;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -72,6 +73,11 @@ module.exports = class ResearchService {
             tech.level++;
             tech.progress -= requiredProgress;
         }
+
+        return {
+            technology: techKey,
+            amount: researchAmount
+        };
     }
 
     calculateCurrentResearchETAInTicks(game, player) {

@@ -2,7 +2,9 @@ const moment = require('moment');
 
 module.exports = class GameTickService {
     
-    constructor(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService) {
+    constructor(eventService, broadcastService, distanceService, starService, carrierService, 
+        researchService, playerService, historyService, waypointService, combatService) {
+        this.eventService = eventService;
         this.broadcastService = broadcastService;
         this.distanceService = distanceService;
         this.starService = starService;
@@ -38,7 +40,7 @@ module.exports = class GameTickService {
        this._moveCarriers(game);
        this._produceShips(game);
        this._conductResearch(game);
-       this._endOfGalacticCycleCheck(game);
+       await this._endOfGalacticCycleCheck(game);
        this._logHistory(game);
        this._gameLoseCheck(game);
        this._gameWinCheck(game);
@@ -281,40 +283,46 @@ module.exports = class GameTickService {
         }
     }
 
-    _endOfGalacticCycleCheck(game) {
+    async _endOfGalacticCycleCheck(game) {
         game.state.tick++;
 
         // Check if we have reached the production tick.
         if (game.state.tick % game.settings.galaxy.productionTicks === 0) {
             game.state.productionTick++;
 
-            this._givePlayersMoney(game);
-            this._conductExperiments(game);
+            // For each player, perform the end of cycle actions.
+            // Give each player money.
+            // Conduct experiments.
+            for (let i = 0; i < game.galaxy.players.length; i++) {
+                let player = game.galaxy.players[i];
+                
+                let creditsResult = this._givePlayerMoney(game, player);
+                let experimentResult = this._conductExperiments(game, player);
+
+                await this.eventService.createGalacticCycleCompleteEvent(game, player,
+                    creditsResult.creditsFromEconomy, creditsResult.creditsFromBanking,
+                    experimentResult.technology, experimentResult.amount);
+            }
         }
     }
 
-    _givePlayersMoney(game) {
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
+    _givePlayerMoney(game, player) {
+        let totalEco = this.playerService.calculateTotalEconomy(player, game.galaxy.stars);
 
-            let totalEco = this.playerService.calculateTotalEconomy(player, game.galaxy.stars);
+        let creditsFromEconomy = totalEco * 10;
+        let creditsFromBanking = player.research.banking.level * 75;
+        let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
-            let creditsFromEconomy = totalEco * 10;
-            let creditsFromBanking = player.research.banking.level * 75;
-            let creditsTotal = creditsFromEconomy + creditsFromBanking;
+        player.credits += creditsTotal;
 
-            player.credits += creditsTotal;
-        }
+        return {
+            creditsFromEconomy,
+            creditsFromBanking
+        };
     }
 
-    _conductExperiments(game) {
-        // Pick a random tech to research and add the current level of experimentation
-        // to its current research progress.
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
-
-            this.researchService.conductExperiments(game, player);
-        }
+    _conductExperiments(game, player) {
+        return this.researchService.conductExperiments(game, player);
     }
 
     _logHistory(game) {

@@ -142,6 +142,19 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let events = await container.eventService.getPlayerEvents(
+                req.game,
+                req.player
+            );
+
+            return res.status(200).json(events);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };
