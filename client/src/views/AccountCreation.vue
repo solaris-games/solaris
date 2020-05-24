@@ -27,7 +27,7 @@
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Create Account</button>
-        <router-link to="/" tag="button" class="btn btn-danger ml-1">Cancel</router-link>
+        <router-link to="/" tag="button" class="btn btn-danger float-right">Cancel</router-link>
       </div>
     </form>
 

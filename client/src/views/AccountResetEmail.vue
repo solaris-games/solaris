@@ -12,7 +12,7 @@
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Email</button>
-        <router-link to="/account/settings" tag="button" class="btn btn-danger ml-1">Cancel</router-link>
+        <router-link to="/account/settings" tag="button" class="btn btn-danger float-right">Cancel</router-link>
       </div>
     </form>
 

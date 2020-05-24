@@ -15,7 +15,7 @@
 
         <div class="form-group">
             <input type="submit" class="btn btn-success" value="Login" :disabled="isLoading"/>
-            <router-link to="/" tag="button" type="button" class="btn btn-danger ml-1">Cancel</router-link>
+            <router-link to="/" tag="button" type="button" class="btn btn-danger float-right">Cancel</router-link>
         </div>
 
         <div class="form-group">

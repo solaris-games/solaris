@@ -11,7 +11,7 @@
 
       <div class="mb-4">
         <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
-        <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ml-1">Open Game <i class="fas fa-arrow-right"></i> </router-link>
+        <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">Open Game <i class="fas fa-arrow-right"></i> </router-link>
       </div>
 
       <h5>General Settings</h5>
