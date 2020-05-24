@@ -62,7 +62,6 @@ export default {
   },
   methods: {
     async handleSubmit (e) {
-      debugger
       this.errors = []
 
       if (!this.username) {
