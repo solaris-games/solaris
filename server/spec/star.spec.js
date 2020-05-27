@@ -98,7 +98,6 @@ describe('star', () => {
         expect(homeStar.infrastructure.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);
-        expect(homeStar.homeStar).toBeTruthy();
     });
     
 });

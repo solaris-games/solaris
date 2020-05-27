@@ -87,7 +87,7 @@ module.exports = class PlayerService {
         while (starsToDistribute--) {
             for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
                 let player = players[playerIndex];
-                let homeStar = allStars.find(s => player.homeStarId == s._id);
+                let homeStar = allStars.find(s => player.homeStarId.equals(s._id));
 
                 // Get X closest stars to the home star and also give those to
                 // the player.

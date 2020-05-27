@@ -103,7 +103,6 @@ module.exports = class GameGalaxyService {
                 name: s.name,
                 ownedByPlayerId: s.ownedByPlayerId,
                 location: s.location,
-                homeStar: s.homeStar,
                 warpGate: s.warpGate,
                 stats: s.stats,
                 manufacturing: s.manufacturing
@@ -160,7 +159,6 @@ module.exports = class GameGalaxyService {
                     name: s.name,
                     ownedByPlayerId: s.ownedByPlayerId,
                     location: s.location,
-                    homeStar: s.homeStar,
                     warpGate: s.warpGate
                 }
             }

@@ -48,11 +48,10 @@ module.exports = class StarService {
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
         homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
         homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
-        homeStar.homeStar = true;
     }
 
     getPlayerHomeStar(stars, playerId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).find(s => s.homeStar);
+        return this.listStarsOwnedByPlayer(stars, playerId).find(s => s._id.equals(playerId));
     }
 
     listStarsOwnedByPlayer(stars, playerId) {
@@ -84,14 +83,15 @@ module.exports = class StarService {
         // Find and destroy all carriers stationed at this star.
         game.galaxy.carriers = game.galaxy.carriers.filter(x => x.orbiting.toString() != star.id);
 
-        // If this was the player's home star, then we need to find a new home star.
-        if (star.homeStar) {
-            let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, player);
+        // TODO: Re-assign home star?
+        // // If this was the player's home star, then we need to find a new home star.
+        // if (star.homeStar) {
+        //     let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, player);
 
-            if (closestStars.length) {
-                closestStars[0].homeStar = true;
-            }
-        }
+        //     if (closestStars.length) {
+        //         closestStars[0].homeStar = true;
+        //     }
+        // }
         
         await game.save();
     }

@@ -134,7 +134,7 @@ class Map extends EventEmitter {
   zoomToPlayer (game, player) {
     // Find the home star the player owns.
     let homeStar = game.galaxy.stars.find(x => {
-      return x.ownedByPlayerId === player._id && x.homeStar === true
+      return x._id === player.homeStarId
     })
 
     if (!homeStar) {
