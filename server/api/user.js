@@ -4,6 +4,16 @@ module.exports = (router, io, container) => {
 
     const middleware = require('./middleware')(container);
 
+    router.get('/api/user/leaderboard', middleware.authenticate, async (req, res, next) => {
+        try {
+            let result = await container.leaderboardService.getLeaderboard();
+                
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.post('/api/user/', async (req, res, next) => {
         let errors = [];
 

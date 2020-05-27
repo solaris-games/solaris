@@ -4,10 +4,10 @@
         <form>
             <div class="form-row">
               <div class="col-7">
-                  <p class="mb-2">{{userPlayer.renownToGive || 8}} Renown to distribute.</p>
+                  <p class="mb-2">{{userPlayer.renownToGive == null ? 0 : userPlayer.renownToGive}} Renown to distribute.</p>
               </div>
               <div class="col-5">
-                  <button type="button" class="btn btn-success btn-block" @click="confirmAwardRenown" :disabled="isAwardingRenown">Award Renown</button>
+                  <button type="button" class="btn btn-success btn-block" @click="confirmAwardRenown" :disabled="isAwardingRenown || !userPlayer.renownToGive">Award Renown</button>
               </div>
             </div>
         </form>

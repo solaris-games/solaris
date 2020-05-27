@@ -5,6 +5,7 @@
     <div>
       <router-link to="/game/active-games" tag="button" class="btn btn-block btn-success">My Games</router-link>
       <router-link to="/game/list" tag="button" class="btn btn-block btn-success">Join Game</router-link>
+      <router-link to="/leaderboard" tag="button" class="btn btn-block btn-info">Leaderboard</router-link>
       <router-link to="/game/create" tag="button" class="btn btn-block btn-primary">Create Game</router-link>
     </div>
 

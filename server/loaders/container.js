@@ -11,6 +11,7 @@ const CarrierService = require('../services/carrier');
 const CombatService = require('../services/combat');
 const DistanceService = require('../services/distance');
 const EventService = require('../services/event');
+const LeaderboardService = require('../services/leaderboard');
 const GameService = require('../services/game');
 const GameCreateService = require('../services/gameCreate');
 const GameGalaxyService = require('../services/gameGalaxy');
@@ -50,6 +51,7 @@ module.exports = (io) => {
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const timeService = new TimeService();
+    const leaderboardService = new LeaderboardService(UserModel);
     const gameService = new GameService(GameModel, userService);
     const gameListService = new GameListService(GameModel);
     const starNameService = new StarNameService(starNames, randomService);
@@ -78,6 +80,7 @@ module.exports = (io) => {
         combatService,
         distanceService,
         eventService,
+        leaderboardService,
         gameService,
         gameCreateService,
         gameGalaxyService,

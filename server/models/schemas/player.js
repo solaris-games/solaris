@@ -4,6 +4,7 @@ const Types = Schema.Types;
 
 const schema = new Schema({
     userId: { type: Types.String, required: false, default: null }, // TODO: This should be an object id
+    homeStarId: { type: Types.ObjectId, required: true },
     alias: { type: Types.String, required: true },
     colour: {
         alias: { type: Types.String, required: true },

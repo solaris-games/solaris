@@ -50,8 +50,8 @@ module.exports = class StarService {
         homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
     }
 
-    getPlayerHomeStar(stars, playerId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).find(s => s._id.equals(playerId));
+    getPlayerHomeStar(stars, player) {
+        return this.listStarsOwnedByPlayer(stars, player._id).find(s => s._id.equals(player.homeStarId));
     }
 
     listStarsOwnedByPlayer(stars, playerId) {

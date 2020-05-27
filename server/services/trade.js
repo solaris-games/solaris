@@ -9,7 +9,7 @@ module.exports = class TradeService {
 
     async sendCredits(game, fromPlayer, toPlayerId, amount) {
         // TODO: Maybe this validation needs to be in the middleware?
-        if (!game.startDate) {
+        if (!game.state.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
         }
         
@@ -32,7 +32,7 @@ module.exports = class TradeService {
 
     async sendRenown(game, fromPlayer, toPlayerId, amount) {
         // TODO: Maybe this validation needs to be in the middleware?
-        if (!game.startDate) {
+        if (!game.state.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
         }
 

@@ -24,7 +24,7 @@
 
     <research v-if="userPlayer" :player="player" :userPlayer="userPlayer"/>
 
-    <div v-if="game.startDate && userPlayer && player != userPlayer && !userPlayer.defeated">
+    <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated">
       <h4 class="mt-2">Trade</h4>
 
       <sendTechnology :player="player" :userPlayer="userPlayer"/>
@@ -39,7 +39,7 @@
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="game.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"/>
+    <sendRenown v-if="game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"/>
 
     <!--
     <h4 class="mt-2">Badges</h4>

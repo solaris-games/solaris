@@ -141,7 +141,7 @@ module.exports = class PlayerService {
         for (let i = 0; i < players.length; i++) {
             let player = players[i];
 
-            let homeStar = this.starService.getPlayerHomeStar(allStars, player._id);
+            let homeStar = this.starService.getPlayerHomeStar(allStars, player);
 
             if (!homeStar) {
                 throw new Error('The player must have a home star in order to set up a carrier');

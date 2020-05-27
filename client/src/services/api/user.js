@@ -36,6 +36,11 @@ class UserService extends BaseApiService {
     { withCredentials: true })
   }
 
+  getLeaderboard () {
+    return axios.get(this.BASE_URL + 'user/leaderboard',
+    { withCredentials: true })
+  }
+
 }
 
 export default new UserService()

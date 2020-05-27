@@ -16,6 +16,7 @@ import GameList from './views/GameList.vue'
 import Home from './views/Home.vue'
 import MainMenu from './views/MainMenu.vue'
 import PremiumStore from './views/PremiumStore.vue'
+import Leaderboard from './views/Leaderboard.vue'
 
 Vue.use(Router)
 
@@ -100,6 +101,11 @@ export default new Router({
       path: '/premium-store',
       name: 'premium-store',
       component: PremiumStore
+    },
+    {
+      path: '/leaderboard',
+      name: 'leaderboard',
+      component: Leaderboard
     }
   ]
 })
