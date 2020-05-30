@@ -11,7 +11,10 @@ module.exports = async (app, io, container) => {
         secret: config.sessionSecret,
         resave: true,
         saveUninitialized: true,
-        cookie: { secure: false } // Requires HTTPS
+        cookie: { 
+            secure: false, // Requires HTTPS
+            maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
+        } 
     }));
 
     // Enable CORS
