@@ -9,7 +9,7 @@
   </div>
 
   <div class="mt-2 events-container" v-if="events">
-      <events-list-item v-for="event in events" :key="event._id" :event="event" />
+      <events-list-item v-for="event in events" :key="event._id" :event="event" @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
   </div>
 </div>
 </template>
@@ -45,6 +45,9 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    },
+    onOpenStarDetailRequested (e) {
+        this.$emit('onOpenStarDetailRequested', e)
     }
   }
 }

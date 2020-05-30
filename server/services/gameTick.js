@@ -36,8 +36,9 @@ module.exports = class GameTickService {
 
        game.state.lastTickDate = moment();
        game.state.nextTickDate = moment().add(game.settings.gameTime.speed, 'm'); // TODO: Do we really need to do this?
+       game.state.nextProductionTickDate = moment().add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
 
-       this._moveCarriers(game);
+       await this._moveCarriers(game);
        this._produceShips(game);
        this._conductResearch(game);
        await this._endOfGalacticCycleCheck(game);
@@ -58,7 +59,7 @@ module.exports = class GameTickService {
         return nextTick <= moment();
     }
 
-    _moveCarriers(game) {
+    async _moveCarriers(game) {
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
         // Note, we order by distance ascending for 2 reasons:
@@ -164,7 +165,7 @@ module.exports = class GameTickService {
         for (let i = 0; i < combatStars.length; i++) {
             let combat = combatStars[i];
 
-            this._performCombatAtStar(game, combat.star, combat.carrier);
+            await this._performCombatAtStar(game, combat.star, combat.carrier);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
@@ -184,7 +185,7 @@ module.exports = class GameTickService {
         }
     }
 
-    _performCombatAtStar(game, star, enemyCarrier) {
+    async _performCombatAtStar(game, star, enemyCarrier) {
         let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
         let attacker = this.playerService.getByObjectId(game, enemyCarrier.ownedByPlayerId);
 
@@ -210,6 +211,10 @@ module.exports = class GameTickService {
             
             friendlyCarrier.ships = combatResult.after.defender;
             enemyCarrier.ships = combatResult.after.attacker;
+
+            // Log the combat event
+            await this.eventService.createCombatCarrierEvent(game, defender, attacker,
+                star, friendlyCarrier, enemyCarrier, combatResult);
 
             // Destroy carriers if they have no ships left.
             if (friendlyCarrier.ships <= 0) {
@@ -239,6 +244,10 @@ module.exports = class GameTickService {
 
             star.garrisonActual = starCombatResult.after.defender + starGarrisonFraction;
             star.garrison = Math.floor(star.garrisonActual);
+
+            // Log the combat event
+            await this.eventService.createCombatStarEvent(game, defender, attacker,
+                star, enemyCarrier, combatResult);
         }
 
         // If the enemy carrier has no ships, then destroy the attacking carrier.
@@ -392,6 +401,9 @@ module.exports = class GameTickService {
             game.state.paused = true;
             game.state.endDate = new Date();
             game.state.winner = winner._id;
+            
+            // TODO: Increase player ranks
+            // TODO: Increase the winner's victory count
         }
     }
 }

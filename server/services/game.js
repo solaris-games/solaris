@@ -81,12 +81,14 @@ module.exports = class GameService {
         if (game.state.players === game.settings.general.playerLimit) {
             let start = moment();
 
+            // TODO: When the game first begins, should we start at normal game speed?
+            // Or should we have a wait period before the game actually starts?
+
             game.state.paused = false;
             game.state.startDate = start.toDate();
             game.state.lastTickDate = start.toDate();
-            // TODO: When the game first begins, should we start at normal game speed?
-            // Or should we have a wait period before the game actually starts?
             game.state.nextTickDate = start.add(game.settings.gameTime.speed, 'm').toDate();
+            game.state.nextProductionTickDate = start.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm').toDate();
         }
 
         return await game.save();

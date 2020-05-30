@@ -24,6 +24,10 @@ class GameHelper {
     return game.galaxy.stars.find(x => x._id === starId)
   }
 
+  getCarrierById (game, carrierId) {
+    return game.galaxy.carriers.find(x => x._id === carrierId)
+  }
+
   getStarOwningPlayer (game, star) {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }

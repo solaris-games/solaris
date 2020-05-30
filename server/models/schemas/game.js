@@ -83,6 +83,7 @@ const schema = new Schema({
 		endDate: { type: Types.Date, required: false },
 		lastTickDate: { type: Types.Date, required: false },
 		nextTickDate: { type: Types.Date, required: false },
+		nextProductionTickDate: { type: Types.Date, required: false },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
