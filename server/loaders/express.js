@@ -12,7 +12,7 @@ module.exports = async (app, io, container) => {
         resave: true,
         saveUninitialized: true,
         cookie: { 
-            secure: false, // Requires HTTPS
+            secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
         } 
     }));
