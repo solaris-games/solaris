@@ -51,8 +51,8 @@
         <loading-spinner :loading="isLoading"/>
         
         <div class="row" v-if="result">
-            <p class="col text-right" v-if="result.defenderShips >= result.attackerShips"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.defenderShips}}</span> ships remaining.</p>
-            <p class="col text-right" v-if="result.attackerShips > result.defenderShips"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.attackerShips}}</span> ships remaining.</p>
+            <p class="col text-right" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
+            <p class="col text-right" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
         </div>
     </div>
 </template>
@@ -75,6 +75,7 @@ export default {
   },
   data () {
     return {
+        isLoading: false,
         errors: [],
         defender: {
             ships: 0,

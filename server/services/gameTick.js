@@ -208,8 +208,8 @@ module.exports = class GameTickService {
                 ships: enemyCarrier.ships
             });
             
-            friendlyCarrier.ships = combatResult.defenderShips;
-            enemyCarrier.ships = combatResult.attackerShips;
+            friendlyCarrier.ships = combatResult.after.defender;
+            enemyCarrier.ships = combatResult.after.attacker;
 
             // Destroy carriers if they have no ships left.
             if (friendlyCarrier.ships <= 0) {
@@ -237,7 +237,7 @@ module.exports = class GameTickService {
                 ships: enemyCarrier.ships
             });
 
-            star.garrisonActual = starCombatResult.defenderShips + starGarrisonFraction;
+            star.garrisonActual = starCombatResult.after.defender + starGarrisonFraction;
             star.garrison = Math.floor(star.garrisonActual);
         }
 
