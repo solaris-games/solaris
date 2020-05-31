@@ -2,9 +2,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService {
 
-    constructor(userService, playerService) {
+    constructor(userService, playerService, eventService) {
         this.userService = userService;
         this.playerService = playerService;
+        this.eventService = eventService;
     }
 
     async sendCredits(game, fromPlayer, toPlayerId, amount) {
@@ -28,6 +29,9 @@ module.exports = class TradeService {
         toPlayer.credits += amount;
 
         await game.save();
+
+        await this.eventService.createCreditsReceivedEvent(game, fromPlayer, toPlayer, amount);
+        await this.eventService.createCreditsSentEvent(game, fromPlayer, toPlayer, amount);
     }
 
     async sendRenown(game, fromPlayer, toPlayerId, amount) {
@@ -59,6 +63,9 @@ module.exports = class TradeService {
 
         await game.save();
         await toUser.save();
+
+        await this.eventService.createRenownReceivedEvent(game, fromPlayer, toPlayer, amount);
+        await this.eventService.createRenownSentEvent(game, fromPlayer, toPlayer, amount);
     }
 
     async sendTechnology(game, fromPlayer, toPlayerId, technology) {
@@ -93,6 +100,14 @@ module.exports = class TradeService {
         fromPlayer.credits -= tradeTech.cost;
 
         await game.save();
+
+        let eventTech = {
+            name: tradeTech.name,
+            level: tradeTech.level
+        };
+
+        await this.eventService.createTechnologyReceivedEvent(game, fromPlayer, toPlayer, eventTech);
+        await this.eventService.createTechnologySentEvent(game, fromPlayer, toPlayer, tradeTech);
     }
 
     getTradeableTechnologies(game, fromPlayer, toPlayerId) {

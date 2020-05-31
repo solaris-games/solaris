@@ -2,9 +2,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService {
 
-    constructor(starService, carrierService) {
+    constructor(starService, carrierService, eventService) {
         this.starService = starService;
         this.carrierService = carrierService;
+        this.eventService = eventService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -32,6 +33,8 @@ module.exports = class StarUpgradeService {
         player.credits -= cost;
 
         await game.save();
+
+        await this.eventService.createWarpGateBuiltEvent(game, player, star);
     }
 
     async destroyWarpGate(game, player, starId) {
@@ -50,6 +53,8 @@ module.exports = class StarUpgradeService {
         star.warpGate = false;
 
         await game.save();
+
+        await this.eventService.createWarpGateDestroyedEvent(game, player, star);
     }
 
     async buildCarrier(game, player, starId) {
@@ -83,6 +88,8 @@ module.exports = class StarUpgradeService {
         player.credits -= cost;
 
         await game.save();
+
+        await this.eventService.createCarrierBuiltEvent(game, player, star, carrier);
 
         return carrier;
     }

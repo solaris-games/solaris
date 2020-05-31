@@ -40,11 +40,11 @@ module.exports = class GameTickService {
 
        await this._moveCarriers(game);
        this._produceShips(game);
-       this._conductResearch(game);
+       await this._conductResearch(game);
        await this._endOfGalacticCycleCheck(game);
        this._logHistory(game);
-       this._gameLoseCheck(game);
-       this._gameWinCheck(game);
+       await this._gameLoseCheck(game);
+       await this._gameWinCheck(game);
 
        await game.save();
 
@@ -213,7 +213,7 @@ module.exports = class GameTickService {
             enemyCarrier.ships = combatResult.after.attacker;
 
             // Log the combat event
-            await this.eventService.createCombatCarrierEvent(game, defender, attacker,
+            await this.eventService.createPlayerCombatCarrierEvent(game, defender, attacker,
                 star, friendlyCarrier, enemyCarrier, combatResult);
 
             // Destroy carriers if they have no ships left.
@@ -246,7 +246,7 @@ module.exports = class GameTickService {
             star.garrison = Math.floor(star.garrisonActual);
 
             // Log the combat event
-            await this.eventService.createCombatStarEvent(game, defender, attacker,
+            await this.eventService.createPlayerCombatStarEvent(game, defender, attacker,
                 star, enemyCarrier, combatResult);
         }
 
@@ -259,12 +259,17 @@ module.exports = class GameTickService {
         let defendersRemaining = friendlyCarriers.reduce((sum, c) => sum += c.ships, 0);
 
         if (defendersRemaining <= 0 && star.garrisonActual <= 0) {
+            let captureReward = star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
+
             star.ownedByPlayerId = enemyCarrier.ownedByPlayerId;
-            attacker.credits += star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
+            attacker.credits += captureReward;
             star.infrastructure.economy = 0;
 
-            // TODO: If the home star is captured, find a new one.
+            // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
+
+            await this.eventService.createStarCapturedEvent(game, attacker, star, captureReward);
+            await this.eventService.createStarCapturedEvent(game, defender, star, captureReward);
         }
     }
 
@@ -282,13 +287,13 @@ module.exports = class GameTickService {
         }
     }
 
-    _conductResearch(game) {
+    async _conductResearch(game) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
             
-            this.researchService.conductResearch(game, player);
+            await this.researchService.conductResearch(game, player);
         }
     }
 
@@ -308,7 +313,7 @@ module.exports = class GameTickService {
                 let creditsResult = this._givePlayerMoney(game, player);
                 let experimentResult = this._conductExperiments(game, player);
 
-                await this.eventService.createGalacticCycleCompleteEvent(game, player,
+                await this.eventService.createPlayerGalacticCycleCompleteEvent(game, player,
                     creditsResult.creditsFromEconomy, creditsResult.creditsFromBanking,
                     experimentResult.technology, experimentResult.amount);
             }
@@ -338,7 +343,7 @@ module.exports = class GameTickService {
         this.historyService.log(game);
     }
 
-    _gameLoseCheck(game) {
+    async _gameLoseCheck(game) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
@@ -358,10 +363,19 @@ module.exports = class GameTickService {
     
                 player.defeated = stars.length === 0 && carriers.length === 0;
             }
+
+            if (player.defeated) {
+                if (isAfk) {
+                    await this.eventService.createPlayerAfkEvent(game, player);
+                }
+                else {
+                    await this.eventService.createPlayerDefeatedEvent(game, player);
+                }
+            }
         }
     }
 
-    _gameWinCheck(game) {
+    async _gameWinCheck(game) {
         // Check to see if anyone has won the game.
         // There could be more than one player who has reached
         // the number of stars required at the same time.
@@ -404,6 +418,8 @@ module.exports = class GameTickService {
             
             // TODO: Increase player ranks
             // TODO: Increase the winner's victory count
+
+            await this.eventService.createGameEndedEvent(game);
         }
     }
 }

@@ -3,9 +3,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService {
 
-    constructor(gameModel, userService) {
+    constructor(gameModel, userService, eventService) {
         this.gameModel = gameModel;
         this.userService = userService;
+        this.eventService = eventService;
     }
 
     async getById(id, select) {
@@ -89,9 +90,13 @@ module.exports = class GameService {
             game.state.lastTickDate = start.toDate();
             game.state.nextTickDate = start.add(game.settings.gameTime.speed, 'm').toDate();
             game.state.nextProductionTickDate = start.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm').toDate();
+
+            await this.eventService.createGameStartedEvent(game);
         }
 
-        return await game.save();
+        await game.save();
+
+        await this.eventService.createPlayerJoinedEvent(game, player);
     }
 
     async quit(game, player) {    
@@ -105,6 +110,8 @@ module.exports = class GameService {
             throw new ValidationError('Cannot quit a game that has finished.');
         }
 
+        let alias = player.alias;
+
         // TODO: Something to consider here is whether the player has done something
         // to their empire, i.e upgrading stars etc, we should prevent the player from
         // doing this otherwise we'd have to reset everything here which will be a pain.
@@ -114,6 +121,8 @@ module.exports = class GameService {
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
         await game.save();
+
+        await this.eventService.createPlayerQuitEvent(game, player, alias);
 
         return player;
     }
@@ -149,7 +158,9 @@ module.exports = class GameService {
 
         // TODO: Remove all carrier waypoints (unless in transit)
 
-        return await game.save();
+        await game.save();
+
+        await this.eventService.createPlayerDefeatedEvent(game, player);
     }
 
     async getPlayerUser(game, playerId) {

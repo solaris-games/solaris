@@ -1,9 +1,10 @@
 module.exports = class ResearchService {
 
-    constructor(randomService, playerService, timeService) {
+    constructor(randomService, playerService, timeService, eventService) {
         this.randomService = randomService;
         this.playerService = playerService;
         this.timeService = timeService;
+        this.eventService = eventService;
     }
 
     async updateResearchNow(game, player, preference) {
@@ -26,7 +27,7 @@ module.exports = class ResearchService {
         return await game.save();
     }
 
-    conductResearch(game, player) {
+    async conductResearch(game, player) {
         // TODO: Defeated players do not conduct research or experiments?
         if (player.defeated) {
             return;
@@ -44,6 +45,8 @@ module.exports = class ResearchService {
             tech.level++;
             tech.progress -= requiredProgress;
             player.researchingNow = player.researchingNext;
+
+            await this.eventService.createResearchCompleteEvent(game, player, tech);
         }
     }
 

@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const DistanceService = require('../services/distance');
 const StarDistanceService = require('../services/starDistance');
 const MapService = require('../services/map');
@@ -61,7 +63,7 @@ function generateStarGrid() {
             i++;
 
             stars.push({
-                _id: i,
+                _id: new mongoose.Types.ObjectId(),
                 name: `Star ${i}`,
                 location: {
                     x, y

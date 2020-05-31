@@ -3,11 +3,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService {
 
-    constructor(randomService, starNameService, distanceService, starDistanceService) {
+    constructor(randomService, starNameService, distanceService, starDistanceService, eventService) {
         this.randomService = randomService;
         this.starNameService = starNameService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
+        this.eventService = eventService;
     }
 
     generateUnownedStar(game, name, location) {
@@ -94,6 +95,8 @@ module.exports = class StarService {
         // }
         
         await game.save();
+
+        await this.eventService.createStarAbandonedEvent(game, player, star);
     }
 
 }
