@@ -8,7 +8,7 @@
                 <div class="col-7">
                     <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
                         <option v-for="opt in availableTechnologies" v-bind:key="opt.name" v-bind:value="opt.name">
-                            {{ opt.name }} ({{opt.level}} - ${{opt.cost}})
+                            {{ getTechnologyFriendlyName(opt.name) }} ({{opt.level}} - ${{opt.cost}})
                         </option>
                     </select>
                 </div>
@@ -29,6 +29,7 @@
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import TradeApiService from '../../../services/api/trade'
+import TechnologyHelper from '../../../services/technologyHelper'
 
 export default {
   props: {
@@ -49,6 +50,9 @@ export default {
     this.getTradeableTechnologies()
   },
   methods: {
+    getTechnologyFriendlyName (key) {
+      return TechnologyHelper.getFriendlyName(key)
+    },
     async getTradeableTechnologies () {
       try {
         let response = await TradeApiService.getTradeableTechnologies(this.$store.state.game._id, this.player._id)

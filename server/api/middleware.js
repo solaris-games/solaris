@@ -84,6 +84,30 @@ module.exports = (container) => {
             }
 
             return next();
+        },
+
+        validateGameInProgress(req, res, next) {
+            if (!container.gameService.isInProgress(req.game)) {
+                throw new ValidationError('You cannot perform this action, the game is not in progress.');
+            }
+
+            return next();
+        },
+
+        validateGameStarted(req, res, next) {
+            if (!container.gameService.isStarted(req.game)) {
+                throw new ValidationError('You cannot perform this action, the game has not yet started.');
+            }
+
+            return next();
+        },
+
+        validateGameNotFinished(req, res, next) {
+            if (container.gameService.isFinished(req.game)) {
+                throw new ValidationError('You cannot perform this action, the game is over.');
+            }
+
+            return next();
         }
     }
 

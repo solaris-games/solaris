@@ -159,6 +159,18 @@ class GameHelper {
 
     return relativeTo.add(ticks * speedInMins, 'm');
   }
+
+  isGameInProgress (game) {
+    return game.state.startDate && !game.state.endDate
+  }
+
+  isGameStarted (game) {
+    return game.state.startDate != null
+  }
+
+  isGameFinished (game) {
+    return game.state.endDate != null
+  }
 }
 
 export default new GameHelper()

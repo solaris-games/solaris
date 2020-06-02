@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="star">
   <p>
       A warp gate has been built at <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
   </p>

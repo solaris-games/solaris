@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="star">
         <p>
             Your forces have engaged the enemy in carrier-to-carrier combat at 
             <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.

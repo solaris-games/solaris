@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="player">
   <p>
       You have received <span class="text-success">${{event.data.credits}}</span> credits from <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
@@ -22,7 +22,7 @@ export default {
     }
   },
   mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerId)
+    this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.fromPlayerId)
   },
   methods: {
     onOpenPlayerDetailRequested (e) {

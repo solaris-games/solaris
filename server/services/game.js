@@ -169,4 +169,16 @@ module.exports = class GameService {
         return await this.userService.getById(player.userId);
     }
 
+    isInProgress(game) {
+        return game.state.startDate && !game.state.endDate;
+    }
+
+    isStarted(game) {
+        return game.state.startDate != null;
+    }
+
+    isFinished(game) {
+        return game.state.endDate != null;
+    }
+
 };

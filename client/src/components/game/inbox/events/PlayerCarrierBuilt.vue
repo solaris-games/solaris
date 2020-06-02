@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="star">
   <p>
       The carrier <a href="javascript:;" @click="onOpenCarrierDetailRequested">{{event.data.carrierName}}</a> has been built at 
       <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.

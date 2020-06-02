@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="player">
   <p>
       <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a> has been defeated.
   </p>

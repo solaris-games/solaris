@@ -1,13 +1,14 @@
 <template>
-<div>
+<div v-if="player">
   <p>
-      You have received <span class="text-success">Level {{event.data.technology.level}} {{event.data.technology.name}}</span> from <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
+      You have received <span class="text-success">Level {{event.data.technology.level}} {{getTechnologyFriendlyName(event.data.technology.name)}}</span> from <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
 </div>
 </template>
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
+import TechnologyHelper from '../../../../services/technologyHelper'
 
 export default {
   components: {
@@ -22,9 +23,12 @@ export default {
     }
   },
   mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerId)
+    this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.fromPlayerId)
   },
   methods: {
+    getTechnologyFriendlyName (key) {
+      return TechnologyHelper.getFriendlyName(key)
+    },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.player)
     }

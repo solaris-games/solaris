@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="star">
   <p>
       You have abandoned the star <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
   </p>

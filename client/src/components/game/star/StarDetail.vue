@@ -76,7 +76,7 @@
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton :disabled="getUserPlayer().credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary">Build for ${{star.upgradeCosts.carriers}}</modalButton>
+          <modalButton :disabled="getUserPlayer().credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
         </div>
       </div>
 
@@ -85,17 +85,17 @@
           <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton v-if="!star.warpGate" :disabled="getUserPlayer().credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-          <modalButton v-if="star.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger">Destroy Gate</modalButton>
+          <modalButton v-if="!star.warpGate" :disabled="getUserPlayer().credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+          <modalButton v-if="star.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
         </div>
       </div>
 
-      <div class="row bg-secondary pt-2 pb-0 mb-1">
+      <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="isGameInProgress()">
         <div class="col-8">
           <p class="mb-2">Abandon this star for another player to claim. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger">Abandon Star</modalButton>
+          <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger mb-2">Abandon Star</modalButton>
         </div>
       </div>
 
@@ -181,6 +181,9 @@ export default {
     },
     getCarriersInOrbit () {
       return GameHelper.getCarriersOrbitingStar(this.$store.state.game, this.star)
+    },
+    isGameInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
     },
     onInfrastructureUpgraded (e) {
       // TODO: Reload the current star to get new costs.

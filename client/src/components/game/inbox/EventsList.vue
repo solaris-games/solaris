@@ -64,7 +64,7 @@ export default {
 
 <style scoped>
 .events-container {
-  max-height: 400px;
+  max-height: 600px;
   overflow: auto;
 }
 </style>
