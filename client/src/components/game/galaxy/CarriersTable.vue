@@ -1,26 +1,28 @@
 <template>
 <div class="container">
-    <div class="mb-2">
-        <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Carriers</button>
-    </div>
+  <div class="mb-2">
+      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Carriers</button>
+  </div>
 
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr class="bg-primary">
-                <td>P</td>
-                <td>Name</td>
-                <td></td>
-                <td>Ships</td>
-                <td>W</td>
-                <td></td>
-                <td>ETA</td>
-                <!-- <td>Total ETA</td> -->
-            </tr>
-        </thead>
-        <tbody>
-            <carrier-row v-for="carrier in tableData" v-bind:key="carrier._id" :carrier="carrier"/>
-        </tbody>
-    </table>
+  <div class="table-responsive">
+      <table class="table table-striped table-hover">
+          <thead>
+              <tr class="bg-primary">
+                  <td>P</td>
+                  <td>Name</td>
+                  <td></td>
+                  <td>Ships</td>
+                  <td>W</td>
+                  <td></td>
+                  <td>ETA</td>
+                  <!-- <td>Total ETA</td> -->
+              </tr>
+          </thead>
+          <tbody>
+              <carrier-row v-for="carrier in tableData" v-bind:key="carrier._id" :carrier="carrier"/>
+          </tbody>
+      </table>
+  </div>
 </div>
 </template>
 

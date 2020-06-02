@@ -1,39 +1,55 @@
 <template>
-<div class="container bg-primary pt-2 pb-1 mb-2">
-    <div class="row">
+<div class="bg-primary pt-2 pb-1 mb-2">
+    <div v-if="event.tick">
         <div class="col text-right">
             <span class="badge badge-success">Tick {{event.tick}}</span>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <div class="mt-2">
-                <game-ended :event="event" v-if="event.type === 'gameEnded'"/>
-                <game-paused :event="event" v-if="event.type === 'gamePaused'"/>
-                <game-player-afk :event="event" v-if="event.type === 'gamePlayerAFK'"/>
-                <game-player-defeated :event="event" v-if="event.type === 'gamePlayerDefeated'"/>
-                <game-player-joined :event="event" v-if="event.type === 'gamePlayerJoined'"/>
-                <game-player-quit :event="event" v-if="event.type === 'gamePlayerQuit'"/>
-                <game-started :event="event" v-if="event.type === 'gameStarted'"/>
+    <div class="col mt-2">
+        <game-ended :event="event" v-if="event.type === 'gameEnded'"/>
+        <game-paused :event="event" v-if="event.type === 'gamePaused'"/>
+        <game-player-afk :event="event" v-if="event.type === 'gamePlayerAFK'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-player-defeated :event="event" v-if="event.type === 'gamePlayerDefeated'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-player-joined :event="event" v-if="event.type === 'gamePlayerJoined'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-player-quit :event="event" v-if="event.type === 'gamePlayerQuit'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-started :event="event" v-if="event.type === 'gameStarted'"/>
 
-                <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
-                <player-carrier-built :event="event" v-if="event.type === 'playerCarrierBuilt'"/>
-                <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'" @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-                <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'" @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-                <player-credits-received :event="event" v-if="event.type === 'playerCreditsReceived'"/>
-                <player-credits-sent :event="event" v-if="event.type === 'playerCreditsSent'"/>
-                <player-galactic-cycle-complete :event="event" v-if="event.type === 'playerGalacticCycleComplete'"/>
-                <player-renown-received :event="event" v-if="event.type === 'playerRenownReceived'"/>
-                <player-renown-sent :event="event" v-if="event.type === 'playerRenownSent'"/>
-                <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
-                <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"/>
-                <player-star-captured :event="event" v-if="event.type === 'playerStarCaptured'"/>
-                <player-star-warp-gate-built :event="event" v-if="event.type === 'playerStarWarpGateBuilt'"/>
-                <player-star-warp-gate-destroyed :event="event" v-if="event.type === 'playerStarWarpGateDestroyed'"/>
-                <player-technology-received :event="event" v-if="event.type === 'playerTechnologyReceived'"/>
-                <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"/>
-            </div>
-        </div>
+        <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
+        <player-carrier-built :event="event" v-if="event.type === 'playerCarrierBuilt'"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        <!-- @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" -->
+        <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'" 
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'" 
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-credits-received :event="event" v-if="event.type === 'playerCreditsReceived'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-credits-sent :event="event" v-if="event.type === 'playerCreditsSent'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-galactic-cycle-complete :event="event" v-if="event.type === 'playerGalacticCycleComplete'"/>
+        <player-renown-received :event="event" v-if="event.type === 'playerRenownReceived'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-renown-sent :event="event" v-if="event.type === 'playerRenownSent'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
+        <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-star-captured :event="event" v-if="event.type === 'playerStarCaptured'"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-star-warp-gate-built :event="event" v-if="event.type === 'playerStarWarpGateBuilt'"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-star-warp-gate-destroyed :event="event" v-if="event.type === 'playerStarWarpGateDestroyed'"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-technology-received :event="event" v-if="event.type === 'playerTechnologyReceived'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
 </div>
 </template>
@@ -95,6 +111,12 @@ export default {
     methods: {
         onOpenStarDetailRequested (e) {
             this.$emit('onOpenStarDetailRequested', e)
+        },
+        onOpenPlayerDetailRequested (e) {
+            this.$emit('onOpenPlayerDetailRequested', e)
+        },
+        onOpenCarrierDetailRequested (e) {
+            this.$emit('onOpenCarrierDetailRequested', e)
         }
     }
 }

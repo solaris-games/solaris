@@ -23,29 +23,31 @@
     </div>
 
     <div class="row">
-        <table class="table table-sm table-striped">
-            <tbody>
-                <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
-                <tr v-for="player in sortedPlayers" :key="player._id">
-                    <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                    <td class="col-avatar" :title="player.colour.alias">
-                        <!-- TODO: Prefer images over font awesome icons? -->
-                        <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
-                        <!-- <img src=""> -->
-                    </td>
-                    <td class="pl-2 pt-3 pb-2">
-                        <!-- Text styling for defeated players? -->
-                        <h5>{{player.alias}} <span v-if="player.defeated">(DEFEATED)</span></h5>
-                    </td>
-                    <td class="fit pt-3 pr-2">
-                        <span>{{player.stats.totalStars}} Stars</span>
-                    </td>
-                    <td class="fit pt-2 pb-2 pr-2">
-                        <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+              <tbody>
+                  <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
+                  <tr v-for="player in sortedPlayers" :key="player._id">
+                      <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
+                      <td class="col-avatar" :title="player.colour.alias">
+                          <!-- TODO: Prefer images over font awesome icons? -->
+                          <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
+                          <!-- <img src=""> -->
+                      </td>
+                      <td class="pl-2 pt-3 pb-2">
+                          <!-- Text styling for defeated players? -->
+                          <h5>{{player.alias}} <span v-if="player.defeated">(DEFEATED)</span></h5>
+                      </td>
+                      <td class="fit pt-3 pr-2">
+                          <span>{{player.stats.totalStars}} Stars</span>
+                      </td>
+                      <td class="fit pt-2 pb-2 pr-2">
+                          <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+        </div>
     </div>
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">

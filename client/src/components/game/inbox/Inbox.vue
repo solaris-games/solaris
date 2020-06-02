@@ -18,7 +18,10 @@
             <diplomacy-list @onConversationOpenRequested="onConversationOpenRequested"/>
         </div>
         <div class="tab-pane fade" id="events">
-            <events-list @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+            <events-list 
+                @onOpenStarDetailRequested="onOpenStarDetailRequested"
+                @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+                @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         </div>
     </div>
 </div>
@@ -44,6 +47,12 @@ export default {
     },
     onOpenStarDetailRequested (e) {
         this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+        this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+        this.$emit('onOpenCarrierDetailRequested', e)
     }
   }
 }

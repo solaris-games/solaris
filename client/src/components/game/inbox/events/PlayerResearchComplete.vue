@@ -1,7 +1,7 @@
 <template>
 <div>
   <p>
-      {{JSON.stringify(event)}}
+      Your scientists have made a breakthrough in the field of <span class="text-success">{{event.data.technology.name}}</span>.
   </p>
 </div>
 </template>

@@ -218,6 +218,8 @@ module.exports = class StarUpgradeService {
 
         await game.save()
 
+        await this.eventService.createInfrastructureBulkUpgraded(game, player, upgradeSummary);
+
         return upgradeSummary;
     }
 

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="table-responsive">
         <table class="table">
             <tbody>
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">

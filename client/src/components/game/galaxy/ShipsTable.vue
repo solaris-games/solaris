@@ -1,9 +1,10 @@
 <template>
 <div class="container">
-    <div class="mb-2">
-        <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Ships</button>
-    </div>
+  <div class="mb-2">
+      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Ships</button>
+  </div>
 
+  <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
@@ -18,6 +19,7 @@
             <ship-row v-for="ship in tableData" v-bind:key="ship._id" :ship="ship" />
         </tbody>
     </table>
+  </div>
 </div>
 </template>
 

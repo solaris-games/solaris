@@ -1,9 +1,10 @@
 <template>
 <div class="container">
-    <div class="mb-2">
-        <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Stars</button>
-    </div>
+  <div class="mb-2">
+      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Stars</button>
+  </div>
 
+  <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
@@ -22,6 +23,7 @@
             <star-row v-for="star in tableData" v-bind:key="star._id" :star="star"/>
         </tbody>
     </table>
+  </div>
 </div>
 </template>
 

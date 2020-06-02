@@ -7,6 +7,7 @@
     </div>
 
     <div class="row">
+      <div class="table-responsive">
         <table class="table table-sm table-striped">
             <tbody>
                 <tr v-for="player in players" v-bind:key="player._id">
@@ -26,6 +27,7 @@
                 </tr>
             </tbody>
         </table>
+      </div>
     </div>
 </div>
 </template>

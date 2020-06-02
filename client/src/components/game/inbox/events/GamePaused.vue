@@ -1,7 +1,7 @@
 <template>
 <div>
   <p>
-      {{JSON.stringify(event)}}
+      The game has been paused.
   </p>
 </div>
 </template>

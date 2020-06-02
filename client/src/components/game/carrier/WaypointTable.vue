@@ -1,4 +1,5 @@
 <template>
+<div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
@@ -17,6 +18,7 @@
                         @onEditWaypointRequested="onEditWaypointRequested"/>
         </tbody>
     </table>
+</div>
 </template>
 
 <script>

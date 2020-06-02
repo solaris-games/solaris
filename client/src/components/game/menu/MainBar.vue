@@ -28,7 +28,12 @@
       <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :carrier="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :transfer="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX" @onCloseRequested="onCloseRequested" @onConversationOpenRequested="onConversationOpenRequested" @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+      <inbox v-if="menuState == MENU_STATES.INBOX" 
+        @onCloseRequested="onCloseRequested" 
+        @onConversationOpenRequested="onConversationOpenRequested" 
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested"/>

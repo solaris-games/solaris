@@ -1,12 +1,14 @@
 <template>
 <div>
   <p>
-      {{JSON.stringify(event)}}
+      You have abandoned the star <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
   </p>
 </div>
 </template>
 
 <script>
+import GameHelper from '../../../../services/gameHelper'
+
 export default {
   components: {
       
@@ -14,8 +16,18 @@ export default {
   props: {
     event: Object
   },
+  data () {
+    return {
+      star: null
+    }
+  },
+  mounted () {
+    this.star = GameHelper.getStarById(this.event.data.starId)
+  },
   methods: {
-
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', this.star)
+    }
   }
 }
 </script>

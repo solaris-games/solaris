@@ -44,9 +44,15 @@ module.exports = class ResearchService {
         if (tech.progress >= requiredProgress) {
             tech.level++;
             tech.progress -= requiredProgress;
-            player.researchingNow = player.researchingNext;
 
-            await this.eventService.createResearchCompleteEvent(game, player, tech);
+            let eventTech = {
+                name: player.researchingNow,
+                level: tech.level
+            };
+
+            await this.eventService.createResearchCompleteEvent(game, player, eventTech);
+
+            player.researchingNow = player.researchingNext;
         }
     }
 

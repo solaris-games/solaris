@@ -8,8 +8,11 @@
       <span class="ml-2">Click on an event to mark is as read.</span> -->
   </div>
 
-  <div class="mt-2 events-container" v-if="events">
-      <events-list-item v-for="event in events" :key="event._id" :event="event" @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+  <div class="mt-2 events-container container" v-if="events">
+      <events-list-item v-for="event in events" :key="event._id" :event="event" 
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
   </div>
 </div>
 </template>
@@ -48,6 +51,12 @@ export default {
     },
     onOpenStarDetailRequested (e) {
         this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+        this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+        this.$emit('onOpenCarrierDetailRequested', e)
     }
   }
 }

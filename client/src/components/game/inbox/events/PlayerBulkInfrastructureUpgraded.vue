@@ -1,7 +1,9 @@
 <template>
 <div>
   <p>
-      {{JSON.stringify(event)}}
+      Your stars have been upgraded. 
+      You purchased <span class="text-success">{{event.data.upgradeReport.upgraded}} {{event.data.upgradeReport.infrastructureType}}</span> for 
+      <span class="text-success">${{event.data.upgradeReport.cost}}</span> credits.
   </p>
 </div>
 </template>

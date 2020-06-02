@@ -1,7 +1,7 @@
 <template>
 <div>
   <p>
-      {{JSON.stringify(event)}}
+      The game has started. Good luck and have fun!
   </p>
 </div>
 </template>
