@@ -194,7 +194,7 @@ module.exports = class GameTickService {
         // until there are no carriers left, in which case we attack the star
         // directly.
         let friendlyCarriers = game.galaxy.carriers
-            .filter(c => c.orbiting.equals(star._id) && c.ownedByPlayerId.equals(defender._id))
+            .filter(c => c.orbiting && c.orbiting.equals(star._id) && c.ownedByPlayerId.equals(defender._id))
             .sort((a, b) => b.ships - a.ships);
 
         // Perform carrier to carrier combat.
@@ -295,7 +295,7 @@ module.exports = class GameTickService {
             if (player.defeated) {
                 continue;
             }
-            
+
             let player = game.galaxy.players[i];
             
             await this.researchService.conductResearch(game, player);
