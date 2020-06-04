@@ -247,7 +247,7 @@ module.exports = class GameTickService {
 
             // Log the combat event
             await this.eventService.createPlayerCombatStarEvent(game, defender, attacker,
-                star, enemyCarrier, combatResult);
+                star, enemyCarrier, starCombatResult);
         }
 
         // If the enemy carrier has no ships, then destroy the attacking carrier.
@@ -314,7 +314,7 @@ module.exports = class GameTickService {
             // Conduct experiments.
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
-                
+
                 // TODO: Defeated players do not conduct research or experiments?
                 if (player.defeated) {
                     continue;
