@@ -291,6 +291,11 @@ module.exports = class GameTickService {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
+            // TODO: Defeated players do not conduct research or experiments?
+            if (player.defeated) {
+                continue;
+            }
+            
             let player = game.galaxy.players[i];
             
             await this.researchService.conductResearch(game, player);
@@ -308,6 +313,11 @@ module.exports = class GameTickService {
             // Give each player money.
             // Conduct experiments.
             for (let i = 0; i < game.galaxy.players.length; i++) {
+                // TODO: Defeated players do not conduct research or experiments?
+                if (player.defeated) {
+                    continue;
+                }
+
                 let player = game.galaxy.players[i];
                 
                 let creditsResult = this._givePlayerMoney(game, player);
