@@ -31,7 +31,7 @@ module.exports = class EventService {
         this.eventModel = eventModel;
     }
 
-    async createGameEvent(game, player, type, data) {
+    async createGameEvent(game, type, data) {
         let event = new this.eventModel({
             gameId: game._id,
             playerId: null,
@@ -79,7 +79,7 @@ module.exports = class EventService {
             alias: player.alias
         };
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
     }
 
     async createPlayerQuitEvent(game, player, alias) {
@@ -88,7 +88,7 @@ module.exports = class EventService {
             alias
         };
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
     }
 
     async createPlayerDefeatedEvent(game, player) {
@@ -96,7 +96,7 @@ module.exports = class EventService {
             playerId: player._id
         };
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
     }
 
     async createPlayerAfkEvent(game, player) {
@@ -104,25 +104,25 @@ module.exports = class EventService {
             playerId: player._id
         };
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
     }
 
     async createGameStartedEvent(game) {
         let data = {};
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_STARTED, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_STARTED, data);
     }
 
     async createGameEndedEvent(game) {
         let data = {};
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_ENDED, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_ENDED, data);
     }
 
     async createGamePausedEvent(game) {
         let data = {};
 
-        return await this.createGameEvent(game, player, this.EVENT_TYPES.GAME_PAUSED, data);
+        return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PAUSED, data);
     }
 
     /* PLAYER EVENTS */
