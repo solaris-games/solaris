@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 module.exports = class PlayerService {
     
@@ -224,7 +225,7 @@ module.exports = class PlayerService {
     }
 
     async updateLastSeen(game, player) {
-        player.lastSeen = new Date();
+        player.lastSeen = moment();
 
         await game.save();
     }

@@ -13,7 +13,7 @@ module.exports = class StarUpgradeService {
         let star = this.starService.getById(game, starId);
 
         // Check whether the star is owned by the player.
-        if (star.ownedByPlayerId.toString() !== player.id) {
+        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot upgrade, the star is not owned by the current player.`);
         }
 
@@ -42,7 +42,7 @@ module.exports = class StarUpgradeService {
         let star = this.starService.getById(game, starId);
 
         // Check whether the star is owned by the player
-        if (star.ownedByPlayerId.toString() !== player.id) {
+        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot destroy warp gate, the star is not owned by the current player.`);
         }
 
@@ -62,7 +62,7 @@ module.exports = class StarUpgradeService {
         let star = this.starService.getById(game, starId);
 
         // Check whether the star is owned by the player.
-        if (star.ownedByPlayerId.toString() !== player.id) {
+        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
         }
 
@@ -98,7 +98,7 @@ module.exports = class StarUpgradeService {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
-        if (star.ownedByPlayerId.toString() !== player.id) {
+        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 

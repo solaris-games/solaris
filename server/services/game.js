@@ -86,10 +86,10 @@ module.exports = class GameService {
             // Or should we have a wait period before the game actually starts?
 
             game.state.paused = false;
-            game.state.startDate = start.toDate();
-            game.state.lastTickDate = start.toDate();
-            game.state.nextTickDate = start.add(game.settings.gameTime.speed, 'm').toDate();
-            game.state.nextProductionTickDate = start.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm').toDate();
+            game.state.startDate = start;
+            game.state.lastTickDate = start;
+            game.state.nextTickDate = start.add(game.settings.gameTime.speed, 'm');
+            game.state.nextProductionTickDate = start.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
 
             await this.eventService.createGameStartedEvent(game);
         }

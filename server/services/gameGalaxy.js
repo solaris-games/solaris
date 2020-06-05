@@ -139,10 +139,14 @@ module.exports = class GameGalaxyService {
             }
 
             // Get the closest player star to this star.
-            let closest = this.starDistanceService.getClosestStar(s, playerStars);
-            let distance = this.starDistanceService.getDistanceBetweenStars(s, closest);
+            let inRange = false;
 
-            let inRange = distance <= scanningRangeDistance;
+            if (playerStars.length) {
+                let closest = this.starDistanceService.getClosestStar(s, playerStars);
+                let distance = this.starDistanceService.getDistanceBetweenStars(s, closest);
+    
+                inRange = distance <= scanningRangeDistance;
+            }
 
             // If its in range then its all good, send the star back as is.
             // Otherwise only return a subset of the data.
@@ -179,6 +183,11 @@ module.exports = class GameGalaxyService {
         // because carriers can only be seen if they are in range.
         doc.galaxy.carriers = doc.galaxy.carriers
             .filter(c => {
+                // If the player owns the carrier then it will always be visible.
+                if (c.ownedByPlayerId.equals(player._id)) {
+                    return true;
+                }
+
                 // Get the closest player star to this carrier.
                 let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
                 let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);

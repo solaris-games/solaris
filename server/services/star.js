@@ -81,8 +81,7 @@ module.exports = class StarService {
         star.garrisonActual = 0;
         star.garrison = star.garrisonActual;
         
-        // Find and destroy all carriers stationed at this star.
-        game.galaxy.carriers = game.galaxy.carriers.filter(x => x.orbiting.toString() != star.id);
+        game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star.id);
 
         // TODO: Re-assign home star?
         // // If this was the player's home star, then we need to find a new home star.
