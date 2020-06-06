@@ -70,6 +70,10 @@ class GameHelper {
   }
 
   getCountdownTimeString (date, relativeTo) {
+    if (date == null) {
+      return 'Unknown'
+    }
+
     relativeTo = relativeTo || new Date()
 
     let t = new Date(date) - relativeTo

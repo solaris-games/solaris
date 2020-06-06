@@ -246,7 +246,12 @@ module.exports = class GameGalaxyService {
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
-                player.currentResearchEta = this.timeService.calculateTimeByTicks(player.currentResearchTicksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
+
+                if (player.currentResearchTicksEta) {
+                    player.currentResearchEta = this.timeService.calculateTimeByTicks(player.currentResearchTicksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
+                } else {
+                    player.currentResearchEta = null;
+                }
 
                 return p;
             }

@@ -12,11 +12,15 @@ module.exports = class ResearchService {
 
         await game.save();
 
-        let eta = this.calculateCurrentResearchETAInTicks(game, player);
-        let etaTime = this.timeService.calculateTimeByTicks(eta, game.settings.gameTime.speed, game.state.lastTickDate);
+        let etaTicks = this.calculateCurrentResearchETAInTicks(game, player);
+        let etaTime = null;
+        
+        if (eta) {
+            this.timeService.calculateTimeByTicks(etaTicks, game.settings.gameTime.speed, game.state.lastTickDate);
+        }
 
         return {
-            eta,
+            etaTicks,
             etaTime
         };
     }
@@ -96,6 +100,11 @@ module.exports = class ResearchService {
         let remainingPoints = requiredProgress - tech.progress;
 
         let totalScience = this.playerService.calculateTotalScience(player, game.galaxy.stars);
+
+        // If there is no science then there cannot be an end date to the research.
+        if (totalScience === 0) {
+            return null;
+        }
 
         return Math.ceil(remainingPoints / totalScience);
     }
