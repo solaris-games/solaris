@@ -35,7 +35,11 @@ module.exports = class ShipTransferService {
         }
 
         carrier.ships = carrierShips;
-        star.garrison = starShips;
+
+        let garrisonFraction = star.garrisonActual - star.garrison; // Keep hold of the fractional amount of garrison so we can add it back later.
+        
+        star.garrisonActual = starShips + garrisonFraction;
+        star.garrison = Math.floor(star.garrisonActual);
 
         await game.save();
     }
