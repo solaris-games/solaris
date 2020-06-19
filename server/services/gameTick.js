@@ -3,7 +3,7 @@ const moment = require('moment');
 module.exports = class GameTickService {
     
     constructor(eventService, broadcastService, distanceService, starService, carrierService, 
-        researchService, playerService, historyService, waypointService, combatService) {
+        researchService, playerService, historyService, waypointService, combatService, leaderboardService) {
         this.eventService = eventService;
         this.broadcastService = broadcastService;
         this.distanceService = distanceService;
@@ -14,6 +14,7 @@ module.exports = class GameTickService {
         this.historyService = historyService;
         this.waypointService = waypointService;
         this.combatService = combatService;
+        this.leaderboardService = leaderboardService;
     }
 
     async tick(game) {
@@ -393,18 +394,10 @@ module.exports = class GameTickService {
         // If that's equal, then pick the player who has the most carriers.
         let winner = null;
     
-        let playerStats = game.galaxy.players.map(p => {
-            return {
-                player: p,
-                stats: this.playerService.getStats(game, p)
-            }
-        });
+        let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
-        let starWinners = playerStats
+        let starWinners = leaderboard
             .filter(p => !p.player.defeated && p.stats.totalStars >= game.state.starsForVictory)
-            .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
-            .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
-            .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
             .map(p => p.player);
 
         if (starWinners.length) {
@@ -425,10 +418,8 @@ module.exports = class GameTickService {
             game.state.paused = true;
             game.state.endDate = new Date();
             game.state.winner = winner._id;
-            
-            // TODO: Increase player ranks
-            // TODO: Increase the winner's victory count
 
+            await this.leaderboardService.addGameRankings(leaderboard);
             await this.eventService.createGameEndedEvent(game);
         }
     }

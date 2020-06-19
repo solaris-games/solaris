@@ -51,7 +51,6 @@ module.exports = (io) => {
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const timeService = new TimeService();
-    const leaderboardService = new LeaderboardService(UserModel);
     const gameService = new GameService(GameModel, userService, eventService);
     const gameListService = new GameListService(GameModel);
     const starNameService = new StarNameService(starNames, randomService);
@@ -62,6 +61,7 @@ module.exports = (io) => {
     // const mapService = new MapService(randomService, starService, starDistanceService, starNameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
     const mapService = new MapService(randomService, starService, starDistanceService, starNameService, circularMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
+    const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
     const researchService = new ResearchService(randomService, playerService, timeService, eventService);
     const tradeService = new TradeService(userService, playerService, eventService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
@@ -69,7 +69,7 @@ module.exports = (io) => {
     const starUpgradeService = new StarUpgradeService(starService, carrierService, eventService);
     const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, timeService);
     const historyService = new HistoryService(HistoryModel, playerService);
-    const gameTickService = new GameTickService(eventService, broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService);
+    const gameTickService = new GameTickService(eventService, broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService);
     const messageService = new MessageService();
     const shipTransferService = new ShipTransferService(carrierService, starService);
 
