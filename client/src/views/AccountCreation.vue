@@ -6,13 +6,13 @@
 
     <form @submit="handleSubmit">
       <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading">
+        <label for="email">Email Address</label>
+        <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
       </div>
 
       <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
+        <label for="username">Username</label>
+        <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading">
       </div>
 
       <div class="form-group">
@@ -54,8 +54,8 @@ export default {
     return {
       isLoading: false,
       errors: [],
-      username: null,
       email: null,
+      username: null,
       password: null,
       passwordConfirm: null
     }
@@ -64,12 +64,12 @@ export default {
     async handleSubmit (e) {
       this.errors = []
 
-      if (!this.username) {
-        this.errors.push('Username required.')
-      }
-
       if (!this.email) {
         this.errors.push('Email required.')
+      }
+
+      if (!this.username) {
+        this.errors.push('Username required.')
       }
 
       if (!this.password) {
@@ -92,7 +92,7 @@ export default {
         this.isLoading = true
 
         // Call the account create API endpoint
-        let response = await userService.createUser(this.username, this.email, this.password)
+        let response = await userService.createUser(this.email, this.username, this.password)
 
         if (response.status === 201) {
           router.push({ name: 'account-login' })

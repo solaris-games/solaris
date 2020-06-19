@@ -2,9 +2,9 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class AuthService extends BaseApiService {
-  login (username, password) {
+  login (email, password) {
     return axios.post(this.BASE_URL + 'auth/login', {
-      username: username,
+      email: email,
       password: password
     },
     {

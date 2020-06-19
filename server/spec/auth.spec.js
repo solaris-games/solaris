@@ -11,10 +11,11 @@ const fakeUserModel = {
         return [
             {
                 _id: 1,
+                email: 'test@test.com',
                 username: 'hello',
                 password: 'test'
             }
-        ].find(x => x.username == user.username);
+        ].find(x => x.email == user.email);
     }
 };
 
@@ -26,7 +27,7 @@ describe('auth', () => {
     });
 
     it('should compare passwords of a user', async (done) => {
-        let result = await service.login('hello', 'test');
+        let result = await service.login('test@test.com', 'test');
 
         expect(result).toBe(1);
 
@@ -35,7 +36,7 @@ describe('auth', () => {
 
     it('should fail if the passwords are not the same', async (done) => {
         try {
-            await service.login('hello', 'hello');
+            await service.login('test@test.com', 'hello');
 
             done('Should have thrown an error');
         } catch (err) {
@@ -43,7 +44,7 @@ describe('auth', () => {
         }
     });
 
-    it('should fail if the username is not valid', async (done) => {
+    it('should fail if the email is not valid', async (done) => {
         try {
             await service.login('test', 'hello');
 

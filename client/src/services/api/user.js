@@ -7,10 +7,10 @@ class UserService extends BaseApiService {
     return axios.get(this.BASE_URL + 'user', { withCredentials: true })
   }
 
-  createUser (username, email, password) {
+  createUser (email, username, password) {
     return axios.post(this.BASE_URL + 'user', {
-      username: username,
       email: email,
+      username: username,
       password: password
     })
   }
@@ -25,6 +25,14 @@ class UserService extends BaseApiService {
   updateEmailAddress (email) {
     return axios.put(this.BASE_URL + 'user/changeEmailAddress', {
       email
+    },
+    { withCredentials: true })
+  }
+
+  // TODO: Implement UI for this.
+  updateUsername (username) {
+    return axios.put(this.BASE_URL + 'user/changeUsername', {
+      username
     },
     { withCredentials: true })
   }

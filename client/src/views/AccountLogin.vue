@@ -4,7 +4,7 @@
 
     <form @submit.prevent="handleSubmit">
         <div class="form-group">
-            <input type="text" required="required" class="form-control" placeholder="Username" v-model="username" :disabled="isLoading"/>
+            <input type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
         </div>
 
         <div class="form-group">
@@ -46,7 +46,7 @@ export default {
     return {
       isLoading: false,
       errors: [],
-      username: null,
+      email: null,
       password: null
     }
   },
@@ -54,8 +54,8 @@ export default {
     async handleSubmit (e) {
       this.errors = []
 
-      if (!this.username) {
-        this.errors.push('Username required.')
+      if (!this.email) {
+        this.errors.push('Email required.')
       }
 
       if (!this.password) {
@@ -70,7 +70,7 @@ export default {
         this.isLoading = true
 
         // Call the login API endpoint
-        let response = await authService.login(this.username, this.password)
+        let response = await authService.login(this.email, this.password)
 
         if (response.status === 200) {
           this.$store.commit('setUserId', response.data.id)

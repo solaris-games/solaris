@@ -38,8 +38,7 @@ export default {
     return {
       isLoading: false,
       errors: [],
-      username: null,
-      password: null
+      email: null
     }
   },
   methods: {

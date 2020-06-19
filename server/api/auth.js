@@ -7,8 +7,8 @@ module.exports = (router, io, container) => {
     router.post('/api/auth/login', async (req, res, next) => {        
         let errors = [];
     
-        if (!req.body.username) {
-            errors.push('Username is a required field');
+        if (!req.body.email) {
+            errors.push('Email is a required field');
         }
     
         if (!req.body.password) {
@@ -20,7 +20,7 @@ module.exports = (router, io, container) => {
         }
     
         try {
-            let userId = await container.authService.login(req.body.username, req.body.password);
+            let userId = await container.authService.login(req.body.email, req.body.password);
     
             // Store the user id in the session.
             req.session.userId = userId;

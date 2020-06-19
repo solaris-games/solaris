@@ -34,12 +34,12 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            let exists = await container.userService.userExists(req.body.username);
+            let exists = await container.userService.userExists(req.body.email);
 
             if (exists) {
                 return res.status(400).json({
                     errors: [
-                        'Username already exists.'
+                        'An account with this email already exists.'
                     ]
                 });
             }

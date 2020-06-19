@@ -16,7 +16,7 @@ const fakeUserModel = {
         return userList.find(x => x._id == id);
     },
     findOne(user) {
-        return userList.find(x => x.username == user.username);
+        return userList.find(x => x.email == user.email);
     }
 };
 
@@ -29,6 +29,7 @@ describe('user', () => {
         userList = [
             {
                 _id: 1,
+                email: 'test@test.com',
                 username: 'hello',
                 password: 'test',
                 save() {
@@ -37,6 +38,7 @@ describe('user', () => {
             },
             {
                 _id: 2,
+                email: 'test2@test.com',
                 username: 'world',
                 password: 'test',
                 save() {
@@ -63,7 +65,7 @@ describe('user', () => {
     });
 
     it('should check if a user exists', async (done) => {
-        let result = await service.userExists('hello');
+        let result = await service.userExists('test@test.com');
 
         expect(result).toBeTruthy();
 
@@ -88,7 +90,7 @@ describe('user', () => {
     });
 
     it('should update the email address of a user', async (done) => {
-        let email = 'test@test.com';
+        let email = 'test@test123.com';
 
         let result = await service.updateEmailAddress(1, email);
 
