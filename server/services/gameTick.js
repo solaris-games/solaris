@@ -3,7 +3,7 @@ const moment = require('moment');
 module.exports = class GameTickService {
     
     constructor(eventService, broadcastService, distanceService, starService, carrierService, 
-        researchService, playerService, historyService, waypointService, combatService, leaderboardService) {
+        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService) {
         this.eventService = eventService;
         this.broadcastService = broadcastService;
         this.distanceService = distanceService;
@@ -15,6 +15,7 @@ module.exports = class GameTickService {
         this.waypointService = waypointService;
         this.combatService = combatService;
         this.leaderboardService = leaderboardService;
+        this.userService = userService;
     }
 
     async tick(game) {
@@ -144,6 +145,10 @@ module.exports = class GameTickService {
                 // If the star is unclaimed, then claim it.
                 if (destinationStar.ownedByPlayerId == null) {
                     destinationStar.ownedByPlayerId = carrier.ownedByPlayerId;
+
+                    let playerUser = await this.userService.getById(carrier.ownedByPlayerId);
+                    playerUser.achievements.combat.stars.captured++;
+                    await playerUser.save();
                 }
 
                 // If the star is owned by another player, then perform combat.
@@ -190,6 +195,9 @@ module.exports = class GameTickService {
         let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
         let attacker = this.playerService.getByObjectId(game, enemyCarrier.ownedByPlayerId);
 
+        let defenderUser = await this.userService.getById(defender.userId);
+        let attackerUser = await this.userService.getById(attacker.userId);
+
         // There may be multiple carriers at this star, we will attack
         // carriers in order of largest carrier first to smallest last
         // until there are no carriers left, in which case we attack the star
@@ -213,6 +221,9 @@ module.exports = class GameTickService {
             friendlyCarrier.ships = combatResult.after.defender;
             enemyCarrier.ships = combatResult.after.attacker;
 
+            defenderUser.achievements.kills.ships += combatResult.lost.attacker;
+            attackerUser.achievements.kills.ships += combatResult.lost.defender;
+
             // Log the combat event
             await this.eventService.createPlayerCombatCarrierEvent(game, defender, attacker,
                 star, friendlyCarrier, enemyCarrier, combatResult);
@@ -220,10 +231,15 @@ module.exports = class GameTickService {
             // Destroy carriers if they have no ships left.
             if (friendlyCarrier.ships <= 0) {
                 game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(friendlyCarrier), 1);
+
+                defenderUser.achievements.losses.carriers++;
+                attackerUser.achievements.kills.carriers++;
             }
 
             // If the enemy carrier has no ships, then carrier to carrier combat is finished.
             if (enemyCarrier.ships <= 0) {
+                defenderUser.achievements.kills.carriers++;
+                attackerUser.achievements.losses.carriers++;
                 break;
             }
         }
@@ -246,6 +262,9 @@ module.exports = class GameTickService {
             star.garrisonActual = starCombatResult.after.defender + starGarrisonFraction;
             star.garrison = Math.floor(star.garrisonActual);
 
+            defenderUser.achievements.kills.ships += starCombatResult.lost.attacker;
+            attackerUser.achievements.kills.ships += starCombatResult.lost.defender;
+
             // Log the combat event
             await this.eventService.createPlayerCombatStarEvent(game, defender, attacker,
                 star, enemyCarrier, starCombatResult);
@@ -254,6 +273,9 @@ module.exports = class GameTickService {
         // If the enemy carrier has no ships, then destroy the attacking carrier.
         if (enemyCarrier.ships <= 0) {
             game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(enemyCarrier), 1);
+
+            defenderUser.achievements.kills.carriers++;
+            attackerUser.achievements.losses.carriers++;
         }
 
         // If the star has no garrison and no defenders, then the attacker has won.
@@ -269,9 +291,15 @@ module.exports = class GameTickService {
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
+            defenderUser.achievements.combat.stars.lost++;
+            attackerUser.achievements.combat.stars.captured++;
+
             await this.eventService.createStarCapturedEvent(game, attacker, star, captureReward);
             await this.eventService.createStarCapturedEvent(game, defender, star, captureReward);
         }
+
+        await defenderUser.save();
+        await attackerUser.save();
     }
 
     _produceShips(game) {
@@ -322,7 +350,7 @@ module.exports = class GameTickService {
                 }
                 
                 let creditsResult = this._givePlayerMoney(game, player);
-                let experimentResult = this._conductExperiments(game, player);
+                let experimentResult = await this._conductExperiments(game, player);
 
                 await this.eventService.createPlayerGalacticCycleCompleteEvent(game, player,
                     creditsResult.creditsFromEconomy, creditsResult.creditsFromBanking,
@@ -346,8 +374,8 @@ module.exports = class GameTickService {
         };
     }
 
-    _conductExperiments(game, player) {
-        return this.researchService.conductExperiments(game, player);
+    async _conductExperiments(game, player) {
+        return await this.researchService.conductExperiments(game, player);
     }
 
     _logHistory(game) {
@@ -376,12 +404,18 @@ module.exports = class GameTickService {
             }
 
             if (player.defeated) {
+                let user = await this.userService.getById(player._id);
+
                 if (isAfk) {
+                    user.achievements.afk++;
                     await this.eventService.createPlayerAfkEvent(game, player);
                 }
                 else {
+                    user.achievements.defeated++;
                     await this.eventService.createPlayerDefeatedEvent(game, player);
                 }
+
+                await user.save();
             }
         }
     }

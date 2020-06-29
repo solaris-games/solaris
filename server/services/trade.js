@@ -25,10 +25,18 @@ module.exports = class TradeService {
             throw new ValidationError(`The player does not own ${amount} credits.`);
         }
 
+        let fromPlayerUser = await this.userService.getById(fromPlayer.userId);
+        let toPlayerUser = await this.userService.getById(toPlayer.userId);
+
         fromPlayer.credits -= amount;
+        fromPlayerUser.achievements.trade.creditsSent += amount;
+
         toPlayer.credits += amount;
+        toPlayerUser.achievements.trade.creditsReceived += amount;
 
         await game.save();
+        await fromPlayerUser.save();
+        await toPlayerUser.save();
 
         await this.eventService.createCreditsReceivedEvent(game, fromPlayer, toPlayer, amount);
         await this.eventService.createCreditsSentEvent(game, fromPlayer, toPlayer, amount);
@@ -56,12 +64,16 @@ module.exports = class TradeService {
         }
 
         // Get the user of the player to award renown to.
+        let fromUser = await this.userService.getById(fromPlayer.userId);
         let toUser = await this.userService.getById(toPlayer.userId);
 
         fromPlayer.renownToGive -= amount;
-        toUser.achievements.renown += amount;
+
+        fromUser.achievements.trade.renownSent += amount;
+        toUser.achievements.renown += amount; // TODO: Refactor into trade?
 
         await game.save();
+        await fromUser.save();
         await toUser.save();
 
         await this.eventService.createRenownReceivedEvent(game, fromPlayer, toPlayer, amount);
@@ -94,12 +106,19 @@ module.exports = class TradeService {
             throw new ValidationError('The player cannot afford to trade this technology.');
         }
 
+        let fromUser = await this.userService.getById(fromPlayer.userId);
+        let toUser = await this.userService.getById(toPlayer.userId);
+
         toPlayerTech.level = tradeTech.level;
         toPlayerTech.progress = 0;
+        toUser.achievements.trade.technologyReceived++;
 
         fromPlayer.credits -= tradeTech.cost;
+        fromUser.achievements.trade.technologySent++;
 
         await game.save();
+        await fromPlayer.save();
+        await toPlayer.save();
 
         let eventTech = {
             name: tradeTech.name,

@@ -13,6 +13,50 @@ const schema = new Schema({
         victories: { type: Types.Number, default: 0 },
         rank: { type: Types.Number, default: 0 },
         renown: { type: Types.Number, default: 0 },
+        joined: { type: Types.Number, default: 0 },
+        completed: { type: Types.Number, default: 0 },
+        quit: { type: Types.Number, default: 0 },
+        defeated: { type: Types.Number, default: 0 },
+        afk: { type: Types.Number, default: 0 },
+        renown: { type: Types.Number, default: 0 },
+        combat: {
+            kills: {
+                ships: { type: Types.Number, default: 0 },
+                carriers: { type: Types.Number, default: 0 },
+            },
+            losses: {
+                ships: { type: Types.Number, default: 0 },
+                carriers: { type: Types.Number, default: 0 },
+            },
+            stars: {
+                captured: { type: Types.Number, default: 0 },
+                lost: { type: Types.Number, default: 0 },
+            }
+        },
+        infrastructure: {
+            economy: { type: Types.Number, default: 0 },
+            industry: { type: Types.Number, default: 0 },
+            science: { type: Types.Number, default: 0 },
+            warpGates: { type: Types.Number, default: 0 },
+            warpGatesDestroyed: { type: Types.Number, default: 0 },
+            carriers: { type: Types.Number, default: 0 },
+        },
+        research: {
+            scanning: { type: Types.Number, default: 0 },
+            hyperspace: { type: Types.Number, default: 0 },
+            terraforming: { type: Types.Number, default: 0 },
+            experimentation: { type: Types.Number, default: 0 },
+            weapons: { type: Types.Number, default: 0 },
+            banking: { type: Types.Number, default: 0 },
+            manufacturing: { type: Types.Number, default: 0 },
+        },
+        trade: {
+            creditsSent: { type: Types.Number, default: 0 },
+            creditsReceived: { type: Types.Number, default: 0 },
+            technologySent: { type: Types.Number, default: 0 },
+            technologyReceived: { type: Types.Number, default: 0 },
+            renownSent: { type: Types.Number, default: 0 },
+        },
         badges: {
             conqueror: { type: Types.Number, default: 0 },
             cutthroatPirate: { type: Types.Number, default: 0 },

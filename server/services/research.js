@@ -1,10 +1,11 @@
 module.exports = class ResearchService {
 
-    constructor(randomService, playerService, timeService, eventService) {
+    constructor(randomService, playerService, timeService, eventService, userService) {
         this.randomService = randomService;
         this.playerService = playerService;
         this.timeService = timeService;
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     async updateResearchNow(game, player, preference) {
@@ -36,21 +37,25 @@ module.exports = class ResearchService {
         if (player.defeated) {
             return;
         }
+        
+        let user = await this.userService.getById(player.userId);
 
-        let tech = player.research[player.researchingNow];
+        let techKey = player.researchingNow;
+        let tech = player.research[techKey];
             
         tech.progress += player.research.experimentation.level;
+        user.achievements.research[techKey] += player.research.experimentation.level;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level);
+        let requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
 
         if (tech.progress >= requiredProgress) {
             tech.level++;
             tech.progress -= requiredProgress;
 
             let eventTech = {
-                name: player.researchingNow,
+                name: techKey,
                 level: tech.level
             };
 
@@ -58,6 +63,8 @@ module.exports = class ResearchService {
 
             player.researchingNow = player.researchingNext;
         }
+
+        await user.save();
     }
 
     getRequiredResearchProgress(game, technologyKey, technologyLevel) {
@@ -68,11 +75,13 @@ module.exports = class ResearchService {
         return technologyLevel * progressMultiplierConfig;
     }
 
-    conductExperiments(game, player) {
+    async conductExperiments(game, player) {
         // TODO: Defeated players do not conduct research or experiments?
         if (player.defeated) {
             return;
         }
+
+        let user = await this.userService.getById(player.userId);
 
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
@@ -85,6 +94,7 @@ module.exports = class ResearchService {
         let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier / 2);
 
         tech.progress += researchAmount;
+        user.achievements.research[techKey] += researchAmount;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -94,6 +104,8 @@ module.exports = class ResearchService {
             tech.level++;
             tech.progress -= requiredProgress;
         }
+
+        await user.save();
 
         return {
             technology: techKey,

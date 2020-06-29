@@ -2,10 +2,11 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService {
 
-    constructor(starService, carrierService, eventService) {
+    constructor(starService, carrierService, eventService, userService) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -34,6 +35,10 @@ module.exports = class StarUpgradeService {
 
         await game.save();
 
+        let user = await this.userService.getById(player.userId);
+        user.achievements.infrastructure.warpGates++;
+        await user.save();
+        
         await this.eventService.createWarpGateBuiltEvent(game, player, star);
     }
 
@@ -54,6 +59,10 @@ module.exports = class StarUpgradeService {
 
         await game.save();
 
+        let user = await this.userService.getById(player.userId);
+        user.achievements.infrastructure.warpGatesDestroyed++;
+        await user.save();
+        
         await this.eventService.createWarpGateDestroyedEvent(game, player, star);
     }
 
@@ -89,6 +98,10 @@ module.exports = class StarUpgradeService {
 
         await game.save();
 
+        let user = await this.userService.getById(player.userId);
+        user.achievements.infrastructure.carriers++;
+        await user.save();
+        
         await this.eventService.createCarrierBuiltEvent(game, player, star, carrier);
 
         return carrier;
@@ -116,6 +129,10 @@ module.exports = class StarUpgradeService {
         player.credits -= cost;
 
         await game.save();
+
+        let user = await this.userService.getById(player.userId);
+        user.achievements.infrastructure[economyType]++;
+        await user.save();
 
         let nextCost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 

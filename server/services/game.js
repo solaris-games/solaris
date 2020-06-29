@@ -96,6 +96,10 @@ module.exports = class GameService {
 
         await game.save();
 
+        let user = await this.getPlayerUser(game, player.id);
+        user.achievements.joined++;
+        await user.save();
+
         await this.eventService.createPlayerJoinedEvent(game, player);
     }
 
@@ -109,6 +113,8 @@ module.exports = class GameService {
         if (game.state.endDate) {
             throw new ValidationError('Cannot quit a game that has finished.');
         }
+        
+        let user = await this.userService.getById(player.userId);
 
         let alias = player.alias;
 
@@ -117,10 +123,12 @@ module.exports = class GameService {
         // doing this otherwise we'd have to reset everything here which will be a pain.
         player.userId = null;
         player.alias = "Empty Slot";
+        user.achievements.quit++;
 
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
         await game.save();
+        await user.save();
 
         await this.eventService.createPlayerQuitEvent(game, player, alias);
 
@@ -159,6 +167,10 @@ module.exports = class GameService {
         // TODO: Remove all carrier waypoints (unless in transit)
 
         await game.save();
+
+        let user = await this.getPlayerUser(game, player.id);
+        user.achievements.defeated++;
+        await user.save();
 
         await this.eventService.createPlayerDefeatedEvent(game, player);
     }

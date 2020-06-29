@@ -9,6 +9,158 @@
 
     <p class="text-center pt-3 mb-0">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
 
+    <h5>Games</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <tr>
+            <td>Victories</td>
+            <td class="text-right">{{ achievements.victories }}</td>
+          </tr>
+          <tr>
+            <td>Joined</td>
+            <td class="text-right">{{ achievements.joined }}</td>
+          </tr>
+          <tr>
+            <td>Completed</td>
+            <td class="text-right">{{ achievements.completed }}</td>
+          </tr>
+          <tr>
+            <td>Defeated</td>
+            <td class="text-right">{{ achievements.defeated }}</td>
+          </tr>
+          <tr>
+            <td>Quit</td>
+            <td class="text-right">{{ achievements.quit }}</td>
+          </tr>
+          <tr>
+            <td>AFK</td>
+            <td class="text-right">{{ achievements.afk }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5>Military</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <tr>
+            <td>Ship Kills</td>
+            <td class="text-right">{{ achievements.combat.kills.ships }}</td>
+          </tr>
+          <tr>
+            <td>Ship Losses</td>
+            <td class="text-right">{{ achievements.combat.losses.ships }}</td>
+          </tr>
+          <tr>
+            <td>Carrier Kills</td>
+            <td class="text-right">{{ achievements.combat.kills.carriers }}</td>
+          </tr>
+          <tr>
+            <td>Carrier Losses</td>
+            <td class="text-right">{{ achievements.combat.losses.carriers }}</td>
+          </tr>
+          <tr>
+            <td>Stars Captured</td>
+            <td class="text-right">{{ achievements.combat.stars.captured }}</td>
+          </tr>
+          <tr>
+            <td>Stars Lost</td>
+            <td class="text-right">{{ achievements.combat.stars.lost }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5>Infrastructure</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <tr>
+            <td>Economy</td>
+            <td class="text-right">{{ achievements.infrastructure.economy }}</td>
+          </tr>
+          <tr>
+            <td>Industry</td>
+            <td class="text-right">{{ achievements.infrastructure.industry }}</td>
+          </tr>
+          <tr>
+            <td>Science</td>
+            <td class="text-right">{{ achievements.infrastructure.science }}</td>
+          </tr>
+          <tr>
+            <td>Warp Gates Built</td>
+            <td class="text-right">{{ achievements.infrastructure.warpGates }}</td>
+          </tr>
+          <tr>
+            <td>Warp Gates Destroyed</td>
+            <td class="text-right">{{ achievements.infrastructure.warpGatesDestroyed }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5>Research</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <tr>
+            <td>Scanning</td>
+            <td class="text-right">{{ achievements.research.scanning }}</td>
+          </tr>
+          <tr>
+            <td>Hyperspace</td>
+            <td class="text-right">{{ achievements.research.hyperspace }}</td>
+          </tr>
+          <tr>
+            <td>Terraforming</td>
+            <td class="text-right">{{ achievements.research.terraforming }}</td>
+          </tr>
+          <tr>
+            <td>Weapons</td>
+            <td class="text-right">{{ achievements.research.weapons }}</td>
+          </tr>
+          <tr>
+            <td>Banking</td>
+            <td class="text-right">{{ achievements.research.banking }}</td>
+          </tr>
+          <tr>
+            <td>Manufacturing</td>
+            <td class="text-right">{{ achievements.research.manufacturing }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5>Trade</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <tr>
+            <td>Credits Sent</td>
+            <td class="text-right">{{ achievements.trade.creditsSent }}</td>
+          </tr>
+          <tr>
+            <td>Credits Received</td>
+            <td class="text-right">{{ achievements.trade.creditsReceived }}</td>
+          </tr>
+          <tr>
+            <td>Technology Sent</td>
+            <td class="text-right">{{ achievements.trade.technologySent }}</td>
+          </tr>
+          <tr>
+            <td>Technology Received</td>
+            <td class="text-right">{{ achievements.trade.technologyReceived }}</td>
+          </tr>
+          <tr>
+            <td>Renown Sent</td>
+            <td class="text-right">{{ achievements.trade.renownSent }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!--
     <view-subtitle title="Badges"/>
 
