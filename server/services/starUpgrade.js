@@ -117,12 +117,15 @@ module.exports = class StarUpgradeService {
 
         await game.save();
 
+        let nextCost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
+
         // Return a report of what just went down.
         return {
             playerId: player._id,
             starId: star._id,
             infrastructure: star.infrastructure[economyType],
-            cost
+            cost,
+            nextCost
         };
     }
 

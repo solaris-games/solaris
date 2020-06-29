@@ -59,7 +59,9 @@
       <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated"
         :star="star"
         :availableCredits="getUserPlayer().credits"
-        :economy="star.upgradeCosts.economy" :industry="star.upgradeCosts.industry" :science="star.upgradeCosts.science"
+        :economy="star.upgradeCosts.economy" 
+        :industry="star.upgradeCosts.industry" 
+        :science="star.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
@@ -186,10 +188,8 @@ export default {
       return GameHelper.isGameInProgress(this.$store.state.game)
     },
     onInfrastructureUpgraded (e) {
-      // TODO: Reload the current star to get new costs.
-      // TODO: Reload the player credits somehow?
-      // this.star[e]++
-      this.getStarOwningPlayer().credits -= this.star.upgradeCosts[e]
+      this.getStarOwningPlayer().credits -= e.data.cost
+      this.star.upgradeCosts[e.infrastructureKey] = e.data.nextCost
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer())
