@@ -56,13 +56,13 @@ const schema = new Schema({
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
 			},
 			researchCosts: {
-				terraforming: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				experimentation: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				scanning: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				hyperspace: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				manufacturing: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				banking: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
+				terraforming: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				experimentation: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				scanning: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				hyperspace: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				manufacturing: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				banking: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				weapons: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			}
 		},
 		gameTime: {
@@ -97,7 +97,7 @@ const schema = new Schema({
 			shipSpeed: { type: Types.Number, required: true, default: 3 }
 		},
 		research: {
-			progressMultiplier: { type: Types.Number, required: true, default: 100 }
+			progressMultiplier: { type: Types.Number, required: true, default: 50 }
 		},
 		star: {
 			resources: {

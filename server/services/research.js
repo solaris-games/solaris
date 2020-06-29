@@ -43,7 +43,7 @@ module.exports = class ResearchService {
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = tech.level * game.constants.research.progressMultiplier;
+        let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level);
 
         if (tech.progress >= requiredProgress) {
             tech.level++;
@@ -58,6 +58,14 @@ module.exports = class ResearchService {
 
             player.researchingNow = player.researchingNext;
         }
+    }
+
+    getRequiredResearchProgress(game, technologyKey, technologyLevel) {
+        const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
+        const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
+        const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier;
+
+        return technologyLevel * progressMultiplierConfig;
     }
 
     conductExperiments(game, player) {
@@ -80,7 +88,7 @@ module.exports = class ResearchService {
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = tech.level * game.constants.research.progressMultiplier;
+        let requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
 
         while (tech.progress >= requiredProgress) {
             tech.level++;
@@ -96,7 +104,7 @@ module.exports = class ResearchService {
     calculateCurrentResearchETAInTicks(game, player) {
         let tech = player.research[player.researchingNow];
         
-        let requiredProgress = tech.level * game.constants.research.progressMultiplier;
+        let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level);
         let remainingPoints = requiredProgress - tech.progress;
 
         let totalScience = this.playerService.calculateTotalScience(player, game.galaxy.stars);
