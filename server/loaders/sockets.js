@@ -11,6 +11,10 @@ module.exports = (server) => {
         socket.on('gameRoomJoined', (data) => {
             socket.join(data.gameId); // Join the game room to receive game-wide messages.
             socket.join(data.userId); // Join a private room to receive user/player specific messages.
+
+            if (data.playerId) {
+                socket.join(data.playerId);
+            }
         });
 
         socket.on('gameRoomLeft', () => {

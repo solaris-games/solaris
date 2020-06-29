@@ -93,8 +93,6 @@ module.exports = class MessageService {
 
         game.messages.push(newMessage);
 
-        newMessage.toUserId = toPlayer.userId;
-
         await game.save();
 
         return newMessage;

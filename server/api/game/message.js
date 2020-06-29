@@ -63,7 +63,7 @@ module.exports = (router, io, container) => {
                 req.body.toPlayerId,
                 req.body.message);
 
-            container.broadcastService.gameMessageSent(req.game, message, message.toUserId)
+            container.broadcastService.gameMessageSent(req.game, message, req.body.toPlayerId)
 
             return res.sendStatus(200);
         } catch (err) {

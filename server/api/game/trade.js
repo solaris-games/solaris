@@ -36,6 +36,8 @@ module.exports = (router, io, container) => {
                 req.body.toPlayerId,
                 req.body.amount);
 
+            container.broadcastService.gamePlayerCreditsReceived(req.game, req.body.toPlayerId, req.body.amount);
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);

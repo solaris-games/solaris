@@ -78,8 +78,16 @@ export default {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
+  created () {
+    this.sockets.listener.subscribe('playerCreditsReceived', (data) => {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      player.credits += data
+    })
+  },
   destroyed () {
     clearInterval(this.intervalFunction)
+
+    this.sockets.listener.unsubscribe('playerCreditsReceived')
   },
   methods: {
     getUserPlayer () {

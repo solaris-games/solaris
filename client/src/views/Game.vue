@@ -45,10 +45,18 @@ export default {
 
     await this.reloadGame()
 
-    this.$socket.emit('gameRoomJoined', {
+    let player = GameHelper.getUserPlayer(this.$store.state.game)
+
+    let socketData = {
       gameId: this.$store.state.game._id,
       userId: this.$store.state.userId
-    })
+    }
+
+    if (player) {
+      socketData.playerId = player._id
+    }
+
+    this.$socket.emit('gameRoomJoined', socketData)
 
     // Check if the user is in this game, if not then show the welcome screen.
     this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
