@@ -23,31 +23,29 @@ module.exports = class BroadcastService {
         });
     }
 
-    // TODO: The infrastructure upgrades below will need
-    // to be broadcasted to only the players who are in scanning range.
-    // Otherwise anyone can listen to the socket traffic and be able
-    // to work out when players upgrade their stars and what upgrades they have.
-    gameStarEconomyUpgraded(game, starId, infrastructure) {
-        this.io.to(game.id).emit('gameStarEconomyUpgraded', {
+    gameStarEconomyUpgraded(game, playerId, starId, infrastructure) {
+        this.io.to(playerId.toString()).emit('gameStarEconomyUpgraded', {
             starId,
             infrastructure
         });
     }
 
-    gameStarIndustryUpgraded(game, starId, infrastructure) {
-        this.io.to(game.id).emit('gameStarIndustryUpgraded', {
+    gameStarIndustryUpgraded(game, playerId, starId, infrastructure) {
+        this.io.to(playerId.toString()).emit('gameStarIndustryUpgraded', {
             starId,
             infrastructure
         });
     }
 
-    gameStarScienceUpgraded(game, starId, infrastructure) {
-        this.io.to(game.id).emit('gameStarScienceUpgraded', {
+    gameStarScienceUpgraded(game, playerId, starId, infrastructure) {
+        this.io.to(playerId.toString()).emit('gameStarScienceUpgraded', {
             starId,
             infrastructure
         });
     }
 
+    // TODO: Need to refactor this to take the player id to broadcast to
+    // and only stars that are within their scanning range should be included in the summary.
     gameStarBulkUpgraded(game, summary) {
         this.io.to(game.id).emit('gameStarBulkUpgraded', summary);
     }

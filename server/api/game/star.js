@@ -25,7 +25,11 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
-            container.broadcastService.gameStarEconomyUpgraded(req.game, req.body.starId, report.infrastructure);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => 
+                container.broadcastService.gameStarEconomyUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
 
             return res.status(200).json(report);
         } catch (err) {
@@ -40,7 +44,11 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
-            container.broadcastService.gameStarIndustryUpgraded(req.game, req.body.starId, report.infrastructure);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => 
+                container.broadcastService.gameStarIndustryUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
 
             return res.status(200).json(report);
         } catch (err) {
@@ -55,7 +63,11 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
-            container.broadcastService.gameStarScienceUpgraded(req.game, req.body.starId, report.infrastructure);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => 
+                container.broadcastService.gameStarScienceUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
 
             return res.status(200).json(report);
         } catch (err) {

@@ -404,7 +404,7 @@ module.exports = class GameTickService {
             }
 
             if (player.defeated) {
-                let user = await this.userService.getById(player._id);
+                let user = await this.userService.getById(player.userId);
 
                 if (isAfk) {
                     user.achievements.afk++;
