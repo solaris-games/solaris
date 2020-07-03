@@ -62,8 +62,8 @@ module.exports = class BroadcastService {
         });
     }
 
-    gameStarCarrierBuilt(game, carrier) {
-        this.io.to(game.id).emit('gameStarCarrierBuilt', carrier);
+    gameStarCarrierBuilt(game, playerId, carrier) {
+        this.io.to(playerId.toString()).emit('gameStarCarrierBuilt', carrier);
     }
 
     gameStarAbandoned(game, starId) {
