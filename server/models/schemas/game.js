@@ -118,9 +118,6 @@ const schema = new Schema({
 				veryExpensive: { type: Types.Number, required: true, default: 8 },
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
 			}
-		},
-		trade: {
-			costPerLevel: { type: Types.Number, required: true, default: 15 }
 		}
 	}
 });

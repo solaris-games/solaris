@@ -1,7 +1,7 @@
 <template>
 <div class="row bg-primary pt-2 pb-2" v-if="selectedTechnology">
     <div class="col">
-        <p class="mb-2">Give this player Technology. (Costs $15 per tech level)</p>
+        <p class="mb-2">Give this player Technology. (Costs ${{getTradeCost()}} per tech level)</p>
 
         <form>
             <div class="form-row">
@@ -52,6 +52,9 @@ export default {
   methods: {
     getTechnologyFriendlyName (key) {
       return TechnologyHelper.getFriendlyName(key)
+    },
+    getTradeCost () {
+      return this.$store.state.game.settings.player.tradeCost
     },
     async getTradeableTechnologies () {
       try {
