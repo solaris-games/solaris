@@ -83,7 +83,28 @@ module.exports = (router, io, container) => {
                 req.body.infrastructure,
                 +req.body.amount);
 
-            container.broadcastService.gameStarBulkUpgraded(req.game, summary);
+            if (summary.upgraded) {
+                // For all of the other players, we'll need to broadcast the summary containing only the stars
+                // that they can see in their scanning range.
+                // Don't send out potentially sensitive info like costs to all players, only
+                // the stuff that the UI needs.
+                req.game.galaxy.players.forEach(p => {
+                    let broadcastSummary = {
+                        stars: summary.stars,
+                        infrastructureType: summary.infrastructureType
+                    };
+    
+                    // If it isn't the player who performed the bulk upgrade then strip out
+                    // the stars that are outside of scanning range.
+                    if (!p._id.equals(req.player._id)) {
+                        let starsInScanningRange = container.starService.getStarsWithinScanningRangeOfPlayer(req.game, p._id);
+    
+                        broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
+                    }
+    
+                    container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);
+                });
+            }
 
             return res.status(200).json(summary);
         } catch (err) {

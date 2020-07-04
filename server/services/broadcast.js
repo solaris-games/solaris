@@ -44,10 +44,8 @@ module.exports = class BroadcastService {
         });
     }
 
-    // TODO: Need to refactor this to take the player id to broadcast to
-    // and only stars that are within their scanning range should be included in the summary.
-    gameStarBulkUpgraded(game, summary) {
-        this.io.to(game.id).emit('gameStarBulkUpgraded', summary);
+    gameStarBulkUpgraded(game, playerId, summary) {
+        this.io.to(playerId.toString()).emit('gameStarBulkUpgraded', summary);
     }
 
     gameStarWarpGateBuilt(game, starId) {

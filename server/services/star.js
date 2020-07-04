@@ -79,6 +79,20 @@ module.exports = class StarService {
         return starsInRange;
     }
 
+    getStarsWithinScanningRangeOfPlayer(game, playerId) {
+        let player = game.galaxy.players.find(p => p._id.equals(playerId));
+        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId);
+        let scanningRangeDistance = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+
+        let starsInRange = game.galaxy.stars.filter(s => {
+            return (s.ownedByPlayerId != null && s.ownedByPlayerId.equals(playerId))   // Owned by the current player
+                // Or any of the stars that the player owns is within scanning range
+                || playerStars.find(ps => this.starDistanceService.getDistanceBetweenStars(ps, s) <= scanningRangeDistance) != null;
+        });
+
+        return starsInRange;
+    }
+
     calculateTerraformedResources(naturalResources, terraforming) {
         return (terraforming * 5) + naturalResources;
     }
