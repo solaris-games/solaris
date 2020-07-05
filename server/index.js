@@ -15,7 +15,7 @@ async function startServer() {
       return;
     }
 
-    console.log(`Server is running on port ${config.port}`);
+    console.log(`Server is running on port ${config.port}.`);
   });
 }
 
