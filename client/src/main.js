@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueSocketio from 'vue-socket.io'
+import VueGtag from 'vue-gtag'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -21,6 +22,14 @@ Vue.use(new VueSocketio({
       mutationPrefix: 'SOCKET_'
   }
 }))
+
+let trackingCode = process.env.VUE_APP_GOOGLE_ANALYTICS_TRACKING_CODE
+
+if (trackingCode) {
+  Vue.use(VueGtag, {
+    config: { id: trackingCode }
+  }, router)
+}
 
 new Vue({
   router,
