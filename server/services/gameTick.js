@@ -394,6 +394,7 @@ module.exports = class GameTickService {
             let isAfk = moment(player.lastSeen) > moment().subtract(2, 'days');
 
             player.defeated = !isAfk;
+            player.afk = isAfk;
 
             // Check if the player has been defeated by conquest.
             if (!player.defeated) {
@@ -407,6 +408,8 @@ module.exports = class GameTickService {
                 let user = await this.userService.getById(player.userId);
 
                 if (isAfk) {
+                    // AFK counts as a defeat as well.
+                    user.achievements.defeated++;
                     user.achievements.afk++;
                     await this.eventService.createPlayerAfkEvent(game, player);
                 }

@@ -15,6 +15,7 @@ const schema = new Schema({
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },
     defeated: { type: Types.Boolean, required: false, default: false },
+    afk: { type: Types.Boolean, required: false, default: false },
     renownToGive: { type: Types.Number, required: true, default: 8 },
     research: {
         // TODO: This would be arguably better if it was just progress points and remove level

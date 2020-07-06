@@ -94,7 +94,7 @@ export default {
   },
   props: {
     menuState: String,
-    menuArguments: [Object, String]
+    menuArguments: [Object, String, Array]
   },
   data () {
     return {

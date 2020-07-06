@@ -270,8 +270,7 @@ module.exports = class GameGalaxyService {
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 defeated: p.defeated,
-                ready: p.ready,
-                missedTurns: p.missedTurns,
+                afk: p.afk,
                 _id: p._id,
                 alias: p.alias,
                 homeStarId: p.homeStarId,

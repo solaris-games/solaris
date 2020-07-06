@@ -17,7 +17,7 @@
 
     <div class="row bg-success" v-if="game.state.endDate">
         <div class="col text-center pt-2">
-            <h3>Game Over!</h3>
+            <h3>Game Over</h3>
             <p>Congratulations to the winner!</p>
         </div>
     </div>
@@ -36,7 +36,10 @@
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
-                          <h5>{{player.alias}} <span v-if="player.defeated">(DEFEATED)</span></h5>
+                          <h5>{{player.alias}} 
+                            <span v-if="player.defeated && !player.afk">(DEFEATED)</span>
+                            <span v-if="player.defeated && player.afk">(AFK)</span>
+                          </h5>
                       </td>
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
@@ -115,6 +118,7 @@ export default {
         .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
         .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
         .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
+        .sort((a, b) => (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1)
     },
     async concedeDefeat () {
       try {

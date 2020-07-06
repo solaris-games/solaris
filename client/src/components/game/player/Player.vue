@@ -36,9 +36,9 @@
       <sendCredits :player="player" :userPlayer="userPlayer"/>
     </div>
 
-    <loading-spinner :loading="!player.isEmptySlot && !user"/>
+    <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
 
-    <h4 class="mt-2" v-if="!player.isEmptySlot && (user || userPlayer)">Achievements</h4>
+    <h4 class="mt-2" v-if="player && !player.isEmptySlot && (user || userPlayer)">Achievements</h4>
 
     <achievements v-if="user" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"

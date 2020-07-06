@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="player">
   <div class="row" :style="{'background-color': getFriendlyColour(player.colour.value)}">
       <div class="col">
           <h4 class="pt-2">{{player.alias}} <span v-if="player.userId">(You)</span></h4>

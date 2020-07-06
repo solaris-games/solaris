@@ -40,13 +40,18 @@ module.exports = class LeaderboardService {
         let leaderboard = playerStats
             .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
             .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
-            .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers);
+            .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
+            .sort((a, b) => (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1);
 
         return leaderboard;
     }
 
     async addGameRankings(leaderboard) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
+
+        // Remove any afk players from the leaderboard, they will not
+        // receive any achievements.
+        leaderboardPlayers = leaderboardPlayers.filter(p => !p.player.afk);
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboard[i];
@@ -60,8 +65,12 @@ module.exports = class LeaderboardService {
             // 2nd place will receive 1 rank (4 / 2 - 1)
             // 3rd place will receive 0 rank (4 / 2 - 2)
             // 4th place will receive -1 rank (4 / 2 - 3)
+
+            // TODO: Maybe a better ranking system would be to simply award players
+            // rank equal to the number of stars they have at the end of the game?
+        
             if (i == 0) {
-                user.achievements.rank += leaderboard.length;
+                user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 user.achievements.victories++; // Increase the winner's victory count
             } else {
                 user.achievements.rank += leaderboard.length / 2 - i;
