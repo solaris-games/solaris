@@ -1,7 +1,10 @@
 <template>
 <div class="container">
     <!-- TODO: Text for premium player and lifetime premium player -->
-    <menu-title title="Player" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Player" @onCloseRequested="onCloseRequested">
+        <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-info"><i class="fas fa-chevron-left"></i></button>
+        <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
+    </menu-title>
   
     <overview :player="player" 
       @onViewConversationRequested="onViewConversationRequested"
@@ -81,15 +84,19 @@ export default {
     'badges': Badges
   },
   props: {
-    player: Object
+    playerId: String
   },
   data () {
     return {
+      player: null,
       user: null,
-      userPlayer: null
+      userPlayer: null,
+      playerIndex: 0
     }
   },
   async mounted () {
+    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
 
@@ -106,6 +113,7 @@ export default {
     }
 
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+    this.playerIndex = this.$store.state.game.galaxy.players.indexOf(this.player)
   },
   methods: {
     onCloseRequested (e) {
@@ -116,6 +124,29 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onOpenPrevPlayerDetailRequested (e) {
+      let prevIndex = this.playerIndex - 1
+
+      if (prevIndex < 0) {
+        prevIndex = this.$store.state.game.galaxy.players.length - 1
+      }
+
+      this.onOpenPlayerDetailRequested(prevIndex)
+    },
+    onOpenNextPlayerDetailRequested (e) {
+      let nextIndex = this.playerIndex + 1
+
+      if (nextIndex > this.$store.state.game.galaxy.players.length - 1) {
+        nextIndex = 0
+      }
+
+      this.onOpenPlayerDetailRequested(nextIndex)
+    },
+    onOpenPlayerDetailRequested (e) {
+      let player = this.$store.state.game.galaxy.players[e]
+
+      this.$emit('onOpenPlayerDetailRequested', player._id)
     }
   },
   computed: {

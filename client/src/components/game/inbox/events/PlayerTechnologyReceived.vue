@@ -30,7 +30,7 @@ export default {
       return TechnologyHelper.getFriendlyName(key)
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.player)
+      this.$emit('onOpenPlayerDetailRequested', this.player._id)
     }
   }
 }

@@ -197,7 +197,7 @@ export default {
       this.star.upgradeCosts[e.infrastructureKey] = e.data.nextCost
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer())
+      this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer()._id)
     },
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier)

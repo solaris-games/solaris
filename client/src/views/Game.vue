@@ -83,36 +83,36 @@ export default {
     // MENU
 
     resetMenuState () {
-      this.menuState = null
       this.menuArguments = null
+      this.menuState = null
     },
-    onMenuStateChanged (e) {
-      this.menuState = e.state || null
+    onMenuStateChanged (e) {      
       this.menuArguments = e.args || null
-
+      this.menuState = e.state || null
+      
       this.$emit('onMenuStateChanged', e)
     },
     onPlayerSelected (e) {
-      this.menuState = MENU_STATES.PLAYER
       this.menuArguments = e
+      this.menuState = MENU_STATES.PLAYER
 
       this.$emit('onPlayerSelected', e)
     },
     onStarClicked (e) {
-      this.menuState = MENU_STATES.STAR_DETAIL
       this.menuArguments = e
+      this.menuState = MENU_STATES.STAR_DETAIL
 
       //this.$emit('onStarClicked', e)
     },
     onCarrierClicked (e) {
-      this.menuState = MENU_STATES.CARRIER_DETAIL
       this.menuArguments = e
+      this.menuState = MENU_STATES.CARRIER_DETAIL
 
       //this.$emit('onCarrierClicked', e)
     },
     onObjectsClicked (e) {
-      this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
       this.menuArguments = e
+      this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
     },
 
     // --------------------

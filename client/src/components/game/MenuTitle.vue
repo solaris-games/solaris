@@ -4,7 +4,8 @@
         <h3>{{ title }}</h3>
     </div>
     <div class="col-auto">
-        <button @click="close" class="btn btn-info float-right"><i class="fas fa-times"></i></button>
+        <slot></slot>
+        <button @click="close" class="btn btn-info ml-1"><i class="fas fa-times"></i></button>
     </div>
 </div>
 </template>

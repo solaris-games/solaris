@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group list-group-horizontal">
-        <li class="list-group-item" v-for="p in players" v-bind:key="p._id" v-on:click="onPlayerSelected(p)"
+        <li class="list-group-item" v-for="p in players" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
           :title="p.colour.alias + ' - ' + p.alias">
             <!-- TODO: Prefer images over font awesome icons? -->
             <i class="far fa-user pl-2 pr-2 pt-2 pb-2 img" style="font-size:30px;"></i>
@@ -23,8 +23,8 @@ export default {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
-    onPlayerSelected (player) {
-      this.$emit('onPlayerSelected', player)
+    onOpenPlayerDetailRequested (player) {
+      this.$emit('onOpenPlayerDetailRequested', player._id)
     }
   }
 }

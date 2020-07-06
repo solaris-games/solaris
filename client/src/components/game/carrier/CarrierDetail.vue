@@ -131,7 +131,7 @@ export default {
       return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.getCarrierOwningPlayer())
+      this.$emit('onOpenPlayerDetailRequested', this.getCarrierOwningPlayer()._id)
     },
     async toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.

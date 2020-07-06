@@ -2,7 +2,7 @@
 <div class="menu">
     <game-info v-bind:nextProduction="game.state.nextProductionTickDate" @onMenuStateChanged="onMenuStateChanged"/>
 
-    <player-list v-bind:players="game.galaxy.players" @onPlayerSelected="onPlayerSelected"/>
+    <player-list v-bind:players="game.galaxy.players" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="menu-content bg-dark" v-if="menuState">
       <!-- <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
@@ -10,9 +10,10 @@
 
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :player="menuArguments" :key="menuArguments._id" 
+      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onViewConversationRequested="onConversationOpenRequested"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :star="menuArguments"
         @onCloseRequested="onCloseRequested" 
@@ -93,7 +94,7 @@ export default {
   },
   props: {
     menuState: String,
-    menuArguments: Object
+    menuArguments: [Object, String]
   },
   data () {
     return {
@@ -112,9 +113,6 @@ export default {
     },
     onCloseRequested (e) {
       this.changeMenuState(null, null)
-    },
-    onPlayerSelected (e) {
-      this.$emit('onPlayerSelected', e)
     },
     onConversationOpenRequested (e) {
       this.changeMenuState('conversation', e)
