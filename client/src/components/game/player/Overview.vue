@@ -16,7 +16,7 @@
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
                   <button class="btn btn-success" :disabled="player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button>
-                  <button class="btn btn-info ml-1" :disabled="player.userId"><i class="fas fa-chart-line"></i></button>
+                  <button class="btn btn-info ml-1" :disabled="player.userId" @click="onViewCompareIntelRequested"><i class="fas fa-chart-line"></i></button>
               </div>
           </div>
       </div>
@@ -44,6 +44,9 @@ export default {
     },
     onViewConversationRequested (e) {
       this.$emit('onViewConversationRequested', this.player._id)
+    },
+    onViewCompareIntelRequested (e) {
+      this.$emit('onViewCompareIntelRequested', this.player._id)
     }
   }
 }

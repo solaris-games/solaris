@@ -3,7 +3,9 @@
     <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested"/>
   
-    <overview :player="player" @onViewConversationRequested="onViewConversationRequested"/>
+    <overview :player="player" 
+      @onViewConversationRequested="onViewConversationRequested"
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 
     <h4 v-if="userPlayer" class="mt-2">Infrastructure</h4>
 
@@ -111,6 +113,9 @@ export default {
     },
     onViewConversationRequested (e) {
       this.$emit('onViewConversationRequested', e)
+    },
+    onViewCompareIntelRequested (e) {
+      this.$emit('onViewCompareIntelRequested', e)
     }
   },
   computed: {

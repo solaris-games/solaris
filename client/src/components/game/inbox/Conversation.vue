@@ -2,7 +2,8 @@
 <div class="container pb-2">
   <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
 
-  <player-overview :player="getPlayer(fromPlayerId)"/>
+  <player-overview :player="getPlayer(fromPlayerId)"
+    @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 
   <loading-spinner :loading="!messages"/>
 
@@ -62,6 +63,9 @@ export default {
   methods: {
     onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
+    },
+    onViewCompareIntelRequested (e) {
+      this.$emit('onViewCompareIntelRequested', e)
     },
     getPlayer (playerId) {
       return this.$store.state.game.galaxy.players.find(p => p._id === playerId)

@@ -67,6 +67,9 @@ export default {
     'menu-title': MenuTitle,
     'line-chart': LineChart
   },
+  props: {
+    compareWithPlayerId: String
+  },
   data () {
     return {
       intelType: 'totalStars',
@@ -83,7 +86,12 @@ export default {
                     precision: 0
                 }
             }]
-        }
+        },
+        // elements: {
+        //     point:{
+        //         borderWidth: 0
+        //     }
+        // }
       },
       playerFilters: []
     }
@@ -96,6 +104,15 @@ export default {
         colour: GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
     })
+
+    if (this.compareWithPlayerId) {
+      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+
+      this.playerFilters.forEach(f => {
+          f.enabled = f.playerId === this.compareWithPlayerId
+            || f.playerId === userPlayer._id
+      })
+    }
 
     try {
       let response = await GameApiService.getGameHistory(this.$store.state.game._id)
@@ -158,6 +175,9 @@ export default {
           label: player.alias,
           borderColor: GameHelper.getFriendlyColour(player.colour.value),
           fill: false,
+          pointRadius: 0,
+          borderWidth: 3,
+          pointHitRadius: 10,
           data: []
         }
         

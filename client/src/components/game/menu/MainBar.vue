@@ -10,20 +10,24 @@
 
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :player="menuArguments" :key="menuArguments._id" @onViewConversationRequested="onConversationOpenRequested"/>
+      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :player="menuArguments" :key="menuArguments._id" 
+        @onViewConversationRequested="onConversationOpenRequested"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :star="menuArguments"
         @onCloseRequested="onCloseRequested" 
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrier="menuArguments" 
         @onShipTransferRequested="onShipTransferRequested" 
         @onEditWaypointsRequested="onEditWaypointsRequested" 
         @onEditWaypointRequested="onEditWaypointRequested" 
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" @onCloseRequested="onCloseRequested" :carrier="menuArguments" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :carrier="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
@@ -34,8 +38,9 @@
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"/>
-      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested"/>
+      <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" @onCloseRequested="onCloseRequested"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested"/>
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
@@ -113,6 +118,9 @@ export default {
     },
     onConversationOpenRequested (e) {
       this.changeMenuState('conversation', e)
+    },
+    onViewCompareIntelRequested (e) {
+      this.changeMenuState(MENU_STATES.INTEL, e)
     },
     onShipTransferRequested (e) {
       this.changeMenuState('shipTransfer', e)

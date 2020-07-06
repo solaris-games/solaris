@@ -61,7 +61,9 @@
       </div>
     </div>
     
-    <playerOverview v-if="getCarrierOwningPlayer()" :player="getCarrierOwningPlayer()" @onViewConversationRequested="onViewConversationRequested"/>
+    <playerOverview v-if="getCarrierOwningPlayer()" :player="getCarrierOwningPlayer()" 
+      @onViewConversationRequested="onViewConversationRequested"
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 </div>
 </template>
 
@@ -114,6 +116,9 @@ export default {
     },
     onViewConversationRequested (e) {
       this.$emit('onViewConversationRequested', e)
+    },
+    onViewCompareIntelRequested (e) {
+      this.$emit('onViewCompareIntelRequested', e)
     },
     // TODO: This method appears everywhere, is there a way to make it global?
     getUserPlayer () {
