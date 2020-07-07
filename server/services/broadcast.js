@@ -63,6 +63,15 @@ module.exports = class BroadcastService {
     gameStarCarrierBuilt(game, playerId, carrier) {
         this.io.to(playerId.toString()).emit('gameStarCarrierBuilt', carrier);
     }
+    
+    gameStarCarrierShipTransferred(game, playerId, starId, starShips, carrierId, carrierShips) {
+        this.io.to(playerId.toString()).emit('gameStarCarrierShipTransferred', {
+            starId,
+            starShips,
+            carrierId,
+            carrierShips
+        });
+    }
 
     gameStarAbandoned(game, starId) {
         this.io.to(game.id).emit('gameStarAbandoned', {

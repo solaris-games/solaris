@@ -38,7 +38,6 @@ module.exports = class GameTickService {
 
        game.state.lastTickDate = moment();
        game.state.nextTickDate = moment().add(game.settings.gameTime.speed, 'm'); // TODO: Do we really need to do this?
-       game.state.nextProductionTickDate = moment().add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
 
        await this._moveCarriers(game);
        this._produceShips(game);
@@ -146,7 +145,9 @@ module.exports = class GameTickService {
                 if (destinationStar.ownedByPlayerId == null) {
                     destinationStar.ownedByPlayerId = carrier.ownedByPlayerId;
 
-                    let playerUser = await this.userService.getById(carrier.ownedByPlayerId);
+                    let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+
+                    let playerUser = await this.userService.getById(carrierPlayer.userId);
                     playerUser.achievements.combat.stars.captured++;
                     await playerUser.save();
                 }
@@ -356,6 +357,9 @@ module.exports = class GameTickService {
                     creditsResult.creditsFromEconomy, creditsResult.creditsFromBanking,
                     experimentResult.technology, experimentResult.amount);
             }
+
+            // Set the next production tick date.
+            game.state.nextProductionTickDate = game.state.lastTickDate.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
         }
     }
 

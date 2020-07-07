@@ -108,7 +108,7 @@ export default {
       async saveTransfer (e) {
           try {
             this.isTransferringShips = true
-
+            
             let response = await CarrierApiService.transferShips(
                 this.$store.state.game._id, 
                 this.transfer.carrier._id,
@@ -117,6 +117,7 @@ export default {
                 parseInt(this.starShips))
 
             if (response.status === 200) {
+                // Note: The web socket event handles setting the carrier and star ships.
                 this.$emit('onShipsTransferred', this.transfer.carrier)
             }
           } catch (err) {

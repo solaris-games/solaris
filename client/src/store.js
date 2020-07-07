@@ -75,6 +75,13 @@ export default new Vuex.Store({
       GameContainer.setup()
       GameContainer.draw()
     },
+    gameStarCarrierShipTransferred (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
+
+      star.garrison = data.starShips
+      carrier.ships = data.carrierShips
+    },
     gameStarAbandoned (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 

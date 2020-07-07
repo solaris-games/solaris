@@ -22,7 +22,7 @@ export default {
     }
   },
   mounted () {
-    this.star = GameHelper.getStarById(this.event.data.starId)
+    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
   },
   methods: {
     onOpenStarDetailRequested (e) {

@@ -24,8 +24,8 @@ export default {
     }
   },
   mounted () {
-    this.carrier = GameHelper.getCarrierById(this.event.data.carrierId)
-    this.star = GameHelper.getStarById(this.event.data.starId)
+    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.event.data.carrierId)
+    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
   },
   methods: {
     onOpenCarrierDetailRequested (e) {

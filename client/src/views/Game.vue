@@ -127,6 +127,7 @@ export default {
       this.sockets.listener.subscribe('gameStarWarpGateBuilt', (data) => this.$store.commit('gameStarWarpGateBuilt', data))
       this.sockets.listener.subscribe('gameStarWarpGateDestroyed', (data) => this.$store.commit('gameStarWarpGateDestroyed', data))
       this.sockets.listener.subscribe('gameStarCarrierBuilt', (data) => this.$store.commit('gameStarCarrierBuilt', data))
+      this.sockets.listener.subscribe('gameStarCarrierShipTransferred', (data) => this.$store.commit('gameStarCarrierShipTransferred', data))
       this.sockets.listener.subscribe('gameStarAbandoned', (data) => this.$store.commit('gameStarAbandoned', data))
     },
     unsubscribeToSockets () {
@@ -138,6 +139,7 @@ export default {
       this.sockets.listener.unsubscribe('gameStarWarpGateBuilt')
       this.sockets.listener.unsubscribe('gameStarWarpGateDestroyed')
       this.sockets.listener.unsubscribe('gameStarCarrierBuilt')
+      this.sockets.listener.unsubscribe('gameStarCarrierShipTransferred')
       this.sockets.listener.unsubscribe('gameStarAbandoned')
     }
   },

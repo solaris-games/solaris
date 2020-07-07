@@ -76,6 +76,12 @@ module.exports = (router, io, container) => {
                 req.body.starId,
                 req.body.starShips);
 
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => 
+                container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
