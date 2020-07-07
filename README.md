@@ -27,6 +27,12 @@ This is a HTML5 game that aims to loosely clone the game [Neptune's Pride](https
 
 *Note: Development work is to be based on the `master` branch, for a new feature or bug fix, create a branch from `master`.*
 
+### Common Fixes
+- If you're on Windows and you get an error running `npm install` in `server/` complaining about `node-gyp`, try the following command:
+    - `npm install --global --production windows-build-tools`
+- If you're using the VS Code debugger, especially for the `server/`, you'll need to set up your `launch.json` with these additional properties:
+    - `"envFile": "${workspaceFolder}/server/.env"` in the `configuration`.
+
 ## Contributing
 See [here](CONTRIBUTING.md).
 
