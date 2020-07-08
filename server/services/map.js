@@ -1,10 +1,10 @@
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, starNameService, starMapService) {
+    constructor(randomService, starService, starDistanceService, nameService, starMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
-        this.starNameService = starNameService;
+        this.nameService = nameService;
         this.starMapService = starMapService;
     }
 
@@ -12,7 +12,7 @@ module.exports = class MapService {
         const stars = [];
 
         // Get an array of random star names for however many stars we want.
-        const starNames = this.starNameService.getRandomStarNames(starCount);
+        const starNames = this.nameService.getRandomStarNames(starCount);
 
         // Generate all of the locations for stars.
         const starLocations = this.starMapService.generateLocations(game, starCount);

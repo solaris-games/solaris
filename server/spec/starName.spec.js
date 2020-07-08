@@ -1,5 +1,13 @@
 const RandomService = require('../services/random');
-const StarNameService = require('../services/starName');
+const NameService = require('../services/name');
+
+const gameNames = [
+    'Game 1',
+    'Game 2',
+    'Game 3',
+    'Game 4',
+    'Game 5'
+];
 
 const starNames = [
     '1',
@@ -16,7 +24,7 @@ describe('star name', () => {
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
-        starService = new StarNameService(starNames, randomService);
+        starService = new NameService(gameNames, starNames, randomService);
     });
 
     it('should generate a random star name', () => {

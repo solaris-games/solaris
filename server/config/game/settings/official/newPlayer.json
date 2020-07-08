@@ -1,7 +1,7 @@
 {
   "general": {
-    "name": "New Player Game",
-    "description": null,
+    "name": "[[[RANDOM]]]",
+    "description": "New Players",
     "password": null,
     "starsForVictoryPercentage": 50,
     "playerLimit": 8,

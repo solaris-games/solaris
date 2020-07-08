@@ -23,7 +23,7 @@ const RandomService = require('../services/random');
 const ResearchService = require('../services/research');
 const StarService = require('../services/star');
 const StarDistanceService = require('../services/starDistance');
-const StarNameService = require('../services/starName');
+const NameService = require('../services/name');
 const StarUpgradeService = require('../services/starUpgrade');
 const TimeService = require('../services/time');
 const TradeService = require('../services/trade');
@@ -36,6 +36,7 @@ const HistoryService = require('../services/history');
 const StandardMapService = require('../services/maps/standard');
 const CircularMapService = require('../services/maps/circular');
 
+const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
 module.exports = (io) => {
@@ -53,19 +54,19 @@ module.exports = (io) => {
     const timeService = new TimeService();
     const gameService = new GameService(GameModel, userService, eventService);
     const gameListService = new GameListService(GameModel);
-    const starNameService = new StarNameService(starNames, randomService);
+    const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
-    const starService = new StarService(randomService, starNameService, distanceService, starDistanceService, eventService);
+    const starService = new StarService(randomService, nameService, distanceService, starDistanceService, eventService);
     const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
-    // const mapService = new MapService(randomService, starService, starDistanceService, starNameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
-    const mapService = new MapService(randomService, starService, starDistanceService, starNameService, circularMapService);
+    // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
+    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
     const researchService = new ResearchService(randomService, playerService, timeService, eventService, userService);
     const tradeService = new TradeService(userService, playerService, eventService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
-    const gameCreateService = new GameCreateService(GameModel, mapService, playerService);
+    const gameCreateService = new GameCreateService(GameModel, nameService, mapService, playerService);
     const starUpgradeService = new StarUpgradeService(starService, carrierService, eventService, userService);
     const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, timeService);
     const historyService = new HistoryService(HistoryModel, playerService);
@@ -92,7 +93,7 @@ module.exports = (io) => {
         researchService,
         starService,
         starDistanceService,
-        starNameService,
+        nameService,
         starUpgradeService,
         tradeService,
         userService,

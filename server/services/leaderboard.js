@@ -51,7 +51,7 @@ module.exports = class LeaderboardService {
 
         // Remove any afk players from the leaderboard, they will not
         // receive any achievements.
-        leaderboardPlayers = leaderboardPlayers.filter(p => !p.player.afk);
+        leaderboardPlayers = leaderboardPlayers.filter(p => !p.afk);
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboard[i];

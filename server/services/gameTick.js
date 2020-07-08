@@ -359,7 +359,7 @@ module.exports = class GameTickService {
             }
 
             // Set the next production tick date.
-            game.state.nextProductionTickDate = game.state.lastTickDate.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
+            game.state.nextProductionTickDate = moment(game.state.lastTickDate).add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
         }
     }
 

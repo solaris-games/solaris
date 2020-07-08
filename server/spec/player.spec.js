@@ -7,8 +7,9 @@ const RandomService = require('../services/random');
 const StarService = require('../services/star');
 const CarrierService = require('../services/carrier');
 const PlayerService = require('../services/player');
-const StarNameService = require('../services/starName');
+const NameService = require('../services/name');
 
+const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
 const game = {
@@ -121,8 +122,8 @@ describe('player', () => {
         starDistanceService = new StarDistanceService(distanceService);
         carrierService = new CarrierService();
         starService = new StarService(randomService);
-        starNameService = new StarNameService(starNames, randomService);
-        mapService = new MapService(randomService, starService, distanceService, starDistanceService, starNameService);
+        nameService = new NameService(gameNames, starNames, randomService);
+        mapService = new MapService(randomService, starService, distanceService, starDistanceService, nameService);
         playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
     });
 

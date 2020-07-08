@@ -1,7 +1,10 @@
+const RANDOM_NAME_STRING = '[[[RANDOM]]]';
+
 module.exports = class GameCreateService {
     
-    constructor(gameModel, mapService, playerService) {
+    constructor(gameModel, nameService, mapService, playerService) {
         this.gameModel = gameModel;
+        this.nameService = nameService;
         this.mapService = mapService;
         this.playerService = playerService;
     }
@@ -10,6 +13,13 @@ module.exports = class GameCreateService {
         let game = new this.gameModel({
             settings
         });
+
+        // If the game name contains a special string, then replace it with a random name.
+        if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
+            let randomGameName = this.nameService.getRandomGameName();
+
+            game.settings.general.name = game.settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
+        }
 
         // Calculate how many stars we need.
         let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;

@@ -1,14 +1,19 @@
 
 
-module.exports = class StarNameService {
+module.exports = class NameService {
 
-    constructor(starNames, randomService) {
+    constructor(gameNames, starNames, randomService) {
+        this.gameNames = gameNames;
         this.starNames = starNames;
         this.randomService = randomService;
     }
 
     getRandomStarName() {
         return this.starNames[this.randomService.getRandomNumber(this.starNames.length - 1)];
+    }
+
+    getRandomGameName() {
+        return this.gameNames[this.randomService.getRandomNumber(this.gameNames.length - 1)];
     }
 
     getRandomStarNames(count) {

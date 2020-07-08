@@ -16,15 +16,15 @@ module.exports = (container) => {
 
             for (let i = 0; i < officialGameSettings.length; i++) {
                 let settings = officialGameSettings[i];
-                let existing = games.find(x => x.settings.general.name === settings.general.name);
+                let existing = games.find(x => x.settings.general.description === settings.general.description);
 
                 if (!existing) {
-                    console.log(`Could not find game [${settings.general.name}], creating it now...`);
+                    console.log(`Could not find game [${settings.general.description}], creating it now...`);
             
                     try {
-                        await container.gameCreateService.create(settings);
+                        let newGame = await container.gameCreateService.create(settings);
         
-                        console.log(`[${settings.general.name}] game created.`);
+                        console.log(`[${newGame.settings.general.name}] game created.`);
                     } catch (e) {
                         console.error(e);
                     }
