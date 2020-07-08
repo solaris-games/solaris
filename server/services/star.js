@@ -3,9 +3,9 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService {
 
-    constructor(randomService, starNameService, distanceService, starDistanceService, eventService) {
+    constructor(randomService, nameService, distanceService, starDistanceService, eventService) {
         this.randomService = randomService;
-        this.starNameService = starNameService;
+        this.nameService = nameService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.eventService = eventService;

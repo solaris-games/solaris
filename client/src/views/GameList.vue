@@ -16,6 +16,7 @@
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
+                <td>Type</td>
                 <td class="text-center">Players</td>
                 <td></td>
             </tr>
@@ -23,6 +24,7 @@
         <tbody>
             <tr v-for="game in serverGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
+                <td>{{game.settings.general.description}}</td>
                 <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
