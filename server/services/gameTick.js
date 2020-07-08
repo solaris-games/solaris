@@ -57,7 +57,7 @@ module.exports = class GameTickService {
         let lastTick = moment(game.state.lastTickDate);
         let nextTick = moment(lastTick).add(mins, 'm');
 
-        return nextTick.diff(now, 'seconds') <= 0;
+        return nextTick.diff(moment(), 'seconds') <= 0;
     }
 
     async _moveCarriers(game) {
