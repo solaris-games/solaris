@@ -15,6 +15,10 @@ class TechnologyHelper {
         return this.FRIENDLY_NAMES[technologyKey]
     }
 
+    isTechnologyEnabled (game, technologyKey) {
+        return game.settings.technology.researchCosts[technologyKey] !== 'none'
+    }
+    
 }
 
 export default new TechnologyHelper()

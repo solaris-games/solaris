@@ -1,6 +1,9 @@
+const ValidationError = require('../errors/validation');
+
 module.exports = class ResearchService {
 
-    constructor(randomService, playerService, timeService, eventService, userService) {
+    constructor(technologyService, randomService, playerService, timeService, eventService, userService) {
+        this.technologyService = technologyService;
         this.randomService = randomService;
         this.playerService = playerService;
         this.timeService = timeService;
@@ -9,6 +12,10 @@ module.exports = class ResearchService {
     }
 
     async updateResearchNow(game, player, preference) {
+        if (!this.technologyService.isTechnologyEnabled(game, preference)) {
+            throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
+        }
+
         player.researchingNow = preference;
 
         await game.save();
@@ -16,7 +23,7 @@ module.exports = class ResearchService {
         let etaTicks = this.calculateCurrentResearchETAInTicks(game, player);
         let etaTime = null;
         
-        if (eta) {
+        if (etaTicks) {
             this.timeService.calculateTimeByTicks(etaTicks, game.settings.gameTime.speed, game.state.lastTickDate);
         }
 
@@ -27,6 +34,10 @@ module.exports = class ResearchService {
     }
 
     async updateResearchNext(game, player, preference) {
+        if (!this.technologyService.isTechnologyEnabled(game, preference)) {
+            throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
+        }
+
         player.researchingNext = preference;
 
         return await game.save();
@@ -81,11 +92,17 @@ module.exports = class ResearchService {
             return;
         }
 
-        let user = await this.userService.getById(player.userId);
-
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
         });
+
+        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t));
+
+        if (!techs.length) {
+            return;
+        }
+
+        let user = await this.userService.getById(player.userId);
 
         let researchTechsCount = techs.length;
 

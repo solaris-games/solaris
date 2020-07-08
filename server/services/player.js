@@ -3,12 +3,13 @@ const moment = require('moment');
 
 module.exports = class PlayerService {
     
-    constructor(randomService, mapService, starService, carrierService, starDistanceService) {
+    constructor(randomService, mapService, starService, carrierService, starDistanceService, technologyService) {
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
         this.carrierService = carrierService;
         this.starDistanceService = starDistanceService;
+        this.technologyService = technologyService;
     }
 
     getByObjectId(game, playerId) {
@@ -79,6 +80,8 @@ module.exports = class PlayerService {
 
             let player = this.createEmptyPlayer(game, colour);
 
+            this._setDefaultResearchTechnology(game, player);
+
             // Get the player's starting location.
             let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
 
@@ -146,6 +149,13 @@ module.exports = class PlayerService {
         startingLocation.y += galaxyCenter.y;
 
         return startingLocation;
+    }
+
+    _setDefaultResearchTechnology(game, player) {
+        let enabledTechs = this.technologyService.getEnabledTechnologies(game);
+
+        player.researchingNow = enabledTechs[0] || 'weapons';
+        player.researchingNext = player.researchingNow;
     }
 
     createEmptyPlayerCarriers(allStars, players) {

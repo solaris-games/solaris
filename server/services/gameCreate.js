@@ -1,3 +1,5 @@
+const ValidationError = require('../errors/validation');
+
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
@@ -14,6 +16,14 @@ module.exports = class GameCreateService {
             settings
         });
 
+        // Calculate how many stars we need.
+        let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
+        let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
+
+        if (desiredPlayerStarCount > desiredStarCount) {
+            throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
+        }
+        
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
             let randomGameName = this.nameService.getRandomGameName();
@@ -21,9 +31,6 @@ module.exports = class GameCreateService {
             game.settings.general.name = game.settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
         }
 
-        // Calculate how many stars we need.
-        let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
-        
         // Create all of the stars required.
         game.galaxy.stars = this.mapService.generateStars(
             game,

@@ -41,6 +41,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import TechnologyHelper from '../../../services/technologyHelper'
 import researchService from '../../../services/api/research'
 
 export default {
@@ -49,22 +50,15 @@ export default {
       loadingNow: false,
       loadingNext: false,
       player: null,
-      options: [
-        { text: 'Scanning', value: 'scanning' },
-        { text: 'Hyperspace Range', value: 'hyperspace' },
-        { text: 'Terraforming', value: 'terraforming' },
-        { text: 'Experimentation', value: 'experimentation' },
-        { text: 'Weapons', value: 'weapons' },
-        { text: 'Banking', value: 'banking' },
-        { text: 'Manufacturing', value: 'manufacturing' }
-      ],
+      options: [],
       timeRemainingEta: null,
       intervalFunction: null
     }
   },
   mounted () {
     this.player = GameHelper.getUserPlayer(this.$store.state.game)
-
+    this.loadTechnologies()
+    
     this.recalculateTimeRemaining()
 
     if (!this.$store.state.game.state.paused) {
@@ -72,6 +66,19 @@ export default {
     }
   },
   methods: {
+    loadTechnologies () {
+      let options = [
+        { text: 'Scanning', value: 'scanning' },
+        { text: 'Hyperspace Range', value: 'hyperspace' },
+        { text: 'Terraforming', value: 'terraforming' },
+        { text: 'Experimentation', value: 'experimentation' },
+        { text: 'Weapons', value: 'weapons' },
+        { text: 'Banking', value: 'banking' },
+        { text: 'Manufacturing', value: 'manufacturing' }
+      ]
+
+      this.options = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value))
+    },
     async updateResearchNow (e) {
       this.loadingNow = true
 

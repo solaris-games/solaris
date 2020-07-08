@@ -3,13 +3,13 @@
     "name": "[[[RANDOM]]]",
     "description": "New Players",
     "password": null,
-    "starsForVictoryPercentage": 50,
+    "starVictoryPercentage": 50,
     "playerLimit": 8,
     "playerType": "all"
   },
   "specialGalaxy": {
-    "buildCarriers": "standard",
-    "buildWarpgates": "cheap",
+    "carrierCost": "standard",
+    "warpgateCost": "cheap",
     "randomGates": "none",
     "darkGalaxy": "disabled"
   },

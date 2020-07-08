@@ -22,7 +22,7 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`The star already has a warp gate.`);
         }
 
-        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildWarpgates];
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level);
         const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
 
@@ -75,7 +75,7 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
         }
 
-        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildCarriers];
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
         const cost = this.calculateCarrierCost(game, expenseConfig);
 
         if (player.credits < cost) {

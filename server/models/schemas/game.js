@@ -19,8 +19,8 @@ const schema = new Schema({
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' }
         },
         specialGalaxy: {
-			buildCarriers: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
-			buildWarpgates: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'cheap' },
+			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
+			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'cheap' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
         },
@@ -56,13 +56,13 @@ const schema = new Schema({
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
 			},
 			researchCosts: {
-				terraforming: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				experimentation: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				scanning: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				hyperspace: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				manufacturing: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				banking: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				weapons: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
+				terraforming: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				experimentation: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				scanning: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				hyperspace: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				manufacturing: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				banking: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			}
 		},
 		gameTime: {

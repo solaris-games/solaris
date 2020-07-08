@@ -25,6 +25,7 @@ const StarService = require('../services/star');
 const StarDistanceService = require('../services/starDistance');
 const NameService = require('../services/name');
 const StarUpgradeService = require('../services/starUpgrade');
+const TechnologyService = require('../services/technology');
 const TimeService = require('../services/time');
 const TradeService = require('../services/trade');
 const WaypointService = require('../services/waypoint');
@@ -51,6 +52,7 @@ module.exports = (io) => {
     const combatService = new CombatService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
+    const technologyService = new TechnologyService();
     const timeService = new TimeService();
     const gameService = new GameService(GameModel, userService, eventService);
     const gameListService = new GameListService(GameModel);
@@ -61,9 +63,9 @@ module.exports = (io) => {
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
-    const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
+    const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
-    const researchService = new ResearchService(randomService, playerService, timeService, eventService, userService);
+    const researchService = new ResearchService(technologyService, randomService, playerService, timeService, eventService, userService);
     const tradeService = new TradeService(userService, playerService, eventService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
     const gameCreateService = new GameCreateService(GameModel, nameService, mapService, playerService);
@@ -95,6 +97,7 @@ module.exports = (io) => {
         starDistanceService,
         nameService,
         starUpgradeService,
+        technologyService,
         tradeService,
         userService,
         waypointService,

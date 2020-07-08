@@ -24,8 +24,8 @@
 
       <div class="form-group">
         <label for="starsForVictory" class="col-form-label">Stars For Victory</label>
-        <select class="form-control" id="starsForVictory" v-model="settings.general.starsForVictoryPercentage" :disabled="isCreatingGame">
-          <option v-for="opt in options.general.starsForVictoryPercentage" v-bind:key="opt" v-bind:value="opt">
+        <select class="form-control" id="starsForVictory" v-model="settings.general.starVictoryPercentage" :disabled="isCreatingGame">
+          <option v-for="opt in options.general.starVictoryPercentage" v-bind:key="opt" v-bind:value="opt">
             {{ opt }}% of all Stars
           </option>
         </select>
@@ -78,18 +78,18 @@
       <view-subtitle title="Special Galaxy Settings"/>
 
       <div class="form-group">
-        <label for="buildCarriers" class="col-form-label">Build Carriers</label>
-        <select class="form-control" id="buildCarriers" v-model="settings.specialGalaxy.buildCarriers" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.buildCarriers" v-bind:key="opt.value" v-bind:value="opt.value">
+        <label for="carrierCost" class="col-form-label">Carrier Cost</label>
+        <select class="form-control" id="carrierCost" v-model="settings.specialGalaxy.carrierCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.carrierCost" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Carriers
           </option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="buildWarpgates" class="col-form-label">Build Warpgates</label>
-        <select class="form-control" id="buildWarpgates" v-model="settings.specialGalaxy.buildWarpgates" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.buildWarpgates" v-bind:key="opt.value" v-bind:value="opt.value">
+        <label for="warpgateCost" class="col-form-label">Warpgate Cost</label>
+        <select class="form-control" id="warpgateCost" v-model="settings.specialGalaxy.warpgateCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.warpgateCost" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Gates
           </option>
         </select>

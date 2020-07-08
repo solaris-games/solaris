@@ -55,12 +55,12 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
-              <td>Build Carriers</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.buildCarriers }}</td>
+              <td>Carrier Cost</td>
+              <td class="text-right">{{ game.settings.specialGalaxy.carrierCost }}</td>
             </tr>
             <tr>
-              <td>Build Warpgates</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.buildWarpgates }}</td>
+              <td>Warpgate Cost</td>
+              <td class="text-right">{{ game.settings.specialGalaxy.warpgateCost }}</td>
             </tr>
             <tr>
               <td>Random Gates</td>

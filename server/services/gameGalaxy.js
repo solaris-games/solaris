@@ -111,7 +111,11 @@ module.exports = class GameGalaxyService {
     }
 
     _setStarInfoDetailed(doc, player) { 
+        const isDarkStart = this._isDarkStart(doc);
         const isDarkMode = this._isDarkMode(doc);
+
+        // TODO: BUG If its dark mode and we haven't started the game yet then
+        // no stars should be visible.
 
         let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
 
@@ -279,6 +283,10 @@ module.exports = class GameGalaxyService {
         });
     }
 
+    _hasGameStarted(doc) {
+        return doc.state.startDate != null;
+    }
+
     _clearPlayerCarriers(doc) {
         doc.galaxy.carriers = [];
     }
@@ -287,8 +295,8 @@ module.exports = class GameGalaxyService {
         const economyExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
         const industryExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
         const scienceExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
-        const warpGateExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildWarpgates];
-        const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.buildCarriers];
+        const warpGateExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
+        const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
 
         // Calculate upgrade costs for the star.
         star.upgradeCosts = { };

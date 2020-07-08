@@ -1,6 +1,6 @@
 {
     "general": {
-        "starsForVictoryPercentage": [
+        "starVictoryPercentage": [
             25,
             33,
             50,
@@ -37,7 +37,7 @@
         ]
         },
         "specialGalaxy": {
-        "buildCarriers": [
+        "carrierCost": [
             {
             "value": "cheap",
             "text": "Cheap"
@@ -51,7 +51,7 @@
             "text": "Expensive"
             }
         ],
-        "buildWarpgates": [
+        "warpgateCost": [
             {
             "value": "none",
             "text": "No"
