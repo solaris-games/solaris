@@ -10,6 +10,7 @@ const BroadcastService = require('../services/broadcast');
 const CarrierService = require('../services/carrier');
 const CombatService = require('../services/combat');
 const DistanceService = require('../services/distance');
+const EmailService = require('../services/email');
 const EventService = require('../services/event');
 const LeaderboardService = require('../services/leaderboard');
 const GameService = require('../services/game');
@@ -37,6 +38,7 @@ const HistoryService = require('../services/history');
 const StandardMapService = require('../services/maps/standard');
 const CircularMapService = require('../services/maps/circular');
 
+const config = require('../config');
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
@@ -51,6 +53,7 @@ module.exports = (io) => {
     const carrierService = new CarrierService();
     const combatService = new CombatService();
     const distanceService = new DistanceService();
+    const emailService = new EmailService(config);
     const randomService = new RandomService();
     const technologyService = new TechnologyService();
     const timeService = new TimeService();
@@ -82,6 +85,7 @@ module.exports = (io) => {
         carrierService,
         combatService,
         distanceService,
+        emailService,
         eventService,
         leaderboardService,
         gameService,

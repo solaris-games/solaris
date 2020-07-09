@@ -19,6 +19,7 @@
     "express-session": "^1.17.1",
     "moment": "^2.24.0",
     "mongoose": "^5.9.11",
+    "nodemailer": "^6.4.10",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
