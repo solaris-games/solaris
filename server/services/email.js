@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
 
 function getFakeTransport() {
     return {
@@ -18,6 +20,10 @@ function getFakeTransport() {
 */
 
 module.exports = class EmailService {
+
+    TEMPLATES = {
+        WELCOME: 'welcomeEmail.html'
+    }
 
     constructor(config) {
         this.config = config;
@@ -40,7 +46,7 @@ module.exports = class EmailService {
     }
 
     async send(toEmail, subject, text) {
-        const transport = getTransport();
+        const transport = this._getTransport();
         
         const message = {
             from: this.config.smtp.from,
@@ -53,13 +59,37 @@ module.exports = class EmailService {
     }
 
     async sendHtml(toEmail, subject, html) {
-        const transport = getTransport();
+        const transport = this._getTransport();
         
         const message = {
             from: this.config.smtp.from,
             to: toEmail,
             subject,
             html
+        };
+        
+        return await transport.sendMail(message);
+    }
+
+    async sendTemplate(toEmail, subject, templateKey, parameters) {
+        parameters = parameters || [];
+
+        const transport = this._getTransport();
+        const filePath = path.join(__dirname, '../templates/', templateKey);
+        const template = fs.readFileSync(filePath, { encoding: 'UTF8' });
+
+        // Replace the parameters in the file
+        for (let i = 0; i < parameters.length; i++) {
+            let parameterString = `[{${i.toString()}}]`;
+
+            template = template.replace(parameterString, parameters[i].toString());
+        }
+        
+        const message = {
+            from: this.config.smtp.from,
+            to: toEmail,
+            subject,
+            html: template
         };
         
         return await transport.sendMail(message);
