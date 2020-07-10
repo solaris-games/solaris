@@ -22,8 +22,11 @@ function getFakeTransport() {
 module.exports = class EmailService {
 
     TEMPLATES = {
-        WELCOME: 'welcomeEmail.html'
-    }
+        WELCOME: {
+            fileName: 'welcomeEmail.html',
+            subject: 'Welcome to Solaris'
+        },
+    };
 
     constructor(config) {
         this.config = config;
@@ -71,28 +74,26 @@ module.exports = class EmailService {
         return await transport.sendMail(message);
     }
 
-    async sendTemplate(toEmail, subject, templateKey, parameters) {
+    async sendTemplate(toEmail, template, parameters) {
         parameters = parameters || [];
 
-        const transport = this._getTransport();
-        const filePath = path.join(__dirname, '../templates/', templateKey);
-        const template = fs.readFileSync(filePath, { encoding: 'UTF8' });
+        const filePath = path.join(__dirname, '../templates/', template.fileName);
+        let html = fs.readFileSync(filePath, { encoding: 'UTF8' });
+
+        // Replace the default parameters in the file
+        // TODO: These should be environment variables.
+        html = html.replace('[{solaris_url}]', 'https://solaris.games');
+        html = html.replace('[{solaris_url_gamelist}]', 'https://solaris.games/#/game/list');
+        html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
 
         // Replace the parameters in the file
         for (let i = 0; i < parameters.length; i++) {
             let parameterString = `[{${i.toString()}}]`;
 
-            template = template.replace(parameterString, parameters[i].toString());
+            html = html.replace(parameterString, parameters[i].toString());
         }
-        
-        const message = {
-            from: this.config.smtp.from,
-            to: toEmail,
-            subject,
-            html: template
-        };
-        
-        return await transport.sendMail(message);
+
+        return await this.sendHtml(toEmail, template.subject, html);
     }
 
 };

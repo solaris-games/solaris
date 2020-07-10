@@ -50,7 +50,11 @@ module.exports = (router, io, container) => {
                 password: req.body.password
             });
 
-            let emailResult = await container.emailService.sendTemplate(req.body.email, 'Welcome to Solaris', container.emailService.TEMPLATES.WELCOME);
+            try {
+                await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.WELCOME);
+            } catch (emailError) {
+                console.error(emailError);
+            }
 
             return res.status(201).json({ id: userId });
         } catch (err) {
