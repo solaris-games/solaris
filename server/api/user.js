@@ -51,7 +51,7 @@ module.exports = (router, io, container) => {
             });
 
             try {
-                await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.WELCOME);
+                await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.WELCOME, [req.body.username]);
             } catch (emailError) {
                 console.error(emailError);
             }
