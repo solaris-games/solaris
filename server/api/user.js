@@ -139,6 +139,34 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.post('/api/user/requestResetPassword', async (req, res, next) => {
+        try {
+            let token = await container.userService.requestResetPassword(req.body.email);
+            
+            try {
+                await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
+            } catch (emailError) {
+                console.error(emailError);
+
+                return res.sendStatus(500);
+            }
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.post('/api/user/resetPassword', async (req, res, next) => {
+        try {
+            await container.userService.resetPassword(req.body.token, req.body.newPassword);
+            
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

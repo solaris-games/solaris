@@ -26,6 +26,10 @@ module.exports = class EmailService {
             fileName: 'welcomeEmail.html',
             subject: 'Welcome to Solaris'
         },
+        RESET_PASSWORD: {
+            fileName: 'resetPassword.html',
+            subject: 'Reset your Solaris password'
+        },
     };
 
     constructor(config) {
@@ -84,6 +88,7 @@ module.exports = class EmailService {
         // TODO: These should be environment variables.
         html = html.replace('[{solaris_url}]', 'https://solaris.games');
         html = html.replace('[{solaris_url_gamelist}]', 'https://solaris.games/#/game/list');
+        html = html.replace('[{solaris_url_resetpassword}]', 'https://solaris.games/#/account/reset-password-external');
         html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
 
         // Replace the parameters in the file

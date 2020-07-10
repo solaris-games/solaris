@@ -1,5 +1,12 @@
 const ValidationError = require('../errors/validation');
 
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 module.exports = class UserService {
     
     constructor(bcrypt, userModel) {
@@ -89,6 +96,40 @@ module.exports = class UserService {
         } else {
             throw new ValidationError('The current password is incorrect.');
         }
+    }
+
+    async requestResetPassword(email) {
+        let user = await this.userModel.findOne({
+            email
+        });
+
+        if (user == null) {
+            throw new ValidationError(`An account does not exist with the email address: ${email}`);
+        }
+
+        user.resetPasswordToken = uuidv4();
+
+        await user.save();
+
+        return user.resetPasswordToken;
+    }
+
+    async resetPassword(resetPasswordToken, newPassword) {
+        let user = await this.userModel.findOne({
+            resetPasswordToken
+        });
+
+        if (user == null) {
+            throw new ValidationError(`The token is invalid.`);
+        }
+        
+        // Update the current password to the new password.
+        let hash = await this.bcrypt.hash(newPassword, 10);
+        
+        user.password = hash;
+        user.resetPasswordToken = null;
+
+        await user.save();
     }
 
 };

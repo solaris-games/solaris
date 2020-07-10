@@ -44,6 +44,18 @@ class UserService extends BaseApiService {
     { withCredentials: true })
   }
 
+  requestResetPassword (email) {
+    return axios.post(this.BASE_URL + 'user/requestResetPassword', {
+      email
+    })
+  }
+
+  resetPassword (token, newPassword) {
+    return axios.post(this.BASE_URL + 'user/resetPassword', {
+      token, newPassword
+    })
+  }
+
   getLeaderboard () {
     return axios.get(this.BASE_URL + 'user/leaderboard',
     { withCredentials: true })

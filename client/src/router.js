@@ -6,6 +6,7 @@ import AccountForgotPassword from './views/AccountForgotPassword.vue'
 import AccountLogin from './views/AccountLogin.vue'
 import AccountResetEmail from './views/AccountResetEmail.vue'
 import AccountResetPassword from './views/AccountResetPassword.vue'
+import AccountExternalResetPassword from './views/AccountExternalResetPassword.vue'
 import AccountSettings from './views/AccountSettings.vue'
 import Codex from './views/Codex.vue'
 import Game from './views/Game.vue'
@@ -51,6 +52,11 @@ export default new Router({
       path: '/account/reset-password',
       name: 'account-reset-password',
       component: AccountResetPassword
+    },
+    {
+      path: '/account/reset-password-external',
+      name: 'account-reset-password-external',
+      component: AccountExternalResetPassword
     },
     {
       path: '/account/settings',

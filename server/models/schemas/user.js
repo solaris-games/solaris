@@ -7,6 +7,7 @@ const schema = new Schema({
     email: { type: Types.String, required: true },
     emailEnabled: { type: Types.Boolean, default: true },
     password: { type: Types.String, required: true },
+    resetPasswordToken: { type: Types.String, required: false },
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
     achievements: {

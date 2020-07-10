@@ -26,6 +26,7 @@ import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
+import userService from '../services/api/user'
 
 export default {
   components: {
@@ -42,7 +43,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit (e) {
+    async handleSubmit (e) {
       this.errors = []
 
       if (!this.email) {
@@ -53,13 +54,23 @@ export default {
 
       if (this.errors.length) return
 
-      this.isLoading = true
+      try {
+        this.isLoading = true
 
-      // TODO: Call the password reset API endpoint
+        let response = await userService.requestResetPassword(this.email)
+
+        if (response.status === 200) {
+          alert('A password reset email has been sent to the email address, please check your email inbox.')
+        } else {
+          alert('There was a problem resetting your password, please check that you entered your accounts email address correctly.')
+        }
+
+        router.push({ name: 'account-login' })
+      } catch (err) {
+        this.errors = err.response.data.errors || []
+      }
 
       this.isLoading = false
-
-      router.push({ name: 'home' })
     }
   }
 }
