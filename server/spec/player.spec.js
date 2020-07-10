@@ -8,6 +8,7 @@ const StarService = require('../services/star');
 const CarrierService = require('../services/carrier');
 const PlayerService = require('../services/player');
 const NameService = require('../services/name');
+const TechnologyService = require('../services/technology');
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -36,6 +37,15 @@ const game = {
                 manufacturing: 1,
                 banking: 1,
                 weapons: 1
+            },
+            researchCosts: {
+                terraforming: 'standard',
+                experimentation: 'standard',
+                scanning: 'standard',
+                hyperspace: 'standard',
+                manufacturing: 'standard',
+                banking: 'standard',
+                weapons: 'standard'
             }
         }
     },
@@ -124,7 +134,8 @@ describe('player', () => {
         starService = new StarService(randomService);
         nameService = new NameService(gameNames, starNames, randomService);
         mapService = new MapService(randomService, starService, distanceService, starDistanceService, nameService);
-        playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService);
+        technologyService = new TechnologyService();
+        playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     });
 
     it('should create an empty player', () => {
