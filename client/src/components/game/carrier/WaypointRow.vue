@@ -65,7 +65,10 @@ export default {
       }
     },
     recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.waypoint.eta)
+      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.waypoint.ticksEta, 
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
     }
   }
 }

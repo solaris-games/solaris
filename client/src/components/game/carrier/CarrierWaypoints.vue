@@ -108,13 +108,13 @@ export default {
 			this.totalEtaTimeString = null
 		},
 		onWaypointCreated () {
-			let totalEtaTicks = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
+			let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
 				this.carrier.waypoints[this.carrier.waypoints.length - 1])
 
-			let totalEtaTime = GameHelper.calculateTimeByTicks(totalEtaTicks, 
+			let totalEtaTime = GameHelper.calculateTimeByTicks(totalTicksEta, 
 				this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
-			this.totalEtaTimeString = GameHelper.getCountdownTimeString(totalEtaTime.toDate(), new Date(this.$store.state.game.state.lastTickDate))
+			this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
 		},
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.

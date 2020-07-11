@@ -56,6 +56,9 @@ module.exports = class WaypointService {
         carrier.waypoints = waypoints;
         carrier.waypointsLooped = false;
 
+        // TODO: Send back the eta ticks of the waypoints so that
+        // the UI can be updated.
+
         return await game.save();
     }
 

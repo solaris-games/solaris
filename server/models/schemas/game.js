@@ -79,11 +79,9 @@ const schema = new Schema({
 		tick: { type: Types.Number, required: true, default: 0 },
 		paused: { type: Types.Boolean, required: true, default: true },
 		productionTick: { type: Types.Number, required: true, default: 0 },
-		startDate: { type: Types.Date, required: false },
+		startDate: { type: Types.Date, required: false }, // Dates are in UTC
 		endDate: { type: Types.Date, required: false },
 		lastTickDate: { type: Types.Date, required: false },
-		nextTickDate: { type: Types.Date, required: false },
-		nextProductionTickDate: { type: Types.Date, required: false },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },

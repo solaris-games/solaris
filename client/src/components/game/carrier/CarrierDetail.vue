@@ -170,8 +170,13 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar())
     },
     recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.carrier.eta)
-      this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.carrier.etaTotal)
+      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+      let timeRemainingEtaTotalDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEtaTotal, 
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+        
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaTotalDate)
     }
   }
 }

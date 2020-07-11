@@ -60,9 +60,6 @@ import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
 
 export default {
-  props: {
-    nextProduction: String
-  },
   data () {
     return {
       forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
@@ -118,7 +115,15 @@ export default {
         return
       }
 
-      this.timeRemaining = GameHelper.getCountdownTimeString(this.nextProduction)
+      let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
+      let currentTick = this.$store.state.game.state.tick
+      let currentProductionTick = this.$store.state.game.state.productionTick
+      
+      let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
+      let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction, 
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+      this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
     }
   },
   computed: {

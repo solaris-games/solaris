@@ -69,14 +69,13 @@ class GameHelper {
     return Math.sqrt(xs + ys)
   }
 
-  getCountdownTimeString (date, relativeTo) {
+  getCountdownTimeString (game, date) {
     if (date == null) {
       return 'Unknown'
     }
-
-    relativeTo = relativeTo || new Date()
-
-    let t = new Date(date) - relativeTo
+    
+    let relativeTo = moment().utc()
+    let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
     let days = Math.floor(t / (1000 * 60 * 60 * 24))
     let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
@@ -156,9 +155,9 @@ class GameHelper {
 
   calculateTimeByTicks(ticks, speedInMins, relativeTo = null) {
     if (relativeTo == null) {
-        relativeTo = moment();
+        relativeTo = moment().utc();
     } else {
-        relativeTo = moment(relativeTo);
+        relativeTo = moment(relativeTo).utc();
     }
 
     return relativeTo.add(ticks * speedInMins, 'm');

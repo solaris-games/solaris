@@ -62,7 +62,7 @@ module.exports = class GameGalaxyService {
         // This is true if the dark galaxy setting is enabled,
         // OR if its "start only" and the game has not yet started.
         const isDarkStart = doc.settings.specialGalaxy.darkGalaxy === 'start'
-                                && !((doc.state.startDate || new Date()) < new Date());
+                                && !doc.state.startDate
     
         return isDarkStart;
     }
@@ -228,16 +228,14 @@ module.exports = class GameGalaxyService {
                 c.waypoints.forEach(w => {
                     w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
                     w.ticksEta = this.waypointService.calculateWaypointTicksEta(doc, c, w);
-
-                    w.eta = this.timeService.calculateTimeByTicks(w.ticksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
                 });
 
                 if (c.waypoints.length) {
-                    c.eta = c.waypoints[0].eta;
-                    c.etaTotal = c.waypoints[c.waypoints.length - 1].eta;
+                    c.ticksEta = c.waypoints[0].ticksEta;
+                    c.ticksEtaTotal = c.waypoints[c.waypoints.length - 1].ticksEta;
                 } else {
-                    c.eta = null;
-                    c.etaTotal = null;
+                    c.ticksEta = null;
+                    c.ticksEtaTotal = null;
                 }
             });
     }
@@ -250,12 +248,6 @@ module.exports = class GameGalaxyService {
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
-
-                if (player.currentResearchTicksEta) {
-                    player.currentResearchEta = this.timeService.calculateTimeByTicks(player.currentResearchTicksEta, doc.settings.gameTime.speed, doc.state.lastTickDate);
-                } else {
-                    player.currentResearchEta = null;
-                }
 
                 return p;
             }

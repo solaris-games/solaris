@@ -36,8 +36,7 @@ module.exports = class GameTickService {
            return;
        }
 
-       game.state.lastTickDate = moment();
-       game.state.nextTickDate = moment().add(game.settings.gameTime.speed, 'm'); // TODO: Do we really need to do this?
+       game.state.lastTickDate = moment().utc();
 
        await this._moveCarriers(game);
        this._produceShips(game);
@@ -54,10 +53,10 @@ module.exports = class GameTickService {
 
     _canTick(game) {
         let mins = game.settings.gameTime.speed;
-        let lastTick = moment(game.state.lastTickDate);
-        let nextTick = moment(lastTick).add(mins, 'm');
+        let lastTick = moment(game.state.lastTickDate).utc();
+        let nextTick = moment(lastTick).utc().add(mins, 'm');
 
-        return nextTick.diff(moment(), 'seconds') <= 0;
+        return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
     async _moveCarriers(game) {
@@ -357,9 +356,6 @@ module.exports = class GameTickService {
                     creditsResult.creditsFromEconomy, creditsResult.creditsFromBanking,
                     experimentResult.technology, experimentResult.amount);
             }
-
-            // Set the next production tick date.
-            game.state.nextProductionTickDate = moment(game.state.lastTickDate).add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
         }
     }
 
@@ -395,7 +391,7 @@ module.exports = class GameTickService {
             let player = undefeatedPlayers[i];
 
             // Check if the player has been AFK for over 48 hours.
-            let isAfk = moment(player.lastSeen) > moment().subtract(2, 'days');
+            let isAfk = moment(player.lastSeen).utc() > moment().utc().subtract(2, 'days');
 
             player.defeated = !isAfk;
             player.afk = isAfk;
@@ -457,7 +453,7 @@ module.exports = class GameTickService {
 
         if (winner) {
             game.state.paused = true;
-            game.state.endDate = new Date();
+            game.state.endDate = moment().utc();
             game.state.winner = winner._id;
 
             await this.leaderboardService.addGameRankings(leaderboard);

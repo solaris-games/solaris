@@ -1,7 +1,10 @@
 <template>
 <div class="container">
   <div class="mb-2">
-      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">Show All Ships</button>
+      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
+        <span v-if="!showAll">Show All Ships</span>
+        <span v-if="showAll">Show Your Ships</span>
+      </button>
   </div>
 
   <div class="table-responsive">

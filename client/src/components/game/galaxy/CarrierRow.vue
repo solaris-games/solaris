@@ -46,8 +46,12 @@ export default {
       gameContainer.map.zoomToLocation(this.carrier.location)
     },
     recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.carrier.eta)
-      // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.carrier.etaTotal)
+      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      // TODO: Get total time of carrier eta
+      // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, this.carrier.ticksEtaTotal)
     }
   }
 }

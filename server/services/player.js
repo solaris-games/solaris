@@ -247,7 +247,7 @@ module.exports = class PlayerService {
     }
 
     async updateLastSeen(game, player) {
-        player.lastSeen = moment();
+        player.lastSeen = moment().utc();
 
         await game.save();
     }

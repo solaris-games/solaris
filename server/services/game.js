@@ -80,7 +80,7 @@ module.exports = class GameService {
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
         if (game.state.players === game.settings.general.playerLimit) {
-            let start = moment();
+            let start = moment().utc();
 
             // TODO: When the game first begins, should we start at normal game speed?
             // Or should we have a wait period before the game actually starts?
@@ -88,8 +88,6 @@ module.exports = class GameService {
             game.state.paused = false;
             game.state.startDate = start;
             game.state.lastTickDate = start;
-            game.state.nextTickDate = start.add(game.settings.gameTime.speed, 'm');
-            game.state.nextProductionTickDate = start.add(game.settings.gameTime.speed * game.settings.galaxy.productionTicks, 'm');
 
             await this.eventService.createGameStartedEvent(game);
         }
@@ -160,7 +158,7 @@ module.exports = class GameService {
             let winner = undefeatedPlayers[0];
 
             game.state.paused = true;
-            game.state.endDate = new Date();
+            game.state.endDate = moment().utc();
             game.state.winner = winner._id;
         }
 

@@ -13,7 +13,7 @@
             </tr>
         </thead>
         <tbody>
-            <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint"
+            <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
                         :waypoint="waypoint" :showAction="showAction"
                         @onEditWaypointRequested="onEditWaypointRequested"/>
         </tbody>

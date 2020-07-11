@@ -1,3 +1,4 @@
+const moment = require('moment');
 const ValidationError = require('../errors/validation');
 
 function filterForConversation(game, fromPlayerId, toPlayerId) {
@@ -88,7 +89,7 @@ module.exports = class MessageService {
             toPlayerId: toPlayer._id,
             message,
             read: false,
-            sentDate: new Date()
+            sentDate: moment().utc()
         };
 
         game.messages.push(newMessage);

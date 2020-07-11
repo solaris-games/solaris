@@ -86,7 +86,7 @@ export default {
         let result = await researchService.updateResearchNow(this.$store.state.game._id, this.player.researchingNow)
 
         if (result.status === 200) {
-          this.player.currentResearchEta = result.data.etaTime
+          this.player.currentResearchTicksEta = result.data.ticksEta
           this.recalculateTimeRemaining()
         }
       } catch (err) {
@@ -107,7 +107,10 @@ export default {
       this.loadingNext = false
     },
     recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.player.currentResearchEta)
+      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.player.currentResearchTicksEta, 
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
     }
   }
 }

@@ -2,7 +2,7 @@
 <div>
   <loading-spinner :loading="!events"/>
 
-  <div class="container">
+  <div class="container" v-if="events">
       <button class="btn btn-primary" @click="loadEvents"><i class="fas fa-sync"></i></button>
       <!-- <button class="btn btn-primary float-right">Mark All Read</button>
       <span class="ml-2">Click on an event to mark is as read.</span> -->

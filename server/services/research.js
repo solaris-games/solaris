@@ -20,16 +20,10 @@ module.exports = class ResearchService {
 
         await game.save();
 
-        let etaTicks = this.calculateCurrentResearchETAInTicks(game, player);
-        let etaTime = null;
+        let ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
         
-        if (etaTicks) {
-            this.timeService.calculateTimeByTicks(etaTicks, game.settings.gameTime.speed, game.state.lastTickDate);
-        }
-
         return {
-            etaTicks,
-            etaTime
+            ticksEta
         };
     }
 
