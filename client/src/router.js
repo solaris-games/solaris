@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import AccountAchievements from './views/AccountAchievements.vue'
 import AccountCreation from './views/AccountCreation.vue'
 import AccountForgotPassword from './views/AccountForgotPassword.vue'
+import AccountForgotUsername from './views/AccountForgotUsername.vue'
 import AccountLogin from './views/AccountLogin.vue'
 import AccountResetEmail from './views/AccountResetEmail.vue'
 import AccountResetPassword from './views/AccountResetPassword.vue'
@@ -37,6 +38,11 @@ export default new Router({
       path: '/account/forgot-password',
       name: 'account-forgot-password',
       component: AccountForgotPassword
+    },
+    {
+      path: '/account/forgot-username',
+      name: 'account-forgot-username',
+      component: AccountForgotUsername
     },
     {
       path: '/account/login',

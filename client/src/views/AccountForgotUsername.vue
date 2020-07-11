@@ -1,6 +1,6 @@
 <template>
   <view-container>
-    <view-title title="Forgot Password" navigation="home"/>
+    <view-title title="Forgot Username" navigation="home"/>
 
     <form-error-list v-bind:errors="errors"/>
 
@@ -11,7 +11,7 @@
       </div>
 
       <div>
-        <button type="submit" class="btn btn-success" :disabled="isLoading">Reset Password</button>
+        <button type="submit" class="btn btn-success" :disabled="isLoading">Send Username</button>
         <router-link to="/" tag="button" class="btn btn-danger float-right">Cancel</router-link>
       </div>
     </form>
@@ -57,12 +57,12 @@ export default {
       try {
         this.isLoading = true
 
-        let response = await userService.requestResetPassword(this.email)
+        let response = await userService.requestUsername(this.email)
 
         if (response.status === 200) {
-          alert('A password reset email has been sent to the email address, please check your email inbox.')
+          alert('The username of the account associated with your email address has been sent to you, please check your email inbox.')
         } else {
-          alert('There was a problem resetting your password, please check that you entered your email address correctly.')
+          alert('There was a problem requesting your username, please check that you entered your email address correctly.')
         }
 
         router.push({ name: 'account-login' })

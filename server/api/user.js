@@ -171,6 +171,24 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.post('/api/user/requestUsername', async (req, res, next) => {
+        try {
+            let username = await container.userService.getUsernameByEmail(req.body.email);
+            
+            try {
+                await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
+            } catch (emailError) {
+                console.error(emailError);
+
+                return res.sendStatus(500);
+            }
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

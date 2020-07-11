@@ -34,6 +34,18 @@ module.exports = class UserService {
         });
     }
 
+    async getUsernameByEmail(email) {
+        let user = await this.userModel.findOne({email}, {
+            username: 1
+        });
+
+        if (!user) {
+            throw new ValidationError(`An account with the email ${email} does not exist.`);
+        }
+
+        return user.username;
+    }
+
     async create(user) {
         const newUser = new this.userModel(user);
     

@@ -30,6 +30,10 @@ module.exports = class EmailService {
             fileName: 'resetPassword.html',
             subject: 'Reset your Solaris password'
         },
+        FORGOT_USERNAME: {
+            fileName: 'forgotUsername.html',
+            subject: 'Your Solaris username'
+        },
     };
 
     constructor(config) {

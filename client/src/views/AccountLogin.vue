@@ -19,7 +19,8 @@
         </div>
 
         <div class="form-group">
-            <router-link to="/account/forgot-password">Forgot Password?</router-link>
+            <router-link to="/account/forgot-password">Forgot Password?</router-link> |
+            <router-link to="/account/forgot-username">Forgot Username?</router-link>
         </div>
     </form>
 

@@ -56,6 +56,12 @@ class UserService extends BaseApiService {
     })
   }
 
+  requestUsername (email) {
+    return axios.post(this.BASE_URL + 'user/requestUsername', {
+      email
+    })
+  }
+
   getLeaderboard () {
     return axios.get(this.BASE_URL + 'user/leaderboard',
     { withCredentials: true })
