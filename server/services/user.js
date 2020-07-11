@@ -115,6 +115,10 @@ module.exports = class UserService {
     }
 
     async resetPassword(resetPasswordToken, newPassword) {
+        if (resetPasswordToken == null || !resetPasswordToken.length) {
+            throw new ValidationError(`The token is required`);
+        }
+
         let user = await this.userModel.findOne({
             resetPasswordToken
         });

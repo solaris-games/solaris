@@ -158,6 +158,10 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.post('/api/user/resetPassword', async (req, res, next) => {
+        if (req.body.token == null || !req.body.token.length) {
+            throw new ValidationError(`The token is required`);
+        }
+
         try {
             await container.userService.resetPassword(req.body.token, req.body.newPassword);
             
