@@ -1,10 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const config = require('../config');
 
 module.exports = async (app, io, container) => {
     app.use(require('body-parser').json());
+
+    // Set up MongoDB session store
+    let store = new MongoDBStore({
+        uri: process.env.CONNECTION_STRING,
+        collection: 'sessions'
+    });
+
+    // Catch session store errors
+    store.on('error', function(err) {
+        console.error(err);
+    });
 
     // Use sessions for tracking logins
     app.use(session({
@@ -14,7 +26,8 @@ module.exports = async (app, io, container) => {
         cookie: { 
             secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
-        } 
+        },
+        store
     }));
 
     // Enable CORS

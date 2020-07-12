@@ -54,9 +54,9 @@ module.exports = class LeaderboardService {
         leaderboardPlayers = leaderboardPlayers.filter(p => !p.afk);
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
-            let player = leaderboard[i];
+            let player = leaderboardPlayers[i];
 
-            let user = this.userService.getById(player.userId);
+            let user = await this.userService.getById(player.userId);
 
             // Add to rank:
             // (Number of players / 2) - index of leaderboard
