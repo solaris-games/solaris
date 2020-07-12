@@ -41,8 +41,9 @@ export default new Vuex.Store({
     },
     gameStarIndustryUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
-
+      
       star.infrastructure.industry = data.infrastructure
+      star.manufacturing = data.manufacturing
     },
     gameStarScienceUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)

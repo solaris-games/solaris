@@ -48,7 +48,7 @@ module.exports = (router, io, container) => {
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
             playersWithinScanningRange.forEach(p => 
-                container.broadcastService.gameStarIndustryUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
+                container.broadcastService.gameStarIndustryUpgraded(req.game, p._id, req.body.starId, report.infrastructure, report.manufacturing));
 
             return res.status(200).json(report);
         } catch (err) {

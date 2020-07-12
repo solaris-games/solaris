@@ -151,7 +151,12 @@ module.exports = class StarUpgradeService {
     }
 
     async upgradeIndustry(game, player, starId) {
-        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
+        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
+
+        // Append the new manufacturing speed to the report.
+        report.manufacturing = this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, report.infrastructure);
+
+        return report;
     }
 
     async upgradeScience(game, player, starId) {

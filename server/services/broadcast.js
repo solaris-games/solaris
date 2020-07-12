@@ -30,10 +30,11 @@ module.exports = class BroadcastService {
         });
     }
 
-    gameStarIndustryUpgraded(game, playerId, starId, infrastructure) {
+    gameStarIndustryUpgraded(game, playerId, starId, infrastructure, manufacturing) {
         this.io.to(playerId.toString()).emit('gameStarIndustryUpgraded', {
             starId,
-            infrastructure
+            infrastructure,
+            manufacturing
         });
     }
 
