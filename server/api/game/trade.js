@@ -72,6 +72,9 @@ module.exports = (router, io, container) => {
                 req.body.toPlayerId,
                 req.body.amount);
 
+            // TODO: Implement receiving renown on the UI, should use a user socket.
+            //container.broadcastService.userRenownReceived(req.game, // to user id, req.body.amount);
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
