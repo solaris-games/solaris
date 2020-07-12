@@ -221,8 +221,8 @@ module.exports = class GameTickService {
             friendlyCarrier.ships = combatResult.after.defender;
             enemyCarrier.ships = combatResult.after.attacker;
 
-            defenderUser.achievements.kills.ships += combatResult.lost.attacker;
-            attackerUser.achievements.kills.ships += combatResult.lost.defender;
+            defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
+            attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
 
             // Log the combat event
             await this.eventService.createPlayerCombatCarrierEvent(game, defender, attacker,
@@ -232,14 +232,14 @@ module.exports = class GameTickService {
             if (friendlyCarrier.ships <= 0) {
                 game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(friendlyCarrier), 1);
 
-                defenderUser.achievements.losses.carriers++;
-                attackerUser.achievements.kills.carriers++;
+                defenderUser.achievements.combat.losses.carriers++;
+                attackerUser.achievements.combat.kills.carriers++;
             }
 
             // If the enemy carrier has no ships, then carrier to carrier combat is finished.
             if (enemyCarrier.ships <= 0) {
-                defenderUser.achievements.kills.carriers++;
-                attackerUser.achievements.losses.carriers++;
+                defenderUser.achievements.combat.kills.carriers++;
+                attackerUser.achievements.combat.losses.carriers++;
                 break;
             }
         }
@@ -259,11 +259,13 @@ module.exports = class GameTickService {
                 ships: enemyCarrier.ships
             });
 
+            enemyCarrier.ships = starCombatResult.after.attacker;
+
             star.garrisonActual = starCombatResult.after.defender + starGarrisonFraction;
             star.garrison = Math.floor(star.garrisonActual);
 
-            defenderUser.achievements.kills.ships += starCombatResult.lost.attacker;
-            attackerUser.achievements.kills.ships += starCombatResult.lost.defender;
+            defenderUser.achievements.combat.kills.ships += starCombatResult.lost.attacker;
+            attackerUser.achievements.combat.kills.ships += starCombatResult.lost.defender;
 
             // Log the combat event
             await this.eventService.createPlayerCombatStarEvent(game, defender, attacker,
@@ -274,8 +276,8 @@ module.exports = class GameTickService {
         if (enemyCarrier.ships <= 0) {
             game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(enemyCarrier), 1);
 
-            defenderUser.achievements.kills.carriers++;
-            attackerUser.achievements.losses.carriers++;
+            defenderUser.achievements.combat.kills.carriers++;
+            attackerUser.achievements.combat.losses.carriers++;
         }
 
         // If the star has no garrison and no defenders, then the attacker has won.
