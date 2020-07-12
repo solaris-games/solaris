@@ -56,7 +56,7 @@
       <infrastructure
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
-      <infrastructureUpgrade v-if="getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated"
+      <infrastructureUpgrade v-if="getStarOwningPlayer() != null && getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated && star.upgradeCosts != null"
         :star="star"
         :availableCredits="getUserPlayer().credits"
         :economy="star.upgradeCosts.economy" 
@@ -72,7 +72,7 @@
     </div>
 
     <!-- TODO: Turn these into components -->
-    <div v-if="getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated" class="mb-2">
+    <div v-if="getStarOwningPlayer() != null && getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated && star.upgradeCosts != null" class="mb-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
@@ -122,12 +122,12 @@
 
     <!-- Modals -->
 
-    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer()" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
+    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer() && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
       <p>Are you sure you want build a Carrier at <b>{{star.name}}</b>?</p>
       <p>The carrier will cost ${{star.upgradeCosts.carriers}}.</p>
     </dialogModal>
 
-    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer()" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer() && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
       <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
       <p>The upgrade will cost ${{star.upgradeCosts.warpGate}}.</p>
     </dialogModal>
@@ -167,7 +167,14 @@ export default {
   },
   data () {
     return {
-      currentPlayerId: this.getUserPlayer()._id
+      currentPlayerId: null
+    }
+  },
+  mounted () {
+    let userPlayer = this.getUserPlayer()
+    
+    if (userPlayer) {
+      this.currentPlayerId = userPlayer._id
     }
   },
   methods: {
