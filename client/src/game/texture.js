@@ -2,11 +2,14 @@ import * as PIXI from 'pixi.js'
 
 class TextureService {
     STAR_BASE_TEXTURE = null
+    PLANET_BASE_TEXTURE = null
     PLANET_TEXTURES = []
 
     constructor () {
-        this.STAR_BASE_TEXTURE = PIXI.BaseTexture.from(require('../assets/PixelPlanets.png'))
-        this.STAR_BASE_TEXTURE.setSize(390, 460)
+        this.STAR_BASE_TEXTURE = new PIXI.BaseTexture.from(require('../assets/star.png'))
+
+        this.PLANET_BASE_TEXTURE = PIXI.BaseTexture.from(require('../assets/PixelPlanets.png'))
+        this.PLANET_BASE_TEXTURE.setSize(390, 460)
         
         // Terran
         this._loadPlanetTexture(79, 73, 28, 28)
@@ -77,6 +80,10 @@ class TextureService {
         this._loadPlanetTexture(190, 369, 28, 28)
     }
 
+    getStarTexture () {
+        return new PIXI.Texture(this.STAR_BASE_TEXTURE)
+    }
+
     getPlanetTexture (x, y) {
         let index = Math.floor(Math.abs(x * y)) % this.PLANET_TEXTURES.length
 
@@ -90,7 +97,7 @@ class TextureService {
     }
 
     _loadPlanetTexture (x, y, w, h) {
-        let texture = new PIXI.Texture(this.STAR_BASE_TEXTURE)
+        let texture = new PIXI.Texture(this.PLANET_BASE_TEXTURE)
         texture.frame = new PIXI.Rectangle(x, y, w, h)
         this.PLANET_TEXTURES.push(texture)
     }

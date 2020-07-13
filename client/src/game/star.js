@@ -13,7 +13,7 @@ class Star extends EventEmitter {
     this.container.interactive = true
     this.container.buttonMode = true
 
-    this.container.on('pointerdown', this.onClicked.bind(this))
+    this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
@@ -68,65 +68,68 @@ class Star extends EventEmitter {
     this.drawName()
     this.drawGarrison()
 
+    this.drawActive()
+  }
+
+  drawActive () {
     if (this.isMouseOver || this.isSelected) {
       this.drawHalo()
       this.drawInfrastructure()
       this.drawPlayerName()
+    } else {
+      if (this.haloGraphics) {
+        this.container.removeChild(this.haloGraphics)
+        this.haloGraphics = null
+      }
+
+      if (this.infrastructureGraphics) {
+        this.container.removeChild(this.infrastructureGraphics)
+        this.infrastructureGraphics = null
+      }
+
+      if (this.playerNameGraphics) {
+        this.container.removeChild(this.playerNameGraphics)
+        this.playerNameGraphics = null
+      }
     }
   }
 
   drawStar () {
-    let starTexture = TextureService.getPlanetTexture(this.data.location.x, this.data.location.y)
+    let starTexture = TextureService.getStarTexture()
 
     let sprite = new PIXI.Sprite(starTexture)
-    sprite.width = 4
-    sprite.height = 4
-    sprite.position.x = this.data.location.x - 2
-    sprite.position.y = this.data.location.y - 2
+    sprite.width = 10
+    sprite.height = 10
+    sprite.position.x = this.data.location.x - 5
+    sprite.position.y = this.data.location.y - 5
 
     //let graphics = new PIXI.Graphics()
 
     if (this._isOutOfScanningRange()) {
       sprite.alpha = 0.3
-      // graphics.lineStyle(1, 0xFFFFFF)
-      // graphics.beginFill(0x000000)
-    } else {
-      // graphics.lineStyle(0)
-      // graphics.beginFill(0xFFFFFF)
     }
-
-    // If its a warp gate then draw a filled square.
-    // Otherwise draw a filled circle.
-    if (this.data.warpGate) {
-      // graphics.drawRect(this.data.location.x - 2, this.data.location.y - 2, 4, 4)
-    } else {
-      // graphics.drawCircle(this.data.location.x, this.data.location.y, 2)
-    }
-
-    //graphics.endFill()
 
     // Add a larger hit radius so that the star is easily clickable
-    //graphics.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
     // sprite.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 12)
 
-    //this.container.addChild(graphics)
     this.container.addChild(sprite)
   }
 
   drawPlanets () {
-    let planetCount = Math.floor(Math.abs(this.data.location.x)) % 3
-
+    let planetCount = Math.floor(Math.abs(this.data.location.x)) % 5
+    
     if (planetCount === 0) {
       return
     }
 
     let rotationDirection = Math.floor(Math.abs(this.data.location.y)) % 2 === 0
+    let rotationSpeedModifier = Math.floor(Math.random() * (1000 - 500 + 1) + 500) // Random number between 500 and 1000
 
     for (let i = 0; i < planetCount; i++) {
       let planetContainer = new PIXI.Container()
       
-      let planetSize = Math.floor(Math.abs(this.data.location.y)) % 2 + 1
       let distanceToStar = 10 + (4 * i);
+      let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 3 + 1
 
       let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
   
@@ -142,8 +145,8 @@ class Star extends EventEmitter {
       planetContainer.position.x = this.data.location.x
       planetContainer.position.y = this.data.location.y
   
-      let rotationSpeed = (planetCount - i) / 1000
-  
+      let rotationSpeed = (planetCount - i) / rotationSpeedModifier
+
       this.app.ticker.add((delta) => {
         if (rotationDirection) {
           planetContainer.rotation += rotationSpeed * delta
@@ -179,11 +182,17 @@ class Star extends EventEmitter {
   }
 
   drawHalo () {
+    if (this.haloGraphics) {
+      this.container.removeChild(this.haloGraphics)
+      this.haloGraphics = null
+    }
+
     let graphics = new PIXI.Graphics()
 
     graphics.lineStyle(1, 0xFFFFFF, 0.1)
     graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2)
 
+    this.haloGraphics = graphics
     this.container.addChild(graphics)
   }
 
@@ -218,6 +227,11 @@ class Star extends EventEmitter {
   }
 
   drawInfrastructure () {
+    if (this.infrastructureGraphics) {
+      this.container.removeChild(this.infrastructureGraphics)
+      this.infrastructureGraphics = null
+    }
+
     if (!this.data.ownedByPlayerId) return
     if (this._isOutOfScanningRange()) return
 
@@ -230,10 +244,16 @@ class Star extends EventEmitter {
     text.y = this.data.location.y - 12
     text.resolution = 10
 
+    this.infrastructureGraphics = text
     this.container.addChild(text)
   }
 
   drawPlayerName () {
+    if (this.playerNameGraphics) {
+      this.container.removeChild(this.playerNameGraphics)
+      this.playerNameGraphics = null
+    }
+
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
@@ -255,6 +275,7 @@ class Star extends EventEmitter {
     
     text.resolution = 10
 
+    this.playerNameGraphics = text
     this.container.addChild(text)
   }
 
@@ -297,7 +318,7 @@ class Star extends EventEmitter {
   onMouseOver (e) {
     this.isMouseOver = true
 
-    this.draw()
+    this.drawActive()
 
     this.emit('onStarMouseOver', this.data)
   }
@@ -305,7 +326,7 @@ class Star extends EventEmitter {
   onMouseOut (e) {
     this.isMouseOver = false
 
-    this.draw()
+    this.drawActive()
 
     this.emit('onStarMouseOut', this.data)
   }

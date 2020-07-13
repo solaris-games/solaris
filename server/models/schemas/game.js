@@ -89,10 +89,10 @@ const schema = new Schema({
 	},
 	constants: {
 		distances: {
-			lightYear: { type: Types.Number, required: true, default: 30 },
-			minDistanceBetweenStars: { type: Types.Number, required: true, default: 30 },
-			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 300 },
-			shipSpeed: { type: Types.Number, required: true, default: 3 }
+			lightYear: { type: Types.Number, required: true, default: 50 },
+			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
+			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
+			shipSpeed: { type: Types.Number, required: true, default: 5 }
 		},
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 }

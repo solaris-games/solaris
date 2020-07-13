@@ -179,7 +179,7 @@ class Map extends EventEmitter {
     this.stars
     .forEach(s => {
       s.isSelected = false
-      s.draw()
+      s.drawActive()
     })
   }
 
@@ -192,7 +192,7 @@ class Map extends EventEmitter {
           s.isSelected = false
         }
 
-        s.draw()
+        s.drawActive()
       })
   }
 

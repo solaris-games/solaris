@@ -55,8 +55,8 @@ class GameHelper {
         && carrier.inTransitTo === waypoint.destination
   }
 
-  getHyperspaceDistance (hyperspace) {
-    return ((hyperspace || 1) + 3) * 30 // TODO: Need a global constant for light year
+  getHyperspaceDistance (game, hyperspace) {
+    return ((hyperspace || 1) + 3) * game.constants.distances.lightYear
   }
 
   getDistanceBetweenLocations (loc1, loc2) {
