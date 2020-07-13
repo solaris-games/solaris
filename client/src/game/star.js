@@ -74,15 +74,9 @@ class Star extends EventEmitter {
 
   drawActive () {
     if (this.isMouseOver || this.isSelected) {
-      this.drawHalo()
       this.drawInfrastructure()
       this.drawPlayerName()
     } else {
-      if (this.haloGraphics) {
-        this.container.removeChild(this.haloGraphics)
-        this.haloGraphics = null
-      }
-
       if (this.infrastructureGraphics) {
         this.container.removeChild(this.infrastructureGraphics)
         this.infrastructureGraphics = null
@@ -104,8 +98,6 @@ class Star extends EventEmitter {
     sprite.position.x = this.data.location.x - 5
     sprite.position.y = this.data.location.y - 5
 
-    //let graphics = new PIXI.Graphics()
-
     if (this._isOutOfScanningRange()) {
       sprite.alpha = 0.3
     }
@@ -117,7 +109,8 @@ class Star extends EventEmitter {
   }
 
   drawPlanets () {
-    let planetCount = Math.floor(Math.abs(this.data.location.x)) % 5
+    // The more resources a star has the more planets it has.
+    let planetCount = Math.floor(this.data.naturalResources / 50 * 3)
     
     if (planetCount === 0) {
       return
@@ -131,6 +124,12 @@ class Star extends EventEmitter {
       
       let distanceToStar = 10 + (4 * i);
       let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 3 + 1
+
+      let orbitGraphics = new PIXI.Graphics()
+      orbitGraphics.lineStyle(0.3, 0xFFFFFF)
+      orbitGraphics.alpha = 0.1
+      orbitGraphics.drawCircle(this.data.location.x, this.data.location.y, distanceToStar - (planetSize / 2))
+      this.container.addChild(orbitGraphics)
 
       let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
   
@@ -179,21 +178,6 @@ class Star extends EventEmitter {
       graphics.drawCircle(this.data.location.x, this.data.location.y, 5)
     }
 
-    this.container.addChild(graphics)
-  }
-
-  drawHalo () {
-    if (this.haloGraphics) {
-      this.container.removeChild(this.haloGraphics)
-      this.haloGraphics = null
-    }
-
-    let graphics = new PIXI.Graphics()
-
-    graphics.lineStyle(1, 0xFFFFFF, 0.1)
-    graphics.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources / 2)
-
-    this.haloGraphics = graphics
     this.container.addChild(graphics)
   }
 
