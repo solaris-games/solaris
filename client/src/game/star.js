@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import EventEmitter from 'events'
+import TextureService from './texture'
 
 class Star extends EventEmitter {
 
@@ -70,30 +71,40 @@ class Star extends EventEmitter {
   }
 
   drawStar () {
-    let graphics = new PIXI.Graphics()
+    let starTexture = TextureService.getRandomPlanetTexture()
+
+    let sprite = new PIXI.Sprite(starTexture)
+    sprite.width = 12
+    sprite.height = 12
+    sprite.position.x = this.data.location.x - 6
+    sprite.position.y = this.data.location.y - 6
+
+    //let graphics = new PIXI.Graphics()
 
     if (this._isOutOfScanningRange()) {
-      graphics.lineStyle(1, 0xFFFFFF)
-      graphics.beginFill(0x000000)
+      // graphics.lineStyle(1, 0xFFFFFF)
+      // graphics.beginFill(0x000000)
     } else {
-      graphics.lineStyle(0)
-      graphics.beginFill(0xFFFFFF)
+      // graphics.lineStyle(0)
+      // graphics.beginFill(0xFFFFFF)
     }
 
     // If its a warp gate then draw a filled square.
     // Otherwise draw a filled circle.
     if (this.data.warpGate) {
-      graphics.drawRect(this.data.location.x - 2, this.data.location.y - 2, 4, 4)
+      // graphics.drawRect(this.data.location.x - 2, this.data.location.y - 2, 4, 4)
     } else {
-      graphics.drawCircle(this.data.location.x, this.data.location.y, 2)
+      // graphics.drawCircle(this.data.location.x, this.data.location.y, 2)
     }
 
-    graphics.endFill()
+    //graphics.endFill()
 
     // Add a larger hit radius so that the star is easily clickable
-    graphics.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+    //graphics.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+    // sprite.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 12)
 
-    this.container.addChild(graphics)
+    //this.container.addChild(graphics)
+    this.container.addChild(sprite)
   }
 
   drawColour () {
