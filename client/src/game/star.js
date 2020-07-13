@@ -50,6 +50,14 @@ class Star extends EventEmitter {
   draw () {
     this.container.removeChildren()
 
+    if (!this._getStarCarriers().length) {
+      this.drawStar()
+    }
+
+    if (!this._isOutOfScanningRange()) {
+      this.drawPlanets()
+    }
+
     this.drawColour()
 
     if (this.isSelected) {
@@ -65,26 +73,21 @@ class Star extends EventEmitter {
       this.drawInfrastructure()
       this.drawPlayerName()
     }
-
-    // If the star doesn't have a carrier, draw the star circle.
-    if (!this._getStarCarriers().length) {
-      this.drawStar()
-      this.drawPlanets()
-    }
   }
 
   drawStar () {
     let starTexture = TextureService.getPlanetTexture(this.data.location.x, this.data.location.y)
 
     let sprite = new PIXI.Sprite(starTexture)
-    sprite.width = 12
-    sprite.height = 12
-    sprite.position.x = this.data.location.x - 6
-    sprite.position.y = this.data.location.y - 6
+    sprite.width = 4
+    sprite.height = 4
+    sprite.position.x = this.data.location.x - 2
+    sprite.position.y = this.data.location.y - 2
 
     //let graphics = new PIXI.Graphics()
 
     if (this._isOutOfScanningRange()) {
+      sprite.alpha = 0.3
       // graphics.lineStyle(1, 0xFFFFFF)
       // graphics.beginFill(0x000000)
     } else {
@@ -111,23 +114,29 @@ class Star extends EventEmitter {
   }
 
   drawPlanets () {
-    let planetCount = Math.floor(this.data.location.x) % 3
+    let planetCount = Math.floor(Math.abs(this.data.location.x)) % 3
 
     if (planetCount === 0) {
       return
     }
 
+    let rotationDirection = Math.floor(Math.abs(this.data.location.y)) % 2 === 0
+
     for (let i = 0; i < planetCount; i++) {
       let planetContainer = new PIXI.Container()
       
-      let planetSize = Math.floor(this.data.location.y) % 6 + 2
-      let distanceToStar = 20 + (10 * i);
+      let planetSize = Math.floor(Math.abs(this.data.location.y)) % 2 + 1
+      let distanceToStar = 10 + (4 * i);
 
       let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
   
       let sprite = new PIXI.Sprite(planetTexture)
       sprite.width = planetSize
       sprite.height = planetSize
+
+      if (this._isOutOfScanningRange()) {
+        sprite.alpha = 0.3
+      }
   
       planetContainer.pivot.set(distanceToStar, 0)
       planetContainer.position.x = this.data.location.x
@@ -136,8 +145,11 @@ class Star extends EventEmitter {
       let rotationSpeed = (planetCount - i) / 1000
   
       this.app.ticker.add((delta) => {
-        planetContainer.rotation -= rotationSpeed * delta
-        planetContainer
+        if (rotationDirection) {
+          planetContainer.rotation += rotationSpeed * delta
+        } else {
+          planetContainer.rotation -= rotationSpeed * delta
+        }
       })
   
       planetContainer.addChild(sprite)
@@ -158,9 +170,9 @@ class Star extends EventEmitter {
     // If its a warp gate then draw a rectangle.
     // Otherwise draw a circle.
     if (this.data.warpGate) {
-      graphics.drawRect(this.data.location.x - 4, this.data.location.y - 4, 8, 8)
+      graphics.drawRect(this.data.location.x - 5, this.data.location.y - 5, 10, 10)
     } else {
-      graphics.drawCircle(this.data.location.x, this.data.location.y, 4)
+      graphics.drawCircle(this.data.location.x, this.data.location.y, 5)
     }
 
     this.container.addChild(graphics)
