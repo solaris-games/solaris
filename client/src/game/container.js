@@ -47,7 +47,7 @@ class GameContainer {
     this.app.stage.addChild(this.viewport)
 
     // Add a new map to the viewport
-    this.map = new Map()
+    this.map = new Map(this.app)
     this.viewport.addChild(this.map.container)
   }
 

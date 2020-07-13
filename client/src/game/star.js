@@ -4,8 +4,10 @@ import TextureService from './texture'
 
 class Star extends EventEmitter {
 
-  constructor () {
+  constructor (app) {
     super()
+
+    this.app = app
 
     this.container = new PIXI.Container()
     this.container.interactive = true
@@ -67,6 +69,7 @@ class Star extends EventEmitter {
     // If the star doesn't have a carrier, draw the star circle.
     if (!this._getStarCarriers().length) {
       this.drawStar()
+      this.drawPlanets()
     }
   }
 
@@ -105,6 +108,41 @@ class Star extends EventEmitter {
 
     //this.container.addChild(graphics)
     this.container.addChild(sprite)
+  }
+
+  drawPlanets () {
+    let planetCount = Math.floor(this.data.location.x) % 3
+
+    if (planetCount === 0) {
+      return
+    }
+
+    for (let i = 0; i < planetCount; i++) {
+      let planetContainer = new PIXI.Container()
+      
+      let planetSize = Math.floor(this.data.location.y) % 6 + 2
+      let distanceToStar = 20 + (10 * i);
+
+      let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
+  
+      let sprite = new PIXI.Sprite(planetTexture)
+      sprite.width = planetSize
+      sprite.height = planetSize
+  
+      planetContainer.pivot.set(distanceToStar, 0)
+      planetContainer.position.x = this.data.location.x
+      planetContainer.position.y = this.data.location.y
+  
+      let rotationSpeed = (planetCount - i) / 1000
+  
+      this.app.ticker.add((delta) => {
+        planetContainer.rotation -= rotationSpeed * delta
+        planetContainer
+      })
+  
+      planetContainer.addChild(sprite)
+      this.container.addChild(planetContainer)
+    }
   }
 
   drawColour () {

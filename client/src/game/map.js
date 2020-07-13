@@ -13,9 +13,10 @@ class Map extends EventEmitter {
   // waypoints - Displays waypoints overlay for a given carrier
   mode = 'galaxy'
 
-  constructor () {
+  constructor (app) {
     super()
 
+    this.app = app
     this.container = new PIXI.Container()
 
     this.stars = []
@@ -48,7 +49,7 @@ class Map extends EventEmitter {
 
     // Add stars
     for (let i = 0; i < this.game.galaxy.stars.length; i++) {
-      let star = new Star()
+      let star = new Star(this.app)
 
       star.setup(this.game, this.game.galaxy.stars[i], this.game.galaxy.players, this.game.galaxy.carriers)
 
