@@ -71,7 +71,7 @@ class Star extends EventEmitter {
   }
 
   drawStar () {
-    let starTexture = TextureService.getRandomPlanetTexture()
+    let starTexture = TextureService.getPlanetTexture(this.data.location.x, this.data.location.y)
 
     let sprite = new PIXI.Sprite(starTexture)
     sprite.width = 12

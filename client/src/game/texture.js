@@ -77,6 +77,12 @@ class TextureService {
         this._loadPlanetTexture(190, 369, 28, 28)
     }
 
+    getPlanetTexture (x, y) {
+        let index = Math.floor(Math.abs(x * y)) % this.PLANET_TEXTURES.length
+
+        return this.PLANET_TEXTURES[index]
+    }
+
     getRandomPlanetTexture () {
         let index = Math.floor(Math.random() * this.PLANET_TEXTURES.length)
 
