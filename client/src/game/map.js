@@ -63,8 +63,10 @@ class Map extends EventEmitter {
     // Add carriers
     for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
       let carrier = new Carrier()
+      let carrierData = this.game.galaxy.carriers[i]
+      let player = GameHelper.getPlayerById(this.game, carrierData.ownedByPlayerId)
 
-      carrier.setup(this.game.galaxy.carriers[i], this.stars)
+      carrier.setup(carrierData, this.stars, player.colour.value)
 
       this.carriers.push(carrier)
 
@@ -119,7 +121,7 @@ class Map extends EventEmitter {
   drawCarriers () {
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
-      
+
       carrier.draw()
     }
   }

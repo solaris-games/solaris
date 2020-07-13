@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import GameHelper from '../services/gameHelper'
 
 class Star extends EventEmitter {
 

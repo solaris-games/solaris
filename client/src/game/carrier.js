@@ -13,13 +13,18 @@ class Carrier extends EventEmitter {
     this.container.on('pointerdown', this.onClicked.bind(this))
   }
 
-  setup (data, stars) {
+  setup (data, stars, colour) {
     this.data = data
     this.stars = stars
+    this.colour = colour
   }
 
   draw () {
     this.container.removeChildren()
+
+    if (!this.data.orbiting) {
+      this.drawColour()
+    }
 
     let graphics = new PIXI.Graphics()
 
@@ -46,6 +51,16 @@ class Carrier extends EventEmitter {
 
     // Add a larger hit radius so that the star is easily clickable
     graphics.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+
+    this.container.addChild(graphics)
+  }
+
+  drawColour () {
+    let graphics = new PIXI.Graphics()
+
+    graphics.lineStyle(1, this.colour)
+
+    graphics.drawCircle(this.data.location.x, this.data.location.y, 4)
 
     this.container.addChild(graphics)
   }
