@@ -298,6 +298,40 @@ class Star extends EventEmitter {
 
   onClicked (e) {
     this.emit('onStarClicked', this.data)
+
+    this.drawAnimatedSelectCircle()
+  }
+
+  drawAnimatedSelectCircle () {
+    // It ain't pretty, but it works.
+    let graphics = new PIXI.Graphics()
+
+    graphics.radius = 1
+
+    graphics.animation = (delta) => {
+      if (graphics.alpha <= 0) {
+        return
+      }
+
+      graphics.clear()
+      graphics.lineStyle(1, 0xFFFFFF, 0.3)
+
+      graphics.alpha -= 0.02 * delta
+      graphics.radius = graphics.radius + delta
+
+      graphics.drawCircle(this.data.location.x, this.data.location.y, graphics.radius)
+    }
+
+    this.app.ticker.add(graphics.animation)
+
+    var that = this
+
+    setTimeout (() => {
+      that.container.removeChild(graphics)
+      that.app.ticker.remove(graphics.animation);
+    }, 3000)
+
+    this.container.addChild(graphics)
   }
 
   onMouseOver (e) {
