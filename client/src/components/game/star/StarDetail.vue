@@ -205,6 +205,11 @@ export default {
     onInfrastructureUpgraded (e) {
       this.getStarOwningPlayer().credits -= e.data.cost
       this.star.upgradeCosts[e.infrastructureKey] = e.data.nextCost
+      this.star.infrastructure[e.infrastructureKey] = e.data.infrastructure
+
+      if (e.data.manufacturing) {
+        this.star.manufacturing = e.data.manufacturing
+      }
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer()._id)
@@ -218,6 +223,7 @@ export default {
 
         if (response.status === 200) {
           // this.$emit('onCarrierBuilt', this.star._id)
+          this.onOpenCarrierDetailRequested(response.data)
         }
       } catch (err) {
         console.error(err)

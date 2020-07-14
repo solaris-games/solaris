@@ -19,6 +19,14 @@ module.exports = class ShipTransferService {
             throw new ValidationError('The player does not own this star.');
         }
 
+        if (!carrier.orbiting) {
+            throw new ValidationError('The carrier must be in orbit of a star to transfer ships.');
+        }
+
+        if (!carrier.orbiting.equals(star._id)) {
+            throw new ValidationError('The carrier must be in orbit of a the desired star to transfer ships.');
+        }
+
         let totalTransferShips = carrierShips + starShips;
         let totalShips = carrier.ships + star.garrison;
 
