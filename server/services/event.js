@@ -66,7 +66,8 @@ module.exports = class EventService {
             }
         })
         .sort({
-            tick: -1 // Sort by tick descending
+            tick: -1, // Sort by tick descending
+            _id: 1
         })
         .exec();
     }
