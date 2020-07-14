@@ -21,7 +21,7 @@ module.exports = class PlayerService {
     }
 
     getByUserId(game, userId) {
-        return game.galaxy.players.find(p => p.userId.toString() === userId.toString());
+        return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
     }
     
     getPlayersWithinScanningRangeOfStar(game, starId) {
