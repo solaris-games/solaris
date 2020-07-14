@@ -224,6 +224,7 @@ export default {
         if (response.status === 200) {
           // this.$emit('onCarrierBuilt', this.star._id)
           this.onOpenCarrierDetailRequested(response.data)
+          this.getUserPlayer().credits -= this.star.upgradeCosts.carriers
         }
       } catch (err) {
         console.error(err)
