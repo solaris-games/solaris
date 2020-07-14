@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary">
@@ -163,14 +163,17 @@ export default {
     'dialogModal': DialogModal
   },
   props: {
-    star: Object
+    starId: String
   },
   data () {
     return {
+      star: null,
       currentPlayerId: null
     }
   },
   mounted () {
+    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
+
     let userPlayer = this.getUserPlayer()
     
     if (userPlayer) {

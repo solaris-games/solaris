@@ -74,7 +74,7 @@ export default {
       )
     },
     onStarClicked (e) {
-      this.$emit('onStarClicked', e)
+      this.$emit('onStarClicked', e._id)
     },
     onCarrierClicked (e) {
       this.$emit('onCarrierClicked', e)

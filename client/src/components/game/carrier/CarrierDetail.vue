@@ -167,7 +167,7 @@ export default {
       })
     },
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar())
+      this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar()._id)
     },
     recalculateTimeRemaining () {
       let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 

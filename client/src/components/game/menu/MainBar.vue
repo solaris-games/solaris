@@ -15,7 +15,7 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
-      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :star="menuArguments"
+      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
         @onCloseRequested="onCloseRequested" 
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"

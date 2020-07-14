@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star)
+      this.$emit('onOpenStarDetailRequested', this.star._id)
     }
   }
 }

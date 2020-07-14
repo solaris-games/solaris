@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star)
+      this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.player._id)

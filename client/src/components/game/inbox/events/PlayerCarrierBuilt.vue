@@ -32,7 +32,7 @@ export default {
       this.$emit('onOpenCarrierDetailRequested', this.carrier)
     },
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star)
+      this.$emit('onOpenStarDetailRequested', this.star._id)
     }
   }
 }

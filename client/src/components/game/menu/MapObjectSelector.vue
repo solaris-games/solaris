@@ -85,7 +85,7 @@ export default {
         switch (mapObject.type) {
             case 'star':
                 gameContainer.map.clickStar(mapObject.data._id)
-                this.$emit('onOpenStarDetailRequested', mapObject.data) 
+                this.$emit('onOpenStarDetailRequested', mapObject.data._id) 
                 break
             case 'carrier': 
                 this.$emit('onOpenCarrierDetailRequested', mapObject.data) 
