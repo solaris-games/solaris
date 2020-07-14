@@ -1,7 +1,6 @@
 <template>
 <div class="container pb-2">
   <loading-spinner :loading="!conversations"/>
-    
   <div v-if="conversations">
     <div>
         <button class="btn btn-primary" @click="onRefreshClicked"><i class="fas fa-sync"></i></button>

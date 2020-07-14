@@ -26,6 +26,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import moment from 'moment'
 
 export default {
   components: {
@@ -41,7 +42,7 @@ export default {
         return GameHelper.getUserPlayer(this.$store.state.game)
     },
       getDateString (date) {
-          date = moment(date).utc()
+          date = moment(date).utc().toDate()
           
           let dayOfWeek = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
           let monthOfYear = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
