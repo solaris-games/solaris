@@ -1,11 +1,18 @@
 import * as PIXI from 'pixi.js'
 
 class TextureService {
+    DEFAULT_FONT_STYLE = null
+
     STAR_BASE_TEXTURE = null
     PLANET_BASE_TEXTURE = null
     PLANET_TEXTURES = []
 
     constructor () {
+        this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
+            fontFamily: `'Space Mono', monospace`,
+            fill: 0xFFFFFF
+        })
+
         this.STAR_BASE_TEXTURE = new PIXI.BaseTexture.from(require('../assets/star.png'))
 
         this.PLANET_BASE_TEXTURE = PIXI.BaseTexture.from(require('../assets/PixelPlanets.png'))

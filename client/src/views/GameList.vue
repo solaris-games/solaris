@@ -27,7 +27,7 @@
                 <td>{{game.settings.general.description}}</td>
                 <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
                 </td>
             </tr>
         </tbody>
@@ -56,7 +56,7 @@
                 <td>{{game.settings.general.name}}</td>
                 <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary float-right">Read More</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
                 </td>
             </tr>
         </tbody>

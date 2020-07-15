@@ -15,7 +15,6 @@
     <!-- TODO: These do not update on socket messages (e.g infrastructure upgrades)
       because their values come from the stats object and are not calculated on the client -->
     <infrastructure v-if="userPlayer"
-                    :isTotal="true" 
                     :economy="player.stats.totalEconomy"
                     :industry="player.stats.totalIndustry"
                     :science="player.stats.totalScience"/>

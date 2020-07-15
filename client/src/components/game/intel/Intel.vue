@@ -76,6 +76,7 @@ export default {
       history: null,
       datacollection: null,
       dataoptions: {
+        bezierCurve : false,
         legend: {
           display: false
         },
@@ -87,11 +88,14 @@ export default {
                 }
             }]
         },
-        // elements: {
-        //     point:{
-        //         borderWidth: 0
-        //     }
-        // }
+        elements: {
+          line: {
+            tension: 0
+          },
+          // point:{
+          //     borderWidth: 0
+          // }
+        }
       },
       playerFilters: []
     }

@@ -2,6 +2,8 @@
     <router-view/>
 </template>
 
-<style lang="less">
-
+<style>
+body {
+    font-family: 'Space Mono', monospace !important;
+}
 </style>

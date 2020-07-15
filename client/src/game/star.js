@@ -182,10 +182,10 @@ class Star extends EventEmitter {
   }
 
   drawName () {
-    let text = new PIXI.Text(this.data.name, {
-      fontSize: 4,
-      fill: 0xFFFFFF
-    })
+    let style = TextureService.DEFAULT_FONT_STYLE
+    style.fontSize = 4
+
+    let text = new PIXI.Text(this.data.name, style)
 
     text.x = this.data.location.x - (text.width / 2)
     text.y = this.data.location.y + 7
@@ -199,10 +199,10 @@ class Star extends EventEmitter {
 
     if (!totalGarrison) return
 
-    let text = new PIXI.Text(totalGarrison, {
-      fontSize: 4,
-      fill: 0xFFFFFF
-    })
+    let style = TextureService.DEFAULT_FONT_STYLE
+    style.fontSize = 4
+
+    let text = new PIXI.Text(totalGarrison, style)
 
     text.x = this.data.location.x - (text.width / 2)
     text.y = this.data.location.y + 12
@@ -220,10 +220,10 @@ class Star extends EventEmitter {
     if (!this.data.ownedByPlayerId) return
     if (this._isOutOfScanningRange()) return
 
-    let text = new PIXI.Text(`${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`, {
-      fontSize: 4,
-      fill: 0xFFFFFF
-    })
+    let style = TextureService.DEFAULT_FONT_STYLE
+    style.fontSize = 4
+
+    let text = new PIXI.Text(`${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`, style)
 
     text.x = this.data.location.x - (text.width / 2)
     text.y = this.data.location.y - 12
@@ -244,10 +244,10 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
-    let text = new PIXI.Text(player.alias, {
-      fontSize: 4,
-      fill: 0xFFFFFF
-    })
+    let style = TextureService.DEFAULT_FONT_STYLE
+    style.fontSize = 4
+
+    let text = new PIXI.Text(player.alias, style)
 
     text.x = this.data.location.x - (text.width / 2)
 
