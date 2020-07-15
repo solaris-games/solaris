@@ -140,6 +140,8 @@ export default {
         let response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
 
         if (response.status === 200) {
+          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
         }
       } catch (err) {

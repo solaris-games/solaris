@@ -92,8 +92,7 @@ export default {
             amount: this.amount
           })
 
-          // TODO: A better modal.
-          alert(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`)
+          this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
         
           // TODO: Update the player credits amount and update all stars.
         }

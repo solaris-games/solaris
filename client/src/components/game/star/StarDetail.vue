@@ -222,6 +222,8 @@ export default {
         let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`Carrier built at ${this.star.name}.`)
+
           // this.$emit('onCarrierBuilt', this.star._id)
           this.onOpenCarrierDetailRequested(response.data)
           this.getUserPlayer().credits -= this.star.upgradeCosts.carriers
@@ -235,6 +237,7 @@ export default {
         let response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`${this.star.name} has been abandoned.`)
           // this.$emit('onStarAbandoned', this.star._id)
         }
       } catch (err) {
@@ -246,6 +249,8 @@ export default {
         let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
+
           // this.$emit('onUpgradedWarpGate', this.star._id)
         }
       } catch (err) {
@@ -257,6 +262,8 @@ export default {
         let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
+
           // this.$emit('onDestroyedWarpGate', this.star._id)
         }
       } catch (err) {

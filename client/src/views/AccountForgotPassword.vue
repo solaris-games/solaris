@@ -60,9 +60,9 @@ export default {
         let response = await userService.requestResetPassword(this.email)
 
         if (response.status === 200) {
-          alert('A password reset email has been sent to the email address, please check your email inbox.')
+          this.$toasted.show(`A password reset email has been sent to the email address, please check your email inbox.`, { type: 'success' })
         } else {
-          alert('There was a problem resetting your password, please check that you entered your email address correctly.')
+          this.$toasted.show(`There was a problem resetting your password, please check that you entered your email address correctly.`, { type: 'error' })
         }
 
         router.push({ name: 'account-login' })

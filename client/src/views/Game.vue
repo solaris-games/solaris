@@ -129,6 +129,7 @@ export default {
       this.sockets.listener.subscribe('gameStarCarrierBuilt', (data) => this.$store.commit('gameStarCarrierBuilt', data))
       this.sockets.listener.subscribe('gameStarCarrierShipTransferred', (data) => this.$store.commit('gameStarCarrierShipTransferred', data))
       this.sockets.listener.subscribe('gameStarAbandoned', (data) => this.$store.commit('gameStarAbandoned', data))
+      this.sockets.listener.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
     },
     unsubscribeToSockets () {
       this.sockets.listener.unsubscribe('gameTicked')
@@ -141,6 +142,39 @@ export default {
       this.sockets.listener.unsubscribe('gameStarCarrierBuilt')
       this.sockets.listener.unsubscribe('gameStarCarrierShipTransferred')
       this.sockets.listener.unsubscribe('gameStarAbandoned')
+      this.sockets.listener.unsubscribe('gameMessageSent')
+    },
+    onMessageReceived (e) {
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
+
+      // Show a toast only if the user isn't already in the conversation.
+      if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === e.fromPlayerId) {
+        return
+      }
+
+      this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
+        duration: null,
+        type: 'info',
+        action: [
+          {
+            text : 'Dismiss',
+            onClick : (e, toastObject) => {
+                toastObject.goAway(0);
+            }
+          },
+          {
+          text: 'View',
+            onClick: (e, toastObject) => {
+              this.onMenuStateChanged({
+                state: MENU_STATES.CONVERSATION,
+                args: fromPlayer._id
+              })
+
+              toastObject.goAway(0);
+            }
+          }
+        ]
+      })
     }
   },
   computed: {

@@ -78,10 +78,10 @@ export default {
         let response = await userService.resetPassword(this.token, this.newPassword)
 
         if (response.status === 200) {
-          alert('Your password has been reset.')
+          this.$toasted.show(`Your password has been reset.`, { type: 'success' })
           router.push({ name: 'account-login' })
         } else {
-          alert('There was a problem resetting your password, please try again.')
+          this.$toasted.show(`There was a problem resetting your password, please try again.`, { type: 'error' })
         }
       } catch (err) {
         console.log(err)

@@ -347,6 +347,8 @@ export default {
         let response = await gameService.createGame(this.settings)
 
         if (response.status === 201) {
+          this.$toasted.show(`The game ${this.settings.general.name} has been created.`, { type: 'success' })
+
           router.push({ name: 'game-detail', query: { id: response.data } })
         }
       } catch (err) {

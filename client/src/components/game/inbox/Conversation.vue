@@ -82,14 +82,7 @@ export default {
             if (response.status === 200) {
                 this.messages = response.data
 
-                // This doesn't seem to work inline, have to wait 100ms so that the UI can update itself
-                // before scrolling the div container to the bottom.
-                setTimeout(() => {
-                  if (this.messages.length) {
-                    const messagesContainer = this.$el.querySelector('.messages-container')
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight
-                  }
-                }, 100)
+                this.scrollToEnd()
             }
         } catch (e) {
             console.error(e)
@@ -100,6 +93,18 @@ export default {
     },
     onMessageReceived (e) {
       this.messages.push(e)
+
+      this.scrollToEnd()
+    },
+    scrollToEnd () {
+      // This doesn't seem to work inline, have to wait 100ms so that the UI can update itself
+      // before scrolling the div container to the bottom.
+      setTimeout(() => {
+        if (this.messages.length) {
+          const messagesContainer = this.$el.querySelector('.messages-container')
+          messagesContainer.scrollTop = messagesContainer.scrollHeight
+        }
+      }, 100)
     }
   }
 }

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueSocketio from 'vue-socket.io'
 import VueGtag from 'vue-gtag'
+import Toasted from 'vue-toasted';
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -30,6 +31,11 @@ if (trackingCode) {
     config: { id: trackingCode }
   }, router)
 }
+
+Vue.use(Toasted, {
+  position: 'bottom-right',
+  duration: 3000
+})
 
 new Vue({
   router,

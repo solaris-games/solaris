@@ -117,6 +117,8 @@ export default {
                 parseInt(this.starShips))
 
             if (response.status === 200) {
+                this.$toasted.show(`Ships transferred between ${this.transfer.star.name} and ${this.transfer.carrier.name}.`)
+
                 // Note: The web socket event handles setting the carrier and star ships.
                 this.$emit('onShipsTransferred', this.transfer.carrier)
             }

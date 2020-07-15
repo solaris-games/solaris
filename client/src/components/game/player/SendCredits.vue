@@ -48,7 +48,10 @@ export default {
         if (response.status === 200) {
           this.$emit('onCreditsSent', this.amount)
 
-          this.player.credits += this.amount
+debugger
+          this.$toasted.show(`Sent ${this.amount} credits to ${this.player.alias}.`)
+
+          //this.player.credits += this.amount
           this.userPlayer.credits -= this.amount
           this.amount = 0
         }

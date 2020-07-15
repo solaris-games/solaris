@@ -12,6 +12,8 @@ class BaseApiService {
             }, error => {
                 // If any Unathorized responses come back, redirect to login page.
                 if (error.response.status === 401) {
+                    this.$toasted.show(`You are not logged in.`, { type: 'error' })
+
                     router.push({ name: 'account-login' })
                 }
 

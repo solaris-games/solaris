@@ -47,6 +47,8 @@ export default {
         let response = await starService.upgradeEconomy(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`Economy upgraded at ${this.star.name}.`)
+
           this.$emit('onInfrastructureUpgraded', {
             infrastructureKey: 'economy',
             data: response.data
@@ -65,6 +67,8 @@ export default {
         let response = await starService.upgradeIndustry(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`Industry upgraded at ${this.star.name}.`)
+
           this.$emit('onInfrastructureUpgraded', {
             infrastructureKey: 'industry',
             data: response.data
@@ -83,6 +87,8 @@ export default {
         let response = await starService.upgradeScience(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
+          this.$toasted.show(`Science upgraded at ${this.star.name}.`)
+
           this.$emit('onInfrastructureUpgraded', {
             infrastructureKey: 'science',
             data: response.data

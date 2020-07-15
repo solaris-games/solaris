@@ -95,6 +95,8 @@ export default {
         let response = await userService.createUser(this.email, this.username, this.password)
 
         if (response.status === 201) {
+          this.$toasted.show(`Account created! Welcome ${this.username}!`, { type: 'success' })
+
           router.push({ name: 'account-login' })
         }
       } catch (err) {

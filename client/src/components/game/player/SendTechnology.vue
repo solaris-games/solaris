@@ -76,7 +76,7 @@ export default {
         let response = await TradeApiService.sendTechnology(this.$store.state.game._id, this.player._id, this.selectedTechnology)
 
         if (response.status === 200) {
-          console.log('Technology sent')
+          this.$toasted.show(`Sent ${this.selectedTechnology} to ${this.player.alias}.`)
 
           this.getTradeableTechnologies()
         }

@@ -159,6 +159,8 @@ export default {
 				if (response.status === 200) {
                     this.carrier.waypoints = this.waypoints
                     
+                    this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+                    
                     this.$emit('onOpenCarrierDetailRequested', this.carrier)
 				}
 			} catch (e) {

@@ -125,6 +125,8 @@ export default {
 				if (response.status === 200) {
 					this.oldWaypoints = this.carrier.waypoints
 
+          			this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+
 					if (saveAndEdit) {
 						this.$emit('onOpenCarrierDetailRequested', this.carrier)
 					} else {

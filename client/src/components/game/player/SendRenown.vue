@@ -39,6 +39,8 @@ export default {
         if (response.status === 200) {
           this.$emit('onRenownSent', this.amount)
 
+          this.$toasted.show(`Sent ${this.amount} renown to ${this.player.alias}.`)
+
           this.userPlayer.renownToGive -= this.amount
         }
       } catch (err) {
