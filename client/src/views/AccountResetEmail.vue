@@ -57,9 +57,14 @@ export default {
       try {
         this.isLoading = true
 
-        await userService.updateEmailAddress(this.email)
+        let response = await userService.updateEmailAddress(this.email)
 
-        router.push({ name: 'main-menu' })
+        if (response.status === 200) {
+          this.$toasted.show(`Email address updated.`, { type: 'success' })
+          router.push({ name: 'main-menu' })
+        } else {
+          this.$toasted.show(`There was a problem updating your email address, please try again.`, { type: 'error' })
+        }
       } catch (err) {
         this.errors = err.response.data.errors || []
       }

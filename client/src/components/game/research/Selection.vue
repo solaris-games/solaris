@@ -88,6 +88,7 @@ export default {
         if (result.status === 200) {
           this.player.currentResearchTicksEta = result.data.ticksEta
           this.recalculateTimeRemaining()
+          this.$toasted.show(`Current research updated.`)
         }
       } catch (err) {
         console.error(err)
@@ -99,7 +100,11 @@ export default {
       this.loadingNext = true
 
       try {
-        await researchService.updateResearchNext(this.$store.state.game._id, this.player.researchingNext)
+        let response = await researchService.updateResearchNext(this.$store.state.game._id, this.player.researchingNext)
+
+        if (response.status === 200) {
+          this.$toasted.show(`Next research updated.`)
+        }
       } catch (err) {
         console.error(err)
       }
