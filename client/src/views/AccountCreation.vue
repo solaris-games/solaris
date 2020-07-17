@@ -97,7 +97,7 @@ export default {
         if (response.status === 201) {
           this.$toasted.show(`Account created! Welcome ${this.username}!`, { type: 'success' })
 
-          router.push({ name: 'account-login' })
+          router.push({ name: 'home' })
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

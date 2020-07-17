@@ -147,6 +147,7 @@ module.exports = class GameService {
         }
 
         player.defeated = true;
+        game.state.players--; // Deduct number of active players from the game.
 
         // Do a winner check here for last man standing as it's possible that everyone might admit
         // or be legit defeated on the same tick.

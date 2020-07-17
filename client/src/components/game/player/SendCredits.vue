@@ -5,8 +5,11 @@
 
         <form>
             <div class="form-row">
-                <div class="col-7">
-                    <input type="number" class="form-control" v-model="amount"/>
+                <div class="col-7 input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                  </div>
+                  <input type="number" class="form-control" v-model="amount"/>
                 </div>
                 <div class="col-5">
                     <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block">Send Credits</modalButton>

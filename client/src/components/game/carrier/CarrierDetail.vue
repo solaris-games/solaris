@@ -23,10 +23,10 @@
 
     <div v-if="getCarrierOwningPlayer() == getUserPlayer()" class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
-        <div class="col-8">
+        <div class="col-7">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
-        <div class="col-4">
+        <div class="col-5">
           <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="!getUserPlayer().defeated">Ship Transfer</button>
         </div>
       </div>
@@ -52,10 +52,10 @@
       </div> -->
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
-        <div class="col-8">
+        <div class="col-7">
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} ({{timeRemainingEtaTotal}})</p>
         </div>
-        <div class="col-4 mb-2">
+        <div class="col-5 mb-2">
           <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="!getUserPlayer().defeated">Edit Waypoints</button>
         </div>
       </div>

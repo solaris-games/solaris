@@ -65,7 +65,7 @@ export default {
           this.$toasted.show(`There was a problem requesting your username, please check that you entered your email address correctly.`, { type: 'error' })
         }
 
-        router.push({ name: 'account-login' })
+        router.push({ name: 'home' })
       } catch (err) {
         this.errors = err.response.data.errors || []
       }

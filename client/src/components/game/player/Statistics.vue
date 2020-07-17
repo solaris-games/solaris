@@ -5,29 +5,29 @@
           <tr>
               <th></th>
               <th v-if="!isUserPlayer()"></th>
-              <th v-if="userIsInGame()" class="text-center">You</th>
+              <th v-if="userIsInGame()" class="text-right">You</th>
           </tr>
       </thead>
       <tbody>
           <tr>
               <td>Total Stars</td>
-              <td class="text-center">{{player.stats.totalStars}}</td>
-              <td class="text-center" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.totalStars}}</td>
+              <td class="text-right">{{player.stats.totalStars}}</td>
+              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.totalStars}}</td>
           </tr>
           <tr>
               <td>Total Carriers</td>
-              <td class="text-center">{{player.stats.totalCarriers}}</td>
-              <td class="text-center" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.totalCarriers}}</td>
+              <td class="text-right">{{player.stats.totalCarriers}}</td>
+              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.totalCarriers}}</td>
           </tr>
           <tr>
               <td>Total Ships</td>
-              <td class="text-center">{{player.stats.totalShips}}</td>
-              <td class="text-center" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.totalShips}}</td>
+              <td class="text-right">{{player.stats.totalShips}}</td>
+              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.totalShips}}</td>
           </tr>
           <tr>
               <td>New Ships</td>
-              <td class="text-center">{{player.stats.newShips}}</td>
-              <td class="text-center" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.newShips}}</td>
+              <td class="text-right">{{player.stats.newShips}}</td>
+              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()">{{getUserPlayer().stats.newShips}}</td>
           </tr>
       </tbody>
   </table>

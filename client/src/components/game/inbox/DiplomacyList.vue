@@ -3,7 +3,7 @@
   <loading-spinner :loading="!conversations"/>
   <div v-if="conversations">
     <div>
-        <button class="btn btn-primary" @click="onRefreshClicked"><i class="fas fa-sync"></i></button>
+        <button class="btn btn-primary" @click="onRefreshClicked">Refresh <i class="fas fa-sync"></i></button>
         <button class="btn btn-primary float-right" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button>
     </div>
 

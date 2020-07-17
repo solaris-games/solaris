@@ -11,13 +11,29 @@
 
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
-
-    <router-link
-      v-for="game in activeGames" v-bind:key="game._id"
-      :to="{ path: '/game', query: { id: game._id } }"
-      tag="button"
-      class="btn btn-block btn-primary mb-2">{{game.settings.general.name}}</router-link>
-
+    
+    <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
+        <thead>
+            <tr class="bg-primary">
+                <td>Name</td>
+                <td class="text-center">Players</td>
+                <td>Status</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="game in activeGames" v-bind:key="game._id">
+                <td>{{game.settings.general.name}}</td>
+                <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                <td>{{getGameStatusText(game)}}</td>
+                <td class="btn-group">
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
+                    <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">Play</router-link>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
     <hr>
 
     <h4>Completed Games</h4>
@@ -29,13 +45,24 @@
 
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
-    
-    <router-link
-      v-for="game in completedGames" v-bind:key="game._id"
-      :to="{ path: '/game', query: { id: game._id } }"
-      tag="button"
-      class="btn btn-block btn-primary mb-2">{{game.settings.general.name}}</router-link>
 
+    <table v-if="!isLoadingActiveGames && completedGames.length" class="table table-striped table-hover">
+        <thead>
+            <tr class="bg-primary">
+                <td>Name</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="game in completedGames" v-bind:key="game._id">
+                <td>{{game.settings.general.name}}</td>
+                <td>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
   </view-container>
 </template>
 
@@ -74,6 +101,19 @@ export default {
 
     this.isLoadingActiveGames = false
     this.isLoadingCompletedGames = false
+  },
+  methods: {
+    getGameStatusText (game) {
+      if (!game.state.startDate) {
+        return 'Waiting for Players'
+      }
+      
+      if (game.state.paused) {
+        return 'Paused'
+      }
+
+      return 'In Progress'
+    }
   }
 }
 </script>

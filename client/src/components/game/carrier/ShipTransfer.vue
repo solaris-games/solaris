@@ -28,7 +28,7 @@
 
     <div class="row mb-2">
         <div class="col-3">
-            <button type="button" class="btn btn-primary" @click="onMinShipsClicked">Min</button>
+            <button type="button" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
         </div>
         <div class="col-3">
             <button type="button" class="btn btn-primary float-right" @click="onTransferLeftClicked" :disabled="carrierShips <= 1"><i class="fas fa-chevron-left"></i></button>
@@ -37,7 +37,7 @@
             <button type="button" class="btn btn-primary" @click="onTransferRightClicked" :disabled="starShips <= 0"><i class="fas fa-chevron-right"></i></button>
         </div>
         <div class="col-3">
-            <button type="button" class="btn btn-primary float-right" @click="onMaxShipsClicked">Max</button>
+            <button type="button" class="btn btn-success btn-block float-right" @click="onMaxShipsClicked">Max</button>
         </div>
     </div>
 

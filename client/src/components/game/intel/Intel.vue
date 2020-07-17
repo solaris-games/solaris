@@ -36,8 +36,10 @@
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <button class="btn btn-primary" @click="showAll">All</button>
-                <button class="btn btn-primary ml-1 mr-3" @click="showNone">None</button>
+              <div class="btn-group">
+                <button class="btn btn-success" @click="showAll">All</button>
+                <button class="btn btn-primary mr-3" @click="showNone">None</button>
+              </div>
             </div>
 
             <div class="col">

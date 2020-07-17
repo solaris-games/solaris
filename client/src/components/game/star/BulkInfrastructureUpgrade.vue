@@ -8,7 +8,10 @@
       </div>
       <div class="col-5">
         <form @submit.prevent>
-          <div class="form-group">
+          <div class="form-group input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
             <input
               class="form-control"
               id="amount"

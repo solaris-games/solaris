@@ -407,6 +407,8 @@ module.exports = class GameTickService {
             }
 
             if (player.defeated) {
+                game.state.players--; // Deduct number of active players from the game.
+
                 let user = await this.userService.getById(player.userId);
 
                 if (isAfk) {

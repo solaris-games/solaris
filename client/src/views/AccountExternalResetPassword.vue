@@ -79,7 +79,7 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`Your password has been reset.`, { type: 'success' })
-          router.push({ name: 'account-login' })
+          router.push({ name: 'home' })
         } else {
           this.$toasted.show(`There was a problem resetting your password, please try again.`, { type: 'error' })
         }

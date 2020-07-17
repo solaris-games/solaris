@@ -15,12 +15,12 @@
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
-                  <button class="btn btn-success" :disabled="player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button>
-                  <button class="btn btn-info ml-1" :disabled="player.userId" @click="onViewCompareIntelRequested"><i class="fas fa-chart-line"></i></button>
+                  <button class="btn btn-success" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button>
+                  <button class="btn btn-info ml-1" :disabled="!gameHasStarted || player.userId" @click="onViewCompareIntelRequested"><i class="fas fa-chart-line"></i></button>
               </div>
           </div>
       </div>
-      <div class="col pr-0 bg-secondary">
+      <div class="col bg-secondary">
           <statistics :player="player"/>
       </div>
   </div>
@@ -37,6 +37,14 @@ export default {
   },
   props: {
     player: Object
+  },
+  data () {
+    return {
+      gameHasStarted: null
+    }
+  },
+  mounted () {
+    this.gameHasStarted = this.$store.state.game.state.startDate != null
   },
   methods: {
     getFriendlyColour (colour) {
