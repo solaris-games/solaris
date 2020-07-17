@@ -14,12 +14,12 @@
                 <td>P</td>
                 <td>Name</td>
                 <td></td>
-                <td>E</td>
-                <td>I</td>
-                <td>S</td>
-                <td>$E</td>
-                <td>$I</td>
-                <td>$S</td>
+                <td class="text-right">E</td>
+                <td class="text-right">I</td>
+                <td class="text-right">S</td>
+                <td class="text-right">$E</td>
+                <td class="text-right">$I</td>
+                <td class="text-right">$S</td>
             </tr>
         </thead>
         <tbody>

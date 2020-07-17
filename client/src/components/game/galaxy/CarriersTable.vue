@@ -14,8 +14,8 @@
                   <td>P</td>
                   <td>Name</td>
                   <td></td>
-                  <td>Ships</td>
-                  <td>W</td>
+                  <td class="text-right">Ships</td>
+                  <td class="text-right">W</td>
                   <td></td>
                   <td>ETA</td>
                   <!-- <td>Total ETA</td> -->

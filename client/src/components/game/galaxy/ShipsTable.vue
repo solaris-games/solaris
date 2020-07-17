@@ -15,7 +15,7 @@
                 <td>Name</td>
                 <td></td>
                 <td></td>
-                <td>Ships</td>
+                <td class="text-right">Ships</td>
             </tr>
         </thead>
         <tbody>

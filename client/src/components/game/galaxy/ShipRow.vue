@@ -7,7 +7,7 @@
       <i v-if="ship.type === 0" class="fas fa-star"></i>
       <i v-if="ship.type === 1" class="fas fa-rocket"></i>
     </td>
-    <td>{{ship.ships}}</td>
+    <td class="text-right">{{ship.ships}}</td>
 </tr>
 </template>
 
