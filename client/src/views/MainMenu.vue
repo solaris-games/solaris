@@ -1,5 +1,5 @@
 <template>
-  <div class="container bg-secondary mt-5">
+  <div class="container bg-dark mt-5">
     <div class="row bg-primary pt-3 pb-2 mb-2">
       <div class="col">
           <h1>Solaris</h1>
@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col-6">
         <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
-        <p>Welcome back<span v-if="user">, {{user.username}}</span>!</p>
+        <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
       </div>
       <div class="col-6">
         <!-- player quick stats -->
@@ -32,7 +32,7 @@
         </div>
 
         <div class="mt-3">
-          <router-link to="/account/achievements" tag="button" class="btn btn-block btn-primary">Achievements</router-link>
+          <router-link v-if="user" :to="{ name: 'account-achievements', params: { userId: user._id }}" tag="button" class="btn btn-block btn-primary">Achievements</router-link>
           <router-link to="/account/settings" tag="button" class="btn btn-block btn-primary">Account Settings</router-link>
           <router-link to="/codex" tag="button" class="btn btn-block btn-info">Help</router-link>
         </div>

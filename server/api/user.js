@@ -83,6 +83,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/user/achievements/:id', middleware.authenticate, async (req, res, next) => {
+        try {
+            let achievements = await container.userService.getAchievements(req.params.id);
+
+            return res.status(200).json(achievements);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.put('/api/user/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
         try {
             await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);

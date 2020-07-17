@@ -18,6 +18,7 @@ module.exports = class UserService {
         return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
+            resetPasswordToken: 0,
             premiumEndDate: 0
         });
     }
@@ -26,11 +27,20 @@ module.exports = class UserService {
         return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
+            resetPasswordToken: 0,
             premiumEndDate: 0,
             credits: 0,
             email: 0,
             emailEnabled: 0,
             username: 0
+        });
+    }
+
+    async getAchievements(id) {
+        return await this.userModel.findById(id, {
+            // Remove fields we don't want to send back.
+            achievements: 1,
+            username: 1
         });
     }
 

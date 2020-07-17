@@ -1,11 +1,11 @@
 <template>
   <view-container>
-    <view-title title="Achievements" />
+    <view-title :title="user ? user.username : 'Achievements'" />
 
-    <loading-spinner :loading="!achievements"/>
+    <loading-spinner :loading="!user"/>
     
     <!-- TODO: Will this look nicer on the main menu instead? -->
-    <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
+    <achievements v-if="user.achievements" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
     <p class="text-center pt-3 mb-0">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
 
@@ -15,27 +15,27 @@
         <tbody>
           <tr>
             <td>Victories</td>
-            <td class="text-right">{{ achievements.victories }}</td>
+            <td class="text-right">{{ user.achievements.victories }}</td>
           </tr>
           <tr>
             <td>Joined</td>
-            <td class="text-right">{{ achievements.joined }}</td>
+            <td class="text-right">{{ user.achievements.joined }}</td>
           </tr>
           <tr>
             <td>Completed</td>
-            <td class="text-right">{{ achievements.completed }}</td>
+            <td class="text-right">{{ user.achievements.completed }}</td>
           </tr>
           <tr>
             <td>Defeated</td>
-            <td class="text-right">{{ achievements.defeated }}</td>
+            <td class="text-right">{{ user.achievements.defeated }}</td>
           </tr>
           <tr>
             <td>Quit</td>
-            <td class="text-right">{{ achievements.quit }}</td>
+            <td class="text-right">{{ user.achievements.quit }}</td>
           </tr>
           <tr>
             <td>AFK</td>
-            <td class="text-right">{{ achievements.afk }}</td>
+            <td class="text-right">{{ user.achievements.afk }}</td>
           </tr>
         </tbody>
       </table>
@@ -47,27 +47,27 @@
         <tbody>
           <tr>
             <td>Ship Kills</td>
-            <td class="text-right">{{ achievements.combat.kills.ships }}</td>
+            <td class="text-right">{{ user.achievements.combat.kills.ships }}</td>
           </tr>
           <tr>
             <td>Ship Losses</td>
-            <td class="text-right">{{ achievements.combat.losses.ships }}</td>
+            <td class="text-right">{{ user.achievements.combat.losses.ships }}</td>
           </tr>
           <tr>
             <td>Carrier Kills</td>
-            <td class="text-right">{{ achievements.combat.kills.carriers }}</td>
+            <td class="text-right">{{ user.achievements.combat.kills.carriers }}</td>
           </tr>
           <tr>
             <td>Carrier Losses</td>
-            <td class="text-right">{{ achievements.combat.losses.carriers }}</td>
+            <td class="text-right">{{ user.achievements.combat.losses.carriers }}</td>
           </tr>
           <tr>
             <td>Stars Captured</td>
-            <td class="text-right">{{ achievements.combat.stars.captured }}</td>
+            <td class="text-right">{{ user.achievements.combat.stars.captured }}</td>
           </tr>
           <tr>
             <td>Stars Lost</td>
-            <td class="text-right">{{ achievements.combat.stars.lost }}</td>
+            <td class="text-right">{{ user.achievements.combat.stars.lost }}</td>
           </tr>
         </tbody>
       </table>
@@ -79,23 +79,23 @@
         <tbody>
           <tr>
             <td>Economy</td>
-            <td class="text-right">{{ achievements.infrastructure.economy }}</td>
+            <td class="text-right">{{ user.achievements.infrastructure.economy }}</td>
           </tr>
           <tr>
             <td>Industry</td>
-            <td class="text-right">{{ achievements.infrastructure.industry }}</td>
+            <td class="text-right">{{ user.achievements.infrastructure.industry }}</td>
           </tr>
           <tr>
             <td>Science</td>
-            <td class="text-right">{{ achievements.infrastructure.science }}</td>
+            <td class="text-right">{{ user.achievements.infrastructure.science }}</td>
           </tr>
           <tr>
             <td>Warp Gates Built</td>
-            <td class="text-right">{{ achievements.infrastructure.warpGates }}</td>
+            <td class="text-right">{{ user.achievements.infrastructure.warpGates }}</td>
           </tr>
           <tr>
             <td>Warp Gates Destroyed</td>
-            <td class="text-right">{{ achievements.infrastructure.warpGatesDestroyed }}</td>
+            <td class="text-right">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
           </tr>
         </tbody>
       </table>
@@ -107,27 +107,27 @@
         <tbody>
           <tr>
             <td>Scanning</td>
-            <td class="text-right">{{ achievements.research.scanning }}</td>
+            <td class="text-right">{{ user.achievements.research.scanning }}</td>
           </tr>
           <tr>
             <td>Hyperspace</td>
-            <td class="text-right">{{ achievements.research.hyperspace }}</td>
+            <td class="text-right">{{ user.achievements.research.hyperspace }}</td>
           </tr>
           <tr>
             <td>Terraforming</td>
-            <td class="text-right">{{ achievements.research.terraforming }}</td>
+            <td class="text-right">{{ user.achievements.research.terraforming }}</td>
           </tr>
           <tr>
             <td>Weapons</td>
-            <td class="text-right">{{ achievements.research.weapons }}</td>
+            <td class="text-right">{{ user.achievements.research.weapons }}</td>
           </tr>
           <tr>
             <td>Banking</td>
-            <td class="text-right">{{ achievements.research.banking }}</td>
+            <td class="text-right">{{ user.achievements.research.banking }}</td>
           </tr>
           <tr>
             <td>Manufacturing</td>
-            <td class="text-right">{{ achievements.research.manufacturing }}</td>
+            <td class="text-right">{{ user.achievements.research.manufacturing }}</td>
           </tr>
         </tbody>
       </table>
@@ -139,23 +139,23 @@
         <tbody>
           <tr>
             <td>Credits Sent</td>
-            <td class="text-right">{{ achievements.trade.creditsSent }}</td>
+            <td class="text-right">{{ user.achievements.trade.creditsSent }}</td>
           </tr>
           <tr>
             <td>Credits Received</td>
-            <td class="text-right">{{ achievements.trade.creditsReceived }}</td>
+            <td class="text-right">{{ user.achievements.trade.creditsReceived }}</td>
           </tr>
           <tr>
             <td>Technology Sent</td>
-            <td class="text-right">{{ achievements.trade.technologySent }}</td>
+            <td class="text-right">{{ user.achievements.trade.technologySent }}</td>
           </tr>
           <tr>
             <td>Technology Received</td>
-            <td class="text-right">{{ achievements.trade.technologyReceived }}</td>
+            <td class="text-right">{{ user.achievements.trade.technologyReceived }}</td>
           </tr>
           <tr>
             <td>Renown Sent</td>
-            <td class="text-right">{{ achievements.trade.renownSent }}</td>
+            <td class="text-right">{{ user.achievements.trade.renownSent }}</td>
           </tr>
         </tbody>
       </table>
@@ -341,14 +341,15 @@ export default {
   },
   data () {
     return {
+      user: null,
       achievements: null
     }
   },
   async mounted () {
     try {
-      let response = await userService.getMyUserInfo()
+      let response = await userService.getUserAchievements(this.$route.params.userId)
 
-      this.achievements = response.data.achievements
+      this.user = response.data
     } catch (err) {
       console.error(err)
     }

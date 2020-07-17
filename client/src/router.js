@@ -25,7 +25,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/account/achievements',
+      path: '/account/achievements/:userId',
       name: 'account-achievements',
       component: AccountAchievements
     },

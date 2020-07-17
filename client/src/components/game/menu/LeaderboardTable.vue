@@ -1,6 +1,6 @@
 <template>
 <div class="table-responsive">
-    <table class="table" v-if="leaderboard">
+    <table class="table table-striped table-hover" v-if="leaderboard">
         <thead>
             <th>#</th>
             <th>Player</th>
@@ -11,7 +11,9 @@
         <tbody>
             <tr v-for="player in leaderboard" :key="player._id">
                 <td>{{player.position}}</td>
-                <td>{{player.username}}</td>
+                <td>
+                    <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">{{player.username}}</router-link>
+                </td>
                 <td align="right">{{player.achievements.rank}}</td>
                 <td align="right">{{player.achievements.victories}}</td>
                 <td align="right">{{player.achievements.renown}}</td>

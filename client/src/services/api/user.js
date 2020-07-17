@@ -7,6 +7,10 @@ class UserService extends BaseApiService {
     return axios.get(this.BASE_URL + 'user', { withCredentials: true })
   }
 
+  getUserAchievements (userId) {
+    return axios.get(this.BASE_URL + 'user/achievements/' + userId, { withCredentials: true })
+  }
+
   createUser (email, username, password) {
     return axios.post(this.BASE_URL + 'user', {
       email: email,
