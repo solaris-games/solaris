@@ -5,12 +5,12 @@
     <loading-spinner :loading="!user"/>
     
     <!-- TODO: Will this look nicer on the main menu instead? -->
-    <achievements v-if="user.achievements" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
+    <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
     <p class="text-center pt-3 mb-0">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
 
     <h5>Games</h5>
-    <div class="table-responsive">
+    <div class="table-responsive" v-if="user">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
@@ -42,7 +42,7 @@
     </div>
 
     <h5>Military</h5>
-    <div class="table-responsive">
+    <div class="table-responsive" v-if="user">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
@@ -74,7 +74,7 @@
     </div>
 
     <h5>Infrastructure</h5>
-    <div class="table-responsive">
+    <div class="table-responsive" v-if="user">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
@@ -102,7 +102,7 @@
     </div>
 
     <h5>Research</h5>
-    <div class="table-responsive">
+    <div class="table-responsive" v-if="user">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
@@ -134,7 +134,7 @@
     </div>
 
     <h5>Trade</h5>
-    <div class="table-responsive">
+    <div class="table-responsive" v-if="user">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
