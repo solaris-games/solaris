@@ -6,24 +6,23 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-6">
+      <div class="col-sm-12 col-md-4 col-lg-6">
         <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
         <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
       </div>
-      <div class="col-6">
+      <div class="col-sm-12 col-md-8 col-lg-6">
         <!-- player quick stats -->
-        <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"
-          style="margin-right: 0px;"/>
+        <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
         <loading-spinner :loading="!achievements"></loading-spinner>
       </div>
     </div>
     <div class="row">
-      <div class="col-8">
+      <div class="d-none d-md-block col-md-8">
         <h4>Leaderboard</h4>
         <leaderboard-table if="leaderboard" :leaderboard="leaderboard"></leaderboard-table>
         <loading-spinner :loading="!leaderboard"></loading-spinner>
       </div>
-      <div class="col-4">
+      <div class="col-sm-12 col-md-4">
         <div>
           <router-link to="/game/active-games" tag="button" class="btn btn-block btn-success">My Games</router-link>
           <router-link to="/game/list" tag="button" class="btn btn-block btn-success">Join Game</router-link>

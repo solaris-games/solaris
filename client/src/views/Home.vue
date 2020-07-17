@@ -1,33 +1,38 @@
 <template>
   <view-container>
-    <h1 class="pt-3">Solaris</h1>
-
-    <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
+    <div class="row bg-primary pt-3 pb-2 mb-2">
+      <div class="col">
+          <h1>Solaris</h1>
+      </div>
+    </div>
 
     <div class="row">
-        <div class="col">
-          <router-link to="/account/create" tag="button" class="btn btn-block btn-primary">Create Account</router-link>
-        </div>
-        <div class="col">
-          <router-link to="/account/login" tag="button" class="btn btn-block btn-success">Login</router-link>
-        </div>
+      <div class="col-sm-12 col-md-6">
+        <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
+        <h4>A board game for the web!</h4>
+        <p>Login throughout the day to command epic fleets of spacecraft in a desperate struggle to conquer the galaxy!</p>
+      </div>
+      <div class="col-sm-12 col-md-6">
+        <h4>Login</h4>
+        <account-login></account-login>
+      </div>
     </div>
-
-    <img />
-
-    <div class="text-center">
-      <h4>A board game for the web!</h4>
-      <p>Login throughout the day to command epic fleets of spacecraft in a desperate struggle to conquer the galaxy!</p>
-    </div>
+    <footer>
+      <div class="text-right">
+        <a href="https://github.com/mike-eason/solaris" target="_blank">Source Code</a>
+      </div>
+    </footer>
   </view-container>
 </template>
 
 <script>
 import ViewContainer from '../components/ViewContainer'
+import AccountLoginVue from './AccountLogin'
 
 export default {
   components: {
-    'view-container': ViewContainer
+    'view-container': ViewContainer,
+    'account-login': AccountLoginVue
   }
 }
 </script>

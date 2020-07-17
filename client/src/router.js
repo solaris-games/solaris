@@ -45,11 +45,6 @@ export default new Router({
       component: AccountForgotUsername
     },
     {
-      path: '/account/login',
-      name: 'account-login',
-      component: AccountLogin
-    },
-    {
       path: '/account/reset-email',
       name: 'account-reset-email',
       component: AccountResetEmail

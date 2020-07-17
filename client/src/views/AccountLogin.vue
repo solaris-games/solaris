@@ -1,36 +1,36 @@
 <template>
-  <view-container>
-    <view-title title="Login" navigation="home"/>
+  <form @submit.prevent="handleSubmit">
+    <div class="form-group" v-if="!isLoading">
+        <input type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
+    </div>
 
-    <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-            <input type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
-        </div>
-
-        <div class="form-group">
-            <input type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
-        </div>
-
-        <form-error-list v-bind:errors="errors"/>
-
-        <div class="form-group">
-            <input type="submit" class="btn btn-success" value="Login" :disabled="isLoading"/>
-            <router-link to="/" tag="button" type="button" class="btn btn-danger float-right">Cancel</router-link>
-        </div>
-
-        <div class="form-group">
-            <router-link to="/account/forgot-password">Forgot Password?</router-link> |
-            <router-link to="/account/forgot-username">Forgot Username?</router-link>
-        </div>
-    </form>
+    <div class="form-group" v-if="!isLoading">
+        <input type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
+    </div>
 
     <loading-spinner :loading="isLoading"/>
-  </view-container>
+
+    <form-error-list v-bind:errors="errors"/>
+
+    <div class="form-group">
+      <div class="row">
+        <div class="col-6">
+          <input type="submit" class="btn btn-success btn-block" value="Login" :disabled="isLoading"/>
+        </div>
+        <div class="col-6">
+          <router-link to="/account/create" tag="button" class="btn btn-primary btn-block" :disabled="isLoading">Register</router-link>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      Forgot <router-link to="/account/forgot-password">Password</router-link>/<router-link to="/account/forgot-username">Username</router-link>?
+    </div>
+  </form>
 </template>
 
 <script>
 import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
 import router from '../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
@@ -39,7 +39,6 @@ import authService from '../services/api/auth'
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
