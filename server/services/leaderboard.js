@@ -6,8 +6,9 @@ module.exports = class LeaderboardService {
         this.playerService = playerService;
     }
 
-    async getLeaderboard() {
+    async getLeaderboard(limit) {
         let leaderboard = await this.userModel.find({})
+        .limit(limit)
         .sort({
             'achievements.rank': -1,
             'achievements.victories': -1,

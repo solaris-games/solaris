@@ -4,26 +4,7 @@
 
     <loading-spinner :loading="!leaderboard"/>
 
-    <div class="table-responsive">
-        <table class="table" v-if="leaderboard">
-            <thead>
-                <th>#</th>
-                <th>Player</th>
-                <th class="text-right">Rank</th>
-                <th class="text-right">Victories</th>
-                <th class="text-right">Renown</th>
-            </thead>
-            <tbody>
-                <tr v-for="player in leaderboard" :key="player._id">
-                    <td>{{player.position}}</td>
-                    <td>{{player.username}}</td>
-                    <td align="right">{{player.achievements.rank}}</td>
-                    <td align="right">{{player.achievements.victories}}</td>
-                    <td align="right">{{player.achievements.renown}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <leaderboard-table :leaderboard="leaderboard"></leaderboard-table>
   </view-container>
 </template>
 
@@ -32,12 +13,14 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
 import UserApiService from '../services/api/user'
+import LeaderboardTable from '../components/game/menu/LeaderboardTable'
 
 export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'leaderboard-table': LeaderboardTable
   },
   data () {
       return {
