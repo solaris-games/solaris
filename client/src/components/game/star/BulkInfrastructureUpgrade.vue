@@ -97,7 +97,8 @@ export default {
 
           this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
         
-          // TODO: Update the player credits amount and update all stars.
+          GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
+          this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
         }
       } catch (err) {
         console.error(err)
