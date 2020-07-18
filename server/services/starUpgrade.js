@@ -163,9 +163,6 @@ module.exports = class StarUpgradeService {
         return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
     }
 
-    // TODO: This method is absolutely insane and needs to be refactored.
-    // It is really really inefficient because it calculates the upgrade costs
-    // like 10 times per star.
     async upgradeBulk(game, player, infrastructureType, amount) {
         let upgradeSummary = {
             stars: [],
@@ -200,45 +197,52 @@ module.exports = class StarUpgradeService {
             throw new ValidationError(`Unknown infrastructure type ${infrastructure}`)
         }
 
+        // Get all of the player stars and what the next upgrade cost will be.
+        let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
+            .map(s => {
+                let terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, player.research.terraforming.level)
+
+                return {
+                    star: s,
+                    terraformedResources,
+                    infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedResources)
+                }
+            });
+
         while (amount) {
-            let upgradeStar = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
-                .filter(a => {
-                    let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, player.research.terraforming.level);
-                    
-                    return calculateCostFunction(game, expenseConfig, a.infrastructure[infrastructureType], terraformedResources) <= amount;
-                })
-                .sort((a, b) => {
-                    let terraformedResources = this.starService.calculateTerraformedResources(a.naturalResources, player.research.terraforming.level);
+            // Get the next star that can be upgraded, cheapest first.
+            let upgradeStar = stars
+                .filter(s => s.infrastructureCost <= amount)
+                .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
 
-                    let costA = calculateCostFunction(game, expenseConfig, a.infrastructure[infrastructureType], terraformedResources);
-                    let costB = calculateCostFunction(game, expenseConfig, b.infrastructure[infrastructureType], terraformedResources);
-
-                    return costA - costB;
-                })[0];
-
+            // If no stars can be upgraded then break out here.
             if (!upgradeStar) {
                 break;
             }
 
-            let upgradedCost = await upgradeFunction(game, player, upgradeStar._id);
+            let upgradedCost = await upgradeFunction(game, player, upgradeStar.star._id);
 
             amount -= upgradedCost.cost;
 
             upgradeSummary.upgraded++;
             upgradeSummary.cost += upgradedCost.cost;
 
+            // Update the stars next infrastructure cost so next time
+            // we loop we will have the most up to date info.
+            upgradeStar.infrastructureCost = upgradedCost.nextCost;
+
             // Add the star that we upgraded to the summary result.
-            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar._id));
+            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
 
             if (!summaryStar) {
                 summaryStar = {
-                    starId: upgradeStar._id
+                    starId: upgradeStar.star._id
                 }
 
                 upgradeSummary.stars.push(summaryStar);
             }
 
-            summaryStar.infrastructure = upgradeStar.infrastructure[infrastructureType];
+            summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
         }
 
         await game.save()
