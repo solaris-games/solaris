@@ -10,10 +10,10 @@
 
     <div class="row">
         <div class="col">
-            <p class="mb-0">{{transfer.star.name}}</p>
+            <p class="mb-0">{{star.name}}</p>
         </div>
         <div class="col">
-            <p class="mb-0">{{transfer.carrier.name}}</p>
+            <p class="mb-0">{{carrier.name}}</p>
         </div>
     </div>
 
@@ -41,6 +41,11 @@
         </div>
     </div>
 
+    <div class="alert alert-warning" role="alert" v-if="isOutOfSync">
+        The game has ticked while you have been on this screen, the ships below may be out of sync,
+        click <a href="#" @click="reSync">here</a> to re-sync.
+    </div>
+
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
         <div class="col pr-0">
@@ -64,38 +69,73 @@ export default {
     'menu-title': MenuTitle
   },
   props: {
-    transfer: Object
+    carrierId: String
   },
   data () {
       return {
+          carrier: null,
+          star: null,
           starShips: 0,
           carrierShips: 0,
-          isTransferringShips: false
+          isTransferringShips: false,
+          isOutOfSync: false
       }
   },
   mounted () {
-      this.starShips = this.transfer.star.garrison
-      this.carrierShips = this.transfer.carrier.ships
+    this.sockets.listener.subscribe('gameTicked', this.onGameTicked)
+    
+    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+    this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
+
+    this.starShips = this.star.garrison
+    this.carrierShips = this.carrier.ships
+  },
+  destroyed () {
+    this.sockets.listener.unsubscribe('gameTicked')
   },
   methods: {
       onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
       },
+      reSync () {
+        // TODO: This isn't a great solution, it would be better to fetch the data from the API or
+        // alternatively the API returns what has been changed when the game ticks to each player
+        // instead of the player requesting the full galaxy whenver the game ticks.
+        this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+        this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
+
+        // If the game ticks then check to see if any ships have been built at the star.
+        let totalInTransfer = this.starShips + this.carrierShips
+        let totalOriginal = this.star.garrison + this.carrier.ships
+        let difference = totalOriginal - totalInTransfer
+
+        // If there is a difference then this means that ship(s) have been built at the star
+        // while the user has been on this screen, in that case, add the new ships to the star total
+        if (difference) {
+            this.starShips += difference
+            this.onStarShipsChanged()
+        }
+
+        this.isOutOfSync = false
+      },
+      onGameTicked () {
+        this.isOutOfSync = true
+      },
       onStarShipsChanged (e) {
-        let difference = parseInt(this.starShips) - this.transfer.star.garrison
-        this.carrierShips = this.transfer.carrier.ships - difference
+        let difference = parseInt(this.starShips) - this.star.garrison
+        this.carrierShips = this.carrier.ships - difference
       },
       onCarrierShipsChanged (e) {
-        let difference = parseInt(this.carrierShips) - this.transfer.carrier.ships
-        this.starShips = this.transfer.star.garrison - difference
+        let difference = parseInt(this.carrierShips) - this.carrier.ships
+        this.starShips = this.star.garrison - difference
       },
       onMinShipsClicked (e) {
           this.carrierShips = 1;
-          this.starShips = this.transfer.carrier.ships + this.transfer.star.garrison - 1
+          this.starShips = this.carrier.ships + this.star.garrison - 1
       },
       onMaxShipsClicked (e) {
           this.starShips = 0;
-          this.carrierShips = this.transfer.carrier.ships + this.transfer.star.garrison
+          this.carrierShips = this.carrier.ships + this.star.garrison
       },
       onTransferLeftClicked (e) {
           this.starShips++
@@ -111,16 +151,16 @@ export default {
             
             let response = await CarrierApiService.transferShips(
                 this.$store.state.game._id, 
-                this.transfer.carrier._id,
+                this.carrier._id,
                 parseInt(this.carrierShips),
-                this.transfer.star._id,
+                this.star._id,
                 parseInt(this.starShips))
 
             if (response.status === 200) {
-                this.$toasted.show(`Ships transferred between ${this.transfer.star.name} and ${this.transfer.carrier.name}.`)
+                this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
 
                 // Note: The web socket event handles setting the carrier and star ships.
-                this.$emit('onShipsTransferred', this.transfer.carrier)
+                this.$emit('onShipsTransferred', this.carrier)
             }
           } catch (err) {
               console.log(err)
@@ -129,7 +169,7 @@ export default {
           this.isTransferringShips = false
       },
       onOpenCarrierDetailRequested (e) {
-          this.$emit('onOpenCarrierDetailRequested', this.transfer.carrier)
+          this.$emit('onOpenCarrierDetailRequested', this.carrier)
       }
   }
 }

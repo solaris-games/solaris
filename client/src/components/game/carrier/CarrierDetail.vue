@@ -157,10 +157,9 @@ export default {
       // this.carrier.waypoints.push(e)
     },
     onShipTransferRequested (e) {
-      this.$emit('onShipTransferRequested', {
-        star: GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting),
-        carrier: this.carrier
-      })
+      if (this.carrier.orbiting) {
+        this.$emit('onShipTransferRequested', this.carrier._id)
+      }
     },
     onEditWaypointRequested (e) {
       this.$emit('onEditWaypointRequested', {
