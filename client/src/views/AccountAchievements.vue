@@ -4,7 +4,6 @@
 
     <loading-spinner :loading="!user"/>
     
-    <!-- TODO: Will this look nicer on the main menu instead? -->
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
     <p class="text-center pt-3 mb-0">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>

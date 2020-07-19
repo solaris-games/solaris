@@ -101,6 +101,6 @@ export default {
 
 <style scoped>
 td {
-  vertical-align: middle !important; /* TODO: Middle align all td everywhere in the app? */
+  vertical-align: middle !important;
 }
 </style>

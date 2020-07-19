@@ -56,7 +56,6 @@ module.exports = class PlayerService {
         };
     }
 
-    // TODO: Refactor as game already contains game settings.
     createEmptyPlayers(game, allStars) {
         let players = [];
 

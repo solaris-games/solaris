@@ -4,7 +4,7 @@ module.exports = class GameGalaxyService {
 
     constructor(mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService, timeService) {
+        waypointService, researchService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -14,7 +14,6 @@ module.exports = class GameGalaxyService {
         this.carrierService = carrierService;
         this.waypointService = waypointService;
         this.researchService = researchService;
-        this.timeService = timeService;
     }
 
     async getGalaxy(game, userId) {

@@ -2,11 +2,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ResearchService {
 
-    constructor(technologyService, randomService, playerService, timeService, eventService, userService) {
+    constructor(technologyService, randomService, playerService, eventService, userService) {
         this.technologyService = technologyService;
         this.randomService = randomService;
         this.playerService = playerService;
-        this.timeService = timeService;
         this.eventService = eventService;
         this.userService = userService;
     }

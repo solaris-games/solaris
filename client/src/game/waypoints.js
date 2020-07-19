@@ -42,9 +42,10 @@ class Waypoints extends EventEmitter {
   drawNextWaypoints () {
     // Draw all of the available waypoints that the last waypoint can reach.
     let lastLocation = this._getLastLocation()
+    let userPlayer = this.game.galaxy.players.find(p => p.userId)
 
     // Calculate which stars are in reach and draw highlights around them
-    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, 1) // TODO: Get the hyperspace level
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer.research.hyperspace.level)
 
     let stars = this.game.galaxy.stars.filter(s => {
         let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
@@ -116,7 +117,9 @@ class Waypoints extends EventEmitter {
   _createWaypoint(desiredLocation, starId) {
     // If the star that was clicked is within hyperspace range then append
     // a new waypoint to this star.
-    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, 1) // TODO: Get hyperspace level
+    let userPlayer = this.game.galaxy.players.find(p => p.userId)
+
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer.research.hyperspace.level)
     
     const lastLocation = this._getLastLocation()
     const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)
