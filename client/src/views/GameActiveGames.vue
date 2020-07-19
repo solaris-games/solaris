@@ -12,27 +12,29 @@
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
     
-    <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
-        <thead>
-            <tr class="bg-primary">
-                <td>Name</td>
-                <td class="text-center">Players</td>
-                <td>Status</td>
-                <td></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="game in activeGames" v-bind:key="game._id">
-                <td>{{game.settings.general.name}}</td>
-                <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
-                <td>{{getGameStatusText(game)}}</td>
-                <td class="btn-group">
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
-                    <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">Play</router-link>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+      <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
+          <thead>
+              <tr class="bg-primary">
+                  <td>Name</td>
+                  <td class="text-center">Players</td>
+                  <td class="d-none d-md-table-cell">Status</td>
+                  <td></td>
+              </tr>
+          </thead>
+          <tbody>
+              <tr v-for="game in activeGames" v-bind:key="game._id">
+                  <td class="col-2">{{game.settings.general.name}}</td>
+                  <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                  <td class="d-none d-md-table-cell">{{getGameStatusText(game)}}</td>
+                  <td class="btn-group">
+                      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
+                      <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">Play</router-link>
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
     
     <hr>
 

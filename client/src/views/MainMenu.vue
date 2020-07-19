@@ -1,16 +1,12 @@
 <template>
-  <div class="container bg-dark mt-5">
-    <div class="row bg-primary pt-3 pb-2 mb-2">
-      <div class="col">
-          <h1>Solaris</h1>
-      </div>
-    </div>
+  <view-container>
+    <view-title title="Solaris" :hideHomeButton="true"></view-title>
     <div class="row">
-      <div class="col-sm-12 col-md-4 col-lg-6">
+      <div class="col-sm-12 col-md-6 col-lg-6">
         <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
         <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
       </div>
-      <div class="col-sm-12 col-md-8 col-lg-6">
+      <div class="col-sm-12 col-md-6 col-lg-6">
         <!-- player quick stats -->
         <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
         <loading-spinner :loading="!achievements"></loading-spinner>
@@ -40,14 +36,14 @@
         <div class="mt-3">
           <router-link to="/premium-store" tag="button" class="btn btn-block btn-danger">Premium Store</router-link>
         </div>
-         -->
+        -->
 
         <div class="mt-3">
           <button @click="logout" class="btn btn-block btn-danger" :disabled="isLoggingOut">Logout</button>
         </div>
       </div>
     </div>
-  </div>
+  </view-container>
 </template>
 
 <script>
@@ -56,6 +52,7 @@ import router from '../router'
 import authService from '../services/api/auth'
 import userService from '../services/api/user'
 import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
 import LeaderboardTable from '../components/game/menu/LeaderboardTable'
 
@@ -63,6 +60,7 @@ export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
+    'view-title': ViewTitle,
     'achievements': Achievements,
     'leaderboard-table': LeaderboardTable
   },

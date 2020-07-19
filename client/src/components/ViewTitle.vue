@@ -3,7 +3,7 @@
     <div class="col">
         <h2>{{ title }}</h2>
     </div>
-    <div class="col-1">
+    <div class="col-1" v-if="!hideHomeButton">
         <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
 </div>
@@ -16,7 +16,8 @@ export default {
   props: {
     title: String,
     navigation: { type: String, default: 'main-menu' },
-    icon: { type: String, default: 'home' }
+    icon: { type: String, default: 'home' },
+    hideHomeButton: Boolean
   },
   methods: {
     navigate () {

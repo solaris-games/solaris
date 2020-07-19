@@ -17,11 +17,6 @@
         <account-login></account-login>
       </div>
     </div>
-    <footer>
-      <div class="text-right">
-        <a href="https://github.com/mike-eason/solaris" target="_blank">Source Code</a>
-      </div>
-    </footer>
   </view-container>
 </template>
 
