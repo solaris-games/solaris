@@ -53,7 +53,7 @@
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-7">
-          <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} ({{timeRemainingEtaTotal}})</p>
+          <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
         <div class="col-5 mb-2">
           <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="!getUserPlayer().defeated">Edit Waypoints</button>
