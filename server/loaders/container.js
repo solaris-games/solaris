@@ -55,7 +55,6 @@ module.exports = (io) => {
     const emailService = new EmailService(config);
     const randomService = new RandomService();
     const technologyService = new TechnologyService();
-    const gameService = new GameService(GameModel, userService, eventService);
     const gameListService = new GameListService(GameModel);
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
@@ -66,6 +65,7 @@ module.exports = (io) => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
+    const gameService = new GameService(GameModel, userService, eventService, leaderboardService);
     const researchService = new ResearchService(technologyService, randomService, playerService, eventService, userService);
     const tradeService = new TradeService(userService, playerService, eventService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
@@ -73,7 +73,7 @@ module.exports = (io) => {
     const starUpgradeService = new StarUpgradeService(starService, carrierService, eventService, userService);
     const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService);
     const historyService = new HistoryService(HistoryModel, playerService);
-    const gameTickService = new GameTickService(eventService, broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService);
+    const gameTickService = new GameTickService(eventService, broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService);
     const messageService = new MessageService();
     const shipTransferService = new ShipTransferService(carrierService, starService);
 

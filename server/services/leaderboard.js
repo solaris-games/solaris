@@ -87,4 +87,48 @@ module.exports = class LeaderboardService {
         }
     }
 
+    getGameWinner(game) {
+        let starWinner = this.getStarCountWinner(game);
+
+        if (starWinner) {
+            return starWinner;
+        }
+
+        let lastManStanding = this.getLastManStanding(game);
+
+        if (lastManStanding) {
+            return lastManStanding;
+        }
+
+        return null;
+    }
+
+    getStarCountWinner(game) {
+        // There could be more than one player who has reached
+        // the number of stars required at the same time.
+        // In this case we pick the player who has the most ships.
+        // If that's equal, then pick the player who has the most carriers.
+        let leaderboard = this.getLeaderboardRankings(game);
+
+        let starWinners = leaderboard
+            .filter(p => !p.player.defeated && p.stats.totalStars >= game.state.starsForVictory)
+            .map(p => p.player);
+
+        if (starWinners.length) {
+            return starWinners[0];
+        }
+
+        return null;
+    }
+
+    getLastManStanding(game) {
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+
+        if (undefeatedPlayers.length === 1) {
+            return undefeatedPlayers[0];
+        }
+
+        return null;
+    }
+
 };

@@ -3,7 +3,7 @@ const moment = require('moment');
 module.exports = class GameTickService {
     
     constructor(eventService, broadcastService, distanceService, starService, carrierService, 
-        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService) {
+        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService) {
         this.eventService = eventService;
         this.broadcastService = broadcastService;
         this.distanceService = distanceService;
@@ -16,6 +16,7 @@ module.exports = class GameTickService {
         this.combatService = combatService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
+        this.gameService = gameService;
     }
 
     async tick(game) {
@@ -393,10 +394,12 @@ module.exports = class GameTickService {
             let player = undefeatedPlayers[i];
 
             // Check if the player has been AFK for over 48 hours.
-            let isAfk = moment(player.lastSeen).utc() > moment().utc().subtract(2, 'days');
+            let isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
 
-            player.defeated = !isAfk;
-            player.afk = isAfk;
+            if (isAfk) {
+                player.defeated = true;
+                player.afk = true;
+            }
 
             // Check if the player has been defeated by conquest.
             if (!player.defeated) {
@@ -428,37 +431,12 @@ module.exports = class GameTickService {
     }
 
     async _gameWinCheck(game) {
-        // Check to see if anyone has won the game.
-        // There could be more than one player who has reached
-        // the number of stars required at the same time.
-        // In this case we pick the player who has the most ships.
-        // If that's equal, then pick the player who has the most carriers.
-        let winner = null;
-    
-        let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
-
-        let starWinners = leaderboard
-            .filter(p => !p.player.defeated && p.stats.totalStars >= game.state.starsForVictory)
-            .map(p => p.player);
-
-        if (starWinners.length) {
-            winner = starWinners[0];
-        }
-
-        // If there are no players who have reached required star count, then check if 
-        // there are any players who are last man standing.
-        if (!winner) {
-            let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
-
-            if (undefeatedPlayers.length === 1) {
-                winner = undefeatedPlayers[0];
-            }
-        }
+        let winner = this.leaderboardService.getGameWinner(game);
 
         if (winner) {
-            game.state.paused = true;
-            game.state.endDate = moment().utc();
-            game.state.winner = winner._id;
+            this.gameService.finishGame(game, winner);
+
+            let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
             await this.leaderboardService.addGameRankings(leaderboard);
             await this.eventService.createGameEndedEvent(game);

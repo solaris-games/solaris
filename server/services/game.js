@@ -3,10 +3,11 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService {
 
-    constructor(gameModel, userService, eventService) {
+    constructor(gameModel, userService, eventService, leaderboardService) {
         this.gameModel = gameModel;
         this.userService = userService;
         this.eventService = eventService;
+        this.leaderboardService = leaderboardService;
     }
 
     async getById(id, select) {
@@ -79,7 +80,9 @@ module.exports = class GameService {
         // If the max player count is reached then start the game.
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
-        if (game.state.players === game.settings.general.playerLimit) {
+        let gameIsFull = game.state.players === game.settings.general.playerLimit;
+
+        if (gameIsFull) {
             let start = moment().utc();
 
             // TODO: When the game first begins, should we start at normal game speed?
@@ -88,8 +91,6 @@ module.exports = class GameService {
             game.state.paused = false;
             game.state.startDate = start;
             game.state.lastTickDate = start;
-
-            await this.eventService.createGameStartedEvent(game);
         }
 
         await game.save();
@@ -99,6 +100,10 @@ module.exports = class GameService {
         await user.save();
 
         await this.eventService.createPlayerJoinedEvent(game, player);
+
+        if (gameIsFull) {
+            await this.eventService.createGameStartedEvent(game); // Make sure this event is last
+        }
     }
 
     async quit(game, player) {    
@@ -151,25 +156,24 @@ module.exports = class GameService {
 
         // Do a winner check here for last man standing as it's possible that everyone might admit
         // or be legit defeated on the same tick.
-        // TODO: This could be refactored into a new service as it's currently also being done in the game
-        // tick service.
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+        let winner = this.leaderboardService.getLastManStanding(game);
 
-        if (undefeatedPlayers.length === 1) {
-            let winner = undefeatedPlayers[0];
+        if (winner) {
+            this.finishGame(game, winner);
 
-            game.state.paused = true;
-            game.state.endDate = moment().utc();
-            game.state.winner = winner._id;
+            let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
+
+            await this.leaderboardService.addGameRankings(leaderboard);
+            await this.eventService.createGameEndedEvent(game);
+
+            await game.save();
         }
 
         // TODO: Remove all carrier waypoints (unless in transit)
 
-        await game.save();
-
-        let user = await this.getPlayerUser(game, player.id);
-        user.achievements.defeated++;
-        await user.save();
+        let userPlayer = await this.getPlayerUser(game, player.id);
+        userPlayer.achievements.defeated++;
+        await userPlayer.save();
 
         await this.eventService.createPlayerDefeatedEvent(game, player);
     }
@@ -190,6 +194,12 @@ module.exports = class GameService {
 
     isFinished(game) {
         return game.state.endDate != null;
+    }
+
+    finishGame(game, winnerPlayer) {
+        game.state.paused = true;
+        game.state.endDate = moment().utc();
+        game.state.winner = winnerPlayer._id;
     }
 
 };
