@@ -6,7 +6,8 @@
         </div>
     </div>
     <div class="col mt-2">
-        <game-ended :event="event" v-if="event.type === 'gameEnded'"/>
+        <game-ended :event="event" v-if="event.type === 'gameEnded'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <game-paused :event="event" v-if="event.type === 'gamePaused'"/>
         <game-player-afk :event="event" v-if="event.type === 'gamePlayerAFK'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>

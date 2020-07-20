@@ -18,7 +18,7 @@
     <div class="row bg-success" v-if="game.state.endDate">
         <div class="col text-center pt-2">
             <h3>Game Over</h3>
-            <p>Congratulations to the winner!</p>
+            <p>The winner is <b>{{getWinnerAlias()}}</b>!</p>
         </div>
     </div>
 
@@ -146,6 +146,11 @@ export default {
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    getWinnerAlias () {
+      let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
+
+      return winnerPlayer.alias
     }
   },
 
