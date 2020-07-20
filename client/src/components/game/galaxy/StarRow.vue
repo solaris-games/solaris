@@ -27,7 +27,7 @@ export default {
       return gameHelper.getPlayerColour(this.$store.state.game, this.star.ownedByPlayerId)
     },
     clickStar (e) {
-      gameContainer.map.clickStar(this.star._id)
+      this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
       gameContainer.map.zoomToLocation(this.star.location)

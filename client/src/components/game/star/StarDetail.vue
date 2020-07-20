@@ -215,7 +215,7 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer()._id)
     },
     onOpenCarrierDetailRequested (carrier) {
-      this.$emit('onOpenCarrierDetailRequested', carrier)
+      this.$emit('onOpenCarrierDetailRequested', carrier._id)
     },
     async confirmBuildCarrier (e) {
       try {

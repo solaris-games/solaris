@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container" v-if="carrier">
     	<menu-title title="Edit Fleet Order" @onCloseRequested="onCloseRequested"/>
 
         <div class="row no-gutters mb-1">
@@ -64,17 +64,20 @@ export default {
     	'menu-title': MenuTitle,
 	},
 	props: {
-        carrier: Object,
+        carrierId: String,
         waypoint: Object
     },
     data () {
         return {
+            carrier: null,
             isSavingWaypoints: false,
             currentWaypoint: null,
             waypoints: []
         }
     },
     mounted () {
+        this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+    
         // Make a copy of the carriers waypoints.
         this.waypoints = JSON.parse(JSON.stringify(this.carrier.waypoints))
         this.currentWaypoint = this.waypoints.find(x => x._id === this.waypoint._id)
@@ -161,7 +164,7 @@ export default {
                     
                     this.$toasted.show(`${this.carrier.name} waypoints updated.`)
                     
-                    this.$emit('onOpenCarrierDetailRequested', this.carrier)
+                    this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
 				}
 			} catch (e) {
 				console.error(e)

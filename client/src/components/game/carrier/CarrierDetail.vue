@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary">
@@ -82,10 +82,11 @@ export default {
     'waypointTable': WaypointTable
   },
   props: {
-    carrier: Object
+    carrierId: String
   },
   data () {
     return {
+      carrier: null,
       currentPlayerId: this.getUserPlayer()._id,
       isLoopingWaypoints: false,
       timeRemainingEta: null,
@@ -95,6 +96,8 @@ export default {
     }
   },
   mounted () {
+    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
 
     GameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)

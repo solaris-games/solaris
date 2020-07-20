@@ -22,7 +22,8 @@
               </tr>
           </thead>
           <tbody>
-              <carrier-row v-for="carrier in tableData" v-bind:key="carrier._id" :carrier="carrier"/>
+              <carrier-row v-for="carrier in tableData" v-bind:key="carrier._id" :carrier="carrier"
+                @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
           </tbody>
       </table>
   </div>
@@ -63,6 +64,9 @@ export default {
       } else {
         return this.$store.state.game.galaxy.carriers.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
+    },
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
     }
   }
 }

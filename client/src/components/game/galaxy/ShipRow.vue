@@ -27,9 +27,9 @@ export default {
     },
     clickShip (e) {
       if (this.ship.type == 0) {
-        gameContainer.map.clickStar(this.ship._id)
+        this.$emit('onOpenStarDetailRequested', this.ship._id)
       } else {
-        gameContainer.map.clickCarrier(this.ship._id)
+        this.$emit('onOpenCarrierDetailRequested', this.ship._id)
       }
     },
     goToShip (e) {

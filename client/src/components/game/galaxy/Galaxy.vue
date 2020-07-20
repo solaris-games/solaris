@@ -18,13 +18,17 @@
 
     <div class="tab-content pt-2 pb-2">
         <div class="tab-pane fade show active" id="stars">
-            <stars-table/>
+            <stars-table
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </div>
         <div class="tab-pane fade" id="carriers">
-            <carriers-table/>
+            <carriers-table
+              @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         </div>
         <div class="tab-pane fade" id="ships">
-            <ships-table/>
+            <ships-table
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"
+              @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         </div>
     </div>
 </div>
@@ -46,6 +50,12 @@ export default {
   methods: {
     onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
     }
   }
 }

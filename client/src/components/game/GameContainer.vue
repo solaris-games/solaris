@@ -77,7 +77,7 @@ export default {
       this.$emit('onStarClicked', e._id)
     },
     onCarrierClicked (e) {
-      this.$emit('onCarrierClicked', e)
+      this.$emit('onCarrierClicked', e._id)
     },
     onWaypointCreated (e) {
       this.$emit('onWaypointCreated', e)

@@ -88,7 +88,7 @@ export default {
                 this.$emit('onOpenStarDetailRequested', mapObject.data._id) 
                 break
             case 'carrier': 
-                this.$emit('onOpenCarrierDetailRequested', mapObject.data) 
+                this.$emit('onOpenCarrierDetailRequested', mapObject.data._id) 
                 break
         }
     },

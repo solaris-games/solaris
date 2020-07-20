@@ -19,7 +19,9 @@
             </tr>
         </thead>
         <tbody>
-            <ship-row v-for="ship in tableData" v-bind:key="ship._id" :ship="ship" />
+            <ship-row v-for="ship in tableData" v-bind:key="ship._id" :ship="ship"
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"
+              @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         </tbody>
     </table>
   </div>
@@ -88,6 +90,12 @@ export default {
       } else {
         return allShips.filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
     }
   }
 }

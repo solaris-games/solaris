@@ -23,7 +23,8 @@
             </tr>
         </thead>
         <tbody>
-            <star-row v-for="star in tableData" v-bind:key="star._id" :star="star"/>
+            <star-row v-for="star in tableData" v-bind:key="star._id" :star="star"
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>
     </table>
   </div>
@@ -64,6 +65,9 @@ export default {
       } else {
         return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
     }
   }
 }

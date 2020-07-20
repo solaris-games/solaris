@@ -169,7 +169,7 @@ export default {
           this.isTransferringShips = false
       },
       onOpenCarrierDetailRequested (e) {
-          this.$emit('onOpenCarrierDetailRequested', this.carrier)
+          this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
       }
   }
 }

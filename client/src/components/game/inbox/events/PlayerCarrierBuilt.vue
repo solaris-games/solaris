@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', this.carrier)
+      this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)

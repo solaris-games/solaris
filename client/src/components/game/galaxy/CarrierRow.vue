@@ -40,7 +40,7 @@ export default {
       return GameHelper.getPlayerColour(this.$store.state.game, this.carrier.ownedByPlayerId)
     },
     clickCarrier (e) {
-      gameContainer.map.clickCarrier(this.carrier._id)
+      this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
     },
     goToCarrier (e) {
       gameContainer.map.zoomToLocation(this.carrier.location)
