@@ -49,32 +49,12 @@ class Map extends EventEmitter {
 
     // Add stars
     for (let i = 0; i < this.game.galaxy.stars.length; i++) {
-      let star = new Star(this.app)
-
-      star.setup(this.game, this.game.galaxy.stars[i], this.game.galaxy.players, this.game.galaxy.carriers)
-
-      this.stars.push(star)
-
-      this.starContainer.addChild(star.container)
-
-      star.on('onStarClicked', this.onStarClicked.bind(this))
+      this.setupStar(this.game.galaxy.stars[i])
     }
 
     // Add carriers
     for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
-      let carrier = new Carrier()
-      let carrierData = this.game.galaxy.carriers[i]
-      let player = GameHelper.getPlayerById(this.game, carrierData.ownedByPlayerId)
-
-      carrier.setup(carrierData, this.stars, player.colour.value)
-
-      this.carriers.push(carrier)
-
-      this.carrierContainer.addChild(carrier.container)
-
-      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+      this.setupCarrier(this.game.galaxy.carriers[i])
     }
 
     if (this.waypoints) {
@@ -86,6 +66,59 @@ class Map extends EventEmitter {
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
+  }
+
+  setupStar (starData) {
+    let existing = this.stars.find(x => x.data._id === starData._id)
+
+    if (existing) {
+      existing.off('onStarClicked', this.onStarClicked.bind(this))
+
+      this.starContainer.removeChild(existing.container)
+
+      this.stars.splice(this.stars.indexOf(existing), 1)
+    }
+
+    let star = new Star(this.app)
+
+    star.setup(this.game, starData, this.game.galaxy.players, this.game.galaxy.carriers)
+
+    this.stars.push(star)
+
+    this.starContainer.addChild(star.container)
+
+    star.on('onStarClicked', this.onStarClicked.bind(this))
+
+    return star
+  }
+
+  setupCarrier (carrierData) {
+    let existing = this.carriers.find(x => x.data._id === carrierData._id)
+
+    if (existing) {
+      existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+      existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+
+      this.carrierContainer.removeChild(existing.container)
+
+      this.carriers.splice(this.carriers.indexOf(existing), 1)
+    }
+
+    let carrier = new Carrier()
+    let player = GameHelper.getPlayerById(this.game, carrierData.ownedByPlayerId)
+
+    carrier.setup(carrierData, this.stars, player.colour.value)
+
+    this.carriers.push(carrier)
+
+    this.carrierContainer.addChild(carrier.container)
+
+    carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+    carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+    carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+
+    return carrier
   }
 
   draw () {
@@ -116,16 +149,24 @@ class Map extends EventEmitter {
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
 
-      star.draw()
+      this.drawStar(star)
     }
+  }
+
+  drawStar (star) {
+    star.draw()
   }
 
   drawCarriers () {
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
 
-      carrier.draw()
+      this.drawCarrier(carrier)
     }
+  }
+
+  drawCarrier (carrier) {
+    carrier.draw()
   }
 
   drawWaypoints () {

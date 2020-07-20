@@ -238,6 +238,7 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`${this.star.name} has been abandoned.`)
+
           // this.$emit('onStarAbandoned', this.star._id)
         }
       } catch (err) {

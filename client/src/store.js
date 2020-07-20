@@ -73,8 +73,8 @@ export default new Vuex.Store({
       let star = GameHelper.getStarById(state.game, data.orbiting)
       star.garrison -= data.ships;
 
-      GameContainer.setup()
-      GameContainer.draw()
+      GameContainer.reloadCarrier(data)
+      GameContainer.reloadStar(star)
     },
     gameStarCarrierShipTransferred (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
@@ -89,6 +89,11 @@ export default new Vuex.Store({
       star.ownedByPlayerId = null
       star.garrison = 0
       star.garrisonActual = 0
+
+      state.game.galaxy.carriers = state.game.galaxy.carriers.filter(x => (x.orbiting || '') != star._id);
+
+      // TODO: Redraw the star and any carriers that were destroyed.
+      GameContainer.reloadStar(star)
     },
 
   },

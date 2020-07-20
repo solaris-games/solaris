@@ -87,6 +87,18 @@ class GameContainer {
     this.map.draw()
   }
 
+  reloadStar (star) {
+    // TODO: If we are reloading the star, will the game have the updated star data?
+    let starObject = this.map.setupStar(star)
+    this.map.drawStar(starObject)
+  }
+
+  reloadCarrier (carrier) {
+    // TODO: If we are reloading the carrier, will the game have the updated carrier data?
+    let carrierObject = this.map.setupCarrier(carrier)
+    this.map.drawCarrier(carrierObject)
+  }
+
   _calculateMinStarX (game) {
     if (!game.galaxy.stars.length) { return 0 }
 
