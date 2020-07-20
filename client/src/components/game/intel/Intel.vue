@@ -85,7 +85,7 @@ export default {
         scales: {
             yAxes: [{
                 ticks: {
-                    beginAtZero: false,
+                    beginAtZero: true,
                     precision: 0
                 }
             }]
