@@ -73,6 +73,8 @@ class Map extends EventEmitter {
       this.carrierContainer.addChild(carrier.container)
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
     }
 
     if (this.waypoints) {
@@ -224,6 +226,24 @@ class Map extends EventEmitter {
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
+    }
+  }
+
+  onCarrierMouseOver (e) {
+    // If the carrier is orbiting something then send the mouse over event
+    // to the star.
+    if (e.orbiting) {
+      let star = this.stars.find(s => s.data._id === e.orbiting)
+      star.onMouseOver()
+    }
+  }
+
+  onCarrierMouseOut (e) {
+    // If the carrier is orbiting something then send the mouse over event
+    // to the star.
+    if (e.orbiting) {
+      let star = this.stars.find(s => s.data._id === e.orbiting)
+      star.onMouseOut()
     }
   }
 

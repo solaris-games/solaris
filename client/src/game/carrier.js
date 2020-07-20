@@ -11,6 +11,10 @@ class Carrier extends EventEmitter {
 
     // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
     this.container.on('pointerdown', this.onClicked.bind(this))
+    this.container.on('mouseover', this.onMouseOver.bind(this))
+    this.container.on('mouseout', this.onMouseOut.bind(this))
+    
+    this.isMouseOver = false
   }
 
   setup (data, stars, colour) {
@@ -98,6 +102,18 @@ class Carrier extends EventEmitter {
 
   onClicked (e) {
     this.emit('onCarrierClicked', this.data)
+  }
+
+  onMouseOver (e) {
+    this.isMouseOver = true
+
+    this.emit('onCarrierMouseOver', this.data)
+  }
+
+  onMouseOut (e) {
+    this.isMouseOver = false
+
+    this.emit('onCarrierMouseOut', this.data)
   }
 
   getAngleTowardsLocation(source, destination) {
