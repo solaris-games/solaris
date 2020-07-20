@@ -26,8 +26,8 @@
                             <span class="text-success">{{event.data.defenderCarrierName}}</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.before.defender}}</td>
-                        <td class="text-right">{{event.data.combatResult.after.defender}}</td>
                         <td class="text-right">{{event.data.combatResult.lost.defender}}</td>
+                        <td class="text-right">{{event.data.combatResult.after.defender}}</td>
                     </tr>
                     <tr>
                         <td>Attacker: Weapons {{event.data.combatResult.weapons.attacker}}</td>
@@ -41,8 +41,8 @@
                             <span class="text-danger">{{event.data.attackerCarrierName}}</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.before.attacker}}</td>
-                        <td class="text-right">{{event.data.combatResult.after.attacker}}</td>
                         <td class="text-right">{{event.data.combatResult.lost.attacker}}</td>
+                        <td class="text-right">{{event.data.combatResult.after.attacker}}</td>
                     </tr>
                 </tbody>
             </table>

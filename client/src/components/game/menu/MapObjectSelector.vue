@@ -93,7 +93,7 @@ export default {
         }
     },
     onEditWaypointsRequested (mapObject) {
-        this.$emit('onEditWaypointsRequested', mapObject.data)
+        this.$emit('onEditWaypointsRequested', mapObject.data._id)
     }
   }
 }

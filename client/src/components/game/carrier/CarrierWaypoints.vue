@@ -49,7 +49,11 @@ export default {
 	},
 	data () {
 		return {
-			carrier: null
+			carrier: null,
+			isSavingWaypoints: false,
+			oldWaypoints: [],
+			totalEtaTimeString: null,
+			waypointCreatedHandler: null
 		}
 	},
 	mounted () {
@@ -66,14 +70,6 @@ export default {
 		GameContainer.map.resetMode()
 
 		GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
-	},
-	data () {
-		return {
-			isSavingWaypoints: false,
-			oldWaypoints: [],
-			totalEtaTimeString: null,
-			waypointCreatedHandler: null
-		}
 	},
 	methods: {
 		onCloseRequested (e) {

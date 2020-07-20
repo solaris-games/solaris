@@ -154,7 +154,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     editWaypoints () {
-      this.$emit('onEditWaypointsRequested', this.carrier)
+      this.$emit('onEditWaypointsRequested', this.carrier._id)
     },
     onWaypointCreated (e) {
       // this.carrier.waypoints.push(e)

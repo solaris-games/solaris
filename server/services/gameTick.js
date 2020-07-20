@@ -239,8 +239,6 @@ module.exports = class GameTickService {
 
             // If the enemy carrier has no ships, then carrier to carrier combat is finished.
             if (enemyCarrier.ships <= 0) {
-                defenderUser.achievements.combat.kills.carriers++;
-                attackerUser.achievements.combat.losses.carriers++;
                 break;
             }
         }
