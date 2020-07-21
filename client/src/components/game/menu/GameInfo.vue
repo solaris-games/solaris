@@ -47,6 +47,9 @@
                     <i class="fas fa-inbox"></i>
                 </button>
             </div>
+            <div class="col" v-if="!getUserPlayer() && !game.state.startDate">
+              <button class="btn btn-success float-right" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
+            </div>
         </div>
     </div>
 </div>
