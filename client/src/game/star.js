@@ -75,7 +75,7 @@ class Star extends EventEmitter {
   drawActive () {
     if (this.isMouseOver || this.isSelected) {
       this.drawInfrastructure()
-      this.drawPlayerName()
+      // this.drawPlayerName()
     } else {
       if (this.infrastructureGraphics) {
         this.container.removeChild(this.infrastructureGraphics)
