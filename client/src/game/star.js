@@ -360,6 +360,8 @@ class Star extends EventEmitter {
     if (this.textGarrison)
       this.textGarrison.visible = zoomPercent < 20
 
+    // TODO: This doesn't always work for small screens, 
+    // maybe increase the percentage or allow the player to zoom more?
     if (this.infrastructureGraphics)
       this.infrastructureGraphics.visible = this.isMouseOver || this.isSelected || zoomPercent < 10
 
