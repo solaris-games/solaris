@@ -18,8 +18,6 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    gameContainer.viewport.on('zoomed', this.onViewportZoom.bind(this))
-
     this.isSelected = false
     this.isMouseOver = false
   }
@@ -355,10 +353,19 @@ class Star extends EventEmitter {
     this.emit('onStarMouseOut', this.data)
   }
 
-  onViewportZoom (e) {
-    this.drawName()
-    this.drawGarrison()
-    this.drawInfrastructure()
+  refreshZoom (zoomPercent) {
+    if (this.textName)
+      this.textName.visible = zoomPercent < 40
+
+    if (this.textGarrison)
+      this.textGarrison.visible = zoomPercent < 20
+
+    if (this.infrastructureGraphics)
+      this.infrastructureGraphics.visible = this.isMouseOver || this.isSelected || zoomPercent < 10
+
+    // this.drawName()
+    // this.drawGarrison()
+    // this.drawInfrastructure()
   }
 }
 

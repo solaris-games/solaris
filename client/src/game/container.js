@@ -77,6 +77,8 @@ class GameContainer {
         maxWidth: Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight),
         maxHeight: Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop)
       })
+
+    this.viewport.on('zoomed', this.onViewportZoomed.bind(this))
   }
 
   setup () {
@@ -128,6 +130,12 @@ class GameContainer {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+
+  onViewportZoomed (e) {
+    let zoomPercent = this.getViewportZoomPercentage()
+
+    this.map.refreshZoom(zoomPercent)
   }
 }
 
