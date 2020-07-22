@@ -90,15 +90,17 @@ class GameContainer {
   }
 
   reloadStar (star) {
-    // TODO: If we are reloading the star, will the game have the updated star data?
     let starObject = this.map.setupStar(star)
     this.map.drawStar(starObject)
   }
 
   reloadCarrier (carrier) {
-    // TODO: If we are reloading the carrier, will the game have the updated carrier data?
     let carrierObject = this.map.setupCarrier(carrier)
     this.map.drawCarrier(carrierObject)
+  }
+
+  undrawCarrier (carrier) {
+    this.map.undrawCarrier(carrier)
   }
 
   getViewportZoomPercentage () {

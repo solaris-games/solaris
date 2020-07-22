@@ -27,6 +27,8 @@
           </tbody>
       </table>
   </div>
+
+  <p v-if="!tableData.length" class="text-center">You have no carriers.</p>
 </div>
 </template>
 

@@ -90,9 +90,14 @@ export default new Vuex.Store({
       star.garrison = 0
       star.garrisonActual = 0
 
+      // Redraw and remove carriers
+      let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)
+
+      carriers.forEach(c => GameContainer.undrawCarrier(c))
+
       state.game.galaxy.carriers = state.game.galaxy.carriers.filter(x => (x.orbiting || '') != star._id);
 
-      // TODO: Redraw the star and any carriers that were destroyed.
+      // Redraw the star
       GameContainer.reloadStar(star)
     },
 

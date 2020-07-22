@@ -25,6 +25,8 @@
         </tbody>
     </table>
   </div>
+
+  <p v-if="!tableData.length" class="text-center">You have no ships.</p>
 </div>
 </template>
 

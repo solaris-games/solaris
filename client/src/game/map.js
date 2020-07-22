@@ -169,6 +169,20 @@ class Map extends EventEmitter {
     carrier.draw()
   }
 
+  undrawCarrier (carrierData) {
+    let existing = this.carriers.find(x => x.data._id === carrierData._id)
+
+    if (existing) {
+      existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+      existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+
+      this.carrierContainer.removeChild(existing.container)
+
+      this.carriers.splice(this.carriers.indexOf(existing), 1)
+    }
+  }
+
   drawWaypoints () {
     this.waypoints.draw(this.modeArgs)
   }

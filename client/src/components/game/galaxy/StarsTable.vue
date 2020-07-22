@@ -28,6 +28,8 @@
         </tbody>
     </table>
   </div>
+
+  <p v-if="!tableData.length" class="text-center">You have no stars.</p>
 </div>
 </template>
 
