@@ -34,6 +34,7 @@ export default {
     },
     goToShip (e) {
       gameContainer.map.zoomToLocation(this.ship.location)
+      // TODO: Call viewport zoom
     }
   }
 }

@@ -151,7 +151,7 @@ export default {
         zoomToWaypoint () {
             let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
 
-            GameContainer.map.zoomToLocation(star.location)
+            GameContainer.map.zoomToStar(star)
         },
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.

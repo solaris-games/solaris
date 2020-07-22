@@ -190,6 +190,9 @@ class Map extends EventEmitter {
     gameContainer.viewport.fitWorld()
     gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true)
     gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y)
+
+    let starObject = this.stars.find(s => s.data._id === homeStar._id)
+    starObject.onViewportZoom()
   }
 
   zoomToUser (game) {
@@ -200,6 +203,13 @@ class Map extends EventEmitter {
     }
 
     this.zoomToPlayer(game, player)
+  }
+
+  zoomToStar (star) {
+    this.zoomToLocation(star.location)
+    
+    let starObject = this.stars.find(s => s.data._id === star._id)
+    starObject.onViewportZoom()
   }
 
   zoomToLocation (location) {

@@ -30,7 +30,7 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
-      gameContainer.map.zoomToLocation(this.star.location)
+      gameContainer.map.zoomToStar(this.star)
     }
   }
 }

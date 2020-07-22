@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import GameHelper from '../services/gameHelper'
+import gameContainer from './container'
 
 class Star extends EventEmitter {
 
@@ -17,6 +17,9 @@ class Star extends EventEmitter {
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
+
+    gameContainer.viewport.on('wheel', this.onViewportZoom.bind(this))
+    gameContainer.viewport.on('pinch', this.onViewportZoom.bind(this))
 
     this.isSelected = false
     this.isMouseOver = false
@@ -73,20 +76,7 @@ class Star extends EventEmitter {
   }
 
   drawActive () {
-    if (this.isMouseOver || this.isSelected) {
-      this.drawInfrastructure()
-      // this.drawPlayerName()
-    } else {
-      if (this.infrastructureGraphics) {
-        this.container.removeChild(this.infrastructureGraphics)
-        this.infrastructureGraphics = null
-      }
-
-      if (this.playerNameGraphics) {
-        this.container.removeChild(this.playerNameGraphics)
-        this.playerNameGraphics = null
-      }
-    }
+    this.drawInfrastructure()
   }
 
   drawStar () {
@@ -182,19 +172,33 @@ class Star extends EventEmitter {
   }
 
   drawName () {
+    if (this.textName) {
+      this.container.removeChild(this.textName)
+      this.textName = null
+    }
+
     let style = TextureService.DEFAULT_FONT_STYLE
     style.fontSize = 4
 
-    let text = new PIXI.Text(this.data.name, style)
+    this.textName = new PIXI.Text(this.data.name, style)
 
-    text.x = this.data.location.x - (text.width / 2)
-    text.y = this.data.location.y + 7
-    text.resolution = 10
+    this.textName.visible = gameContainer.getViewportZoomPercentage() < 40
+    this.textName.x = this.data.location.x - (this.textName.width / 2)
+    this.textName.y = this.data.location.y + 7
+    this.textName.resolution = 10
 
-    this.container.addChild(text)
+    this.container.addChild(this.textName)
   }
 
   drawGarrison () {
+    // TODO: A better approach is to use .visible instead of removing
+    // the item from the container. Will need to first check to see how
+    // things are being drawn first as this will probably be a big refactor.
+    if (this.textGarrison) {
+      this.container.removeChild(this.textGarrison)
+      this.textGarrison = null
+    }
+
     let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
     if (!totalGarrison) return
@@ -202,13 +206,14 @@ class Star extends EventEmitter {
     let style = TextureService.DEFAULT_FONT_STYLE
     style.fontSize = 4
 
-    let text = new PIXI.Text(totalGarrison, style)
+    this.textGarrison = new PIXI.Text(totalGarrison, style)
 
-    text.x = this.data.location.x - (text.width / 2)
-    text.y = this.data.location.y + 12
-    text.resolution = 10
+    this.textGarrison.visible = gameContainer.getViewportZoomPercentage() < 20
+    this.textGarrison.x = this.data.location.x - (this.textGarrison.width / 2)
+    this.textGarrison.y = this.data.location.y + 12
+    this.textGarrison.resolution = 10
 
-    this.container.addChild(text)
+    this.container.addChild(this.textGarrison)
   }
 
   drawInfrastructure () {
@@ -225,6 +230,7 @@ class Star extends EventEmitter {
 
     let text = new PIXI.Text(`${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`, style)
 
+    text.visible = this.isMouseOver || this.isSelected || gameContainer.getViewportZoomPercentage() < 10
     text.x = this.data.location.x - (text.width / 2)
     text.y = this.data.location.y - 12
     text.resolution = 10
@@ -348,6 +354,12 @@ class Star extends EventEmitter {
     this.drawActive()
 
     this.emit('onStarMouseOut', this.data)
+  }
+
+  onViewportZoom (e) {
+    this.drawName()
+    this.drawGarrison()
+    this.drawInfrastructure()
   }
 }
 

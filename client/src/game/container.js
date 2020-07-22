@@ -99,6 +99,13 @@ class GameContainer {
     this.map.drawCarrier(carrierObject)
   }
 
+  getViewportZoomPercentage () {
+    let viewportWidth = this.viewport.right - this.viewport.left
+    let viewportPercent = (viewportWidth / this.viewport.screenWidth) * 100
+
+    return viewportPercent
+  }
+
   _calculateMinStarX (game) {
     if (!game.galaxy.stars.length) { return 0 }
 
