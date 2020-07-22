@@ -270,7 +270,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_infrastructure)
     }
 
-    if (this.data.ownedByPlayerId) {
+    if (this.data.ownedByPlayerId && this._isInScanningRange()) {
       this.text_infrastructure.text = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
       this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
       this.text_infrastructure.y = this.data.location.y - 12
