@@ -41,20 +41,18 @@ class Map extends EventEmitter {
     this.container.removeChildren()
     this._setupContainers()
 
-    this.game = game
-
     // Reset the canvas
     this.stars = []
     this.carriers = []
 
     // Add stars
-    for (let i = 0; i < this.game.galaxy.stars.length; i++) {
-      this.setupStar(this.game.galaxy.stars[i])
+    for (let i = 0; i < game.galaxy.stars.length; i++) {
+      this.setupStar(game, game.galaxy.stars[i])
     }
 
     // Add carriers
-    for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
-      this.setupCarrier(this.game.galaxy.carriers[i])
+    for (let i = 0; i < game.galaxy.carriers.length; i++) {
+      this.setupCarrier(game, game.galaxy.carriers[i])
     }
 
     if (this.waypoints) {
@@ -62,13 +60,13 @@ class Map extends EventEmitter {
     }
 
     this.waypoints = new Waypoints()
-    this.waypoints.setup(this.game)
+    this.waypoints.setup(game)
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
   }
 
-  setupStar (starData) {
+  setupStar (game, starData) {
     let existing = this.stars.find(x => x.data._id === starData._id)
 
     if (existing) {
@@ -81,7 +79,7 @@ class Map extends EventEmitter {
 
     let star = new Star(this.app)
 
-    star.setup(this.game, starData, this.game.galaxy.players, this.game.galaxy.carriers)
+    star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     this.stars.push(star)
 
@@ -92,7 +90,7 @@ class Map extends EventEmitter {
     return star
   }
 
-  setupCarrier (carrierData) {
+  setupCarrier (game, carrierData) {
     let existing = this.carriers.find(x => x.data._id === carrierData._id)
 
     if (existing) {
@@ -106,7 +104,7 @@ class Map extends EventEmitter {
     }
 
     let carrier = new Carrier()
-    let player = GameHelper.getPlayerById(this.game, carrierData.ownedByPlayerId)
+    let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
     carrier.setup(carrierData, this.stars, player.colour.value)
 
@@ -121,8 +119,8 @@ class Map extends EventEmitter {
     return carrier
   }
 
-  draw () {
-    this.drawStars()
+  draw (zoomPercent) {
+    this.drawStars(zoomPercent)
     this.drawCarriers()
 
     if (this.mode === 'waypoints') {
@@ -132,29 +130,57 @@ class Map extends EventEmitter {
     }
   }
 
-  setMode (mode, args) {
-    this.mode = mode
-    this.modeArgs = args
+  reloadGame (game, zoomPercent) {
+    // Update all of the stars.
+    for (let i = 0; i < game.galaxy.stars.length; i++) {
+      let starData = game.galaxy.stars[i]
+      let existing = this.stars.find(x => x.data._id === starData._id)
 
-    this.draw()
-  }
+      existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+      existing.draw(zoomPercent)
+    }
 
-  resetMode () {
-    this.mode = 'galaxy'
+    // Remove any carriers that have been destroyed and add new ones that have been built.
+    for (let i = 0; i < game.galaxy.carriers.length; i++) {
+      let carrierData = game.galaxy.carriers[i]
 
-    this.draw()
-  }
+      let existing = this.carriers.find(x => x.data._id === carrierData._id)
 
-  drawStars () {
-    for (let i = 0; i < this.stars.length; i++) {
-      let star = this.stars[i]
+      if (existing) {
+        let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-      this.drawStar(star)
+        existing.setup(carrierData, this.stars, player.colour.value)
+      } else {
+        existing = this.setupCarrier(game, carrierData)
+      }
+
+      existing.draw()
     }
   }
 
-  drawStar (star) {
-    star.draw()
+  setMode (mode, args, zoomPercent) {
+    this.mode = mode
+    this.modeArgs = args
+
+    this.draw(zoomPercent)
+  }
+
+  resetMode (zoomPercent) {
+    this.mode = 'galaxy'
+
+    this.draw(zoomPercent)
+  }
+
+  drawStars (zoomPercent) {
+    for (let i = 0; i < this.stars.length; i++) {
+      let star = this.stars[i]
+
+      this.drawStar(star, zoomPercent)
+    }
+  }
+
+  drawStar (star, zoomPercent) {
+    star.draw(zoomPercent)
   }
 
   drawCarriers () {
@@ -252,7 +278,7 @@ class Map extends EventEmitter {
     this.stars
     .forEach(s => {
       s.isSelected = false
-      s.drawActive()
+      s.drawActive(false) // Should be fine to pass in false for force
     })
   }
 
@@ -265,7 +291,7 @@ class Map extends EventEmitter {
           s.isSelected = false
         }
 
-        s.drawActive()
+        s.drawActive(false) // Should be fine to pass in false for the force param
       })
   }
 

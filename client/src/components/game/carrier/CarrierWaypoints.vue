@@ -59,7 +59,7 @@ export default {
 	mounted () {
     	this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     
-		GameContainer.map.setMode('waypoints', this.carrier)
+		GameContainer.setMode('waypoints', this.carrier)
 
 		this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
     	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
@@ -67,7 +67,7 @@ export default {
 		this.oldWaypoints = this.carrier.waypoints.slice(0)
 	},
 	destroyed () {
-		GameContainer.map.resetMode()
+		GameContainer.resetMode()
 
 		GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
 	},
@@ -95,7 +95,7 @@ export default {
 			if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
 				this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
 
-				GameContainer.map.draw()
+				GameContainer.draw()
 			}
 
 			if (!this.carrier.waypoints.length) {
@@ -106,7 +106,7 @@ export default {
 			// Remove all waypoints up to the last waypoint (if in transit)
 			this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
 
-			GameContainer.map.draw()
+			GameContainer.draw()
 
 			this.totalEtaTimeString = null
 		},

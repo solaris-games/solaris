@@ -58,7 +58,10 @@ export default {
   methods: {
     loadGame (game) {
       this.gameContainer.setupViewport(game)
-      this.gameContainer.setup()
+      this.gameContainer.setup(game)
+    },
+    updateGame (game) {
+      this.gameContainer.reloadGame(game)
     },
     drawGame (game, zoomToUser = true) {
       this.gameContainer.draw()
@@ -91,8 +94,7 @@ export default {
 
   watch: {
     game (newGame, oldGame) {
-      this.loadGame(newGame)
-      this.drawGame(newGame, false)
+      this.updateGame(newGame)
     }
   }
 }

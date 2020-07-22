@@ -86,16 +86,23 @@ class GameContainer {
   }
 
   draw () {
-    this.map.draw()
+    let zoomPercent = this.getViewportZoomPercentage()
+
+    this.map.draw(zoomPercent)
+  }
+
+  reloadGame (game) {
+    this.game = game
+    this.map.reloadGame(game, this.getViewportZoomPercentage())
   }
 
   reloadStar (star) {
-    let starObject = this.map.setupStar(star)
+    let starObject = this.map.setupStar(this.game, star)
     this.map.drawStar(starObject)
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map.setupCarrier(carrier)
+    let carrierObject = this.map.setupCarrier(this.game, carrier)
     this.map.drawCarrier(carrierObject)
   }
 
@@ -138,6 +145,14 @@ class GameContainer {
     let zoomPercent = this.getViewportZoomPercentage()
 
     this.map.refreshZoom(zoomPercent)
+  }
+  
+  setMode (mode, args) {
+    this.map.setMode(mode, args, this.getViewportZoomPercentage())
+  }
+
+  resetMode () {
+    this.map.resetMode(this.getViewportZoomPercentage())
   }
 }
 

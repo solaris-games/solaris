@@ -24,49 +24,55 @@ class Carrier extends EventEmitter {
   }
 
   draw () {
-    this.container.removeChildren()
-
-    if (!this.data.orbiting) {
-      this.drawColour()
-    }
-
-    let graphics = new PIXI.Graphics()
-
-    graphics.lineStyle(0.3, 0x000000)
-    graphics.beginFill(0xFFFFFF)
-    graphics.moveTo(this.data.location.x, this.data.location.y - 4)
-    graphics.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
-    graphics.lineTo(this.data.location.x + 3, this.data.location.y + 2)
-    graphics.lineTo(this.data.location.x + 1, this.data.location.y + 2)
-    graphics.lineTo(this.data.location.x + 0, this.data.location.y + 3)
-    graphics.lineTo(this.data.location.x + -1, this.data.location.y + 2)
-    graphics.lineTo(this.data.location.x - 3, this.data.location.y + 2)
-    graphics.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
-    graphics.lineTo(this.data.location.x, this.data.location.y - 4)
-    graphics.endFill()
-
-    graphics.pivot.set(this.data.location.x, this.data.location.y)
-    graphics.position.x = this.data.location.x
-    graphics.position.y = this.data.location.y
-    graphics.scale.set(1)
-
-    this._rotateCarrierTowardsWaypoint(graphics)
+    this.drawColour()
+    this.drawShip()
     this._drawCarrierWaypoints()
-
-    // Add a larger hit radius so that the star is easily clickable
-    graphics.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
-
-    this.container.addChild(graphics)
   }
 
   drawColour () {
-    let graphics = new PIXI.Graphics()
+    if (!this.graphics_colour) {
+      this.graphics_colour = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour)
+    }
 
-    graphics.lineStyle(1, this.colour)
+    this.graphics_colour.clear()
+    
+    if (!this.data.orbiting) {
+      this.graphics_colour.lineStyle(1, this.colour)
+      this.graphics_colour.drawCircle(this.data.location.x, this.data.location.y, 4)
+    }
+  }
 
-    graphics.drawCircle(this.data.location.x, this.data.location.y, 4)
+  drawShip () {
+    if (!this.graphics_ship) {
+      this.graphics_ship = new PIXI.Graphics()
+      this.container.addChild(this.graphics_ship)
+    }
 
-    this.container.addChild(graphics)
+    this.graphics_ship.clear()
+
+    this.graphics_ship.lineStyle(0.3, 0x000000)
+    this.graphics_ship.beginFill(0xFFFFFF)
+    this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
+    this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
+    this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
+    this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
+    this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
+    this.graphics_ship.endFill()
+
+    this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
+    this.graphics_ship.position.x = this.data.location.x
+    this.graphics_ship.position.y = this.data.location.y
+    this.graphics_ship.scale.set(1)
+
+    this._rotateCarrierTowardsWaypoint(this.graphics_ship)
+
+    // Add a larger hit radius so that the star is easily clickable
+    this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {
@@ -83,10 +89,15 @@ class Carrier extends EventEmitter {
   }
 
   _drawCarrierWaypoints () {
-    let graphics = new PIXI.Graphics()
+    if (!this.graphics_waypoints) {
+      this.graphics_waypoints = new PIXI.Graphics()
+      this.container.addChild(this.graphics_waypoints)
+    }
 
-    graphics.moveTo(this.data.location.x, this.data.location.y)
-    graphics.lineStyle(1, 0xFFFFFF, 0.2)
+    this.graphics_waypoints.clear()
+
+    this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
+    this.graphics_waypoints.lineStyle(1, 0xFFFFFF, 0.2)
 
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]
@@ -94,10 +105,8 @@ class Carrier extends EventEmitter {
       // Draw a line to each destination along the waypoints.
       let star = this.stars.find(s => s.data._id === waypoint.destination)
         
-      graphics.lineTo(star.data.location.x, star.data.location.y)
+      this.graphics_waypoints.lineTo(star.data.location.x, star.data.location.y)
     }
-
-    this.container.addChild(graphics)
   }
 
   onClicked (e) {
