@@ -18,8 +18,7 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    gameContainer.viewport.on('wheel', this.onViewportZoom.bind(this))
-    gameContainer.viewport.on('pinch', this.onViewportZoom.bind(this))
+    gameContainer.viewport.on('zoomed', this.onViewportZoom.bind(this))
 
     this.isSelected = false
     this.isMouseOver = false
