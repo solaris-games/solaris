@@ -1,6 +1,7 @@
 <template>
 <div>
-    <div class="mt-5 d-none d-md-block"></div>
+    <logo></logo>
+    <div class="mt-3 d-none d-md-block"></div>
     <div class="container bg-dark pb-3 col-xs-12 col-sm-10 col-md-10 col-lg-6">
         <slot></slot>
         <footer class="mt-3">
@@ -10,6 +11,16 @@
             </div>
         </footer>
     </div>
-    <div class="mb-5 d-none d-md-block"></div>
+    <div class="mb-3 d-none d-md-block"></div>
 </div>
 </template>
+
+<script>
+import LogoVue from '../components/Logo'
+
+export default {
+    components: {
+        'logo': LogoVue
+    }
+}
+</script>

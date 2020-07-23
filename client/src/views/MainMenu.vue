@@ -1,6 +1,7 @@
 <template>
+<div>
   <view-container>
-    <view-title title="Solaris" :hideHomeButton="true"></view-title>
+    <view-title title="Main Menu" :hideHomeButton="true"></view-title>
     <div class="row">
       <div class="col-sm-12 col-md-6 col-lg-5">
         <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
@@ -44,6 +45,7 @@
       </div>
     </div>
   </view-container>
+</div>
 </template>
 
 <script>

@@ -1,5 +1,7 @@
 <template>
   <div>
+    <logo v-if="!hasGame"></logo>
+
     <loading-spinner :loading="!hasGame"/>
     
     <div v-if="hasGame">
@@ -18,6 +20,7 @@
 </template>
 
 <script>
+import LogoVue from '../components/Logo'
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
@@ -27,6 +30,7 @@ import GameHelper from '../services/gameHelper'
 
 export default {
   components: {
+    'logo': LogoVue,
     'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
     'main-bar': MainBar
