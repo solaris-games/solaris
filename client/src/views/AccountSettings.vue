@@ -30,7 +30,10 @@
           <p>Email Address</p>
         </div>
         <div class="col">
-          <p class="text-right">{{ info.email }}</p>
+          <p class="text-right">
+            {{ info.email }}
+            <router-link to="/account/reset-email" tag="a"><i class="fas fa-pencil-alt"></i></router-link>
+          </p>
         </div>
       </div>
 
@@ -39,15 +42,20 @@
           <p>Email Notifications</p>
         </div>
         <div class="col text-right">
-          <button v-if="info.emailEnabled" @click="toggleEmailNotifications(false)" class="btn btn-success">Enabled</button>
-          <button v-if="!info.emailEnabled" @click="toggleEmailNotifications(true)" class="btn btn-danger">Disabled</button>
+          <button v-if="info.emailEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailNotifications(false)" class="btn btn-success">
+            Enabled
+            <i class="fas fa-check"></i>
+          </button>
+          <button v-if="!info.emailEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailNotifications(true)" class="btn btn-danger">
+            Disabled
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
     </div>
 
     <div class="mt-3">
-      <router-link to="/account/reset-email" tag="button" class="btn btn-primary">Change Email Address</router-link>
-      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
+      <router-link to="/account/reset-password" tag="button" class="btn btn-primary">Change Password</router-link>
     </div>
   </view-container>
 </template>
@@ -66,7 +74,8 @@ export default {
   },
   data () {
     return {
-      info: null
+      info: null,
+      isChangingEmailNotifications: false
     }
   },
   async mounted () {
@@ -80,7 +89,15 @@ export default {
     async toggleEmailNotifications (enabled) {
       this.info.emailEnabled = enabled
 
-      await userService.toggleEmailNotifications(this.info.emailEnabled)
+      try {
+        this.isChangingEmailNotifications = true
+
+        await userService.toggleEmailNotifications(this.info.emailEnabled)
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isChangingEmailNotifications = false
     }
   }
 }
