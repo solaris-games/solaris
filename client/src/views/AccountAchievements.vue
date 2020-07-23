@@ -6,9 +6,9 @@
     
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
-    <p class="text-center pt-3 mb-0">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
+    <p class="text-center pt-3 mb-3">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
 
-    <h5>Games</h5>
+    <view-subtitle title="Games"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
       <table class="table table-striped table-hover">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <h5>Military</h5>
+    <view-subtitle title="Military"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -82,7 +82,7 @@
       </div>
     </div>
 
-    <h5>Infrastructure</h5>
+    <view-subtitle title="Infrastructure"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -115,7 +115,7 @@
       </div>
     </div>
     
-    <h5>Research</h5>
+    <view-subtitle title="Research"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -156,7 +156,7 @@
       </div>
     </div>
 
-    <h5>Trade</h5>
+    <view-subtitle title="Trade"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">

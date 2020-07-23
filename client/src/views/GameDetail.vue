@@ -14,7 +14,7 @@
         <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">Open Game <i class="fas fa-arrow-right"></i> </router-link>
       </div>
 
-      <h5>General Settings</h5>
+      <view-subtitle title="General Settings"/>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
@@ -34,7 +34,7 @@
         </table>
       </div>
 
-      <h5>Galaxy Settings</h5>
+      <view-subtitle title="Galaxy Settings"/>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
@@ -50,7 +50,7 @@
         </table>
       </div>
 
-      <h5>Special Galaxy Settings</h5>
+      <view-subtitle title="Special Galaxy Settings"/>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
@@ -74,7 +74,7 @@
         </table>
       </div>
 
-      <h5>Player Settings</h5>
+      <view-subtitle title="Player Settings"/>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
@@ -126,7 +126,7 @@
         </table>
       </div>
 
-      <h5>Technology Settings</h5>
+      <view-subtitle title="Technology Settings"/>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
@@ -190,7 +190,7 @@
         </table>
       </div>
 
-      <h5>Game Time Settings</h5>
+      <view-subtitle title="Game Time Settings"/>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>

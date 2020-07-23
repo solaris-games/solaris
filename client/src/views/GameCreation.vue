@@ -1,12 +1,11 @@
 <template>
   <view-container>
     <view-title title="Create Game" />
+    <view-subtitle title="Game Settings"/>
 
     <loading-spinner :loading="!settings"/>
     
     <form @submit.prevent="handleSubmit" v-if="settings">
-      <view-subtitle title="Game Settings"/>
-
       <div class="form-group">
         <label for="name" class="col-form-label">Name</label>
         <input type="text" required="required" class="form-control" id="name" v-model="settings.general.name" :disabled="isCreatingGame">

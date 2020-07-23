@@ -2,11 +2,11 @@
   <view-container>
     <view-title title="Solaris" :hideHomeButton="true"></view-title>
     <div class="row">
-      <div class="col-sm-12 col-md-6 col-lg-6">
+      <div class="col-sm-12 col-md-6 col-lg-5">
         <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
         <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
       </div>
-      <div class="col-sm-12 col-md-6 col-lg-6">
+      <div class="col-sm-12 col-md-6 col-lg-7">
         <!-- player quick stats -->
         <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
         <loading-spinner :loading="!achievements"></loading-spinner>
