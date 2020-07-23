@@ -251,7 +251,7 @@ class Star extends EventEmitter {
     this.text_garrison.text = totalGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || zoomPercent < 20)
+    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 20)
   }
 
   drawInfrastructure (force, zoomPercent) {
