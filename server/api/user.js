@@ -29,6 +29,8 @@ module.exports = (router, io, container) => {
         if (!req.body.password) {
             errors.push('Password is a required field');
         }
+        
+        // TODO: Restrict username length?
 
         if (errors.length) {
             throw new ValidationError(errors);
@@ -97,6 +99,26 @@ module.exports = (router, io, container) => {
         try {
             await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
             
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/user/changeUsername', middleware.authenticate, async (req, res, next) => {
+        let errors = [];
+
+        if (!req.body.username) {
+            errors.push('Username is a required field');
+        }
+
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
+
+        try {
+            await container.userService.updateUsername(req.session.userId, req.body.username);
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);

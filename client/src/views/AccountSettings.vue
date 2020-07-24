@@ -21,7 +21,10 @@
           <p>Username</p>
         </div>
         <div class="col">
-          <p class="text-right">{{ info.username }}</p>
+          <p class="text-right">
+            {{ info.username }}
+            <router-link to="/account/reset-username" tag="a"><i class="fas fa-pencil-alt"></i></router-link>
+          </p>
         </div>
       </div>
 

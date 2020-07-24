@@ -74,6 +74,14 @@ module.exports = class UserService {
         return user != null;
     }
 
+    async usernameExists(username) {
+        let user = await this.userModel.findOne({
+            username: username
+        });
+
+        return user != null;
+    }
+
     async updateEmailPreference(id, preference) {
         let user = await this.userModel.findById(id);
 
@@ -97,6 +105,10 @@ module.exports = class UserService {
     async updateUsername(id, username) {
         let user = await this.userModel.findById(id);
         
+        if (await this.usernameExists(username)) {
+            throw new ValidationError('Cannot change your username, the new username is already in use by another account.');
+        }
+
         user.username = username;
 
         return await user.save();
