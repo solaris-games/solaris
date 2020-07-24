@@ -28,10 +28,23 @@
 </template>
 
 <script>
+import UserService from '../../../services/api/user'
+
 export default {
   data () {
     return {
       alias: ''
+    }
+  },
+  async mounted () {
+    try {
+      let response = await UserService.getMyUserInfo()
+
+      if (response.status === 200) {
+        this.alias = response.data.username
+      }
+    } catch (err) {
+      console.error(err)
     }
   },
   methods: {
