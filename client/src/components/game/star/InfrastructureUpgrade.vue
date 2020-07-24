@@ -23,6 +23,7 @@
 
 <script>
 import starService from '../../../services/api/star'
+import AudioService from '../../../game/audio'
 
 export default {
   props: {
@@ -53,6 +54,8 @@ export default {
             infrastructureKey: 'economy',
             data: response.data
           })
+
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -73,6 +76,8 @@ export default {
             infrastructureKey: 'industry',
             data: response.data
           })
+
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -93,6 +98,8 @@ export default {
             infrastructureKey: 'science',
             data: response.data
           })
+
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)

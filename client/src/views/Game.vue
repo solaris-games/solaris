@@ -27,6 +27,7 @@ import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
+import AudioService from '../game/audio'
 
 export default {
   components: {
@@ -48,6 +49,8 @@ export default {
     this.subscribeToSockets()
 
     await this.reloadGame()
+
+    AudioService.download()
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 
@@ -107,16 +110,20 @@ export default {
       this.menuState = MENU_STATES.STAR_DETAIL
 
       //this.$emit('onStarClicked', e)
+      AudioService.click()
     },
     onCarrierClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.CARRIER_DETAIL
 
       //this.$emit('onCarrierClicked', e)
+      AudioService.click()
     },
     onObjectsClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
+      
+      AudioService.open()
     },
 
     // --------------------
@@ -179,6 +186,8 @@ export default {
           }
         ]
       })
+
+      AudioService.join()
     }
   },
   computed: {

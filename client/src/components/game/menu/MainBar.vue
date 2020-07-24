@@ -54,6 +54,7 @@
 
 <script>
 import MENU_STATES from '../../data/menuStates'
+import AudioService from '../../../game/audio'
 import GameInfoVue from './GameInfo.vue'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
