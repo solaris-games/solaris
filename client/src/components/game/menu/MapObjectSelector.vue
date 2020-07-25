@@ -88,6 +88,7 @@ export default {
                 this.$emit('onOpenStarDetailRequested', mapObject.data._id) 
                 break
             case 'carrier': 
+                gameContainer.map.clickCarrier(mapObject.data._id)
                 this.$emit('onOpenCarrierDetailRequested', mapObject.data._id) 
                 break
         }

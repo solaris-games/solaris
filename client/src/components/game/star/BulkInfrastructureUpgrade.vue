@@ -42,6 +42,7 @@
 import MenuTitle from "../MenuTitle"
 import starService from "../../../services/api/star"
 import GameHelper from "../../../services/gameHelper"
+import AudioService from '../../../game/audio'
 
 export default {
   components: {
@@ -90,6 +91,8 @@ export default {
         )
 
         if (response.status === 200) {
+          AudioService.join()
+          
           this.$emit("onBulkInfrastructureUpgraded", {
             type: this.selectedType,
             amount: this.amount

@@ -43,6 +43,7 @@
 import GameHelper from '../../../services/gameHelper'
 import TechnologyHelper from '../../../services/technologyHelper'
 import researchService from '../../../services/api/research'
+import AudioService from '../../../game/audio'
 
 export default {
   data: function () {
@@ -86,6 +87,7 @@ export default {
         let result = await researchService.updateResearchNow(this.$store.state.game._id, this.player.researchingNow)
 
         if (result.status === 200) {
+          AudioService.join()
           this.player.currentResearchTicksEta = result.data.ticksEta
           this.recalculateTimeRemaining()
           this.$toasted.show(`Current research updated.`)
@@ -103,6 +105,7 @@ export default {
         let response = await researchService.updateResearchNext(this.$store.state.game._id, this.player.researchingNext)
 
         if (response.status === 200) {
+          AudioService.join()
           this.$toasted.show(`Next research updated.`)
         }
       } catch (err) {

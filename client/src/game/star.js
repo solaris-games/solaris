@@ -56,7 +56,7 @@ class Star extends EventEmitter {
     let force = this.isInScanningRange != this._isInScanningRange()
 
     this.drawStar(force)
-    this.drawPlanets(force)
+    this.drawPlanets(force, zoomPercent)
     this.drawColour(force)
     this.drawScanningRange(force)
     this.drawHyperspaceRange(force)
@@ -101,7 +101,7 @@ class Star extends EventEmitter {
     // sprite.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 12)
   }
 
-  drawPlanets (force) {
+  drawPlanets (force, zoomPercent) {
     if (force && this.container_planets) {
       this.container.removeChild(this.container_planets)
       this.container_planets = null
@@ -164,7 +164,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.container_planets)
     }
 
-    this.container_planets.visible = this._isInScanningRange()
+    this.container_planets.visible = this._isInScanningRange() && zoomPercent < 75
   }
 
   _getPlanetsCount () {
@@ -436,6 +436,7 @@ class Star extends EventEmitter {
     this.drawName(false, zoomPercent)
     this.drawGarrison(false, zoomPercent)
     this.drawInfrastructure(false, zoomPercent)
+    this.drawPlanets(false, zoomPercent)
   }
 }
 

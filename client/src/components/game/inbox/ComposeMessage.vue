@@ -12,6 +12,7 @@
 
 <script>
 import MessageApiService from '../../../services/api/message'
+import AudioService from '../../../game/audio'
 
 export default {
   components: {
@@ -34,6 +35,8 @@ export default {
             let response = await MessageApiService.send(this.$store.state.game._id, this.toPlayerId, this.message)
 
             if (response.status === 200) {
+                AudioService.type()
+                
                 this.message = '';
                 
                 this.$emit('onMessageSent', {

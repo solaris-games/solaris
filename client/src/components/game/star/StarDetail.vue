@@ -145,6 +145,7 @@
 
 <script>
 import starService from '../../../services/api/star'
+import AudioService from '../../../game/audio'
 import GameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import Infrastructure from '../shared/Infrastructure'
@@ -227,6 +228,8 @@ export default {
           // this.$emit('onCarrierBuilt', this.star._id)
           this.onOpenCarrierDetailRequested(response.data)
           this.getUserPlayer().credits -= this.star.upgradeCosts.carriers
+
+          AudioService.join()
         }
       } catch (err) {
         console.error(err)
@@ -240,6 +243,8 @@ export default {
           this.$toasted.show(`${this.star.name} has been abandoned.`)
 
           // this.$emit('onStarAbandoned', this.star._id)
+
+          AudioService.leave()
         }
       } catch (err) {
         console.error(err)
@@ -253,6 +258,8 @@ export default {
           this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
 
           // this.$emit('onUpgradedWarpGate', this.star._id)
+
+          AudioService.join()
         }
       } catch (err) {
         console.error(err)
@@ -266,6 +273,8 @@ export default {
           this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
 
           // this.$emit('onDestroyedWarpGate', this.star._id)
+
+          AudioService.leave()
         }
       } catch (err) {
         console.error(err)

@@ -39,6 +39,7 @@ import MenuTitle from '../MenuTitle'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
 import CarrierApiService from '../../../services/api/carrier'
+import AudioService from '../../../game/audio'
 
 export default {
 	components: {
@@ -101,6 +102,8 @@ export default {
 			if (!this.carrier.waypoints.length) {
 				this.totalEtaTimeString = null
 			}
+			
+			AudioService.backspace()
 		},
 		removeAllWaypoints () {
 			// Remove all waypoints up to the last waypoint (if in transit)
@@ -109,6 +112,8 @@ export default {
 			GameContainer.draw()
 
 			this.totalEtaTimeString = null
+			
+			AudioService.backspace()
 		},
 		onWaypointCreated () {
 			let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
@@ -118,6 +123,8 @@ export default {
 				this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
 			this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
+			
+			AudioService.type()
 		},
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.
@@ -126,6 +133,8 @@ export default {
 				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints)
 
 				if (response.status === 200) {
+					AudioService.join()
+
 					this.oldWaypoints = this.carrier.waypoints
 
           			this.$toasted.show(`${this.carrier.name} waypoints updated.`)
