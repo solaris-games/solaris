@@ -5,6 +5,7 @@ import Carrier from './carrier'
 import Waypoints from './waypoints'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
+import AnimationService from './animation'
 
 class Map extends EventEmitter {
 
@@ -302,6 +303,8 @@ class Map extends EventEmitter {
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
     }
+
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
   onCarrierClicked (e) {
@@ -315,6 +318,8 @@ class Map extends EventEmitter {
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
     }
+
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
   onCarrierMouseOver (e) {
