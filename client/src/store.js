@@ -54,6 +54,12 @@ export default new Vuex.Store({
 
       star.infrastructure.science = data.infrastructure
 
+      let player = GameHelper.getUserPlayer(state.game)
+
+      if (player && star.ownedByPlayerId === player._id) {
+        player.stats.totalScience++
+      }
+
       GameContainer.reloadStar(star)
     },
     gameStarBulkUpgraded (state, data) {
