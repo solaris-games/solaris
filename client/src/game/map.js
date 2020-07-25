@@ -67,25 +67,18 @@ class Map extends EventEmitter {
   }
 
   setupStar (game, starData) {
-    let existing = this.stars.find(x => x.data._id === starData._id)
+    let star = this.stars.find(x => x.data._id === starData._id)
 
-    if (existing) {
-      existing.off('onStarClicked', this.onStarClicked.bind(this))
+    if (!star) {
+      star = new Star(this.app)
+      this.stars.push(star)
 
-      this.starContainer.removeChild(existing.container)
-
-      this.stars.splice(this.stars.indexOf(existing), 1)
+      this.starContainer.addChild(star.container)
+      
+      star.on('onStarClicked', this.onStarClicked.bind(this))
     }
 
-    let star = new Star(this.app)
-
     star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
-
-    this.stars.push(star)
-
-    this.starContainer.addChild(star.container)
-
-    star.on('onStarClicked', this.onStarClicked.bind(this))
 
     return star
   }

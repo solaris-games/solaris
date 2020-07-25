@@ -38,34 +38,46 @@ export default new Vuex.Store({
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.infrastructure.economy = data.infrastructure
+
+      GameContainer.reloadStar(star)
     },
     gameStarIndustryUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
       
       star.infrastructure.industry = data.infrastructure
       star.manufacturing = data.manufacturing
+
+      GameContainer.reloadStar(star)
     },
     gameStarScienceUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.infrastructure.science = data.infrastructure
+
+      GameContainer.reloadStar(star)
     },
     gameStarBulkUpgraded (state, data) {
       data.stars.forEach(s => {
         let star = GameHelper.getStarById(state.game, s.starId)
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
+
+        GameContainer.reloadStar(star)
       })
     },
     gameStarWarpGateBuilt (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.warpGate = true
+
+      GameContainer.reloadStar(star)
     },
     gameStarWarpGateDestroyed (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.warpGate = false
+
+      GameContainer.reloadStar(star)
     },
     gameStarCarrierBuilt (state, data) {
       state.game.galaxy.carriers.push(data)
@@ -82,6 +94,9 @@ export default new Vuex.Store({
 
       star.garrison = data.starShips
       carrier.ships = data.carrierShips
+
+      GameContainer.reloadStar(star)
+      GameContainer.reloadCarrier(carrier)
     },
     gameStarAbandoned (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)

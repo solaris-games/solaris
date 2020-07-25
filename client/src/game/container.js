@@ -98,12 +98,12 @@ class GameContainer {
 
   reloadStar (star) {
     let starObject = this.map.setupStar(this.game, star)
-    this.map.drawStar(starObject)
+    this.map.drawStar(starObject, this.getViewportZoomPercentage())
   }
 
   reloadCarrier (carrier) {
     let carrierObject = this.map.setupCarrier(this.game, carrier)
-    this.map.drawCarrier(carrierObject)
+    this.map.drawCarrier(carrierObject, this.getViewportZoomPercentage())
   }
 
   undrawCarrier (carrier) {
