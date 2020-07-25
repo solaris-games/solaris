@@ -39,13 +39,22 @@ export default new Vuex.Store({
 
       star.infrastructure.economy = data.infrastructure
 
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalEconomy++
+
       GameContainer.reloadStar(star)
     },
     gameStarIndustryUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
       
+      let manufacturingDifference = data.manufacturing - star.manufacturing
+
       star.infrastructure.industry = data.infrastructure
       star.manufacturing = data.manufacturing
+
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalIndustry++
+      player.stats.newShips += manufacturingDifference
 
       GameContainer.reloadStar(star)
     },
@@ -54,11 +63,8 @@ export default new Vuex.Store({
 
       star.infrastructure.science = data.infrastructure
 
-      let player = GameHelper.getUserPlayer(state.game)
-
-      if (player && star.ownedByPlayerId === player._id) {
-        player.stats.totalScience++
-      }
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalScience++
 
       GameContainer.reloadStar(star)
     },
@@ -67,6 +73,8 @@ export default new Vuex.Store({
         let star = GameHelper.getStarById(state.game, s.starId)
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
+
+        // TODO: Update the player stats
 
         GameContainer.reloadStar(star)
       })
@@ -89,7 +97,10 @@ export default new Vuex.Store({
       state.game.galaxy.carriers.push(data)
 
       let star = GameHelper.getStarById(state.game, data.orbiting)
-      star.garrison -= data.ships;
+      star.garrison -= data.ships
+
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalCarriers++
 
       GameContainer.reloadCarrier(data)
       GameContainer.reloadStar(star)
@@ -110,6 +121,9 @@ export default new Vuex.Store({
       star.ownedByPlayerId = null
       star.garrison = 0
       star.garrisonActual = 0
+
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalStars--
 
       // Redraw and remove carriers
       let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)

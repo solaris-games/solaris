@@ -100,7 +100,7 @@ class Map extends EventEmitter {
     let carrier = new Carrier()
     let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-    carrier.setup(carrierData, this.stars, player.colour.value)
+    carrier.setup(carrierData, this.stars, player, game.constants.distances.lightYear)
 
     this.carriers.push(carrier)
 
@@ -115,7 +115,7 @@ class Map extends EventEmitter {
 
   draw (zoomPercent) {
     this.drawStars(zoomPercent)
-    this.drawCarriers()
+    this.drawCarriers(zoomPercent)
 
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
@@ -143,12 +143,12 @@ class Map extends EventEmitter {
       if (existing) {
         let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-        existing.setup(carrierData, this.stars, player.colour.value)
+        existing.setup(carrierData, this.stars, player, game.constants.distances.lightYear)
       } else {
         existing = this.setupCarrier(game, carrierData)
       }
 
-      existing.draw()
+      existing.draw(zoomPercent)
     }
   }
 
@@ -177,16 +177,16 @@ class Map extends EventEmitter {
     star.draw(zoomPercent)
   }
 
-  drawCarriers () {
+  drawCarriers (zoomPercent) {
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
 
-      this.drawCarrier(carrier)
+      this.drawCarrier(carrier, zoomPercent)
     }
   }
 
-  drawCarrier (carrier) {
-    carrier.draw()
+  drawCarrier (carrier, zoomPercent) {
+    carrier.draw(zoomPercent)
   }
 
   undrawCarrier (carrierData) {
@@ -276,6 +276,14 @@ class Map extends EventEmitter {
     })
   }
 
+  unselectAllCarriers () {
+    this.carriers
+    .forEach(c => {
+      c.isSelected = false
+      c.drawActive()
+    })
+  }
+
   unselectAllStarsExcept (star) {
     this.stars
       .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
@@ -289,12 +297,26 @@ class Map extends EventEmitter {
       })
   }
 
+  unselectAllCarriersExcept (carrier) {
+    this.carriers
+      .filter(c => c.isSelected || c.data._id === carrier.data._id) // Get only stars that are selected or the e star.
+      .forEach(c => {
+        // Set all other carriers to unselected.
+        if (c.data._id !== carrier.data._id) {
+          c.isSelected = false
+        }
+
+        c.drawActive(false) // Should be fine to pass in false for the force param
+      })
+  }
+
   onStarClicked (e) {
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
       selectedStar.isSelected = true
       
+      this.unselectAllCarriers()
       this.unselectAllStarsExcept(selectedStar)
   
       if (!this.tryMultiSelect(e.location)) {
@@ -310,7 +332,18 @@ class Map extends EventEmitter {
   onCarrierClicked (e) {
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
+      // If the carrier is in orbit, pass the click over to the star instead.
+      if (e.orbiting) {
+        let star = this.stars.find(x => x.data._id === e.orbiting)
+
+        return this.onStarClicked(star.data)
+      }
+
+      let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
+      selectedCarrier.isSelected = true
+
       this.unselectAllStars()
+      this.unselectAllCarriersExcept(selectedCarrier)
 
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
@@ -385,6 +418,7 @@ class Map extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
+    this.carriers.forEach(c => c.refreshZoom(zoomPercent))
   }
 
 }

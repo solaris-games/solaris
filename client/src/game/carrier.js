@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import EventEmitter from 'events'
+import TextureService from './texture'
 
 class Carrier extends EventEmitter {
   constructor () {
@@ -17,16 +18,23 @@ class Carrier extends EventEmitter {
     this.isMouseOver = false
   }
 
-  setup (data, stars, colour) {
+  setup (data, stars, player, lightYearDistance) {
     this.data = data
     this.stars = stars
-    this.colour = colour
+    this.player = player
+    this.colour = player.colour.value
+    this.lightYearDistance = lightYearDistance
   }
 
-  draw () {
+  draw (zoomPercent) {
     this.drawColour()
     this.drawShip()
+    this.drawGarrison(zoomPercent)
     this._drawCarrierWaypoints()
+  }
+
+  drawActive (zoomPercent) {
+    this.drawGarrison(zoomPercent)
   }
 
   drawColour () {
@@ -73,6 +81,30 @@ class Carrier extends EventEmitter {
 
     // Add a larger hit radius so that the star is easily clickable
     this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+  }
+
+  drawGarrison (zoomPercent) {
+    if (this.text_garrison) {
+      this.container.removeChild(this.text_garrison)
+      this.text_garrison = null
+    }
+
+    if (!this.text_garrison) {
+      let style = TextureService.DEFAULT_FONT_STYLE
+      style.fontSize = 4
+  
+      this.text_garrison = new PIXI.Text('', style)
+      this.text_garrison.resolution = 10
+  
+      this.container.addChild(this.text_garrison)
+    }
+
+    let totalGarrison = this.data.ships
+
+    this.text_garrison.text = totalGarrison
+    this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
+    this.text_garrison.y = this.data.location.y + 5
+    this.text_garrison.visible = !this.data.orbiting && totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 20)
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {
@@ -130,6 +162,10 @@ class Carrier extends EventEmitter {
     let deltaY = destination.y - source.y;
 
     return Math.atan2(deltaY, deltaX);
+  }
+
+  refreshZoom (zoomPercent) {
+    this.drawGarrison(zoomPercent)
   }
 }
 
