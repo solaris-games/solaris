@@ -1,7 +1,8 @@
 <template>
-<div class="menu">
-    <game-info @onMenuStateChanged="onMenuStateChanged"/>
+<div>
+  <header-bar @onMenuStateChanged="onMenuStateChanged"/>
 
+  <div class="menu">
     <player-list v-bind:players="game.galaxy.players" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="menu-content bg-dark" v-if="menuState">
@@ -49,13 +50,13 @@
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested"/>
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
     </div>
+  </div>
 </div>
 </template>
 
 <script>
 import MENU_STATES from '../../data/menuStates'
 import AudioService from '../../../game/audio'
-import GameInfoVue from './GameInfo.vue'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
 import PlayerVue from '../player/Player.vue'
@@ -74,10 +75,11 @@ import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
 import MapObjectSelectorVue from './MapObjectSelector.vue'
 import GameHelper from '../../../services/gameHelper'
 import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
+import HeaderBarVue from './HeaderBar'
 
 export default {
   components: {
-    'game-info': GameInfoVue,
+    'header-bar': HeaderBarVue,
     'welcome': WelcomeVue,
     'player-list': PlayerListVue,
     'leaderboard': LeaderboardVue,
@@ -156,11 +158,11 @@ export default {
 
 <style scoped>
 .menu {
-    position:absolute; /* This is a must otherwise the div overlays the map */
-    width: 473px;
-    max-height: 100%;
-    overflow: auto;
-    overflow-x: hidden;
+  position:absolute; /* This is a must otherwise the div overlays the map */
+  width: 473px;
+  max-height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
