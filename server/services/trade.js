@@ -1,11 +1,13 @@
+const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
 
-module.exports = class TradeService {
+module.exports = class TradeService extends EventEmitter {
 
-    constructor(userService, playerService, eventService) {
+    constructor(userService, playerService) {
+        super();
+        
         this.userService = userService;
         this.playerService = playerService;
-        this.eventService = eventService;
     }
 
     async sendCredits(game, fromPlayer, toPlayerId, amount) {
@@ -38,8 +40,19 @@ module.exports = class TradeService {
         await fromPlayerUser.save();
         await toPlayerUser.save();
 
-        await this.eventService.createCreditsReceivedEvent(game, fromPlayer, toPlayer, amount);
-        await this.eventService.createCreditsSentEvent(game, fromPlayer, toPlayer, amount);
+        this.emit('onPlayerCreditsReceived', {
+            game,
+            fromPlayer,
+            toPlayer,
+            amount
+        });
+
+        this.emit('onPlayerCreditsSent', {
+            game,
+            fromPlayer,
+            toPlayer,
+            amount
+        });
     }
 
     async sendRenown(game, fromPlayer, toPlayerId, amount) {
@@ -76,8 +89,19 @@ module.exports = class TradeService {
         await fromUser.save();
         await toUser.save();
 
-        await this.eventService.createRenownReceivedEvent(game, fromPlayer, toPlayer, amount);
-        await this.eventService.createRenownSentEvent(game, fromPlayer, toPlayer, amount);
+        this.emit('onPlayerRenownReceived', {
+            game,
+            fromPlayer,
+            toPlayer,
+            amount
+        });
+
+        this.emit('onPlayerRenownSent', {
+            game,
+            fromPlayer,
+            toPlayer,
+            amount
+        });
     }
 
     async sendTechnology(game, fromPlayer, toPlayerId, technology) {
@@ -125,8 +149,19 @@ module.exports = class TradeService {
             level: tradeTech.level
         };
 
-        await this.eventService.createTechnologyReceivedEvent(game, fromPlayer, toPlayer, eventTech);
-        await this.eventService.createTechnologySentEvent(game, fromPlayer, toPlayer, tradeTech);
+        this.emit('onPlayerTechnologyReceived', {
+            game,
+            fromPlayer,
+            toPlayer,
+            technology: eventTech
+        });
+
+        this.emit('onPlayerTechnologySent', {
+            game,
+            fromPlayer,
+            toPlayer,
+            technology: eventTech
+        });
     }
 
     getTradeableTechnologies(game, fromPlayer, toPlayerId) {

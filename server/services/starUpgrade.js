@@ -1,11 +1,13 @@
+const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
 
-module.exports = class StarUpgradeService {
+module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(starService, carrierService, eventService, userService) {
+    constructor(starService, carrierService, userService) {
+        super();
+        
         this.starService = starService;
         this.carrierService = carrierService;
-        this.eventService = eventService;
         this.userService = userService;
     }
 
@@ -38,8 +40,12 @@ module.exports = class StarUpgradeService {
         let user = await this.userService.getById(player.userId);
         user.achievements.infrastructure.warpGates++;
         await user.save();
-        
-        await this.eventService.createWarpGateBuiltEvent(game, player, star);
+
+        this.emit('onPlayerWarpGateBuilt', {
+            game,
+            player,
+            star
+        });
     }
 
     async destroyWarpGate(game, player, starId) {
@@ -62,8 +68,12 @@ module.exports = class StarUpgradeService {
         let user = await this.userService.getById(player.userId);
         user.achievements.infrastructure.warpGatesDestroyed++;
         await user.save();
-        
-        await this.eventService.createWarpGateDestroyedEvent(game, player, star);
+
+        this.emit('onPlayerWarpGateDestroyed', {
+            game,
+            player,
+            star
+        });
     }
 
     async buildCarrier(game, player, starId) {
@@ -101,8 +111,13 @@ module.exports = class StarUpgradeService {
         let user = await this.userService.getById(player.userId);
         user.achievements.infrastructure.carriers++;
         await user.save();
-        
-        await this.eventService.createCarrierBuiltEvent(game, player, star, carrier);
+
+        this.emit('onPlayerCarrierBuilt', {
+            game,
+            player,
+            star,
+            carrier
+        });
 
         return carrier;
     }
@@ -245,9 +260,13 @@ module.exports = class StarUpgradeService {
             summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
         }
 
-        await game.save()
+        await game.save();
 
-        await this.eventService.createInfrastructureBulkUpgraded(game, player, upgradeSummary);
+        this.emit('onPlayerInfrastructureBulkUpgraded', {
+            game,
+            player,
+            upgradeSummary
+        });
 
         return upgradeSummary;
     }

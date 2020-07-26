@@ -1,10 +1,12 @@
+const EventEmitter = require('events');
 const moment = require('moment');
 
-module.exports = class GameTickService {
+module.exports = class GameTickService extends EventEmitter {
     
-    constructor(eventService, broadcastService, distanceService, starService, carrierService, 
+    constructor(broadcastService, distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService) {
-        this.eventService = eventService;
+        super();
+            
         this.broadcastService = broadcastService;
         this.distanceService = distanceService;
         this.starService = starService;
@@ -226,8 +228,15 @@ module.exports = class GameTickService {
             attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
 
             // Log the combat event
-            await this.eventService.createPlayerCombatCarrierEvent(game, defender, attacker,
-                star, friendlyCarrier, enemyCarrier, combatResult);
+            this.emit('onPlayerCombatCarrier', {
+                game,
+                defender,
+                attacker,
+                star,
+                friendlyCarrier,
+                enemyCarrier,
+                combatResult
+            });
 
             // Destroy carriers if they have no ships left.
             if (friendlyCarrier.ships <= 0) {
@@ -267,8 +276,14 @@ module.exports = class GameTickService {
             attackerUser.achievements.combat.kills.ships += starCombatResult.lost.defender;
 
             // Log the combat event
-            await this.eventService.createPlayerCombatStarEvent(game, defender, attacker,
-                star, enemyCarrier, starCombatResult);
+            this.emit('onPlayerCombatStar', {
+                game,
+                defender,
+                attacker,
+                star,
+                enemyCarrier,
+                combatResult
+            });
         }
 
         // If the enemy carrier has no ships, then destroy the attacking carrier.
@@ -295,8 +310,17 @@ module.exports = class GameTickService {
             defenderUser.achievements.combat.stars.lost++;
             attackerUser.achievements.combat.stars.captured++;
 
-            await this.eventService.createStarCapturedEvent(game, attacker, star, captureReward);
-            await this.eventService.createStarCapturedEvent(game, defender, star, captureReward);
+            this.emit('onStarCaptured', {
+                game,
+                player: attacker,
+                captureReward
+            });
+
+            this.emit('onStarCaptured', {
+                game,
+                player: defender,
+                captureReward
+            });
         }
 
         await defenderUser.save();
@@ -353,9 +377,14 @@ module.exports = class GameTickService {
                 let creditsResult = this._givePlayerMoney(game, player);
                 let experimentResult = await this._conductExperiments(game, player);
 
-                await this.eventService.createPlayerGalacticCycleCompleteEvent(game, player,
-                    creditsResult.creditsFromEconomy, creditsResult.creditsFromBanking,
-                    experimentResult.technology, experimentResult.amount);
+                this.emit('onPlayerGalacticCycleCompleted', {
+                    game, 
+                    player, 
+                    creditsEconomy: creditsResult.creditsFromEconomy, 
+                    creditsBanking: creditsResult.creditsFromBanking, 
+                    experimentTechnology: experimentResult.technology,
+                    experimentAmount: experimentResult.amount
+                });
             }
         }
     }
@@ -416,11 +445,19 @@ module.exports = class GameTickService {
                     // AFK counts as a defeat as well.
                     user.achievements.defeated++;
                     user.achievements.afk++;
-                    await this.eventService.createPlayerAfkEvent(game, player);
+
+                    this.emit('onPlayerAfk', {
+                        game, 
+                        player
+                    });
                 }
                 else {
                     user.achievements.defeated++;
-                    await this.eventService.createPlayerDefeatedEvent(game, player);
+
+                    this.emit('onPlayerDefeated', {
+                        game, 
+                        player
+                    });
                 }
 
                 await user.save();
@@ -437,7 +474,10 @@ module.exports = class GameTickService {
             let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
             await this.leaderboardService.addGameRankings(leaderboard);
-            await this.eventService.createGameEndedEvent(game);
+
+            this.emit('onGameEnded', {
+                game
+            });
         }
     }
 }

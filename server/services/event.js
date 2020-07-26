@@ -27,8 +27,49 @@ module.exports = class EventService {
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
     }
 
-    constructor(eventModel) {
+    constructor(eventModel,
+        gameService, gameTickService, researchService, starService, starUpgradeService, tradeService) {
         this.eventModel = eventModel;
+        this.gameService = gameService;
+        this.gameTickService = gameTickService;
+        this.researchService = researchService;
+        this.starService = starService;
+        this.starUpgradeService = starUpgradeService;
+        this.tradeService = tradeService;
+
+        this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.game, args.player));
+        this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.game));
+        this.gameService.on('onPlayerQuit', (args) => this.createPlayerQuitEvent(args.game, args.player, args.alias));
+        this.gameService.on('onGameEnded', (args) => this.createGameEndedEvent(args.game));
+        this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.game, args.player));
+        
+        this.gameTickService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
+            args.game, args.defender, args.attacker, args.star, args.friendlyCarrier, args.enemyCarrier, args.combatResult));
+        this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
+            args.game, args.defender, args.attacker, args.star, args.enemyCarrier, args.combatResult));
+        this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.captureReward));
+        this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
+            args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount));
+            
+        this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.game, args.player));
+        this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.game, args.player));
+        this.gameTickService.on('onGameEnded', (args) => this.createGameEndedEvent(args.game));
+        
+        this.gameTickService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.game, args.player, args.technology));
+
+        this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.game, args.player, args.star));
+        
+        this.starUpgradeService.on('onPlayerWarpGateBuilt', (args) => this.createWarpGateBuiltEvent(args.game, args.player, args.star));
+        this.starUpgradeService.on('onPlayerWarpGateDestroyed', (args) => this.createWarpGateDestroyedEvent(args.game, args.player, args.star));
+        this.starUpgradeService.on('onPlayerCarrierBuilt', (args) => this.createCarrierBuiltEvent(args.game, args.player, args.star, args.carrier));
+        this.starUpgradeService.on('onPlayerInfrastructureBulkUpgraded', (args) => this.createInfrastructureBulkUpgraded(args.game, args.player, args.upgradeSummary));
+
+        this.tradeService.on('onPlayerCreditsReceived', (args) => this.createCreditsReceivedEvent(args.game, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerCreditsSent', (args) => this.createCreditsSentEvent(args.game, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerRenownReceived', (args) => this.createRenownReceivedEvent(args.game, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerRenownSent', (args) => this.createRenownSentEvent(args.game, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.game, args.fromPlayer, args.toPlayer, args.technology));
+        this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.game, args.fromPlayer, args.toPlayer, args.technology));
     }
 
     async createGameEvent(game, type, data) {

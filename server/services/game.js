@@ -1,12 +1,14 @@
+const EventEmitter = require('events');
 const moment = require('moment');
 const ValidationError = require('../errors/validation');
 
-module.exports = class GameService {
+module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, eventService, leaderboardService) {
+    constructor(gameModel, userService, leaderboardService) {
+        super();
+        
         this.gameModel = gameModel;
         this.userService = userService;
-        this.eventService = eventService;
         this.leaderboardService = leaderboardService;
     }
 
@@ -99,10 +101,15 @@ module.exports = class GameService {
         user.achievements.joined++;
         await user.save();
 
-        await this.eventService.createPlayerJoinedEvent(game, player);
+        this.emit('onPlayerJoined', {
+            game,
+            player
+        });
 
         if (gameIsFull) {
-            await this.eventService.createGameStartedEvent(game); // Make sure this event is last
+            this.emit('onGameStarted', {
+                game
+            });
         }
     }
 
@@ -133,7 +140,11 @@ module.exports = class GameService {
         await game.save();
         await user.save();
 
-        await this.eventService.createPlayerQuitEvent(game, player, alias);
+        this.emit('onPlayerQuit', {
+            game,
+            player,
+            alias
+        });
 
         return player;
     }
@@ -164,7 +175,10 @@ module.exports = class GameService {
             let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
             await this.leaderboardService.addGameRankings(leaderboard);
-            await this.eventService.createGameEndedEvent(game);
+            
+            this.emit('onGameEnded', {
+                game
+            });
 
             await game.save();
         }
@@ -175,7 +189,10 @@ module.exports = class GameService {
         userPlayer.achievements.defeated++;
         await userPlayer.save();
 
-        await this.eventService.createPlayerDefeatedEvent(game, player);
+        this.emit('onPlayerDefeated', {
+            game,
+            player
+        });
     }
 
     async getPlayerUser(game, playerId) {

@@ -1,12 +1,14 @@
+const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
 
-module.exports = class ResearchService {
+module.exports = class ResearchService extends EventEmitter {
 
-    constructor(technologyService, randomService, playerService, eventService, userService) {
+    constructor(technologyService, randomService, playerService, userService) {
+        super();
+        
         this.technologyService = technologyService;
         this.randomService = randomService;
         this.playerService = playerService;
-        this.eventService = eventService;
         this.userService = userService;
     }
 
@@ -63,7 +65,11 @@ module.exports = class ResearchService {
                 level: tech.level
             };
 
-            await this.eventService.createResearchCompleteEvent(game, player, eventTech);
+            this.emit('onPlayerResearchCompleted', {
+                game,
+                player,
+                technology: eventTech
+            });
 
             player.researchingNow = player.researchingNext;
         }

@@ -48,7 +48,6 @@ module.exports = (io) => {
     const userService = new UserService(bcrypt, UserModel);
 
     const broadcastService = new BroadcastService(io);
-    const eventService = new EventService(EventModel);
     const carrierService = new CarrierService();
     const combatService = new CombatService();
     const distanceService = new DistanceService();
@@ -58,24 +57,26 @@ module.exports = (io) => {
     const gameListService = new GameListService(GameModel);
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
-    const starService = new StarService(randomService, nameService, distanceService, starDistanceService, eventService);
+    const starService = new StarService(randomService, nameService, distanceService, starDistanceService);
     const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
-    const gameService = new GameService(GameModel, userService, eventService, leaderboardService);
-    const researchService = new ResearchService(technologyService, randomService, playerService, eventService, userService);
-    const tradeService = new TradeService(userService, playerService, eventService);
+    const gameService = new GameService(GameModel, userService, leaderboardService);
+    const researchService = new ResearchService(technologyService, randomService, playerService, userService);
+    const tradeService = new TradeService(userService, playerService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
     const gameCreateService = new GameCreateService(GameModel, nameService, mapService, playerService);
-    const starUpgradeService = new StarUpgradeService(starService, carrierService, eventService, userService);
+    const starUpgradeService = new StarUpgradeService(starService, carrierService, userService);
     const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService);
     const historyService = new HistoryService(HistoryModel, playerService);
-    const gameTickService = new GameTickService(eventService, broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService);
+    const gameTickService = new GameTickService(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService);
     const messageService = new MessageService();
     const shipTransferService = new ShipTransferService(carrierService, starService);
+    
+    const eventService = new EventService(EventModel, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService);
 
     return {
         authService,

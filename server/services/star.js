@@ -1,14 +1,16 @@
+const EventEmitter = require('events');
 const mongoose = require('mongoose');
 const ValidationError = require('../errors/validation');
 
-module.exports = class StarService {
+module.exports = class StarService extends EventEmitter {
 
-    constructor(randomService, nameService, distanceService, starDistanceService, eventService) {
+    constructor(randomService, nameService, distanceService, starDistanceService) {
+        super();
+        
         this.randomService = randomService;
         this.nameService = nameService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
-        this.eventService = eventService;
     }
 
     generateUnownedStar(game, name, location) {
@@ -129,7 +131,11 @@ module.exports = class StarService {
         
         await game.save();
 
-        await this.eventService.createStarAbandonedEvent(game, player, star);
+        this.emit('onPlayerStarAbandoned', {
+            game,
+            player,
+            star
+        });
     }
 
 }
