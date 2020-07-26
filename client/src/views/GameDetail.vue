@@ -26,10 +26,10 @@
               <td>Players</td>
               <td class="text-right">{{ game.settings.general.playerLimit }}</td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Player Type</td>
               <td class="text-right">{{ game.settings.general.playerType }}</td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </div>
