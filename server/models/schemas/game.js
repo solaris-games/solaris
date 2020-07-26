@@ -20,7 +20,7 @@ const schema = new Schema({
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
-			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'cheap' },
+			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
         },
@@ -103,7 +103,7 @@ const schema = new Schema({
 				maxNaturalResources: { type: Types.Number, required: true, default: 50 }
 			},
 			infrastructureCostMultipliers: {
-				warpGate: { type: Types.Number, required: true, default: 100 },
+				warpGate: { type: Types.Number, required: true, default: 50 },
 				economy: { type: Types.Number, required: true, default: 2.5 },
 				industry: { type: Types.Number, required: true, default: 5 },
 				science: { type: Types.Number, required: true, default: 20 },

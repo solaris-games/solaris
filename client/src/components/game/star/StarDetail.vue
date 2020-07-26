@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      <div class="row bg-secondary pt-2 pb-0 mb-1">
+      <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="canBuildWarpGates">
         <div class="col-8">
           <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
         </div>
@@ -169,7 +169,8 @@ export default {
   data () {
     return {
       star: null,
-      currentPlayerId: null
+      currentPlayerId: null,
+      canBuildWarpGates: false
     }
   },
   mounted () {
@@ -180,6 +181,8 @@ export default {
     if (userPlayer) {
       this.currentPlayerId = userPlayer._id
     }
+
+    this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
   },
   methods: {
     onCloseRequested (e) {

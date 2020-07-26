@@ -9,7 +9,7 @@
   },
   "specialGalaxy": {
     "carrierCost": "standard",
-    "warpgateCost": "cheap",
+    "warpgateCost": "standard",
     "randomGates": "none",
     "darkGalaxy": "start"
   },

@@ -24,6 +24,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`The star already has a warp gate.`);
         }
 
+        if (game.settings.specialGalaxy.warpgateCost === 'none') {
+            throw new ValidationError('The game settings has disabled the building of warp gates.');
+        }
+
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level);
         const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
