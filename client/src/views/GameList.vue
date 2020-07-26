@@ -33,6 +33,10 @@
         </tbody>
     </table>
 
+    <div class="text-right" v-if="!isLoadingServerGames">
+      <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+    </div>
+
     <hr>
 
     <h4>User Created Games</h4>
@@ -61,6 +65,10 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="text-right" v-if="!isLoadingUserGames">
+      <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+    </div>
   </view-container>
 </template>
 

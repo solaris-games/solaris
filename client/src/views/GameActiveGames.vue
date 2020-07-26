@@ -35,6 +35,10 @@
           </tbody>
       </table>
     </div>
+
+    <div class="text-right" v-if="!isLoadingActiveGames && activeGames.length">
+      <router-link to="/game/list" tag="button" class="btn btn-success">Join New Game</router-link>
+    </div>
     
     <hr>
 
@@ -42,13 +46,13 @@
 
     <loading-spinner :loading="isLoadingCompletedGames"/>
     
-    <div v-if="!isLoadingActiveGames && !completedGames.length">
+    <div v-if="!isLoadingCompletedGames && !completedGames.length">
         <p>You have not completed any games yet.</p>
 
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
 
-    <table v-if="!isLoadingActiveGames && completedGames.length" class="table table-striped table-hover">
+    <table v-if="!isLoadingCompletedGames && completedGames.length" class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
@@ -64,6 +68,10 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="text-right" v-if="!isLoadingCompletedGames && completedGames.length">
+      <router-link to="/game/list" tag="button" class="btn btn-success">Join New Game</router-link>
+    </div>
     
   </view-container>
 </template>
