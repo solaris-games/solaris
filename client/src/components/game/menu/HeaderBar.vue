@@ -1,6 +1,6 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
-    <div class="row pt-2 pb-2">
+    <div class="row pt-2 pb-2 no-gutters">
         <div class="col-auto d-none d-md-block">
             <i class="fas fa-gamepad"></i> {{game.settings.general.name}}
         </div>
@@ -21,7 +21,7 @@
                 <i class="fas fa-flask text-info"></i> {{userPlayer.stats.totalScience}}
             </span>
         </div>
-        <div class="col-auto dropleft">
+        <div class="col-auto dropleft ml-1">
             <button class="btn btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <button class="btn btn-sm btn-info ml-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

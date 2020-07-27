@@ -11,12 +11,12 @@
     <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
-                <td>P</td>
+                <td><i class="fas fa-user"></i></td>
                 <td>Name</td>
                 <td></td>
-                <td class="text-right">E</td>
-                <td class="text-right">I</td>
-                <td class="text-right">S</td>
+                <td class="text-right"><i class="fas fa-money-bill-wave"></i></td>
+                <td class="text-right"><i class="fas fa-tools"></i></td>
+                <td class="text-right"><i class="fas fa-flask"></i></td>
                 <td class="text-right">$E</td>
                 <td class="text-right">$I</td>
                 <td class="text-right">$S</td>

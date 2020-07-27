@@ -44,7 +44,10 @@
           <div class="col">
             <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
           </div>
-          <div class="col text-right">
+        <div class="col-auto">
+          <i class="fas fa-map-marker-alt"></i> {{carrier.waypoints.length}}
+        </div>
+          <div class="col-auto">
               {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
           </div>
       </div>

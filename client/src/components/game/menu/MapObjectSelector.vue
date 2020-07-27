@@ -1,6 +1,11 @@
 <template>
+<div>
+    <div class="container">
+        <menu-title title="Select Object" @onCloseRequested="onCloseRequested"/>
+    </div>
+
     <div class="table-responsive">
-        <table class="table">
+        <table class="table mb-0">
             <tbody>
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
                     <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
@@ -20,6 +25,9 @@
                         <span>{{mapObject.data.name}}</span>
                     </td>
                     <td class="text-right">
+                        <span v-if="mapObject.type === 'carrier'"><i class="fas fa-map-marker-alt"></i> {{mapObject.data.waypoints.length}}</span>
+                    </td>
+                    <td class="text-right" style="width:30%;">
                         <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
                         <button type="button" class="btn btn-primary"><i class="fas fa-chevron-down"></i></button>
                         <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary"><i class="fas fa-rocket"></i></button> -->
@@ -30,13 +38,18 @@
             </tbody>
         </table>
     </div>
+</div>
 </template>
 
 <script>
 import gameHelper from '../../../services/gameHelper'
 import gameContainer from '../../../game/container'
+import MenuTitleVue from '../MenuTitle'
 
 export default {
+    components: {
+        'menu-title': MenuTitleVue
+    },
   props: {
     mapObjects: Array
   },
@@ -95,6 +108,9 @@ export default {
     },
     onEditWaypointsRequested (mapObject) {
         this.$emit('onEditWaypointsRequested', mapObject.data._id)
+    },
+    onCloseRequested (e) {
+        this.$emit('onCloseRequested', e)
     }
   }
 }

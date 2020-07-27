@@ -11,11 +11,11 @@
     <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
-                <td>P</td>
+                <td><i class="fas fa-user"></i></td>
                 <td>Name</td>
                 <td></td>
                 <td></td>
-                <td class="text-right">Ships</td>
+                <td class="text-right"><i class="fas fa-rocket"></i></td>
             </tr>
         </thead>
         <tbody>

@@ -8,7 +8,7 @@
                 <div class="col-7">
                     <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
                         <option v-for="opt in availableTechnologies" v-bind:key="opt.name" v-bind:value="opt.name">
-                            {{ getTechnologyFriendlyName(opt.name) }} ({{opt.level}} - ${{opt.cost}})
+                            {{ getTechnologyFriendlyName(opt.name) }} {{opt.level}} (${{opt.cost}})
                         </option>
                     </select>
                 </div>

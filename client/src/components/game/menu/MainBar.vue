@@ -1,8 +1,10 @@
 <template>
 <div>
-  <header-bar @onMenuStateChanged="onMenuStateChanged"/>
+  <header-bar class="header-bar" @onMenuStateChanged="onMenuStateChanged"/>
 
   <div class="menu">
+    <div class="header-buffer"></div>
+
     <player-list v-bind:players="game.galaxy.players" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="menu-content bg-dark" v-if="menuState">
@@ -157,6 +159,16 @@ export default {
 </script>
 
 <style scoped>
+.header-bar {
+  position:absolute;
+  height: 45px;
+  z-index: 1;
+}
+
+.header-buffer {
+  height: 45px;
+}
+
 .menu {
   position:absolute; /* This is a must otherwise the div overlays the map */
   width: 473px;
