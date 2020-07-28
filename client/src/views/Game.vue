@@ -50,7 +50,7 @@ export default {
 
     await this.reloadGame()
 
-    AudioService.download()
+    // AudioService.download()
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 

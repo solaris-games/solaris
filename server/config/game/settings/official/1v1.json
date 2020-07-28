@@ -55,6 +55,7 @@
     }
   },
   "gameTime": {
-    "speed": 1
+    "speed": 1,
+    "startDelay": 10
   }
 }

@@ -1,12 +1,13 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-block">
+        <div class="col-auto d-none d-md-block mr-5">
             <i class="fas fa-gamepad"></i> {{game.settings.general.name}}
         </div>
         <div class="col" v-if="userPlayer">
-            <span v-if="!game.state.paused">Production: {{timeRemaining}}</span>
-            <span v-if="game.state.paused">Paused</span>
+            <span v-if="gameIsPaused()">Paused</span>
+            <span v-if="gameIsInProgress()">Production: {{timeRemaining}}</span>
+            <span v-if="gameIsPendingStart()">Starts In: {{timeRemaining}}</span>
         </div>
         <div class="col-auto text-right pr-0" v-if="userPlayer">
             <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
@@ -81,6 +82,7 @@ import router from '../../../router'
 import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
+import * as moment from 'moment'
 
 export default {
     data () {
@@ -97,7 +99,7 @@ export default {
 
         this.recalculateTimeRemaining()
 
-        if (!this.$store.state.game.state.paused) {
+        if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
             this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
         }
     },
@@ -134,19 +136,29 @@ export default {
             GameContainer.map.zoomToUser(this.$store.state.game)
         },
         recalculateTimeRemaining () {
-            if (this.$store.state.game.state.paused) {
-                return
+            if (GameHelper.isGamePendingStart(this.$store.state.game)) {
+                this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
             }
+            else {
+                let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
+                let currentTick = this.$store.state.game.state.tick
+                let currentProductionTick = this.$store.state.game.state.productionTick
+                
+                let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
+                let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction, 
+                    this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
-            let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
-            let currentTick = this.$store.state.game.state.tick
-            let currentProductionTick = this.$store.state.game.state.productionTick
-            
-            let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
-            let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction, 
-                this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-            this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
+                this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
+            }
+        },
+        gameIsPaused () {
+            return GameHelper.isGamePaused(this.$store.state.game)
+        },
+        gameIsInProgress () {
+            return GameHelper.isGameInProgress(this.$store.state.game)
+        },
+        gameIsPendingStart () {
+            return GameHelper.isGamePendingStart(this.$store.state.game)
         }
     },
     computed: {

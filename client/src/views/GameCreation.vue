@@ -288,6 +288,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="startDelay" class="col-form-label">Start Delay</label>
+        <select class="form-control" id="startDelay" v-model="settings.gameTime.startDelay" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.startDelay" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
     </form>
   </view-container>
 </template>

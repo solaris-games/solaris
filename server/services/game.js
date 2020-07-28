@@ -87,8 +87,8 @@ module.exports = class GameService extends EventEmitter {
         if (gameIsFull) {
             let start = moment().utc();
 
-            // TODO: When the game first begins, should we start at normal game speed?
-            // Or should we have a wait period before the game actually starts?
+            // Add the start delay to the start date.
+            start.add(game.settings.gameTime.startDelay, 'minute');
 
             game.state.paused = false;
             game.state.startDate = start;

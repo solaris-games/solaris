@@ -81,6 +81,7 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import gameService from '../services/api/game'
+import GameHelper from '../services/gameHelper'
 
 export default {
   components: {
@@ -114,15 +115,23 @@ export default {
   },
   methods: {
     getGameStatusText (game) {
-      if (!game.state.startDate) {
-        return 'Waiting for Players'
-      }
-      
-      if (game.state.paused) {
+      if (GameHelper.isGamePaused(game)) {
         return 'Paused'
       }
 
-      return 'In Progress'
+      if (GameHelper.isGamePendingStart(game)) {
+        return 'Waiting to Start'
+      }
+
+      if (GameHelper.isGameInProgress(game)) {
+        return 'In Progress'
+      }
+
+      if (GameHelper.isGameFinished(game)) {
+        return 'Finished'
+      }
+
+      return 'Unknown'
     }
   }
 }

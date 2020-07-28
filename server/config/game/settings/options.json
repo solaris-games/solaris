@@ -294,6 +294,28 @@
                 "value": 60,
                 "text": "Legacy Speed (1 tick = 1 hour)"
             }
+        ],
+        "startDelay": [
+            {
+                "value": 10,
+                "text": "10 Minutes"
+            },
+            {
+                "value": 30,
+                "text": "30 Minutes"
+            },
+            {
+                "value": 60,
+                "text": "1 Hour"
+            },
+            {
+                "value": 120,
+                "text": "2 Hours"
+            },
+            {
+                "value": 240,
+                "text": "4 Hours"
+            }
         ]
     }
 }

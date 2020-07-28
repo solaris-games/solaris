@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 const SELECTS = {
     INFO: {
         settings: 1,
@@ -71,7 +73,7 @@ module.exports = class GameListService {
 
     async listInProgressGames() {
         return await this.gameModel.find({
-            'state.startDate': { $ne: null },
+            'state.startDate': { $lte: moment().utc().toDate() },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
         })

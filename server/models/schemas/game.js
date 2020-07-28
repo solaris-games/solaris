@@ -66,7 +66,8 @@ const schema = new Schema({
 			}
 		},
 		gameTime: {
-			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 10 }
+			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 10 },
+			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
 		}
     },
     galaxy: {

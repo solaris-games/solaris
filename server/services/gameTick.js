@@ -35,6 +35,10 @@ module.exports = class GameTickService extends EventEmitter {
            throw new Error('Cannot perform a game tick on a paused game');
        }
 
+       if (moment(game.state.startDate).utc().diff(moment().utc()) > 0) {
+            throw new Error('Cannot perform a game tick as this game has not yet started.');
+       }
+
        if (!this._canTick(game)) {
            return;
        }
