@@ -132,7 +132,7 @@ export default {
       this.changeMenuState('shipTransfer', e)
     },
     onShipsTransferred (e) {
-      this.changeMenuState('carrierDetail', e)
+      this.changeMenuState(MENU_STATES.CARRIER_DETAIL, e)
     },
     onOpenCarrierDetailRequested (e) {
       this.changeMenuState('carrierDetail', e)

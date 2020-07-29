@@ -160,7 +160,7 @@ export default {
                 this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
 
                 // Note: The web socket event handles setting the carrier and star ships.
-                this.$emit('onShipsTransferred', this.carrier)
+                this.$emit('onShipsTransferred', this.carrier._id)
             }
           } catch (err) {
               console.log(err)
