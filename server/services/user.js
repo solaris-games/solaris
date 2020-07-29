@@ -12,7 +12,7 @@ module.exports = class UserService extends EventEmitter {
     
     constructor(bcrypt, userModel) {
         super();
-        
+
         this.bcrypt = bcrypt;
         this.userModel = userModel;
     }
@@ -41,7 +41,8 @@ module.exports = class UserService extends EventEmitter {
 
     async getEmailById(id) {
         return await this.userModel.findById(id, {
-            email: 1
+            email: 1,
+            emailEnabled: 1
         });
     }
 

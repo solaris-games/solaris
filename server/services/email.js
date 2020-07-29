@@ -128,14 +128,16 @@ module.exports = class EmailService {
 
         for (let player of game.galaxy.players) {
             let user = await this.userService.getEmailById(player.userId);
-
-            try {
-                await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
-                    gameName,
-                    gameUrl
-                ]);
-            } catch (err) {
-                console.error(err);
+            
+            if (user.emailEnabled) {
+                try {
+                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
+                        gameName,
+                        gameUrl
+                    ]);
+                } catch (err) {
+                    console.error(err);
+                }
             }
         }
     }
