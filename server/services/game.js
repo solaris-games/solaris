@@ -12,6 +12,10 @@ module.exports = class GameService extends EventEmitter {
         this.leaderboardService = leaderboardService;
     }
 
+    async getByIdAll(id) {
+        return await this.gameModel.findById(id).exec();
+    }
+
     async getById(id, select) {
         return await this.gameModel.findById(id)
             .select(select)
@@ -52,6 +56,10 @@ module.exports = class GameService extends EventEmitter {
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
             throw new ValidationError('The game has already finished.');
+        }
+
+        if (game.quitters.find(x => x.equals(userId))) {
+            throw new ValidationError('You cannot rejoin this game.');
         }
 
         // Disallow if they are already in the game as another player.
@@ -131,6 +139,9 @@ module.exports = class GameService extends EventEmitter {
         // TODO: Something to consider here is whether the player has done something
         // to their empire, i.e upgrading stars etc, we should prevent the player from
         // doing this otherwise we'd have to reset everything here which will be a pain.
+
+        game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
+
         player.userId = null;
         player.alias = "Empty Slot";
         user.achievements.quit++;

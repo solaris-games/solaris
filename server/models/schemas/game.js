@@ -118,7 +118,8 @@ const schema = new Schema({
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
 			}
 		}
-	}
+	},
+	quitters: [{ type: Types.ObjectId, required: false }]
 });
 
 module.exports = schema;

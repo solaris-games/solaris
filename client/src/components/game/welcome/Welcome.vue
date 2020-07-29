@@ -39,6 +39,7 @@ export default {
     return {
       isJoiningGame: false,
       domain: '',
+      protocol: '',
       errors: [],
       alias: ''
     }
@@ -75,11 +76,15 @@ export default {
         this.isJoiningGame = true
 
         let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias)
-
+        
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.
         }
       } catch (err) {
+        if (err.response.data) {
+          this.errors = err.response.data.errors
+        }
+        
         console.error(err)
       }
 

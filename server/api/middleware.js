@@ -40,6 +40,14 @@ module.exports = (container) => {
             return next();
         },
 
+        async loadGameAll(req, res, next) {
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdAll(req.params.gameId);
+            }
+
+            return next();
+        },
+
         async loadGameInfo(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdInfo(req.params.gameId);

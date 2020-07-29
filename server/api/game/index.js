@@ -87,7 +87,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGameAll, async (req, res, next) => {
         try {
             await container.gameService.join(
                 req.game,
@@ -103,7 +103,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGameAll, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let player = await container.gameService.quit(
                 req.game,
