@@ -64,7 +64,6 @@ module.exports = (io) => {
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
     const gameService = new GameService(GameModel, userService, leaderboardService);
-    const emailService = new EmailService(config, gameService, userService);
     const researchService = new ResearchService(technologyService, randomService, playerService, userService);
     const tradeService = new TradeService(userService, playerService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
@@ -74,6 +73,7 @@ module.exports = (io) => {
     const historyService = new HistoryService(HistoryModel, playerService);
     const gameTickService = new GameTickService(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService);
     const messageService = new MessageService();
+    const emailService = new EmailService(config, gameService, gameTickService, userService);
     const shipTransferService = new ShipTransferService(carrierService, starService);
     
     const eventService = new EventService(EventModel, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService);

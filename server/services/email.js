@@ -38,14 +38,20 @@ module.exports = class EmailService {
             fileName: 'gameWelcome.html',
             subject: 'Your Solaris game stars soon!'
         },
+        GAME_FINISHED: {
+            fileName: 'gameFinished.html',
+            subject: 'Your Solaris game has ended!'
+        },
     };
 
-    constructor(config, gameService, userService) {
+    constructor(config, gameService, gameTickService, userService) {
         this.config = config;
         this.gameService = gameService;
+        this.gameTickService = gameTickService;
         this.userService = userService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.game));
+        this.gameTickService.on('onGameEnded', (data) => this.sendGameFinishedEmail(data.game));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
     }
 
@@ -132,6 +138,26 @@ module.exports = class EmailService {
             if (user.emailEnabled) {
                 try {
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
+                        gameName,
+                        gameUrl
+                    ]);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    async sendGameFinishedEmail(game) {
+        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameName = game.settings.general.name;
+
+        for (let player of game.galaxy.players) {
+            let user = await this.userService.getEmailById(player.userId);
+            
+            if (user.emailEnabled) {
+                try {
+                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_FINISHED, [
                         gameName,
                         gameUrl
                     ]);
