@@ -34,10 +34,19 @@ module.exports = class EmailService {
             fileName: 'forgotUsername.html',
             subject: 'Your Solaris username'
         },
+        GAME_WELCOME: {
+            fileName: 'gameWelcome.html',
+            subject: 'Your Solaris game stars soon!'
+        },
     };
 
-    constructor(config) {
+    constructor(config, gameService, userService) {
         this.config = config;
+        this.gameService = gameService;
+        this.userService = userService;
+
+        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.game));
+        this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
     }
 
     _getTransport() {
@@ -99,10 +108,36 @@ module.exports = class EmailService {
         for (let i = 0; i < parameters.length; i++) {
             let parameterString = `[{${i.toString()}}]`;
 
-            html = html.replace(parameterString, parameters[i].toString());
+            html = html.split(parameterString).join(parameters[i].toString());
         }
 
         return await this.sendHtml(toEmail, template.subject, html);
+    }
+
+    async sendWelcomeEmail(user) {
+        try {
+            await this.sendTemplate(user.email, this.TEMPLATES.WELCOME, [user.username]);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async sendGameStartedEmail(game) {
+        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameName = game.settings.general.name;
+
+        for (let player of game.galaxy.players) {
+            let user = await this.userService.getEmailById(player.userId);
+
+            try {
+                await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
+                    gameName,
+                    gameUrl
+                ]);
+            } catch (err) {
+                console.error(err);
+            }
+        }
     }
 
 };

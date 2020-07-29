@@ -53,12 +53,6 @@ module.exports = (router, io, container) => {
                 password: req.body.password
             });
 
-            try {
-                await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.WELCOME, [req.body.username]);
-            } catch (emailError) {
-                console.error(emailError);
-            }
-
             return res.status(201).json({ id: userId });
         } catch (err) {
             return next(err);

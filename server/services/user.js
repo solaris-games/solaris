@@ -1,3 +1,4 @@
+const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
 
 function uuidv4() {
@@ -7,9 +8,11 @@ function uuidv4() {
     });
 }
 
-module.exports = class UserService {
+module.exports = class UserService extends EventEmitter {
     
     constructor(bcrypt, userModel) {
+        super();
+        
         this.bcrypt = bcrypt;
         this.userModel = userModel;
     }
@@ -33,6 +36,12 @@ module.exports = class UserService {
             email: 0,
             emailEnabled: 0,
             username: 0
+        });
+    }
+
+    async getEmailById(id) {
+        return await this.userModel.findById(id, {
+            email: 1
         });
     }
 
@@ -62,6 +71,8 @@ module.exports = class UserService {
         newUser.password = await this.bcrypt.hash(newUser.password, 10);
 
         let doc = await newUser.save();
+
+        this.emit('onUserCreated', doc);
 
         return doc._id;
     }

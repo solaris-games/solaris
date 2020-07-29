@@ -33,7 +33,7 @@ import UserService from '../../../services/api/user'
 export default {
   data () {
     return {
-      alias: ''
+      alias: null
     }
   },
   async mounted () {
@@ -42,6 +42,7 @@ export default {
 
       if (response.status === 200) {
         this.alias = response.data.username
+        this.onAliasChanged(this.alias)
       }
     } catch (err) {
       console.error(err)
