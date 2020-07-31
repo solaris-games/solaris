@@ -3,8 +3,17 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
+    constructor(distanceService, starService) {
+        this.distanceService = distanceService;
+        this.starService = starService;
+    }
+
     getById(game, id) {
         return game.galaxy.carriers.find(s => s._id.toString() === id);
+    }
+
+    getByObjectId(game, id) {
+        return game.galaxy.carriers.find(s => s._id.equals(id));
     }
 
     createAtStar(star, carriers, ships = 1) {
@@ -46,6 +55,70 @@ module.exports = class CarrierService {
         }
 
         return name;
+    }
+
+    filterCarriersByScanningRange(game, player) {
+        let scanningRangeDistance = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+
+        // Get all of the players stars.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStarLocations = playerStars.map(s => s.location);
+
+        return game.galaxy.carriers
+        .filter(c => {
+            // If the player owns the carrier then it will always be visible.
+            if (c.ownedByPlayerId.equals(player._id)) {
+                return true;
+            }
+
+            // Get the closest player star to this carrier.
+            let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
+            let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
+
+            let inRange = distance <= scanningRangeDistance;
+
+            return inRange;
+        });
+    }
+
+    sanitizeCarriersByPlayer(game, player) {
+        // Filter all waypoints (except those in transit) for all carriers that do not belong
+        // to the player.
+        return game.galaxy.carriers
+        .map(c => {
+            if (c.ownedByPlayerId.equals(player._id)) {
+                return c;
+            }
+
+            // Return only key data about the carrier and the waypoints
+            // if the carrier does not belong to the given player.
+            let carrierData = {
+                _id: c._id,
+                ownedByPlayerId: c.ownedByPlayerId,
+                orbiting: c.orbiting,
+                inTransitFrom: c.inTransitFrom,
+                inTransitTo: c.inTransitTo,
+                name: c.name,
+                ships: c.ships,
+                location: c.location
+            };
+
+            if (!c.orbiting) {
+                carrierData.waypoints = c.waypoints.slice(0, 1);
+
+                // Hide any sensitive info about the waypoint.
+                let wp = c.waypoints[0];
+
+                // TODO: Remove these values entirely?
+                wp.action = 'collectAll';
+                wp.actionShips = 0;
+                wp.delayTicks = 0;
+            } else {
+                carrierData.waypoints = [];
+            }
+
+            return carrierData;
+        });
     }
     
 };

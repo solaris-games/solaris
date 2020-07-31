@@ -6,8 +6,8 @@ module.exports = class BroadcastService {
         this.io = io;
     }
 
-    gameTick(game, report) {
-        this.io.to(game.id).emit('gameTicked', {
+    gameTick(game, playerId, report) {
+        this.io.to(playerId.toString()).emit('gameTicked', {
             report
         });
     }

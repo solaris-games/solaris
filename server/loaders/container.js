@@ -48,7 +48,6 @@ module.exports = (io) => {
     const userService = new UserService(bcrypt, UserModel);
 
     const broadcastService = new BroadcastService(io);
-    const carrierService = new CarrierService();
     const combatService = new CombatService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
@@ -57,6 +56,7 @@ module.exports = (io) => {
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const starService = new StarService(randomService, nameService, distanceService, starDistanceService);
+    const carrierService = new CarrierService(distanceService, starService);
     const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.

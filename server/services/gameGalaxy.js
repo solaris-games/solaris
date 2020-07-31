@@ -111,7 +111,7 @@ module.exports = class GameGalaxyService {
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
         if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
-            doc.galaxy.stars = this.starService.getStarsWithinScanningRangeOfPlayer(doc, player._id);
+            doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
         }
 
         let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
@@ -173,68 +173,15 @@ module.exports = class GameGalaxyService {
     }
         
     _setCarrierInfoDetailed(doc, player) {
-        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
-
-        // Get all of the players stars.
-        let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
-        let playerStarLocations = playerStars.map(s => s.location);
-
-        // Filter out any carriers that are outside of scanning range.
-        // NOTE: We don't need to consider dark mode
-        // because carriers can only be seen if they are in range.
-        doc.galaxy.carriers = doc.galaxy.carriers
-            .filter(c => {
-                // If the player owns the carrier then it will always be visible.
-                if (c.ownedByPlayerId.equals(player._id)) {
-                    return true;
-                }
-
-                // Get the closest player star to this carrier.
-                let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
-                let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
-
-                let inRange = distance <= scanningRangeDistance;
-
-                return inRange;
-            });
-
+        doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, player);
+        
         // Remove all waypoints (except those in transit) for all carriers that do not belong
         // to the player.
-        doc.galaxy.carriers
-            .filter(c => !c.ownedByPlayerId.equals(player._id))
-            .forEach(c => {
-                if (!c.orbiting) {
-                    c.waypoints = c.waypoints.slice(0, 1);
-                } else {
-                    c.waypoints = [];
-                }
-
-                // Return only key data about the waypoints.
-                c.waypoints = c.waypoints.map(w => {
-                    return {
-                        _id: w._id,
-                        source: w.source,
-                        destination: w.destination
-                    };
-                });
-            });
+        doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, player);
 
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
-            .forEach(c => {
-                c.waypoints.forEach(w => {
-                    w.ticks = this.waypointService.calculateWaypointTicks(doc, c, w);
-                    w.ticksEta = this.waypointService.calculateWaypointTicksEta(doc, c, w);
-                });
-
-                if (c.waypoints.length) {
-                    c.ticksEta = c.waypoints[0].ticksEta;
-                    c.ticksEtaTotal = c.waypoints[c.waypoints.length - 1].ticksEta;
-                } else {
-                    c.ticksEta = null;
-                    c.ticksEtaTotal = null;
-                }
-            });
+            .forEach(c => this.waypointService.populateCarrierWaypointEta(doc, c));
     }
 
     _setPlayerInfoBasic(doc, player) {

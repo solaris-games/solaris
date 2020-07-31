@@ -81,19 +81,45 @@ module.exports = class StarService extends EventEmitter {
         return starsInRange;
     }
 
-    getStarsWithinScanningRangeOfPlayer(game, playerId) {
-        let player = game.galaxy.players.find(p => p._id.equals(playerId));
-        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId);
+    filterStarsByScanningRange(game, player) {
+        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, player.research.scanning.level);
 
         let starsInRange = game.galaxy.stars.filter(s => {
-            return (s.ownedByPlayerId != null && s.ownedByPlayerId.equals(playerId))   // Owned by the current player
+            return (s.ownedByPlayerId != null && s.ownedByPlayerId.equals(player._id))   // Owned by the current player
                 // Or any of the stars that the player owns is within scanning range
                 || playerStars.find(ps => this.starDistanceService.getDistanceBetweenStars(ps, s) <= scanningRangeDistance) != null;
         });
 
         return starsInRange;
     }
+
+    // sanitizeStarsByScanningRange(game, player) {
+    //     let scanningRangeDistance = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+
+    //     // Get all of the player's stars.
+    //     let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+    //     return game.galaxy.stars
+    //     .map(s => {
+    //         let starData = {
+    //             _id: s._id,
+    //             ownedByPlayerId: s.ownedByPlayerId,
+    //             name: s.name,
+    //             naturalResources: s.naturalResources,
+    //             garrison: s.garrison,
+    //             infrastructure: s.infrastructure,
+    //             warpGate: s.warpGate,
+    //             location: s.location
+    //         };
+
+    //         let owningPlayer = game.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
+
+    //         starData.terraformedResources = this.calculateTerraformedResources(starData.naturalResources, owningPlayer.research.terraforming.level);
+
+    //         return starData;
+    //     });
+    // }
 
     calculateTerraformedResources(naturalResources, terraforming) {
         return (terraforming * 5) + naturalResources;

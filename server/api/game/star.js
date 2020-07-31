@@ -97,7 +97,7 @@ module.exports = (router, io, container) => {
                     // If it isn't the player who performed the bulk upgrade then strip out
                     // the stars that are outside of scanning range.
                     if (!p._id.equals(req.player._id)) {
-                        let starsInScanningRange = container.starService.getStarsWithinScanningRangeOfPlayer(req.game, p._id);
+                        let starsInScanningRange = container.starService.filterStarsByScanningRange(req.game, p);
     
                         broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
                     }

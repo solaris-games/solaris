@@ -37,20 +37,69 @@ export default new Vuex.Store({
     gameTicked (state, data) {
       let report = data.report
 
-      state.game.state = report.gameState
+      // Update game state
+      state.game.state.lastTickDate = report.gameState.lastTickDate
+      state.game.state.paused = report.gameState.paused
+      state.game.state.players = report.gameState.players
+      state.game.state.productionTick = report.gameState.productionTick
+      state.game.state.tick = report.gameState.tick
+      state.game.state.endDate = report.gameState.endDate
+      state.game.state.winner = report.gameState.winner
 
-      // // Update all star garrison data.
-      // for (let starShips of report.stars.newShips) {
-      //   let star = GameHelper.getStarById(state.game, starShips.starId)
+      // Update stars
+      for (let reportStar of report.stars) {
+        let star = GameHelper.getStarById(state.game, reportStar._id)
 
-      //   star.garrison = starShips.garrison
-      // }
+        star.ownedByPlayerId = reportStar.ownedByPlayerId
+        star.garrison = reportStar.garrison
+        star.infrastructure = reportStar.infrastructure
 
-      // Update all player stats
-      for (let playerStats of report.players.stats) {
-        let player = GameHelper.getPlayerById(state.game, playerStats.playerId);
+        GameContainer.reloadStar(star)
+      }
 
-        player.stats = playerStats.stats
+      // Update carriers
+      for (let reportCarrier of report.carriers) {
+        let carrier = GameHelper.getCarrierById(state.game, reportCarrier._id)
+
+        // TODO: Carriers do not despawn on the map when they leave scanning range.
+
+        if (reportCarrier.destroyed) {
+          state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
+
+          GameContainer.undrawCarrier(carrier)
+        } else if (!carrier) {
+          state.game.galaxy.carriers.push(reportCarrier)
+
+          GameContainer.reloadCarrier(reportCarrier)
+        } else {
+          carrier.ownedByPlayerId = reportCarrier.ownedByPlayerId
+          carrier.orbiting = reportCarrier.orbiting
+          carrier.inTransitFrom = reportCarrier.inTransitFrom
+          carrier.inTransitTo = reportCarrier.inTransitTo
+          carrier.ships = reportCarrier.ships
+          carrier.location = reportCarrier.location
+          carrier.waypoints = reportCarrier.waypoints
+          carrier.ticksEta = reportCarrier.ticksEta
+          carrier.ticksEtaTotal = reportCarrier.ticksEtaTotal
+
+          GameContainer.reloadCarrier(carrier)
+        }
+      }
+
+      // Update players
+      for (let reportPlayer of report.players) {
+        let player = GameHelper.getPlayerById(state.game, reportPlayer._id)
+
+        player.defeated = reportPlayer.defeated
+        player.afk = reportPlayer.afk
+        player.stats = reportPlayer.stats
+      }
+
+      // Update player research
+      for (let reportResearch of report.playerResearch) {
+        let player = GameHelper.getPlayerById(state.game, reportResearch.playerId)
+
+        player.research[reportResearch.technology.name].level = reportResearch.technology.level
       }
     },
     gameStarEconomyUpgraded (state, data) {

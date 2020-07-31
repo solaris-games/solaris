@@ -100,7 +100,7 @@ module.exports = class WaypointService {
 
         // If the carrier is already en-route, then the number of ticks will be relative
         // to where the carrier is currently positioned.
-        if (!carrier.orbiting && carrier.waypoints[0]._id.equals(waypoint._id)) {
+        if (!carrier.orbiting && carrier.waypoints[0]._id.toString() === waypoint._id.toString()) {
             source = carrier.location;
         }
 
@@ -128,7 +128,7 @@ module.exports = class WaypointService {
             
             totalTicks += this.calculateWaypointTicks(game, carrier, waypoint);
 
-            if (cwaypoint._id.equals(waypoint._id)) {
+            if (cwaypoint._id.toString() === waypoint._id.toString()) {
                 break;
             }
         }
@@ -159,6 +159,21 @@ module.exports = class WaypointService {
             case 'garrison':
                 this._performWaypointActionGarrison(carrier, star, waypoint);
                 break;
+        }
+    }
+
+    populateCarrierWaypointEta(game, carrier) {
+        carrier.waypoints.forEach(w => {
+            w.ticks = this.calculateWaypointTicks(game, carrier, w);
+            w.ticksEta = this.calculateWaypointTicksEta(game, carrier, w);
+        });
+
+        if (carrier.waypoints.length) {
+            carrier.ticksEta = carrier.waypoints[0].ticksEta;
+            carrier.ticksEtaTotal = carrier.waypoints[carrier.waypoints.length - 1].ticksEta;
+        } else {
+            carrier.ticksEta = null;
+            carrier.ticksEtaTotal = null;
         }
     }
 
