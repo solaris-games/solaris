@@ -56,25 +56,30 @@ module.exports = class ResearchService extends EventEmitter {
         // then increase the level and carry over the remainder.
         let requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
 
+        let levelUpTech = null;
+
         if (tech.progress >= requiredProgress) {
             tech.level++;
             tech.progress -= requiredProgress;
 
-            let eventTech = {
+            levelUpTech = {
                 name: techKey,
                 level: tech.level
             };
 
+            // TODO: This shouldn't really be here, it should be returned as part of the game tick report.
             this.emit('onPlayerResearchCompleted', {
                 game,
                 player,
-                technology: eventTech
+                technology: levelUpTech
             });
 
             player.researchingNow = player.researchingNext;
         }
 
         await user.save();
+
+        return levelUpTech;
     }
 
     getRequiredResearchProgress(game, technologyKey, technologyLevel) {

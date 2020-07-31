@@ -34,6 +34,25 @@ export default new Vuex.Store({
     // ----------------
     // Sockets
 
+    gameTicked (state, data) {
+      let report = data.report
+
+      state.game.state = report.gameState
+
+      // // Update all star garrison data.
+      // for (let starShips of report.stars.newShips) {
+      //   let star = GameHelper.getStarById(state.game, starShips.starId)
+
+      //   star.garrison = starShips.garrison
+      // }
+
+      // Update all player stats
+      for (let playerStats of report.players.stats) {
+        let player = GameHelper.getPlayerById(state.game, playerStats.playerId);
+
+        player.stats = playerStats.stats
+      }
+    },
     gameStarEconomyUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 

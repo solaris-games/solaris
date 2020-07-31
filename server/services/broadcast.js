@@ -6,8 +6,10 @@ module.exports = class BroadcastService {
         this.io = io;
     }
 
-    gameTick(game) {
-        this.io.to(game.id).emit('gameTicked');
+    gameTick(game, report) {
+        this.io.to(game.id).emit('gameTicked', {
+            report
+        });
     }
 
     gamePlayerJoined(game, playerId, alias) {

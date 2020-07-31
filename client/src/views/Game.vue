@@ -129,7 +129,11 @@ export default {
     // --------------------
     // Sockets
     subscribeToSockets () {
-      this.sockets.listener.subscribe('gameTicked', this.reloadGame)
+      this.sockets.listener.subscribe('gameTicked', async (data) => {
+        //await this.reloadGame() // TODO: This needs to be phased out, instead rely on the game tick socket data.
+
+        this.$store.commit('gameTicked', data)
+      })
 
       this.sockets.listener.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.listener.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))

@@ -45,17 +45,45 @@ module.exports = class GameTickService extends EventEmitter {
 
        game.state.lastTickDate = moment().utc();
 
-       await this._moveCarriers(game);
-       this._produceShips(game);
-       await this._conductResearch(game);
-       await this._endOfGalacticCycleCheck(game);
-       this._logHistory(game);
-       await this._gameLoseCheck(game);
-       await this._gameWinCheck(game);
+        let report = {
+            gameState: null,
+            // TODO: These need to be filtered based on each players scanning range.
+            // carriers: {
+            //     launched: [],
+            //     moved: [],
+            //     landed: [],
+            //     combat: []
+            // },
+            // stars: {
+            //     newShips: [],
+            //     combat: [],
+            //     captured: []
+            // },
+            players: {
+                afk: [],
+                defeated: [],
+                stats: [],
+                research: []
+            }
+        };
+
+       await this._moveCarriers(game, report);
+       this._produceShips(game, report);
+       await this._conductResearch(game, report);
+       await this._endOfGalacticCycleCheck(game, report);
+       this._logHistory(game, report);
+       await this._gameLoseCheck(game, report);
+       await this._gameWinCheck(game, report);
+
+       this._appendPlayerReportStats(game, report);
+
+       report.gameState = game.state; // Append the game state to the report.
 
        await game.save();
 
-       this.broadcastService.gameTick(game);
+       // TODO: The report will need to be filtered for each player
+       // because of scanning range.
+       this.broadcastService.gameTick(game, report);
     }
 
     _canTick(game) {
@@ -231,6 +259,7 @@ module.exports = class GameTickService extends EventEmitter {
             defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
             attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
 
+            // TODO: This should probably be handled by the game tick report socket.
             // Log the combat event
             this.emit('onPlayerCombatCarrier', {
                 game,
@@ -279,6 +308,7 @@ module.exports = class GameTickService extends EventEmitter {
             defenderUser.achievements.combat.kills.ships += starCombatResult.lost.attacker;
             attackerUser.achievements.combat.kills.ships += starCombatResult.lost.defender;
 
+            // TODO: This should probably be handled by the game tick report socket.
             // Log the combat event
             this.emit('onPlayerCombatStar', {
                 game,
@@ -313,13 +343,15 @@ module.exports = class GameTickService extends EventEmitter {
 
             defenderUser.achievements.combat.stars.lost++;
             attackerUser.achievements.combat.stars.captured++;
-
+            
+            // TODO: This should probably be handled by the game tick report socket.
             this.emit('onStarCaptured', {
                 game,
                 player: attacker,
                 captureReward
             });
-
+            
+            // TODO: This should probably be handled by the game tick report socket.
             this.emit('onStarCaptured', {
                 game,
                 player: defender,
@@ -331,7 +363,7 @@ module.exports = class GameTickService extends EventEmitter {
         await attackerUser.save();
     }
 
-    _produceShips(game) {
+    _produceShips(game, report) {
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let star = game.galaxy.stars[i];
 
@@ -341,11 +373,17 @@ module.exports = class GameTickService extends EventEmitter {
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
                 star.garrisonActual += this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, star.infrastructure.industry);
                 star.garrison = Math.floor(star.garrisonActual);
+
+                // TODO: Commented out until scanning range filtering has been applied to the report.
+                // report.stars.newShips.push({
+                //     starId: star._id,
+                //     garrison: star.garrison
+                // });
             }
         }
     }
 
-    async _conductResearch(game) {
+    async _conductResearch(game, report) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -356,7 +394,14 @@ module.exports = class GameTickService extends EventEmitter {
                 continue;
             }
             
-            await this.researchService.conductResearch(game, player);
+            let levelUpTech = await this.researchService.conductResearch(game, player);
+
+            if (levelUpTech) {
+                report.players.research.push({
+                    playerId: player._id,
+                    technology: levelUpTech
+                });
+            }
         }
     }
 
@@ -416,7 +461,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.historyService.log(game);
     }
 
-    async _gameLoseCheck(game) {
+    async _gameLoseCheck(game, report) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
@@ -450,18 +495,24 @@ module.exports = class GameTickService extends EventEmitter {
                     user.achievements.defeated++;
                     user.achievements.afk++;
 
+                    // TODO: This should probably be handled by the game tick report socket.
                     this.emit('onPlayerAfk', {
                         game, 
                         player
                     });
+
+                    report.players.afk.push(player._id);
                 }
                 else {
                     user.achievements.defeated++;
 
+                    // TODO: This should probably be handled by the game tick report socket.
                     this.emit('onPlayerDefeated', {
                         game, 
                         player
                     });
+
+                    report.players.defeated.push(player._id);
                 }
 
                 await user.save();
@@ -479,8 +530,18 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this.leaderboardService.addGameRankings(leaderboard);
 
+            // TODO: This should probably be handled by the game tick report socket.
             this.emit('onGameEnded', {
                 game
+            });
+        }
+    }
+
+    _appendPlayerReportStats(game, report) {
+        for (let player of game.galaxy.players) {
+            report.players.stats.push({
+                playerId: player._id,
+                stats: this.playerService.getStats(game, player)
             });
         }
     }
