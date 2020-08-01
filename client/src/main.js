@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueSocketio from 'vue-socket.io'
+import VueSocketio from 'vue-socket.io' // NOTE: There is an issue with >3.0.7 so forced to use 3.0.7, see here: https://stackoverflow.com/questions/61769716/vue-socket-connection-not-triggered
 import VueGtag from 'vue-gtag'
 import Toasted from 'vue-toasted'
 import App from './App.vue'

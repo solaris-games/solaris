@@ -59,14 +59,14 @@ export default {
   },
 
   created () {
-    this.sockets.listener.subscribe('gamePlayerJoined', (data) => {
+    this.sockets.subscribe('gamePlayerJoined', (data) => {
       let player = gameHelper.getPlayerById(this.$store.state.game, data.playerId)
 
       player.isEmptySlot = false
       player.alias = data.alias
     })
 
-    this.sockets.listener.subscribe('gamePlayerQuit', (data) => {
+    this.sockets.subscribe('gamePlayerQuit', (data) => {
       let player = this.players.find(p => p._id === data.playerId)
 
       player.isEmptySlot = true
@@ -74,8 +74,8 @@ export default {
     })
   },
   destroyed () {
-    this.sockets.listener.unsubscribe('gamePlayerJoined')
-    this.sockets.listener.unsubscribe('gamePlayerQuit')
+    this.sockets.unsubscribe('gamePlayerJoined')
+    this.sockets.unsubscribe('gamePlayerQuit')
   }
 }
 </script>

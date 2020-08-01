@@ -76,7 +76,7 @@ export default {
       }
   },
   mounted () {
-    this.sockets.listener.subscribe('gameTicked', (data) => this.onGameTicked(data))
+    this.sockets.subscribe('gameTicked', (data) => this.onGameTicked(data))
     
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
@@ -85,7 +85,7 @@ export default {
     this.carrierShips = this.carrier.ships
   },
   destroyed () {
-    this.sockets.listener.unsubscribe('gameTicked')
+    this.sockets.unsubscribe('gameTicked')
   },
   methods: {
       onCloseRequested (e) {

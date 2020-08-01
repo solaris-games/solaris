@@ -2,7 +2,9 @@
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
         <div class="col-auto d-none d-md-block mr-5">
-            <i class="fas fa-gamepad"></i> {{game.settings.general.name}}
+            <server-connection-status/>
+
+            {{game.settings.general.name}}
         </div>
         <div class="col" v-if="userPlayer">
             <span v-if="gameIsPaused()">Paused</span>
@@ -82,9 +84,13 @@ import router from '../../../router'
 import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
+import ServerConnectionStatusVue from './ServerConnectionStatus'
 import * as moment from 'moment'
 
 export default {
+    components: {
+        'server-connection-status': ServerConnectionStatusVue
+    },
     data () {
         return {
             forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
@@ -104,7 +110,7 @@ export default {
         }
     },
     created () {
-        this.sockets.listener.subscribe('playerCreditsReceived', (data) => {
+        this.sockets.subscribe('playerCreditsReceived', (data) => {
             let player = GameHelper.getUserPlayer(this.$store.state.game)
             player.credits += data
         })
@@ -112,7 +118,7 @@ export default {
     destroyed () {
         clearInterval(this.intervalFunction)
 
-        this.sockets.listener.unsubscribe('playerCreditsReceived')
+        this.sockets.unsubscribe('playerCreditsReceived')
     },
     methods: {
         setMenuState (state, args) {

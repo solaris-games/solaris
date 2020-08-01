@@ -55,10 +55,10 @@ export default {
     this.loadMessages()
   },
   created () {
-      this.sockets.listener.subscribe('gameMessageSent', this.onMessageReceived)
+      this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
   },
   destroyed () {
-    this.sockets.listener.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('gameMessageSent')
   },
   methods: {
     onCloseRequested (e) {

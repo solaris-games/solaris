@@ -22,7 +22,7 @@
     "vue-chartjs": "^3.5.0",
     "vue-gtag": "^1.7.0",
     "vue-router": "^3.1.6",
-    "vue-socket.io": "^3.0.8",
+    "vue-socket.io": "^3.0.7",
     "vue-toasted": "^1.1.28",
     "vuex": "^3.3.0",
     "vuex-persist": "^2.2.0"
