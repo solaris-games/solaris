@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const session = require('express-session');
+const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 const config = require('../config');
 
 module.exports = async (app, io, container) => {
     app.use(require('body-parser').json());
 
+    // ---------------
     // Set up MongoDB session store
     let store = new MongoDBStore({
         uri: process.env.CONNECTION_STRING,
@@ -18,6 +20,7 @@ module.exports = async (app, io, container) => {
         console.error(err);
     });
 
+    // ---------------
     // Use sessions for tracking logins
     app.use(session({
         secret: config.sessionSecret,
@@ -30,6 +33,7 @@ module.exports = async (app, io, container) => {
         store
     }));
 
+    // ---------------
     // Enable CORS
     app.use((req, res, next) => {
         res.header("Access-Control-Allow-Origin", config.clientUrl);
@@ -40,6 +44,19 @@ module.exports = async (app, io, container) => {
         next();
     });
 
+    // ---------------
+    // Rate limiting
+    app.set('trust proxy', 1); // NOTE: App is behind a proxy in production so this is required.
+    
+    const limiter = rateLimit({
+        windowMs: 1000, // 1 second
+        max: 5 // limit each IP to X requests per windowMs
+    });
+    
+    //  apply to all requests
+    app.use(limiter);
+
+    // ---------------
     // Register routes
     const game = require('../api/game')(router, io, container);
     const research = require('../api/game/research')(router, io, container);
