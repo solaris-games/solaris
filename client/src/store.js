@@ -46,28 +46,20 @@ export default new Vuex.Store({
       state.game.state.endDate = report.gameState.endDate
       state.game.state.winner = report.gameState.winner
 
-      // Update stars
-      for (let reportStar of report.stars) {
-        let star = GameHelper.getStarById(state.game, reportStar._id)
+      // Remove destroyed carriers.
+      for (let reportCarrier of report.destroyedCarriers) {
+        let carrier = GameHelper.getCarrierById(state.game, reportCarrier)
+        
+        state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
 
-        star.ownedByPlayerId = reportStar.ownedByPlayerId
-        star.garrison = reportStar.garrison
-        star.infrastructure = reportStar.infrastructure
-
-        GameContainer.reloadStar(star)
+        GameContainer.undrawCarrier(carrier)
       }
 
       // Update carriers
       for (let reportCarrier of report.carriers) {
         let carrier = GameHelper.getCarrierById(state.game, reportCarrier._id)
 
-        // TODO: Carriers do not despawn on the map when they leave scanning range.
-
-        if (reportCarrier.destroyed) {
-          state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
-
-          GameContainer.undrawCarrier(carrier)
-        } else if (!carrier) {
+        if (!carrier) { // Could be a new carriers come into scanning range.
           state.game.galaxy.carriers.push(reportCarrier)
 
           GameContainer.reloadCarrier(reportCarrier)
@@ -86,6 +78,33 @@ export default new Vuex.Store({
         }
       }
 
+      // Iterate over all carriers that the store has, if the carrier
+      // isn't present in the tick report then it must have gone out of scanning range.
+      for (let i = 0; i < state.game.galaxy.carriers.length; i++) {
+        let carrier = state.game.galaxy.carriers[i];
+
+        let reportCarrier = report.carriers.find(c => c._id === carrier._id);
+
+        if (!reportCarrier) {
+          state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
+
+          i--
+
+          GameContainer.undrawCarrier(carrier)
+        }
+      }
+
+      // Update stars
+      for (let reportStar of report.stars) {
+        let star = GameHelper.getStarById(state.game, reportStar._id)
+
+        star.ownedByPlayerId = reportStar.ownedByPlayerId
+        star.garrison = reportStar.garrison
+        star.infrastructure = reportStar.infrastructure
+
+        GameContainer.reloadStar(star)
+      }
+
       // Update players
       for (let reportPlayer of report.players) {
         let player = GameHelper.getPlayerById(state.game, reportPlayer._id)
@@ -100,6 +119,17 @@ export default new Vuex.Store({
         let player = GameHelper.getPlayerById(state.game, reportResearch.playerId)
 
         player.research[reportResearch.technology.name].level = reportResearch.technology.level
+      }
+
+      // Update player for the end of a galactic cycle.
+      if (report.playerGalacticCycleReport) {
+        let userPlayer = GameHelper.getUserPlayer(state.game)
+        
+        if (userPlayer) {
+          userPlayer.credits += report.playerGalacticCycleReport.credits
+          userPlayer.research[report.playerGalacticCycleReport.experimentTechnology].level 
+            = report.playerGalacticCycleReport.experimentTechnologyLevel
+        }
       }
     },
     gameStarEconomyUpgraded (state, data) {

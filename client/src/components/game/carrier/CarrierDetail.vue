@@ -123,7 +123,8 @@ export default {
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
     },
-    // TODO: This method appears everywhere, is there a way to make it global?
+    // TODO: Methods like these should never be used, instead assign the user player
+    // to the vue data() method in mounted()
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },

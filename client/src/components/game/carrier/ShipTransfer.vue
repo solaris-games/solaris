@@ -9,10 +9,10 @@
     </div>
 
     <div class="row">
-        <div class="col">
+        <div class="col" v-if="star">
             <p class="mb-0">{{star.name}}</p>
         </div>
-        <div class="col">
+        <div class="col" v-if="carrier">
             <p class="mb-0">{{carrier.name}}</p>
         </div>
     </div>
@@ -39,11 +39,6 @@
         <div class="col-3">
             <button type="button" class="btn btn-success btn-block float-right" @click="onMaxShipsClicked">Max</button>
         </div>
-    </div>
-
-    <div class="alert alert-warning" role="alert" v-if="isOutOfSync">
-        The game has ticked while you have been on this screen, the ships below may be out of sync,
-        click <a href="#" @click="reSync">here</a> to re-sync.
     </div>
 
     <div class="row pb-2 pt-2 bg-secondary">
@@ -77,12 +72,11 @@ export default {
           star: null,
           starShips: 0,
           carrierShips: 0,
-          isTransferringShips: false,
-          isOutOfSync: false
+          isTransferringShips: false
       }
   },
   mounted () {
-    this.sockets.listener.subscribe('gameTicked', this.onGameTicked)
+    this.sockets.listener.subscribe('gameTicked', (data) => this.onGameTicked(data))
     
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
@@ -97,10 +91,13 @@ export default {
       onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
       },
-      reSync () {
-        // TODO: This isn't a great solution, it would be better to fetch the data from the API or
-        // alternatively the API returns what has been changed when the game ticks to each player
-        // instead of the player requesting the full galaxy whenver the game ticks.
+      onGameTicked (data) {
+        // When the game ticks there may have been ships built at the star.
+        // Find the star in the tick report and compare the garrison, then add
+        // the difference to the star ships side on the transfer.
+
+        // NOTE: At this stage the star will have the latest data for its garrison
+        // as the store deals with updating the star.
         this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
         this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
 
@@ -115,11 +112,6 @@ export default {
             this.starShips += difference
             this.onStarShipsChanged()
         }
-
-        this.isOutOfSync = false
-      },
-      onGameTicked () {
-        this.isOutOfSync = true
       },
       onStarShipsChanged (e) {
         let difference = parseInt(this.starShips) - this.star.garrison

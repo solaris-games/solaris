@@ -33,7 +33,6 @@ class UserService extends BaseApiService {
     { withCredentials: true })
   }
 
-  // TODO: Implement UI for this.
   updateUsername (username) {
     return axios.put(this.BASE_URL + 'user/changeUsername', {
       username

@@ -281,6 +281,8 @@ class Star extends EventEmitter {
     }
   }
 
+  // TODO: Not used, decide whether we actually want to display the player name on the map at all.
+  // If not, remove this.
   drawPlayerName (force) {
     if (force && this.text_playerName) {
       this.container.removeChild(this.text_playerName)

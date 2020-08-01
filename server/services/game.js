@@ -122,8 +122,6 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async quit(game, player) {    
-        // TODO: Something to prevent the user from being able rejoin a game.
-        
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
         }

@@ -67,7 +67,6 @@ module.exports = class ResearchService extends EventEmitter {
                 level: tech.level
             };
 
-            // TODO: This shouldn't really be here, it should be returned as part of the game tick report.
             this.emit('onPlayerResearchCompleted', {
                 game,
                 player,
@@ -130,6 +129,7 @@ module.exports = class ResearchService extends EventEmitter {
 
         return {
             technology: techKey,
+            level: tech.level,
             amount: researchAmount
         };
     }

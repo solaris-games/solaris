@@ -48,9 +48,11 @@ module.exports = class GameTickService extends EventEmitter {
         let report = {
             gameState: null,
             carriers: [],
+            destroyedCarriers: [],
             stars: [],
             players: [],
-            playerResearch: []
+            playerResearch: [],
+            playerGalacticCycleReport: []
         };
 
        await this._moveCarriers(game, report);
@@ -68,8 +70,6 @@ module.exports = class GameTickService extends EventEmitter {
        this._appendReportStars(game, report);
        this._appendReportPlayers(game, report);
 
-       // TODO: The report will need to be filtered for each player
-       // because of scanning range.
        for (let player of game.galaxy.players) {
            this._broadcastReportToPlayer(game, report, player);
        }
@@ -207,10 +207,6 @@ module.exports = class GameTickService extends EventEmitter {
 
         // 4. Now that combat is done, perform any carrier waypoint actions.
         this._performWaypointActions(game, actionWaypoints);
-
-        // 5. Populate the report with the latest data for all carriers.
-        // NOTE: Populate only the carrier id, we will get the real data later at the end of the tick.
-        report.carriers = carriers.map(c => c._id);
     }
 
     _performWaypointActions(game, actionWaypoints) {
@@ -256,7 +252,6 @@ module.exports = class GameTickService extends EventEmitter {
             defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
             attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
 
-            // TODO: This should probably be handled by the game tick report socket.
             // Log the combat event
             this.emit('onPlayerCombatCarrier', {
                 game,
@@ -274,6 +269,8 @@ module.exports = class GameTickService extends EventEmitter {
 
                 defenderUser.achievements.combat.losses.carriers++;
                 attackerUser.achievements.combat.kills.carriers++;
+
+                report.destroyedCarriers.push(friendlyCarrier._id);
             }
 
             // If the enemy carrier has no ships, then carrier to carrier combat is finished.
@@ -305,7 +302,6 @@ module.exports = class GameTickService extends EventEmitter {
             defenderUser.achievements.combat.kills.ships += starCombatResult.lost.attacker;
             attackerUser.achievements.combat.kills.ships += starCombatResult.lost.defender;
 
-            // TODO: This should probably be handled by the game tick report socket.
             // Log the combat event
             this.emit('onPlayerCombatStar', {
                 game,
@@ -323,6 +319,8 @@ module.exports = class GameTickService extends EventEmitter {
 
             defenderUser.achievements.combat.kills.carriers++;
             attackerUser.achievements.combat.losses.carriers++;
+
+            report.destroyedCarriers.push(enemyCarrier._id);
         }
 
         // If the star has no garrison and no defenders, then the attacker has won.
@@ -341,14 +339,12 @@ module.exports = class GameTickService extends EventEmitter {
             defenderUser.achievements.combat.stars.lost++;
             attackerUser.achievements.combat.stars.captured++;
             
-            // TODO: This should probably be handled by the game tick report socket.
             this.emit('onStarCaptured', {
                 game,
                 player: attacker,
                 captureReward
             });
             
-            // TODO: This should probably be handled by the game tick report socket.
             this.emit('onStarCaptured', {
                 game,
                 player: defender,
@@ -401,7 +397,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    async _endOfGalacticCycleCheck(game) {
+    async _endOfGalacticCycleCheck(game, report) {
         game.state.tick++;
 
         // Check if we have reached the production tick.
@@ -428,7 +424,15 @@ module.exports = class GameTickService extends EventEmitter {
                     creditsEconomy: creditsResult.creditsFromEconomy, 
                     creditsBanking: creditsResult.creditsFromBanking, 
                     experimentTechnology: experimentResult.technology,
+                    experimentTechnologyLevel: experimentResult.level,
                     experimentAmount: experimentResult.amount
+                });
+
+                report.playerGalacticCycleReport.push({
+                    playerId: player._id,
+                    credits: creditsResult.creditsTotal,
+                    experimentTechnology: experimentResult.technology,
+                    experimentTechnologyLevel: experimentResult.level
                 });
             }
         }
@@ -445,7 +449,8 @@ module.exports = class GameTickService extends EventEmitter {
 
         return {
             creditsFromEconomy,
-            creditsFromBanking
+            creditsFromBanking,
+            creditsTotal
         };
     }
 
@@ -491,7 +496,6 @@ module.exports = class GameTickService extends EventEmitter {
                     user.achievements.defeated++;
                     user.achievements.afk++;
 
-                    // TODO: This should probably be handled by the game tick report socket.
                     this.emit('onPlayerAfk', {
                         game, 
                         player
@@ -500,7 +504,6 @@ module.exports = class GameTickService extends EventEmitter {
                 else {
                     user.achievements.defeated++;
 
-                    // TODO: This should probably be handled by the game tick report socket.
                     this.emit('onPlayerDefeated', {
                         game, 
                         player
@@ -522,7 +525,6 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this.leaderboardService.addGameRankings(leaderboard);
 
-            // TODO: This should probably be handled by the game tick report socket.
             this.emit('onGameEnded', {
                 game
             });
@@ -542,35 +544,22 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _appendReportCarriers(game, report) {
-        let carriersData = [];
-
-        for (let carrierId of report.carriers) {
-            let carrier = this.carrierService.getByObjectId(game, carrierId);
-
-            if (carrier) {
-                // Add everything that could have changed
-                let carrierData = {
-                    _id: carrier._id,
-                    ownedByPlayerId: carrier.ownedByPlayerId,
-                    orbiting: carrier.orbiting,
-                    inTransitFrom: carrier.inTransitFrom,
-                    inTransitTo: carrier.inTransitTo,
-                    ships: carrier.ships,
-                    location: carrier.location,
-                    waypoints: carrier.waypoints,
-                    destroyed: false
-                };
-
-                carriersData.push(carrierData);
-            } else {
-                carriersData.push({
-                    _id: carrierId,
-                    destroyed: true
-                });
-            }
-        }
-
-        report.carriers = carriersData;
+        // The report for the carriers will contain all carriers
+        // and fields that could have changed in the tick.
+        report.carriers = game.galaxy.carriers
+        .map(carrier => {
+            return {
+                _id: carrier._id,
+                ownedByPlayerId: carrier.ownedByPlayerId,
+                orbiting: carrier.orbiting,
+                inTransitFrom: carrier.inTransitFrom,
+                inTransitTo: carrier.inTransitTo,
+                ships: carrier.ships,
+                location: carrier.location,
+                waypoints: carrier.waypoints,
+                name: carrier.name // Include the name because carriers can go in and out of scanning range.
+            };
+        });
     }
 
     _appendReportStars(game, report) {
@@ -604,6 +593,9 @@ module.exports = class GameTickService extends EventEmitter {
 
     _broadcastReportToPlayer(game, report, player) {
         let playerReport = JSON.parse(JSON.stringify(report)); // Clone the original report.
+
+        // Get the end of galactic cycle report for the player if there is one.
+        playerReport.playerGalacticCycleReport = report.playerGalacticCycleReport.find(r => r.playerId.equals(player._id)) || null;
 
         // Perform a filter on the report stars, if the star is out of range
         // then only return basic info.
