@@ -43,6 +43,8 @@ module.exports = class GameTickService extends EventEmitter {
            return;
        }
 
+       let startTime = process.hrtime();
+
        game.state.lastTickDate = moment().utc();
 
         let report = {
@@ -65,14 +67,11 @@ module.exports = class GameTickService extends EventEmitter {
 
        await game.save();
 
-       this._appendReportGameState(game, report);
-       this._appendReportCarriers(game, report);
-       this._appendReportStars(game, report);
-       this._appendReportPlayers(game, report);
+       this._broadcastReport(game, report);       
 
-       for (let player of game.galaxy.players) {
-           this._broadcastReportToPlayer(game, report, player);
-       }
+       let endTime = process.hrtime(startTime);
+
+       console.info(`Game tick [${game.settings.general.name}]: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     _canTick(game) {
@@ -528,6 +527,25 @@ module.exports = class GameTickService extends EventEmitter {
             this.emit('onGameEnded', {
                 game
             });
+        }
+    }
+
+    _broadcastReport(game, report) {
+        // Get all players who are connected to the server.
+        let broadcastPlayers = game.galaxy.players.filter(p =>
+            this.broadcastService.playerRoomExists(p));
+
+        // If there are no players to broadcast to, then
+        // there is no point creating the game tick report.
+        if (broadcastPlayers.length) {
+            this._appendReportGameState(game, report);
+            this._appendReportCarriers(game, report);
+            this._appendReportStars(game, report);
+            this._appendReportPlayers(game, report);
+     
+            for (let player of broadcastPlayers) {
+                this._broadcastReportToPlayer(game, report, player);
+            }
         }
     }
 

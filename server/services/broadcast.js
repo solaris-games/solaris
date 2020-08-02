@@ -6,6 +6,14 @@ module.exports = class BroadcastService {
         this.io = io;
     }
 
+    gameRoomExists(game) {
+        return this.io.sockets.adapter.rooms[roomId._id.toString()] != null;
+    }
+
+    playerRoomExists(player) {
+        return this.io.sockets.adapter.rooms[player._id.toString()] != null
+    }
+
     gameTick(game, playerId, report) {
         this.io.to(playerId.toString()).emit('gameTicked', {
             report
