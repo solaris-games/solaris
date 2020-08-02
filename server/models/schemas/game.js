@@ -94,6 +94,7 @@ const schema = new Schema({
 			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
 			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
 			shipSpeed: { type: Types.Number, required: true, default: 5 }
+			// TODO: Need a warp speed modifier value here.
 		},
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 }

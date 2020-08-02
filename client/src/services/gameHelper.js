@@ -69,6 +69,24 @@ class GameHelper {
     return Math.sqrt(xs + ys)
   }
 
+  getTicksBetweenLocations (game, locs, tickDistanceModifier = 1) {
+    let totalTicks = 0
+    let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
+
+    for (let i = 1; i < locs.length; i++) {
+      let prevLoc = locs[i - 1]
+      let currLoc = locs[i]
+
+      let distance = this.getDistanceBetweenLocations(prevLoc, currLoc)
+
+      let ticks = Math.ceil(distance / tickDistance)
+  
+      totalTicks += ticks
+    }
+
+    return totalTicks
+  }
+
   getCountdownTimeString (game, date) {
     if (date == null) {
       return 'Unknown'
@@ -77,10 +95,14 @@ class GameHelper {
     let relativeTo = moment().utc()
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
-    let days = Math.floor(t / (1000 * 60 * 60 * 24))
-    let hours = Math.floor((t % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    let mins = Math.floor((t % (1000 * 60 * 60)) / (1000 * 60))
-    let secs = Math.floor((t % (1000 * 60)) / 1000)
+    return this.getDateToString(t)
+  }
+
+  getDateToString (date) {
+    let days = Math.floor(date / (1000 * 60 * 60 * 24))
+    let hours = Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    let mins = Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
+    let secs = Math.floor((date % (1000 * 60)) / 1000)
 
     if (secs < 0) {
       return 'Pending...'
@@ -121,18 +143,14 @@ class GameHelper {
         source = carrier.location
     }
 
-    let distance = this.getDistanceBetweenLocations(source, destination)
+    let ticks
 
-    let tickDistance = game.constants.distances.shipSpeed
-
-    // If the carrier is moving between warp gates then
-    // the tick distance is x3
     if (source.warpGate && destination.warpGate
-        && source.ownedByPlayerId && destination.ownedByPlayerId) {
-            tickDistance *= 3
-        }
-
-    let ticks = Math.ceil(distance / tickDistance)
+      && source.ownedByPlayerId && destination.ownedByPlayerId) {
+        ticks = this.getTicksBetweenLocations(game, [source, destination], 3) // TODO: Need a constant here
+      } else {
+        ticks = this.getTicksBetweenLocations(game, [source, destination])
+      }
 
     return ticks
   }

@@ -51,6 +51,7 @@
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested"/>
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
+      <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
     </div>
   </div>
 </div>
@@ -77,6 +78,7 @@ import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
 import MapObjectSelectorVue from './MapObjectSelector.vue'
 import GameHelper from '../../../services/gameHelper'
 import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
+import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
 
 export default {
@@ -98,7 +100,8 @@ export default {
     'intel': IntelVue,
     'galaxy': GalaxyVue,
     'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
-    'map-object-selector': MapObjectSelectorVue
+    'map-object-selector': MapObjectSelectorVue,
+    'ruler': RulerVue
   },
   props: {
     menuState: String,

@@ -3,6 +3,7 @@ import gameContainer from './container'
 import Star from './star'
 import Carrier from './carrier'
 import Waypoints from './waypoints'
+import RulerPoints from './rulerPoints'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 import AnimationService from './animation'
@@ -28,10 +29,12 @@ class Map extends EventEmitter {
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
+    this.rulerPointContainer = new PIXI.Container()
 
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.waypointContainer)
+    this.container.addChild(this.rulerPointContainer)
   }
 
   setup (game) {
@@ -56,6 +59,8 @@ class Map extends EventEmitter {
       this.setupCarrier(game, game.galaxy.carriers[i])
     }
 
+    // -----------
+    // Setup Waypoints
     if (this.waypoints) {
       this.waypoints.removeAllListeners()
     }
@@ -65,6 +70,19 @@ class Map extends EventEmitter {
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
+
+    // -----------
+    // Setup Ruler Points
+    if (this.rulerPoints) {
+      this.rulerPoints.removeAllListeners()
+    }
+
+    this.rulerPoints = new RulerPoints()
+    this.rulerPoints.setup(game)
+    this.rulerPoints.onRulerPointCreatedHandler = this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
+    this.rulerPoints.onRulerPointsClearedHandler = this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
+
+    this.rulerPointContainer.addChild(this.rulerPoints.container)
   }
 
   setupStar (game, starData) {
@@ -121,6 +139,12 @@ class Map extends EventEmitter {
       this.drawWaypoints()
     } else {
       this.clearWaypoints()
+    }
+
+    if (this.mode === 'ruler') {
+      this.drawRulerPoints()
+    } else {
+      this.clearRulerPoints()
     }
   }
 
@@ -209,6 +233,14 @@ class Map extends EventEmitter {
 
   clearWaypoints () {
     this.waypoints.clear()
+  }
+
+  drawRulerPoints () {
+    this.rulerPoints.draw(this.modeArgs)
+  }
+
+  clearRulerPoints () {
+    this.rulerPoints.setup(this.game)
   }
 
   zoomToPlayer (game, player) {
@@ -324,6 +356,8 @@ class Map extends EventEmitter {
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onStarClicked(e)
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
@@ -350,6 +384,8 @@ class Map extends EventEmitter {
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onCarrierClicked(e)
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
@@ -375,6 +411,14 @@ class Map extends EventEmitter {
 
   onWaypointCreated (e) {
     this.emit('onWaypointCreated', e)
+  }
+
+  onRulerPointCreated (e) {
+    this.emit('onRulerPointCreated', e)
+  }
+
+  onRulerPointsCleared (e) {
+    this.emit('onRulerPointsCleared', e)
   }
 
   tryMultiSelect (location) {

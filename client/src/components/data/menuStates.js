@@ -29,5 +29,6 @@ export default {
   CARRIER_RENAME: 'carrierRename',
   SHIP_TRANSFER: 'shipTransfer',
   BULK_INFRASTRUCTURE_UPGRADE: 'bulkInfrastructureUpgrade',
-  MAP_OBJECT_SELECTOR: 'mapObjectSelector'
+  MAP_OBJECT_SELECTOR: 'mapObjectSelector',
+  RULER: 'ruler'
 }
