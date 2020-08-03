@@ -61,6 +61,9 @@ const game = {
                 maxNaturalResources: 50
             }
         }
+    },
+    galaxy: {
+        stars: []
     }
 }
 
@@ -148,7 +151,8 @@ describe('player', () => {
 
     it('should create a list of empty players', () => {
         const allStars = generateStarGrid();
-        const players = playerService.createEmptyPlayers(game, allStars);
+        game.galaxy.stars = allStars;
+        const players = playerService.createEmptyPlayers(game);
 
         expect(players.length).toEqual(game.settings.general.playerLimit);
 

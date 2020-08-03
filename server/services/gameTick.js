@@ -44,6 +44,7 @@ module.exports = class GameTickService extends EventEmitter {
        }
 
        let startTime = process.hrtime();
+       console.info(`[${game.settings.general.name}] - Game tick started.`);
 
        game.state.lastTickDate = moment().utc();
 
@@ -57,21 +58,39 @@ module.exports = class GameTickService extends EventEmitter {
             playerGalacticCycleReport: []
         };
 
+        let taskTime = process.hrtime();
+        let taskTimeEnd = null;
+
+        let logTime = (taskName) => {
+            taskTimeEnd = process.hrtime(taskTime);
+            taskTime = process.hrtime();
+            console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
+        };
+
        await this._moveCarriers(game, report);
+       logTime('Move carriers');
        this._produceShips(game, report);
+       logTime('Produce ships');
        await this._conductResearch(game, report);
+       logTime('Conduct research');
        await this._endOfGalacticCycleCheck(game, report);
+       logTime('Galactic cycle check');
        this._logHistory(game, report);
+       logTime('Log history');
        await this._gameLoseCheck(game, report);
+       logTime('Game lose check');
        await this._gameWinCheck(game, report);
+       logTime('Game win check');
 
        await game.save();
+       logTime('Save game');
 
        this._broadcastReport(game, report);       
+       logTime('Broadcast report');
 
        let endTime = process.hrtime(startTime);
 
-       console.info(`Game tick [${game.settings.general.name}]: %ds %dms'`, endTime[0], endTime[1] / 1000000);
+       console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     _canTick(game) {

@@ -56,17 +56,17 @@ module.exports = class PlayerService {
         };
     }
 
-    createEmptyPlayers(game, allStars) {
+    createEmptyPlayers(game) {
         let players = [];
 
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
 
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(allStars);
+        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(game.galaxy.stars);
 
         // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.mapService.getGalaxyDiameter(allStars).x / 2 / 2;
+        const distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars).x / 2 / 2;
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
@@ -85,7 +85,7 @@ module.exports = class PlayerService {
             let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
 
             // Find the star that is closest to this location, that will be the player's home star.
-            let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, allStars);
+            let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, game.galaxy.stars);
 
             // Set up the home star
             this.starService.setupHomeStar(game, homeStar, player, game.settings);
@@ -102,11 +102,11 @@ module.exports = class PlayerService {
         while (starsToDistribute--) {
             for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
                 let player = players[playerIndex];
-                let homeStar = allStars.find(s => player.homeStarId.equals(s._id));
+                let homeStar = game.galaxy.stars.find(s => player.homeStarId.equals(s._id));
 
                 // Get X closest stars to the home star and also give those to
                 // the player.
-                let s = this.starDistanceService.getClosestUnownedStar(homeStar, allStars);
+                let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
                 this.setupStarForGameStart(game, s, player);
@@ -118,7 +118,7 @@ module.exports = class PlayerService {
 
     setupStarForGameStart(game, star, player) {
         if (player.homeStarId.equals(star._id)) {
-            this.starService.setupHomeStar(game, homeStar, player, game.settings);
+            this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
             star.garrisonActual = game.settings.player.startingShips;
@@ -148,7 +148,7 @@ module.exports = class PlayerService {
         // Reset the player's carriers
         this.carrierService.clearPlayerCarriers(game, player);
 
-        let homeCarrier = this.createHomeStarCarrier(game.galaxy.stars, player);
+        let homeCarrier = this.createHomeStarCarrier(game, player);
         
         game.galaxy.carriers.push(homeCarrier);
     }
@@ -192,13 +192,13 @@ module.exports = class PlayerService {
         player.researchingNext = player.researchingNow;
     }
 
-    createHomeStarCarriers(allStars, players) {
+    createHomeStarCarriers(game) {
         let carriers = [];
 
-        for (let i = 0; i < players.length; i++) {
-            let player = players[i];
+        for (let i = 0; i < game.galaxy.players.length; i++) {
+            let player = game.galaxy.players[i];
 
-            let homeCarrier = this.createHomeStarCarrier(allStars, player);
+            let homeCarrier = this.createHomeStarCarrier(game, player);
 
             carriers.push(homeCarrier);
         }
@@ -206,15 +206,15 @@ module.exports = class PlayerService {
         return carriers;
     }
 
-    createHomeStarCarrier(allStars, player) {
-        let homeStar = this.starService.getPlayerHomeStar(allStars, player);
+    createHomeStarCarrier(game, player) {
+        let homeStar = this.starService.getPlayerHomeStar(game.galaxy.stars, player);
 
         if (!homeStar) {
             throw new Error('The player must have a home star in order to set up a carrier');
         }
 
         // Create a carrier for the home star.
-        let homeCarrier = this.carrierService.createAtStar(homeStar, carriers);
+        let homeCarrier = this.carrierService.createAtStar(homeStar, game.galaxy.carriers);
 
         return homeCarrier;
     }

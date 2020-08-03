@@ -100,7 +100,8 @@ module.exports = class CarrierService {
                 inTransitTo: c.inTransitTo,
                 name: c.name,
                 ships: c.ships,
-                location: c.location
+                location: c.location,
+                waypoints: c.waypoints
             };
 
             this.clearCarrierWaypointsNonTransit(c, true);
