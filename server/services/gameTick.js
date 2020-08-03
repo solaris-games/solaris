@@ -643,20 +643,7 @@ module.exports = class GameTickService extends EventEmitter {
             // If the carrier does not belong to the player and the carrier has waypoints
             // then only return the first waypoint.
             if (c.ownedByPlayerId !== player.id) {
-                if (!c.orbiting) {
-                    c.waypoints = c.waypoints.slice(0, 1);
-
-                    // TODO: This code is copied from the carrier service, needs to be refactored to use that.
-                    // Hide any sensitive info about the waypoint.
-                    let wp = c.waypoints[0];
-
-                    // TODO: Remove these values entirely?
-                    wp.action = 'collectAll';
-                    wp.actionShips = 0;
-                    wp.delayTicks = 0;
-                } else {
-                    c.waypoints = [];
-                }
+                this.carrierService.clearCarrierWaypointsNonTransit(c, true);
             }
 
             // The waypoint ETAs may have changed so make sure that they are updated.

@@ -73,6 +73,7 @@ module.exports = class LeaderboardService {
             if (i == 0) {
                 user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 user.achievements.victories++; // Increase the winner's victory count
+                user.credits++; // Give the winner a galactic credit.
             } else {
                 user.achievements.rank += leaderboard.length / 2 - i;
                 user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.

@@ -63,7 +63,7 @@ module.exports = (io) => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
-    const gameService = new GameService(GameModel, userService, leaderboardService);
+    const gameService = new GameService(GameModel, userService, carrierService);
     const researchService = new ResearchService(technologyService, randomService, playerService, userService);
     const tradeService = new TradeService(userService, playerService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);

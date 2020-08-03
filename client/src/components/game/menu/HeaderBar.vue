@@ -6,7 +6,7 @@
 
             {{game.settings.general.name}}
         </div>
-        <div class="col" v-if="userPlayer">
+        <div class="col">
             <span v-if="gameIsPaused()">Paused</span>
             <span v-if="gameIsInProgress()">Production: {{timeRemaining}}</span>
             <span v-if="gameIsPendingStart()">Starts In: {{timeRemaining}}</span>
@@ -103,13 +103,11 @@ export default {
     mounted () {
         this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
-        this.recalculateTimeRemaining()
-
-        if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-            this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
-        }
+        this.setupTimer()
     },
     created () {
+        this.sockets.subscribe('gamePlayerJoined', this.setupTimer.bind(this))
+
         this.sockets.subscribe('playerCreditsReceived', (data) => {
             let player = GameHelper.getUserPlayer(this.$store.state.game)
             player.credits += data
@@ -118,9 +116,21 @@ export default {
     destroyed () {
         clearInterval(this.intervalFunction)
 
+        this.sockets.unsubscribe('gamePlayerJoined')
         this.sockets.unsubscribe('playerCreditsReceived')
     },
     methods: {
+        setupTimer() {
+            // TODO: Needs a rethink on how the socket works
+            // as isGameInProgress will always return false as there is never any updates
+            // to the game object in cache when a player joins the game. 
+            // Use onGameStarted socket instead?
+            this.recalculateTimeRemaining()
+
+            if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
+                this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+            }
+        },
         setMenuState (state, args) {
             this.$emit('onMenuStateChanged', {
                 state,

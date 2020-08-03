@@ -7,8 +7,8 @@ function getFakeTransport() {
         async sendMail(message) {
             console.log('-----');
             console.log(`SMTP DISABLED - Attempted to send email to [${message.to}] from [${message.from}]`);
-            console.log(message.text);
-            console.log(message.html);
+            // console.log(message.text);
+            // console.log(message.html);
             console.log('-----');
         }
     };

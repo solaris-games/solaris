@@ -4,12 +4,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, leaderboardService) {
+    constructor(gameModel, userService, carrierService) {
         super();
         
         this.gameModel = gameModel;
         this.userService = userService;
-        this.leaderboardService = leaderboardService;
+        this.carrierService = carrierService;
     }
 
     async getByIdAll(id) {
@@ -174,25 +174,11 @@ module.exports = class GameService extends EventEmitter {
         player.defeated = true;
         game.state.players--; // Deduct number of active players from the game.
 
-        // Do a winner check here for last man standing as it's possible that everyone might admit
-        // or be legit defeated on the same tick.
-        let winner = this.leaderboardService.getLastManStanding(game);
-
-        if (winner) {
-            this.finishGame(game, winner);
-
-            let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
-
-            await this.leaderboardService.addGameRankings(leaderboard);
-            
-            this.emit('onGameEnded', {
-                game
-            });
-
-            await game.save();
-        }
-
-        // TODO: Remove all carrier waypoints (unless in transit)
+        // NOTE: The game will check for a winner on each tick so no need to 
+        // repeat that here.
+        
+        // Remove all carrier waypoints (unless in transit)
+        this.carrierService.clearPlayerCarrierWaypointsNonTransit(game, player);
 
         let userPlayer = await this.getPlayerUser(game, player.id);
         userPlayer.achievements.defeated++;
