@@ -114,14 +114,14 @@ module.exports = (router, io, container) => {
 
     router.put('/api/game/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.starUpgradeService.buildWarpGate(
+            let report = await container.starUpgradeService.buildWarpGate(
                 req.game,
                 req.player,
                 req.body.starId);
 
             container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId);
 
-            return res.sendStatus(200);
+            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }

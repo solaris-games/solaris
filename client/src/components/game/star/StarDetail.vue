@@ -264,6 +264,7 @@ export default {
           this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
 
           // this.$emit('onUpgradedWarpGate', this.star._id)
+          GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
 
           AudioService.join()
         }

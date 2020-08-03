@@ -50,6 +50,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
             player,
             star
         });
+
+        return {
+            starId: star._id,
+            cost
+        };
     }
 
     async destroyWarpGate(game, player, starId) {
