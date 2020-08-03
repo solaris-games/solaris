@@ -133,4 +133,10 @@ module.exports = class CarrierService {
             this.clearCarrierWaypointsNonTransit(carrier);
         }
     }
+
+    clearPlayerCarriers(game, player) {
+        game.galaxy.carriers = game.galaxy.carriers.filter(c => !c.ownedByPlayerId
+            || !c.ownedByPlayerId.equals(player._id));
+    }
+    
 };

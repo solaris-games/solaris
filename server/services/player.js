@@ -109,13 +109,48 @@ module.exports = class PlayerService {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, allStars);
 
                 // Set up the closest star.
-                s.ownedByPlayerId = player._id;
-                s.garrisonActual = game.settings.player.startingShips;
-                s.garrison = s.garrisonActual;
+                this.setupStarForGameStart(game, s, player);
             }
         }
 
         return players;
+    }
+
+    setupStarForGameStart(game, star, player) {
+        if (player.homeStarId.equals(star._id)) {
+            this.starService.setupHomeStar(game, homeStar, player, game.settings);
+        } else {
+            star.ownedByPlayerId = player._id;
+            star.garrisonActual = game.settings.player.startingShips;
+            star.garrison = s.garrisonActual;
+            star.warpGate = false;
+            star.infrastructure.economy = 0;
+            star.infrastructure.industry = 0;
+            star.infrastructure.science = 0;
+        }
+    }
+
+    resetPlayerForGameStart(game, player) {
+        player.userId = null;
+        player.alias = "Empty Slot";
+        player.credits = game.settings.player.startingCredits;
+
+        // Reset the player's research
+        this._setDefaultResearchTechnology(game, player);
+
+        // Reset the player's stars.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        for (let star of playerStars) {
+            this.setupStarForGameStart(game, star, player);
+        }
+
+        // Reset the player's carriers
+        this.carrierService.clearPlayerCarriers(game, player);
+
+        let homeCarrier = this.createHomeStarCarrier(game.galaxy.stars, player);
+        
+        game.galaxy.carriers.push(homeCarrier);
     }
 
     _getPlayerStartingLocationRadians(playerCount) {
@@ -157,25 +192,31 @@ module.exports = class PlayerService {
         player.researchingNext = player.researchingNow;
     }
 
-    createEmptyPlayerCarriers(allStars, players) {
+    createHomeStarCarriers(allStars, players) {
         let carriers = [];
 
         for (let i = 0; i < players.length; i++) {
             let player = players[i];
 
-            let homeStar = this.starService.getPlayerHomeStar(allStars, player);
-
-            if (!homeStar) {
-                throw new Error('The player must have a home star in order to set up a carrier');
-            }
-
-            // Create a carrier for the home star.
-            let homeCarrier = this.carrierService.createAtStar(homeStar, carriers);
+            let homeCarrier = this.createHomeStarCarrier(allStars, player);
 
             carriers.push(homeCarrier);
         }
 
         return carriers;
+    }
+
+    createHomeStarCarrier(allStars, player) {
+        let homeStar = this.starService.getPlayerHomeStar(allStars, player);
+
+        if (!homeStar) {
+            throw new Error('The player must have a home star in order to set up a carrier');
+        }
+
+        // Create a carrier for the home star.
+        let homeCarrier = this.carrierService.createAtStar(homeStar, carriers);
+
+        return homeCarrier;
     }
 
     calculateTotalStars(player, stars) {

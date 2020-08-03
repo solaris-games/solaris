@@ -40,7 +40,7 @@ module.exports = class GameCreateService {
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game, game.galaxy.stars);
-        game.galaxy.carriers = this.playerService.createEmptyPlayerCarriers(game.galaxy.stars, game.galaxy.players);
+        game.galaxy.carriers = this.playerService.createHomeStarCarriers(game.galaxy.stars, game.galaxy.players);
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;

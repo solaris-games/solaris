@@ -46,6 +46,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.garrisonActual = gameSettings.player.startingShips;
         homeStar.garrison = homeStar.garrisonActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
+        homeStar.warpGate = false;
         
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;

@@ -4,12 +4,13 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, carrierService) {
+    constructor(gameModel, userService, carrierService, playerService) {
         super();
         
         this.gameModel = gameModel;
         this.userService = userService;
         this.carrierService = carrierService;
+        this.playerService = playerService;
     }
 
     async getByIdAll(id) {
@@ -134,15 +135,13 @@ module.exports = class GameService extends EventEmitter {
 
         let alias = player.alias;
 
-        // TODO: Something to consider here is whether the player has done something
-        // to their empire, i.e upgrading stars etc, we should prevent the player from
-        // doing this otherwise we'd have to reset everything here which will be a pain.
-
         game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
 
-        player.userId = null;
-        player.alias = "Empty Slot";
         user.achievements.quit++;
+
+        // Reset everything the player may have done to their empire.
+        // This is to prevent the next player joining this slot from being screwed over.
+        this.playerService.resetPlayerForGameStart(game, player);
 
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
