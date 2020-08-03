@@ -122,7 +122,7 @@ module.exports = class PlayerService {
         } else {
             star.ownedByPlayerId = player._id;
             star.garrisonActual = game.settings.player.startingShips;
-            star.garrison = s.garrisonActual;
+            star.garrison = star.garrisonActual;
             star.warpGate = false;
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
