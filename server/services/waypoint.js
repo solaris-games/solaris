@@ -56,10 +56,19 @@ module.exports = class WaypointService {
         carrier.waypoints = waypoints;
         carrier.waypointsLooped = false;
 
-        // TODO: Send back the eta ticks of the waypoints so that
-        // the UI can be updated.
+        await game.save();
 
-        return await game.save();
+        // Send back the eta ticks of the waypoints so that
+        // the UI can be updated.
+        let reportCarrier = carrier.toObject();
+
+        this.populateCarrierWaypointEta(game, reportCarrier);
+
+        return {
+            ticksEta: reportCarrier.ticksEta,
+            ticksEtaTotal: reportCarrier.ticksEtaTotal,
+            waypoints: reportCarrier.waypoints
+        };
     }
 
     async loopWaypoints(game, player, carrierId, loop) {
@@ -117,6 +126,8 @@ module.exports = class WaypointService {
 
         let ticks = Math.ceil(distance / tickDistance);
 
+        ticks += waypoint.delayTicks; // Add any delay ticks the waypoint has.
+
         return ticks;
     }
 
@@ -126,7 +137,7 @@ module.exports = class WaypointService {
         for (let i = 0; i < carrier.waypoints.length; i++) {
             let cwaypoint = carrier.waypoints[i];
             
-            totalTicks += this.calculateWaypointTicks(game, carrier, waypoint);
+            totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint);
 
             if (cwaypoint._id.toString() === waypoint._id.toString()) {
                 break;

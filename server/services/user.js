@@ -27,6 +27,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async getById(id) {
+        return await this.userModel.findById(id);
+    }
+
+    async getInfoById(id) {
         return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
@@ -38,7 +42,7 @@ module.exports = class UserService extends EventEmitter {
             username: 0
         });
     }
-
+    
     async getEmailById(id) {
         return await this.userModel.findById(id, {
             email: 1,

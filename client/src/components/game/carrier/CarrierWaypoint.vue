@@ -160,7 +160,9 @@ export default {
 				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.waypoints)
 
 				if (response.status === 200) {
-                    this.carrier.waypoints = this.waypoints
+                    this.carrier.ticksEta = response.data.ticksEta
+                    this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
+                    this.carrier.waypoints = response.data.waypoints
                     
                     this.$toasted.show(`${this.carrier.name} waypoints updated.`)
                     

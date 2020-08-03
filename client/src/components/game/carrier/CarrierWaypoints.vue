@@ -66,6 +66,8 @@ export default {
     	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
 
 		this.oldWaypoints = this.carrier.waypoints.slice(0)
+
+		this.recalculateTotalEta()
 	},
 	destroyed () {
 		GameContainer.resetMode()
@@ -104,6 +106,8 @@ export default {
 			}
 			
 			AudioService.backspace()
+
+			this.recalculateTotalEta()
 		},
 		removeAllWaypoints () {
 			// Remove all waypoints up to the last waypoint (if in transit)
@@ -114,8 +118,15 @@ export default {
 			this.totalEtaTimeString = null
 			
 			AudioService.backspace()
+
+			this.recalculateTotalEta()
 		},
 		onWaypointCreated () {
+			AudioService.type()
+			
+			this.recalculateTotalEta()
+		},
+		recalculateTotalEta () {
 			let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
 				this.carrier.waypoints[this.carrier.waypoints.length - 1])
 
@@ -123,8 +134,6 @@ export default {
 				this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
 			this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
-			
-			AudioService.type()
 		},
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.
@@ -135,6 +144,11 @@ export default {
 				if (response.status === 200) {
 					AudioService.join()
 
+					// Update the waypoints
+                    this.carrier.ticksEta = response.data.ticksEta
+                    this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
+					this.carrier.waypoints = response.data.waypoints
+					
 					this.oldWaypoints = this.carrier.waypoints
 
           			this.$toasted.show(`${this.carrier.name} waypoints updated.`)
@@ -144,7 +158,6 @@ export default {
 					} else {
 						this.onCloseRequested()
 					}
-
 				}
 			} catch (e) {
 				console.error(e)

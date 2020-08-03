@@ -32,8 +32,14 @@
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
-      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments.carrier" :waypoint="menuArguments.waypoint" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" 
+        @onCloseRequested="onCloseRequested" :carrierId="menuArguments" 
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" 
+        @onCloseRequested="onCloseRequested" 
+        :carrierId="menuArguments.carrierId" 
+        :waypoint="menuArguments.waypoint" 
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX" 
@@ -138,7 +144,7 @@ export default {
       this.changeMenuState(MENU_STATES.CARRIER_DETAIL, e)
     },
     onOpenCarrierDetailRequested (e) {
-      this.changeMenuState('carrierDetail', e)
+      this.changeMenuState(MENU_STATES.CARRIER_DETAIL, e)
     },
     onOpenStarDetailRequested (e) {
       this.changeMenuState(MENU_STATES.STAR_DETAIL, e)

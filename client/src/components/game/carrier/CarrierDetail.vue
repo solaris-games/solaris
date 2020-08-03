@@ -167,7 +167,7 @@ export default {
     },
     onEditWaypointRequested (e) {
       this.$emit('onEditWaypointRequested', {
-        carrier: this.carrier,
+        carrierId: this.carrier._id,
         waypoint: e
       })
     },

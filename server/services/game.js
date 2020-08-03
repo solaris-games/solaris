@@ -192,7 +192,7 @@ module.exports = class GameService extends EventEmitter {
     async getPlayerUser(game, playerId) {
         let player = game.galaxy.players.find(p => p.id === playerId);
 
-        return await this.userService.getById(player.userId);
+        return await this.userService.getInfoById(player.userId);
     }
 
     isInProgress(game) {

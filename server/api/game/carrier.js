@@ -12,13 +12,13 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.waypointService.saveWaypoints(
+            let report = await container.waypointService.saveWaypoints(
                 req.game,
                 req.player,
                 req.params.carrierId,
                 req.body);
 
-            return res.sendStatus(200);
+            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }
