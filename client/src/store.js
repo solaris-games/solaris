@@ -34,6 +34,10 @@ export default new Vuex.Store({
     // ----------------
     // Sockets
 
+    gameStarted(state, data) {
+      state.game.state = data.state
+    },
+
     gameTicked (state, data) {
       let report = data.report
 

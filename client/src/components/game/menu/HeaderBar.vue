@@ -86,6 +86,7 @@ import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus'
 import * as moment from 'moment'
+import AudioService from '../../../game/audio'
 
 export default {
     components: {
@@ -106,7 +107,7 @@ export default {
         this.setupTimer()
     },
     created () {
-        this.sockets.subscribe('gamePlayerJoined', this.setupTimer.bind(this))
+        this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
 
         this.sockets.subscribe('playerCreditsReceived', (data) => {
             let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -116,15 +117,17 @@ export default {
     destroyed () {
         clearInterval(this.intervalFunction)
 
-        this.sockets.unsubscribe('gamePlayerJoined')
+        this.sockets.unsubscribe('gameStarted')
         this.sockets.unsubscribe('playerCreditsReceived')
     },
     methods: {
-        setupTimer() {
-            // TODO: Needs a rethink on how the socket works
-            // as isGameInProgress will always return false as there is never any updates
-            // to the game object in cache when a player joins the game. 
-            // Use onGameStarted socket instead?
+        gameStarted () {
+            this.setupTimer()
+
+            this.$toasted.show(`Get ready, the game will start soon!`, {type:'success'})
+            AudioService.download()
+        },
+        setupTimer () {
             this.recalculateTimeRemaining()
 
             if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {

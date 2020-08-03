@@ -89,13 +89,17 @@ module.exports = (router, io, container) => {
 
     router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGameAll, async (req, res, next) => {
         try {
-            await container.gameService.join(
+            let gameIsFull = await container.gameService.join(
                 req.game,
                 req.session.userId,
                 req.body.playerId,
                 req.body.alias);
 
             container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias);
+
+            if (gameIsFull) {
+                container.broadcastService.gameStarted(req.game);
+            }
 
             return res.sendStatus(200);
         } catch (err) {

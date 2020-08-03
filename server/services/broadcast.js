@@ -20,6 +20,12 @@ module.exports = class BroadcastService {
         });
     }
 
+    gameStarted(game) {
+        this.io.to(game.id).emit('gameStarted', {
+            state: game.state
+        });
+    }
+
     gamePlayerJoined(game, playerId, alias) {
         this.io.to(game.id).emit('gamePlayerJoined', {
             playerId,

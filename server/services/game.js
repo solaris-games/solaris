@@ -120,6 +120,8 @@ module.exports = class GameService extends EventEmitter {
                 game
             });
         }
+
+        return gameIsFull; // Return whether the game is now full, the calling API endpoint can broadcast it.
     }
 
     async quit(game, player) {    

@@ -130,8 +130,8 @@ export default {
     // Sockets
     subscribeToSockets () {
       // TODO: Move all component subscriptions into the components' socket object.
-      this.sockets.subscribe('gameTicked', async (data) => this.$store.commit('gameTicked', data))
-
+      this.sockets.subscribe('gameTicked', (data) => this.$store.commit('gameTicked', data))
+      this.sockets.subscribe('gameStarted', (data) => this.$store.commit('gameStarted', data))
       this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
       this.sockets.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
@@ -145,6 +145,7 @@ export default {
     },
     unsubscribeToSockets () {
       this.sockets.unsubscribe('gameTicked')
+      this.sockets.unsubscribe('gameStarted')
       this.sockets.unsubscribe('gameStarEconomyUpgraded')
       this.sockets.unsubscribe('gameStarIndustryUpgraded')
       this.sockets.unsubscribe('gameStarScienceUpgraded')
