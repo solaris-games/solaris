@@ -662,7 +662,7 @@ module.exports = class GameTickService extends EventEmitter {
             // If the carrier does not belong to the player and the carrier has waypoints
             // then only return the first waypoint.
             if (c.ownedByPlayerId !== player.id) {
-                this.carrierService.clearCarrierWaypointsNonTransit(c, true);
+                c.waypoints = this.carrierService.clearCarrierWaypointsNonTransit(c, true);
             }
 
             // The waypoint ETAs may have changed so make sure that they are updated.

@@ -104,34 +104,36 @@ module.exports = class CarrierService {
                 waypoints: c.waypoints
             };
 
-            this.clearCarrierWaypointsNonTransit(c, true);
+            carrierData.waypoints = this.clearCarrierWaypointsNonTransit(c, true);
 
             return carrierData;
         });
     }
 
     clearCarrierWaypointsNonTransit(carrier, obfuscateFirstWaypoint = false) {
-        if (carrier.orbiting) {
-            carrier.waypoints = [];
-        } else {
-            carrier.waypoints = carrier.waypoints.slice(0, 1);
+        let waypoints = [];
+
+        if (!carrier.orbiting) {
+            waypoints = carrier.waypoints.slice(0, 1);
 
             if (obfuscateFirstWaypoint) {
                 // Hide any sensitive info about the waypoint.
-                let wp = carrier.waypoints[0];
+                let wp = waypoints[0];
 
                 wp.action = 'collectAll';
                 wp.actionShips = 0;
                 wp.delayTicks = 0;
             }
         }
+
+        return waypoints;
     }
     
     clearPlayerCarrierWaypointsNonTransit(game, player) {
         let carriers = this.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
         for (let carrier of carriers) {
-            this.clearCarrierWaypointsNonTransit(carrier);
+            carrier.waypoints = this.clearCarrierWaypointsNonTransit(carrier);
         }
     }
 
