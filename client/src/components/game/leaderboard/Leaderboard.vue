@@ -53,6 +53,8 @@
         </div>
     </div>
 
+    <share-link v-if="!game.state.startDate"/>
+
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
         <div class="col text-right pr-2">
             <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">Quit Game</modalButton>
@@ -81,12 +83,14 @@ import DialogModal from '../../modal/DialogModal'
 import gameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import AudioService from '../../../game/audio'
+import ShareLinkVue from '../welcome/ShareLink'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
-    'dialogModal': DialogModal
+    'dialogModal': DialogModal,
+    'share-link': ShareLinkVue
   },
 
   data () {

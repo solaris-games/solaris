@@ -12,6 +12,12 @@ module.exports = class GameCreateService {
     }
 
     async create(settings) {
+        // TODO: Prevent players from being able to create loads of games?
+        
+        if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
+            throw new ValidationError('Game name must be between 3 and 24 characters.');
+        }
+
         let game = new this.gameModel({
             settings
         });

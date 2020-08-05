@@ -178,6 +178,9 @@ export default {
         },
         gameIsPendingStart () {
             return GameHelper.isGamePendingStart(this.$store.state.game)
+        },
+        getGameStatusText (game) {
+            return GameHelper.getGameStatusText(this.$store.state.game)
         }
     },
     computed: {

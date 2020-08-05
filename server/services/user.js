@@ -71,6 +71,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async create(user) {
+        if (user.username.trim().length < 3 || user.username.trim().length > 24) {
+            throw new ValidationError('Username must be between 3 and 24 characters.');
+        }
+
         const newUser = new this.userModel(user);
     
         newUser.password = await this.bcrypt.hash(newUser.password, 10);
@@ -119,6 +123,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async updateUsername(id, username) {
+        if (username.trim().length < 3 || username.trim().length > 24) {
+            throw new ValidationError('Username must be between 3 and 24 characters.');
+        }
+
         let user = await this.userModel.findById(id);
         
         if (await this.usernameExists(username)) {

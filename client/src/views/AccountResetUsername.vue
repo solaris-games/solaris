@@ -5,7 +5,7 @@
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
         <label for="username">New Username</label>
-        <input type="text" required="required" class="form-control" v-model="username" :disabled="isLoading"/>
+        <input type="text" required="required" class="form-control" minlength="3" maxlength="24" v-model="username" :disabled="isLoading"/>
       </div>
 
       <form-error-list v-bind:errors="errors"/>

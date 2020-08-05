@@ -8,7 +8,7 @@
     <form @submit.prevent="handleSubmit" v-if="settings">
       <div class="form-group">
         <label for="name" class="col-form-label">Name</label>
-        <input type="text" required="required" class="form-control" id="name" v-model="settings.general.name" :disabled="isCreatingGame">
+        <input type="text" required="required" class="form-control" id="name" minlength="3" maxlength="24" v-model="settings.general.name" :disabled="isCreatingGame">
       </div>
 
       <div class="form-group">

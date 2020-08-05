@@ -94,6 +94,7 @@ module.exports = (container) => {
             return next();
         },
 
+        // TODO: Does this need a rework because games can be waiting to start?
         validateGameInProgress(req, res, next) {
             if (!container.gameService.isInProgress(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is not in progress.');
@@ -102,6 +103,7 @@ module.exports = (container) => {
             return next();
         },
 
+        // TODO: Does this need a rework because games can be waiting to start?
         validateGameStarted(req, res, next) {
             if (!container.gameService.isStarted(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game has not yet started.');

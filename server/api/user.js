@@ -16,27 +16,25 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.post('/api/user/', async (req, res, next) => {
-        let errors = [];
-
-        if (!req.body.email) {
-            errors.push('Email is a required field');
-        }
-
-        if (!req.body.username) {
-            errors.push('Username is a required field');
-        }
-
-        if (!req.body.password) {
-            errors.push('Password is a required field');
-        }
-        
-        // TODO: Restrict username length?
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            let errors = [];
+
+            if (!req.body.email) {
+                errors.push('Email is a required field');
+            }
+
+            if (!req.body.username) {
+                errors.push('Username is a required field');
+            }
+
+            if (!req.body.password) {
+                errors.push('Password is a required field');
+            }
+
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let exists = await container.userService.userExists(req.body.email);
 
             if (exists) {

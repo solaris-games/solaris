@@ -217,7 +217,7 @@ module.exports = class GameTickService extends EventEmitter {
         for (let i = 0; i < combatStars.length; i++) {
             let combat = combatStars[i];
 
-            await this._performCombatAtStar(game, combat.star, combat.carrier);
+            await this._performCombatAtStar(game, combat.star, combat.carrier, report);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
@@ -237,7 +237,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    async _performCombatAtStar(game, star, enemyCarrier) {
+    async _performCombatAtStar(game, star, enemyCarrier, report) {
         let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
         let attacker = this.playerService.getByObjectId(game, enemyCarrier.ownedByPlayerId);
 
@@ -327,7 +327,7 @@ module.exports = class GameTickService extends EventEmitter {
                 attacker,
                 star,
                 enemyCarrier,
-                combatResult
+                starCombatResult
             });
         }
 

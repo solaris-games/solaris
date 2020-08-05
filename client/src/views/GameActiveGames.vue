@@ -115,23 +115,7 @@ export default {
   },
   methods: {
     getGameStatusText (game) {
-      if (GameHelper.isGamePaused(game)) {
-        return 'Paused'
-      }
-
-      if (GameHelper.isGamePendingStart(game)) {
-        return 'Waiting to Start'
-      }
-
-      if (GameHelper.isGameInProgress(game)) {
-        return 'In Progress'
-      }
-
-      if (GameHelper.isGameFinished(game)) {
-        return 'Finished'
-      }
-
-      return 'Unknown'
+      return GameHelper.getGameStatusText(game)
     }
   }
 }

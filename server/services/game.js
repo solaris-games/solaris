@@ -185,6 +185,8 @@ module.exports = class GameService extends EventEmitter {
         userPlayer.achievements.defeated++;
         await userPlayer.save();
 
+        await game.save();
+
         this.emit('onPlayerDefeated', {
             game,
             player
@@ -196,6 +198,14 @@ module.exports = class GameService extends EventEmitter {
 
         return await this.userService.getInfoById(player.userId);
     }
+
+    // TODO: All of below needs a rework. A game is started if the start date is less than now and the game hasn't finished
+    // and the game is not paused
+    
+    // isWaitingToStart(game) {
+    //     return !this.isPaused(game) && !this.isFinished(game) 
+    //         && game.state.startDate && moment(game.state.startDate).utc() < moment().utc; // TODO: Use diff?
+    // }
 
     isInProgress(game) {
         return game.state.startDate && !game.state.endDate;

@@ -28,7 +28,7 @@ export default {
   mounted () {
     this.recalculateTimeRemaining()
 
-    if (GameHelper.isGameInProgress(this.$store.state.game)) {
+    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },

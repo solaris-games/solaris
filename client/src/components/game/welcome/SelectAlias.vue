@@ -15,11 +15,11 @@
                 </div>
 
                 <div class="form-group">
-                    <input class="form-control" required="required" placeholder="Enter your alias here" type="text" v-model="alias" v-on:keyup="onAliasChanged">
+                    <input class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
                 </div>
 
                 <div class="form-group text-center small">
-                    <p>Your alias must be between 3 and 24 characters and can only contain standard characters.</p>
+                    <p>Your alias must be between 3 and 24 characters.</p>
                 </div>
             </form>
         </div>

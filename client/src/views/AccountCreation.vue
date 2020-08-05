@@ -2,36 +2,53 @@
   <view-container>
     <view-title title="Create Account" navigation="home"/>
 
-    <form-error-list v-bind:errors="errors"/>
-
-    <form @submit="handleSubmit">
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
+    <div class="row">
+      <div class="col-sm-12 col-md-6">
+        <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
+        <p>Login throughout the day to command epic fleets of spacecraft in a desperate struggle to conquer the galaxy!</p>
+        <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
+        <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade with allies and build up huge fleets of ships.</p>
+        <p>Every story needs heroes and villains, <b>which will you be?</b></p>
       </div>
+      <div class="col-sm-12 col-md-6">
+        <form-error-list v-bind:errors="errors"/>
 
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading">
+        <form @submit="handleSubmit">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
+          </div>
+
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" required="required" class="form-control" name="username" minlength="3" maxlength="24" v-model="username" :disabled="isLoading">
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" required="required" class="form-control" name="password" v-model="password" :disabled="isLoading">
+          </div>
+
+          <div class="form-group">
+            <label for="passwordConfirm">Re-enter Password</label>
+            <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm" :disabled="isLoading">
+          </div>
+
+          <div class="form-group">
+            <div class="row">
+              <div class="col-6">
+                <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">Create Account</button>
+              </div>
+              <div class="col-6">
+                <router-link to="/" tag="button" class="btn btn-danger btn-block">Cancel</router-link>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <loading-spinner :loading="isLoading"/>
       </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" required="required" class="form-control" name="password" v-model="password" :disabled="isLoading">
-      </div>
-
-      <div class="form-group">
-        <label for="passwordConfirm">Re-enter Password</label>
-        <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm" :disabled="isLoading">
-      </div>
-
-      <div>
-        <button type="submit" class="btn btn-success" :disabled="isLoading">Create Account</button>
-        <router-link to="/" tag="button" class="btn btn-danger float-right">Cancel</router-link>
-      </div>
-    </form>
-
-    <loading-spinner :loading="isLoading"/>
+    </div>
   </view-container>
 </template>
 

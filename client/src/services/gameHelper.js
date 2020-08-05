@@ -197,6 +197,25 @@ class GameHelper {
     return game.state.endDate != null
   }
   
+  getGameStatusText (game) {
+    if (this.isGamePendingStart(game)) {
+      return 'Waiting to start'
+    }
+
+    if (this.isGameInProgress(game)) {
+      return 'In progress'
+    }
+
+    if (this.isGameFinished(game)) {
+      return 'Finished'
+    }
+    
+    if (this.isGamePaused(game)) {
+      return 'Paused'
+    }
+
+    return 'Unknown'
+  }
 }
 
 export default new GameHelper()

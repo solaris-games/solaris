@@ -10,12 +10,7 @@
 
     <select-colour v-on:onJoinRequested="onJoinRequested"/>
 
-    <div class="text-center pb-2">
-        <p>Invite your friends and take on the Galaxy together!</p>
-
-        <p class="mb-0">Send them this address!</p>
-        <p class="text-info"><i>{{protocol}}//{{domain}}/#{{$route.fullPath}}</i></p>
-    </div>
+    <share-link/>
 </div>
 </template>
 
@@ -26,6 +21,7 @@ import MenuTitle from '../MenuTitle'
 import FormErrorListVue from '../../FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
 import SelectColourVue from './SelectColour.vue'
+import ShareLinkVue from './ShareLink.vue'
 
 export default {
   components: {
@@ -33,20 +29,15 @@ export default {
     'menu-title': MenuTitle,
     'form-error-list': FormErrorListVue,
     'select-alias': SelectAliasVue,
-    'select-colour': SelectColourVue
+    'select-colour': SelectColourVue,
+    'share-link': ShareLinkVue
   },
   data () {
     return {
       isJoiningGame: false,
-      domain: '',
-      protocol: '',
       errors: [],
       alias: ''
     }
-  },
-  mounted () {
-    this.protocol = window.location.protocol
-    this.domain = window.location.host
   },
   methods: {
     onCloseRequested (e) {

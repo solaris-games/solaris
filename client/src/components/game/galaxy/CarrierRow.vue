@@ -31,7 +31,7 @@ export default {
   mounted () {
     this.recalculateTimeRemaining()
 
-    if (GameHelper.isGameInProgress(this.$store.state.game)) {
+    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
     }
   },
@@ -51,6 +51,7 @@ export default {
         this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
       this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+
       // TODO: Get total time of carrier eta
       // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, this.carrier.ticksEtaTotal)
     }

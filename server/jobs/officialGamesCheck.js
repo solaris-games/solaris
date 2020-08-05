@@ -1,6 +1,7 @@
 const officialGameSettings = [
     require('../config/game/settings/official/newPlayer'),
     require('../config/game/settings/official/standard'),
+    require('../config/game/settings/official/standard4player'),
     require('../config/game/settings/official/dark'),
     require('../config/game/settings/official/1v1'),
 ];
