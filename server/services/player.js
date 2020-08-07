@@ -265,7 +265,7 @@ module.exports = class PlayerService {
 
         let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
 
-        return totalManufacturing;
+        return totalManufacturing.toFixed(2);
     }
 
     calculateTotalCarriers(player, carriers) {
