@@ -55,6 +55,12 @@ module.exports = class MessageService {
         return conversations;
     }
 
+    getUnreadCount(game, player) {
+        return game.messages.filter(m => {
+            return !m.read && m.toPlayerId.equals(player._id)
+        }).length;
+    }
+
     async markAllAsRead(game, player) {
         let allUnread = game.messages.filter(m => {
             return !m.read && m.toPlayerId.equals(player._id)

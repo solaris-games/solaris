@@ -100,6 +100,14 @@ module.exports = class BroadcastService {
         this.io.to(toPlayerId).emit('gameMessageSent', message);
     }
 
+    gameMessagesRead(game, playerId, messageIds) {
+        this.io.to(playerId).emit('gameMessagesRead', messageIds);
+    }
+
+    gameMessagesAllRead(game, playerId) {
+        this.io.to(playerId).emit('gameMessagesAllRead');
+    }
+
     gamePlayerCreditsReceived(game, toPlayerId, credits) {
         this.io.to(toPlayerId).emit('playerCreditsReceived', credits);
     }

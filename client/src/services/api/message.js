@@ -13,6 +13,11 @@ class MessageService extends BaseApiService {
         { withCredentials: true })
     }
 
+    getUnreadCount (gameId) {
+        return axios.get(this.BASE_URL + 'game/' + gameId + '/message/unread',
+        { withCredentials: true })
+    }
+
     markAllConversationsAsRead (gameId) {
         return axios.put(this.BASE_URL + 'game/' + gameId + '/message/markallread', { },
         { withCredentials: true })

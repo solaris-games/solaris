@@ -55,7 +55,7 @@ export default {
     this.loadMessages()
   },
   created () {
-      this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+    this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
   },
   destroyed () {
     this.sockets.unsubscribe('gameMessageSent')

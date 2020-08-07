@@ -65,9 +65,8 @@
             <button class="btn btn-sm btn-info ml-1" type="button">
                 <i class="fas fa-cog"></i>
             </button> -->
-
-            <button class="btn btn-sm btn-info ml-1" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)">
-                <i class="fas fa-inbox"></i>
+            <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)">
+                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
             <button class="btn btn-sm btn-info ml-1" type="button" @click="goToMainMenu()">
@@ -87,6 +86,7 @@ import GameContainer from '../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
+import MessageApiService from '../../../services/api/message'
 
 export default {
     components: {
@@ -98,16 +98,22 @@ export default {
             MENU_STATES: MENU_STATES,
             timeRemaining: null,
             intervalFunction: null,
-            userPlayer: null
+            userPlayer: null,
+            unreadMessages: 0
         }
     },
     mounted () {
         this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
         this.setupTimer()
+
+        this.checkForUnreadMessages()
     },
     created () {
         this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
+        this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
+        this.sockets.subscribe('gameMessagesAllRead', this.checkForUnreadMessages.bind(this))
+        this.sockets.subscribe('gameMessagesRead', this.checkForUnreadMessages.bind(this))
 
         this.sockets.subscribe('playerCreditsReceived', (data) => {
             let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -181,6 +187,17 @@ export default {
         },
         getGameStatusText (game) {
             return GameHelper.getGameStatusText(this.$store.state.game)
+        },
+        async checkForUnreadMessages () {
+            try {
+                let response = await MessageApiService.getUnreadCount(this.$store.state.game._id)
+
+                if (response.status === 200) {
+                    this.unreadMessages = response.data.unread
+                }
+            } catch (err) {
+                console.error(err)
+            }
         }
     },
     computed: {
