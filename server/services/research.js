@@ -48,9 +48,11 @@ module.exports = class ResearchService extends EventEmitter {
 
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
+
+        let totalScience = this.playerService.calculateTotalScience(player, game.galaxy.stars);
             
-        tech.progress += player.research.experimentation.level;
-        user.achievements.research[techKey] += player.research.experimentation.level;
+        tech.progress += totalScience;
+        user.achievements.research[techKey] += totalScience;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -111,7 +113,7 @@ module.exports = class ResearchService extends EventEmitter {
 
         let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)];
         let tech = player.research[techKey];
-        let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier / 2);
+        let researchAmount = player.research.experimentation.level * game.constants.research.progressMultiplier;
 
         tech.progress += researchAmount;
         user.achievements.research[techKey] += researchAmount;
