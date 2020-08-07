@@ -110,6 +110,8 @@ export default {
     },
     zoomToPlayer (player) {
       gameContainer.map.zoomToPlayer(this.$store.state.game, player)
+
+      this.$emit('onOpenPlayerDetailRequested', player._id);
     },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
