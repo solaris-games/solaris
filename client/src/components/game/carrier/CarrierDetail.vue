@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <h4 class="pt-2">Navigation</h4>
+    <h4 class="pt-2" v-if="getCarrierOwningPlayer() == getUserPlayer()">Navigation</h4>
 
     <div v-if="getCarrierOwningPlayer() == getUserPlayer()" class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
