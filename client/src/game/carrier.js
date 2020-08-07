@@ -104,7 +104,7 @@ class Carrier extends EventEmitter {
     this.text_garrison.text = totalGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 5
-    this.text_garrison.visible = !this.data.orbiting && totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 20)
+    this.text_garrison.visible = !this.data.orbiting && totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 50)
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {

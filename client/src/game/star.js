@@ -164,7 +164,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.container_planets)
     }
 
-    this.container_planets.visible = this._isInScanningRange() && zoomPercent < 75
+    this.container_planets.visible = this._isInScanningRange() && zoomPercent < 60
   }
 
   _getPlanetsCount () {
@@ -227,7 +227,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_name)
     }
 
-    this.text_name.visible = this.isSelected || zoomPercent < 40
+    this.text_name.visible = this.isSelected || zoomPercent < 60
   }
 
   drawGarrison (force, zoomPercent) {
@@ -251,7 +251,7 @@ class Star extends EventEmitter {
     this.text_garrison.text = totalGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 20)
+    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 50)
   }
 
   drawInfrastructure (force, zoomPercent) {
@@ -275,7 +275,7 @@ class Star extends EventEmitter {
       this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
       this.text_infrastructure.y = this.data.location.y - 12
       
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || zoomPercent < 10
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || zoomPercent < 40
     } else {
       this.text_infrastructure.visible = false
     }
@@ -313,7 +313,7 @@ class Star extends EventEmitter {
         this.text_playerName.y = this.data.location.y + 17
       }
 
-      this.text_playerName.visible = gameContainer.getViewportZoomPercentage() < 30 // TODO: Move this into zoom refresh
+      this.text_playerName.visible = gameContainer.getViewportZoomPercentage() < 60 // TODO: Move this into zoom refresh
     } else {
       this.text_playerName.visible = false
     }
