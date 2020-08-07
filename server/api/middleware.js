@@ -81,7 +81,9 @@ module.exports = (container) => {
 
             req.player = player;
 
-            await container.playerService.updateLastSeen(req.game, player);
+            container.playerService.updateLastSeen(player);
+
+            await req.game.save();
 
             return next();
         },

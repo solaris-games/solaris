@@ -102,6 +102,10 @@ module.exports = class GameService extends EventEmitter {
             game.state.paused = false;
             game.state.startDate = start;
             game.state.lastTickDate = start;
+
+            for (let player of game.galaxy.players) {
+                this.playerService.updateLastSeen(player);
+            }
         }
 
         await game.save();
