@@ -284,15 +284,15 @@
             },
             {
                 "value": 10,
-                "text": "Standard (1 tick = 10 minutes)"
+                "text": "Fast (1 tick = 10 minutes)"
             },
             {
                 "value": 30,
-                "text": "Slow Speed (1 tick = 30 minutes)"
+                "text": "Normal (1 tick = 30 minutes)"
             },
             {
                 "value": 60,
-                "text": "Legacy Speed (1 tick = 1 hour)"
+                "text": "Slow Speed (1 tick = 1 hour)"
             }
         ],
         "startDelay": [
