@@ -21,13 +21,13 @@
 
     <h4 class="pt-2" v-if="getCarrierOwningPlayer() == getUserPlayer()">Navigation</h4>
 
-    <div v-if="getCarrierOwningPlayer() == getUserPlayer()" class="mt-2">
+    <div class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-7">
-          <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
+          <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-5">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="!getUserPlayer().defeated">Ship Transfer</button>
+          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="getCarrierOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated">Ship Transfer</button>
         </div>
       </div>
 
@@ -37,8 +37,18 @@
         </div>
       </div>
 
-      <div v-if="carrier.waypoints.length" class="row pt-0 pb-0 mb-0">
-        <waypointTable :carrier="carrier" @onEditWaypointRequested="onEditWaypointRequested"/>
+      <div v-if="carrier.waypoints.length && getCarrierOwningPlayer() == getUserPlayer()" class="row pt-0 pb-0 mb-0">
+        <waypointTable :carrier="carrier" @onEditWaypointRequested="onEditWaypointRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+      </div>
+
+      <div v-if="carrier.waypoints.length && getCarrierOwningPlayer() != getUserPlayer()" class="row mb-0 pt-2 pb-3">
+        <div class="col">
+            Destination
+        </div>
+        <div class="col text-right">
+          <a href="javascript:;" @click="onOpenFirstWaypointStarDetailRequested">{{getFirstWaypointDestination().name}}</a> <i class="fas fa-map-marker-alt ml-2"></i>
+        </div>
       </div>
 
       <!-- <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
@@ -56,7 +66,7 @@
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
         <div class="col-5 mb-2">
-          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="!getUserPlayer().defeated">Edit Waypoints</button>
+          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="getCarrierOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated">Edit Waypoints</button>
         </div>
       </div>
     </div>
@@ -137,6 +147,19 @@ export default {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.getCarrierOwningPlayer()._id)
     },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenFirstWaypointStarDetailRequested (e) {
+      this.onOpenStarDetailRequested(this.getFirstWaypointDestination()._id)
+    },
+    getFirstWaypointDestination () {
+      if (!this.carrier.waypoints.length) {
+        return null
+      }
+
+      return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].destination)
+    },
     async toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
       try {
@@ -171,8 +194,8 @@ export default {
         waypoint: e
       })
     },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.getCarrierOrbitingStar()._id)
+    onOpenOrbitingStarDetailRequested (e) {
+      this.onOpenStarDetailRequested(this.getCarrierOrbitingStar()._id)
     },
     recalculateTimeRemaining () {
       let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 

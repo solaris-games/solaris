@@ -5,7 +5,8 @@
 		Waypoints:
 		<ul class="pl-4 mt-2">
 			<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
-				{{getStarName(waypoint.destination)}}
+				<!-- <a href="javascript:;" @click="onOpenStarDetailRequested(waypoint.destination)">{{getStarName(waypoint.destination)}}</a> -->
+				<span>{{getStarName(waypoint.destination)}}</span>
 
 				<i class="ml-2" :class="{
 					'fas fa-angle-double-up text-success': waypoint.action == 'collectAll',
@@ -79,6 +80,9 @@ export default {
 			this.carrier.waypoints = this.oldWaypoints
 
 			this.$emit('onCloseRequested', e)
+		},
+		onOpenStarDetailRequested (e) {
+			this.$emit('onOpenStarDetailRequested', e)
 		},
 		getStarName (starId) {
 			return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name

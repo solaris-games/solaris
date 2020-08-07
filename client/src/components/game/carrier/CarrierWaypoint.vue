@@ -22,6 +22,7 @@
                 <input type="number" class="form-control input-sm" v-model="currentWaypoint.delayTicks">
             </div>
             <div class="col-3 text-center pt-1">
+                <!-- <a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(currentWaypoint.destination)}}</a> -->
                 <span>{{getStarName(currentWaypoint.destination)}}</span>
             </div>
             <div class="col-5 text-center">
@@ -86,7 +87,10 @@ export default {
 	methods: {
 		onCloseRequested (e) {
 			this.$emit('onCloseRequested', e)
-		},
+        },
+        onOpenStarDetailRequested (e) {
+            this.$emit('onOpenStarDetailRequested', this.currentWaypoint.destination)
+        },
 		getStarName (starId) {
 			return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
 		},

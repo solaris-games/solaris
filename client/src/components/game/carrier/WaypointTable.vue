@@ -15,7 +15,8 @@
         <tbody>
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
                         :waypoint="waypoint" :showAction="showAction"
-                        @onEditWaypointRequested="onEditWaypointRequested"/>
+                        @onEditWaypointRequested="onEditWaypointRequested"
+                        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>
     </table>
 </div>
@@ -42,6 +43,9 @@ export default {
     },
     onEditWaypointRequested (e) {
       this.$emit('onEditWaypointRequested', e)
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
     }
   }
 }

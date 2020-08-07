@@ -1,7 +1,7 @@
 <template>
     <tr>
         <td>{{waypoint.delayTicks}}</td>
-        <td>{{getStarName(waypoint.destination)}}</td>
+        <td><a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(waypoint.destination)}}</a></td>
         <td v-if="!showAction">{{timeRemainingEta}}</td>
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
@@ -36,6 +36,9 @@ export default {
     clearInterval(this.intervalFunction)
   },
   methods: {
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', this.waypoint.destination)
+    },
     getStarName (starId) {
       return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
     },
