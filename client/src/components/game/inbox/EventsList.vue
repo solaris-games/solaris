@@ -3,13 +3,25 @@
   <loading-spinner :loading="!events"/>
 
   <div class="container" v-if="events">
-      <button class="btn btn-primary" @click="loadEvents">Refresh <i class="fas fa-sync"></i></button>
-      <!-- <button class="btn btn-primary float-right">Mark All Read</button>
-      <span class="ml-2">Click on an event to mark is as read.</span> -->
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-primary" @click="loadEvents">Refresh <i class="fas fa-sync"></i></button>
+      </div>
+      <div class="col">
+        <select class="form-control" v-model="selectedFilter" @change="onSelectedFilterChanged">
+          <option value="all">All Events</option>
+          <option value="trade">Trade</option>
+          <option value="combat">Combat</option>
+        </select>
+      </div>
+    </div>
   </div>
 
-  <div class="mt-2 events-container container" v-if="events">
-      <events-list-item v-for="event in events" :key="event._id" :event="event" 
+  <!-- <button class="btn btn-primary float-right">Mark All Read</button>
+  <span class="ml-2">Click on an event to mark is as read.</span> -->
+
+  <div class="mt-2 events-container container" v-if="filteredEvents">
+      <events-list-item v-for="event in filteredEvents" :key="event._id" :event="event" 
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
@@ -29,7 +41,9 @@ export default {
   },
   data: function () {
     return {
-      events: null
+      events: null,
+      filteredEvents: null,
+      selectedFilter: 'all'
     }
   },
   mounted () {
@@ -44,6 +58,8 @@ export default {
 
         if (response.status === 200) {
           this.events = response.data
+
+          this.onSelectedFilterChanged()
         }
       } catch (err) {
         console.error(err)
@@ -57,6 +73,32 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
         this.$emit('onOpenCarrierDetailRequested', e)
+    },
+    onSelectedFilterChanged (e) {
+      const categories = {
+        trade: [
+          'playerTechnologyReceived',
+          'playerTechnologySent',
+          'playerCreditsReceived',
+          'playerCreditsSent',
+          'playerRenownReceived',
+          'playerRenownSent'
+        ],
+        combat: [
+          'playerCombatCarrier',
+          'playerCombatStar',
+          'playerStarAbandoned',
+          'playerStarCaptured'
+        ]
+      }
+
+      if (this.selectedFilter === 'all') {
+        this.filteredEvents = this.events
+      } else {
+        this.filteredEvents = this.events.filter(ev => {
+          return categories[this.selectedFilter].indexOf(ev.type) > -1
+        })
+      }
     }
   }
 }

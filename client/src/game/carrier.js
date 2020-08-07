@@ -16,6 +16,7 @@ class Carrier extends EventEmitter {
     this.container.on('mouseout', this.onMouseOut.bind(this))
     
     this.isMouseOver = false
+    this.zoomPercent = 0
   }
 
   setup (data, stars, player, lightYearDistance) {
@@ -26,15 +27,15 @@ class Carrier extends EventEmitter {
     this.lightYearDistance = lightYearDistance
   }
 
-  draw (zoomPercent) {
+  draw () {
     this.drawColour()
     this.drawShip()
-    this.drawGarrison(zoomPercent)
+    this.drawGarrison()
     this._drawCarrierWaypoints()
   }
 
-  drawActive (zoomPercent) {
-    this.drawGarrison(zoomPercent)
+  drawActive () {
+    this.drawGarrison()
   }
 
   drawColour () {
@@ -83,7 +84,7 @@ class Carrier extends EventEmitter {
     this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
-  drawGarrison (zoomPercent) {
+  drawGarrison () {
     if (this.text_garrison) {
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
@@ -104,7 +105,7 @@ class Carrier extends EventEmitter {
     this.text_garrison.text = totalGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 5
-    this.text_garrison.visible = !this.data.orbiting && totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 50)
+    this.text_garrison.visible = !this.data.orbiting && totalGarrison > 0 && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {
@@ -165,7 +166,9 @@ class Carrier extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
-    this.drawGarrison(zoomPercent)
+    this.zoomPercent = zoomPercent
+
+    this.drawGarrison()
   }
 }
 

@@ -327,7 +327,7 @@ module.exports = class GameTickService extends EventEmitter {
                 attacker,
                 star,
                 enemyCarrier,
-                starCombatResult
+                combatResult: starCombatResult
             });
         }
 

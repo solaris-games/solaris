@@ -6,7 +6,7 @@
   </p>
   <p>
     Your experimental scientists have stumbled across a new discovery which has unlocked 
-    <span class="text-success">{{event.data.experimentAmount}} points</span> of research in the field of <span class="text-success">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>.
+    <span class="text-warning">{{event.data.experimentAmount}} points</span> of research in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>.
   </p>
 </div>
 </template>

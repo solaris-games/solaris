@@ -6,7 +6,7 @@
   </p>
   <p>
       <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a> is awarded 
-      <span class="text-success">${{event.data.creditsReward}}</span> credits.
+      <span class="text-warning">${{event.data.creditsReward}}</span> credits.
   </p>
 </div>
 </template>

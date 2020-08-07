@@ -1,7 +1,7 @@
 <template>
 <div v-if="player">
   <p>
-      You have received <span class="text-success">{{event.data.renown}}</span> renown from <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
+      You have received <span class="text-warning">{{event.data.renown}}</span> renown from <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
 </div>
 </template>

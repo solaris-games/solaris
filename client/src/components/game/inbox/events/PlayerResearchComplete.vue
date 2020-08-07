@@ -1,7 +1,7 @@
 <template>
 <div>
   <p>
-      Your scientists have made a breakthrough in the field of <span class="text-success">{{getTechnologyFriendlyName(event.data.technology.name)}}</span>.
+      Your scientists have made a breakthrough in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.technology.name)}}</span>.
   </p>
 </div>
 </template>

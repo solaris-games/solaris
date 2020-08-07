@@ -21,6 +21,7 @@ class Star extends EventEmitter {
     this.isSelected = false
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to force initial redraw
+    this.zoomPercent = 0
   }
 
   _getStarPlayer () {
@@ -49,27 +50,27 @@ class Star extends EventEmitter {
     this.lightYearDistance = lightYearDistance
   }
 
-  draw (zoomPercent) {
+  draw () {
     // Note: The star may become visible/hidden due to changing scanning range.
     // If a star is revealed or a star becomes masked then we want to force the entire
     // star to be re-drawn.
     let force = this.isInScanningRange != this._isInScanningRange()
 
     this.drawStar(force)
-    this.drawPlanets(force, zoomPercent)
+    this.drawPlanets(force)
     this.drawColour(force)
     this.drawScanningRange(force)
     this.drawHyperspaceRange(force)
-    this.drawName(force, zoomPercent)
-    this.drawGarrison(force, zoomPercent)
-    this.drawActive(force, zoomPercent)
+    this.drawName(force)
+    this.drawGarrison(force)
+    this.drawActive(force)
 
     this.isInScanningRange = this._isInScanningRange()
   }
 
-  drawActive (force, zoomPercent) {
-    this.drawInfrastructure(force, zoomPercent)
-    this.drawGarrison(force, zoomPercent)
+  drawActive (force) {
+    this.drawInfrastructure(force)
+    this.drawGarrison(force)
     this.drawScanningRange(force)
     this.drawHyperspaceRange(force)
   }
@@ -101,7 +102,7 @@ class Star extends EventEmitter {
     // sprite.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 12)
   }
 
-  drawPlanets (force, zoomPercent) {
+  drawPlanets (force) {
     if (force && this.container_planets) {
       this.container.removeChild(this.container_planets)
       this.container_planets = null
@@ -164,7 +165,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.container_planets)
     }
 
-    this.container_planets.visible = this._isInScanningRange() && zoomPercent < 60
+    this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
   }
 
   _getPlanetsCount () {
@@ -209,7 +210,7 @@ class Star extends EventEmitter {
     }
   }
 
-  drawName (force, zoomPercent) {
+  drawName (force) {
     if (force && this.text_name) {
       this.container.removeChild(this.text_name)
       this.text_name = null
@@ -227,10 +228,10 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_name)
     }
 
-    this.text_name.visible = this.isSelected || zoomPercent < 60
+    this.text_name.visible = this.isSelected || this.zoomPercent < 60
   }
 
-  drawGarrison (force, zoomPercent) {
+  drawGarrison (force) {
     if (force && this.text_garrison) {
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
@@ -251,10 +252,10 @@ class Star extends EventEmitter {
     this.text_garrison.text = totalGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || zoomPercent < 50)
+    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
-  drawInfrastructure (force, zoomPercent) {
+  drawInfrastructure (force) {
     if (force && this.text_infrastructure) {
       this.container.removeChild(this.text_infrastructure)
       this.text_infrastructure = null
@@ -275,7 +276,7 @@ class Star extends EventEmitter {
       this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
       this.text_infrastructure.y = this.data.location.y - 12
       
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || zoomPercent < 40
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
     } else {
       this.text_infrastructure.visible = false
     }
@@ -313,7 +314,7 @@ class Star extends EventEmitter {
         this.text_playerName.y = this.data.location.y + 17
       }
 
-      this.text_playerName.visible = gameContainer.getViewportZoomPercentage() < 60 // TODO: Move this into zoom refresh
+      this.text_playerName.visible = this.zoomPercent < 60
     } else {
       this.text_playerName.visible = false
     }
@@ -400,12 +401,14 @@ class Star extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
+    this.zoomPercent = zoomPercent
+
     // Note: Should never need to force a redraw when zooming
     // so we should be fine to pass in false to the force draw parameter.
-    this.drawName(false, zoomPercent)
-    this.drawGarrison(false, zoomPercent)
-    this.drawInfrastructure(false, zoomPercent)
-    this.drawPlanets(false, zoomPercent)
+    this.drawName(false)
+    this.drawGarrison(false)
+    this.drawInfrastructure(false)
+    this.drawPlanets(false)
   }
 }
 

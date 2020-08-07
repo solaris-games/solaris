@@ -23,6 +23,8 @@ class Map extends EventEmitter {
 
     this.stars = []
     this.carriers = []
+
+    this.zoomPercent = 0
   }
 
   _setupContainers () {
@@ -131,9 +133,9 @@ class Map extends EventEmitter {
     return carrier
   }
 
-  draw (zoomPercent) {
-    this.drawStars(zoomPercent)
-    this.drawCarriers(zoomPercent)
+  draw () {
+    this.drawStars()
+    this.drawCarriers()
 
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
@@ -148,14 +150,14 @@ class Map extends EventEmitter {
     }
   }
 
-  reloadGame (game, zoomPercent) {
+  reloadGame (game) {
     // Update all of the stars.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
       let starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
-      existing.draw(zoomPercent)
+      existing.draw()
     }
 
     // Remove any carriers that have been destroyed and add new ones that have been built.
@@ -172,45 +174,45 @@ class Map extends EventEmitter {
         existing = this.setupCarrier(game, carrierData)
       }
 
-      existing.draw(zoomPercent)
+      existing.draw()
     }
   }
 
-  setMode (mode, args, zoomPercent) {
+  setMode (mode, args) {
     this.mode = mode
     this.modeArgs = args
 
-    this.draw(zoomPercent)
+    this.draw()
   }
 
-  resetMode (zoomPercent) {
+  resetMode () {
     this.mode = 'galaxy'
 
-    this.draw(zoomPercent)
+    this.draw()
   }
 
-  drawStars (zoomPercent) {
+  drawStars () {
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
 
-      this.drawStar(star, zoomPercent)
+      this.drawStar(star)
     }
   }
 
-  drawStar (star, zoomPercent) {
-    star.draw(zoomPercent)
+  drawStar (star) {
+    star.draw()
   }
 
-  drawCarriers (zoomPercent) {
+  drawCarriers () {
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
 
-      this.drawCarrier(carrier, zoomPercent)
+      this.drawCarrier(carrier)
     }
   }
 
-  drawCarrier (carrier, zoomPercent) {
-    carrier.draw(zoomPercent)
+  drawCarrier (carrier) {
+    carrier.draw()
   }
 
   undrawCarrier (carrierData) {
@@ -257,10 +259,9 @@ class Map extends EventEmitter {
     gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true)
     gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y)
 
-    let starObject = this.stars.find(s => s.data._id === homeStar._id)
-    
     let zoomPercent = gameContainer.getViewportZoomPercentage()
-    starObject.refreshZoom(zoomPercent)
+
+    this.refreshZoom(zoomPercent)
   }
 
   zoomToUser (game) {
@@ -276,10 +277,9 @@ class Map extends EventEmitter {
   zoomToStar (star) {
     this.zoomToLocation(star.location)
     
-    let starObject = this.stars.find(s => s.data._id === star._id)
-
     let zoomPercent = gameContainer.getViewportZoomPercentage()
-    starObject.refreshZoom(zoomPercent)
+
+    this.refreshZoom(zoomPercent)
   }
 
   zoomToLocation (location) {
@@ -461,6 +461,8 @@ class Map extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
+    this.zoomPercent = zoomPercent
+
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
   }
