@@ -36,7 +36,7 @@ module.exports = class EmailService {
         },
         GAME_WELCOME: {
             fileName: 'gameWelcome.html',
-            subject: 'Your Solaris game stars soon!'
+            subject: 'Your Solaris game starts soon!'
         },
         GAME_FINISHED: {
             fileName: 'gameFinished.html',
