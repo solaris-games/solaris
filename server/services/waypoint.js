@@ -117,23 +117,26 @@ module.exports = class WaypointService {
     }
 
     calculateWaypointTicks(game, carrier, waypoint) {
-        let source = this.starService.getByObjectId(game, waypoint.source)
-        let destination = this.starService.getByObjectId(game, waypoint.destination)
+        let sourceStar = this.starService.getByObjectId(game, waypoint.source)
+        let destinationStar = this.starService.getByObjectId(game, waypoint.destination)
+
+        let source = sourceStar.location
+        let destination = destinationStar.location
 
         // If the carrier is already en-route, then the number of ticks will be relative
         // to where the carrier is currently positioned.
         if (!carrier.orbiting && carrier.waypoints[0]._id.toString() === waypoint._id.toString()) {
-            source.location = carrier.location;
+            source = carrier.location;
         }
 
-        let distance = this.distanceService.getDistanceBetweenLocations(source.location, destination.location);
+        let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
 
         let tickDistance = game.constants.distances.shipSpeed;
 
         // If the carrier is moving between warp gates then
         // the tick distance is x3
-        if (source.warpGate && destination.warpGate
-            && source.ownedByPlayerId && destination.ownedByPlayerId) {
+        if (sourceStar.warpGate && destinationStar.warpGate
+            && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
                 tickDistance *= 3;
             }
 
