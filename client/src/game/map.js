@@ -182,6 +182,11 @@ class Map extends EventEmitter {
     this.mode = mode
     this.modeArgs = args
 
+    if (this.mode !== 'galaxy') {
+      this.unselectAllCarriers()
+      this.unselectAllStars()
+    }
+
     this.draw()
   }
 

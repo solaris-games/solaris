@@ -14,6 +14,7 @@ class Waypoints extends EventEmitter {
 
   setup (game) {
     this.game = game
+    this.lightYearDistance = game.constants.distances.lightYear
   }
 
   clear () {
@@ -28,6 +29,7 @@ class Waypoints extends EventEmitter {
     this.drawLastWaypoint()
     this.drawNextWaypoints()
     this.drawPaths()
+    this.drawHyperspaceRange()
   }
 
   drawLastWaypoint () {
@@ -82,6 +84,19 @@ class Waypoints extends EventEmitter {
         
         graphics.lineTo(star.location.x, star.location.y)
     }
+
+    this.container.addChild(graphics)
+  }
+
+  drawHyperspaceRange () {
+    let graphics = new PIXI.Graphics()
+    let lastLocationStar = this._getLastLocationStar()
+    let player = this.game.galaxy.players.find(p => p.userId)
+
+    let radius = ((player.research.hyperspace.level || 1) + 3) * this.lightYearDistance
+
+    graphics.lineStyle(1, 0xFFFFFF, 0.3)
+    graphics.drawStar(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 2)
 
     this.container.addChild(graphics)
   }
@@ -161,15 +176,23 @@ class Waypoints extends EventEmitter {
   }
 
   _getLastLocation () {
-    let lastLocation = this.carrier.location
+    let lastLocationStar = this._getLastLocationStar()
 
+    if (lastLocationStar) {
+      return lastLocationStar.location
+    }
+
+    return null
+  }
+
+  _getLastLocationStar () {
     if (this.carrier.waypoints.length) {
         let lastWaypointStarId = this.carrier.waypoints[this.carrier.waypoints.length - 1].destination
 
-        lastLocation = this.game.galaxy.stars.find(s => s._id === lastWaypointStarId).location
+        return this.game.galaxy.stars.find(s => s._id === lastWaypointStarId)
+    } else {
+      return this.game.galaxy.stars.find(s => s._id === this.carrier.orbiting)
     }
-
-    return lastLocation
   }
   
 }
