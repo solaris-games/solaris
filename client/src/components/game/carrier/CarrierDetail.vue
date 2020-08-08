@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <!-- <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
@@ -59,7 +59,7 @@
           <button class="btn btn-block btn-success" v-if="!carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">Enable</button>
           <button class="btn btn-block btn-danger" v-if="carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">Disable</button>
         </div>
-      </div> -->
+      </div>
 
       <div class="row bg-secondary pt-2 pb-0 mb-0">
         <div class="col-7">
@@ -198,13 +198,18 @@ export default {
       this.onOpenStarDetailRequested(this.getCarrierOrbitingStar()._id)
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-      let timeRemainingEtaTotalDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEtaTotal, 
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-        
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
-      this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaTotalDate)
+      if (this.carrier.ticksEta) {
+        let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 
+          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+        this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      }
+
+      if (this.carrier.ticksEtaTotal) {
+        let timeRemainingEtaTotalDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEtaTotal, 
+          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+        this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaTotalDate)
+      } 
     }
   }
 }

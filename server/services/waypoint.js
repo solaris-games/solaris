@@ -54,7 +54,12 @@ module.exports = class WaypointService {
         }
         
         carrier.waypoints = waypoints;
-        carrier.waypointsLooped = false;
+
+        // If the waypoints are not a valid loop then ensure that
+        // the waypoints are not looped.
+        if (!this.canLoop(game, player, carrier)) {
+            carrier.waypointsLooped = false;
+        }
 
         await game.save();
 
@@ -83,17 +88,7 @@ module.exports = class WaypointService {
                 throw new ValidationError('The carrier must have 2 or more waypoints to loop');
             }
 
-            // Check whether the last waypoint is in range of the first waypoint.
-            let firstWaypoint = carrier.waypoints[0];
-            let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
-
-            let firstWaypointStar = this.starService.getByObjectId(game, firstWaypoint.source);
-            let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.destination);
-
-            let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
-            let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
-
-            if (distanceBetweenStars > hyperspaceDistance) {
+            if (!this.canLoop(game, player, carrier)) {
                 throw new ValidationError('The last waypoint star is out of hyperspace range of the first waypoint star.');
             }
         }
@@ -101,6 +96,24 @@ module.exports = class WaypointService {
         carrier.waypointsLooped = loop;
 
         await game.save();
+    }
+
+    canLoop(game, player, carrier) {
+        if (carrier.waypoints.length < 2) {
+            return false;
+        }
+
+        // Check whether the last waypoint is in range of the first waypoint.
+        let firstWaypoint = carrier.waypoints[0];
+        let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
+
+        let firstWaypointStar = this.starService.getByObjectId(game, firstWaypoint.source);
+        let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.source);
+
+        let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+
+        return distanceBetweenStars <= hyperspaceDistance
     }
 
     calculateWaypointTicks(game, carrier, waypoint) {

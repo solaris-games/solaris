@@ -180,7 +180,11 @@ module.exports = class GameTickService extends EventEmitter {
                     waypoint: currentWaypoint
                 });
 
-                // TODO: Looping
+                // If the carrier waypoints are looped then append the
+                // carrier waypoint back onto the waypoint stack.
+                if (carrier.waypointsLooped) {
+                    carrier.waypoints.push(currentWaypoint);
+                }
 
                 // If the star is unclaimed, then claim it.
                 if (destinationStar.ownedByPlayerId == null) {
