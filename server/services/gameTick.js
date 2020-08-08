@@ -73,7 +73,7 @@ module.exports = class GameTickService extends EventEmitter {
        logTime('Produce ships');
        await this._conductResearch(game, report);
        logTime('Conduct research');
-       await this._endOfGalacticCycleCheck(game, report);
+       this._endOfGalacticCycleCheck(game, report);
        logTime('Galactic cycle check');
        this._logHistory(game, report);
        logTime('Log history');
@@ -419,7 +419,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    async _endOfGalacticCycleCheck(game, report) {
+    _endOfGalacticCycleCheck(game, report) {
         game.state.tick++;
 
         // Check if we have reached the production tick.
@@ -438,7 +438,7 @@ module.exports = class GameTickService extends EventEmitter {
                 }
                 
                 let creditsResult = this._givePlayerMoney(game, player);
-                let experimentResult = await this._conductExperiments(game, player);
+                let experimentResult = this._conductExperiments(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -476,8 +476,8 @@ module.exports = class GameTickService extends EventEmitter {
         };
     }
 
-    async _conductExperiments(game, player) {
-        return await this.researchService.conductExperiments(game, player);
+    _conductExperiments(game, player) {
+        return this.researchService.conductExperiments(game, player);
     }
 
     _logHistory(game) {

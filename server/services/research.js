@@ -91,7 +91,9 @@ module.exports = class ResearchService extends EventEmitter {
         return technologyLevel * progressMultiplierConfig;
     }
 
-    async conductExperiments(game, player) {
+    conductExperiments(game, player) {
+        // NOTE: Experiments do not count towards player research achievements.
+
         // TODO: Defeated players do not conduct research or experiments?
         if (player.defeated) {
             return;
@@ -107,8 +109,6 @@ module.exports = class ResearchService extends EventEmitter {
             return;
         }
 
-        let user = await this.userService.getById(player.userId);
-
         let researchTechsCount = techs.length;
 
         let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)];
@@ -116,7 +116,6 @@ module.exports = class ResearchService extends EventEmitter {
         let researchAmount = player.research.experimentation.level * game.constants.research.progressMultiplier;
 
         tech.progress += researchAmount;
-        user.achievements.research[techKey] += researchAmount;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -126,8 +125,6 @@ module.exports = class ResearchService extends EventEmitter {
             tech.level++;
             tech.progress -= requiredProgress;
         }
-
-        await user.save();
 
         return {
             technology: techKey,
