@@ -134,22 +134,22 @@ class GameHelper {
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
   calculateWaypointTicks(game, carrier, waypoint) {
-    let source = game.galaxy.stars.find(x => x._id === waypoint.source).location
-    let destination = game.galaxy.stars.find(x => x._id === waypoint.destination).location
+    let source = game.galaxy.stars.find(x => x._id === waypoint.source)
+    let destination = game.galaxy.stars.find(x => x._id === waypoint.destination)
 
     // If the carrier is already en-route, then the number of ticks will be relative
     // to where the carrier is currently positioned.
     if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
-        source = carrier.location
+        source.location = carrier.location
     }
 
     let ticks
 
     if (source.warpGate && destination.warpGate
       && source.ownedByPlayerId && destination.ownedByPlayerId) {
-        ticks = this.getTicksBetweenLocations(game, [source, destination], 3) // TODO: Need a constant here
+        ticks = this.getTicksBetweenLocations(game, [source.location, destination.location], 3) // TODO: Need a constant here
       } else {
-        ticks = this.getTicksBetweenLocations(game, [source, destination])
+        ticks = this.getTicksBetweenLocations(game, [source.location, destination.location])
       }
 
     return ticks
@@ -161,7 +161,7 @@ class GameHelper {
     for (let i = 0; i < carrier.waypoints.length; i++) {
         let cwaypoint = carrier.waypoints[i]
         
-        totalTicks += this.calculateWaypointTicks(game, carrier, waypoint);
+        totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint);
 
         if (cwaypoint === waypoint) {
             break
