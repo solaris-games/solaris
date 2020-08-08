@@ -22,6 +22,9 @@ module.exports = class CombatService {
             defenderShipsRemaining -= attackPower;
         }
 
+        attackerShipsRemaining = Math.max(0, attackerShipsRemaining)
+        defenderShipsRemaining = Math.max(0, defenderShipsRemaining)
+
         return {
             weapons: {
                 defender: defendPower,
