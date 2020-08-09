@@ -137,6 +137,12 @@ class GameHelper {
     let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
     let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
 
+    // if the waypoint is going to the same star then it is at least 1
+    // tick, plus any delay ticks.
+    if (sourceStar._id === destinationStar._id) {
+      return 1 + waypoint.delayTicks
+    }
+
     let source = sourceStar.location
     let destination = destinationStar.location
 

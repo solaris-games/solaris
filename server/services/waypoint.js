@@ -117,8 +117,14 @@ module.exports = class WaypointService {
     }
 
     calculateWaypointTicks(game, carrier, waypoint) {
-        let sourceStar = this.starService.getByObjectId(game, waypoint.source)
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination)
+        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
+        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        // if the waypoint is going to the same star then it is at least 1
+        // tick, plus any delay ticks.
+        if (sourceStar._id.equals(destinationStar._id)) {
+            return 1 + waypoint.delayTicks;
+        }
 
         let source = sourceStar.location
         let destination = destinationStar.location

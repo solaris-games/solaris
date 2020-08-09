@@ -151,10 +151,10 @@ class Waypoints extends EventEmitter {
       if (this.carrier.waypoints.length) {
         const lastWaypoint = this._getLastWaypoint()
 
-        // The waypoint cannot be the same as the previous waypoint.
-        if (newWaypoint.destination === lastWaypoint.destination) {
-          return
-        }
+        // // The waypoint cannot be the same as the previous waypoint.
+        // if (newWaypoint.destination === lastWaypoint.destination) {
+        //   return
+        // }
 
         newWaypoint.source = lastWaypoint.destination
       }
