@@ -39,10 +39,22 @@ module.exports = class LeaderboardService {
         });
 
         let leaderboard = playerStats
-            .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
-            .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
-            .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
-            .sort((a, b) => (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1);
+            .sort((a, b) => {
+                // Sort by total stars descending
+                if (a.stats.totalStars > b.stats.totalStars) return -1;
+                if (a.stats.totalStars < b.stats.totalStars) return 1;
+
+                // Then by total ships descending
+                if (a.stats.totalShips > b.stats.totalShips) return -1;
+                if (a.stats.totalShips < b.stats.totalShips) return 1;
+
+                // Then by total carriers descending
+                if (a.stats.totalCarriers > b.stats.totalCarriers) return -1;
+                if (a.stats.totalCarriers < b.stats.totalCarriers) return 1;
+
+                // Then by defeated descending
+                return (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1;
+            });
 
         return leaderboard;
     }

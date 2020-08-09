@@ -84,6 +84,7 @@ import gameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import AudioService from '../../../game/audio'
 import ShareLinkVue from '../welcome/ShareLink'
+import { DEG_TO_RAD } from 'pixi.js'
 
 export default {
   components: {
@@ -122,10 +123,22 @@ export default {
     getSortedLeaderboardPlayerList () {
       // Sort by total number of stars, then by total ships, then by total carriers.
       return this.players
-        .sort((a, b) => b.stats.totalStars - a.stats.totalStars)
-        .sort((a, b) => b.stats.totalShips - a.stats.totalShips)
-        .sort((a, b) => b.stats.totalCarriers - a.stats.totalCarriers)
-        .sort((a, b) => (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1)
+        .sort((a, b) => {
+          // Sort by total stars descending
+          if (a.stats.totalStars > b.stats.totalStars) return -1
+          if (a.stats.totalStars < b.stats.totalStars) return 1
+
+          // Then by total ships descending
+          if (a.stats.totalShips > b.stats.totalShips) return -1
+          if (a.stats.totalShips < b.stats.totalShips) return 1
+
+          // Then by total carriers descending
+          if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
+          if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
+
+          // Then by defeated descending
+          return (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1
+        })
     },
     async concedeDefeat () {
       try {
