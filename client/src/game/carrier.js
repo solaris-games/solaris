@@ -129,8 +129,11 @@ class Carrier extends EventEmitter {
 
     this.graphics_waypoints.clear()
 
+    let lineWidth = this.data.waypointsLooped ? 0.5 : 1
+    let lineAlpha = this.data.waypointsLooped ? 0.1 : 0.2
+
     this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
-    this.graphics_waypoints.lineStyle(1, 0xFFFFFF, 0.2)
+    this.graphics_waypoints.lineStyle(lineWidth, 0xFFFFFF, lineAlpha)
 
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]

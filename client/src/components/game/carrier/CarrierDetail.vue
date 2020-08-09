@@ -170,6 +170,8 @@ export default {
           this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
+
+          GameContainer.reloadCarrier(this.carrier)
         }
       } catch (err) {
         console.error(err)
