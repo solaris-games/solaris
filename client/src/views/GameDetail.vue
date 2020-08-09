@@ -44,7 +44,7 @@
             </tr>
             <tr>
               <td>Production Ticks</td>
-              <td class="text-right">{{ game.settings.galaxy.productionTicks }}</td>
+              <td class="text-right">{{ game.settings.galaxy.productionTicks }} ticks/cycle</td>
             </tr>
           </tbody>
         </table>
@@ -116,7 +116,7 @@
             </tr>
             <tr>
               <td>Trade Cost</td>
-              <td class="text-right">{{ game.settings.player.tradeCost }}</td>
+              <td class="text-right">{{ game.settings.player.tradeCost }} credits/level</td>
             </tr>
             <tr>
               <td>Trade Scanning</td>
@@ -196,7 +196,11 @@
           <tbody>
             <tr>
               <td>Game Time</td>
-              <td class="text-right">{{ game.settings.gameTime.speed }}</td>
+              <td class="text-right">{{ game.settings.gameTime.speed }} minute(s)/tick</td>
+            </tr>
+            <tr>
+              <td>Start Delay</td>
+              <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
             </tr>
           </tbody>
         </table>

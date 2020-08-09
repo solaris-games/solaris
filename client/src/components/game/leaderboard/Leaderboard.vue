@@ -56,6 +56,9 @@
     <share-link v-if="!game.state.startDate"/>
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
+      <div class="col">
+        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
+      </div>
         <div class="col text-right pr-2">
             <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">Quit Game</modalButton>
             <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger">Concede Defeat</modalButton>
