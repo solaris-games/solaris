@@ -186,12 +186,16 @@ module.exports = class TradeService extends EventEmitter {
             let techFromPlayer = fromPlayer.research[techKey];
             let techToPlayer = toPlayer.research[techKey];
 
-            if (techFromPlayer.level > techToPlayer.level) {
+            let techLevel = techFromPlayer.level
+
+            while (techLevel > techToPlayer.level) {
                 tradeTechs.push({
                     name: techKey,
-                    level: techFromPlayer.level,
-                    cost: techFromPlayer.level * game.settings.player.tradeCost
+                    level: techLevel,
+                    cost: techLevel * game.settings.player.tradeCost
                 });
+
+                techLevel--;
             }
         }
 
