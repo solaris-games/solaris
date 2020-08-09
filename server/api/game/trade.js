@@ -97,7 +97,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.player,
                 req.body.toPlayerId,
-                req.body.technology);
+                req.body.technology,
+                req.body.level);
 
             return res.sendStatus(200);
         } catch (err) {

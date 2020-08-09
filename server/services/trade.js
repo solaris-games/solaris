@@ -104,7 +104,7 @@ module.exports = class TradeService extends EventEmitter {
         });
     }
 
-    async sendTechnology(game, fromPlayer, toPlayerId, technology) {
+    async sendTechnology(game, fromPlayer, toPlayerId, technology, techLevel) {
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
@@ -114,7 +114,7 @@ module.exports = class TradeService extends EventEmitter {
 
         let tradeTechs = this.getTradeableTechnologies(game, fromPlayer, toPlayerId);
 
-        let tradeTech = tradeTechs.find(t => t.name === technology);
+        let tradeTech = tradeTechs.find(t => t.name === technology && t.level === techLevel);
 
         if (!tradeTech) {
             throw new ValidationError(`The technology ${technology} cannot be traded with this player.`);

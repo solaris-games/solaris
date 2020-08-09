@@ -19,10 +19,11 @@ class TradeService extends BaseApiService {
     { withCredentials: true })
   }
 
-  sendTechnology (gameId, toPlayerId, technology) {
+  sendTechnology (gameId, toPlayerId, technology, level) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/trade/tech', {
       toPlayerId,
-      technology
+      technology,
+      level
     },
     { withCredentials: true })
   }
