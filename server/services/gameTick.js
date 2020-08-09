@@ -348,7 +348,7 @@ module.exports = class GameTickService extends EventEmitter {
         // If the star has no garrison and no defenders, then the attacker has won.
         let defendersRemaining = friendlyCarriers.reduce((sum, c) => sum += c.ships, 0);
 
-        if (defendersRemaining <= 0 && star.garrisonActual <= 0) {
+        if (defendersRemaining <= 0 && star.garrison <= 0) {
             let captureReward = star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
 
             star.ownedByPlayerId = enemyCarrier.ownedByPlayerId;
