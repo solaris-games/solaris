@@ -99,7 +99,7 @@ class Star extends EventEmitter {
     }
 
     // Add a larger hit radius so that the star is easily clickable
-    // sprite.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 12)
+    this.sprite_star.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
   drawPlanets (force) {
