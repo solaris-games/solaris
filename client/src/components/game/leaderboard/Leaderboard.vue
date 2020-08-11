@@ -140,7 +140,7 @@ export default {
           if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
 
           // Then by defeated descending
-          return (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1
+          return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
         })
     },
     async concedeDefeat () {
