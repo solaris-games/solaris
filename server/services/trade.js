@@ -141,8 +141,8 @@ module.exports = class TradeService extends EventEmitter {
         fromUser.achievements.trade.technologySent++;
 
         await game.save();
-        await fromPlayer.save();
-        await toPlayer.save();
+        await fromUser.save();
+        await toUser.save();
 
         let eventTech = {
             name: tradeTech.name,

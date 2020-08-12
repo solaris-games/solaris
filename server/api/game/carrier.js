@@ -16,7 +16,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.player,
                 req.params.carrierId,
-                req.body);
+                req.body.waypoints,
+                req.body.looped);
 
             return res.status(200).json(report);
         } catch (err) {

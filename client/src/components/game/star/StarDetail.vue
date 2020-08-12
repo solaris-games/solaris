@@ -224,15 +224,22 @@ export default {
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
     },
+    onEditWaypointsRequested (carrier) {
+      this.$emit('onEditWaypointsRequested', carrier._id)
+    },
     async confirmBuildCarrier (e) {
       try {
-        let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id)
+        // Build the carrier with the entire star garrison.
+        let ships = this.star.garrison
+
+        let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id, ships)
 
         if (response.status === 200) {
           this.$toasted.show(`Carrier built at ${this.star.name}.`)
 
           // this.$emit('onCarrierBuilt', this.star._id)
-          this.onOpenCarrierDetailRequested(response.data)
+          // this.onOpenCarrierDetailRequested(response.data)
+          this.onEditWaypointsRequested(response.data)
           this.getUserPlayer().credits -= this.star.upgradeCosts.carriers
 
           AudioService.join()

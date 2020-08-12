@@ -24,7 +24,8 @@
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" 
         @onShipTransferRequested="onShipTransferRequested" 
         @onEditWaypointsRequested="onEditWaypointsRequested" 
@@ -35,7 +36,8 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" 
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments" 
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onEditWaypointRequested="onEditWaypointRequested"/>
       <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" 
         @onCloseRequested="onCloseRequested" 
         :carrierId="menuArguments.carrierId" 

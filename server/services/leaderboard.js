@@ -16,9 +16,11 @@ module.exports = class LeaderboardService {
         })
         .select({
             username: 1,
+            developer: 1,
+            contributor: 1,
             'achievements.victories': 1,
             'achievements.rank': 1,
-            'achievements.renown': 1
+            'achievements.renown': 1,
         })
         .lean()
         .exec();

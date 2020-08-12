@@ -1,6 +1,8 @@
 <template>
 	<div class="container" v-if="carrier">
-    	<menu-title :title="carrier.name" @onCloseRequested="onCloseRequested"/>
+    	<menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
+			<span class="mr-2">{{carrier.ships}} <i class="fas fa-rocket"></i></span>
+    	</menu-title>
 
 		Waypoints:
 		<ul class="pl-4 mt-2">
@@ -22,12 +24,15 @@
 		</ul>
 
 		<div class="row bg-secondary pt-2 pb-2">
-			<div class="col">
+			<div class="col-12">
 				<p v-if="totalEtaTimeString">ETA: {{totalEtaTimeString}}</p>
 			</div>
-			<div class="col-auto">
+			<div class="col">
 				<button class="btn btn-danger" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-minus"></i></button>
 				<button class="btn btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-times"></i></button>
+				<button class="btn ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop"><i class="fas fa-sync"></i></button>
+			</div>
+			<div class="col-auto">
 				<button class="btn btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">Save</button>
 				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">Save &amp; Edit</button>
 			</div>
@@ -51,6 +56,7 @@ export default {
 	},
 	data () {
 		return {
+			userPlayer: null,
 			carrier: null,
 			isSavingWaypoints: false,
 			oldWaypoints: [],
@@ -59,7 +65,8 @@ export default {
 		}
 	},
 	mounted () {
-    	this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+		this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+		this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     
 		GameContainer.setMode('waypoints', this.carrier)
 
@@ -112,6 +119,7 @@ export default {
 			AudioService.backspace()
 
 			this.recalculateTotalEta()
+			this.recalculateLooped()
 		},
 		removeAllWaypoints () {
 			// Remove all waypoints up to the last waypoint (if in transit)
@@ -124,11 +132,13 @@ export default {
 			AudioService.backspace()
 
 			this.recalculateTotalEta()
+			this.recalculateLooped()
 		},
 		onWaypointCreated () {
 			AudioService.type()
 			
 			this.recalculateTotalEta()
+			this.recalculateLooped()
 		},
 		recalculateTotalEta () {
 			let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
@@ -139,11 +149,19 @@ export default {
 
 			this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
 		},
+		recalculateLooped () {
+			if (this.carrier.waypointsLooped) {
+				this.carrier.waypointsLooped = this.canLoop
+			}
+		},
+		toggleLooped () {
+			this.carrier.waypointsLooped = !this.carrier.waypointsLooped
+		},
 		async saveWaypoints (saveAndEdit = false) {
 			// Push the waypoints to the API.
 			try {
 				this.isSavingWaypoints = true
-				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints)
+				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints, this.carrier.waypointsLooped)
 
 				if (response.status === 200) {
 					AudioService.join()
@@ -158,7 +176,14 @@ export default {
           			this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 
 					if (saveAndEdit) {
-						this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
+						if (this.carrier.waypoints.length) {
+							this.$emit('onEditWaypointRequested', {
+								carrierId: this.carrier._id,
+								waypoint: this.carrier.waypoints[0]
+							})
+						} else {
+							this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
+						}
 					} else {
 						this.onCloseRequested()
 					}
@@ -168,6 +193,11 @@ export default {
 			}
 
 			this.isSavingWaypoints = false
+		}
+	},
+	computed: {
+		canLoop () {
+			return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
 		}
 	}
 }

@@ -2,6 +2,22 @@
   <view-container>
     <view-title :title="user ? user.username : 'Achievements'" />
 
+    <div class="row bg-success mb-2" v-if="user && user.contributor">
+      <div class="col text-center">
+        <p class="mt-1 mb-1">
+          This player is a contributor <i class="fas fa-hands-helping"></i>
+        </p>
+      </div>
+    </div>
+
+    <div class="row bg-warning mb-2" v-if="user && user.developer">
+      <div class="col text-center">
+        <p class="mt-1 mb-1">
+          This player is a developer <i class="fas fa-code"></i>
+        </p>
+      </div>
+    </div>
+
     <loading-spinner :loading="!user"/>
     
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>

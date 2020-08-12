@@ -9,7 +9,7 @@ module.exports = class WaypointService {
         this.starDistanceService = starDistanceService;
     }
 
-    async saveWaypoints(game, player, carrierId, waypoints) {
+    async saveWaypoints(game, player, carrierId, waypoints, looped) {
         let carrier = this.carrierService.getById(game, carrierId);
         
         if (!carrier.ownedByPlayerId.equals(player._id)) {
@@ -55,11 +55,12 @@ module.exports = class WaypointService {
         
         carrier.waypoints = waypoints;
 
-        // If the waypoints are not a valid loop then ensure that
-        // the waypoints are not looped.
-        if (!this.canLoop(game, player, carrier)) {
-            carrier.waypointsLooped = false;
+        // If the waypoints are not a valid loop then throw an error.
+        if (looped && !this.canLoop(game, player, carrier)) {
+            throw new ValidationError(`The carrier waypoints cannot be looped.`);
         }
+
+        carrier.waypointsLooped = looped;
 
         await game.save();
 

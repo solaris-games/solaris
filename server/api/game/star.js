@@ -143,11 +143,14 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        let ships = +req.body.ships || 1;
+
         try {
             let carrier = await container.starUpgradeService.buildCarrier(
                 req.game,
                 req.player,
-                req.body.starId);
+                req.body.starId,
+                ships);
 
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);

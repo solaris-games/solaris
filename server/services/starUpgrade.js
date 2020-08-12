@@ -85,7 +85,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
         });
     }
 
-    async buildCarrier(game, player, starId) {
+    async buildCarrier(game, player, starId, ships) {
+        ships = ships || 1;
+
+        if (ships < 1) {
+            throw new ValidationError(`Carrier must have 1 or more ships.`);
+        }
+
         // Get the star.
         let star = this.starService.getById(game, starId);
 
@@ -100,8 +106,6 @@ module.exports = class StarUpgradeService extends EventEmitter {
         if (player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to build a carrier.`);
         }
-
-        const ships = 1; // TODO: Need to get this from body?
 
         if (Math.floor(star.garrisonActual) < ships) {
             throw new ValidationError(`The star does not have enough ships garrisoned (${ships}) to build the carrier.`);

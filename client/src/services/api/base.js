@@ -5,7 +5,7 @@ class BaseApiService {
 
     constructor () {
         this.BASE_URL = process.env.VUE_APP_API_HOST + '/api/'
-        console.log(this.BASE_URL)
+        
         axios.interceptors.response.use(
             response => {
                 return response

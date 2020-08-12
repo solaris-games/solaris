@@ -54,7 +54,9 @@ module.exports = class UserService extends EventEmitter {
         return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
             achievements: 1,
-            username: 1
+            username: 1,
+            contributor: 1,
+            developer: 1
         });
     }
 

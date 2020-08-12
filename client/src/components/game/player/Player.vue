@@ -2,8 +2,12 @@
 <div class="container">
     <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested">
-        <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-info"><i class="fas fa-chevron-left"></i></button>
-        <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
+      <span class="mr-2">
+        <i class="fas fa-hands-helping" v-if="user.contributor" title="This player is a contributor"></i>
+        <i class="fas fa-code ml-1" v-if="user.developer" title="This player is a developer"></i>
+      </span>
+      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-info"><i class="fas fa-chevron-left"></i></button>
+      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
     </menu-title>
   
     <overview :player="player" 

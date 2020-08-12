@@ -190,6 +190,24 @@ class GameHelper {
     return relativeTo.add(ticks * speedInMins, 'm');
   }
 
+  canLoop(game, player, carrier) {
+    if (carrier.waypoints.length < 2) {
+        return false;
+    }
+
+    // Check whether the last waypoint is in range of the first waypoint.
+    let firstWaypoint = carrier.waypoints[0];
+    let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
+
+    let firstWaypointStar = this.getStarById(game, firstWaypoint.source);
+    let lastWaypointStar = this.getStarById(game, lastWaypoint.source);
+
+    let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location);
+    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.level);
+
+    return distanceBetweenStars <= hyperspaceDistance
+  }
+
   isGamePaused (game) {
     return game.state.paused
   }

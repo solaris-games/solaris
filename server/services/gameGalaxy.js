@@ -152,6 +152,8 @@ module.exports = class GameGalaxyService {
             // If its in range then its all good, send the star back as is.
             // Otherwise only return a subset of the data.
             if (inRange) {
+                // delete s.garrisonActual; // TODO: Don't need to send this back?
+
                 return s;
             } else {
                 // Return null if its dark mode

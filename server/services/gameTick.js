@@ -272,7 +272,10 @@ module.exports = class GameTickService extends EventEmitter {
             enemyCarrier.ships = combatResult.after.attacker;
 
             defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
+            defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
+            
             attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
+            attackerUser.achievements.combat.losses.ships += combatResult.lost.attacker;
 
             // Log the combat event
             this.emit('onPlayerCombatCarrier', {
@@ -322,7 +325,10 @@ module.exports = class GameTickService extends EventEmitter {
             star.garrison = Math.floor(star.garrisonActual);
 
             defenderUser.achievements.combat.kills.ships += starCombatResult.lost.attacker;
+            defenderUser.achievements.combat.losses.ships += starCombatResult.lost.defender;
+
             attackerUser.achievements.combat.kills.ships += starCombatResult.lost.defender;
+            attackerUser.achievements.combat.losses.ships += starCombatResult.lost.attacker;
 
             // Log the combat event
             this.emit('onPlayerCombatStar', {

@@ -3,9 +3,11 @@ import BaseApiService from './base'
 
 class CarrierService extends BaseApiService {
   
-  saveWaypoints (gameId, carrierId, waypoints) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/waypoints', 
-        waypoints,
+  saveWaypoints (gameId, carrierId, waypoints, looped) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/waypoints', {
+      waypoints,
+      looped
+    },
     { withCredentials: true })
   }
   

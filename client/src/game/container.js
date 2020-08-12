@@ -63,7 +63,10 @@ class GameContainer {
     this.viewport
       .drag()
       .pinch()
-      .wheel()
+      .wheel({
+        // percent: 2,
+        smooth: 5
+      })
       .decelerate({ friction: 0.9 })
       .clamp({
         left: this.starFieldLeft,
@@ -78,7 +81,7 @@ class GameContainer {
         maxHeight: Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop)
       })
 
-    this.viewport.on('zoomed', this.onViewportZoomed.bind(this))
+    this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
   }
 
   setup () {
