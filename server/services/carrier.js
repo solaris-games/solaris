@@ -32,7 +32,8 @@ module.exports = class CarrierService {
             orbiting: star._id,
             location: star.location,
             name,
-            waypoints: []
+            waypoints: [],
+            waypointsLooped: false
         };
 
         // Reduce the star garrison by how many we have added to the carrier.
