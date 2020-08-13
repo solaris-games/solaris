@@ -1,10 +1,18 @@
 <template>
 <div class="container">
-  <div class="mb-2">
+  <div class="row mb-2">
+    <div class="col">
       <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
         <span v-if="!showAll">Show All Stars</span>
         <span v-if="showAll">Show Your Stars</span>
       </button>
+    </div>
+    <div class="col-auto">
+      <select class="form-control" v-model="allowUpgrades">
+        <option :value="true">Enable Upgrades</option>
+        <option :value="false">Disable Upgrades</option>
+      </select>
+    </div>
   </div>
 
   <div class="table-responsive">
@@ -23,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            <star-row v-for="star in tableData" v-bind:key="star._id" :star="star"
+            <star-row v-for="star in tableData" v-bind:key="star._id" :star="star" :allowUpgrades="allowUpgrades"
               @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>
     </table>
@@ -44,6 +52,7 @@ export default {
   data: function () {
     return {
       showAll: false,
+      allowUpgrades: true,
       tableData: []
     }
   },
