@@ -56,7 +56,7 @@ class GameHelper {
   }
 
   getHyperspaceDistance (game, hyperspace) {
-    return ((hyperspace || 1) + 3) * game.constants.distances.lightYear
+    return ((hyperspace || 1) + 1.5) * game.constants.distances.lightYear
   }
 
   getDistanceBetweenLocations (loc1, loc2) {

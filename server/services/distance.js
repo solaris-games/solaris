@@ -36,11 +36,11 @@ module.exports = class DistanceService {
     }
 
     getScanningDistance(game, scanning) {
-        return ((scanning || 1) + 2) * game.constants.distances.lightYear;
+        return ((scanning || 1) + 1) * game.constants.distances.lightYear;
     }
     
     getHyperspaceDistance(game, hyperspace) {
-        return ((hyperspace || 1) + 3) * game.constants.distances.lightYear;
+        return ((hyperspace || 1) + 1.5) * game.constants.distances.lightYear;
     }
 
     getAngleTowardsLocation(source, destination) {

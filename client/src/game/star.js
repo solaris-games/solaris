@@ -343,7 +343,7 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
-    let radius = ((player.research.scanning.level || 1) + 2) * this.lightYearDistance
+    let radius = ((player.research.scanning.level || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.3)
     this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1)
@@ -372,7 +372,7 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
-    let radius = ((player.research.hyperspace.level || 1) + 1) * this.lightYearDistance
+    let radius = ((player.research.hyperspace.level || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.3)
     this.graphics_hyperspaceRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
