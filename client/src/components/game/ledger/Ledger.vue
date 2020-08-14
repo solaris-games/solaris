@@ -2,18 +2,16 @@
 <div class="container">
     <menu-title title="Ledger" @onCloseRequested="onCloseRequested"/>
 
-    <p>Debts that you owe are in <span class="text-danger">red</span>.</p>
-    <p>Use the <b>Pay Debt</b> button to send credits and settle the debt.</p>
+    <p>Debts that you owe are in <span class="text-danger">red</span>. Use the <b>Settle Debt</b> button to send credits and settle the debt in full.</p>
+
+    <p>Debts that are owed to you are in <span class="text-success">green</span>. Use the <b>Forgive Debt</b> button to write off the debt.</p>
 
     <hr/>
-
-    <p>Debts that are owed to you are in <span class="text-success">green</span>.</p>
-    <p>Use the <b>Forgive Debt</b> button to write off the debt.</p>
 
     <loading-spinner :loading="isLoadingLedger"/>
 
     <div v-if="!isLoadingLedger" class="row">
-        <div class="table-responsive">
+        <div class="table-responsive" v-if="ledgers.length">
           <table class="table table-sm table-striped">
               <tbody>
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
@@ -33,12 +31,15 @@
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                         <!-- <modalButton :disabled="ledger.debt <= 0" modalName="forgiveDebtModal" classText="btn btn-info">Forgive Debt</modalButton> -->
-                          <button class="btn btn-info" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt" @click="forgiveDebt(ledger)" title="Forgive Debt"><i class="fas fa-hands-helping"></i></button>
+                          <button class="btn btn-danger" :disabled="ledger.debt >= 0 || ledger.isSettlingDebt" @click="settleDebt(ledger)" title="Settle Debt"><i class="fas fa-money-check-alt"></i></button>
+                          <button class="btn btn-success ml-1" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt" @click="forgiveDebt(ledger)" title="Forgive Debt"><i class="fas fa-hands-helping"></i></button>
                       </td>
                   </tr>
               </tbody>
           </table>
         </div>
+
+        <p v-if="!ledgers.length" class="col text-warning">You have not traded with any other player and have no debts or credits.</p>
     </div>
 
     <!-- <dialogModal modalName="forgiveDebtModal" titleText="Forgive Debt" cancelText="No" confirmText="Yes" @onConfirm="forgiveDebt(selectedLedger)">
@@ -87,12 +88,35 @@ export default {
                     this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, {type:'success'})
                 }
 
-                ledger.debt = 0
+                ledger.debt = response.data.debt
             } catch (err) {
                 console.error(err)
             }
 
             ledger.isForgivingDebt = false
+        }
+    },
+    async settleDebt (ledger) {
+        let playerAlias = this.getPlayerAlias(ledger.playerId)
+
+        if (confirm(`Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
+            try {
+                ledger.isSettlingDebt = true
+
+                let response = await LedgerApiService.settleDebt(this.$store.state.game._id, ledger.playerId)
+
+                if (response.status === 200) {
+                    this.$toasted.show(`You have paid off the debt you owe to ${playerAlias}.`, {type:'success'})
+                }
+
+                gameHelper.getUserPlayer(this.$store.state.game).credits -= Math.abs(ledger.debt)
+
+                ledger.debt = response.data.debt
+            } catch (err) {
+                console.error(err)
+            }
+
+            ledger.isSettlingDebt = false
         }
     },
     async loadLedger () {

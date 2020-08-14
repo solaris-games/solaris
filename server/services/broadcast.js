@@ -112,6 +112,10 @@ module.exports = class BroadcastService {
         this.io.to(toPlayerId).emit('playerCreditsReceived', credits);
     }
 
+    // TODO: Settle debt
+    // TODO: Forgive debt
+    // TODO: Debt added
+
     // userRenownReceived(game, toUserId, renown) {
     //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?
     // }

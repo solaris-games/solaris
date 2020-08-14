@@ -13,6 +13,11 @@ class CarrierService extends BaseApiService {
     { withCredentials: true })
   }
   
+  settleDebt (gameId, playerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/settle/' + playerId, {},
+    { withCredentials: true })
+  }
+  
 }
 
 export default new CarrierService()

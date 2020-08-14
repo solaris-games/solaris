@@ -52,7 +52,7 @@ const schema = new Schema({
     ledger: [
         {
             playerId: { type: Types.ObjectId, required: true },
-            debt: { type: Types.Number, required: true, default: 0  }
+            debt: { type: Types.Number, required: true  }
         }
     ]
 });
