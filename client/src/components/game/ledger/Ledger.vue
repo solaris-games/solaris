@@ -1,0 +1,139 @@
+<template>
+<div class="container">
+    <menu-title title="Ledger" @onCloseRequested="onCloseRequested"/>
+
+    <p>Debts that you owe are in <span class="text-danger">red</span>.</p>
+    <p>Use the <b>Pay Debt</b> button to send credits and settle the debt.</p>
+
+    <hr/>
+
+    <p>Debts that are owed to you are in <span class="text-success">green</span>.</p>
+    <p>Use the <b>Forgive Debt</b> button to write off the debt.</p>
+
+    <loading-spinner :loading="isLoadingLedger"/>
+
+    <div v-if="!isLoadingLedger" class="row">
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+              <tbody>
+                  <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
+                  <tr v-for="ledger in ledgers" :key="ledger.playerId">
+                      <td :style="{'width': '8px', 'background-color': getFriendlyColour(ledger.playerId)}"></td>
+                      <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
+                          <!-- TODO: Prefer images over font awesome icons? -->
+                          <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
+                          <!-- <img src=""> -->
+                      </td>
+                      <td class="pl-2 pt-3 pb-2">
+                          <!-- Text styling for defeated players? -->
+                          <h5>{{getPlayerAlias(ledger.playerId)}}</h5>
+                      </td>
+                      <td class="fit pt-3 pr-4">
+                          <h5 :class="{'text-success':ledger.debt>0,'text-danger':ledger.debt<0}">${{ledger.debt}}</h5>
+                      </td>
+                      <td class="fit pt-2 pb-2 pr-2">
+                        <!-- <modalButton :disabled="ledger.debt <= 0" modalName="forgiveDebtModal" classText="btn btn-info">Forgive Debt</modalButton> -->
+                          <button class="btn btn-info" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt" @click="forgiveDebt(ledger)" title="Forgive Debt"><i class="fas fa-hands-helping"></i></button>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+        </div>
+    </div>
+
+    <!-- <dialogModal modalName="forgiveDebtModal" titleText="Forgive Debt" cancelText="No" confirmText="Yes" @onConfirm="forgiveDebt(selectedLedger)">
+      <p>Are you sure you want to forgive the debt of <span class="text-success">${{selectedLedger.debt}}</span> that <b>{{getPlayerAlias(ledger.playerId)}}</b> owes you?</p>
+    </dialogModal> -->
+</div>
+</template>
+
+<script>
+import MenuTitle from '../MenuTitle'
+import LoadingSpinner from '../../LoadingSpinner'
+import LedgerApiService from '../../../services/api/ledger'
+import gameHelper from '../../../services/gameHelper'
+
+export default {
+  components: {
+    'menu-title': MenuTitle,
+    'loading-spinner': LoadingSpinner
+  },
+  data () {
+      return {
+          isLoadingLedger: false,
+          ledgers: []
+      }
+  },
+  mounted () {
+      this.loadLedger()
+  },
+  methods: {
+    getPlayerAlias (playerId) {
+        return gameHelper.getPlayerById(this.$store.state.game, playerId).alias
+    },
+    getFriendlyColour (playerId) {
+        return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+    },
+    async forgiveDebt (ledger) {
+        let playerAlias = this.getPlayerAlias(ledger.playerId)
+
+        if (confirm(`Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
+            try {
+                ledger.isForgivingDebt = true
+
+                let response = await LedgerApiService.forgiveDebt(this.$store.state.game._id, ledger.playerId)
+
+                if (response.status === 200) {
+                    this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, {type:'success'})
+                }
+
+                ledger.debt = 0
+            } catch (err) {
+                console.error(err)
+            }
+
+            ledger.isForgivingDebt = false
+        }
+    },
+    async loadLedger () {
+        try {
+            this.isLoadingLedger = true
+
+            let response = await LedgerApiService.getLedger(this.$store.state.game._id)
+
+            if (response.status === 200) {
+                this.ledgers = response.data
+            }
+        } catch (err) {
+            console.error(err)
+        }
+
+        this.isLoadingLedger = false
+    },
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
+    }
+  }
+}
+</script>
+
+<style scoped>
+img {
+    height: 48px;
+    width: 48px;
+}
+
+.col-avatar {
+    width: 48px;
+}
+
+.table-sm td {
+    padding: 0;
+}
+
+.table td.fit,
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
+</style>

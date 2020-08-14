@@ -3,11 +3,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(userService, playerService) {
+    constructor(userService, playerService, ledgerService) {
         super();
         
         this.userService = userService;
         this.playerService = playerService;
+        this.ledgerService = ledgerService;
     }
 
     async sendCredits(game, fromPlayer, toPlayerId, amount) {
@@ -35,6 +36,8 @@ module.exports = class TradeService extends EventEmitter {
 
         toPlayer.credits += amount;
         toPlayerUser.achievements.trade.creditsReceived += amount;
+
+        this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
 
         await game.save();
         await fromPlayerUser.save();
@@ -139,6 +142,8 @@ module.exports = class TradeService extends EventEmitter {
 
         fromPlayer.credits -= tradeTech.cost;
         fromUser.achievements.trade.technologySent++;
+
+        this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
 
         await game.save();
         await fromUser.save();

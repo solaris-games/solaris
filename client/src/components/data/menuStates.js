@@ -30,5 +30,6 @@ export default {
   SHIP_TRANSFER: 'shipTransfer',
   BULK_INFRASTRUCTURE_UPGRADE: 'bulkInfrastructureUpgrade',
   MAP_OBJECT_SELECTOR: 'mapObjectSelector',
-  RULER: 'ruler'
+  RULER: 'ruler',
+  LEDGER: 'ledger'
 }
