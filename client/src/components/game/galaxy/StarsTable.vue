@@ -14,24 +14,24 @@
       </select>
     </div>
   </div>
-
+  
   <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td><i class="fas fa-user"></i></td>
-                <td>Name</td>
+                <td><a href="javascript:;" @click="sort(['ships'])">Name</a></td>
                 <td></td>
-                <td class="text-right"><i class="fas fa-money-bill-wave"></i></td>
-                <td class="text-right"><i class="fas fa-tools"></i></td>
-                <td class="text-right"><i class="fas fa-flask"></i></td>
-                <td class="text-right">$E</td>
-                <td class="text-right">$I</td>
-                <td class="text-right">$S</td>
+                <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
+                <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
+                <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td>
+                <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
+                <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
+                <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
             </tr>
         </thead>
         <tbody>
-            <star-row v-for="star in tableData" v-bind:key="star._id" :star="star" :allowUpgrades="allowUpgrades"
+            <star-row v-for="star in sortedTableData" v-bind:key="star._id" :star="star" :allowUpgrades="allowUpgrades"
               @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>
     </table>
@@ -53,7 +53,9 @@ export default {
     return {
       showAll: false,
       allowUpgrades: true,
-      tableData: []
+      tableData: [],
+      sortBy: null,
+      sortDirection: true
     }
   },
   mounted () {
@@ -77,8 +79,40 @@ export default {
         return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     },
+    sort (columnName) {
+      // If sorting by a new column, reset the sort.
+      if (JSON.stringify(this.sortBy) !== JSON.stringify(columnName)) {
+        this.sortBy = columnName
+        this.sortDirection = true
+      } else {
+        // Otherwise if we are sorting by the same column, flip the sort direction.
+        this.sortDirection = !this.sortDirection
+      }
+    },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)
+    }
+  },
+  computed: {
+    sortedTableData () {
+      // here be dragons
+      const getNestedObject = (nestedObj, pathArr) => {
+        return pathArr.reduce((obj, key) =>
+            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj);
+      }
+
+      if (this.sortBy == null) {
+        return this.tableData
+      }
+
+      return this.tableData.sort((a, b) => {
+        if (this.sortDirection) { // Ascending
+          return getNestedObject(b, this.sortBy) < getNestedObject(a, this.sortBy) ? 1 : -1
+        }
+
+        // Descending
+        return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
+      })
     }
   }
 }

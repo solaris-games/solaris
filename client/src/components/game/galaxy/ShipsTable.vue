@@ -12,14 +12,14 @@
         <thead>
             <tr class="bg-primary">
                 <td><i class="fas fa-user"></i></td>
-                <td>Name</td>
+                <td><a href="javascript:;" @click="sort('name')">Name</a></td>
                 <td></td>
                 <td></td>
-                <td class="text-right"><i class="fas fa-rocket"></i></td>
+                <td class="text-right"><a href="javascript:;" @click="sort('ships')"><i class="fas fa-rocket"></i></a></td>
             </tr>
         </thead>
         <tbody>
-            <ship-row v-for="ship in tableData" v-bind:key="ship._id" :ship="ship"
+            <ship-row v-for="ship in sortedTableData" v-bind:key="ship._id" :ship="ship"
               @onOpenStarDetailRequested="onOpenStarDetailRequested"
               @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         </tbody>
@@ -41,7 +41,9 @@ export default {
   data: function () {
     return {
       showAll: false,
-      tableData: []
+      tableData: [],
+      sortBy: null,
+      sortDirection: true
     }
   },
   mounted () {
@@ -98,6 +100,32 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
       this.$emit('onOpenCarrierDetailRequested', e)
+    },
+    sort (columnName) {
+      // If sorting by a new column, reset the sort.
+      if (this.sortBy !== columnName) {
+        this.sortBy = columnName
+        this.sortDirection = true
+      } else {
+        // Otherwise if we are sorting by the same column, flip the sort direction.
+        this.sortDirection = !this.sortDirection
+      }
+    }
+  },
+  computed: {
+    sortedTableData () {
+      if (this.sortBy == null) {
+        return this.tableData
+      }
+
+      return this.tableData.sort((a, b) => {
+        if (this.sortDirection) { // Ascending
+          return b[this.sortBy] < a[this.sortBy] ? 1 : -1
+        }
+
+        // Descending
+        return a[this.sortBy] <= b[this.sortBy] ? 1 : -1
+      })
     }
   }
 }
