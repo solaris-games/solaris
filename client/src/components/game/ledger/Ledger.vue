@@ -6,8 +6,6 @@
 
     <p>Debts that are owed to you are in <span class="text-success">green</span>. Use the <b>Forgive Debt</b> button to write off the debt.</p>
 
-    <hr/>
-
     <loading-spinner :loading="isLoadingLedger"/>
 
     <div v-if="!isLoadingLedger" class="row">

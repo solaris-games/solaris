@@ -237,7 +237,13 @@ export default new Vuex.Store({
       // Redraw the star
       GameContainer.reloadStar(star)
     },
+    playerDebtSettled (state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
 
+      if (data.creditorPlayerId === player._id) {
+        player.credits += data.amount
+      }
+    }
   },
   actions: {
 

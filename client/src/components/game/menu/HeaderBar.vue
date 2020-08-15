@@ -70,7 +70,7 @@
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
-            <button class="btn btn-sm btn-info ml-1" type="button" @click="goToMainMenu()">
+            <button class="btn btn-sm btn-info ml-1" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
@@ -149,6 +149,9 @@ export default {
         },
         goToMainMenu () {
             router.push({ name: 'main-menu' })
+        },
+        goToMyGames () {
+            router.push({ name: 'game-active-games' })
         },
         fitGalaxy () {
             GameContainer.viewport.fitWorld()

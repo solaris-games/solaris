@@ -141,6 +141,7 @@ export default {
       this.sockets.subscribe('gameStarCarrierBuilt', (data) => this.$store.commit('gameStarCarrierBuilt', data))
       this.sockets.subscribe('gameStarCarrierShipTransferred', (data) => this.$store.commit('gameStarCarrierShipTransferred', data))
       this.sockets.subscribe('gameStarAbandoned', (data) => this.$store.commit('gameStarAbandoned', data))
+      this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
     },
     unsubscribeToSockets () {
@@ -155,6 +156,7 @@ export default {
       this.sockets.unsubscribe('gameStarCarrierBuilt')
       this.sockets.unsubscribe('gameStarCarrierShipTransferred')
       this.sockets.unsubscribe('gameStarAbandoned')
+      this.sockets.unsubscribe('playerDebtSettled')
       this.sockets.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
