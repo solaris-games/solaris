@@ -29,10 +29,11 @@ module.exports = class EventService {
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
     }
 
-    constructor(eventModel,
+    constructor(eventModel, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService) {
         this.eventModel = eventModel;
+        this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.gameTickService = gameTickService;
         this.researchService = researchService;
@@ -75,6 +76,7 @@ module.exports = class EventService {
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.game, args.fromPlayer, args.toPlayer, args.technology));
         this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.game, args.fromPlayer, args.toPlayer, args.technology));
 
+        this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.game, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.game, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.game, args.debtor, args.creditor, args.amount));
     }
@@ -331,6 +333,13 @@ module.exports = class EventService {
         return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data);
     }
 
+    async createDebtAddedEvent(game, debtorPlayerId, creditorPlayerId, amount) {
+        // Debt added event is superfluous as we already have other events for when trades occur.
+        // Just broadcast the event instead.
+
+        this.broadcastService.gamePlayerDebtAdded(game, debtorPlayerId, creditorPlayerId, amount);
+    }
+
     async createDebtSettledEvent(game, debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
@@ -340,6 +349,8 @@ module.exports = class EventService {
 
         await this.createPlayerEvent(game, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data);
         await this.createPlayerEvent(game, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data);
+
+        this.broadcastService.gamePlayerDebtSettled(game, debtorPlayerId, creditorPlayerId, amount);
     }
 
     async createDebtForgivenEvent(game, debtorPlayerId, creditorPlayerId, amount) {
@@ -351,6 +362,8 @@ module.exports = class EventService {
 
         await this.createPlayerEvent(game, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
         await this.createPlayerEvent(game, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
+
+        this.broadcastService.gamePlayerDebtForgiven(game, debtorPlayerId, creditorPlayerId, amount);
     }
 
 };

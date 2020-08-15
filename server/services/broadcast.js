@@ -112,9 +112,38 @@ module.exports = class BroadcastService {
         this.io.to(toPlayerId).emit('playerCreditsReceived', credits);
     }
 
-    // TODO: Settle debt
-    // TODO: Forgive debt
-    // TODO: Debt added
+    gamePlayerDebtAdded(game, debtorPlayerId, creditorPlayerId, amount) {
+        let data = {
+            debtorPlayerId,
+            creditorPlayerId,
+            amount
+        };
+
+        this.io.to(debtorPlayerId).emit('playerDebtAdded', data);
+        this.io.to(creditorPlayerId).emit('playerDebtAdded', data);
+    }
+
+    gamePlayerDebtForgiven(game, debtorPlayerId, creditorPlayerId, amount) {
+        let data = {
+            debtorPlayerId,
+            creditorPlayerId,
+            amount
+        };
+
+        this.io.to(debtorPlayerId).emit('playerDebtForgiven', data);
+        this.io.to(creditorPlayerId).emit('playerDebtForgiven', data);
+    }
+
+    gamePlayerDebtSettled(game, debtorPlayerId, creditorPlayerId, amount) {
+        let data = {
+            debtorPlayerId,
+            creditorPlayerId,
+            amount
+        };
+
+        this.io.to(debtorPlayerId).emit('playerDebtSettled', data);
+        this.io.to(creditorPlayerId).emit('playerDebtSettled', data);
+    }
 
     // userRenownReceived(game, toUserId, renown) {
     //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?

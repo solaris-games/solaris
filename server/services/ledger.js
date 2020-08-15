@@ -32,26 +32,30 @@ module.exports = class LedgerService extends EventEmitter {
         return fullLedger.find(l => l.playerId.equals(playerId));
     }
 
-    addDebt(game, playerA, playerB, debt) {
+    addDebt(game, creditor, debtor, debt) {
         // Get both of the ledgers between the two players.
-        let ledgerA = this.getLedgerForPlayer(game, playerA, playerB._id);
-        let ledgerB = this.getLedgerForPlayer(game, playerB, playerA._id);
+        let ledgerA = this.getLedgerForPlayer(game, creditor, debtor._id);
+        let ledgerB = this.getLedgerForPlayer(game, debtor, creditor._id);
 
         ledgerA.debt += debt;   // Player B now has debt to player A
         ledgerB.debt -= debt;   // Player A has paid off some of the debt to player B
 
-        // NOTE: Don't need to add an event because there are already events for
-        // when credits are sent and technology is sent so would be useless to add another.
-        
+        this.emit('onDebtAdded', {
+            game,
+            debtor: debtor._id,
+            creditor: creditor._id,
+            amount: debt
+        });
+
         return ledgerA;
     }
 
-    async settleDebt(game, playerA, playerBId) {
-        let playerB = this.playerService.getByObjectId(game, playerBId);
+    async settleDebt(game, debtor, playerBId) {
+        let creditor = this.playerService.getByObjectId(game, playerBId);
 
         // Get both of the ledgers between the two players.
-        let ledgerA = this.getLedgerForPlayer(game, playerA, playerBId);
-        let ledgerB = this.getLedgerForPlayer(game, playerB, playerA._id);
+        let ledgerA = this.getLedgerForPlayer(game, debtor, playerBId);
+        let ledgerB = this.getLedgerForPlayer(game, creditor, debtor._id);
 
         if (ledgerA.debt > 0) {
             throw new ValidationError('You do not owe the player anything.');
@@ -59,34 +63,34 @@ module.exports = class LedgerService extends EventEmitter {
 
         let debtAmount = Math.abs(ledgerA.debt);
 
-        if (playerA.credits < debtAmount) {
+        if (debtor.credits < debtAmount) {
             throw new ValidationError('You do not have enough credits to fully settle the debt.')
         }
 
         ledgerA.debt += debtAmount;
         ledgerB.debt -= debtAmount;
 
-        playerA.credits -= debtAmount;
-        playerB.credits += debtAmount;
+        debtor.credits -= debtAmount;
+        creditor.credits += debtAmount;
 
         await game.save();
 
         this.emit('onDebtSettled', {
             game,
-            debtor: playerA._id,
-            creditor: playerB._id,
+            debtor: debtor._id,
+            creditor: creditor._id,
             amount: debtAmount
         });
 
         return ledgerA;
     }
 
-    async forgiveDebt(game, playerA, playerBId) {
-        let playerB = this.playerService.getByObjectId(game, playerBId);
+    async forgiveDebt(game, creditor, playerBId) {
+        let debtor = this.playerService.getByObjectId(game, playerBId);
 
         // Get both of the ledgers between the two players.
-        let ledgerA = this.getLedgerForPlayer(game, playerA, playerBId);
-        let ledgerB = this.getLedgerForPlayer(game, playerB, playerA._id);
+        let ledgerA = this.getLedgerForPlayer(game, creditor, playerBId);
+        let ledgerB = this.getLedgerForPlayer(game, debtor, creditor._id);
 
         if (ledgerA.debt <= 0) {
             throw new ValidationError('The player does not owe you anything.');
@@ -101,8 +105,8 @@ module.exports = class LedgerService extends EventEmitter {
 
         this.emit('onDebtForgiven', {
             game,
-            debtor: playerB._id,
-            creditor: playerA._id,
+            debtor: debtor._id,
+            creditor: creditor._id,
             amount: debtAmount
         });
 

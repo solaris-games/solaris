@@ -61,12 +61,25 @@ export default {
   },
   data () {
       return {
+          userPlayer: null,
           isLoadingLedger: false,
           ledgers: []
       }
   },
   mounted () {
       this.loadLedger()
+
+      this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+  },
+  created () {
+      this.sockets.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
+      this.sockets.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
+      this.sockets.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
+  },
+  destroyed () {
+      this.sockets.unsubscribe('playerDebtAdded')
+      this.sockets.unsubscribe('playerDebtForgiven')
+      this.sockets.unsubscribe('playerDebtSettled')
   },
   methods: {
     getPlayerAlias (playerId) {
@@ -109,7 +122,7 @@ export default {
                     this.$toasted.show(`You have paid off the debt you owe to ${playerAlias}.`, {type:'success'})
                 }
 
-                gameHelper.getUserPlayer(this.$store.state.game).credits -= Math.abs(ledger.debt)
+                this.userPlayer.credits -= Math.abs(ledger.debt)
 
                 ledger.debt = response.data.debt
             } catch (err) {
@@ -136,6 +149,16 @@ export default {
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    // Below: Fuck it.
+    onPlayerDebtAdded (e) {
+        this.loadLedger()
+    },
+    onPlayerDebtForgiven (e) {
+        this.loadLedger()
+    },
+    onPlayerDebtSettled (e) {
+        this.loadLedger()
     }
   }
 }
