@@ -25,10 +25,13 @@ module.exports = class EventService {
         PLAYER_STAR_CAPTURED: 'playerStarCaptured',
         PLAYER_CARRIER_BUILT: 'playerCarrierBuilt',
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
+        PLAYER_DEBT_SETTLED: 'playerDebtSettled',
+        PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
     }
 
     constructor(eventModel,
-        gameService, gameTickService, researchService, starService, starUpgradeService, tradeService) {
+        gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
+        ledgerService) {
         this.eventModel = eventModel;
         this.gameService = gameService;
         this.gameTickService = gameTickService;
@@ -36,6 +39,7 @@ module.exports = class EventService {
         this.starService = starService;
         this.starUpgradeService = starUpgradeService;
         this.tradeService = tradeService;
+        this.ledgerService = ledgerService;
 
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.game, args.player));
         this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.game));
@@ -70,6 +74,9 @@ module.exports = class EventService {
         this.tradeService.on('onPlayerRenownSent', (args) => this.createRenownSentEvent(args.game, args.fromPlayer, args.toPlayer, args.amount));
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.game, args.fromPlayer, args.toPlayer, args.technology));
         this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.game, args.fromPlayer, args.toPlayer, args.technology));
+
+        this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.game, args.debtor, args.creditor, args.amount));
+        this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.game, args.debtor, args.creditor, args.amount));
     }
 
     async createGameEvent(game, type, data) {
@@ -84,10 +91,10 @@ module.exports = class EventService {
         await event.save();
     }
 
-    async createPlayerEvent(game, player, type, data) {
+    async createPlayerEvent(game, playerId, type, data) {
         let event = new this.eventModel({
             gameId: game._id,
-            playerId: player._id,
+            playerId,
             tick: game.state.tick,
             type,
             data
@@ -178,7 +185,7 @@ module.exports = class EventService {
             experimentAmount
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
     async createPlayerCombatStarEvent(game, defender, attacker, defenderStar, attackerCarrier, combatResult) {
@@ -191,8 +198,8 @@ module.exports = class EventService {
             combatResult
         };
 
-        await this.createPlayerEvent(game, defender, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
-        await this.createPlayerEvent(game, attacker, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+        await this.createPlayerEvent(game, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+        await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
     }
 
     async createPlayerCombatCarrierEvent(game, defender, attacker, defenderStar, defenderCarrier, attackerCarrier, combatResult) {
@@ -207,8 +214,8 @@ module.exports = class EventService {
             combatResult
         };
 
-        await this.createPlayerEvent(game, defender, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
-        await this.createPlayerEvent(game, attacker, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+        await this.createPlayerEvent(game, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+        await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
     }
 
     async createResearchCompleteEvent(game, player, technology) {
@@ -216,7 +223,7 @@ module.exports = class EventService {
             technology
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
     }
 
     async createWarpGateBuiltEvent(game, player, star) {
@@ -224,7 +231,7 @@ module.exports = class EventService {
             starId: star._id
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_BUILT, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_BUILT, data);
     }
 
     async createWarpGateDestroyedEvent(game, player, star) {
@@ -232,7 +239,7 @@ module.exports = class EventService {
             starId: star._id
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_DESTROYED, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_DESTROYED, data);
     }
 
     async createTechnologyReceivedEvent(game, fromPlayer, toPlayer, technology) {
@@ -241,7 +248,7 @@ module.exports = class EventService {
             technology
         };
 
-        return await this.createPlayerEvent(game, toPlayer, this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED, data);
+        return await this.createPlayerEvent(game, toPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED, data);
     }
 
     async createTechnologySentEvent(game, fromPlayer, toPlayer, technology) {
@@ -250,7 +257,7 @@ module.exports = class EventService {
             technology
         };
 
-        return await this.createPlayerEvent(game, fromPlayer, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data);
+        return await this.createPlayerEvent(game, fromPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data);
     }
 
     async createCreditsReceivedEvent(game, fromPlayer, toPlayer, credits) {
@@ -259,7 +266,7 @@ module.exports = class EventService {
             credits
         };
 
-        return await this.createPlayerEvent(game, toPlayer, this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED, data);
+        return await this.createPlayerEvent(game, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED, data);
     }
 
     async createCreditsSentEvent(game, fromPlayer, toPlayer, credits) {
@@ -268,7 +275,7 @@ module.exports = class EventService {
             credits
         };
 
-        return await this.createPlayerEvent(game, fromPlayer, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data);
+        return await this.createPlayerEvent(game, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data);
     }
 
     async createRenownReceivedEvent(game, fromPlayer, toPlayer, renown) {
@@ -277,7 +284,7 @@ module.exports = class EventService {
             renown
         };
 
-        return await this.createPlayerEvent(game, toPlayer, this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED, data);
+        return await this.createPlayerEvent(game, toPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED, data);
     }
 
     async createRenownSentEvent(game, fromPlayer, toPlayer, renown) {
@@ -286,7 +293,7 @@ module.exports = class EventService {
             renown
         };
 
-        return await this.createPlayerEvent(game, fromPlayer, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data);
+        return await this.createPlayerEvent(game, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data);
     }
 
     async createStarAbandonedEvent(game, player, star) {
@@ -294,7 +301,7 @@ module.exports = class EventService {
             starId: star._id
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data);
     }
 
     async createStarCapturedEvent(game, player, star, creditsReward) {
@@ -303,7 +310,7 @@ module.exports = class EventService {
             creditsReward
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_STAR_CAPTURED, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_CAPTURED, data);
     }
 
     async createCarrierBuiltEvent(game, player, star, carrier) {
@@ -313,7 +320,7 @@ module.exports = class EventService {
             carrierName: carrier.name
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_CARRIER_BUILT, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_CARRIER_BUILT, data);
     }
 
     async createInfrastructureBulkUpgraded(game, player, upgradeReport) {
@@ -321,7 +328,29 @@ module.exports = class EventService {
             upgradeReport
         };
 
-        return await this.createPlayerEvent(game, player, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data);
+        return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data);
+    }
+
+    async createDebtSettledEvent(game, debtorPlayerId, creditorPlayerId, amount) {
+        let data = {
+            debtorPlayerId,
+            creditorPlayerId,
+            amount
+        };
+
+        await this.createPlayerEvent(game, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data);
+        await this.createPlayerEvent(game, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data);
+    }
+
+    async createDebtForgivenEvent(game, debtorPlayerId, creditorPlayerId, amount) {
+        let data = {
+            debtorPlayerId,
+            creditorPlayerId,
+            amount
+        };
+
+        await this.createPlayerEvent(game, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
+        await this.createPlayerEvent(game, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
     }
 
 };

@@ -78,7 +78,8 @@ module.exports = (io) => {
     const emailService = new EmailService(config, gameService, gameTickService, userService);
     const shipTransferService = new ShipTransferService(carrierService, starService);
     
-    const eventService = new EventService(EventModel, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService);
+    const eventService = new EventService(EventModel, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
+        ledgerService);
 
     return {
         authService,

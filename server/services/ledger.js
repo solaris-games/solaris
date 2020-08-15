@@ -1,8 +1,11 @@
 const ValidationError = require("../errors/validation");
+const EventEmitter = require('events');
 
-module.exports = class LedgerService {
+module.exports = class LedgerService extends EventEmitter {
 
     constructor(playerService) {
+        super();
+
         this.playerService = playerService;
     }
 
@@ -37,6 +40,9 @@ module.exports = class LedgerService {
         ledgerA.debt += debt;   // Player B now has debt to player A
         ledgerB.debt -= debt;   // Player A has paid off some of the debt to player B
 
+        // NOTE: Don't need to add an event because there are already events for
+        // when credits are sent and technology is sent so would be useless to add another.
+        
         return ledgerA;
     }
 
@@ -65,6 +71,13 @@ module.exports = class LedgerService {
 
         await game.save();
 
+        this.emit('onDebtSettled', {
+            game,
+            debtor: playerA._id,
+            creditor: playerB._id,
+            amount: debtAmount
+        });
+
         return ledgerA;
     }
 
@@ -79,10 +92,19 @@ module.exports = class LedgerService {
             throw new ValidationError('The player does not owe you anything.');
         }
 
-        ledgerB.debt += ledgerA.debt; // Player B no longer has debt to player A
+        let debtAmount = ledgerA.debt;
+
+        ledgerB.debt += debtAmount; // Player B no longer has debt to player A
         ledgerA.debt = 0;             // Forgive Player B's debt.
 
         await game.save();
+
+        this.emit('onDebtForgiven', {
+            game,
+            debtor: playerB._id,
+            creditor: playerA._id,
+            amount: debtAmount
+        });
 
         return ledgerA;
     }

@@ -51,6 +51,10 @@
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-debt-forgiven :event="event" v-if="event.type === 'playerDebtForgiven'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-debt-settled :event="event" v-if="event.type === 'playerDebtSettled'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
 </div>
 </template>
@@ -79,6 +83,8 @@ import PlayerStarWarpGateBuiltVue from './events/PlayerStarWarpGateBuilt'
 import PlayerStarWarpGateDestroyedVue from './events/PlayerStarWarpGateDestroyed'
 import PlayerTechnologyReceivedVue from './events/PlayerTechnologyReceived'
 import PlayerTechnologySentVue from './events/PlayerTechnologySent'
+import PlayerDebtForgivenVue from './events/PlayerDebtForgiven'
+import PlayerDebtSettledVue from './events/PlayerDebtSettled'
 
 export default {
     components: {
@@ -104,7 +110,9 @@ export default {
         'player-star-warp-gate-built': PlayerStarWarpGateBuiltVue,
         'player-star-warp-gate-destroyed': PlayerStarWarpGateDestroyedVue,
         'player-technology-received': PlayerTechnologyReceivedVue,
-        'player-technology-sent': PlayerTechnologySentVue
+        'player-technology-sent': PlayerTechnologySentVue,
+        'player-debt-forgiven': PlayerDebtForgivenVue,
+        'player-debt-settled': PlayerDebtSettledVue
     },
     props: {
         event: Object

@@ -82,7 +82,9 @@ export default {
           'playerCreditsReceived',
           'playerCreditsSent',
           'playerRenownReceived',
-          'playerRenownSent'
+          'playerRenownSent',
+          'playerDebtSettled',
+          'playerDebtForgiven'
         ],
         combat: [
           'playerCombatCarrier',
