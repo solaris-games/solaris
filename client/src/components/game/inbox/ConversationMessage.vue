@@ -17,7 +17,7 @@
     </div>
     <div class="row bg-secondary mt-2">
         <div class="col">
-            <p class="mt-2 mb-2" v-if="message">{{message.message}}</p>
+            <p class="mt-2 mb-2" v-if="message" :class="{'truncate':isTruncated}">{{message.message}}</p>
             <p class="mt-2 mb-2" v-if="!message">No messages.</p>
         </div>
     </div>
@@ -35,7 +35,8 @@ export default {
     message: Object,
     sender: Object,
     colour: String,
-    isUnread: Boolean
+    isUnread: Boolean,
+    isTruncated: Boolean
   },
   methods: {
     getUserPlayer () {
@@ -59,5 +60,12 @@ export default {
 <style scoped>
 .container {
     cursor: pointer;
+}
+
+.truncate {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 </style>

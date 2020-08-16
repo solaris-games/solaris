@@ -18,6 +18,7 @@
           :message="conversation.lastMessage"
           :colour="getPlayerColour(conversation.playerId)"
           :isUnread="conversation.hasUnread"
+          :isTruncated="true"
           @onConversationOpenRequested="onConversationOpenRequested"
           class="mb-2"/>
     </div>
