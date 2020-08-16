@@ -416,14 +416,11 @@ module.exports = class GameTickService extends EventEmitter {
                 continue;
             }
             
-            let levelUpTech = await this.researchService.conductResearch(game, player);
+            let researchReport = await this.researchService.conductResearch(game, player);
 
-            if (levelUpTech) {
-                report.playerResearch.push({
-                    playerId: player._id,
-                    technology: levelUpTech
-                });
-            }
+            researchReport.playerId = player._id;
+
+            report.playerResearch.push(researchReport);
         }
     }
 
@@ -682,6 +679,17 @@ module.exports = class GameTickService extends EventEmitter {
 
             return c;
         });
+
+        // Filter out other player's research progress.
+        playerReport.playerResearch = playerReport.playerResearch
+            .filter(r => r.playerId === player.id || r.levelUp) // Get the player report or any other reports that have leveled up.
+            .map(r => {
+                if (r.playerId !== player.id) {
+                    delete r.progress; // Remove the progress if it isn't the current player.
+                }
+                
+                return r;
+            });
 
         this.broadcastService.gameTick(game, player._id, playerReport);
     }

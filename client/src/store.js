@@ -122,7 +122,11 @@ export default new Vuex.Store({
       for (let reportResearch of report.playerResearch) {
         let player = GameHelper.getPlayerById(state.game, reportResearch.playerId)
 
-        player.research[reportResearch.technology.name].level = reportResearch.technology.level
+        player.research[reportResearch.name].level = reportResearch.level
+
+        if (reportResearch.progress) {
+          player.research[reportResearch.name].progress = reportResearch.progress
+        }
       }
 
       // Update player for the end of a galactic cycle.
