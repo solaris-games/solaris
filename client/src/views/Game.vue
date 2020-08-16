@@ -79,6 +79,8 @@ export default {
         let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
 
         this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
+
+        document.title = 'Solaris - ' + galaxyResponse.data.settings.general.name
       } catch (err) {
         console.error(err)
       }
