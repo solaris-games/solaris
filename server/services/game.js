@@ -23,6 +23,13 @@ module.exports = class GameService extends EventEmitter {
             .exec();
     }
 
+    async getByIdLean(id, select) {
+        return await this.gameModel.findById(id)
+            .select(select)
+            .lean()
+            .exec();
+    }
+
     async getByIdGalaxy(id, select) {
         return await this.getById(id, {
             settings: 1,
@@ -32,8 +39,17 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async getByIdGalaxyLean(id, select) {
+        return await this.getByIdLean(id, {
+            settings: 1,
+            state: 1,
+            galaxy: 1,
+            constants: 1
+        });
+    }
+
     async getByIdInfo(id) {
-        return await this.getById(id, {
+        return await this.getByIdLean(id, {
             settings: 1,
             state: 1
         });
@@ -41,6 +57,15 @@ module.exports = class GameService extends EventEmitter {
 
     async getByIdMessages(id) {
         return await this.getById(id, {
+            settings: 1,
+            state: 1,
+            messages: 1,
+            'galaxy.players': 1
+        });
+    }
+
+    async getByIdMessagesLean(id) {
+        return await this.getByIdLean(id, {
             settings: 1,
             state: 1,
             messages: 1,
@@ -110,7 +135,7 @@ module.exports = class GameService extends EventEmitter {
 
         await game.save();
 
-        let user = await this.getPlayerUser(game, player.id);
+        let user = await this.getPlayerUser(game, player._id);
         user.achievements.joined++;
         await user.save();
 
@@ -185,7 +210,7 @@ module.exports = class GameService extends EventEmitter {
         // Remove all carrier waypoints (unless in transit)
         this.carrierService.clearPlayerCarrierWaypointsNonTransit(game, player);
 
-        let userPlayer = await this.getPlayerUser(game, player.id);
+        let userPlayer = await this.getPlayerUser(game, player._id);
         userPlayer.achievements.defeated++;
         await userPlayer.save();
 
@@ -198,9 +223,15 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async getPlayerUser(game, playerId) {
-        let player = game.galaxy.players.find(p => p.id === playerId);
+        let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
 
         return await this.userService.getInfoById(player.userId);
+    }
+
+    async getPlayerUserLean(game, playerId) {
+        let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
+
+        return await this.userService.getInfoByIdLean(player.userId);
     }
 
     // TODO: All of below needs a rework. A game is started if the start date is less than now and the game hasn't finished

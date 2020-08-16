@@ -23,7 +23,9 @@ module.exports = class UserService extends EventEmitter {
             password: 0,
             resetPasswordToken: 0,
             premiumEndDate: 0
-        });
+        })
+        .lean()
+        .exec();
     }
 
     async getById(id) {
@@ -42,6 +44,21 @@ module.exports = class UserService extends EventEmitter {
             username: 0
         });
     }
+
+    async getInfoByIdLean(id) {
+        return await this.userModel.findById(id, {
+            // Remove fields we don't want to send back.
+            password: 0,
+            resetPasswordToken: 0,
+            premiumEndDate: 0,
+            credits: 0,
+            email: 0,
+            emailEnabled: 0,
+            username: 0
+        })
+        .lean()
+        .exec();
+    }
     
     async getEmailById(id) {
         return await this.userModel.findById(id, {
@@ -57,7 +74,9 @@ module.exports = class UserService extends EventEmitter {
             username: 1,
             contributor: 1,
             developer: 1
-        });
+        })
+        .lean()
+        .exec();
     }
 
     async getUsernameByEmail(email) {

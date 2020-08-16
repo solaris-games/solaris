@@ -40,6 +40,16 @@ module.exports = (container) => {
             return next();
         },
 
+        async loadGameLean(req, res, next) {
+            // If the request URL contains a game id then
+            // append it to the request object.
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdGalaxyLean(req.params.gameId);
+            }
+
+            return next();
+        },
+
         async loadGameAll(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdAll(req.params.gameId);
@@ -59,6 +69,24 @@ module.exports = (container) => {
         async loadGameMessages(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdMessages(req.params.gameId);
+            }
+
+            return next();
+        },
+
+        async loadGameMessagesLean(req, res, next) {
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdMessagesLean(req.params.gameId);
+            }
+
+            return next();
+        },
+
+        async loadGamePlayers(req, res, next) {
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                    'galaxy.players': 1
+                });
             }
 
             return next();
@@ -84,6 +112,18 @@ module.exports = (container) => {
             container.playerService.updateLastSeen(player);
 
             await req.game.save();
+
+            return next();
+        },
+
+        async loadPlayerLean(req, res, next) {
+            let player = container.playerService.getByUserId(req.game, req.session.userId);
+
+            if (!player) {
+                throw new ValidationError('You are not participating in this game.');
+            }
+
+            req.player = player;
 
             return next();
         },

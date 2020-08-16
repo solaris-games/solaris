@@ -41,7 +41,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/galaxy', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.get('/api/game/:gameId/galaxy', middleware.authenticate, middleware.loadGameLean, async (req, res, next) => {
         try {
             let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);
 
@@ -137,9 +137,9 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.get('/api/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayers, async (req, res, next) => {
         try {
-            let user = await container.gameService.getPlayerUser(
+            let user = await container.gameService.getPlayerUserLean(
                 req.game,
                 req.params.playerId
             );
@@ -150,7 +150,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
         try {
             let events = await container.eventService.getPlayerEvents(
                 req.game,

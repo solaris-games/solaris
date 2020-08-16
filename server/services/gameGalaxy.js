@@ -17,8 +17,6 @@ module.exports = class GameGalaxyService {
     }
 
     async getGalaxy(game, userId) {
-        game = game.toObject();
-
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
         

@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/api/game/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessagesLean, middleware.loadPlayerLean, async (req, res, next) => {
         try {
             let result = await container.messageService.getConversation(
                 req.game,
@@ -21,7 +21,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessagesLean, middleware.loadPlayerLean, async (req, res, next) => {
         try {
             let result = container.messageService.summary(
                 req.game,
@@ -33,7 +33,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/message/unread', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/unread', middleware.authenticate, middleware.loadGameMessagesLean, middleware.loadPlayerLean, async (req, res, next) => {
         try {
             let result = await container.messageService.getUnreadCount(
                 req.game,

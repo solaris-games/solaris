@@ -25,6 +25,7 @@ module.exports = class GameListService {
             'state.startDate': { $eq: null }
         })
         .select(SELECTS.INFO)
+        .lean()
         .exec();
     }
 
@@ -34,6 +35,7 @@ module.exports = class GameListService {
             'state.startDate': { $eq: null }
         })
         .select(SELECTS.INFO)
+        .lean()
         .exec();
     }
 
@@ -53,6 +55,7 @@ module.exports = class GameListService {
             ]
         })
         .select(SELECTS.INFO)
+        .lean()
         .exec();
     }
 
@@ -68,6 +71,7 @@ module.exports = class GameListService {
             'state.endDate': -1 // Sort end date descending
         })
         .select(SELECTS.INFO)
+        .lean()
         .exec();
     }
 

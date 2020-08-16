@@ -11,6 +11,7 @@ module.exports = class HistoryService {
         return await this.historyModel.find({
             gameId
         })
+        .lean()
         .exec();
     }
 

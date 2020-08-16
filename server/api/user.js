@@ -69,7 +69,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/user/:id', middleware.authenticate, async (req, res, next) => {
         try {
-            let user = await container.userService.getInfoById(req.params.id);
+            let user = await container.userService.getInfoByIdLean(req.params.id);
 
             return res.status(200).json(user);
         } catch (err) {
