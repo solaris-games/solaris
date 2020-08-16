@@ -10,7 +10,8 @@ class TextureService {
     constructor () {
         this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
             fontFamily: `'Space Mono', monospace`,
-            fill: 0xFFFFFF
+            fill: 0xFFFFFF,
+            padding: 3
         })
 
         this.STAR_BASE_TEXTURE = new PIXI.BaseTexture.from(require('../assets/star.png'))
