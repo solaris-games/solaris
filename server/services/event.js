@@ -52,7 +52,7 @@ module.exports = class EventService {
             args.game, args.defender, args.attacker, args.star, args.friendlyCarrier, args.enemyCarrier, args.combatResult));
         this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
             args.game, args.defender, args.attacker, args.star, args.enemyCarrier, args.combatResult));
-        this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.captureReward));
+        this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
             args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount));
             

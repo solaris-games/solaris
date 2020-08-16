@@ -370,12 +370,14 @@ module.exports = class GameTickService extends EventEmitter {
             this.emit('onStarCaptured', {
                 game,
                 player: attacker,
+                star,
                 captureReward
             });
             
             this.emit('onStarCaptured', {
                 game,
                 player: defender,
+                star,
                 captureReward
             });
         }
