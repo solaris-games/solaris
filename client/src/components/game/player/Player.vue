@@ -45,7 +45,8 @@
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"/>
+    <sendRenown v-if="game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"
+      @onRenownSent="onRenownSent"/>
 
     <!--
     <h4 class="mt-2">Badges</h4>
@@ -145,6 +146,9 @@ export default {
       let player = this.$store.state.game.galaxy.players[e]
 
       this.$emit('onOpenPlayerDetailRequested', player._id)
+    },
+    onRenownSent (e) {
+      this.user.achievements.renown += e
     }
   },
   computed: {

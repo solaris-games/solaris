@@ -17,6 +17,7 @@
 
 <script>
 import tradeService from '../../../services/api/trade'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
@@ -37,11 +38,11 @@ export default {
         let response = await tradeService.sendRenown(this.$store.state.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
-          this.$emit('onRenownSent', this.amount)
-
           this.$toasted.show(`Sent ${this.amount} renown to ${this.player.alias}.`)
 
           this.userPlayer.renownToGive -= this.amount
+          
+          this.$emit('onRenownSent', this.amount)
         }
       } catch (err) {
         console.error(err)
