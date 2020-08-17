@@ -67,7 +67,7 @@ module.exports = class ResearchService extends EventEmitter {
             this.emit('onPlayerResearchCompleted', {
                 game,
                 player,
-                technology: levelUpTech
+                technology: {name:techKey,level:tech.level}
             });
 
             player.researchingNow = player.researchingNext;
