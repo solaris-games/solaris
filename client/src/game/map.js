@@ -250,7 +250,7 @@ class Map extends EventEmitter {
     this.rulerPoints.setup(this.game)
   }
 
-  zoomToPlayer (game, player) {
+  panToPlayer (game, player) {
     // Find the home star the player owns.
     let homeStar = game.galaxy.stars.find(x => {
       return x._id === player.homeStarId
@@ -260,8 +260,6 @@ class Map extends EventEmitter {
       return
     }
 
-    gameContainer.viewport.fitWorld()
-    gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true)
     gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y)
 
     let zoomPercent = gameContainer.getViewportZoomPercentage()
@@ -269,27 +267,25 @@ class Map extends EventEmitter {
     this.refreshZoom(zoomPercent)
   }
 
-  zoomToUser (game) {
+  panToUser (game) {
     let player = GameHelper.getUserPlayer(game)
 
     if (!player) {
       return
     }
 
-    this.zoomToPlayer(game, player)
+    this.panToPlayer(game, player)
   }
 
-  zoomToStar (star) {
-    this.zoomToLocation(star.location)
+  panToStar (star) {
+    this.panToLocation(star.location)
     
     let zoomPercent = gameContainer.getViewportZoomPercentage()
 
     this.refreshZoom(zoomPercent)
   }
 
-  zoomToLocation (location) {
-    gameContainer.viewport.fitWorld()
-    gameContainer.viewport.zoom(-gameContainer.viewport.worldWidth, true)
+  panToLocation (location) {
     gameContainer.viewport.moveCenter(location.x, location.y)
   }
 

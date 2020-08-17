@@ -63,11 +63,11 @@ export default {
     updateGame (game) {
       this.gameContainer.reloadGame(game)
     },
-    drawGame (game, zoomToUser = true) {
+    drawGame (game, panToUser = true) {
       this.gameContainer.draw()
 
-      if (zoomToUser) {
-        this.gameContainer.map.zoomToUser(game)
+      if (panToUser) {
+        this.gameContainer.map.panToUser(game)
       }
     },
     handleResize (e) {

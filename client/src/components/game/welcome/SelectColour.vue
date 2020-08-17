@@ -21,7 +21,7 @@
                         <h5 style="vertical-align: middle;">{{player.alias}}</h5>
                     </td>
                     <td class="fit pl-2 pt-2 pb-2 pr-2">
-                        <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
                         <button class="btn btn-success ml-1" @click="onJoinRequested(player)" v-if="player.isEmptySlot">Join</button>
                     </td>
                 </tr>
@@ -53,8 +53,8 @@ export default {
     onJoinRequested (player) {
       this.$emit('onJoinRequested', player._id)
     },
-    zoomToPlayer (player) {
-      gameContainer.map.zoomToPlayer(this.$store.state.game, player)
+    panToPlayer (player) {
+      gameContainer.map.panToPlayer(this.$store.state.game, player)
     }
   },
 

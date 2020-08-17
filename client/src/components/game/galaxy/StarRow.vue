@@ -56,7 +56,7 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
-      gameContainer.map.zoomToStar(this.star)
+      gameContainer.map.panToStar(this.star)
     },
     refreshCredits () {
       this.availableCredits = gameHelper.getUserPlayer(this.$store.state.game).credits

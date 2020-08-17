@@ -43,8 +43,7 @@ export default {
       this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
     },
     goToCarrier (e) {
-      gameContainer.map.zoomToLocation(this.carrier.location)
-      // TODO: Call viewport zoom
+      gameContainer.map.panToLocation(this.carrier.location)
     },
     recalculateTimeRemaining () {
       let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 

@@ -45,7 +45,7 @@
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
-                          <button class="btn btn-info" @click="zoomToPlayer(player)"><i class="fas fa-eye"></i></button>
+                          <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
                       </td>
                   </tr>
               </tbody>
@@ -112,10 +112,8 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    zoomToPlayer (player) {
-      gameContainer.map.zoomToPlayer(this.$store.state.game, player)
-
-      this.$emit('onOpenPlayerDetailRequested', player._id);
+    panToPlayer (player) {
+      gameContainer.map.panToPlayer(this.$store.state.game, player)
     },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)

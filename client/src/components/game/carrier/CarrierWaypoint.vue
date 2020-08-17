@@ -86,7 +86,7 @@ export default {
         // Make a copy of the carriers waypoints.
         this.waypoints = JSON.parse(JSON.stringify(this.carrier.waypoints))
         this.currentWaypoint = this.waypoints.find(x => x._id === this.waypoint._id)
-        this.zoomToWaypoint()
+        this.panToWaypoint()
     },
 	methods: {
 		onCloseRequested (e) {
@@ -142,7 +142,7 @@ export default {
             }
 
             this.currentWaypoint = this.waypoints[index]
-            this.zoomToWaypoint()
+            this.panToWaypoint()
         },
         nextWaypoint () {
             let index = this.waypoints.indexOf(this.currentWaypoint)
@@ -154,12 +154,12 @@ export default {
             }
 
             this.currentWaypoint = this.waypoints[index]
-            this.zoomToWaypoint()
+            this.panToWaypoint()
         },
-        zoomToWaypoint () {
+        panToWaypoint () {
             let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
 
-            GameContainer.map.zoomToStar(star)
+            GameContainer.map.panToStar(star)
         },
         toggleLooped () {
 			this.carrier.waypointsLooped = !this.carrier.waypointsLooped
