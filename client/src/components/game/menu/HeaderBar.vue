@@ -11,10 +11,14 @@
             <span v-if="gameIsInProgress()">Production: {{timeRemaining}}</span>
             <span v-if="gameIsPendingStart()">Starts In: {{timeRemaining}}</span>
         </div>
-        <div class="col-auto text-right pr-0" v-if="userPlayer">
-            <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
+        <div class="col-auto text-right" v-if="userPlayer">
+            <span>
+                <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
+            </span>
+            
+            <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
 
-            <span class="d-none d-sm-inline-block ml-2">
+            <span class="d-none d-sm-inline-block ml-4">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
             <span class="d-none d-sm-inline-block ml-2">
@@ -85,14 +89,15 @@ import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus'
+import ResearchProgressVue from './ResearchProgress'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
-import gameHelper from '../../../services/gameHelper'
 
 export default {
     components: {
-        'server-connection-status': ServerConnectionStatusVue
+        'server-connection-status': ServerConnectionStatusVue,
+        'research-progress': ResearchProgressVue
     },
     data () {
         return {
@@ -154,6 +159,9 @@ export default {
         goToMyGames () {
             router.push({ name: 'game-active-games' })
         },
+        onViewResearchRequested (e) {
+            this.setMenuState(this.MENU_STATES.RESEARCH, e)
+        },
         fitGalaxy () {
             GameContainer.viewport.fitWorld()
             GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
@@ -194,12 +202,12 @@ export default {
             return GameHelper.getGameStatusText(this.$store.state.game)
         },
         async checkForUnreadMessages () {
-            let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+            let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
             if (!userPlayer) {
                 return
             }
-            
+
             try {
                 let response = await MessageApiService.getUnreadCount(this.$store.state.game._id)
 
