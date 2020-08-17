@@ -80,7 +80,7 @@ export default {
 
         this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
 
-        document.title = 'Solaris - ' + galaxyResponse.data.settings.general.name
+        document.title = galaxyResponse.data.settings.general.name + ' - Solaris'
       } catch (err) {
         console.error(err)
       }
