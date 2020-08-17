@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/api/game/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessagesLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/conversation/:fromPlayerId', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayerLean, async (req, res, next) => {
         try {
             let result = await container.messageService.getConversation(
                 req.game,
