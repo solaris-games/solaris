@@ -119,4 +119,7 @@ export default {
 </script>
 
 <style scoped>
+td {
+  padding: 12px 6px !important;
+}
 </style>

@@ -88,6 +88,7 @@ import ServerConnectionStatusVue from './ServerConnectionStatus'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
     components: {
@@ -193,6 +194,12 @@ export default {
             return GameHelper.getGameStatusText(this.$store.state.game)
         },
         async checkForUnreadMessages () {
+            let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
+            if (!userPlayer) {
+                return
+            }
+            
             try {
                 let response = await MessageApiService.getUnreadCount(this.$store.state.game._id)
 
