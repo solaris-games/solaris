@@ -21,7 +21,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessagesLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/message/conversations', middleware.authenticate, middleware.loadGameMessages, middleware.loadPlayerLean, async (req, res, next) => {
         try {
             let result = container.messageService.summary(
                 req.game,
