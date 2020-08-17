@@ -1,10 +1,6 @@
 <template>
 <div v-if="player">
-  <div class="row" :style="{'background-color': getFriendlyColour(player.colour.value)}">
-      <div class="col">
-          <h4 class="pt-2">{{player.alias}} <span v-if="player.userId">(You)</span></h4>
-      </div>
-  </div>
+  <player-title :player="player"/>
 
   <div class="row">
       <div class="col-auto">
@@ -29,11 +25,13 @@
 
 <script>
 import Statistics from './Statistics'
+import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
-    'statistics': Statistics
+    'statistics': Statistics,
+    'player-title': PlayerTitleVue
   },
   props: {
     player: Object
@@ -47,9 +45,6 @@ export default {
     this.gameHasStarted = this.$store.state.game.state.startDate != null
   },
   methods: {
-    getFriendlyColour (colour) {
-      return gameHelper.getFriendlyColour(colour)
-    },
     onViewConversationRequested (e) {
       this.$emit('onViewConversationRequested', this.player._id)
     },

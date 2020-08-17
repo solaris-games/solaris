@@ -52,7 +52,8 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onOpenInboxRequested="onOpenInboxRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY" 
         @onCloseRequested="onCloseRequested"
@@ -163,6 +164,9 @@ export default {
     },
     onEditWaypointRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_WAYPOINT_DETAIL, e)
+    },
+    onOpenInboxRequested (e) {
+      this.changeMenuState(MENU_STATES.INBOX, e)
     }
   },
   computed: {

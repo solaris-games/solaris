@@ -1,10 +1,11 @@
 <template>
 <div class="container pb-2">
-  <menu-title title="Conversation" @onCloseRequested="onCloseRequested"/>
+  <menu-title title="Conversation" @onCloseRequested="onCloseRequested">
+    <button class="btn btn-primary" @click="onOpenInboxRequested"><i class="fas fa-inbox"></i></button>
+  </menu-title>
 
-  <player-overview :player="getPlayer(fromPlayerId)"
-    @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
-
+  <player-title :player="getPlayer(fromPlayerId)"/>
+    
   <loading-spinner :loading="!messages"/>
 
   <div v-if="messages">
@@ -31,7 +32,7 @@
 import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
 import MenuTitle from '../MenuTitle'
-import PlayerOverview from '../player/Overview'
+import PlayerTitleVue from '../player/PlayerTitle'
 import ComposeMessage from './ComposeMessage'
 import ConversationMessageVue from './ConversationMessage'
 import gameHelper from '../../../services/gameHelper'
@@ -42,7 +43,7 @@ export default {
     'menu-title': MenuTitle,
     'compose-message': ComposeMessage,
     'conversation-message': ConversationMessageVue,
-    'player-overview': PlayerOverview
+    'player-title': PlayerTitleVue
   },
   props: {
     fromPlayerId: String
@@ -65,8 +66,8 @@ export default {
     onCloseRequested (e) {
         this.$emit('onCloseRequested', e)
     },
-    onViewCompareIntelRequested (e) {
-      this.$emit('onViewCompareIntelRequested', e)
+    onOpenInboxRequested (e) {
+      this.$emit('onOpenInboxRequested', e)
     },
     getPlayer (playerId) {
       return this.$store.state.game.galaxy.players.find(p => p._id === playerId)
