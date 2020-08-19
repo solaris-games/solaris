@@ -462,6 +462,10 @@ module.exports = class GameTickService extends EventEmitter {
                     experimentTechnologyLevel: experimentResult.level
                 });
             }
+
+            this.emit('onGameGalacticCycleTicked', {
+                game
+            });
         }
     }
 
