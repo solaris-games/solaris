@@ -690,6 +690,7 @@ module.exports = class GameTickService extends EventEmitter {
             .map(r => {
                 if (r.playerId !== player.id) {
                     delete r.progress; // Remove the progress if it isn't the current player.
+                    delete r.currentResearchTicksEta;
                 }
                 
                 return r;

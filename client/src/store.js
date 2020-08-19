@@ -127,6 +127,11 @@ export default new Vuex.Store({
         if (reportResearch.progress) {
           player.research[reportResearch.name].progress = reportResearch.progress
         }
+
+        // Update the current research ETA
+        if (reportResearch.currentResearchTicksEta != null) {
+          player.currentResearchTicksEta = reportResearch.currentResearchTicksEta
+        }
       }
 
       // Update player for the end of a galactic cycle.

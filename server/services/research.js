@@ -75,13 +75,16 @@ module.exports = class ResearchService extends EventEmitter {
             levelUp = true
         }
 
+        let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
+
         await user.save();
 
         let report = {
             name: techKey,
             level: tech.level,
             progress: tech.progress,
-            levelUp
+            levelUp,
+            currentResearchTicksEta
         }
         
         return report;
