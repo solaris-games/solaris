@@ -124,13 +124,29 @@ export default new Vuex.Store({
 
         player.research[reportResearch.name].level = reportResearch.level
 
-        if (reportResearch.progress) {
+        if (reportResearch.progress != null) {
           player.research[reportResearch.name].progress = reportResearch.progress
         }
 
         // Update the current research ETA
         if (reportResearch.currentResearchTicksEta != null) {
           player.currentResearchTicksEta = reportResearch.currentResearchTicksEta
+        }
+      }
+
+      // Update player experiments
+      for (let reportExperiment of report.playerExperiments) {
+        let player = GameHelper.getPlayerById(state.game, reportExperiment.playerId)
+
+        player.research[reportExperiment.technology].level = reportExperiment.level
+
+        if (reportExperiment.progress != null) {
+          player.research[reportExperiment.technology].progress = reportExperiment.progress
+        }
+
+        // Update the current research ETA
+        if (reportExperiment.currentResearchTicksEta != null) {
+          player.currentResearchTicksEta = reportExperiment.currentResearchTicksEta
         }
       }
 

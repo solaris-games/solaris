@@ -128,15 +128,24 @@ module.exports = class ResearchService extends EventEmitter {
         // then increase the level and carry over the remainder.
         let requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
 
+        let levelUp = false;
+
         while (tech.progress >= requiredProgress) {
             tech.level++;
             tech.progress -= requiredProgress;
+            levelUp = true;
         }
+
+        // The current research may have been the one experimented on, so make sure we get the ETA of it.
+        let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
 
         return {
             technology: techKey,
             level: tech.level,
-            amount: researchAmount
+            progress: tech.progress,
+            amount: researchAmount,
+            levelUp,
+            currentResearchTicksEta
         };
     }
 

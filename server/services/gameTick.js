@@ -55,6 +55,7 @@ module.exports = class GameTickService extends EventEmitter {
             stars: [],
             players: [],
             playerResearch: [],
+            playerExperiments: [],
             playerGalacticCycleReport: []
         };
 
@@ -443,7 +444,7 @@ module.exports = class GameTickService extends EventEmitter {
                 }
                 
                 let creditsResult = this._givePlayerMoney(game, player);
-                let experimentResult = this._conductExperiments(game, player);
+                let experimentResult = this._conductExperiments(game, player, report);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -485,8 +486,14 @@ module.exports = class GameTickService extends EventEmitter {
         };
     }
 
-    _conductExperiments(game, player) {
-        return this.researchService.conductExperiments(game, player);
+    _conductExperiments(game, player, report) {
+        let experimentReport = this.researchService.conductExperiments(game, player);
+
+        experimentReport.playerId = player._id;
+
+        report.playerExperiments.push(experimentReport);
+
+        return experimentReport;
     }
 
     _logHistory(game) {
@@ -690,6 +697,19 @@ module.exports = class GameTickService extends EventEmitter {
             .map(r => {
                 if (r.playerId !== player.id) {
                     delete r.progress; // Remove the progress if it isn't the current player.
+                    delete r.currentResearchTicksEta;
+                }
+                
+                return r;
+            });
+
+        // Filter out other player's experiments
+        playerReport.playerExperiments = playerReport.playerExperiments
+            .filter(r => r.playerId === player.id || r.levelUp) // Get the player report or any other reports that have leveled up.
+            .map(r => {
+                if (r.playerId !== player.id) {
+                    delete r.progress; // Remove the new research progress if it isn't the current player.
+                    delete r.amount; // Remove the experiment amount if it isn't the current player.
                     delete r.currentResearchTicksEta;
                 }
                 
