@@ -3,12 +3,13 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(starService, carrierService, userService) {
+    constructor(starService, carrierService, userService, researchService) {
         super();
         
         this.starService = starService;
         this.carrierService = carrierService;
         this.userService = userService;
+        this.researchService = researchService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -188,7 +189,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async upgradeScience(game, player, starId) {
-        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
+        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
+
+        report.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(game, player);
+
+        return report;
     }
 
     async upgradeBulk(game, player, infrastructureType, amount) {

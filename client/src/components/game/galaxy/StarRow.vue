@@ -62,7 +62,14 @@ export default {
       this.availableCredits = gameHelper.getUserPlayer(this.$store.state.game).credits
     },
     onInfrastructureUpgraded (infrastructure, data) {
-      gameHelper.getUserPlayer(this.$store.state.game).credits -= data.cost
+      let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
+      userPlayer.credits -= data.cost
+
+      if (data.currentResearchTicksEta != null) {
+        userPlayer.currentResearchTicksEta = data.currentResearchTicksEta
+      }
+
       this.star.upgradeCosts[infrastructure] = data.nextCost
       this.star.infrastructure[infrastructure] = data.infrastructure
 

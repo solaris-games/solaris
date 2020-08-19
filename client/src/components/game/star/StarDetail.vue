@@ -210,7 +210,14 @@ export default {
       return GameHelper.isGameInProgress(this.$store.state.game)
     },
     onInfrastructureUpgraded (e) {
-      this.getStarOwningPlayer().credits -= e.data.cost
+      let starOwningPlayer = this.getStarOwningPlayer()
+      
+      starOwningPlayer.credits -= e.data.cost
+
+      if (e.data.currentResearchTicksEta != null) {
+        starOwningPlayer.currentResearchTicksEta = e.data.currentResearchTicksEta
+      }
+
       this.star.upgradeCosts[e.infrastructureKey] = e.data.nextCost
       this.star.infrastructure[e.infrastructureKey] = e.data.infrastructure
 
