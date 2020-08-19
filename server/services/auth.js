@@ -8,9 +8,11 @@ module.exports = class AuthService {
     }
 
     async login(email, password) {
+        email = email.trim();
+
         // Try to find the user by email
         let user = await this.userModel.findOne({
-            email: email
+            email
         });
         
         if (!user) {

@@ -80,6 +80,8 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async getUsernameByEmail(email) {
+        email = email.trim();
+
         let user = await this.userModel.findOne({email}, {
             username: 1
         });
@@ -92,7 +94,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async create(user) {
-        if (user.username.trim().length < 3 || user.username.trim().length > 24) {
+        user.username = user.username.trim();
+        user.email = user.email.trim();
+
+        if (user.username.length < 3 || user.username.length > 24) {
             throw new ValidationError('Username must be between 3 and 24 characters.');
         }
 
@@ -108,6 +113,8 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async userExists(email) {
+        email = email.trim();
+
         let user = await this.userModel.findOne({
             email: email
         });
@@ -116,8 +123,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async usernameExists(username) {
+        username = username.trim();
+
         let user = await this.userModel.findOne({
-            username: username
+            username
         });
 
         return user != null;
@@ -132,6 +141,8 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async updateEmailAddress(id, email) {
+        email = email.trim();
+
         let user = await this.userModel.findById(id);
         
         if (await this.userExists(email)) {
@@ -144,7 +155,9 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async updateUsername(id, username) {
-        if (username.trim().length < 3 || username.trim().length > 24) {
+        username = username.trim();
+
+        if (username.length < 3 || username.length > 24) {
             throw new ValidationError('Username must be between 3 and 24 characters.');
         }
 
@@ -178,6 +191,8 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async requestResetPassword(email) {
+        email = email.trim();
+
         let user = await this.userModel.findOne({
             email
         });
