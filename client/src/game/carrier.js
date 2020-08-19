@@ -14,7 +14,7 @@ class Carrier extends EventEmitter {
     this.container.on('pointerdown', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
-    
+
     this.isMouseOver = false
     this.zoomPercent = 0
   }
@@ -45,7 +45,7 @@ class Carrier extends EventEmitter {
     }
 
     this.graphics_colour.clear()
-    
+
     if (!this.data.orbiting) {
       this.graphics_colour.lineStyle(1, this.colour)
       this.graphics_colour.drawCircle(this.data.location.x, this.data.location.y, 4)
@@ -93,10 +93,10 @@ class Carrier extends EventEmitter {
     if (!this.text_garrison) {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
-  
+
       this.text_garrison = new PIXI.Text('', style)
       this.text_garrison.resolution = 10
-  
+
       this.container.addChild(this.text_garrison)
     }
 
@@ -140,7 +140,7 @@ class Carrier extends EventEmitter {
 
       // Draw a line to each destination along the waypoints.
       let star = this.stars.find(s => s.data._id === waypoint.destination)
-        
+
       this.graphics_waypoints.lineTo(star.data.location.x, star.data.location.y)
     }
   }
@@ -161,11 +161,11 @@ class Carrier extends EventEmitter {
     this.emit('onCarrierMouseOut', this.data)
   }
 
-  getAngleTowardsLocation(source, destination) {
-    let deltaX = destination.x - source.x;
-    let deltaY = destination.y - source.y;
+  getAngleTowardsLocation (source, destination) {
+    let deltaX = destination.x - source.x
+    let deltaY = destination.y - source.y
 
-    return Math.atan2(deltaY, deltaX);
+    return Math.atan2(deltaY, deltaX)
   }
 
   refreshZoom (zoomPercent) {

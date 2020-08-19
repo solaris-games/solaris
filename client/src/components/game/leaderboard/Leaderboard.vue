@@ -36,7 +36,7 @@
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
-                          <h5>{{player.alias}} 
+                          <h5>{{player.alias}}
                             <span v-if="player.defeated && !player.afk">(DEFEATED)</span>
                             <span v-if="player.defeated && player.afk">(AFK)</span>
                           </h5>
@@ -98,14 +98,14 @@ export default {
   },
 
   data () {
-      return {
-          players: [],
-          sortedPlayers: []
-      }
+    return {
+      players: [],
+      sortedPlayers: []
+    }
   },
   mounted () {
-      this.players = this.$store.state.game.galaxy.players
-      this.sortedPlayers = this.getSortedLeaderboardPlayerList()
+    this.players = this.$store.state.game.galaxy.players
+    this.sortedPlayers = this.getSortedLeaderboardPlayerList()
   },
 
   methods: {
@@ -161,7 +161,7 @@ export default {
         if (response.status === 200) {
           AudioService.quit()
           this.$toasted.show(`You have quit ${this.$store.state.game.settings.general.name}.`, { type: 'error' })
-            router.push({ name: 'main-menu' })
+          router.push({ name: 'main-menu' })
         }
       } catch (err) {
         console.error(err)
@@ -196,7 +196,7 @@ export default {
     this.sockets.unsubscribe('gamePlayerJoined')
     this.sockets.unsubscribe('gamePlayerQuit')
   },
-  
+
   computed: {
     game () {
       return this.$store.state.game

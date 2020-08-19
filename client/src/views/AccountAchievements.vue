@@ -19,7 +19,7 @@
     </div>
 
     <loading-spinner :loading="!user"/>
-    
+
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
     <p class="text-center pt-3 mb-3">Read more about <a href="javascript:;">Victory, Rank and Renown</a>.</p>
@@ -130,7 +130,7 @@
         <pie-chart v-if="infrastructureChartData" :chart-data="infrastructureChartData" :options="pieChartOptions" />
       </div>
     </div>
-    
+
     <view-subtitle title="Research"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
@@ -409,10 +409,10 @@ export default {
         },
         tooltips: {
           callbacks: {
-            title: function(tooltipItems, data) {
-              return data.datasets[tooltipItems[0].datasetIndex].label;
+            title: function (tooltipItems, data) {
+              return data.datasets[tooltipItems[0].datasetIndex].label
             },
-            label: function(tooltipItem, data) {
+            label: function (tooltipItem, data) {
               // If the star dataset, use the label "Captured"
               // instead of "Kills"
               let label = data.labels[tooltipItem.index]
@@ -420,7 +420,7 @@ export default {
               if (tooltipItem.datasetIndex === 2) {
                 label = tooltipItem.index ? 'Losses' : 'Captured'
               }
-              
+
               return label + ': ' +
                 data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
             }
@@ -433,8 +433,8 @@ export default {
         },
         tooltips: {
           callbacks: {
-            title: function(tooltipItems, data) {
-              return data.datasets[tooltipItems[0].datasetIndex].label;
+            title: function (tooltipItems, data) {
+              return data.datasets[tooltipItems[0].datasetIndex].label
             }
           }
         }
@@ -553,7 +553,7 @@ export default {
           data: [
             this.user.achievements.infrastructure.economy,
             this.user.achievements.infrastructure.industry,
-            this.user.achievements.infrastructure.science,
+            this.user.achievements.infrastructure.science
           ],
           backgroundColor: [
             '#00bc8c',
@@ -576,7 +576,7 @@ export default {
           'Weapons',
           'Banking',
           'Manufacturing',
-          'Experimentation',
+          'Experimentation'
         ],
         datasets: [{
           data: [

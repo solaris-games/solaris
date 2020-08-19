@@ -62,8 +62,8 @@
       <infrastructureUpgrade v-if="getStarOwningPlayer() != null && getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated && star.upgradeCosts != null"
         :star="star"
         :availableCredits="getUserPlayer().credits"
-        :economy="star.upgradeCosts.economy" 
-        :industry="star.upgradeCosts.industry" 
+        :economy="star.upgradeCosts.economy"
+        :industry="star.upgradeCosts.industry"
         :science="star.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
@@ -119,7 +119,7 @@
       -->
     </div>
 
-    <playerOverview v-if="getStarOwningPlayer()" :player="getStarOwningPlayer()" 
+    <playerOverview v-if="getStarOwningPlayer()" :player="getStarOwningPlayer()"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 
@@ -180,7 +180,7 @@ export default {
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
     let userPlayer = this.getUserPlayer()
-    
+
     if (userPlayer) {
       this.currentPlayerId = userPlayer._id
     }
@@ -211,7 +211,7 @@ export default {
     },
     onInfrastructureUpgraded (e) {
       let starOwningPlayer = this.getStarOwningPlayer()
-      
+
       starOwningPlayer.credits -= e.data.cost
 
       if (e.data.currentResearchTicksEta != null) {

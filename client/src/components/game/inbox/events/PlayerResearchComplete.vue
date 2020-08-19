@@ -11,7 +11,7 @@ import TechnologyHelper from '../../../../services/technologyHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

@@ -12,11 +12,11 @@ class GameContainer {
     if (this.app) {
       this.app.destroy(false, {
         children: true
-      });
+      })
     }
 
     if (this.viewport) {
-      this.viewport.destroy();
+      this.viewport.destroy()
     }
 
     this.app = new PIXI.Application({
@@ -26,7 +26,7 @@ class GameContainer {
       resolution: window.devicePixelRatio || 1,
       autoResize: true
     })
-    
+
     // create viewport
     this.viewport = new Viewport({
       screenWidth: window.innerWidth,
@@ -147,7 +147,7 @@ class GameContainer {
 
     this.map.refreshZoom(zoomPercent)
   }
-  
+
   setMode (mode, args) {
     this.map.setMode(mode, args)
   }

@@ -62,30 +62,30 @@ export default {
       let sorter = (a, b) => a.name.localeCompare(b.name)
 
       let starShips = this.$store.state.game.galaxy.stars
-      .filter(s => s.garrison)
-      .map(s => {
-        return {
-          _id: s._id,
-          ownedByPlayerId: s.ownedByPlayerId,
-          name: s.name,
-          ships: s.garrison,
-          type: 0,
-          location: s.location
-        }
-      })
+        .filter(s => s.garrison)
+        .map(s => {
+          return {
+            _id: s._id,
+            ownedByPlayerId: s.ownedByPlayerId,
+            name: s.name,
+            ships: s.garrison,
+            type: 0,
+            location: s.location
+          }
+        })
 
       let carrierShips = this.$store.state.game.galaxy.carriers
-      .filter(s => s.ships)
-      .map(c => {
-        return {
-          _id: c._id,
-          ownedByPlayerId: c.ownedByPlayerId,
-          name: c.name,
-          ships: c.ships,
-          type: 1,
-          location: c.location
-        }
-      })
+        .filter(s => s.ships)
+        .map(c => {
+          return {
+            _id: c._id,
+            ownedByPlayerId: c.ownedByPlayerId,
+            name: c.name,
+            ships: c.ships,
+            type: 1,
+            location: c.location
+          }
+        })
 
       let allShips = starShips.concat(carrierShips).sort(sorter)
 

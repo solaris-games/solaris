@@ -1,11 +1,11 @@
 <template>
 <div v-if="debtor && creditor">
   <p v-if="isCreditor">
-    <a href="javascript:;" @click="onOpenPlayerDetailRequested(debtor)">{{debtor.alias}}</a> has paid off 
+    <a href="javascript:;" @click="onOpenPlayerDetailRequested(debtor)">{{debtor.alias}}</a> has paid off
     <span class="text-warning">${{event.data.amount}}</span> of debt owed to you.
   </p>
   <p v-if="!isCreditor">
-      You have paid off <span class="text-warning">${{event.data.amount}}</span> of debt owed to 
+      You have paid off <span class="text-warning">${{event.data.amount}}</span> of debt owed to
       <a href="javascript:;" @click="onOpenPlayerDetailRequested(creditor)">{{creditor.alias}}</a>.
   </p>
 </div>
@@ -16,7 +16,7 @@ import GameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

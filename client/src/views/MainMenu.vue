@@ -33,7 +33,7 @@
           <router-link to="/codex" tag="button" class="btn btn-block btn-info">Help</router-link>
         </div>
 
-<!--         
+<!--
         <div class="mt-3">
           <router-link to="/premium-store" tag="button" class="btn btn-block btn-danger">Premium Store</router-link>
         </div>
@@ -85,7 +85,7 @@ export default {
       await authService.logout()
 
       this.$store.commit('clearUserId')
-          
+
       this.isLoggingOut = false
 
       router.push({ name: 'home' })

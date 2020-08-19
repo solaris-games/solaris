@@ -16,40 +16,40 @@ import AudioService from '../../../game/audio'
 
 export default {
   components: {
-      
+
   },
   props: {
     toPlayerId: String
   },
   data () {
-      return {
-          message: '',
-          isSendingMessage: false
-      }
+    return {
+      message: '',
+      isSendingMessage: false
+    }
   },
   methods: {
-      async send () {
-        try {
-            this.isSendingMessage = true
+    async send () {
+      try {
+        this.isSendingMessage = true
 
-            let response = await MessageApiService.send(this.$store.state.game._id, this.toPlayerId, this.message)
+        let response = await MessageApiService.send(this.$store.state.game._id, this.toPlayerId, this.message)
 
-            if (response.status === 200) {
-                AudioService.type()
-                
-                this.message = '';
-                
-                this.$emit('onMessageSent', {
-                    toPlayerId: this.toPlayerId,
-                    message: this.message
-                })
-            }
-        } catch (e) {
-            console.error(e)
+        if (response.status === 200) {
+          AudioService.type()
+
+          this.message = ''
+
+          this.$emit('onMessageSent', {
+            toPlayerId: this.toPlayerId,
+            message: this.message
+          })
         }
-
-        this.isSendingMessage = false
+      } catch (e) {
+        console.error(e)
       }
+
+      this.isSendingMessage = false
+    }
   }
 }
 </script>

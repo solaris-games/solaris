@@ -49,7 +49,7 @@
         </div>
 
         <loading-spinner :loading="isLoading"/>
-        
+
         <div class="row" v-if="result">
             <p class="col text-right" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
             <p class="col text-right" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
@@ -71,70 +71,70 @@ export default {
     'form-error-list': FormErrorList
   },
   props: {
-      
+
   },
   data () {
     return {
-        isLoading: false,
-        errors: [],
-        defender: {
-            ships: 0,
-            weaponsLevel: 1
-        },
-        attacker: {
-            ships: 0,
-            weaponsLevel: 1
-        },
-        result: null
+      isLoading: false,
+      errors: [],
+      defender: {
+        ships: 0,
+        weaponsLevel: 1
+      },
+      attacker: {
+        ships: 0,
+        weaponsLevel: 1
+      },
+      result: null
     }
   },
   methods: {
     onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
+      this.$emit('onCloseRequested', e)
     },
     async calculate (e) {
-        this.errors = []
+      this.errors = []
 
-        if (this.defender.weaponsLevel <= 0) {
-            this.errors.push('Defender weapons level must be greater than 0.')
+      if (this.defender.weaponsLevel <= 0) {
+        this.errors.push('Defender weapons level must be greater than 0.')
+      }
+
+      if (this.defender.ships <= 0) {
+        this.errors.push('Defender ships must be greater than 0.')
+      }
+
+      if (this.attacker.weaponsLevel <= 0) {
+        this.errors.push('Attacker weapons level must be greater than 0.')
+      }
+
+      if (this.attacker.ships <= 0) {
+        this.errors.push('Attacker ships must be greater than 0.')
+      }
+
+      e.preventDefault()
+
+      if (this.errors.length) return
+
+      this.isLoading = true
+      this.result = null
+
+      try {
+        let response = await CarrierApiService.calculateCombat(this.$store.state.game._id, {
+          weaponsLevel: +this.defender.weaponsLevel,
+          ships: +this.defender.ships
+        }, {
+          weaponsLevel: +this.attacker.weaponsLevel,
+          ships: +this.attacker.ships
+        })
+
+        if (response.status === 200) {
+          this.result = response.data
         }
+      } catch (err) {
+        console.error(err)
+      }
 
-        if (this.defender.ships <= 0) {
-            this.errors.push('Defender ships must be greater than 0.')
-        }
-
-        if (this.attacker.weaponsLevel <= 0) {
-            this.errors.push('Attacker weapons level must be greater than 0.')
-        }
-
-        if (this.attacker.ships <= 0) {
-            this.errors.push('Attacker ships must be greater than 0.')
-        }
-
-        e.preventDefault()
-
-        if (this.errors.length) return
-
-        this.isLoading = true
-        this.result = null
-
-        try {
-            let response = await CarrierApiService.calculateCombat(this.$store.state.game._id, {
-                weaponsLevel: +this.defender.weaponsLevel,
-                ships: +this.defender.ships
-            }, {
-                weaponsLevel: +this.attacker.weaponsLevel,
-                ships: +this.attacker.ships
-            })
-
-            if (response.status === 200) {
-                this.result = response.data
-            }
-        } catch (err) {
-            console.error(err)
-        }
-
-        this.isLoading = false
+      this.isLoading = false
     }
   }
 }

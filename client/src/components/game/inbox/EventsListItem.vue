@@ -24,9 +24,9 @@
             @onOpenStarDetailRequested="onOpenStarDetailRequested"
             @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         <!-- @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" -->
-        <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'" 
+        <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'"
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-        <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'" 
+        <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         <player-credits-received :event="event" v-if="event.type === 'playerCreditsReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -87,47 +87,47 @@ import PlayerDebtForgivenVue from './events/PlayerDebtForgiven'
 import PlayerDebtSettledVue from './events/PlayerDebtSettled'
 
 export default {
-    components: {
-        'game-ended': GameEndedVue,
-        'game-paused': GamePausedVue,
-        'game-player-afk': GamePlayerAFKVue,
-        'game-player-defeated': GamePlayerDefeatedVue,
-        'game-player-joined': GamePlayerJoinedVue,
-        'game-player-quit': GamePlayerQuitVue,
-        'game-started': GameStartedVue,
-        'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
-        'player-carrier-built': PlayerCarrierBuiltVue,
-        'player-combat-carrier': PlayerCombatCarrierEventVue,
-        'player-combat-star': PlayerCombatStarEventVue,
-        'player-credits-received': PlayerCreditsReceivedVue,
-        'player-credits-sent': PlayerCreditsSentVue,
-        'player-galactic-cycle-complete': PlayerGalacticCycleCompleteEventVue,
-        'player-renown-received': PlayerRenownReceivedVue,
-        'player-renown-sent': PlayerRenownSentVue,
-        'player-research-complete': PlayerResearchCompleteVue,
-        'player-star-abandoned': PlayerStarAbandonedVue,
-        'player-star-captured': PlayerStarCapturedVue,
-        'player-star-warp-gate-built': PlayerStarWarpGateBuiltVue,
-        'player-star-warp-gate-destroyed': PlayerStarWarpGateDestroyedVue,
-        'player-technology-received': PlayerTechnologyReceivedVue,
-        'player-technology-sent': PlayerTechnologySentVue,
-        'player-debt-forgiven': PlayerDebtForgivenVue,
-        'player-debt-settled': PlayerDebtSettledVue
+  components: {
+    'game-ended': GameEndedVue,
+    'game-paused': GamePausedVue,
+    'game-player-afk': GamePlayerAFKVue,
+    'game-player-defeated': GamePlayerDefeatedVue,
+    'game-player-joined': GamePlayerJoinedVue,
+    'game-player-quit': GamePlayerQuitVue,
+    'game-started': GameStartedVue,
+    'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
+    'player-carrier-built': PlayerCarrierBuiltVue,
+    'player-combat-carrier': PlayerCombatCarrierEventVue,
+    'player-combat-star': PlayerCombatStarEventVue,
+    'player-credits-received': PlayerCreditsReceivedVue,
+    'player-credits-sent': PlayerCreditsSentVue,
+    'player-galactic-cycle-complete': PlayerGalacticCycleCompleteEventVue,
+    'player-renown-received': PlayerRenownReceivedVue,
+    'player-renown-sent': PlayerRenownSentVue,
+    'player-research-complete': PlayerResearchCompleteVue,
+    'player-star-abandoned': PlayerStarAbandonedVue,
+    'player-star-captured': PlayerStarCapturedVue,
+    'player-star-warp-gate-built': PlayerStarWarpGateBuiltVue,
+    'player-star-warp-gate-destroyed': PlayerStarWarpGateDestroyedVue,
+    'player-technology-received': PlayerTechnologyReceivedVue,
+    'player-technology-sent': PlayerTechnologySentVue,
+    'player-debt-forgiven': PlayerDebtForgivenVue,
+    'player-debt-settled': PlayerDebtSettledVue
+  },
+  props: {
+    event: Object
+  },
+  methods: {
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
     },
-    props: {
-        event: Object
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
-    methods: {
-        onOpenStarDetailRequested (e) {
-            this.$emit('onOpenStarDetailRequested', e)
-        },
-        onOpenPlayerDetailRequested (e) {
-            this.$emit('onOpenPlayerDetailRequested', e)
-        },
-        onOpenCarrierDetailRequested (e) {
-            this.$emit('onOpenCarrierDetailRequested', e)
-        }
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
     }
+  }
 }
 </script>
 

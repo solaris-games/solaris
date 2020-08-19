@@ -48,13 +48,13 @@ describe('user', () => {
         ];
     });
 
-    it('should get the current user by ID', async (done) => {
-        let result = await service.getMe(1);
+    // it('should get the current user by ID', async (done) => {
+    //     let result = await service.getMe(1);
 
-        expect(result._id).toBe(1);
+    //     expect(result._id).toBe(1);
 
-        done();
-    });
+    //     done();
+    // });
 
     it('should get a user by ID', async (done) => {
         let result = await service.getById(2);

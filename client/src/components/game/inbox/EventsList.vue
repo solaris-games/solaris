@@ -21,7 +21,7 @@
   <span class="ml-2">Click on an event to mark is as read.</span> -->
 
   <div class="mt-2 events-container container" v-if="filteredEvents">
-      <events-list-item v-for="event in filteredEvents" :key="event._id" :event="event" 
+      <events-list-item v-for="event in filteredEvents" :key="event._id" :event="event"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
@@ -66,13 +66,13 @@ export default {
       }
     },
     onOpenStarDetailRequested (e) {
-        this.$emit('onOpenStarDetailRequested', e)
+      this.$emit('onOpenStarDetailRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
-        this.$emit('onOpenPlayerDetailRequested', e)
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     onOpenCarrierDetailRequested (e) {
-        this.$emit('onOpenCarrierDetailRequested', e)
+      this.$emit('onOpenCarrierDetailRequested', e)
     },
     onSelectedFilterChanged (e) {
       const categories = {

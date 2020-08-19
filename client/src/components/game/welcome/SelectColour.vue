@@ -38,12 +38,12 @@ import gameHelper from '../../../services/gameHelper'
 
 export default {
   data () {
-      return {
-          players: []
-      }
+    return {
+      players: []
+    }
   },
   mounted () {
-      this.players = this.$store.state.game.galaxy.players
+    this.players = this.$store.state.game.galaxy.players
   },
 
   methods: {

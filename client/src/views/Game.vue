@@ -3,7 +3,7 @@
     <logo v-if="!hasGame"></logo>
 
     <loading-spinner :loading="!hasGame"/>
-    
+
     <div v-if="hasGame">
         <span class="d-none">{{ gameId }}</span>
 
@@ -70,7 +70,7 @@ export default {
   },
   destroyed () {
     this.unsubscribeToSockets()
-    
+
     this.$socket.emit('gameRoomLeft')
   },
   methods: {
@@ -95,10 +95,10 @@ export default {
       this.menuArguments = null
       this.menuState = null
     },
-    onMenuStateChanged (e) {      
+    onMenuStateChanged (e) {
       this.menuArguments = e.args || null
       this.menuState = e.state || null
-      
+
       this.$emit('onMenuStateChanged', e)
     },
     onPlayerSelected (e) {
@@ -111,20 +111,20 @@ export default {
       this.menuArguments = e
       this.menuState = MENU_STATES.STAR_DETAIL
 
-      //this.$emit('onStarClicked', e)
+      // this.$emit('onStarClicked', e)
       AudioService.click()
     },
     onCarrierClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.CARRIER_DETAIL
 
-      //this.$emit('onCarrierClicked', e)
+      // this.$emit('onCarrierClicked', e)
       AudioService.click()
     },
     onObjectsClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
-      
+
       AudioService.open()
     },
 
@@ -174,20 +174,20 @@ export default {
         type: 'info',
         action: [
           {
-            text : 'Dismiss',
-            onClick : (e, toastObject) => {
-                toastObject.goAway(0);
+            text: 'Dismiss',
+            onClick: (e, toastObject) => {
+              toastObject.goAway(0)
             }
           },
           {
-          text: 'View',
+            text: 'View',
             onClick: (e, toastObject) => {
               this.onMenuStateChanged({
                 state: MENU_STATES.CONVERSATION,
                 args: fromPlayer._id
               })
 
-              toastObject.goAway(0);
+              toastObject.goAway(0)
             }
           }
         ]

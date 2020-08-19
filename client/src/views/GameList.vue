@@ -42,7 +42,7 @@
     <h4>User Created Games</h4>
 
     <loading-spinner :loading="isLoadingUserGames"/>
-    
+
     <div v-if="!isLoadingUserGames && !userGames.length">
       There are no user created games available.
     </div>

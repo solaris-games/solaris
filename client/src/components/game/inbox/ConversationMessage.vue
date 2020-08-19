@@ -7,7 +7,7 @@
                 <i class="fas fa-envelope"></i>
             </span>
             <span>
-                <i class="fas fa-circle" :style="{'color': colour}"></i> 
+                <i class="fas fa-circle" :style="{'color': colour}"></i>
                 {{sender.alias}}
             </span>
         </div>
@@ -40,19 +40,19 @@ export default {
   },
   methods: {
     getUserPlayer () {
-        return GameHelper.getUserPlayer(this.$store.state.game)
+      return GameHelper.getUserPlayer(this.$store.state.game)
     },
-      getDateString (date) {
-          date = moment(date).utc().toDate()
-          
-          let dayOfWeek = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-          let monthOfYear = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    getDateString (date) {
+      date = moment(date).utc().toDate()
 
-          return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
-      },
-      openConversation () {
-          this.$emit('onConversationOpenRequested', this.sender._id)
-      }
+      let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      let monthOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+      return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
+    },
+    openConversation () {
+      this.$emit('onConversationOpenRequested', this.sender._id)
+    }
   }
 }
 </script>

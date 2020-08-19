@@ -62,7 +62,7 @@ export default {
     },
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
-      
+
       if (this.showAll) {
         return this.$store.state.game.galaxy.carriers.sort(sorter)
       } else {

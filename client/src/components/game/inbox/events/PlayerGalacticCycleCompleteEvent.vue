@@ -5,7 +5,7 @@
     economic infrastructure and <span class="text-success">${{event.data.creditsBanking}}</span> from your banking technology.
   </p>
   <p>
-    Your experimental scientists have stumbled across a new discovery which has unlocked 
+    Your experimental scientists have stumbled across a new discovery which has unlocked
     <span class="text-warning">{{event.data.experimentAmount}} points</span> of research in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>.
   </p>
 </div>
@@ -16,7 +16,7 @@ import TechnologyHelper from '../../../../services/technologyHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

@@ -10,18 +10,18 @@
 <script>
 export default {
   data () {
-      return {
-        connectedToServer: true
-      }
-  },
-    sockets: {
-        connect: function() {
-            this.connectedToServer = true
-        },
-        disconnect: function() {
-            this.connectedToServer = false
-        }
+    return {
+      connectedToServer: true
     }
+  },
+  sockets: {
+    connect: function () {
+      this.connectedToServer = true
+    },
+    disconnect: function () {
+      this.connectedToServer = false
+    }
+  }
 }
 </script>
 

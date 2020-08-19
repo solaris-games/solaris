@@ -1,7 +1,7 @@
 <template>
 <div v-if="star">
   <p>
-      The carrier <a href="javascript:;" @click="onOpenCarrierDetailRequested">{{event.data.carrierName}}</a> has been built at 
+      The carrier <a href="javascript:;" @click="onOpenCarrierDetailRequested">{{event.data.carrierName}}</a> has been built at
       <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
   </p>
 </div>
@@ -12,7 +12,7 @@ import GameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

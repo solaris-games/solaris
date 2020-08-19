@@ -30,12 +30,12 @@ class RulerPoints extends EventEmitter {
 
   drawPaths () {
     if (!this.rulerPoints.length) {
-        return
+      return
     }
 
     // Draw all paths to each ruler point
     let graphics = new PIXI.Graphics()
-    
+
     // Start the line from where the first point is.
     let firstPoint = this.rulerPoints[0]
     graphics.moveTo(firstPoint.x, firstPoint.y)
@@ -43,9 +43,9 @@ class RulerPoints extends EventEmitter {
 
     // Draw a line to each other point
     for (let i = 1; i < this.rulerPoints.length; i++) {
-        let point = this.rulerPoints[i]
-        
-        graphics.lineTo(point.x, point.y)
+      let point = this.rulerPoints[i]
+
+      graphics.lineTo(point.x, point.y)
     }
 
     this.container.addChild(graphics)
@@ -62,19 +62,18 @@ class RulerPoints extends EventEmitter {
   _createRulerPoint (desiredLocation) {
     let lastPoint = this.rulerPoints[this.rulerPoints.length - 1]
 
-    if (lastPoint
-      && lastPoint.x === desiredLocation.x
-      && lastPoint.y === desiredLocation.y) {
-        return
-      }
+    if (lastPoint &&
+      lastPoint.x === desiredLocation.x &&
+      lastPoint.y === desiredLocation.y) {
+      return
+    }
 
     this.rulerPoints.push(desiredLocation)
-    
+
     this.draw()
 
     this.emit('onRulerPointCreated', desiredLocation)
   }
-
 }
 
 export default RulerPoints

@@ -64,7 +64,7 @@
                         <td class="row-icon"><i class="fas fa-industry"></i></td>
                         <td>Manufacturing</td>
                         <td class="text-right">{{player.research.manufacturing.level}}</td>
-                        <td v-if="userPlayer && player != userPlayer" class="text-right" 
+                        <td v-if="userPlayer && player != userPlayer" class="text-right"
                             :class="{'text-success': userPlayer.research.manufacturing.level > player.research.manufacturing.level,
                                     'text-danger': userPlayer.research.manufacturing.level < player.research.manufacturing.level}">{{userPlayer.research.manufacturing.level}}</td>
                     </tr>

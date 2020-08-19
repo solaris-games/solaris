@@ -1,21 +1,21 @@
 <template>
     <div class="row">
         <div class="col text-center bg-secondary pt-2 pb-2">
-            <button class="btn btn-block" 
-              :class="{'btn-success': availableCredits >= economy, 'btn-secondary': availableCredits < economy}" 
-              :disabled="isUpgradingEconomy || availableCredits < economy" 
+            <button class="btn btn-block"
+              :class="{'btn-success': availableCredits >= economy, 'btn-secondary': availableCredits < economy}"
+              :disabled="isUpgradingEconomy || availableCredits < economy"
               @click="upgradeEconomy"><small>Buy for ${{economy}}</small></button>
         </div>
         <div class="col text-center bg-primary pt-2 pb-2">
-            <button class="btn btn-block" 
-              :class="{'btn-success': availableCredits >= industry, 'btn-secondary': availableCredits < industry}" 
-              :disabled="isUpgradingIndustry || availableCredits < industry" 
+            <button class="btn btn-block"
+              :class="{'btn-success': availableCredits >= industry, 'btn-secondary': availableCredits < industry}"
+              :disabled="isUpgradingIndustry || availableCredits < industry"
               @click="upgradeIndustry"><small>Buy for ${{industry}}</small></button>
         </div>
         <div class="col text-center bg-secondary pt-2 pb-2">
-            <button class="btn btn-block" 
-              :class="{'btn-success': availableCredits >= science, 'btn-secondary': availableCredits < science}" 
-              :disabled="isUpgradingScience || availableCredits < science" 
+            <button class="btn btn-block"
+              :class="{'btn-success': availableCredits >= science, 'btn-secondary': availableCredits < science}"
+              :disabled="isUpgradingScience || availableCredits < science"
               @click="upgradeScience"><small>Buy for ${{science}}</small></button>
         </div>
     </div>

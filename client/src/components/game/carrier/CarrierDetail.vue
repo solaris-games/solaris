@@ -70,8 +70,8 @@
         </div>
       </div>
     </div>
-    
-    <playerOverview v-if="getCarrierOwningPlayer()" :player="getCarrierOwningPlayer()" 
+
+    <playerOverview v-if="getCarrierOwningPlayer()" :player="getCarrierOwningPlayer()"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 </div>
@@ -120,7 +120,7 @@ export default {
   },
   destroyed () {
     GameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
-    
+
     clearInterval(this.intervalFunction)
   },
   methods: {
@@ -201,17 +201,17 @@ export default {
     },
     recalculateTimeRemaining () {
       if (this.carrier.ticksEta) {
-        let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta, 
+        let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta,
           this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
         this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
       }
 
       if (this.carrier.ticksEtaTotal) {
-        let timeRemainingEtaTotalDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEtaTotal, 
+        let timeRemainingEtaTotalDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEtaTotal,
           this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
         this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaTotalDate)
-      } 
+      }
     }
   }
 }

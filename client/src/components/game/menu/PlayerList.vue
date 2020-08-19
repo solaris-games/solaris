@@ -68,7 +68,7 @@ li {
 }
 
 .grow .colour-bar { transition: all .1s linear; }
-.grow:hover .colour-bar { 
+.grow:hover .colour-bar {
   transform: scale(1.5);
   transform-origin: bottom;
 }

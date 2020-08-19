@@ -3,7 +3,7 @@
     <view-title title="Game Detail" navigation="main-menu"/>
 
     <loading-spinner :loading="isLoadingGame"/>
-    
+
     <div v-if="!isLoadingGame">
       <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
 

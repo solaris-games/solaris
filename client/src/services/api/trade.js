@@ -2,7 +2,6 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class TradeService extends BaseApiService {
-  
   sendCredits (gameId, toPlayerId, amount) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/trade/credits', {
       toPlayerId,
@@ -30,9 +29,8 @@ class TradeService extends BaseApiService {
 
   getTradeableTechnologies (gameId, toPlayerId) {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/trade/tech/' + toPlayerId,
-    { withCredentials: true })
+      { withCredentials: true })
   }
-
 }
 
 export default new TradeService()

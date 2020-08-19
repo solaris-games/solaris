@@ -9,7 +9,6 @@ import GameHelper from '../services/gameHelper'
 import AnimationService from './animation'
 
 class Map extends EventEmitter {
-
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
   // waypoints - Displays waypoints overlay for a given carrier
@@ -95,7 +94,7 @@ class Map extends EventEmitter {
       this.stars.push(star)
 
       this.starContainer.addChild(star.container)
-      
+
       star.on('onStarClicked', this.onStarClicked.bind(this))
     }
 
@@ -279,7 +278,7 @@ class Map extends EventEmitter {
 
   panToStar (star) {
     this.panToLocation(star.location)
-    
+
     let zoomPercent = gameContainer.getViewportZoomPercentage()
 
     this.refreshZoom(zoomPercent)
@@ -303,18 +302,18 @@ class Map extends EventEmitter {
 
   unselectAllStars () {
     this.stars
-    .forEach(s => {
-      s.isSelected = false
-      s.drawActive(false) // Should be fine to pass in false for force
-    })
+      .forEach(s => {
+        s.isSelected = false
+        s.drawActive(false) // Should be fine to pass in false for force
+      })
   }
 
   unselectAllCarriers () {
     this.carriers
-    .forEach(c => {
-      c.isSelected = false
-      c.drawActive()
-    })
+      .forEach(c => {
+        c.isSelected = false
+        c.drawActive()
+      })
   }
 
   unselectAllStarsExcept (star) {
@@ -348,10 +347,10 @@ class Map extends EventEmitter {
     if (this.mode === 'galaxy') {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
       selectedStar.isSelected = true
-      
+
       this.unselectAllCarriers()
       this.unselectAllStarsExcept(selectedStar)
-  
+
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onStarClicked', e)
       }
@@ -424,10 +423,10 @@ class Map extends EventEmitter {
 
   tryMultiSelect (location) {
     // See if there are any other objects close by, if so then
-    // we want to allow the user to select which one they want as there might be 
+    // we want to allow the user to select which one they want as there might be
     // objects on the map that are on top of eachother or very close together.
     const distance = 10
-    
+
     let closeStars = this.stars
       .map(s => {
         return {
@@ -436,7 +435,7 @@ class Map extends EventEmitter {
           data: s.data
         }
       })
-      .filter(s => s.distance <= distance);
+      .filter(s => s.distance <= distance)
 
     let closeCarriers = this.carriers
       .map(s => {
@@ -446,7 +445,7 @@ class Map extends EventEmitter {
           data: s.data
         }
       })
-      .filter(s => s.distance <= distance);
+      .filter(s => s.distance <= distance)
 
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
@@ -467,7 +466,6 @@ class Map extends EventEmitter {
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
   }
-
 }
 
 export default Map

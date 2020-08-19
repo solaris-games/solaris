@@ -49,10 +49,10 @@ class GameHelper {
   }
 
   isCarrierInTransitToWaypoint (carrier, waypoint) {
-    return carrier.waypoints.indexOf(waypoint) === 0
-        && this.isCarrierInTransit(carrier) 
-        && carrier.inTransitFrom === waypoint.source
-        && carrier.inTransitTo === waypoint.destination
+    return carrier.waypoints.indexOf(waypoint) === 0 &&
+        this.isCarrierInTransit(carrier) &&
+        carrier.inTransitFrom === waypoint.source &&
+        carrier.inTransitTo === waypoint.destination
   }
 
   getHyperspaceDistance (game, hyperspace) {
@@ -60,8 +60,8 @@ class GameHelper {
   }
 
   getDistanceBetweenLocations (loc1, loc2) {
-    let xs = loc2.x - loc1.x,
-        ys = loc2.y - loc1.y
+    let xs = loc2.x - loc1.x
+    let ys = loc2.y - loc1.y
 
     xs *= xs
     ys *= ys
@@ -80,7 +80,7 @@ class GameHelper {
       let distance = this.getDistanceBetweenLocations(prevLoc, currLoc)
 
       let ticks = Math.ceil(distance / tickDistance)
-  
+
       totalTicks += ticks
     }
 
@@ -91,7 +91,7 @@ class GameHelper {
     if (date == null) {
       return 'Unknown'
     }
-    
+
     let relativeTo = moment().utc()
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
@@ -109,8 +109,8 @@ class GameHelper {
     }
 
     let str = ''
-    let showDays = false,
-      showHours = false
+    let showDays = false
+    let showHours = false
 
     if (days > 0) {
       str += `${days}d `
@@ -133,7 +133,7 @@ class GameHelper {
 
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
-  calculateWaypointTicks(game, carrier, waypoint) {
+  calculateWaypointTicks (game, carrier, waypoint) {
     let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
     let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
 
@@ -149,61 +149,61 @@ class GameHelper {
     // If the carrier is already en-route, then the number of ticks will be relative
     // to where the carrier is currently positioned.
     if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
-        source = carrier.location
+      source = carrier.location
     }
 
     let ticks
 
-    if (sourceStar.warpGate && destinationStar.warpGate
-      && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-        ticks = this.getTicksBetweenLocations(game, [source, destination], 3) // TODO: Need a constant here
-      } else {
-        ticks = this.getTicksBetweenLocations(game, [source, destination])
-      }
+    if (sourceStar.warpGate && destinationStar.warpGate &&
+      sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
+      ticks = this.getTicksBetweenLocations(game, [source, destination], 3) // TODO: Need a constant here
+    } else {
+      ticks = this.getTicksBetweenLocations(game, [source, destination])
+    }
 
     return ticks
   }
 
-  calculateWaypointTicksEta(game, carrier, waypoint) {
+  calculateWaypointTicksEta (game, carrier, waypoint) {
     let totalTicks = 0
 
     for (let i = 0; i < carrier.waypoints.length; i++) {
-        let cwaypoint = carrier.waypoints[i]
-        
-        totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint);
+      let cwaypoint = carrier.waypoints[i]
 
-        if (cwaypoint === waypoint) {
-            break
-        }
+      totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint)
+
+      if (cwaypoint === waypoint) {
+        break
+      }
     }
 
     return totalTicks
   }
 
-  calculateTimeByTicks(ticks, speedInMins, relativeTo = null) {
+  calculateTimeByTicks (ticks, speedInMins, relativeTo = null) {
     if (relativeTo == null) {
-        relativeTo = moment().utc();
+      relativeTo = moment().utc()
     } else {
-        relativeTo = moment(relativeTo).utc();
+      relativeTo = moment(relativeTo).utc()
     }
 
-    return relativeTo.add(ticks * speedInMins, 'm');
+    return relativeTo.add(ticks * speedInMins, 'm')
   }
 
-  canLoop(game, player, carrier) {
+  canLoop (game, player, carrier) {
     if (carrier.waypoints.length < 2) {
-        return false;
+      return false
     }
 
     // Check whether the last waypoint is in range of the first waypoint.
-    let firstWaypoint = carrier.waypoints[0];
-    let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
+    let firstWaypoint = carrier.waypoints[0]
+    let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1]
 
-    let firstWaypointStar = this.getStarById(game, firstWaypoint.source);
-    let lastWaypointStar = this.getStarById(game, lastWaypoint.source);
+    let firstWaypointStar = this.getStarById(game, firstWaypoint.source)
+    let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
 
-    let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location);
-    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.level);
+    let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
+    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.level)
 
     return distanceBetweenStars <= hyperspaceDistance
   }
@@ -223,7 +223,7 @@ class GameHelper {
   isGameFinished (game) {
     return game.state.endDate != null
   }
-  
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
@@ -236,7 +236,7 @@ class GameHelper {
     if (this.isGameFinished(game)) {
       return 'Finished'
     }
-    
+
     if (this.isGamePaused(game)) {
       return 'Paused'
     }

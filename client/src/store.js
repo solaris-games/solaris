@@ -34,7 +34,7 @@ export default new Vuex.Store({
     // ----------------
     // Sockets
 
-    gameStarted(state, data) {
+    gameStarted (state, data) {
       state.game.state = data.state
     },
 
@@ -53,7 +53,7 @@ export default new Vuex.Store({
       // Remove destroyed carriers.
       for (let reportCarrier of report.destroyedCarriers) {
         let carrier = GameHelper.getCarrierById(state.game, reportCarrier)
-        
+
         state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
 
         GameContainer.undrawCarrier(carrier)
@@ -85,9 +85,9 @@ export default new Vuex.Store({
       // Iterate over all carriers that the store has, if the carrier
       // isn't present in the tick report then it must have gone out of scanning range.
       for (let i = 0; i < state.game.galaxy.carriers.length; i++) {
-        let carrier = state.game.galaxy.carriers[i];
+        let carrier = state.game.galaxy.carriers[i]
 
-        let reportCarrier = report.carriers.find(c => c._id === carrier._id);
+        let reportCarrier = report.carriers.find(c => c._id === carrier._id)
 
         if (!reportCarrier) {
           state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
@@ -137,11 +137,11 @@ export default new Vuex.Store({
       // Update player for the end of a galactic cycle.
       if (report.playerGalacticCycleReport) {
         let userPlayer = GameHelper.getUserPlayer(state.game)
-        
+
         if (userPlayer) {
           userPlayer.credits += report.playerGalacticCycleReport.credits
-          userPlayer.research[report.playerGalacticCycleReport.experimentTechnology].level 
-            = report.playerGalacticCycleReport.experimentTechnologyLevel
+          userPlayer.research[report.playerGalacticCycleReport.experimentTechnology].level =
+            report.playerGalacticCycleReport.experimentTechnologyLevel
         }
       }
     },
@@ -157,7 +157,7 @@ export default new Vuex.Store({
     },
     gameStarIndustryUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
-      
+
       let manufacturingDifference = data.manufacturing - star.manufacturing
 
       star.infrastructure.industry = data.infrastructure
@@ -241,7 +241,7 @@ export default new Vuex.Store({
 
       carriers.forEach(c => GameContainer.undrawCarrier(c))
 
-      state.game.galaxy.carriers = state.game.galaxy.carriers.filter(x => (x.orbiting || '') != star._id);
+      state.game.galaxy.carriers = state.game.galaxy.carriers.filter(x => (x.orbiting || '') !== star._id)
 
       // Redraw the star
       GameContainer.reloadStar(star)

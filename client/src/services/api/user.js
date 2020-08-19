@@ -2,7 +2,6 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class UserService extends BaseApiService {
-  
   getMyUserInfo () {
     return axios.get(this.BASE_URL + 'user', { withCredentials: true })
   }
@@ -67,14 +66,13 @@ class UserService extends BaseApiService {
 
   getLeaderboard (limit) {
     return axios.get(this.BASE_URL + 'user/leaderboard',
-    { 
-      withCredentials: true,
-      params: {
-        limit: limit
-      }
-    })
+      {
+        withCredentials: true,
+        params: {
+          limit: limit
+        }
+      })
   }
-
 }
 
 export default new UserService()

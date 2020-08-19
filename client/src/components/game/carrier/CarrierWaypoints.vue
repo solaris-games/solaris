@@ -18,7 +18,7 @@
 					'fas fa-angle-up text-success': waypoint.action == 'collectAllBut',
 					'fas fa-angle-down text-danger': waypoint.action == 'dropAllBut',
 					'fas fa-star text-warning': waypoint.action == 'garrison'
-				}"></i> 
+				}"></i>
 				<span v-if="waypoint.actionShips"> {{waypoint.actionShips}}</span>
 			</li>
 		</ul>
@@ -48,158 +48,158 @@ import CarrierApiService from '../../../services/api/carrier'
 import AudioService from '../../../game/audio'
 
 export default {
-	components: {
-    	'menu-title': MenuTitle,
-	},
-	props: {
-		carrierId: String
-	},
-	data () {
-		return {
-			userPlayer: null,
-			carrier: null,
-			isSavingWaypoints: false,
-			oldWaypoints: [],
-			totalEtaTimeString: null,
-			waypointCreatedHandler: null
-		}
-	},
-	mounted () {
-		this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-		this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
-    
-		GameContainer.setMode('waypoints', this.carrier)
+  components: {
+    	'menu-title': MenuTitle
+  },
+  props: {
+    carrierId: String
+  },
+  data () {
+    return {
+      userPlayer: null,
+      carrier: null,
+      isSavingWaypoints: false,
+      oldWaypoints: [],
+      totalEtaTimeString: null,
+      waypointCreatedHandler: null
+    }
+  },
+  mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-		this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
+    GameContainer.setMode('waypoints', this.carrier)
+
+    this.waypointCreatedHandler = this.onWaypointCreated.bind(this)
     	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
 
-		this.oldWaypoints = this.carrier.waypoints.slice(0)
+    this.oldWaypoints = this.carrier.waypoints.slice(0)
 
-		this.recalculateTotalEta()
-	},
-	destroyed () {
-		GameContainer.resetMode()
+    this.recalculateTotalEta()
+  },
+  destroyed () {
+    GameContainer.resetMode()
 
-		GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
-	},
-	methods: {
-		onCloseRequested (e) {
-			this.carrier.waypoints = this.oldWaypoints
+    GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
+  },
+  methods: {
+    onCloseRequested (e) {
+      this.carrier.waypoints = this.oldWaypoints
 
-			this.$emit('onCloseRequested', e)
-		},
-		onOpenStarDetailRequested (e) {
-			this.$emit('onOpenStarDetailRequested', e)
-		},
-		getStarName (starId) {
-			return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
-		},
-		getWaypointsString () {
-			if (!this.carrier.waypoints.length) {
-				return 'None'
-			}
+      this.$emit('onCloseRequested', e)
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    getStarName (starId) {
+      return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
+    },
+    getWaypointsString () {
+      if (!this.carrier.waypoints.length) {
+        return 'None'
+      }
 
-			return this.carrier.waypoints.map(w => this.getStarName(w.destination)).join(', ')
-		},
-		removeLastWaypoint () {
-			// If the carrier is not currently in transit to the waypoint
-			// then remove it.
-			let lastWaypoint = this.carrier.waypoints[this.carrier.waypoints.length - 1]
+      return this.carrier.waypoints.map(w => this.getStarName(w.destination)).join(', ')
+    },
+    removeLastWaypoint () {
+      // If the carrier is not currently in transit to the waypoint
+      // then remove it.
+      let lastWaypoint = this.carrier.waypoints[this.carrier.waypoints.length - 1]
 
-			if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
-				this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
+      if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
+        this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
 
-				GameContainer.draw()
-			}
+        GameContainer.draw()
+      }
 
-			if (!this.carrier.waypoints.length) {
-				this.totalEtaTimeString = null
-			}
-			
-			AudioService.backspace()
+      if (!this.carrier.waypoints.length) {
+        this.totalEtaTimeString = null
+      }
 
-			this.recalculateTotalEta()
-			this.recalculateLooped()
-		},
-		removeAllWaypoints () {
-			// Remove all waypoints up to the last waypoint (if in transit)
-			this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
+      AudioService.backspace()
 
-			GameContainer.draw()
+      this.recalculateTotalEta()
+      this.recalculateLooped()
+    },
+    removeAllWaypoints () {
+      // Remove all waypoints up to the last waypoint (if in transit)
+      this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
 
-			this.totalEtaTimeString = null
-			
-			AudioService.backspace()
+      GameContainer.draw()
 
-			this.recalculateTotalEta()
-			this.recalculateLooped()
-		},
-		onWaypointCreated () {
-			AudioService.type()
-			
-			this.recalculateTotalEta()
-			this.recalculateLooped()
-		},
-		recalculateTotalEta () {
-			let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier, 
-				this.carrier.waypoints[this.carrier.waypoints.length - 1])
+      this.totalEtaTimeString = null
 
-			let totalEtaTime = GameHelper.calculateTimeByTicks(totalTicksEta, 
-				this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+      AudioService.backspace()
 
-			this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
-		},
-		recalculateLooped () {
-			if (this.carrier.waypointsLooped) {
-				this.carrier.waypointsLooped = this.canLoop
-			}
-		},
-		toggleLooped () {
-			this.carrier.waypointsLooped = !this.carrier.waypointsLooped
-		},
-		async saveWaypoints (saveAndEdit = false) {
-			// Push the waypoints to the API.
-			try {
-				this.isSavingWaypoints = true
-				let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints, this.carrier.waypointsLooped)
+      this.recalculateTotalEta()
+      this.recalculateLooped()
+    },
+    onWaypointCreated () {
+      AudioService.type()
 
-				if (response.status === 200) {
-					AudioService.join()
+      this.recalculateTotalEta()
+      this.recalculateLooped()
+    },
+    recalculateTotalEta () {
+      let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier,
+        this.carrier.waypoints[this.carrier.waypoints.length - 1])
 
-					// Update the waypoints
-                    this.carrier.ticksEta = response.data.ticksEta
-                    this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
-					this.carrier.waypoints = response.data.waypoints
-					
-					this.oldWaypoints = this.carrier.waypoints
+      let totalEtaTime = GameHelper.calculateTimeByTicks(totalTicksEta,
+        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+      this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
+    },
+    recalculateLooped () {
+      if (this.carrier.waypointsLooped) {
+        this.carrier.waypointsLooped = this.canLoop
+      }
+    },
+    toggleLooped () {
+      this.carrier.waypointsLooped = !this.carrier.waypointsLooped
+    },
+    async saveWaypoints (saveAndEdit = false) {
+      // Push the waypoints to the API.
+      try {
+        this.isSavingWaypoints = true
+        let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints, this.carrier.waypointsLooped)
+
+        if (response.status === 200) {
+          AudioService.join()
+
+          // Update the waypoints
+          this.carrier.ticksEta = response.data.ticksEta
+          this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
+          this.carrier.waypoints = response.data.waypoints
+
+          this.oldWaypoints = this.carrier.waypoints
 
           			this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 
-					if (saveAndEdit) {
-						if (this.carrier.waypoints.length) {
-							this.$emit('onEditWaypointRequested', {
-								carrierId: this.carrier._id,
-								waypoint: this.carrier.waypoints[0]
-							})
-						} else {
-							this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
-						}
-					} else {
-						this.onCloseRequested()
-					}
-				}
-			} catch (e) {
-				console.error(e)
-			}
+          if (saveAndEdit) {
+            if (this.carrier.waypoints.length) {
+              this.$emit('onEditWaypointRequested', {
+                carrierId: this.carrier._id,
+                waypoint: this.carrier.waypoints[0]
+              })
+            } else {
+              this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
+            }
+          } else {
+            this.onCloseRequested()
+          }
+        }
+      } catch (e) {
+        console.error(e)
+      }
 
-			this.isSavingWaypoints = false
-		}
-	},
-	computed: {
-		canLoop () {
-			return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
-		}
-	}
+      this.isSavingWaypoints = false
+    }
+  },
+  computed: {
+    canLoop () {
+      return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
+    }
+  }
 }
 </script>
 

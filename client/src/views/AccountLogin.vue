@@ -32,14 +32,12 @@
 <script>
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import router from '../router'
-import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
 import authService from '../services/api/auth'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
-    'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
   data () {

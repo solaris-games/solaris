@@ -2,7 +2,6 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class GameService extends BaseApiService {
-    
   getPlayerUserInfo (gameId, playerId) {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/player/' + playerId, { withCredentials: true })
   }
@@ -73,7 +72,6 @@ class GameService extends BaseApiService {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/events',
       { withCredentials: true })
   }
-
 }
 
 export default new GameService()

@@ -12,64 +12,62 @@ import quitFile from '../assets/audio/quit.mp3'
 import typeFile from '../assets/audio/type.mp3'
 
 class AudioService {
-
-    _play (audioFile) {
-        try {
-            let audio = new Audio(audioFile)
-            audio.play()
-        } catch (err) {
-            console.error(err)
-        }
+  _play (audioFile) {
+    try {
+      let audio = new Audio(audioFile)
+      audio.play()
+    } catch (err) {
+      console.error(err)
     }
+  }
 
-    backspace () {
-        this._play(backspaceFile)
-    }
+  backspace () {
+    this._play(backspaceFile)
+  }
 
-    click () {
-        this._play(clickFile)
-    }
+  click () {
+    this._play(clickFile)
+  }
 
-    close () {
-        this._play(closeFile)
-    }
+  close () {
+    this._play(closeFile)
+  }
 
-    dialogOpen () {
-        this._play(dialogOpenFile)
-    }
+  dialogOpen () {
+    this._play(dialogOpenFile)
+  }
 
-    download () {
-        this._play(downloadFile)
-    }
+  download () {
+    this._play(downloadFile)
+  }
 
-    hover () {
-        this._play(hoverFile)
-    }
+  hover () {
+    this._play(hoverFile)
+  }
 
-    join () {
-        this._play(joinFile)
-    }
+  join () {
+    this._play(joinFile)
+  }
 
-    leave () {
-        this._play(leaveFile)
-    }
+  leave () {
+    this._play(leaveFile)
+  }
 
-    loading () {
-        this._play(loadingFile)
-    }
+  loading () {
+    this._play(loadingFile)
+  }
 
-    open () {
-        this._play(openFile)
-    }
+  open () {
+    this._play(openFile)
+  }
 
-    quit () {
-        this._play(quitFile)
-    }
+  quit () {
+    this._play(quitFile)
+  }
 
-    type () {
-        this._play(typeFile)
-    }
-
+  type () {
+    this._play(typeFile)
+  }
 }
 
 export default new AudioService()

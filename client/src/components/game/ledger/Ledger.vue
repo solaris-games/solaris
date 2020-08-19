@@ -58,105 +58,105 @@ export default {
     'loading-spinner': LoadingSpinner
   },
   data () {
-      return {
-          userPlayer: null,
-          isLoadingLedger: false,
-          ledgers: []
-      }
+    return {
+      userPlayer: null,
+      isLoadingLedger: false,
+      ledgers: []
+    }
   },
   mounted () {
-      this.loadLedger()
+    this.loadLedger()
 
-      this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
   },
   created () {
-      this.sockets.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
-      this.sockets.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
-      this.sockets.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
+    this.sockets.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
+    this.sockets.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
+    this.sockets.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
   },
   destroyed () {
-      this.sockets.unsubscribe('playerDebtAdded')
-      this.sockets.unsubscribe('playerDebtForgiven')
-      this.sockets.unsubscribe('playerDebtSettled')
+    this.sockets.unsubscribe('playerDebtAdded')
+    this.sockets.unsubscribe('playerDebtForgiven')
+    this.sockets.unsubscribe('playerDebtSettled')
   },
   methods: {
     getPlayerAlias (playerId) {
-        return gameHelper.getPlayerById(this.$store.state.game, playerId).alias
+      return gameHelper.getPlayerById(this.$store.state.game, playerId).alias
     },
     getFriendlyColour (playerId) {
-        return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
     async forgiveDebt (ledger) {
-        let playerAlias = this.getPlayerAlias(ledger.playerId)
+      let playerAlias = this.getPlayerAlias(ledger.playerId)
 
-        if (confirm(`Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
-            try {
-                ledger.isForgivingDebt = true
+      if (confirm(`Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
+        try {
+          ledger.isForgivingDebt = true
 
-                let response = await LedgerApiService.forgiveDebt(this.$store.state.game._id, ledger.playerId)
+          let response = await LedgerApiService.forgiveDebt(this.$store.state.game._id, ledger.playerId)
 
-                if (response.status === 200) {
-                    this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, {type:'success'})
-                }
+          if (response.status === 200) {
+            this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, { type: 'success' })
+          }
 
-                ledger.debt = response.data.debt
-            } catch (err) {
-                console.error(err)
-            }
-
-            ledger.isForgivingDebt = false
+          ledger.debt = response.data.debt
+        } catch (err) {
+          console.error(err)
         }
+
+        ledger.isForgivingDebt = false
+      }
     },
     async settleDebt (ledger) {
-        let playerAlias = this.getPlayerAlias(ledger.playerId)
+      let playerAlias = this.getPlayerAlias(ledger.playerId)
 
-        if (confirm(`Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
-            try {
-                ledger.isSettlingDebt = true
+      if (confirm(`Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
+        try {
+          ledger.isSettlingDebt = true
 
-                let response = await LedgerApiService.settleDebt(this.$store.state.game._id, ledger.playerId)
+          let response = await LedgerApiService.settleDebt(this.$store.state.game._id, ledger.playerId)
 
-                if (response.status === 200) {
-                    this.$toasted.show(`You have paid off the debt you owe to ${playerAlias}.`, {type:'success'})
-                }
+          if (response.status === 200) {
+            this.$toasted.show(`You have paid off the debt you owe to ${playerAlias}.`, { type: 'success' })
+          }
 
-                this.userPlayer.credits -= Math.abs(ledger.debt)
+          this.userPlayer.credits -= Math.abs(ledger.debt)
 
-                ledger.debt = response.data.debt
-            } catch (err) {
-                console.error(err)
-            }
-
-            ledger.isSettlingDebt = false
+          ledger.debt = response.data.debt
+        } catch (err) {
+          console.error(err)
         }
+
+        ledger.isSettlingDebt = false
+      }
     },
     async loadLedger () {
-        try {
-            this.isLoadingLedger = true
+      try {
+        this.isLoadingLedger = true
 
-            let response = await LedgerApiService.getLedger(this.$store.state.game._id)
+        let response = await LedgerApiService.getLedger(this.$store.state.game._id)
 
-            if (response.status === 200) {
-                this.ledgers = response.data
-            }
-        } catch (err) {
-            console.error(err)
+        if (response.status === 200) {
+          this.ledgers = response.data
         }
+      } catch (err) {
+        console.error(err)
+      }
 
-        this.isLoadingLedger = false
+      this.isLoadingLedger = false
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
     // Below: Fuck it.
     onPlayerDebtAdded (e) {
-        this.loadLedger()
+      this.loadLedger()
     },
     onPlayerDebtForgiven (e) {
-        this.loadLedger()
+      this.loadLedger()
     },
     onPlayerDebtSettled (e) {
-        this.loadLedger()
+      this.loadLedger()
     }
   }
 }

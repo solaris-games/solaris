@@ -47,70 +47,66 @@ import gameContainer from '../../../game/container'
 import MenuTitleVue from '../MenuTitle'
 
 export default {
-    components: {
-        'menu-title': MenuTitleVue
-    },
+  components: {
+    'menu-title': MenuTitleVue
+  },
   props: {
     mapObjects: Array
   },
   methods: {
     userOwnsObject (mapObject) {
-        let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+      let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
 
-        switch (mapObject.type) {
-            case 'star': 
-                return gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
-                break
-            case 'carrier': 
-                return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
-                break
-        }
+      switch (mapObject.type) {
+        case 'star':
+          return gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
+        case 'carrier':
+          return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
+      }
     },
     getObjectOwningPlayer (mapObject) {
-        switch (mapObject.type) {
-            case 'star': 
-                return gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
-                break
-            case 'carrier': 
-                return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
-                break
-        }
+      switch (mapObject.type) {
+        case 'star':
+          return gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
+        case 'carrier':
+          return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
+      }
     },
     getFriendlyColour (mapObject) {
-        let owningPlayer;
+      let owningPlayer
 
-        switch (mapObject.type) {
-            case 'star': 
-                owningPlayer = gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
-                break
-            case 'carrier': 
-                owningPlayer = gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
-                break
-        }
+      switch (mapObject.type) {
+        case 'star':
+          owningPlayer = gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
+          break
+        case 'carrier':
+          owningPlayer = gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
+          break
+      }
 
-        if (!owningPlayer) {
-            return ''
-        }
+      if (!owningPlayer) {
+        return ''
+      }
 
-        return gameHelper.getFriendlyColour(owningPlayer.colour.value)
+      return gameHelper.getFriendlyColour(owningPlayer.colour.value)
     },
     onViewObjectRequested (mapObject) {
-        switch (mapObject.type) {
-            case 'star':
-                gameContainer.map.clickStar(mapObject.data._id)
-                this.$emit('onOpenStarDetailRequested', mapObject.data._id) 
-                break
-            case 'carrier': 
-                gameContainer.map.clickCarrier(mapObject.data._id)
-                this.$emit('onOpenCarrierDetailRequested', mapObject.data._id) 
-                break
-        }
+      switch (mapObject.type) {
+        case 'star':
+          gameContainer.map.clickStar(mapObject.data._id)
+          this.$emit('onOpenStarDetailRequested', mapObject.data._id)
+          break
+        case 'carrier':
+          gameContainer.map.clickCarrier(mapObject.data._id)
+          this.$emit('onOpenCarrierDetailRequested', mapObject.data._id)
+          break
+      }
     },
     onEditWaypointsRequested (mapObject) {
-        this.$emit('onEditWaypointsRequested', mapObject.data._id)
+      this.$emit('onEditWaypointsRequested', mapObject.data._id)
     },
     onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
+      this.$emit('onCloseRequested', e)
     }
   }
 }

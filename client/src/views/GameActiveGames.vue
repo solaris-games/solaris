@@ -5,13 +5,13 @@
     <h4>Active Games</h4>
 
     <loading-spinner :loading="isLoadingActiveGames"/>
-    
+
     <div v-if="!isLoadingActiveGames && !activeGames.length">
         <p>You are not in any active games.</p>
 
         <router-link to="/game/list" tag="button" class="btn btn-success">Join Game</router-link>
     </div>
-    
+
     <div class="table-responsive">
       <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
           <thead>
@@ -39,13 +39,13 @@
     <div class="text-right" v-if="!isLoadingActiveGames && activeGames.length">
       <router-link to="/game/list" tag="button" class="btn btn-success">Join New Game</router-link>
     </div>
-    
+
     <hr>
 
     <h4>Completed Games</h4>
 
     <loading-spinner :loading="isLoadingCompletedGames"/>
-    
+
     <div v-if="!isLoadingCompletedGames && !completedGames.length">
         <p>You have not completed any games yet.</p>
 
@@ -72,7 +72,7 @@
     <div class="text-right" v-if="!isLoadingCompletedGames && completedGames.length">
       <router-link to="/game/list" tag="button" class="btn btn-success">Join New Game</router-link>
     </div>
-    
+
   </view-container>
 </template>
 

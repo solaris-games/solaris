@@ -40,11 +40,11 @@ export default {
     'modalButton': ModalButton,
     'dialogModal': DialogModal
   },
-  data() {
-      return {
-          selectedTechnology: null,
-          availableTechnologies: []
-      }
+  data () {
+    return {
+      selectedTechnology: null,
+      availableTechnologies: []
+    }
   },
   mounted () {
     this.getTradeableTechnologies()
@@ -62,7 +62,7 @@ export default {
 
         if (response.status === 200) {
           this.availableTechnologies = response.data
-          
+
           if (this.availableTechnologies.length) {
             this.selectedTechnology = this.availableTechnologies[0]
           }

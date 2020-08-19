@@ -6,7 +6,7 @@
         <slot></slot>
         <footer class="mt-3">
             <div class="text-right">
-                <a href="https://discord.com/invite/v7PD33d" target="_blank">Discord</a> | 
+                <a href="https://discord.com/invite/v7PD33d" target="_blank">Discord</a> |
                 <a href="https://github.com/mike-eason/solaris" target="_blank">Source Code</a>
             </div>
         </footer>
@@ -19,8 +19,8 @@
 import LogoVue from '../components/Logo'
 
 export default {
-    components: {
-        'logo': LogoVue
-    }
+  components: {
+    'logo': LogoVue
+  }
 }
 </script>

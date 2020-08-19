@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
+      this.$emit('onCloseRequested', e)
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)

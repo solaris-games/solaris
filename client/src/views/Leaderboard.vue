@@ -23,22 +23,22 @@ export default {
     'leaderboard-table': LeaderboardTable
   },
   data () {
-      return {
-          leaderboard: null
-      }
+    return {
+      leaderboard: null
+    }
   },
   async mounted () {
-      this.leaderboard = null
+    this.leaderboard = null
 
-      try {
-          let response = await UserApiService.getLeaderboard()
+    try {
+      let response = await UserApiService.getLeaderboard()
 
-          if (response.status === 200) {
-              this.leaderboard = response.data
-          }
-      } catch (err) {
-          console.error(err)
+      if (response.status === 200) {
+        this.leaderboard = response.data
       }
+    } catch (err) {
+      console.error(err)
+    }
   }
 }
 </script>

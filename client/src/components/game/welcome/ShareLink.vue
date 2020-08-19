@@ -23,11 +23,11 @@ export default {
     this.fullRoute = `${this.protocol}//${this.domain}/#${this.$route.fullPath}`
   },
   methods: {
-      copyToClipboard () {
-          navigator.clipboard.writeText(this.fullRoute)
+    copyToClipboard () {
+      navigator.clipboard.writeText(this.fullRoute)
 
-          this.$toasted.show(`Copied to clipboard.`, {type:'success'})
-      }
+      this.$toasted.show(`Copied to clipboard.`, { type: 'success' })
+    }
   }
 }
 </script>

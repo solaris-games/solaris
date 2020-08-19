@@ -77,7 +77,7 @@ export default {
         infrastructureKey: infrastructure,
         data: data
       })
-      
+
       AudioService.hover()
       gameContainer.reloadStar(this.star)
       this.refreshCredits()

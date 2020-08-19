@@ -4,7 +4,7 @@
     <view-subtitle title="Game Settings"/>
 
     <loading-spinner :loading="!settings"/>
-    
+
     <form @submit.prevent="handleSubmit" v-if="settings">
       <div class="form-group">
         <label for="name" class="col-form-label">Name</label>
@@ -73,7 +73,7 @@
           </option>
         </select>
       </div>
-    
+
       <view-subtitle title="Special Galaxy Settings"/>
 
       <div class="form-group">

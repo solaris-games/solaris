@@ -1,10 +1,8 @@
 import * as PIXI from 'pixi.js'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import gameContainer from './container'
 
 class Star extends EventEmitter {
-
   constructor (app) {
     super()
 
@@ -54,7 +52,7 @@ class Star extends EventEmitter {
     // Note: The star may become visible/hidden due to changing scanning range.
     // If a star is revealed or a star becomes masked then we want to force the entire
     // star to be re-drawn.
-    let force = this.isInScanningRange != this._isInScanningRange()
+    let force = this.isInScanningRange !== this._isInScanningRange()
 
     this.drawStar(force)
     this.drawPlanets(force)
@@ -113,7 +111,7 @@ class Star extends EventEmitter {
 
       // The more resources a star has the more planets it has.
       let planetCount = this._getPlanetsCount()
-      
+
       if (planetCount === 0) {
         return
       }
@@ -123,8 +121,8 @@ class Star extends EventEmitter {
 
       for (let i = 0; i < planetCount; i++) {
         let planetContainer = new PIXI.Container()
-        
-        let distanceToStar = 10 + (4 * i);
+
+        let distanceToStar = 10 + (4 * i)
         let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 3 + 1
 
         let orbitGraphics = new PIXI.Graphics()
@@ -134,7 +132,7 @@ class Star extends EventEmitter {
         this.container.addChild(orbitGraphics)
 
         let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
-    
+
         let sprite = new PIXI.Sprite(planetTexture)
         sprite.width = planetSize
         sprite.height = planetSize
@@ -142,11 +140,11 @@ class Star extends EventEmitter {
         if (!this._isInScanningRange()) {
           sprite.alpha = 0.3
         }
-    
+
         planetContainer.pivot.set(distanceToStar, 0)
         planetContainer.position.x = this.data.location.x
         planetContainer.position.y = this.data.location.y
-    
+
         let rotationSpeed = (planetCount - i) / rotationSpeedModifier
 
         this.app.ticker.add((delta) => {
@@ -156,7 +154,7 @@ class Star extends EventEmitter {
             planetContainer.rotation -= rotationSpeed * delta
           }
         })
-    
+
         planetContainer.addChild(sprite)
 
         this.container_planets.addChild(planetContainer)
@@ -188,7 +186,7 @@ class Star extends EventEmitter {
 
     if (!this.graphics_colour) {
       this.graphics_colour = new PIXI.Graphics()
-  
+
       this.container.addChild(this.graphics_colour)
     }
 
@@ -219,7 +217,7 @@ class Star extends EventEmitter {
     if (!this.text_name) {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
-  
+
       this.text_name = new PIXI.Text(this.data.name, style)
       this.text_name.x = this.data.location.x - (this.text_name.width / 2)
       this.text_name.y = this.data.location.y + 7
@@ -240,10 +238,10 @@ class Star extends EventEmitter {
     if (!this.text_garrison) {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
-  
+
       this.text_garrison = new PIXI.Text('', style)
       this.text_garrison.resolution = 10
-  
+
       this.container.addChild(this.text_garrison)
     }
 
@@ -267,7 +265,7 @@ class Star extends EventEmitter {
 
       this.text_infrastructure = new PIXI.Text('', style)
       this.text_infrastructure.resolution = 10
-      
+
       this.container.addChild(this.text_infrastructure)
     }
 
@@ -275,7 +273,7 @@ class Star extends EventEmitter {
       this.text_infrastructure.text = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
       this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
       this.text_infrastructure.y = this.data.location.y - 12
-      
+
       this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
     } else {
       this.text_infrastructure.visible = false
@@ -296,7 +294,7 @@ class Star extends EventEmitter {
 
       this.text_playerName = new PIXI.Text('', style)
       this.text_playerName.resolution = 10
-      
+
       this.container.addChild(this.text_playerName)
     }
 
@@ -309,8 +307,7 @@ class Star extends EventEmitter {
 
       if (this.data.garrison == null) {
         this.text_playerName.y = this.data.location.y + 12
-      } 
-      else {
+      } else {
         this.text_playerName.y = this.data.location.y + 17
       }
 
@@ -333,7 +330,7 @@ class Star extends EventEmitter {
     }
 
     this.graphics_scanningRange.clear()
-  
+
     if (!this.isSelected) {
       return
     }
@@ -362,7 +359,7 @@ class Star extends EventEmitter {
     }
 
     this.graphics_hyperspaceRange.clear()
-  
+
     if (!this.isSelected) {
       return
     }
@@ -380,7 +377,7 @@ class Star extends EventEmitter {
 
   onClicked (e) {
     this.emit('onStarClicked', this.data)
-    
+
     this.drawActive(false)
   }
 

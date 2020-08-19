@@ -5,20 +5,20 @@
   </menu-title>
 
   <player-title :player="getPlayer(fromPlayerId)"/>
-    
+
   <loading-spinner :loading="!messages"/>
 
   <div v-if="messages">
     <div class="pt-0 mb-2 mt-2 messages-container" v-if="messages.length">
-        <conversation-message v-for="message in messages" 
-            v-bind:key="message._id" 
-            :sender="getPlayer(message.fromPlayerId)" 
+        <conversation-message v-for="message in messages"
+            v-bind:key="message._id"
+            :sender="getPlayer(message.fromPlayerId)"
             :message="message"
             :colour="getPlayerColour(message.fromPlayerId)"
             :isTruncated="false"
             class="mb-1"/>
     </div>
-    
+
     <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
         <p class="mb-0">No messages.</p>
     </div>
@@ -49,9 +49,9 @@ export default {
     fromPlayerId: String
   },
   data () {
-      return {
-          messages: null
-      }
+    return {
+      messages: null
+    }
   },
   mounted () {
     this.loadMessages()
@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
+      this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
       this.$emit('onOpenInboxRequested', e)
@@ -78,20 +78,20 @@ export default {
     async loadMessages () {
       this.messages = []
 
-        try {
-            let response = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
+      try {
+        let response = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
 
-            if (response.status === 200) {
-                this.messages = response.data
+        if (response.status === 200) {
+          this.messages = response.data
 
-                this.scrollToEnd()
-            }
-        } catch (e) {
-            console.error(e)
+          this.scrollToEnd()
         }
+      } catch (e) {
+        console.error(e)
+      }
     },
     onMessageSent (e) {
-        this.loadMessages()
+      this.loadMessages()
     },
     onMessageReceived (e) {
       this.messages.push(e)

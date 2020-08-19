@@ -15,7 +15,6 @@ class AuthService extends BaseApiService {
   logout () {
     return axios.post(this.BASE_URL + 'auth/logout', {}, { withCredentials: true })
   }
-  
 }
 
 export default new AuthService()

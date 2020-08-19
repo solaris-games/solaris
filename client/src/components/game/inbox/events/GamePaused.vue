@@ -9,7 +9,7 @@
 <script>
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

@@ -11,7 +11,7 @@ import GameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

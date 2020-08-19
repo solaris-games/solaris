@@ -74,7 +74,7 @@ export default {
       const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig]
       const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier
 
-      return this.research[technologyKey].level * progressMultiplierConfig;
+      return this.research[technologyKey].level * progressMultiplierConfig
     },
     isTechnologyEnabled (technologyKey) {
       return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, technologyKey)

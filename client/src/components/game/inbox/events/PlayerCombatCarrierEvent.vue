@@ -1,10 +1,10 @@
 <template>
     <div v-if="star">
         <p>
-            Your forces have engaged the enemy in carrier-to-carrier combat at 
+            Your forces have engaged the enemy in carrier-to-carrier combat at
             <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
         </p>
-            
+
         <div class="table-responsive mt-2">
             <table class="table table-sm">
                 <thead>
@@ -22,7 +22,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <i class="fas fa-rocket mr-1"></i> 
+                            <i class="fas fa-rocket mr-1"></i>
                             <span class="text-success">{{event.data.defenderCarrierName}}</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.before.defender}}</td>
@@ -37,7 +37,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <i class="fas fa-rocket mr-1"></i> 
+                            <i class="fas fa-rocket mr-1"></i>
                             <span class="text-danger">{{event.data.attackerCarrierName}}</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.before.attacker}}</td>
@@ -55,17 +55,17 @@ import GameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object
   },
   data () {
-      return {
-          defender: null,
-          attacker: null,
-          star: null
-      }
+    return {
+      defender: null,
+      attacker: null,
+      star: null
+    }
   },
   mounted () {
     this.defender = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender)

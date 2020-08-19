@@ -14,7 +14,7 @@
       </select>
     </div>
   </div>
-  
+
   <div class="table-responsive">
     <table class="table table-striped table-hover">
         <thead>
@@ -72,7 +72,7 @@ export default {
     },
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
-      
+
       if (this.showAll) {
         return this.$store.state.game.galaxy.stars.sort(sorter)
       } else {
@@ -98,7 +98,7 @@ export default {
       // here be dragons
       const getNestedObject = (nestedObj, pathArr) => {
         return pathArr.reduce((obj, key) =>
-            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj);
+          (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
       }
 
       if (this.sortBy == null) {

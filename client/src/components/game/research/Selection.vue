@@ -59,7 +59,7 @@ export default {
   mounted () {
     this.player = GameHelper.getUserPlayer(this.$store.state.game)
     this.loadTechnologies()
-    
+
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
@@ -115,7 +115,7 @@ export default {
       this.loadingNext = false
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.player.currentResearchTicksEta, 
+      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.player.currentResearchTicksEta,
         this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
 
       this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)

@@ -15,7 +15,7 @@
             <span>
                 <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
             </span>
-            
+
             <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
 
             <span class="d-none d-sm-inline-block ml-4">
@@ -95,141 +95,140 @@ import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
 
 export default {
-    components: {
-        'server-connection-status': ServerConnectionStatusVue,
-        'research-progress': ResearchProgressVue
-    },
-    data () {
-        return {
-            forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
-            MENU_STATES: MENU_STATES,
-            timeRemaining: null,
-            intervalFunction: null,
-            userPlayer: null,
-            unreadMessages: 0
-        }
-    },
-    mounted () {
-        this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
-        this.setupTimer()
-
-        this.checkForUnreadMessages()
-    },
-    created () {
-        this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
-        this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-        this.sockets.subscribe('gameMessagesAllRead', this.checkForUnreadMessages.bind(this))
-        this.sockets.subscribe('gameMessagesRead', this.checkForUnreadMessages.bind(this))
-
-        this.sockets.subscribe('playerCreditsReceived', (data) => {
-            let player = GameHelper.getUserPlayer(this.$store.state.game)
-            player.credits += data
-        })
-    },
-    destroyed () {
-        clearInterval(this.intervalFunction)
-
-        this.sockets.unsubscribe('gameStarted')
-        this.sockets.unsubscribe('playerCreditsReceived')
-    },
-    methods: {
-        gameStarted () {
-            this.setupTimer()
-
-            this.$toasted.show(`Get ready, the game will start soon!`, {type:'success'})
-            AudioService.download()
-        },
-        setupTimer () {
-            this.recalculateTimeRemaining()
-
-            if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-                this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
-            }
-        },
-        setMenuState (state, args) {
-            this.$emit('onMenuStateChanged', {
-                state,
-                args
-            })
-        },
-        goToMainMenu () {
-            router.push({ name: 'main-menu' })
-        },
-        goToMyGames () {
-            router.push({ name: 'game-active-games' })
-        },
-        onViewResearchRequested (e) {
-            this.setMenuState(this.MENU_STATES.RESEARCH, e)
-        },
-        fitGalaxy () {
-            GameContainer.viewport.fitWorld()
-            GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
-            GameContainer.viewport.moveCenter(0,0)
-        },
-        zoomByPercent (percent) {
-            GameContainer.viewport.zoomPercent(percent, true)
-        },
-        panToHomeStar () {
-            GameContainer.map.panToUser(this.$store.state.game)
-        },
-        recalculateTimeRemaining () {
-            if (GameHelper.isGamePendingStart(this.$store.state.game)) {
-                this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
-            }
-            else {
-                let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
-                let currentTick = this.$store.state.game.state.tick
-                let currentProductionTick = this.$store.state.game.state.productionTick
-                
-                let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
-                let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction, 
-                    this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-                this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
-            }
-        },
-        gameIsPaused () {
-            return GameHelper.isGamePaused(this.$store.state.game)
-        },
-        gameIsInProgress () {
-            return GameHelper.isGameInProgress(this.$store.state.game)
-        },
-        gameIsPendingStart () {
-            return GameHelper.isGamePendingStart(this.$store.state.game)
-        },
-        getGameStatusText (game) {
-            return GameHelper.getGameStatusText(this.$store.state.game)
-        },
-        async checkForUnreadMessages () {
-            let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
-            if (!userPlayer) {
-                return
-            }
-
-            try {
-                let response = await MessageApiService.getUnreadCount(this.$store.state.game._id)
-
-                if (response.status === 200) {
-                    this.unreadMessages = response.data.unread
-                }
-            } catch (err) {
-                console.error(err)
-            }
-        }
-    },
-    computed: {
-        game () {
-            return this.$store.state.game
-        }
+  components: {
+    'server-connection-status': ServerConnectionStatusVue,
+    'research-progress': ResearchProgressVue
+  },
+  data () {
+    return {
+      forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
+      MENU_STATES: MENU_STATES,
+      timeRemaining: null,
+      intervalFunction: null,
+      userPlayer: null,
+      unreadMessages: 0
     }
+  },
+  mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+
+    this.setupTimer()
+
+    this.checkForUnreadMessages()
+  },
+  created () {
+    this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
+    this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
+    this.sockets.subscribe('gameMessagesAllRead', this.checkForUnreadMessages.bind(this))
+    this.sockets.subscribe('gameMessagesRead', this.checkForUnreadMessages.bind(this))
+
+    this.sockets.subscribe('playerCreditsReceived', (data) => {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      player.credits += data
+    })
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
+
+    this.sockets.unsubscribe('gameStarted')
+    this.sockets.unsubscribe('playerCreditsReceived')
+  },
+  methods: {
+    gameStarted () {
+      this.setupTimer()
+
+      this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
+      AudioService.download()
+    },
+    setupTimer () {
+      this.recalculateTimeRemaining()
+
+      if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
+        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+      }
+    },
+    setMenuState (state, args) {
+      this.$emit('onMenuStateChanged', {
+        state,
+        args
+      })
+    },
+    goToMainMenu () {
+      router.push({ name: 'main-menu' })
+    },
+    goToMyGames () {
+      router.push({ name: 'game-active-games' })
+    },
+    onViewResearchRequested (e) {
+      this.setMenuState(this.MENU_STATES.RESEARCH, e)
+    },
+    fitGalaxy () {
+      GameContainer.viewport.fitWorld()
+      GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
+      GameContainer.viewport.moveCenter(0, 0)
+    },
+    zoomByPercent (percent) {
+      GameContainer.viewport.zoomPercent(percent, true)
+    },
+    panToHomeStar () {
+      GameContainer.map.panToUser(this.$store.state.game)
+    },
+    recalculateTimeRemaining () {
+      if (GameHelper.isGamePendingStart(this.$store.state.game)) {
+        this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
+      } else {
+        let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
+        let currentTick = this.$store.state.game.state.tick
+        let currentProductionTick = this.$store.state.game.state.productionTick
+
+        let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
+        let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction,
+          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
+
+        this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
+      }
+    },
+    gameIsPaused () {
+      return GameHelper.isGamePaused(this.$store.state.game)
+    },
+    gameIsInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    gameIsPendingStart () {
+      return GameHelper.isGamePendingStart(this.$store.state.game)
+    },
+    getGameStatusText (game) {
+      return GameHelper.getGameStatusText(this.$store.state.game)
+    },
+    async checkForUnreadMessages () {
+      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+
+      if (!userPlayer) {
+        return
+      }
+
+      try {
+        let response = await MessageApiService.getUnreadCount(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.unreadMessages = response.data.unread
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
+    }
+  }
 }
 </script>
 
 <style scoped>
 /* .header-bar {
-  position:absolute; 
+  position:absolute;
     overflow: auto;
     overflow-x: hidden;
 } */

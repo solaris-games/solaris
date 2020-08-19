@@ -5,7 +5,7 @@
       by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
   <p>
-      <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a> is awarded 
+      <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a> is awarded
       <span class="text-warning">${{event.data.creditsReward}}</span> credits.
   </p>
 </div>
@@ -16,7 +16,7 @@ import GameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
-      
+
   },
   props: {
     event: Object

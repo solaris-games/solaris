@@ -43,7 +43,7 @@
             </div>
 
             <div class="col">
-              <button v-for="playerFilter in playerFilters" :key="playerFilter._id" 
+              <button v-for="playerFilter in playerFilters" :key="playerFilter._id"
                 class="btn mr-1 mb-1"
                 :class="{'btn-primary': playerFilter.enabled}"
                 @click="togglePlayerFilter(playerFilter)">
@@ -78,22 +78,22 @@ export default {
       history: null,
       datacollection: null,
       dataoptions: {
-        bezierCurve : false,
+        bezierCurve: false,
         legend: {
           display: false
         },
         scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                    precision: 0
-                }
-            }]
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              precision: 0
+            }
+          }]
         },
         elements: {
           line: {
             tension: 0
-          },
+          }
           // point:{
           //     borderWidth: 0
           // }
@@ -115,14 +115,14 @@ export default {
       let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
       this.playerFilters.forEach(f => {
-          f.enabled = f.playerId === this.compareWithPlayerId
-            || f.playerId === userPlayer._id
+        f.enabled = f.playerId === this.compareWithPlayerId ||
+            f.playerId === userPlayer._id
       })
     }
 
     try {
       let response = await GameApiService.getGameHistory(this.$store.state.game._id)
-      
+
       if (response.status === 200) {
         this.history = response.data
         this.fillData()
@@ -133,7 +133,7 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
+      this.$emit('onCloseRequested', e)
     },
     getPlayerColour (player) {
       return GameHelper.getPlayerColour(this.$store.state.game, player._id)
@@ -186,7 +186,7 @@ export default {
           pointHitRadius: 10,
           data: []
         }
-        
+
         // Get all data points for the selected intel type.
         for (let e = 0; e < this.history.length; e++) {
           let history = this.history[e]

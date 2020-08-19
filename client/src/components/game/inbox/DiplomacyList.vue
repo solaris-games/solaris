@@ -10,11 +10,11 @@
     <div class="text-center pt-2" v-if="!conversations.length">
         No Messages
     </div>
-    
+
     <div class="pt-2">
-        <conversation-message v-for="conversation in conversations" 
-          v-bind:key="conversation.playerId" 
-          :sender="getPlayer(conversation.playerId)" 
+        <conversation-message v-for="conversation in conversations"
+          v-bind:key="conversation.playerId"
+          :sender="getPlayer(conversation.playerId)"
           :message="conversation.lastMessage"
           :colour="getPlayerColour(conversation.playerId)"
           :isUnread="conversation.hasUnread"
@@ -67,7 +67,7 @@ export default {
     },
     async refreshList () {
       this.conversations = null
-      
+
       try {
         let response = await MessageApiService.getConversations(this.$store.state.game._id)
 

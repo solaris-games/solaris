@@ -3,7 +3,7 @@
     <view-title title="Account" />
 
     <loading-spinner :loading="!info"/>
-    
+
     <div v-if="info">
       <!--
       <div class="row pt-3 pb-3 bg-info">

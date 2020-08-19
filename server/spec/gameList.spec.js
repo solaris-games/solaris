@@ -6,8 +6,12 @@ const fakeGameModel = {
         return {
             select() {
                 return {
-                    exec() {
-                        return 1;
+                    lean() {
+                        return {
+                            exec() {
+                                return 1;
+                            }
+                        }
                     }
                 }
             }

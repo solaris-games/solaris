@@ -39,9 +39,9 @@ export default {
     'dialogModal': DialogModal
   },
   data () {
-      return {
-          amount: 0
-      }
+    return {
+      amount: 0
+    }
   },
   methods: {
     async confirmSendCredits () {

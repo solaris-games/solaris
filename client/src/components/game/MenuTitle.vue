@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     close () {
-        this.$emit('onCloseRequested')
+      this.$emit('onCloseRequested')
     }
   }
 }

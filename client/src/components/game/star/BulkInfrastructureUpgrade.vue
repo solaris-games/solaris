@@ -39,42 +39,42 @@
 </template>
 
 <script>
-import MenuTitle from "../MenuTitle"
-import starService from "../../../services/api/star"
-import GameHelper from "../../../services/gameHelper"
+import MenuTitle from '../MenuTitle'
+import starService from '../../../services/api/star'
+import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
 
 export default {
   components: {
-    "menu-title": MenuTitle
+    'menu-title': MenuTitle
   },
-  data() {
+  data () {
     return {
       isUpgrading: false,
       amount: 0,
-      selectedType: "economy",
+      selectedType: 'economy',
       types: [
         {
-          key: "economy",
-          name: "Economy"
+          key: 'economy',
+          name: 'Economy'
         },
         {
-          key: "industry",
-          name: "Industry"
+          key: 'industry',
+          name: 'Industry'
         },
         {
-          key: "science",
-          name: "Science"
+          key: 'science',
+          name: 'Science'
         }
       ]
     }
   },
-  mounted() {
+  mounted () {
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
   },
   methods: {
-    onCloseRequested(e) {
-      this.$emit("onCloseRequested", e)
+    onCloseRequested (e) {
+      this.$emit('onCloseRequested', e)
     },
     async upgrade () {
       if (this.amount <= 0) {
@@ -92,14 +92,14 @@ export default {
 
         if (response.status === 200) {
           AudioService.join()
-          
-          this.$emit("onBulkInfrastructureUpgraded", {
+
+          this.$emit('onBulkInfrastructureUpgraded', {
             type: this.selectedType,
             amount: this.amount
           })
 
           this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
-        
+
           GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
           this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
         }

@@ -2,7 +2,6 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class StarService extends BaseApiService {
-
   upgradeEconomy (gameId, starId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/economy', {
       starId
@@ -60,7 +59,6 @@ class StarService extends BaseApiService {
     },
     { withCredentials: true })
   }
-
 }
 
 export default new StarService()

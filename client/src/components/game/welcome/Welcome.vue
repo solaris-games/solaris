@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-        this.$emit('onCloseRequested', e)
+      this.$emit('onCloseRequested', e)
     },
     onAliasChanged (e) {
       this.alias = e
@@ -67,7 +67,7 @@ export default {
         this.isJoiningGame = true
 
         let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias)
-        
+
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.
         }
@@ -75,7 +75,7 @@ export default {
         if (err.response.data) {
           this.errors = err.response.data.errors
         }
-        
+
         console.error(err)
       }
 

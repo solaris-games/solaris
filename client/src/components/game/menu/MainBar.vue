@@ -20,34 +20,34 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
-        @onCloseRequested="onCloseRequested" 
+        @onCloseRequested="onCloseRequested"
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" 
-        @onShipTransferRequested="onShipTransferRequested" 
-        @onEditWaypointsRequested="onEditWaypointsRequested" 
-        @onEditWaypointRequested="onEditWaypointRequested" 
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
+        @onShipTransferRequested="onShipTransferRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+        @onEditWaypointRequested="onEditWaypointRequested"
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
-      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS" 
-        @onCloseRequested="onCloseRequested" :carrierId="menuArguments" 
+      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
+        @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onEditWaypointRequested="onEditWaypointRequested"/>
-      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL" 
-        @onCloseRequested="onCloseRequested" 
-        :carrierId="menuArguments.carrierId" 
-        :waypoint="menuArguments.waypoint" 
+      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuArguments.carrierId"
+        :waypoint="menuArguments.waypoint"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX" 
-        @onCloseRequested="onCloseRequested" 
-        @onConversationOpenRequested="onConversationOpenRequested" 
+      <inbox v-if="menuState == MENU_STATES.INBOX"
+        @onCloseRequested="onCloseRequested"
+        @onConversationOpenRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
@@ -55,7 +55,7 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenInboxRequested="onOpenInboxRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
-      <galaxy v-if="menuState == MENU_STATES.GALAXY" 
+      <galaxy v-if="menuState == MENU_STATES.GALAXY"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
