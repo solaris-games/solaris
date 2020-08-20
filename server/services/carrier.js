@@ -65,6 +65,10 @@ module.exports = class CarrierService {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
         let playerStarLocations = playerStars.map(s => s.location);
 
+        if (!playerStarLocations.length) {
+            return [];
+        }
+        
         return game.galaxy.carriers
         .filter(c => {
             // If the player owns the carrier then it will always be visible.
