@@ -10,7 +10,6 @@ module.exports = class EventService {
         GAME_PAUSED: 'gamePaused',
 
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
-        PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
         PLAYER_RESEARCH_COMPLETE: 'playerResearchComplete',
         PLAYER_STAR_WARP_GATE_BUILT: 'playerStarWarpGateBuilt',
@@ -48,8 +47,6 @@ module.exports = class EventService {
         this.gameService.on('onGameEnded', (args) => this.createGameEndedEvent(args.game));
         this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.game, args.player));
         
-        this.gameTickService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
-            args.game, args.defender, args.attacker, args.star, args.friendlyCarrier, args.enemyCarrier, args.combatResult));
         this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
             args.game, args.defender, args.attackers, args.star, args.carriers, args.combatResult));
         this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.captureReward));
@@ -209,22 +206,6 @@ module.exports = class EventService {
         for (let attacker of attackers) {
             await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
         }
-    }
-
-    async createPlayerCombatCarrierEvent(game, defender, attacker, defenderStar, defenderCarrier, attackerCarrier, combatResult) {
-        let data = {
-            playerIdDefender: defender._id,
-            playerIdAttacker: attacker._id,
-            defenderStarId: defenderStar._id,
-            defenderCarrierId: defenderCarrier._id,
-            defenderCarrierName: defenderCarrier.name,
-            attackerCarrierId: attackerCarrier._id,
-            attackerCarrierName: attackerCarrier.name,
-            combatResult
-        };
-
-        await this.createPlayerEvent(game, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
-        await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
     }
 
     async createResearchCompleteEvent(game, player, technology) {

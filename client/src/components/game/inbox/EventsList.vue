@@ -87,7 +87,6 @@ export default {
           'playerDebtForgiven'
         ],
         combat: [
-          'playerCombatCarrier',
           'playerCombatStar',
           'playerStarAbandoned',
           'playerStarCaptured'
