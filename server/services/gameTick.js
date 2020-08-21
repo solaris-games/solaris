@@ -222,7 +222,11 @@ module.exports = class GameTickService extends EventEmitter {
         for (let i = 0; i < combatStars.length; i++) {
             let combat = combatStars[i];
 
-            await this._performCombatAtStar(game, combat.star, combat.carrier, report);
+            // Get all carriers orbiting the star and perform combat.
+            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combat.star._id));
+
+            // await this._performCombatAtStar(game, combat.star, combat.carrier, report);
+            await this._performCombatAtStar2(game, combat.star, carriersAtStar, report);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
@@ -385,6 +389,243 @@ module.exports = class GameTickService extends EventEmitter {
 
         await defenderUser.save();
         await attackerUser.save();
+    }
+
+    async _performCombatAtStar2(game, star, carriers, report) {
+        // Get all defender carriers ordered by most carriers present descending.
+        // Carriers who have the most ships will be target first in combat.
+        let defenderCarriers = carriers
+                                .filter(c => c.ownedByPlayerId.equals(star.ownedByPlayerId))
+                                .sort((a, b) => b.ships - a.ships);
+
+        // Get all attacker carriers.
+        let attackerCarriers = carriers
+                                .filter(c => !c.ownedByPlayerId.equals(star.ownedByPlayerId))
+                                .sort((a, b) => b.ships - a.ships);
+
+        // Get the players for the defender and all attackers.
+        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+
+        let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
+        let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
+
+        let defenderUser = await this.userService.getById(defender.userId);
+        let attackerUsers = [];
+        
+        for (let attacker of attackers) {
+            let attackerUser = await this.userService.getById(attacker.userId);
+            attackerUsers.push(attackerUser);
+        }
+
+        const getCarrierUser = (carrier, players, users) => {
+            let player = players.find(p => carrier.ownedByPlayerId.equals(p._id));
+
+            return users.find(u => u._id.toString() === player.userId.toString());
+        };
+
+        // Calculate the combined combat result taking into account
+        // the star garrison and all defenders vs. all attackers
+        let totalDefenders = Math.floor(star.garrisonActual) + defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
+        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
+
+        // Use the highest weapons tech of the attacking players to calculate combat result.
+        let weaponsTechLevel = attackers.map(p => p.research.weapons.level).sort((a, b) => b - a)[0];
+
+        let combatResult = this.combatService.calculate({
+            weaponsLevel: defender.research.weapons.level,
+            ships: totalDefenders
+        }, {
+            weaponsLevel: weaponsTechLevel,
+            ships: totalAttackers
+        });
+        
+        // Add all of the carriers to the combat result with a snapshot of
+        // how many ships they had before combat occurs.
+        // We will update this as we go along with combat.
+        combatResult.carriers = carriers.map(c => {
+            return {
+                _id: c._id,
+                ownedByPlayerId: c.ownedByPlayerId,
+                before: c.ships,
+                lost: 0,
+                after: c.ships
+            };
+        });
+
+        // Do the same with the star.
+        combatResult.star = {
+            _id: star._id,
+            before: Math.floor(star.garrisonActual),
+            lost: 0,
+            after: Math.floor(star.garrisonActual)
+        };
+
+        // Add combat result stats to defender achievements.
+        defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
+        defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
+        
+        // Using the combat result, iterate over all of the defenders and attackers
+        // and deduct from each ship/carrier until combat has been resolved.
+
+        // Start with the attackers because its easier.
+        let attackersKilled = combatResult.lost.attacker;
+        let attackerCarrierIndex = 0;
+
+        while (attackersKilled--) {
+            let attackerCarrier = attackerCarriers[attackerCarrierIndex];
+            let combatCarrier = combatResult.carriers.find(c => c._id.equals(attackerCarrier._id));
+
+            attackerCarrier.ships--;
+            combatCarrier.after--;
+            combatCarrier.lost++;
+
+            // Deduct ships lost from attacker.
+            let attackerUser = getCarrierUser(attackerCarrier, attackers, attackerUsers);
+
+            attackerUser.achievements.combat.losses.ships++;
+
+            // If the carrier has been destroyed, remove it from the game.
+            if (!attackerCarrier.ships) {
+                game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(attackerCarrier), 1);
+
+                report.destroyedCarriers.push(attackerCarrier._id);
+                
+                attackerCarriers.splice(attackerCarrierIndex, 1);
+                attackerCarrierIndex--;
+
+                attackerUser.achievements.combat.losses.carriers++;
+                defenderUser.achievements.combat.kills.carriers++;
+            }
+
+            attackerCarrierIndex++;
+
+            if (attackerCarrierIndex > attackerCarriers.length - 1) {
+                attackerCarrierIndex = 0;
+            }
+        }
+
+        // Now do the same for the defender.
+        let defendersKilled = combatResult.lost.defender;
+        let defenderCarrierIndex = 0;
+
+        while (defendersKilled--) {
+            let defenderShipKilled = false;
+
+            // Decide whether to attack the star or the carrier.
+            if (defenderCarrierIndex === -1) {
+                if (Math.floor(star.garrisonActual)) { // Only hit the star if there is garrison.
+                    star.garrisonActual--;
+                    star.garrison = Math.floor(star.garrisonActual);
+                    combatResult.star.after--;
+                    combatResult.star.lost++;
+                    defenderShipKilled = true;
+                } else {
+                    defendersKilled++; // Add back to the while loop.
+                }
+            } else if (defenderCarriers.length) {
+                let defenderCarrier = defenderCarriers[defenderCarrierIndex];
+                let combatCarrier = combatResult.carriers.find(c => c._id.equals(defenderCarrier._id));
+    
+                defenderCarrier.ships--;
+                combatCarrier.after--;
+                combatCarrier.lost++;
+                defenderShipKilled = true;
+
+                // If the carrier has been destroyed, remove it from the game.
+                if (!defenderCarrier.ships) {
+                    game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(defenderCarrier), 1);
+
+                    report.destroyedCarriers.push(defenderCarrier._id);
+                    
+                    defenderCarriers.splice(defenderCarrierIndex, 1);
+                    defenderCarrierIndex--;
+
+                    defenderUser.achievements.combat.losses.carriers++;
+
+                    // Add carriers killed to attackers.
+                    for (let attackerUser of attackerUsers) {
+                        attackerUser.achievements.combat.kills.carriers++;
+                    }
+                }
+            } else {
+                defendersKilled++; // Nothing happened so keep looping.
+            }
+
+            if (defenderShipKilled) {
+                // Add ships killed to attackers.
+                for (let attackerUser of attackerUsers) {
+                    attackerUser.achievements.combat.kills.ships++;
+                }
+            }
+
+            defenderCarrierIndex++;
+
+            if (defenderCarrierIndex > defenderCarriers.length - 1) {
+                defenderCarrierIndex = -1;
+            }
+        }
+
+        // If the defender has been eliminated then the attacker who travelled the shortest distance in the last tick
+        // captures the star. Repeat star combat until there is only one player remaining.
+        let defenderDefeated = !Math.floor(star.garrisonActual) && !defenderCarriers.length;
+
+        if (defenderDefeated) {
+            let closestPlayerId = attackerCarriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].ownedByPlayerId;
+
+            // Capture the star.
+            let newStarPlayer = attackers.find(p => p._id.equals(closestPlayerId));
+            let newStarUser = attackerUsers.find(u => u._id.toString() === newStarPlayer.userId.toString());
+
+            let captureReward = star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
+
+            star.ownedByPlayerId = newStarPlayer._id;
+            newStarPlayer.credits += captureReward;
+            star.infrastructure.economy = 0;
+
+            // TODO: If the home star is captured, find a new one?
+            // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
+
+            defenderUser.achievements.combat.stars.lost++;
+            newStarUser.achievements.combat.stars.captured++;
+
+            this.emit('onStarCaptured', {
+                game,
+                player: newStarPlayer,
+                star,
+                captureReward
+            });
+            
+            this.emit('onStarCaptured', {
+                game,
+                player: defender,
+                star,
+                captureReward
+            });
+
+            // If there are still attackers remaining, recurse.
+            attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+
+            if (attackerPlayerIds.length > 1) {
+                return await this.performCombatAtStar(game, star, attackerCarriers);
+            }
+        }
+
+        // Log the combat event
+        this.emit('onPlayerCombatStar', {
+            game,
+            defender,
+            attackers,
+            star,
+            carriers,
+            combatResult
+        });
+
+        // Save user profile achievements.
+        await defenderUser.save();
+
+        for (let attackerUser of attackerUsers) {
+            await attackerUser.save();
+        }
     }
 
     _produceShips(game, report) {

@@ -51,7 +51,7 @@ module.exports = class EventService {
         this.gameTickService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
             args.game, args.defender, args.attacker, args.star, args.friendlyCarrier, args.enemyCarrier, args.combatResult));
         this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
-            args.game, args.defender, args.attacker, args.star, args.enemyCarrier, args.combatResult));
+            args.game, args.defender, args.attackers, args.star, args.carriers, args.combatResult));
         this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
             args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount));
@@ -190,18 +190,25 @@ module.exports = class EventService {
         return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
-    async createPlayerCombatStarEvent(game, defender, attacker, defenderStar, attackerCarrier, combatResult) {
+    async createPlayerCombatStarEvent(game, defender, attackers, star, carriers, combatResult) {
         let data = {
             playerIdDefender: defender._id,
-            playerIdAttacker: attacker._id,
-            defenderStarId: defenderStar._id,
-            attackerCarrierId: attackerCarrier._id,
-            attackerCarrierName: attackerCarrier.name,
+            playerIdAttackers: attackers.map(p => p._id),
+            starId: star._id,
+            carriers: carriers.map(c => {
+                return {
+                    _id: c._id,
+                    name: c.name
+                }
+            }),
             combatResult
         };
 
         await this.createPlayerEvent(game, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
-        await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+
+        for (let attacker of attackers) {
+            await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+        }
     }
 
     async createPlayerCombatCarrierEvent(game, defender, attacker, defenderStar, defenderCarrier, attackerCarrier, combatResult) {

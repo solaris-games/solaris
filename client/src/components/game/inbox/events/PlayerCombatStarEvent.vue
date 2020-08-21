@@ -4,9 +4,8 @@
             Your forces have engaged the enemy in carrier-to-star combat at
             <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
         </p>
-
         <div class="table-responsive mt-2">
-            <table class="table table-sm">
+            <table class="table table-sm" v-if="event">
                 <thead>
                     <th></th>
                     <th class="text-right">Before</th>
@@ -23,26 +22,35 @@
                     <tr>
                         <td>
                             <i class="fas fa-star mr-1"></i>
-                            <span class="text-success">{{star.name}}</span>
+                            <span class="text-success" v-if="star">{{star.name}}</span>
                         </td>
-                        <td class="text-right">{{event.data.combatResult.before.defender}}</td>
-                        <td class="text-right">{{event.data.combatResult.lost.defender}}</td>
-                        <td class="text-right">{{event.data.combatResult.after.defender}}</td>
+                        <td class="text-right">{{event.data.combatResult.star.before}}</td>
+                        <td class="text-right">{{event.data.combatResult.star.lost}}</td>
+                        <td class="text-right">{{event.data.combatResult.star.after}}</td>
                     </tr>
-                    <tr>
-                        <td>Attacker: Weapons {{event.data.combatResult.weapons.attacker}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
+                    <tr v-for="carrier of defenderCarriers" :key="carrier._id">
                         <td>
                             <i class="fas fa-rocket mr-1"></i>
-                            <span class="text-danger">{{event.data.attackerCarrierName}}</span>
+                            <span class="text-success">{{getCarrierName(carrier._id)}}</span>
                         </td>
-                        <td class="text-right">{{event.data.combatResult.before.attacker}}</td>
-                        <td class="text-right">{{event.data.combatResult.lost.attacker}}</td>
-                        <td class="text-right">{{event.data.combatResult.after.attacker}}</td>
+                        <td class="text-right">{{carrier.before}}</td>
+                        <td class="text-right">{{carrier.lost}}</td>
+                        <td class="text-right">{{carrier.after}}</td>
+                    </tr>
+                    <tr>
+                        <td>Attacker(s): Weapons {{event.data.combatResult.weapons.attacker}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr v-for="carrier of attackerCarriers" :key="carrier._id">
+                        <td>
+                            <i class="fas fa-rocket mr-1"></i>
+                            <span class="text-danger">{{getCarrierName(carrier._id)}}</span>
+                        </td>
+                        <td class="text-right">{{carrier.before}}</td>
+                        <td class="text-right">{{carrier.lost}}</td>
+                        <td class="text-right">{{carrier.after}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -63,18 +71,26 @@ export default {
   data () {
     return {
       defender: null,
-      attacker: null,
-      star: null
+      attackers: [],
+      star: null,
+      defenderCarriers: [],
+      attackerCarriers: []
     }
   },
   mounted () {
     this.defender = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender)
-    this.attacker = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdAttacker)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.defenderStarId)
+    this.attackers = this.event.data.playerIdAttackers.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
+    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
+
+    this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId === this.event.data.playerIdDefender)
+    this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId !== this.event.data.playerIdDefender)
   },
   methods: {
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
+    },
+    getCarrierName (carrierId) {
+      return this.event.data.carriers.find(c => c._id === carrierId).name
     }
   }
 }
