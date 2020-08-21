@@ -200,10 +200,7 @@ module.exports = class GameTickService extends EventEmitter {
 
                 // If the star is owned by another player, then perform combat.
                 if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    combatStars.push({
-                        star: destinationStar,
-                        carrier
-                    });
+                    combatStars.push(destinationStar);
                 }
 
                 // The star has been affected by the game tick so append it to the report
@@ -220,13 +217,12 @@ module.exports = class GameTickService extends EventEmitter {
 
         // 3. Now that all carriers have finished moving, perform combat.
         for (let i = 0; i < combatStars.length; i++) {
-            let combat = combatStars[i];
+            let combatStar = combatStars[i];
 
             // Get all carriers orbiting the star and perform combat.
-            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combat.star._id));
+            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combatStar._id));
 
-            // await this._performCombatAtStar(game, combat.star, combat.carrier, report);
-            await this._performCombatAtStar2(game, combat.star, carriersAtStar, report);
+            await this._performCombatAtStar(game, combatStar, carriersAtStar, report);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
@@ -246,152 +242,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    async _performCombatAtStar(game, star, enemyCarrier, report) {
-        let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
-        let attacker = this.playerService.getByObjectId(game, enemyCarrier.ownedByPlayerId);
-
-        let defenderUser = await this.userService.getById(defender.userId);
-        let attackerUser = await this.userService.getById(attacker.userId);
-
-        // There may be multiple carriers at this star, we will attack
-        // carriers in order of largest carrier first to smallest last
-        // until there are no carriers left, in which case we attack the star
-        // directly.
-        let friendlyCarriers = game.galaxy.carriers
-            .filter(c => c.orbiting && c.orbiting.equals(star._id) && c.ownedByPlayerId.equals(defender._id))
-            .sort((a, b) => b.ships - a.ships);
-
-        // Perform carrier to carrier combat.
-        for (let i = 0; i < friendlyCarriers.length; i++) {
-            let friendlyCarrier = friendlyCarriers[i];
-
-            let combatResult = this.combatService.calculate({
-                weaponsLevel: defender.research.weapons.level,
-                ships: friendlyCarrier.ships
-            }, {
-                weaponsLevel: attacker.research.weapons.level,
-                ships: enemyCarrier.ships
-            });
-            
-            friendlyCarrier.ships = combatResult.after.defender;
-            enemyCarrier.ships = combatResult.after.attacker;
-
-            defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
-            defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
-            
-            attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
-            attackerUser.achievements.combat.losses.ships += combatResult.lost.attacker;
-
-            // Log the combat event
-            this.emit('onPlayerCombatCarrier', {
-                game,
-                defender,
-                attacker,
-                star,
-                friendlyCarrier,
-                enemyCarrier,
-                combatResult
-            });
-
-            // Destroy carriers if they have no ships left.
-            if (friendlyCarrier.ships <= 0) {
-                game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(friendlyCarrier), 1);
-
-                defenderUser.achievements.combat.losses.carriers++;
-                attackerUser.achievements.combat.kills.carriers++;
-
-                report.destroyedCarriers.push(friendlyCarrier._id);
-            }
-
-            // If the enemy carrier has no ships, then carrier to carrier combat is finished.
-            if (enemyCarrier.ships <= 0) {
-                break;
-            }
-        }
-
-        // Perform star to carrier combat if there is a garrison at the star
-        // and the enemy carrier has ships remaining.
-        let starGarrison = Math.floor(star.garrisonActual);
-
-        if (starGarrison && enemyCarrier.ships) {
-            let starGarrisonFraction = star.garrisonActual - starGarrison; // Save the fractional amount of ships so we can add it back on after combat.
-
-            let starCombatResult = this.combatService.calculate({
-                weaponsLevel: defender.research.weapons.level,
-                ships: starGarrison
-            }, {
-                weaponsLevel: attacker.research.weapons.level,
-                ships: enemyCarrier.ships
-            });
-
-            enemyCarrier.ships = starCombatResult.after.attacker;
-
-            star.garrisonActual = starCombatResult.after.defender + starGarrisonFraction;
-            star.garrison = Math.floor(star.garrisonActual);
-
-            defenderUser.achievements.combat.kills.ships += starCombatResult.lost.attacker;
-            defenderUser.achievements.combat.losses.ships += starCombatResult.lost.defender;
-
-            attackerUser.achievements.combat.kills.ships += starCombatResult.lost.defender;
-            attackerUser.achievements.combat.losses.ships += starCombatResult.lost.attacker;
-
-            // Log the combat event
-            this.emit('onPlayerCombatStar', {
-                game,
-                defender,
-                attacker,
-                star,
-                enemyCarrier,
-                combatResult: starCombatResult
-            });
-        }
-
-        // If the enemy carrier has no ships, then destroy the attacking carrier.
-        if (enemyCarrier.ships <= 0) {
-            game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(enemyCarrier), 1);
-
-            defenderUser.achievements.combat.kills.carriers++;
-            attackerUser.achievements.combat.losses.carriers++;
-
-            report.destroyedCarriers.push(enemyCarrier._id);
-        }
-
-        // If the star has no garrison and no defenders, then the attacker has won.
-        let defendersRemaining = friendlyCarriers.reduce((sum, c) => sum += c.ships, 0);
-
-        if (defendersRemaining <= 0 && star.garrison <= 0) {
-            let captureReward = star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
-
-            star.ownedByPlayerId = enemyCarrier.ownedByPlayerId;
-            attacker.credits += captureReward;
-            star.infrastructure.economy = 0;
-
-            // TODO: If the home star is captured, find a new one?
-            // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
-
-            defenderUser.achievements.combat.stars.lost++;
-            attackerUser.achievements.combat.stars.captured++;
-            
-            this.emit('onStarCaptured', {
-                game,
-                player: attacker,
-                star,
-                captureReward
-            });
-            
-            this.emit('onStarCaptured', {
-                game,
-                player: defender,
-                star,
-                captureReward
-            });
-        }
-
-        await defenderUser.save();
-        await attackerUser.save();
-    }
-
-    async _performCombatAtStar2(game, star, carriers, report) {
+    async _performCombatAtStar(game, star, carriers, report) {
         // Get all defender carriers ordered by most carriers present descending.
         // Carriers who have the most ships will be target first in combat.
         let defenderCarriers = carriers
