@@ -87,7 +87,7 @@ export default {
     GameContainer.map.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
     GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
 
-    let userPlayer = GameHelper.getUserPlayer()
+    let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     if (userPlayer) {
       this.hyperspaceRange = userPlayer.research.hyperspace.level

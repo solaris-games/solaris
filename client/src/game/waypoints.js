@@ -23,10 +23,10 @@ class Waypoints extends EventEmitter {
 
     this.carrier = carrier
 
+    this.drawHyperspaceRange()
     this.drawLastWaypoint()
     this.drawNextWaypoints()
     this.drawPaths()
-    this.drawHyperspaceRange()
   }
 
   drawLastWaypoint () {
@@ -92,8 +92,9 @@ class Waypoints extends EventEmitter {
 
     let radius = ((player.research.hyperspace.level || 1) + 1.5) * this.lightYearDistance
 
-    graphics.lineStyle(1, 0xFFFFFF, 0.3)
-    graphics.drawStar(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 2)
+    graphics.beginFill(player.colour.value, 0.2)
+    graphics.drawStar(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 3)
+    graphics.endFill()
 
     this.container.addChild(graphics)
   }

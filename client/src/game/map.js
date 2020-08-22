@@ -32,10 +32,10 @@ class Map extends EventEmitter {
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
 
+    this.container.addChild(this.rulerPointContainer)
+    this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
-    this.container.addChild(this.waypointContainer)
-    this.container.addChild(this.rulerPointContainer)
   }
 
   setup (game) {

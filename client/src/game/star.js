@@ -74,30 +74,29 @@ class Star extends EventEmitter {
   }
 
   drawStar (force) {
-    if (force && this.sprite_star) {
-      this.container.removeChild(this.sprite_star)
-      this.sprite_star = null
+    if (force && this.graphics_star) {
+      this.container.removeChild(this.graphics_star)
+      this.graphics_star = null
     }
 
-    if (!this.sprite_star) {
-      this.sprite_star = new PIXI.Sprite(TextureService.getStarTexture())
+    if (!this.graphics_star) {
+      this.graphics_star = new PIXI.Graphics()
 
-      this.sprite_star.width = 10
-      this.sprite_star.height = 10
-      this.sprite_star.position.x = this.data.location.x - 5
-      this.sprite_star.position.y = this.data.location.y - 5
-
-      this.container.addChild(this.sprite_star)
+      this.container.addChild(this.graphics_star)
     }
 
-    this.sprite_star.visible = !this._getStarCarriers().length
+    this.graphics_star.clear()
 
-    if (!this._isInScanningRange()) {
-      this.sprite_star.alpha = 0.3
-    }
+    this.graphics_star.visible = !this._getStarCarriers().length
 
-    // Add a larger hit radius so that the star is easily clickable
-    // this.sprite_star.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+    let radius = 3,
+      alpha = this._isInScanningRange() ? 1 : 0.3
+
+    this.graphics_star.beginFill(0xFFFFFF, alpha)
+    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, radius * 2, radius, radius - 3)
+    this.graphics_star.endFill()
+
+    this.graphics_star.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
   }
 
   drawPlanets (force) {
@@ -342,8 +341,12 @@ class Star extends EventEmitter {
 
     let radius = ((player.research.scanning.level || 1) + 1) * this.lightYearDistance
 
-    this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.3)
-    this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 1)
+    // this.graphics_scanningRange.lineStyle(0, 0xFFFFFF, 0.2)
+    this.graphics_scanningRange.beginFill(player.colour.value, 0.2)
+    this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
+    this.graphics_scanningRange.endFill()
+    this.graphics_scanningRange.zIndex = -1
+    this.container.zIndex = -1
   }
 
   drawHyperspaceRange (force) {
@@ -361,6 +364,7 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.clear()
 
     if (!this.isSelected) {
+      this.container.zIndex = 0
       return
     }
 
@@ -371,8 +375,12 @@ class Star extends EventEmitter {
 
     let radius = ((player.research.hyperspace.level || 1) + 1.5) * this.lightYearDistance
 
-    this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.3)
-    this.graphics_hyperspaceRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
+    // this.graphics_hyperspaceRange.lineStyle(0, 0xFFFFFF, 0.2)
+    this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.2)
+    this.graphics_hyperspaceRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 3)
+    this.graphics_hyperspaceRange.endFill()
+    this.graphics_hyperspaceRange.zIndex = -1
+    this.container.zIndex = -1
   }
 
   onClicked (e) {

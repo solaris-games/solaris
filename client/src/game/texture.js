@@ -3,7 +3,6 @@ import * as PIXI from 'pixi.js'
 class TextureService {
     DEFAULT_FONT_STYLE = null
 
-    STAR_BASE_TEXTURE = null
     PLANET_BASE_TEXTURE = null
     PLANET_TEXTURES = []
 
@@ -13,8 +12,6 @@ class TextureService {
         fill: 0xFFFFFF,
         padding: 3
       })
-
-      this.STAR_BASE_TEXTURE = PIXI.BaseTexture.from(require('../assets/star.png'))
 
       this.PLANET_BASE_TEXTURE = PIXI.BaseTexture.from(require('../assets/PixelPlanets.png'))
       this.PLANET_BASE_TEXTURE.setSize(390, 460)
@@ -86,10 +83,6 @@ class TextureService {
       this._loadPlanetTexture(116, 369, 28, 28)
       this._loadPlanetTexture(153, 369, 28, 28)
       this._loadPlanetTexture(190, 369, 28, 28)
-    }
-
-    getStarTexture () {
-      return new PIXI.Texture(this.STAR_BASE_TEXTURE)
     }
 
     getPlanetTexture (x, y) {
