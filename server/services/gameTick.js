@@ -200,7 +200,9 @@ module.exports = class GameTickService extends EventEmitter {
 
                 // If the star is owned by another player, then perform combat.
                 if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    combatStars.push(destinationStar);
+                    if (combatStars.indexOf(destinationStar) < 0) {
+                        combatStars.push(destinationStar);
+                    }
                 }
 
                 // The star has been affected by the game tick so append it to the report
@@ -296,6 +298,7 @@ module.exports = class GameTickService extends EventEmitter {
         combatResult.carriers = carriers.map(c => {
             return {
                 _id: c._id,
+                name: c.name,
                 ownedByPlayerId: c.ownedByPlayerId,
                 before: c.ships,
                 lost: 0,
@@ -443,6 +446,7 @@ module.exports = class GameTickService extends EventEmitter {
                 game,
                 player: newStarPlayer,
                 star,
+                capturedBy: newStarPlayer,
                 captureReward
             });
             
@@ -450,15 +454,9 @@ module.exports = class GameTickService extends EventEmitter {
                 game,
                 player: defender,
                 star,
+                capturedBy: newStarPlayer,
                 captureReward
             });
-
-            // If there are still attackers remaining, recurse.
-            attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
-
-            if (attackerPlayerIds.length > 1) {
-                return await this.performCombatAtStar(game, star, attackerCarriers);
-            }
         }
 
         // Log the combat event
@@ -467,7 +465,6 @@ module.exports = class GameTickService extends EventEmitter {
             defender,
             attackers,
             star,
-            carriers,
             combatResult
         });
 
@@ -476,6 +473,13 @@ module.exports = class GameTickService extends EventEmitter {
 
         for (let attackerUser of attackerUsers) {
             await attackerUser.save();
+        }
+
+        // If there are still attackers remaining, recurse.
+        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+
+        if (attackerPlayerIds.length > 1) {
+            await this._performCombatAtStar(game, star, attackerCarriers, report);
         }
     }
 

@@ -48,8 +48,8 @@ module.exports = class EventService {
         this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.game, args.player));
         
         this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
-            args.game, args.defender, args.attackers, args.star, args.carriers, args.combatResult));
-        this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.captureReward));
+            args.game, args.defender, args.attackers, args.star, args.combatResult));
+        this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.capturedBy, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
             args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount));
             
@@ -187,17 +187,11 @@ module.exports = class EventService {
         return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
-    async createPlayerCombatStarEvent(game, defender, attackers, star, carriers, combatResult) {
+    async createPlayerCombatStarEvent(game, defender, attackers, star, combatResult) {
         let data = {
             playerIdDefender: defender._id,
             playerIdAttackers: attackers.map(p => p._id),
             starId: star._id,
-            carriers: carriers.map(c => {
-                return {
-                    _id: c._id,
-                    name: c.name
-                }
-            }),
             combatResult
         };
 
@@ -294,9 +288,10 @@ module.exports = class EventService {
         return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data);
     }
 
-    async createStarCapturedEvent(game, player, star, creditsReward) {
+    async createStarCapturedEvent(game, player, star, capturedBy, creditsReward) {
         let data = {
             starId: star._id,
+            capturedBy: capturedBy._id,
             creditsReward
         };
 

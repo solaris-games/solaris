@@ -21,8 +21,8 @@
                     </tr>
                     <tr>
                         <td>
-                            <i class="fas fa-star mr-1"></i>
-                            <span class="text-success" v-if="star">{{star.name}}</span>
+                            <i class="fas fa-star mr-2"></i>
+                            <span :style="{ 'color': getStarColour() }" v-if="star">{{star.name}}</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.star.before}}</td>
                         <td class="text-right">{{event.data.combatResult.star.lost}}</td>
@@ -30,8 +30,8 @@
                     </tr>
                     <tr v-for="carrier of defenderCarriers" :key="carrier._id">
                         <td>
-                            <i class="fas fa-rocket mr-1"></i>
-                            <span class="text-success">{{getCarrierName(carrier._id)}}</span>
+                            <i class="fas fa-rocket mr-2"></i>
+                            <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
                         <td class="text-right">{{carrier.lost}}</td>
@@ -45,8 +45,8 @@
                     </tr>
                     <tr v-for="carrier of attackerCarriers" :key="carrier._id">
                         <td>
-                            <i class="fas fa-rocket mr-1"></i>
-                            <span class="text-danger">{{getCarrierName(carrier._id)}}</span>
+                            <i class="fas fa-rocket mr-2"></i>
+                            <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
                         <td class="text-right">{{carrier.lost}}</td>
@@ -89,8 +89,16 @@ export default {
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
-    getCarrierName (carrierId) {
-      return this.event.data.carriers.find(c => c._id === carrierId).name
+    getCarrierColour (carrierId) {
+      let carrier = this.event.data.combatResult.carriers.find(c => c._id === carrierId)
+      let playerColour = GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)
+
+      return playerColour
+    },
+    getStarColour (starId) {
+      let playerColour = GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdDefender)
+
+      return playerColour
     }
   }
 }

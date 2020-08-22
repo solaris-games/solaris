@@ -29,7 +29,7 @@ export default {
   },
   mounted () {
     this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerId)
+    this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.capturedBy)
   },
   methods: {
     onOpenStarDetailRequested (e) {
