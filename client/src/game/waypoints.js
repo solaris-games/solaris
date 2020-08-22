@@ -92,7 +92,8 @@ class Waypoints extends EventEmitter {
 
     let radius = ((player.research.hyperspace.level || 1) + 1.5) * this.lightYearDistance
 
-    graphics.beginFill(player.colour.value, 0.3)
+    graphics.lineStyle(1, player.colour.value, 0.2)
+    graphics.beginFill(player.colour.value, 0.15)
     graphics.drawStar(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 3)
     graphics.endFill()
 
