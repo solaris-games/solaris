@@ -55,7 +55,7 @@ class Star extends EventEmitter {
     let force = this.isInScanningRange !== this._isInScanningRange()
 
     this.drawStar(force)
-    this.drawTerritory(force)
+    // this.drawTerritory(force)
     this.drawPlanets(force)
     this.drawColour(force)
     this.drawScanningRange(force)
