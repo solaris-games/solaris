@@ -55,7 +55,7 @@ class Star extends EventEmitter {
     let force = this.isInScanningRange !== this._isInScanningRange()
 
     this.drawStar(force)
-    // this.drawTerritory(force)
+    this.drawTerritory(force)
     this.drawPlanets(force)
     this.drawColour(force)
     this.drawScanningRange(force)
@@ -120,7 +120,7 @@ class Star extends EventEmitter {
     if (!player) { return }
 
     this.graphics_territory.beginFill(player.colour.value, 0.1)
-    this.graphics_territory.drawCircle(this.data.location.x, this.data.location.y, this.lightYearDistance)
+    this.graphics_territory.drawCircle(this.data.location.x, this.data.location.y, this.lightYearDistance / 3)
     this.graphics_territory.endFill()
   }
 
