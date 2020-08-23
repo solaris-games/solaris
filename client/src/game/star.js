@@ -97,7 +97,7 @@ class Star extends EventEmitter {
     this.graphics_star.drawStar(this.data.location.x, this.data.location.y, radius * 2, radius, radius - 3)
     this.graphics_star.endFill()
 
-    this.graphics_star.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
+    this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
   }
 
   drawTerritory (force) {
