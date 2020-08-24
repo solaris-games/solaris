@@ -25,7 +25,10 @@
                         <span>{{mapObject.data.name}}</span>
                     </td>
                     <td class="text-right">
-                        <span v-if="mapObject.type === 'carrier'"><i class="fas fa-map-marker-alt"></i> {{mapObject.data.waypoints.length}}</span>
+                        <span v-if="mapObject.type === 'carrier'">
+                          <i class="fas fa-map-marker-alt"></i>
+                          <i class="fas fa-sync ml-1" v-if="mapObject.data.waypointsLooped"></i>
+                          {{mapObject.data.waypoints.length}}</span>
                     </td>
                     <td class="text-right" style="width:30%;">
                         <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
