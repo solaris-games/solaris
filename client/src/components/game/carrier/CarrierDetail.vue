@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div v-if="carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated && carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>

@@ -69,9 +69,7 @@ module.exports = class GameTickService extends EventEmitter {
         };
 
        await this._moveCarriers(game, report);
-       logTime('Move carriers');
-       this._produceShips(game, report);
-       logTime('Produce ships');
+       logTime('Move carriers and produce ships');
        await this._conductResearch(game, report);
        logTime('Conduct research');
        this._endOfGalacticCycleCheck(game, report);
@@ -230,18 +228,40 @@ module.exports = class GameTickService extends EventEmitter {
         // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
         actionWaypoints = actionWaypoints.filter(x => x.carrier.ships > 0);
 
-        // 4. Now that combat is done, perform any carrier waypoint actions.
-        this._performWaypointActions(game, actionWaypoints);
+        // 4a. Now that combat is done, perform any carrier waypoint actions.
+        // Do the drops first
+        this._performWaypointActionsDrops(game, actionWaypoints);
+
+        // 4b. Build ships at star.
+        this._produceShips(game, report);
+
+        // 4c. Do the rest of the waypoint actions.
+        this._performWaypointActionsCollects(game, actionWaypoints);
+        this._performWaypointActionsGarrisons(game, actionWaypoints);
     }
 
     _performWaypointActions(game, actionWaypoints) {
-        // TODO: Order the waypoints by action, so that drops occur before collects.
-        for (let i = 0; i < actionWaypoints.length; i++) {
-            let actionWaypoint = actionWaypoints[i];
-
-            this.waypointService.performWaypointAction(actionWaypoint.carrier, 
-                actionWaypoint.star, actionWaypoint.waypoint);
+        for (let actionWaypoint of actionWaypoints) {
+            this.waypointService.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
         }
+    }
+
+    _performFilteredWaypointActions(game, waypoints, waypointTypes) {
+        let actionWaypoints = waypoints.filter(w => waypointTypes.indexOf(w.waypoint.action) > -1);
+
+        this._performWaypointActions(game, actionWaypoints);
+    }
+
+    _performWaypointActionsDrops(game, waypoints) {
+        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut']);
+    }
+
+    _performWaypointActionsCollects(game, waypoints) {
+        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut']);
+    }
+
+    _performWaypointActionsGarrisons(game, waypoints) {
+        this._performFilteredWaypointActions(game, waypoints, ['garrison']);
     }
 
     async _performCombatAtStar(game, star, carriers, report) {
