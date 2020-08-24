@@ -24,6 +24,9 @@ module.exports = class GameListService {
             'settings.general.createdByUserId': { $eq: null },
             'state.startDate': { $eq: null }
         })
+        .sort({
+            'settings.general.description': 1 // Sort description ascending
+        })
         .select(SELECTS.INFO)
         .lean()
         .exec();
@@ -54,6 +57,9 @@ module.exports = class GameListService {
                 }
             ]
         })
+        .sort({
+            'state.startDate': -1 // Sort start date descending (most recent started games appear first)
+        })
         .select(SELECTS.INFO)
         .lean()
         .exec();
@@ -68,7 +74,7 @@ module.exports = class GameListService {
             ]
         })
         .sort({
-            'state.endDate': -1 // Sort end date descending
+            'state.startDate': -1 // Sort start date descending (most recent finished games appear first)
         })
         .select(SELECTS.INFO)
         .lean()
