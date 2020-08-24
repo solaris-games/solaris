@@ -10,7 +10,7 @@
       <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
     </menu-title>
 
-    <overview :player="player"
+    <overview v-if="player" :playerId="player._id"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 
@@ -28,12 +28,12 @@
 
     <h4 v-if="userPlayer" class="mt-2">Technology</h4>
 
-    <research v-if="userPlayer" :player="player" :userPlayer="userPlayer"/>
+    <research v-if="player" :playerId="player._id"/>
 
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated">
       <h4 class="mt-2">Trade</h4>
 
-      <sendTechnology :player="player" :userPlayer="userPlayer"/>
+      <sendTechnology v-if="player" :playerId="player._id"/>
       <sendCredits :player="player" :userPlayer="userPlayer"/>
     </div>
 

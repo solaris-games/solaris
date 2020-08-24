@@ -4,8 +4,8 @@
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p v-if="carrier.ownedByPlayerId == currentPlayerId">A carrier under your command.<br/>Give it orders to capture more stars!</p>
-        <p v-if="carrier.ownedByPlayerId != null && carrier.ownedByPlayerId != currentPlayerId">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getCarrierOwningPlayer().alias}}</a>.</p>
+        <p v-if="userPlayer && carrier.ownedByPlayerId == userPlayer._id">A carrier under your command.<br/>Give it orders to capture more stars!</p>
+        <p v-if="carrier.ownedByPlayerId != null && (!userPlayer || carrier.ownedByPlayerId != userPlayer._id)">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <h4 class="pt-2" v-if="getCarrierOwningPlayer() == getUserPlayer()">Navigation</h4>
+    <h4 class="pt-2" v-if="carrierOwningPlayer == userPlayer">Navigation</h4>
 
     <div class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
@@ -27,7 +27,7 @@
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-5">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="getCarrierOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated">Ship Transfer</button>
+          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated">Ship Transfer</button>
         </div>
       </div>
 
@@ -37,12 +37,12 @@
         </div>
       </div>
 
-      <div v-if="carrier.waypoints.length && getCarrierOwningPlayer() == getUserPlayer()" class="row pt-0 pb-0 mb-0">
+      <div v-if="carrier.waypoints.length && carrierOwningPlayer == userPlayer" class="row pt-0 pb-0 mb-0">
         <waypointTable :carrier="carrier" @onEditWaypointRequested="onEditWaypointRequested"
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
-      <div v-if="carrier.waypoints.length && getCarrierOwningPlayer() != getUserPlayer()" class="row mb-0 pt-2 pb-3">
+      <div v-if="carrier.waypoints.length && carrierOwningPlayer != userPlayer" class="row mb-0 pt-2 pb-3">
         <div class="col">
             Destination
         </div>
@@ -66,12 +66,12 @@
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
         <div class="col-5 mb-2">
-          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="getCarrierOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated">Edit Waypoints</button>
+          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated">Edit Waypoints</button>
         </div>
       </div>
     </div>
 
-    <playerOverview v-if="getCarrierOwningPlayer()" :player="getCarrierOwningPlayer()"
+    <playerOverview v-if="carrierOwningPlayer" :playerId="carrierOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 </div>
@@ -97,7 +97,8 @@ export default {
   data () {
     return {
       carrier: null,
-      currentPlayerId: this.getUserPlayer()._id,
+      carrierOwningPlayer: null,
+      userPlayer: null,
       isLoopingWaypoints: false,
       timeRemainingEta: null,
       timeRemainingEtaTotal: null,
@@ -106,7 +107,9 @@ export default {
     }
   },
   mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+    this.carrierOwningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
 
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
 
@@ -133,19 +136,11 @@ export default {
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
     },
-    // TODO: Methods like these should never be used, instead assign the user player
-    // to the vue data() method in mounted()
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    getCarrierOwningPlayer () {
-      return GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
-    },
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.getCarrierOwningPlayer()._id)
+      this.$emit('onOpenPlayerDetailRequested', this.carrierOwningPlayer._id)
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)

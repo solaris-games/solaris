@@ -4,8 +4,8 @@
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p v-if="star.ownedByPlayerId == currentPlayerId">A star under your command.</p>
-        <p v-if="star.ownedByPlayerId != null && star.ownedByPlayerId != currentPlayerId">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getStarOwningPlayer().alias}}</a>.</p>
+        <p v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
+        <p v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
       </div>
     </div>
@@ -45,7 +45,8 @@
             <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
           </div>
         <div class="col-auto">
-          <i class="fas fa-map-marker-alt"></i> {{carrier.waypoints.length}}
+          <i class="fas fa-map-marker-alt"></i>
+          <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
         </div>
           <div class="col-auto">
               {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
@@ -59,29 +60,29 @@
       <infrastructure
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
-      <infrastructureUpgrade v-if="getStarOwningPlayer() != null && getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated && star.upgradeCosts != null"
+      <infrastructureUpgrade v-if="userPlayer && starOwningPlayer != null && starOwningPlayer == userPlayer && !userPlayer.defeated && star.upgradeCosts != null"
         :star="star"
-        :availableCredits="getUserPlayer().credits"
+        :availableCredits="userPlayer.credits"
         :economy="star.upgradeCosts.economy"
         :industry="star.upgradeCosts.industry"
         :science="star.upgradeCosts.science"
         v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
     </div>
 
-    <div class="row bg-secondary mt-2 mb-2" v-if="star.ownedByPlayerId && getUserPlayer() && star.manufacturing != null">
+    <div class="row bg-secondary mt-2 mb-2" v-if="star.ownedByPlayerId && star.manufacturing != null">
       <div class="col text-center pt-3">
-        <p>This star builds <b>{{star.manufacturing}}</b> every tick.</p>
+        <p>This star builds <b>{{star.manufacturing}}</b> ships every tick.</p>
       </div>
     </div>
 
     <!-- TODO: Turn these into components -->
-    <div v-if="getStarOwningPlayer() != null && getStarOwningPlayer() == getUserPlayer() && !getUserPlayer().defeated && star.upgradeCosts != null" class="mb-2">
+    <div v-if="userPlayer && starOwningPlayer != null && starOwningPlayer == userPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton :disabled="getUserPlayer().credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
+          <modalButton :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
         </div>
       </div>
 
@@ -90,7 +91,7 @@
           <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
         </div>
         <div class="col-4">
-          <modalButton v-if="!star.warpGate" :disabled="getUserPlayer().credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+          <modalButton v-if="!star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
           <modalButton v-if="star.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
         </div>
       </div>
@@ -119,18 +120,18 @@
       -->
     </div>
 
-    <playerOverview v-if="getStarOwningPlayer()" :player="getStarOwningPlayer()"
+    <playerOverview v-if="starOwningPlayer" :playerId="starOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 
     <!-- Modals -->
 
-    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer() && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
+    <dialogModal v-if="userPlayer && starOwningPlayer == userPlayer && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
       <p>Are you sure you want build a Carrier at <b>{{star.name}}</b>?</p>
       <p>The carrier will cost ${{star.upgradeCosts.carriers}}.</p>
     </dialogModal>
 
-    <dialogModal v-if="getStarOwningPlayer() == getUserPlayer() && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+    <dialogModal v-if="userPlayer && starOwningPlayer == userPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
       <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
       <p>The upgrade will cost ${{star.upgradeCosts.warpGate}}.</p>
     </dialogModal>
@@ -172,18 +173,16 @@ export default {
   data () {
     return {
       star: null,
+      starOwningPlayer: null,
+      userPlayer: null,
       currentPlayerId: null,
       canBuildWarpGates: false
     }
   },
   mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
-
-    let userPlayer = this.getUserPlayer()
-
-    if (userPlayer) {
-      this.currentPlayerId = userPlayer._id
-    }
+    this.starOwningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
   },
@@ -197,9 +196,6 @@ export default {
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
     },
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
     },
@@ -210,7 +206,7 @@ export default {
       return GameHelper.isGameInProgress(this.$store.state.game)
     },
     onInfrastructureUpgraded (e) {
-      let starOwningPlayer = this.getStarOwningPlayer()
+      let starOwningPlayer = this.starOwningPlayer
 
       starOwningPlayer.credits -= e.data.cost
 
@@ -226,7 +222,7 @@ export default {
       }
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.getStarOwningPlayer()._id)
+      this.$emit('onOpenPlayerDetailRequested', this.starOwningPlayer._id)
     },
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
@@ -247,7 +243,7 @@ export default {
           // this.$emit('onCarrierBuilt', this.star._id)
           // this.onOpenCarrierDetailRequested(response.data)
           this.onEditWaypointsRequested(response.data)
-          this.getUserPlayer().credits -= this.star.upgradeCosts.carriers
+          this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
           AudioService.join()
         }

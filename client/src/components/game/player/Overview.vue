@@ -17,7 +17,7 @@
           </div>
       </div>
       <div class="col bg-secondary">
-          <statistics :player="player"/>
+          <statistics :playerId="playerId"/>
       </div>
   </div>
 </div>
@@ -34,14 +34,17 @@ export default {
     'player-title': PlayerTitleVue
   },
   props: {
-    player: Object
+    playerId: String
   },
   data () {
     return {
+      player: null,
       gameHasStarted: null
     }
   },
   mounted () {
+    this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
+
     this.gameHasStarted = this.$store.state.game.state.startDate != null
   },
   methods: {

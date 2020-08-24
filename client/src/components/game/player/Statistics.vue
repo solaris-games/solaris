@@ -1,5 +1,5 @@
 <template>
-<div class="table-responsive mb-0">
+<div class="table-responsive mb-0" v-if="player">
   <table class="table table-sm bg-secondary">
       <thead>
           <tr>
@@ -47,14 +47,16 @@ import GameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
-    player: Object
+    playerId: String
   },
   data () {
     return {
+      player: null,
       userPlayer: null
     }
   },
   mounted () {
+    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
   },
   methods: {

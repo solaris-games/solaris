@@ -1,5 +1,5 @@
 <template>
-<div class="row bg-primary">
+<div class="row bg-primary" v-if="userPlayer && player">
     <div class="col">
         <div class="table-responsive mb-0">
             <table class="table table-sm">
@@ -76,10 +76,21 @@
 </template>
 
 <script>
+import gameHelper from '../../../services/gameHelper'
+
 export default {
   props: {
-    player: Object,
-    userPlayer: Object
+    playerId: String
+  },
+  data () {
+      return {
+          player: null,
+          userPlayer: null
+      }
+  }, 
+  mounted () {
+      this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
+      this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
   }
 }
 </script>

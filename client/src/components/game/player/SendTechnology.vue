@@ -30,11 +30,11 @@ import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import TradeApiService from '../../../services/api/trade'
 import TechnologyHelper from '../../../services/technologyHelper'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   props: {
-    player: Object,
-    userPlayer: Object
+    playerId: String
   },
   components: {
     'modalButton': ModalButton,
@@ -42,11 +42,16 @@ export default {
   },
   data () {
     return {
+      player: null,
+      userPlayer: null,
       selectedTechnology: null,
       availableTechnologies: []
     }
   },
   mounted () {
+    this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
+    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
     this.getTradeableTechnologies()
   },
   methods: {
@@ -78,6 +83,10 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Sent ${this.selectedTechnology.name} (level ${this.selectedTechnology.level}) to ${this.player.alias}.`)
 
+          let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
+
+          playerTech.level = this.selectedTechnology.level
+          
           this.getTradeableTechnologies()
         }
       } catch (err) {

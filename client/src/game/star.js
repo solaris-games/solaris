@@ -90,8 +90,8 @@ class Star extends EventEmitter {
 
     this.graphics_star.visible = !this._getStarCarriers().length
 
-    let radius = 3,
-      alpha = this._isInScanningRange() ? 1 : 0.3
+    let radius = 3
+    let alpha = this._isInScanningRange() ? 1 : 0.3
 
     this.graphics_star.beginFill(0xFFFFFF, alpha)
     this.graphics_star.drawStar(this.data.location.x, this.data.location.y, radius * 2, radius, radius - 3)
