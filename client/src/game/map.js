@@ -4,6 +4,7 @@ import Star from './star'
 import Carrier from './carrier'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
+import Territories from './territories'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 import AnimationService from './animation'
@@ -31,7 +32,9 @@ class Map extends EventEmitter {
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
+    this.territoryContainer = new PIXI.Container()
 
+    this.container.addChild(this.territoryContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
@@ -84,6 +87,13 @@ class Map extends EventEmitter {
     this.rulerPoints.onRulerPointsClearedHandler = this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
 
     this.rulerPointContainer.addChild(this.rulerPoints.container)
+
+    // -----------
+    // Setup Territories
+    this.territories = new Territories()
+    this.territories.setup(game)
+
+    this.territoryContainer.addChild(this.territories.container)
   }
 
   setupStar (game, starData) {
@@ -247,6 +257,14 @@ class Map extends EventEmitter {
 
   clearRulerPoints () {
     this.rulerPoints.setup(this.game)
+  }
+  
+  drawTerritories () {
+    this.territories.draw()
+  }
+
+  clearTerritories () {
+    this.territories.clear()
   }
 
   panToPlayer (game, player) {
@@ -465,6 +483,12 @@ class Map extends EventEmitter {
 
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
+
+    if (this.zoomPercent > 100) {
+      this.drawTerritories()
+    } else {
+      this.clearTerritories()
+    }
   }
 }
 
