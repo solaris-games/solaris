@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js'
 class Territories {
   constructor () {
     this.container = new PIXI.Container()
-    this.container.alpha = 0.2
+    this.container.alpha = 0.3
   }
 
   setup (game) {
