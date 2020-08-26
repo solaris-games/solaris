@@ -48,7 +48,7 @@ describe('random', () => {
     });
 
 
-    describe('getResourceScore', () => {
+    describe('generateStarNaturalResources', () => {
 
         const minResourceValue = 10;
         const maxResourceValue = 50;
@@ -59,14 +59,14 @@ describe('random', () => {
             let x = 3
             let y = 4;
 
-            let res = randomService.getResourceScore(radius, x, y);
+            let res = randomService.generateStarNaturalResources(radius, x, y, minResourceValue, maxResourceValue);
             expect(res).toBe(minResourceValue);
 
             radius = Math.sqrt(5);
             x = 1;
             y = 2;
 
-            res = randomService.getResourceScore(radius, x, y);
+            res = randomService.generateStarNaturalResources(radius, x, y,minResourceValue, maxResourceValue);
             expect(res).toBe(minResourceValue);
         });
 
@@ -76,11 +76,11 @@ describe('random', () => {
             let x = 0
             let y = 0;
 
-            let res = randomService.getResourceScore(radius, x, y);
+            let res = randomService.generateStarNaturalResources(radius, x, y, minResourceValue, maxResourceValue);
             expect(res).toBe(maxResourceValue);
 
             radius = 10;
-            res = randomService.getResourceScore(radius, x, y);
+            res = randomService.generateStarNaturalResources(radius, x, y, minResourceValue, maxResourceValue);
             expect(res).toBe(maxResourceValue);
         });
 
@@ -99,7 +99,7 @@ describe('random', () => {
                 x = i;
                 y = i;
              
-                let res = randomService.getResourceScore(radius, x, y);
+                let res = randomService.generateStarNaturalResources(radius, x, y, minResourceValue, maxResourceValue);
 
                 expect(res).toBeGreaterThanOrEqual(minResourceValue);
                 expect(res).toBeLessThanOrEqual(maxResourceValue);

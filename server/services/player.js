@@ -62,11 +62,13 @@ module.exports = class PlayerService {
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
 
+        const starLocations = game.galaxy.stars.map(s => s.location);
+
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(game.galaxy.stars);
+        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
 
         // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars).x / 2 / 2;
+        const distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 

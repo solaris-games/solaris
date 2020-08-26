@@ -191,7 +191,7 @@ class Star extends EventEmitter {
   }
 
   _getPlanetsCount () {
-    return Math.floor(this.data.naturalResources / 50 * 3)
+    return Math.floor(this.data.naturalResources / 45 * 3) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {

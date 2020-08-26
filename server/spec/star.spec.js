@@ -13,6 +13,9 @@ const fakeRandomService = {
     },
     getRandomPositionInCircleFromOrigin(originX, originY, radius) {
         return radius;
+    },
+    generateStarNaturalResources() {
+        return 10;
     }
 };
 
@@ -53,7 +56,7 @@ describe('star', () => {
     it('should generate an unowned star', () => {
         const name = 'test star name';
 
-        const newStar = starService.generateUnownedStar(game, name);
+        const newStar = starService.generateUnownedStar(game, name, { x:0, y:0 }, 10);
 
         expect(newStar).not.toBe(null);
         expect(newStar._id).not.toBe(null);

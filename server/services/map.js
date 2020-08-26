@@ -17,9 +17,13 @@ module.exports = class MapService {
         // Generate all of the locations for stars.
         const starLocations = this.starMapService.generateLocations(game, starCount);
 
+        // Work out how large the radius of the circle used to determine natural resources.
+        // The closer to the center of the galaxy, the more likely to find stars with higher resources.
+        const resourceRadius = this.getGalaxyDiameter(starLocations).x / 3;
+
         // Iterate over all star locations
         for (let i = 0; i < starLocations.length; i++) {
-            const star = this.starService.generateUnownedStar(game, starNames[i], starLocations[i]);
+            const star = this.starService.generateUnownedStar(game, starNames[i], starLocations[i], resourceRadius);
 
             stars.push(star);
         }
@@ -53,10 +57,10 @@ module.exports = class MapService {
     }
 
     getGalaxyDiameter(stars) {
-        let maxX = stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
-        let maxY = stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
-        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
-        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
+        let maxX = stars.sort((a, b) => b.x - a.x)[0].x;
+        let maxY = stars.sort((a, b) => b.y - a.y)[0].y;
+        let minX = stars.sort((a, b) => a.x - b.x)[0].x;
+        let minY = stars.sort((a, b) => a.y - b.y)[0].y;
 
         return {
             x: Math.abs(minX) + Math.abs(maxX),
@@ -64,11 +68,11 @@ module.exports = class MapService {
         };
     }
 
-    getGalaxyCenter(stars) {
-        let maxX = stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
-        let maxY = stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
-        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
-        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
+    getGalaxyCenter(starLocations) {
+        let maxX = starLocations.sort((a, b) => b.x - a.x)[0].x;
+        let maxY = starLocations.sort((a, b) => b.y - a.y)[0].y;
+        let minX = starLocations.sort((a, b) => a.x - b.x)[0].x;
+        let minY = starLocations.sort((a, b) => a.y - b.y)[0].y;
 
         return {
             x: (minX + maxX) / 2,
@@ -76,13 +80,13 @@ module.exports = class MapService {
         };
     }
 
-    getGalaxyCenterOfMass(stars) {
-        let totalX = stars.reduce((total, s) => total += s.location.x, 0);
-        let totalY = stars.reduce((total, s) => total += s.location.y, 0);
+    getGalaxyCenterOfMass(starLocations) {
+        let totalX = starLocations.reduce((total, s) => total += s.x, 0);
+        let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 
         return {
-            x: totalX / stars.length,
-            y: totalY / stars.length,
+            x: totalX / starLocations.length,
+            y: totalY / starLocations.length,
         };
     }
 

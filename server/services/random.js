@@ -1,6 +1,3 @@
-const minResourceScore = 10;
-const maxResourceScore = 50;
-
 module.exports = class RandomService {
 
     getRandomNumber(max) {
@@ -36,17 +33,37 @@ module.exports = class RandomService {
         return position;
     }
     
+    generateStarNaturalResources(radius, x, y, minResources, maxResources, fuzzy = false){
+        const RS_BASE = 2;
+        const RS_EXPONENT = 5.8;
 
-    getResourceScore(radius, x, y){
         let vector = Math.hypot(x, y);
         
         //How far from the outside (%) is the point
-        let vectorScale = (radius - vector)/radius;
+        let vectorScale = (radius - vector) / radius;
 
-        let resourceRange = maxResourceScore - minResourceScore;
+        let resourceRange = maxResources - minResources;
 
-        let score = minResourceScore + (resourceRange * vectorScale);
+        let naturalResources = minResources + (resourceRange * vectorScale);
 
-        return score;
+        // TODO: This is a better approach however appears to be incorrect. Seems to be returning
+        // the reverse of what is intended. i.e Center of the galaxy returns max resources instead of min.
+        // let naturalResources = minResources + (resourceRange * Math.pow(RS_BASE, -RS_EXPONENT * Math.pow(vectorScale, 2)));
+
+        if (fuzzy) {
+            const FUZZY_LIMIT = 10;
+
+            let floorFuzzyNR = Math.max(minResources, naturalResources - FUZZY_LIMIT);
+            let ceilFuzzyNR = Math.min(maxResources, naturalResources + FUZZY_LIMIT);
+
+            naturalResources = this.getRandomNumberBetween(floorFuzzyNR, ceilFuzzyNR);
+        }
+
+        // Double check.
+        naturalResources = Math.max(minResources, naturalResources);
+        naturalResources = Math.min(maxResources, naturalResources);
+
+        return naturalResources;
     }
+
 };
