@@ -1,3 +1,6 @@
+const minResourceScore = 10;
+const maxResourceScore = 50;
+
 module.exports = class RandomService {
 
     getRandomNumber(max) {
@@ -33,4 +36,17 @@ module.exports = class RandomService {
         return position;
     }
     
+
+    getResourceScore(radius, x, y){
+        let vector = Math.hypot(x, y);
+        
+        //How far from the outside (%) is the point
+        let vectorScale = (radius - vector)/radius;
+
+        let resourceRange = maxResourceScore - minResourceScore;
+
+        let score = minResourceScore + (resourceRange * vectorScale);
+
+        return score;
+    }
 };
