@@ -100,6 +100,9 @@ module.exports = (router, io, container) => {
                         let starsInScanningRange = container.starService.filterStarsByScanningRange(req.game, p);
     
                         broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
+                    } else {
+                        // If its the player who did the upgrade then send everything.
+                        broadcastSummary = summary;
                     }
     
                     container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);

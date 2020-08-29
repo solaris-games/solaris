@@ -17,7 +17,8 @@
             </span>
 
             <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
-
+        </div>
+        <div class="col-auto text-right infrastructure" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
             <span class="d-none d-sm-inline-block ml-4">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
@@ -162,6 +163,9 @@ export default {
     onViewResearchRequested (e) {
       this.setMenuState(this.MENU_STATES.RESEARCH, e)
     },
+    onViewBulkUpgradeRequested (e) {
+      this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE, e)
+    },
     fitGalaxy () {
       GameContainer.viewport.fitWorld()
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
@@ -232,4 +236,7 @@ export default {
     overflow: auto;
     overflow-x: hidden;
 } */
+.infrastructure {
+  cursor:pointer;
+}
 </style>

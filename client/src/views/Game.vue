@@ -196,7 +196,6 @@ export default {
       AudioService.join()
     },
     onGameStarted (data) {
-      debugger
       this.$store.commit('gameStarted', data)
 
       this.$toasted.show(`The game is full and will start soon. Reload the game now to view the galaxy.`, {

@@ -201,10 +201,27 @@ export default new Vuex.Store({
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
 
-        // TODO: Update the player stats
-
         GameContainer.reloadStar(star)
       })
+      
+      // If there is an upgraded amount then its the current player.
+      if (data.upgraded) {
+        let userPlayer = GameHelper.getUserPlayer(state.game)
+  
+        switch (data.infrastructureType) {
+          case 'economy': 
+            userPlayer.stats.totalEconomy += data.upgraded 
+            break;
+          case 'industry': 
+            userPlayer.stats.totalIndustry += data.upgraded 
+            break;
+          case 'science': 
+            userPlayer.stats.totalScience += data.upgraded 
+            break;
+        }
+
+        userPlayer.credits -= data.cost
+      }
     },
     gameStarWarpGateBuilt (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
