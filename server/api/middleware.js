@@ -61,6 +61,8 @@ module.exports = (container) => {
         async loadGameInfo(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdInfo(req.params.gameId);
+
+                delete req.game.settings.general.password;
             }
 
             return next();

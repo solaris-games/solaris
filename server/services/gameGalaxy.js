@@ -26,6 +26,10 @@ module.exports = class GameGalaxyService {
             throw new ValidationError('Cannot view information about this game, you are not playing.');
         }
 
+        // Remove who created the game.
+        delete game.settings.general.createdByUserId;
+        delete game.settings.general.password; // Don't really need to explain why this is removed.
+
         // TODO: If the game is completed then show everything.
 
         // Append the player stats to each player.

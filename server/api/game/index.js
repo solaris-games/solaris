@@ -95,7 +95,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.session.userId,
                 req.body.playerId,
-                req.body.alias);
+                req.body.alias,
+                req.body.password);
 
             container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias);
 

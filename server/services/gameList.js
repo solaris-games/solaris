@@ -1,18 +1,5 @@
 const moment = require('moment');
 
-const SELECTS = {
-    INFO: {
-        settings: 1,
-        state: 1
-    },
-    SETTINGS: {
-        settings: 1
-    },
-    GALAXY: {
-        galaxy: 1
-    }
-};
-
 module.exports = class GameListService {
     
     constructor(gameModel) {
@@ -27,7 +14,12 @@ module.exports = class GameListService {
         .sort({
             'settings.general.description': 1 // Sort description ascending
         })
-        .select(SELECTS.INFO)
+        .select({
+            'settings.general.name': 1,
+            'settings.general.description': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
         .lean()
         .exec();
     }
@@ -37,7 +29,11 @@ module.exports = class GameListService {
             'settings.general.createdByUserId': { $ne: null },
             'state.startDate': { $eq: null }
         })
-        .select(SELECTS.INFO)
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
         .lean()
         .exec();
     }
@@ -60,7 +56,11 @@ module.exports = class GameListService {
         .sort({
             'state.startDate': -1 // Sort start date descending (most recent started games appear first)
         })
-        .select(SELECTS.INFO)
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
         .lean()
         .exec();
     }
@@ -76,7 +76,11 @@ module.exports = class GameListService {
         .sort({
             'state.startDate': -1 // Sort start date descending (most recent finished games appear first)
         })
-        .select(SELECTS.INFO)
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
         .lean()
         .exec();
     }

@@ -4,13 +4,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, carrierService, playerService) {
+    constructor(gameModel, userService, carrierService, playerService, passwordService) {
         super();
         
         this.gameModel = gameModel;
         this.userService = userService;
         this.carrierService = carrierService;
         this.playerService = playerService;
+        this.passwordService = passwordService;
     }
 
     async getByIdAll(id) {
@@ -35,7 +36,7 @@ module.exports = class GameService extends EventEmitter {
             settings: 1,
             state: 1,
             galaxy: 1,
-            constants: 1
+            constants: 1,
         });
     }
 
@@ -73,7 +74,7 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    async join(game, userId, playerId, alias) {
+    async join(game, userId, playerId, alias, password) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {
             throw new ValidationError('The game has already started.');
@@ -86,6 +87,14 @@ module.exports = class GameService extends EventEmitter {
 
         if (game.quitters.find(x => x.equals(userId))) {
             throw new ValidationError('You cannot rejoin this game.');
+        }
+
+        if (game.settings.general.password) {
+            let passwordMatch = await this.passwordService.compare(password, game.settings.general.password);
+
+            if (!passwordMatch) {
+                throw new ValidationError('The password is invalid.');
+            }
         }
 
         // Disallow if they are already in the game as another player.

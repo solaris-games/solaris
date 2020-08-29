@@ -8,7 +8,7 @@ module.exports = class PasswordService {
         return await this.bcrypt.hash(password, 10);
     }
 
-    compare(password1, password2) {
+    async compare(password1, password2) {
         return await this.bcrypt.compare(password1, password2);
     }
 };

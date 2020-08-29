@@ -4,12 +4,13 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService) {
         this.gameModel = gameModel;
         this.gameListService = gameListService;
         this.nameService = nameService;
         this.mapService = mapService;
         this.playerService = playerService;
+        this.passwordService = passwordService;
     }
 
     async create(settings) {
@@ -22,6 +23,11 @@ module.exports = class GameCreateService {
         
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
             throw new ValidationError('Game name must be between 3 and 24 characters.');
+        }
+
+        if (settings.general.password) {
+            settings.general.password = await this.passwordService.hash(settings.general.password);
+            settings.general.passwordRequired = true;
         }
 
         let game = new this.gameModel({

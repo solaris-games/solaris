@@ -68,11 +68,11 @@ module.exports = (io) => {
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const ledgerService = new LedgerService(playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
-    const gameService = new GameService(GameModel, userService, carrierService, playerService);
+    const gameService = new GameService(GameModel, userService, carrierService, playerService, passwordService);
     const researchService = new ResearchService(technologyService, randomService, playerService, userService);
     const tradeService = new TradeService(userService, playerService, ledgerService);
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService);
-    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService);
+    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService);
     const starUpgradeService = new StarUpgradeService(starService, carrierService, userService, researchService);
     const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService);
     const historyService = new HistoryService(HistoryModel, playerService);

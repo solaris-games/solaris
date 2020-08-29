@@ -51,9 +51,9 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  joinGame (gameId, playerId, alias) {
+  joinGame (gameId, playerId, alias, password) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/join', {
-      playerId, alias
+      playerId, alias, password
     },
     { withCredentials: true })
   }

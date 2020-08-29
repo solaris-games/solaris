@@ -4,6 +4,8 @@
 
     <select-alias v-on:onAliasChanged="onAliasChanged"/>
 
+    <enter-password v-if="isPasswordRequired" v-on:onPasswordChanged="onPasswordChanged"/>
+
     <form-error-list v-bind:errors="errors" class="mt-2"/>
 
     <loading-spinner :loading="isJoiningGame"/>
@@ -20,6 +22,7 @@ import gameService from '../../../services/api/game'
 import MenuTitle from '../MenuTitle'
 import FormErrorListVue from '../../FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
+import EnterPasswordVue from './EnterPassword.vue'
 import SelectColourVue from './SelectColour.vue'
 import ShareLinkVue from './ShareLink.vue'
 
@@ -29,15 +32,21 @@ export default {
     'menu-title': MenuTitle,
     'form-error-list': FormErrorListVue,
     'select-alias': SelectAliasVue,
+    'enter-password': EnterPasswordVue,
     'select-colour': SelectColourVue,
     'share-link': ShareLinkVue
   },
   data () {
     return {
       isJoiningGame: false,
+      isPasswordRequired: false,
       errors: [],
-      alias: ''
+      alias: '',
+      password: ''
     }
+  },
+  mounted () {
+    this.isPasswordRequired = this.$store.state.game.settings.general.passwordRequired
   },
   methods: {
     onCloseRequested (e) {
@@ -45,6 +54,9 @@ export default {
     },
     onAliasChanged (e) {
       this.alias = e
+    },
+    onPasswordChanged (e) {
+      this.password = e
     },
     async onJoinRequested (playerId) {
       this.errors = []
@@ -66,7 +78,7 @@ export default {
       try {
         this.isJoiningGame = true
 
-        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias)
+        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.password)
 
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.
