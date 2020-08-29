@@ -133,7 +133,7 @@ export default {
     subscribeToSockets () {
       // TODO: Move all component subscriptions into the components' socket object.
       this.sockets.subscribe('gameTicked', (data) => this.$store.commit('gameTicked', data))
-      this.sockets.subscribe('gameStarted', (data) => this.$store.commit('gameStarted', data))
+      this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
       this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
       this.sockets.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
@@ -194,6 +194,31 @@ export default {
       })
 
       AudioService.join()
+    },
+    onGameStarted (data) {
+      debugger
+      this.$store.commit('gameStarted', data)
+
+      this.$toasted.show(`The game is full and will start soon. Reload the game now to view the galaxy.`, {
+        duration: null,
+        type: 'info',
+        action: [
+          {
+            text: 'Dismiss',
+            onClick: (e, toastObject) => {
+              toastObject.goAway(0)
+            }
+          },
+          {
+            text: 'Reload',
+            onClick: (e, toastObject) => {
+              toastObject.goAway(0)
+
+              window.location.reload()
+            }
+          }
+        ]
+      })
     }
   },
   computed: {
