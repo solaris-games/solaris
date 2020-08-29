@@ -90,4 +90,12 @@ module.exports = class GameListService {
         .exec();
     }
 
+    async listOpenGamesCreatedByUser(userId) {
+        return await this.gameModel.find({
+            'settings.general.createdByUserId': { $eq: userId },
+            'state.startDate': { $eq: null }
+        })
+        .exec();
+    }
+
 };

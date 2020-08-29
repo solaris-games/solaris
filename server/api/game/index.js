@@ -15,8 +15,6 @@ module.exports = (router, io, container) => {
         req.body.general.createdByUserId = req.session.userId;
 
         try {
-            throw new ValidationError('Custom game creation has been disabled in the beta.');
-
             let game = await container.gameCreateService.create(req.body);
 
             return res.status(201).json(game._id);
