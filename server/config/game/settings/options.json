@@ -292,7 +292,7 @@
             },
             {
                 "value": 60,
-                "text": "Slow Speed (1 tick = 1 hour)"
+                "text": "Slow (1 tick = 1 hour)"
             }
         ],
         "startDelay": [
