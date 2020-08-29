@@ -90,8 +90,10 @@ module.exports = (router, io, container) => {
                 // the stuff that the UI needs.
                 req.game.galaxy.players.forEach(p => {
                     let broadcastSummary = {
+                        playerId: req.player._id,
                         stars: summary.stars,
-                        infrastructureType: summary.infrastructureType
+                        infrastructureType: summary.infrastructureType,
+                        upgraded: summary.upgraded
                     };
     
                     // If it isn't the player who performed the bulk upgrade then strip out
@@ -100,9 +102,6 @@ module.exports = (router, io, container) => {
                         let starsInScanningRange = container.starService.filterStarsByScanningRange(req.game, p);
     
                         broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
-                    } else {
-                        // If its the player who did the upgrade then send everything.
-                        broadcastSummary = summary;
                     }
     
                     container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);
