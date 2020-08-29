@@ -10,11 +10,11 @@ function uuidv4() {
 
 module.exports = class UserService extends EventEmitter {
     
-    constructor(bcrypt, userModel) {
+    constructor(userModel, passwordService) {
         super();
 
-        this.bcrypt = bcrypt;
         this.userModel = userModel;
+        this.passwordService = passwordService;
     }
 
     async getMe(id) {
@@ -103,7 +103,7 @@ module.exports = class UserService extends EventEmitter {
 
         const newUser = new this.userModel(user);
     
-        newUser.password = await this.bcrypt.hash(newUser.password, 10);
+        newUser.password = await this.passwordService.hash(newUser.password, 10);
 
         let doc = await newUser.save();
 
@@ -176,11 +176,11 @@ module.exports = class UserService extends EventEmitter {
         let user = await this.userModel.findById(id);
         
         // Make sure the current password matches.
-        let result = await this.bcrypt.compare(currentPassword, user.password);
+        let result = await this.passwordService.compare(currentPassword, user.password);
 
         if (result) {
             // Update the current password to the new password.
-            let hash = await this.bcrypt.hash(newPassword, 10);
+            let hash = await this.passwordService.hash(newPassword, 10);
             
             user.password = hash;
 
@@ -222,7 +222,7 @@ module.exports = class UserService extends EventEmitter {
         }
         
         // Update the current password to the new password.
-        let hash = await this.bcrypt.hash(newPassword, 10);
+        let hash = await this.passwordService.hash(newPassword, 10);
         
         user.password = hash;
         user.resetPasswordToken = null;

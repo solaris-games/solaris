@@ -5,6 +5,7 @@ const UserModel = require('../models/User');
 const HistoryModel = require('../models/History');
 const EventModel = require('../models/Event');
 
+const PasswordService = require('../services/password');
 const AuthService = require('../services/auth');
 const BroadcastService = require('../services/broadcast');
 const CarrierService = require('../services/carrier');
@@ -45,8 +46,10 @@ const starNames = require('../config/game/starNames');
 module.exports = (io) => {
     // Poor man's dependency injection.
 
-    const authService = new AuthService(bcrypt, UserModel);
-    const userService = new UserService(bcrypt, UserModel);
+    const passwordService = new PasswordService(bcrypt);
+    
+    const authService = new AuthService(UserModel, passwordService);
+    const userService = new UserService(UserModel, passwordService);
 
     const broadcastService = new BroadcastService(io);
     const combatService = new CombatService();
@@ -82,6 +85,7 @@ module.exports = (io) => {
         ledgerService);
 
     return {
+        passwordService,
         authService,
         broadcastService,
         carrierService,
