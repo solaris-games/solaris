@@ -68,8 +68,8 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  getEvents (gameId) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/events',
+  getEvents (gameId, startTick = 0) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/events?startTick=' + startTick.toString(),
       { withCredentials: true })
   }
 }

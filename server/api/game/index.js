@@ -151,10 +151,13 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+        let startTick = +req.query.startTick || 0;
+        
         try {
             let events = await container.eventService.getPlayerEvents(
                 req.game,
-                req.player
+                req.player,
+                startTick
             );
 
             return res.status(200).json(events);

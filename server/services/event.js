@@ -102,9 +102,10 @@ module.exports = class EventService {
         await event.save();
     }
 
-    async getPlayerEvents(game, player) {
+    async getPlayerEvents(game, player, startTick = 0) {
         return this.eventModel.find({
             gameId: game._id,
+            tick: { $gte: startTick },
             playerId: {
                 $in: [
                     player._id,

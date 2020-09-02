@@ -53,8 +53,13 @@ export default {
     async loadEvents () {
       this.events = null
 
+      let game = this.$store.state.game
+
       try {
-        let response = await GameApiService.getEvents(this.$store.state.game._id)
+        // 10 cycles ago
+        let startTick = Math.max(0, game.state.tick - (game.settings.galaxy.productionTicks * 10))
+
+        let response = await GameApiService.getEvents(this.$store.state.game._id, startTick)
 
         if (response.status === 200) {
           this.events = response.data
