@@ -37,7 +37,7 @@
           <div class="form-group">
             <div class="row">
               <div class="col-6">
-                <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">Create Account</button>
+                <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">Register</button>
               </div>
               <div class="col-6">
                 <router-link to="/" tag="button" class="btn btn-danger btn-block">Cancel</router-link>
