@@ -43,6 +43,7 @@ module.exports = class PlayerService {
             alias: 'Empty Slot',
             colour: colour,
             credits: game.settings.player.startingCredits,
+            renownToGive: game.settings.general.playerLimit,
             carriers: [],
             research: {
                 terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },

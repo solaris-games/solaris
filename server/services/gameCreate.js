@@ -14,11 +14,13 @@ module.exports = class GameCreateService {
     }
 
     async create(settings) {
-        // Prevent players from being able to create loads of games?
-        let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
+        if (settings.general.createdByUserId) {
+            // Prevent players from being able to create loads of games?
+            let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
 
-        if (openGames.length) {
-            throw new ValidationError('Cannot create game, you already have another game waiting for players.');
+            if (openGames.length) {
+                throw new ValidationError('Cannot create game, you already have another game waiting for players.');
+            }
         }
         
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
