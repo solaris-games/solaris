@@ -46,6 +46,8 @@ export default {
     overflow:hidden;
     cursor: pointer;
     border-radius: 0 !important;
+    height: 68px;
+    width: 60px;
 }
 
 .colour-bar {
