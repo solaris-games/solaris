@@ -29,7 +29,7 @@
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
                   <tr v-for="player in sortedPlayers" :key="player._id">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                      <td class="col-avatar" :title="player.colour.alias">
+                      <td class="col-avatar" :title="player.colour.alias" @click="onOpenPlayerDetailRequested(player)">
                           <!-- TODO: Prefer images over font awesome icons? -->
                           <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
                           <!-- <img src=""> -->
@@ -110,6 +110,9 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e._id)
     },
     panToPlayer (player) {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
@@ -215,6 +218,7 @@ img {
 
 .col-avatar {
     width: 48px;
+    cursor: pointer;
 }
 
 .table-sm td {

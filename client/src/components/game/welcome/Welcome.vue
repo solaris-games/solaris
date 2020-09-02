@@ -10,7 +10,7 @@
 
     <loading-spinner :loading="isJoiningGame"/>
 
-    <select-colour v-on:onJoinRequested="onJoinRequested"/>
+    <select-colour v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <share-link/>
 </div>
@@ -51,6 +51,9 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     onAliasChanged (e) {
       this.alias = e
