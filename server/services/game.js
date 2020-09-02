@@ -74,7 +74,7 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    async join(game, userId, playerId, alias, password) {
+    async join(game, userId, playerId, alias, avatar, password) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {
             throw new ValidationError('The game has already started.');
@@ -121,6 +121,7 @@ module.exports = class GameService extends EventEmitter {
         // Assign the user to the player.
         player.userId = userId;
         player.alias = alias;
+        player.avatar = avatar;
 
         // If the max player count is reached then start the game.
         game.state.players = game.galaxy.players.filter(p => p.userId).length;

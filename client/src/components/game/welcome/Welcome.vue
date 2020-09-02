@@ -2,7 +2,7 @@
 <div class="container">
     <menu-title title="Welcome" @onCloseRequested="onCloseRequested"/>
 
-    <select-alias v-on:onAliasChanged="onAliasChanged"/>
+    <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged"/>
 
     <enter-password v-if="isPasswordRequired" v-on:onPasswordChanged="onPasswordChanged"/>
 
@@ -41,6 +41,7 @@ export default {
       isJoiningGame: false,
       isPasswordRequired: false,
       errors: [],
+      avatar: '22',
       alias: '',
       password: ''
     }
@@ -54,6 +55,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onAvatarChanged (e) {
+      this.avatar = e
     },
     onAliasChanged (e) {
       this.alias = e
@@ -81,7 +85,7 @@ export default {
       try {
         this.isJoiningGame = true
 
-        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.password)
+        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.avatar, this.password)
 
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.

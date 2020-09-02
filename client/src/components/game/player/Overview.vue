@@ -4,10 +4,9 @@
 
   <div class="row">
       <div class="col-auto">
-          <div class="row col pt-4 pb-2">
-              <!-- TODO: Prefer images over font awesome icons? -->
-              <i class="far fa-user" style="font-size:100px;"></i>
-              <!-- <img src="" height="100"> -->
+          <div class="row col pl-0 pr-0 text-center">
+              <img v-if="player.avatar" :src="getAvatarImage()" height="128">
+              <i v-if="!player.avatar" class="far fa-user mr-2 mt-2 ml-2 mb-2" style="font-size:100px;"></i>
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
@@ -53,6 +52,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', this.player._id)
+    },
+    getAvatarImage () {
+      return require(`../../../assets/avatars/${this.player.avatar}.png`)
     }
   }
 }

@@ -9,17 +9,21 @@
     <div class="row bg-secondary">
         <div class="col">
             <form @submit.prevent>
-                <div class="form-group mt-2 text-center">
-                    <p class="mb-0">Choose a new alias every game and play anonymously.</p>
+                <div class="row">
+                  <div class="col-auto">
+                    <select-avatar v-on:onAvatarChanged="onAvatarChanged"/>
+                  </div>
+                  <div class="col pt-3">
                     <p>Every great story needs both heroes and villians. Which will you be?</p>
-                </div>
 
-                <div class="form-group">
-                    <input class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
-                </div>
+                    <div class="form-group">
+                        <input class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
+                    </div>
 
-                <div class="form-group text-center small">
-                    <p>Your alias must be between 3 and 24 characters.</p>
+                    <!-- <div class="form-group text-center small">
+                        <p>Your alias must be between 3 and 24 characters.</p>
+                    </div> -->
+                  </div>
                 </div>
             </form>
         </div>
@@ -29,8 +33,12 @@
 
 <script>
 import UserService from '../../../services/api/user'
+import SelectAvatarVue from './SelectAvatar.vue'
 
 export default {
+  components: {
+    'select-avatar': SelectAvatarVue
+  },
   data () {
     return {
       alias: null
@@ -51,6 +59,9 @@ export default {
   methods: {
     onAliasChanged (e) {
       this.$emit('onAliasChanged', this.alias)
+    },
+    onAvatarChanged (e) {
+      this.$emit('onAvatarChanged', e)
     }
   }
 }

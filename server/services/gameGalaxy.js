@@ -217,6 +217,7 @@ module.exports = class GameGalaxyService {
                 afk: p.afk,
                 _id: p._id,
                 alias: p.alias,
+                avatar: p.avatar,
                 homeStarId: p.homeStarId,
                 stats: p.stats
             };
