@@ -243,6 +243,40 @@ class GameHelper {
 
     return 'Unknown'
   }
+
+  userPlayerHasHighestTechLevel (game, techKey) {
+    let userPlayer = this.getUserPlayer(game)
+    
+    let levels = [...new Set(game.galaxy.players.map(p => {
+      return p.research[techKey].level
+    }))]
+
+    // If all players have the same level then nobody has the highest.
+    if (levels.length === 1) {
+      return false
+    }
+
+    let maxLevel = levels.sort((a, b) => b - a)[0]
+
+    return maxLevel === userPlayer.research[techKey].level
+  }
+
+  userPlayerHasLowestTechLevel (game, techKey) {
+    let userPlayer = this.getUserPlayer(game)
+    
+    let levels = [...new Set(game.galaxy.players.map(p => {
+      return p.research[techKey].level
+    }))]
+
+    // If all players have the same level then nobody has the lowest.
+    if (levels.length === 1) {
+      return false
+    }
+
+    let minLevel = levels.sort((a, b) => a - b)[0]
+
+    return minLevel === userPlayer.research[techKey].level
+  }
 }
 
 export default new GameHelper()
