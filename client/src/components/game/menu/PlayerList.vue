@@ -2,8 +2,10 @@
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item grow" v-for="p in players" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
           :title="p.colour.alias + ' - ' + p.alias">
+          <div class="player-icon text-center">
             <img v-if="p.avatar" :src="getAvatarImage(p)">
-            <i v-if="!p.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:30px;"></i>
+            <i v-if="!p.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:44px;"></i>
+          </div>
 
             <div class="colour-bar" v-bind:style="{'background-color':getFriendlyColour(p.colour.value)}">
             </div>
@@ -33,7 +35,7 @@ export default {
 </script>
 
 <style scoped>
-img {
+.player-icon, img {
     width: 60px;
     height: 60px;
 }
