@@ -4,9 +4,9 @@
         <thead>
             <th>#</th>
             <th>Player</th>
-            <th class="text-right">Rank</th>
-            <th class="text-right">Victories</th>
-            <th class="text-right">Renown</th>
+            <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
+            <th class="text-right" title="Victories"><i class="fas fa-trophy text-warning"></i></th>
+            <th class="text-right" title="Renown"><i class="fas fa-heart text-danger"></i></th>
         </thead>
         <tbody>
             <tr v-for="player in leaderboard" :key="player._id">
