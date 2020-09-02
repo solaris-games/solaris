@@ -88,6 +88,8 @@ export default {
 
           playerTech.level = this.selectedTechnology.level
           
+          gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
+          
           this.getTradeableTechnologies()
         }
       } catch (err) {
