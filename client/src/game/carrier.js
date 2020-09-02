@@ -17,6 +17,7 @@ class Carrier extends EventEmitter {
 
     this.isMouseOver = false
     this.zoomPercent = 0
+    this.clicks = 0
   }
 
   setup (data, stars, player, lightYearDistance) {
@@ -146,7 +147,18 @@ class Carrier extends EventEmitter {
   }
 
   onClicked (e) {
-    this.emit('onCarrierClicked', this.data)
+    this.clicks++
+
+    setTimeout(() => {
+      this.clicks = 0
+    }, 500)
+
+    if (this.clicks > 1) {
+      this.emit('onCarrierDoubleClicked', this.data)
+      this.clicks = 0
+    } else {
+      this.emit('onCarrierClicked', this.data)
+    }
   }
 
   onMouseOver (e) {

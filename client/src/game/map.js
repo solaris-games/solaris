@@ -106,6 +106,7 @@ class Map extends EventEmitter {
       this.starContainer.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
+      star.on('onStarDoubleClicked', this.onStarDoubleClicked.bind(this))
     }
 
     star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
@@ -118,6 +119,7 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -136,6 +138,7 @@ class Map extends EventEmitter {
     this.carrierContainer.addChild(carrier.container)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+    carrier.on('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
     carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -234,6 +237,7 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -364,13 +368,30 @@ class Map extends EventEmitter {
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
+      selectedStar.isSelected = !selectedStar.isSelected
+
+      this.unselectAllCarriers()
+      this.unselectAllStarsExcept(selectedStar)
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onStarClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onStarClicked(e)
+    }
+
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onStarDoubleClicked (e) {
+    // Clicking stars should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      let selectedStar = this.stars.find(x => x.data._id === e._id)
       selectedStar.isSelected = true
 
       this.unselectAllCarriers()
       this.unselectAllStarsExcept(selectedStar)
 
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onStarClicked', e)
+        this.emit('onStarDoubleClicked', e)
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
@@ -392,13 +413,37 @@ class Map extends EventEmitter {
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
+      selectedCarrier.isSelected = !selectedCarrier.isSelected
+
+      this.unselectAllStars()
+      this.unselectAllCarriersExcept(selectedCarrier)
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onCarrierClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onCarrierClicked(e)
+    }
+
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onCarrierDoubleClicked (e) {
+    // Clicking carriers should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      // If the carrier is in orbit, pass the click over to the star instead.
+      if (e.orbiting) {
+        let star = this.stars.find(x => x.data._id === e.orbiting)
+
+        return this.onStarDoubleClicked(star.data)
+      }
+
+      let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
       selectedCarrier.isSelected = true
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
 
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierClicked', e)
+        this.emit('onCarrierDoubleClicked', e)
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)

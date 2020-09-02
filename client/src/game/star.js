@@ -20,6 +20,7 @@ class Star extends EventEmitter {
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to force initial redraw
     this.zoomPercent = 0
+    this.clicks = 0
   }
 
   _getStarPlayer () {
@@ -409,7 +410,18 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
-    this.emit('onStarClicked', this.data)
+    this.clicks++
+
+    setTimeout(() => {
+      this.clicks = 0
+    }, 500)
+    
+    if (this.clicks > 1) {
+      this.emit('onStarDoubleClicked', this.data)
+      this.clicks = 0
+    } else {
+      this.emit('onStarClicked', this.data)
+    }
 
     this.drawActive(false)
   }

@@ -33,20 +33,20 @@ export default {
     this.drawGame(this.$store.state.game)
 
     // Bind to game events.
-    this.onStarClickedHandler = this.onStarClicked.bind(this)
-    this.onCarrierClickedHandler = this.onCarrierClicked.bind(this)
+    this.onStarDoubleClickedHandler = this.onStarDoubleClicked.bind(this)
+    this.onCarrierDoubleClickedHandler = this.onCarrierDoubleClicked.bind(this)
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
     this.onObjectsClickedHandler = this.onObjectsClicked.bind(this)
 
-    this.gameContainer.map.on('onStarClicked', this.onStarClickedHandler)
-    this.gameContainer.map.on('onCarrierClicked', this.onCarrierClickedHandler)
+    this.gameContainer.map.on('onStarDoubleClicked', this.onStarDoubleClickedHandler)
+    this.gameContainer.map.on('onCarrierDoubleClicked', this.onCarrierDoubleClickedHandler)
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
   },
 
   destroyed () {
-    this.gameContainer.map.off('onStarClicked', this.onStarClickedHandler)
-    this.gameContainer.map.off('onCarrierClicked', this.onCarrierClickedHandler)
+    this.gameContainer.map.off('onStarDoubleClicked', this.onStarDoubleClickedHandler)
+    this.gameContainer.map.off('onCarrierDoubleClicked', this.onCarrierDoubleClickedHandler)
     this.gameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.off('onObjectsClicked', this.onObjectsClickedHandler)
   },
@@ -76,11 +76,11 @@ export default {
         window.innerHeight
       )
     },
-    onStarClicked (e) {
-      this.$emit('onStarClicked', e._id)
+    onStarDoubleClicked (e) {
+      this.$emit('onStarDoubleClicked', e._id)
     },
-    onCarrierClicked (e) {
-      this.$emit('onCarrierClicked', e._id)
+    onCarrierDoubleClicked (e) {
+      this.$emit('onCarrierDoubleClicked', e._id)
     },
     onWaypointCreated (e) {
       this.$emit('onWaypointCreated', e)

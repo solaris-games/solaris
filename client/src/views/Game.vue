@@ -12,8 +12,8 @@
                   @onMenuStateChanged="onMenuStateChanged"
                   @onPlayerSelected="onPlayerSelected"/>
 
-        <game-container @onStarClicked="onStarClicked"
-                    @onCarrierClicked="onCarrierClicked"
+        <game-container @onStarDoubleClicked="onStarDoubleClicked"
+                    @onCarrierDoubleClicked="onCarrierDoubleClicked"
                     @onObjectsClicked="onObjectsClicked"/>
     </div>
   </div>
@@ -107,18 +107,16 @@ export default {
 
       this.$emit('onPlayerSelected', e)
     },
-    onStarClicked (e) {
+    onStarDoubleClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.STAR_DETAIL
 
-      // this.$emit('onStarClicked', e)
       AudioService.click()
     },
-    onCarrierClicked (e) {
+    onCarrierDoubleClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.CARRIER_DETAIL
 
-      // this.$emit('onCarrierClicked', e)
       AudioService.click()
     },
     onObjectsClicked (e) {
