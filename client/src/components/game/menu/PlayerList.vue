@@ -2,9 +2,8 @@
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item grow" v-for="p in players" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
           :title="p.colour.alias + ' - ' + p.alias">
-            <!-- TODO: Prefer images over font awesome icons? -->
-            <i class="far fa-user pl-2 pr-2 pt-2 pb-2 img" style="font-size:30px;"></i>
-            <!-- <img src=""> -->
+            <img v-if="p.avatar" :src="getAvatarImage(p)">
+            <i v-if="!p.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:30px;"></i>
 
             <div class="colour-bar" v-bind:style="{'background-color':getFriendlyColour(p.colour.value)}">
             </div>
@@ -25,6 +24,9 @@ export default {
     },
     onOpenPlayerDetailRequested (player) {
       this.$emit('onOpenPlayerDetailRequested', player._id)
+    },
+    getAvatarImage (player) {
+      return require(`../../../assets/avatars/${player.avatar}.png`)
     }
   }
 }

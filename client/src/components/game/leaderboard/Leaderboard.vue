@@ -31,7 +31,7 @@
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                       <td class="col-avatar" :title="player.colour.alias" @click="onOpenPlayerDetailRequested(player)">
                           <img v-if="player.avatar" :src="getAvatarImage(player)">
-                          <i v-if="!player.avatar" class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
+                          <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:40px;"></i>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
@@ -214,12 +214,11 @@ export default {
 
 <style scoped>
 img {
-    height: 48px;
-    width: 48px;
+    height: 55px;
 }
 
 .col-avatar {
-    width: 48px;
+    width: 55px;
     cursor: pointer;
 }
 

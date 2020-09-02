@@ -16,9 +16,8 @@
                   <tr v-for="ledger in ledgers" :key="ledger.playerId">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(ledger.playerId)}"></td>
                       <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
-                          <!-- TODO: Prefer images over font awesome icons? -->
-                          <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
-                          <!-- <img src=""> -->
+                          <img v-if="getAvatarImage(ledger)" :src="getAvatarImage(ledger)">
+                          <i v-if="!getAvatarImage(ledger)" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:40px;"></i>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
@@ -157,6 +156,15 @@ export default {
     },
     onPlayerDebtSettled (e) {
       this.loadLedger()
+    },
+    getAvatarImage (ledger) {
+      let player = gameHelper.getPlayerById(this.$store.state.game, ledger.playerId)
+
+      if (!player.avatar) {
+        return null
+      }
+      
+      return require(`../../../assets/avatars/${player.avatar}.png`)
     }
   }
 }
@@ -164,12 +172,12 @@ export default {
 
 <style scoped>
 img {
-    height: 48px;
-    width: 48px;
+    height: 55px;
 }
 
 .col-avatar {
-    width: 48px;
+    width: 55px;
+    cursor: pointer;
 }
 
 .table-sm td {
