@@ -3,7 +3,9 @@
       <div class="col">
           <h4 class="pt-2">
             <i class="fas fa-circle" :style="{'color': colour}"></i>
-            {{player.alias}} <span v-if="player.userId">(You)</span>
+            {{player.alias}} 
+            <!-- <span v-if="player.userId">(You)</span> -->
+            <span v-if="player.defeated">({{getPlayerStatus()}})</span>
           </h4>
       </div>
   </div>
@@ -27,6 +29,9 @@ export default {
   methods: {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
+    },
+    getPlayerStatus () {
+      return gameHelper.getPlayerStatus(this.player)
     }
   }
 }

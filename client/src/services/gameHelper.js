@@ -277,6 +277,16 @@ class GameHelper {
 
     return minLevel === userPlayer.research[techKey].level
   }
+
+  getPlayerStatus (player) {
+    if (player.defeated && !player.afk) {
+      return 'DEFEATED'
+    } else if (player.defeated && player.afk) {
+      return 'AFK'
+    }
+
+    return 'UNKNOWN'
+  }
 }
 
 export default new GameHelper()

@@ -37,8 +37,7 @@
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
                           <h5>{{player.alias}}
-                            <span v-if="player.defeated && !player.afk">(DEFEATED)</span>
-                            <span v-if="player.defeated && player.afk">(AFK)</span>
+                            <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2">
@@ -174,6 +173,9 @@ export default {
       let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
 
       return winnerPlayer.alias
+    },
+    getPlayerStatus (player) {
+      return GameHelper.getPlayerStatus(player)
     }
   },
 
