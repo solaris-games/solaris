@@ -13,7 +13,8 @@
                     </select>
                 </div>
                 <div class="col-5">
-                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" :disabled="!availableTechnologies.length">Share Technology</modalButton>
+                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
+                      :disabled="!availableTechnologies.length || selectedTechnology.cost > userPlayer.credits">Share Technology</modalButton>
                 </div>
             </div>
         </form>
