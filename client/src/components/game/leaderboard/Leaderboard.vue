@@ -1,5 +1,5 @@
 <template>
-<div class="container pb-2">
+<div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-primary">

@@ -1,5 +1,5 @@
 <template>
-	<div class="container" v-if="carrier">
+	<div class="menu-page container" v-if="carrier">
     	<menu-title title="Edit Fleet Order" @onCloseRequested="onCloseRequested"/>
 
         <div class="row no-gutters mb-1">

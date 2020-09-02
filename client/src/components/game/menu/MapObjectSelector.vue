@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="menu-page">
     <div class="container">
         <menu-title title="Select Object" @onCloseRequested="onCloseRequested"/>
     </div>

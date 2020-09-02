@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
         <button class="btn btn-primary" @click="resetRulerPoints">Reset</button>
     </menu-title>

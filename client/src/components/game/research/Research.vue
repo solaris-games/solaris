@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <menu-title title="Research" @onCloseRequested="onCloseRequested"/>
 
     <p>Each point of science on your stars contributes 1 point of research every tick towards your chosen technology.</p>

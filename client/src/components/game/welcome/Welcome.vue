@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <menu-title title="Welcome" @onCloseRequested="onCloseRequested"/>
 
     <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged"/>

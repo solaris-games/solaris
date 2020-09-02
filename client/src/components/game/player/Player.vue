@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested">
       <span class="mr-2" v-if="user">

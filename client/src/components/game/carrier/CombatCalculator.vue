@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="menu-page container">
         <menu-title title="Combat Calculator" @onCloseRequested="onCloseRequested"/>
 
         <div class="row">

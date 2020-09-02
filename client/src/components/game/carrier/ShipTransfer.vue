@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <menu-title title="Ship Transfer" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary mb-2">

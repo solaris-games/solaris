@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <menu-title title="Ledger" @onCloseRequested="onCloseRequested"/>
 
     <p>Debts that you owe are in <span class="text-danger">red</span>. Use the <b>Settle Debt</b> button to send credits and settle the debt in full.</p>

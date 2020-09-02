@@ -1,5 +1,5 @@
 <template>
-<div class="container" v-if="star">
+<div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary">

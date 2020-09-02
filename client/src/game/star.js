@@ -419,11 +419,19 @@ class Star extends EventEmitter {
     if (this.clicks > 1) {
       this.emit('onStarDoubleClicked', this.data)
       this.clicks = 0
+
+      // Need to do this otherwise sometimes text gets highlighted.
+      this.deselectAllText()
     } else {
       this.emit('onStarClicked', this.data)
     }
 
     this.drawActive(false)
+  }
+
+  deselectAllText () {
+    if (window.getSelection) {window.getSelection().removeAllRanges();}
+    else if (document.selection) {document.selection.empty();}
   }
 
   onMouseOver (e) {
