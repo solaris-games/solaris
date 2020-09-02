@@ -17,7 +17,7 @@
             <tr class="bg-primary">
                 <td>Name</td>
                 <td>Type</td>
-                <td class="text-center">Players</td>
+                <td class="d-none d-md-block text-center">Players</td>
                 <td></td>
             </tr>
         </thead>
@@ -25,7 +25,7 @@
             <tr v-for="game in serverGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
                 <td>{{game.settings.general.description}}</td>
-                <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
                 </td>
@@ -51,14 +51,14 @@
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
-                <td class="text-center">Players</td>
+                <td class="d-none d-md-block text-center">Players</td>
                 <td></td>
             </tr>
         </thead>
         <tbody>
             <tr v-for="game in userGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
-                <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
                 </td>
