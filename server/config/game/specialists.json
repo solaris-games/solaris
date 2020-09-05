@@ -1,0 +1,15 @@
+{
+    "carrier": [
+        {
+            "id": 1,
+            "name": "Speedy boi",
+            "description": "i am speed",
+            "baseCost": 100,
+            "modifiers": {
+                "local": {
+                    "speed": 2
+                }
+            }
+        }
+    ]
+}

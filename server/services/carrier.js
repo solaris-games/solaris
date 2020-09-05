@@ -146,5 +146,15 @@ module.exports = class CarrierService {
         game.galaxy.carriers = game.galaxy.carriers.filter(c => !c.ownedByPlayerId
             || !c.ownedByPlayerId.equals(player._id));
     }
+
+    getCarrierDistancePerTick(game, carrier, warpSpeed = false) {
+        let distanceModifier = warpSpeed ? 3 : 1;
+
+        if (carrier.specialist === 1) { // Speedy boi TODO: Make this a constant.
+            distanceModifier *= 2; // TODO: This should come from the specialist definition instead of hard-coded here.
+        }
+
+        return game.constants.distances.shipSpeed * distanceModifier;
+    }
     
 };

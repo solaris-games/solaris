@@ -35,6 +35,7 @@ const ShipTransferService = require('../services/shipTransfer');
 const UserService = require('../services/user');
 const HistoryService = require('../services/history');
 const LedgerService = require('../services/ledger');
+const SpecialistService = require('../services/specialist');
 
 const StandardMapService = require('../services/maps/standard');
 const CircularMapService = require('../services/maps/circular');
@@ -80,6 +81,7 @@ module.exports = (io) => {
     const messageService = new MessageService();
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService);
     const shipTransferService = new ShipTransferService(carrierService, starService);
+    const specialistService = new SpecialistService(carrierService);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService);
@@ -115,5 +117,6 @@ module.exports = (io) => {
         messageService,
         historyService,
         ledgerService,
+        specialistService,
     };
 };
