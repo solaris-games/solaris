@@ -22,14 +22,18 @@ module.exports = class SpecialistService {
         return specialists[type];
     }
 
+    listCarrier(game) {
+        return this.list(game, TYPES.CARRIER);
+    }
+
+    listStar(game) {
+        return this.list(game, TYPES.STAR);
+    }
+
     async upgradeCarrier(game, player, carrierId, specialistId) {
         // TODO: Check if the game has specialists enabled.
 
         let carrier = this.carrierService.getById(game, carrierId);
-
-        if (this.carrier.specialist) {
-            throw new ValidationError(`Cannot assign another a specialist to this carrier, it already has one assigned.`);
-        }
 
         if (!carrier.orbiting) {
             throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);
