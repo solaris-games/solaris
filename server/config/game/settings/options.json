@@ -69,6 +69,24 @@
             "text": "Expensive"
             }
         ],
+        "specialistCost": [
+            {
+                "value": "none",
+                "text": "No"
+            },
+            {
+                "value": "cheap",
+                "text": "Cheap"
+            },
+            {
+                "value": "standard",
+                "text": "Standard"
+            },
+            {
+                "value": "expensive",
+                "text": "Expensive"
+            }
+        ],
         "randomGates": [
             {
             "value": "none",

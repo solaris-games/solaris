@@ -95,6 +95,15 @@
       </div>
 
       <div class="form-group">
+        <label for="specialistCost" class="col-form-label">Specialist Cost</label>
+        <select class="form-control" id="specialistCost" v-model="settings.specialGalaxy.specialistCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.specialistCost" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }} Specialists
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="randomGates" class="col-form-label">Random Gates</label>
         <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.randomGates" v-bind:key="opt.value" v-bind:value="opt.value">

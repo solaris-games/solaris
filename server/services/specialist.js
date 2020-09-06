@@ -30,8 +30,18 @@ module.exports = class SpecialistService {
         return this.list(game, TYPES.STAR);
     }
 
+    getSpecialistActualCost(game, specialist) {
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
+
+        let cost = specialist.baseCost * expenseConfig;
+
+        return cost;
+    }
+
     async upgradeCarrier(game, player, carrierId, specialistId) {
-        // TODO: Check if the game has specialists enabled.
+        if (game.settings.specialGalaxy.specialistCost === 'none') {
+            throw new ValidationError('The game settings has disabled the hiring of specialists.');
+        }
 
         let carrier = this.carrierService.getById(game, carrierId);
 
@@ -45,9 +55,10 @@ module.exports = class SpecialistService {
             throw new ValidationError(`A specialist with ID ${specialistId} does not exist.`);
         }
         
-        let cost = specialist.baseCost; // TODO: Need a modifier here from the game settings.
+        // Calculate how much the spec will cost.
+        let cost = this.getSpecialistActualCost(game, specialist);
 
-        if (player.credits > specialist.baseCost) {
+        if (player.credits < cost) {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }
 

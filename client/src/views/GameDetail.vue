@@ -63,6 +63,10 @@
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.warpgateCost) }}</td>
             </tr>
             <tr>
+              <td>Specialist Cost</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistCost) }}</td>
+            </tr>
+            <tr>
               <td>Random Gates</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomGates) }}</td>
             </tr>
