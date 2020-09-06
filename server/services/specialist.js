@@ -17,9 +17,21 @@ module.exports = class SpecialistService {
     }
 
     list(game, type) {
-        // TODO: Need to return a list with actual costs based on game cost modifier settings.
-        // TODO: Also need to check whether the game has specialists enabled.
-        return specialists[type];
+        // Clone the existing list otherwise could run into issues with multiple requests
+        // as the specs are being loaded from a file.
+        let specialistsList = JSON.parse(JSON.stringify(specialists));
+
+        if (game.settings.specialGalaxy.specialistCost === 'none') {
+            throw new ValidationError('The game settings has disabled the hiring of specialists.');
+        }
+        
+        let specs = specialistsList[type];
+
+        for (let spec of specs) {
+            spec.cost = this.getSpecialistActualCost(game, spec);
+        }
+
+        return specs;
     }
 
     listCarrier(game) {
@@ -38,7 +50,7 @@ module.exports = class SpecialistService {
         return cost;
     }
 
-    async upgradeCarrier(game, player, carrierId, specialistId) {
+    async hireCarrierSpecialist(game, player, carrierId, specialistId) {
         if (game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
@@ -53,6 +65,10 @@ module.exports = class SpecialistService {
 
         if (!specialist) {
             throw new ValidationError(`A specialist with ID ${specialistId} does not exist.`);
+        }
+
+        if (carrier.specialist && carrier.specialist === specialist.id) {
+            throw new ValidationError(`The carrier already has the specialist assigned.`);
         }
         
         // Calculate how much the spec will cost.

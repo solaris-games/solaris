@@ -4,7 +4,7 @@ module.exports = class GameGalaxyService {
 
     constructor(mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService) {
+        waypointService, researchService, specialistService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -14,6 +14,7 @@ module.exports = class GameGalaxyService {
         this.carrierService = carrierService;
         this.waypointService = waypointService;
         this.researchService = researchService;
+        this.specialistService = specialistService;
     }
 
     async getGalaxy(game, userId) {
@@ -185,7 +186,13 @@ module.exports = class GameGalaxyService {
 
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
-            .forEach(c => this.waypointService.populateCarrierWaypointEta(doc, c));
+            .forEach(c => {
+                this.waypointService.populateCarrierWaypointEta(doc, c);
+                
+                if (c.specialist) {
+                    c.specialist = this.specialistService.getById(c.specialist, 'carrier');
+                }
+            });
     }
 
     _setPlayerInfoBasic(doc, player) {

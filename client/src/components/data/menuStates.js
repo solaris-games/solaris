@@ -31,5 +31,6 @@ export default {
   BULK_INFRASTRUCTURE_UPGRADE: 'bulkInfrastructureUpgrade',
   MAP_OBJECT_SELECTOR: 'mapObjectSelector',
   RULER: 'ruler',
-  LEDGER: 'ledger'
+  LEDGER: 'ledger',
+  HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier'
 }

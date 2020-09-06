@@ -34,7 +34,8 @@
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
@@ -64,6 +65,10 @@
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
       <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested"/>
+      <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
+        :carrierId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
     </div>
   </div>
 </div>
@@ -93,6 +98,7 @@ import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
+import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 
 export default {
   components: {
@@ -115,7 +121,8 @@ export default {
     'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
     'map-object-selector': MapObjectSelectorVue,
     'ruler': RulerVue,
-    'ledger': LedgerVue
+    'ledger': LedgerVue,
+    'hire-specialist-carrier': HireSpecialistCarrierVue
   },
   props: {
     menuState: String,
@@ -168,6 +175,9 @@ export default {
     },
     onOpenInboxRequested (e) {
       this.changeMenuState(MENU_STATES.INBOX, e)
+    },
+    onViewHireCarrierSpecialistRequested (e) {
+      this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_CARRIER, e)
     }
   },
   computed: {

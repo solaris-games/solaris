@@ -71,6 +71,10 @@
       </div>
     </div>
 
+    <h4 class="pt-2" v-if="carrierOwningPlayer == userPlayer">Specialist</h4>
+
+    <carrier-specialist :carrierId="carrier._id" @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
+
     <playerOverview v-if="carrierOwningPlayer" :playerId="carrierOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
@@ -84,12 +88,14 @@ import MenuTitle from '../MenuTitle'
 import PlayerOverview from '../player/Overview'
 import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
+import CarrierSpecialistVue from './CarrierSpecialist'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'playerOverview': PlayerOverview,
-    'waypointTable': WaypointTable
+    'waypointTable': WaypointTable,
+    'carrier-specialist': CarrierSpecialistVue
   },
   props: {
     carrierId: String
@@ -135,6 +141,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onViewHireCarrierSpecialistRequested (e) {
+      this.$emit('onViewHireCarrierSpecialistRequested', e)
     },
     getCarrierOrbitingStar () {
       return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
