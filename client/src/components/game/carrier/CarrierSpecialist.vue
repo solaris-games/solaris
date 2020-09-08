@@ -1,7 +1,7 @@
 <template>
     <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="carrier">
         <div class="col-7">
-            <p class="mb-2" v-if="!carrier.specialist">
+            <p class="mb-2" v-if="!carrier.specialistId">
                 This carrier does not have a specialist assigned. <a href="javascript:;">Read More</a>.
             </p>
             <div v-if="carrier.specialist">

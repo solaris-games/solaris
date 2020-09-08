@@ -96,6 +96,10 @@ module.exports = class GameGalaxyService {
 
         doc.galaxy.stars = doc.galaxy.stars
         .map(s => {
+            if (s.specialistId) {
+                s.specialist = this.specialistService.getByIdStar(s.specialistId);
+            }
+
             return {
                 _id: s._id,
                 name: s.name,
@@ -103,7 +107,9 @@ module.exports = class GameGalaxyService {
                 location: s.location,
                 warpGate: s.warpGate,
                 stats: s.stats,
-                manufacturing: s.manufacturing
+                manufacturing: s.manufacturing,
+                specialistId: s.specialistId,
+                specialist: s.specialist
             }
         });
     }
@@ -142,6 +148,10 @@ module.exports = class GameGalaxyService {
                 // Calculate infrastructure upgrades for the star.
                 this._setUpgradeCosts(doc, s);
                 
+                if (s.specialistId) {
+                    s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                }
+
                 return s;
             }
 
@@ -160,6 +170,10 @@ module.exports = class GameGalaxyService {
             if (inRange) {
                 // delete s.garrisonActual; // TODO: Don't need to send this back?
 
+                if (s.specialistId) {
+                    s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                }
+                
                 return s;
             } else {
                 // Return null if its dark mode
@@ -192,8 +206,8 @@ module.exports = class GameGalaxyService {
             .forEach(c => {
                 this.waypointService.populateCarrierWaypointEta(doc, c);
                 
-                if (c.specialist) {
-                    c.specialist = this.specialistService.getById(c.specialist, 'carrier');
+                if (c.specialistId) {
+                    c.specialist = this.specialistService.getByIdCarrier(c.specialistId);
                 }
             });
     }

@@ -75,7 +75,7 @@ module.exports = class SpecialistService {
             throw new ValidationError(`A specialist with ID ${specialistId} does not exist.`);
         }
 
-        if (carrier.specialist && carrier.specialist === specialist.id) {
+        if (carrier.specialistId && carrier.specialistId === specialist.id) {
             throw new ValidationError(`The carrier already has the specialist assigned.`);
         }
         
@@ -86,13 +86,50 @@ module.exports = class SpecialistService {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }
 
-        carrier.specialist = specialist.id;
+        carrier.specialistId = specialist.id;
         player.credits -= cost;
 
         await game.save();
 
         // TODO: The carrier may have its waypoint ETAs changed based on the specialist so need to 
         // return the new data.
+        // TODO: Need to consider local and global effects and update the UI accordingly.
+    }
+
+    async hireStarSpecialist(game, player, starId, specialistId) {
+        if (game.settings.specialGalaxy.specialistCost === 'none') {
+            throw new ValidationError('The game settings has disabled the hiring of specialists.');
+        }
+
+        let star = game.galaxy.stars.find(x => x.ownedByPlayerId && x.ownedByPlayerId.equals(player._id) && x._id.toString() === starId);
+
+        if (!star) {
+            throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);
+        }
+
+        const specialist = this.getById(specialistId, TYPES.STAR);
+
+        if (!specialist) {
+            throw new ValidationError(`A specialist with ID ${specialistId} does not exist.`);
+        }
+
+        if (star.specialistId && star.specialistId === specialist.id) {
+            throw new ValidationError(`The star already has the specialist assigned.`);
+        }
+        
+        // Calculate how much the spec will cost.
+        let cost = this.getSpecialistActualCost(game, specialist);
+
+        if (player.credits < cost) {
+            throw new ValidationError(`You cannot afford to buy this specialist.`);
+        }
+
+        star.specialistId = specialist.id;
+        player.credits -= cost;
+
+        await game.save();
+
+        // TODO: The star may have its manufacturing changed so return back the new manufacturing.
         // TODO: Need to consider local and global effects and update the UI accordingly.
     }
     

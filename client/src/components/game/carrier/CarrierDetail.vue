@@ -71,9 +71,9 @@
       </div>
     </div>
 
-    <h4 class="pt-2" v-if="carrierOwningPlayer == userPlayer">Specialist</h4>
+    <h4 class="pt-2" v-if="canHireSpecialist && carrierOwningPlayer == userPlayer">Specialist</h4>
 
-    <carrier-specialist :carrierId="carrier._id" @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
+    <carrier-specialist v-if="canHireSpecialist" :carrierId="carrier._id" @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
 
     <playerOverview v-if="carrierOwningPlayer" :playerId="carrierOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
@@ -109,13 +109,15 @@ export default {
       timeRemainingEta: null,
       timeRemainingEtaTotal: null,
       intervalFunction: null,
-      onWaypointCreatedHandler: null
+      onWaypointCreatedHandler: null,
+      canHireSpecialist: false
     }
   },
   mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.carrierOwningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
+    this.canHireSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
 
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
 

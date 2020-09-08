@@ -120,6 +120,10 @@
       -->
     </div>
 
+    <h4 class="pt-2" v-if="canHireSpecialist && starOwningPlayer == userPlayer">Specialist</h4>
+
+    <star-specialist v-if="canHireSpecialist" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
+
     <playerOverview v-if="starOwningPlayer" :playerId="starOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
@@ -157,6 +161,7 @@ import InfrastructureUpgrade from './InfrastructureUpgrade'
 import PlayerOverview from '../player/Overview'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
+import StarSpecialistVue from './StarSpecialist'
 
 export default {
   components: {
@@ -165,7 +170,8 @@ export default {
     'infrastructureUpgrade': InfrastructureUpgrade,
     'playerOverview': PlayerOverview,
     'modalButton': ModalButton,
-    'dialogModal': DialogModal
+    'dialogModal': DialogModal,
+    'star-specialist': StarSpecialistVue
   },
   props: {
     starId: String
@@ -176,7 +182,8 @@ export default {
       starOwningPlayer: null,
       userPlayer: null,
       currentPlayerId: null,
-      canBuildWarpGates: false
+      canBuildWarpGates: false,
+      canHireSpecialists: false
     }
   },
   mounted () {
@@ -185,6 +192,7 @@ export default {
     this.starOwningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
+    this.canHireSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
   },
   methods: {
     onCloseRequested (e) {
@@ -195,6 +203,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onViewHireStarSpecialistRequested (e) {
+      this.$emit('onViewHireStarSpecialistRequested', e)
     },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)

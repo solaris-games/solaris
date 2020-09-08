@@ -26,7 +26,8 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onEditWaypointsRequested="onEditWaypointsRequested"/>
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+        @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
@@ -69,6 +70,10 @@
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
+        :starId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
     </div>
   </div>
 </div>
@@ -99,6 +104,7 @@ import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
+import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 
 export default {
   components: {
@@ -122,7 +128,8 @@ export default {
     'map-object-selector': MapObjectSelectorVue,
     'ruler': RulerVue,
     'ledger': LedgerVue,
-    'hire-specialist-carrier': HireSpecialistCarrierVue
+    'hire-specialist-carrier': HireSpecialistCarrierVue,
+    'hire-specialist-star': HireSpecialistStarVue
   },
   props: {
     menuState: String,
@@ -178,6 +185,9 @@ export default {
     },
     onViewHireCarrierSpecialistRequested (e) {
       this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_CARRIER, e)
+    },
+    onViewHireStarSpecialistRequested (e) {
+      this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_STAR, e)
     }
   },
   computed: {

@@ -32,5 +32,6 @@ export default {
   MAP_OBJECT_SELECTOR: 'mapObjectSelector',
   RULER: 'ruler',
   LEDGER: 'ledger',
-  HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier'
+  HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier',
+  HIRE_SPECIALIST_STAR: 'hireSpecialistStar'
 }

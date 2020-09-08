@@ -21,9 +21,11 @@
                     "weapons": 1
                 }
             }
-        },
+        }
+    ],
+    "star": [
         {
-            "id": 3,
+            "id": 1,
             "name": "Minister of Energy",
             "description": "Grants +1 Scanning bonus to all owned stars.",
             "baseCost": 1,

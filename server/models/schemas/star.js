@@ -8,6 +8,7 @@ const schema = new Schema({
     naturalResources: { type: Types.Number, required: true },
     garrison: { type: Types.Number, required: true, default: 0 }, // TODO: garrison could be a computed field or instead returned to the client floored.
     garrisonActual: { type: Types.Number, required: true, default: 0 },
+    specialistId: { type: Types.Number, required: false, default: null },
     infrastructure: {
         economy: { type: Types.Number, required: true, default: 0 },
         industry: { type: Types.Number, required: true, default: 0 },

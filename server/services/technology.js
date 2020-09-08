@@ -40,10 +40,10 @@ module.exports = class TechnologyService {
         };
 
         // Add global effects of stars.
-        let stars = game.galaxy.stars.filter(s => s.specialist != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+        let stars = game.galaxy.stars.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
 
         for (let star of stars) {
-            let specialist = this.specialistService.getByIdStar(star.specialist);
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
 
             if (specialist.modifiers.global != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.global);
@@ -51,10 +51,10 @@ module.exports = class TechnologyService {
         }
 
         // Add global effects of carriers.
-        let carriers = game.galaxy.carriers.filter(s => s.specialist != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+        let carriers = game.galaxy.carriers.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
 
         for (let carrier of carriers) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialist);
+            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist.modifiers.global != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.global);
@@ -69,8 +69,8 @@ module.exports = class TechnologyService {
 
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player);
 
-        if (star.specialist) {
-            let specialist = this.specialistService.getByIdStar(star.specialist);
+        if (star.specialistId) {
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
 
             if (specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local);
@@ -85,8 +85,8 @@ module.exports = class TechnologyService {
 
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player);
 
-        if (carrier.specialist) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialist);
+        if (carrier.specialistId) {
+            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local);

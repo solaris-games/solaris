@@ -153,7 +153,7 @@ module.exports = class CarrierService {
         let distanceModifier = warpSpeed ? 3 : 1;
 
         // TODO: Get the specialist instead of relying on hard coded values.
-        if (carrier.specialist === 1) { // Speedy boi TODO: Make this a constant.
+        if (carrier.specialistId === 1) { // Speedy boi TODO: Make this a constant.
             distanceModifier *= 2; // TODO: This should come from the specialist definition instead of hard-coded here.
         }
 

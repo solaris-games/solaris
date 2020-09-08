@@ -4,7 +4,7 @@
 
     <div class="row bg-primary">
         <div class="col">
-            <h4 class="mt-2">Carrier</h4>
+            <h4 class="mt-2">Star</h4>
         </div>
     </div>
 
@@ -12,14 +12,10 @@
 
     <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="!isLoadingSpecialists">
         <div class="col">
-            <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
+            <a href="javascript:;" @click="onOpenStarDetailRequested(star)">{{star.name}}</a>
         </div>
         <div class="col-auto">
-            <i class="fas fa-map-marker-alt"></i>
-            <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
-        </div>
-        <div class="col-auto">
-            {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{star.garrison}} <i class="fas fa-rocket ml-1"></i>
         </div>
     </div>
 
@@ -30,7 +26,7 @@
                 <p>{{specialist.description}}</p>
             </div>
             <div class="col-auto">
-                <button class="btn btn-success mt-2" :disabled="isHiringSpecialist || (carrier.specialistId && carrier.specialist.id === specialist.id)" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+                <button class="btn btn-success mt-2" :disabled="isHiringSpecialist || (star.specialistId && star.specialist.id === specialist.id)" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
             </div>
         </div>
     </div>
@@ -50,12 +46,12 @@ export default {
     'menu-title': MenuTitleVue
   },
   props: {
-      carrierId: String
+      starId: String
   },
   data () {
     return {
       userPlayer: null,
-      carrier: null,
+      star: null,
       specialists: [],
       isLoadingSpecialists: false,
       isHiringSpecialist: false
@@ -63,7 +59,7 @@ export default {
   },
   mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
     this.loadSpecialists()
   },
@@ -71,14 +67,14 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onOpenCarrierDetailRequested (carrier) {
-      this.$emit('onOpenCarrierDetailRequested', carrier._id)
+    onOpenStarDetailRequested (star) {
+      this.$emit('onOpenStarDetailRequested', star._id)
     },
     async loadSpecialists () {
         this.isLoadingSpecialists = true
 
         try {
-            let response = await SpecialistApiService.getCarrierSpecialists(this.$store.state.game._id)
+            let response = await SpecialistApiService.getStarSpecialists(this.$store.state.game._id)
 
             if (response.status === 200) {
                 this.specialists = response.data
@@ -93,13 +89,13 @@ export default {
         this.isHiringSpecialist = true
 
         try {
-            let response = await SpecialistApiService.hireCarrierSpecialist(this.$store.state.game._id, this.carrierId, specialist.id)
+            let response = await SpecialistApiService.hireStarSpecialist(this.$store.state.game._id, this.starId, specialist.id)
 
             if (response.status === 200) {
-                this.$toasted.show(`${specialist.name} has been hired for the carrier ${this.carrier.name}.`)
+                this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
 
-                this.carrier.specialistId = specialist.id
-                this.carrier.specialist = specialist
+                this.star.specialistId = specialist.id
+                this.star.specialist = specialist
                 this.userPlayer.credits -= specialist.cost
             }
         } catch (err) {
