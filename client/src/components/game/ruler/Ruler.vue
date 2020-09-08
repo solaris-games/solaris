@@ -124,8 +124,8 @@ export default {
     recalculateETAs () {
       let game = this.$store.state.game
 
-      let totalTicks = GameHelper.getTicksBetweenLocations(game, this.points)
-      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, this.points, 3) // TODO: Need a constant here.
+      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, this.points)
+      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, this.points, 3) // TODO: Need a constant here.
 
       let totalTime = GameHelper.calculateTimeByTicks(totalTicks, game.settings.gameTime.speed, moment().utc())
       let totalTimeString = GameHelper.getCountdownTimeString(game, totalTime)

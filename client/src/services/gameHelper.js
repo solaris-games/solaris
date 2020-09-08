@@ -69,9 +69,15 @@ class GameHelper {
     return Math.sqrt(xs + ys)
   }
 
-  getTicksBetweenLocations (game, locs, tickDistanceModifier = 1) {
+  getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
     let totalTicks = 0
     let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
+
+    if (carrier && carrier.specialist && carrier.specialist.id === 1) { // TODO: need a constant somewhere.
+      tickDistance *= carrier.specialist.modifiers.local.speed
+    }
+
+    // TODO: Factor in any global speed modifiers.
 
     for (let i = 1; i < locs.length; i++) {
       let prevLoc = locs[i - 1]
@@ -156,9 +162,9 @@ class GameHelper {
 
     if (sourceStar.warpGate && destinationStar.warpGate &&
       sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-      ticks = this.getTicksBetweenLocations(game, [source, destination], 3) // TODO: Need a constant here
+      ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], 3) // TODO: Need a constant here
     } else {
-      ticks = this.getTicksBetweenLocations(game, [source, destination])
+      ticks = this.getTicksBetweenLocations(game, carrier, [source, destination])
     }
 
     return ticks
