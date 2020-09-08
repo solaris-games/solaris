@@ -53,16 +53,16 @@ module.exports = (io) => {
     const userService = new UserService(UserModel, passwordService);
 
     const broadcastService = new BroadcastService(io);
-    const combatService = new CombatService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
-    const technologyService = new TechnologyService();
     const gameListService = new GameListService(GameModel);
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const starService = new StarService(randomService, nameService, distanceService, starDistanceService);
     const carrierService = new CarrierService(distanceService, starService);
     const specialistService = new SpecialistService(carrierService);
+    const technologyService = new TechnologyService(starService, carrierService, specialistService);
+    const combatService = new CombatService(technologyService);
     const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.

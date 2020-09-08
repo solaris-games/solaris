@@ -290,21 +290,8 @@ module.exports = class GameTickService extends EventEmitter {
             return users.find(u => u._id.toString() === player.userId.toString());
         };
 
-        // Calculate the combined combat result taking into account
-        // the star garrison and all defenders vs. all attackers
-        let totalDefenders = Math.floor(star.garrisonActual) + defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
-        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
-
-        // Use the highest weapons tech of the attacking players to calculate combat result.
-        let weaponsTechLevel = attackers.map(p => p.research.weapons.level).sort((a, b) => b - a)[0];
-
-        let combatResult = this.combatService.calculate({
-            weaponsLevel: defender.research.weapons.level,
-            ships: totalDefenders
-        }, {
-            weaponsLevel: weaponsTechLevel,
-            ships: totalAttackers
-        });
+        // Perform combat at the star.
+        let combatResult = this.combatService.calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers);
         
         // Add all of the carriers to the combat result with a snapshot of
         // how many ships they had before combat occurs.

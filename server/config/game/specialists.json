@@ -4,10 +4,21 @@
             "id": 1,
             "name": "Speedy boi",
             "description": "i am speed",
-            "baseCost": 100,
+            "baseCost": 1,
             "modifiers": {
                 "local": {
                     "speed": 2
+                }
+            }
+        },
+        {
+            "id": 2,
+            "name": "Lieutenant",
+            "description": "Grants +1 Weapons bonus to the carrier.",
+            "baseCost": 1,
+            "modifiers": {
+                "local": {
+                    "weapons": 1
                 }
             }
         }

@@ -16,6 +16,14 @@ module.exports = class SpecialistService {
         return specialists[type].find(x => x.id === id);
     }
 
+    getByIdCarrier(id) {
+        return this.getById(id, TYPES.CARRIER);
+    }
+
+    getByIdStar(id) {
+        return this.getById(id, TYPES.STAR);
+    }
+
     list(game, type) {
         // Clone the existing list otherwise could run into issues with multiple requests
         // as the specs are being loaded from a file.
