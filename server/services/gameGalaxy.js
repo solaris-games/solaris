@@ -4,7 +4,7 @@ module.exports = class GameGalaxyService {
 
     constructor(mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService, specialistService) {
+        waypointService, researchService, specialistService, technologyService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -15,6 +15,7 @@ module.exports = class GameGalaxyService {
         this.waypointService = waypointService;
         this.researchService = researchService;
         this.specialistService = specialistService;
+        this.technologyService = technologyService;
     }
 
     async getGalaxy(game, userId) {
@@ -50,8 +51,8 @@ module.exports = class GameGalaxyService {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
             this._setStarInfoDetailed(game, player);
-            this._setCarrierInfoDetailed(game, player);
             this._setPlayerInfoBasic(game, player);
+            this._setCarrierInfoDetailed(game, player);
     
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
         }
@@ -117,7 +118,9 @@ module.exports = class GameGalaxyService {
             doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
         }
 
-        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
+        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, player);
+
+        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, effectiveTechs.scanning);
 
         // Get all of the player's stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
@@ -127,9 +130,9 @@ module.exports = class GameGalaxyService {
         .map(s => {
             // Calculate the star's terraformed resources.
             if (s.ownedByPlayerId) {
-                let owningPlayer = doc.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
+                let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
-                s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming.level);
+                s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayerEffectiveTechs.terraforming);
             }
 
             // Ignore stars the player owns, they will always be visible.
@@ -199,10 +202,20 @@ module.exports = class GameGalaxyService {
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
+            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
+
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
+
+                player.research.scanning.effective = effectiveTechs.scanning;
+                player.research.hyperspace.effective = effectiveTechs.hyperspace;
+                player.research.terraforming.effective = effectiveTechs.terraforming;
+                player.research.experimentation.effective = effectiveTechs.experimentation;
+                player.research.weapons.effective = effectiveTechs.weapons;
+                player.research.banking.effective = effectiveTechs.banking;
+                player.research.manufacturing.effective = effectiveTechs.manufacturing;
 
                 return p;
             }
@@ -211,13 +224,34 @@ module.exports = class GameGalaxyService {
             return {
                 colour: p.colour,
                 research: {
-                    scanning: { level: p.research.scanning.level },
-                    hyperspace: { level: p.research.hyperspace.level },
-                    terraforming: { level: p.research.terraforming.level },
-                    experimentation: { level: p.research.experimentation.level },
-                    weapons: { level: p.research.weapons.level },
-                    banking: { level: p.research.banking.level },
-                    manufacturing: { level: p.research.manufacturing.level }
+                    scanning: { 
+                        level: p.research.scanning.level,
+                        effective: effectiveTechs.scanning
+                    },
+                    hyperspace: { 
+                        level: p.research.hyperspace.level,
+                        effective: effectiveTechs.hyperspace
+                    },
+                    terraforming: { 
+                        level: p.research.terraforming.level,
+                        effective: effectiveTechs.terraforming
+                    },
+                    experimentation: { 
+                        level: p.research.experimentation.level,
+                        effective: effectiveTechs.experimentation
+                    },
+                    weapons: { 
+                        level: p.research.weapons.level,
+                        effective: effectiveTechs.weapons
+                    },
+                    banking: { 
+                        level: p.research.banking.level,
+                        effective: effectiveTechs.banking
+                    },
+                    manufacturing: { 
+                        level: p.research.manufacturing.level,
+                        effective: effectiveTechs.manufacturing
+                    }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 defeated: p.defeated,

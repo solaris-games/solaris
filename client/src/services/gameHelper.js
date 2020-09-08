@@ -73,11 +73,11 @@ class GameHelper {
     let totalTicks = 0
     let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
 
-    if (carrier && carrier.specialist && carrier.specialist.id === 1) { // TODO: need a constant somewhere.
-      tickDistance *= carrier.specialist.modifiers.local.speed
+    // Factor in any local speed modifers
+    // TODO: Global speed modifiers.
+    if (carrier && carrier.specialist && carrier.specialist.modifiers.local) {
+      tickDistance *= carrier.specialist.modifiers.local.speed || 1
     }
-
-    // TODO: Factor in any global speed modifiers.
 
     for (let i = 1; i < locs.length; i++) {
       let prevLoc = locs[i - 1]

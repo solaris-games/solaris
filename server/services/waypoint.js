@@ -2,11 +2,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(carrierService, starService, distanceService, starDistanceService) {
+    constructor(carrierService, starService, distanceService, starDistanceService, technologyService) {
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
+        this.technologyService = technologyService;
     }
 
     async saveWaypoints(game, player, carrierId, waypoints, looped) {
@@ -16,7 +17,8 @@ module.exports = class WaypointService {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
@@ -104,6 +106,8 @@ module.exports = class WaypointService {
             return false;
         }
 
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
+
         // Check whether the last waypoint is in range of the first waypoint.
         let firstWaypoint = carrier.waypoints[0];
         let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
@@ -112,7 +116,7 @@ module.exports = class WaypointService {
         let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.source);
 
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         return distanceBetweenStars <= hyperspaceDistance
     }

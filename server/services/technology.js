@@ -1,8 +1,6 @@
 module.exports = class TechnologyService {
 
-    constructor(starService, carrierService, specialistService) {
-        this.starService = starService;
-        this.carrierService = carrierService;
+    constructor(specialistService) {
         this.specialistService = specialistService;
     }
 
@@ -42,7 +40,7 @@ module.exports = class TechnologyService {
         };
 
         // Add global effects of stars.
-        let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id).filter(s => s.specialist != null);
+        let stars = game.galaxy.stars.filter(s => s.specialist != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
 
         for (let star of stars) {
             let specialist = this.specialistService.getByIdStar(star.specialist);
@@ -53,7 +51,7 @@ module.exports = class TechnologyService {
         }
 
         // Add global effects of carriers.
-        let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).filter(s => s.specialist != null);
+        let carriers = game.galaxy.carriers.filter(s => s.specialist != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
 
         for (let carrier of carriers) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialist);

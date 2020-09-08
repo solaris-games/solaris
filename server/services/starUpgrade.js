@@ -3,13 +3,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(starService, carrierService, userService, researchService) {
+    constructor(starService, carrierService, userService, researchService, technologyService) {
         super();
         
         this.starService = starService;
         this.carrierService = carrierService;
         this.userService = userService;
         this.researchService = researchService;
+        this.technologyService = technologyService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -183,7 +184,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
 
         // Append the new manufacturing speed to the report.
-        report.manufacturing = this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, report.infrastructure);
+        let star = this.starService.getById(game, starId);
+        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+
+        report.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, report.infrastructure);
 
         return report;
     }
@@ -229,6 +233,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
         if (!calculateCostFunction) {
             throw new ValidationError(`Unknown infrastructure type ${infrastructure}`)
         }
+
+        // NOTE: Do not need to do calculations for effective tech level here as it is unnecessary because
+        // the resources will scale in the same way for all stars.
 
         // Get all of the player stars and what the next upgrade cost will be.
         let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)

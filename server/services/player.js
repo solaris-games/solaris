@@ -260,11 +260,15 @@ module.exports = class PlayerService {
         return totalScience;
     }
 
-    calculateTotalManufacturing(player, stars) {
+    calculateTotalManufacturing(game, player, stars) {
         let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
         // Calculate the manufacturing level for all of the stars the player owns.
-        playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, s.infrastructure.industry));
+        playerStars.forEach(s => {
+            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
+
+            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, s.infrastructure.industry)
+        });
 
         let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
 
@@ -285,7 +289,7 @@ module.exports = class PlayerService {
             totalEconomy: this.calculateTotalEconomy(player, game.galaxy.stars),
             totalIndustry: this.calculateTotalIndustry(player, game.galaxy.stars),
             totalScience: this.calculateTotalScience(player, game.galaxy.stars),
-            newShips: this.calculateTotalManufacturing(player, game.galaxy.stars)
+            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars)
         };
     }
 

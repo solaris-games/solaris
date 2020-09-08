@@ -8,10 +8,6 @@ const TYPES = {
 
 module.exports = class SpecialistService {
 
-    constructor(carrierService) {
-        this.carrierService = carrierService;
-    }
-
     getById(id, type) {
         return specialists[type].find(x => x.id === id);
     }
@@ -63,7 +59,7 @@ module.exports = class SpecialistService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
-        let carrier = this.carrierService.getById(game, carrierId);
+        let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.toString() === carrierId);
 
         if (!carrier.orbiting) {
             throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);

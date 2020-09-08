@@ -4,7 +4,7 @@ const moment = require('moment');
 module.exports = class GameTickService extends EventEmitter {
     
     constructor(broadcastService, distanceService, starService, carrierService, 
-        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService) {
+        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService) {
         super();
             
         this.broadcastService = broadcastService;
@@ -19,6 +19,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.leaderboardService = leaderboardService;
         this.userService = userService;
         this.gameService = gameService;
+        this.technologyService = technologyService;
     }
 
     async tick(game) {
@@ -489,10 +490,10 @@ module.exports = class GameTickService extends EventEmitter {
             let star = game.galaxy.stars[i];
 
             if (star.ownedByPlayerId) {
-                let player = this.playerService.getByObjectId(game, star.ownedByPlayerId);
+                let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
     
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.garrisonActual += this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, star.infrastructure.industry);
+                star.garrisonActual += this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry);
                 star.garrison = Math.floor(star.garrisonActual);
 
                 // If the star isn't already in the report, add it.
@@ -568,10 +569,11 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _givePlayerMoney(game, player) {
+        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.playerService.calculateTotalEconomy(player, game.galaxy.stars);
 
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = player.research.banking.level * 75;
+        let creditsFromBanking = effectiveTechs.banking * 75;
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
