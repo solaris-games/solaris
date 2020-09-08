@@ -59,7 +59,11 @@ module.exports = class SpecialistService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
-        let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.toString() === carrierId);
+        let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.equals(player._id) && x._id.toString() === carrierId);
+
+        if (!carrier) {
+            throw new ValidationError(`Cannot assign a specialist to a carrier that you do not own.`);
+        }
 
         if (!carrier.orbiting) {
             throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);

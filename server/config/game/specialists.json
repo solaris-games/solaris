@@ -21,6 +21,17 @@
                     "weapons": 1
                 }
             }
+        },
+        {
+            "id": 3,
+            "name": "Minister of Energy",
+            "description": "Grants +1 Scanning bonus to all owned stars.",
+            "baseCost": 1,
+            "modifiers": {
+                "global": {
+                    "scanning": 1
+                }
+            }
         }
     ]
 }

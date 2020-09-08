@@ -209,7 +209,7 @@ class GameHelper {
     let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
 
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
-    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.level)
+    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.effective)
 
     return distanceBetweenStars <= hyperspaceDistance
   }

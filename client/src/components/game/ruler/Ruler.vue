@@ -90,7 +90,7 @@ export default {
     let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     if (userPlayer) {
-      this.hyperspaceRange = userPlayer.research.hyperspace.level
+      this.hyperspaceRange = userPlayer.research.hyperspace.effective
     }
   },
   destroyed () {

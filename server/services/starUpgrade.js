@@ -30,8 +30,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError('The game settings has disabled the building of warp gates.');
         }
 
+        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level);
+        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
         const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
 
         if (player.credits < cost) {
@@ -145,9 +147,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
+        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+
         // Calculate how much the upgrade will cost.
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level);
+        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
         if (player.credits < cost) {
@@ -234,12 +238,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Unknown infrastructure type ${infrastructure}`)
         }
 
-        // NOTE: Do not need to do calculations for effective tech level here as it is unnecessary because
-        // the resources will scale in the same way for all stars.
-
         // Get all of the player stars and what the next upgrade cost will be.
         let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
             .map(s => {
+                // NOTE: Do not need to do calculations for effective tech level here as it is unnecessary because
+                // the resources will scale in the same way for all stars.
                 let terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, player.research.terraforming.level)
 
                 return {
