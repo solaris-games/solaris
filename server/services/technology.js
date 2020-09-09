@@ -16,7 +16,7 @@ module.exports = class TechnologyService {
         return game.settings.technology.researchCosts[techKey] !== 'none';
     }
 
-    _applyTechModifiers(techs, modifiers) {
+    _applyTechModifiers(techs, modifiers, sanitize = true) {
         techs.scanning += modifiers.scanning || 0;
         techs.hyperspace += modifiers.hyperspace || 0;
         techs.terraforming += modifiers.terraforming || 0;
@@ -25,10 +25,20 @@ module.exports = class TechnologyService {
         techs.banking += modifiers.banking || 0;
         techs.manufacturing += modifiers.manufacturing || 0;
         
+        if (sanitize) {
+            techs.scanning = Math.max(1, techs.scanning);
+            techs.hyperspace = Math.max(1, techs.hyperspace);
+            techs.terraforming = Math.max(1, techs.terraforming);
+            techs.experimentation = Math.max(1, techs.experimentation);
+            techs.weapons = Math.max(1, techs.weapons);
+            techs.banking = Math.max(1, techs.banking);
+            techs.manufacturing = Math.max(1, techs.manufacturing);
+        }
+
         return techs;
     }
 
-    getPlayerEffectiveTechnologyLevels(game, player) {
+    getPlayerEffectiveTechnologyLevels(game, player, sanitize = true) {
         let techs = {
             scanning: player.research.scanning.level,
             hyperspace: player.research.hyperspace.level,
@@ -46,7 +56,7 @@ module.exports = class TechnologyService {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
             if (specialist.modifiers.global != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.global);
+                this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
             }
         }
 
@@ -57,39 +67,39 @@ module.exports = class TechnologyService {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist.modifiers.global != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.global);
+                this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
             }
         }
 
         return techs;
     }
 
-    getStarEffectiveTechnologyLevels(game, star) {
+    getStarEffectiveTechnologyLevels(game, star, sanitize = true) {
         let player = game.galaxy.players.find(x => x._id.equals(star.ownedByPlayerId));
 
-        let techs = this.getPlayerEffectiveTechnologyLevels(game, player);
+        let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
             if (specialist.modifiers.local != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.local);
+                this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
             }
         }
 
         return techs;
     }
 
-    getCarrierEffectiveTechnologyLevels(game, carrier) {
+    getCarrierEffectiveTechnologyLevels(game, carrier, sanitize = true) {
         let player = game.galaxy.players.find(x => x._id.equals(carrier.ownedByPlayerId));
 
-        let techs = this.getPlayerEffectiveTechnologyLevels(game, player);
+        let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist.modifiers.local != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.local);
+                this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
             }
         }
 
@@ -100,7 +110,7 @@ module.exports = class TechnologyService {
         if (!carriers.length) {
             return 1;
         }
-        
+
         // Get the max tech level of all carriers in the array.
         let techLevels = carriers.map(c => this.getCarrierEffectiveTechnologyLevels(game, c).weapons);
 
