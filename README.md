@@ -1,14 +1,20 @@
 # Solaris
 
-This is a HTML5 game that aims to loosely clone the game [Neptune's Pride](https://np.ironhelmet.com). It uses the following tech:
+This is a 4X strategy game that aims to loosely clone the game [Neptune's Pride](https://np.ironhelmet.com).
 
-#### Server
+Visit [solaris.games](https://solaris.games) to play now!
+
+![](client/src/assets/screenshots/game1.png)
+
+### Server
+The server uses the following tech:
 - [Node.js](https://nodejs.org/en/)
 - [Express](https://expressjs.com/)
 - [MongoDB](https://www.mongodb.com/)
     - [Mongoose](https://mongoosejs.com/)
 
-#### Client
+### Client
+The client uses the following tech:
 - [Vue.js](https://vuejs.org/)
 - [PixiJS](https://www.pixijs.com/)
 
