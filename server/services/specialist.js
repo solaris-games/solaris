@@ -35,7 +35,7 @@ module.exports = class SpecialistService {
             spec.cost = this.getSpecialistActualCost(game, spec);
         }
 
-        return specs;
+        return specs.sort((a, b) => a.cost - b.cost);
     }
 
     listCarrier(game) {
@@ -82,12 +82,12 @@ module.exports = class SpecialistService {
         // Calculate how much the spec will cost.
         let cost = this.getSpecialistActualCost(game, specialist);
 
-        if (player.credits < cost) {
-            throw new ValidationError(`You cannot afford to buy this specialist.`);
-        }
+        // if (player.credits < cost) {
+        //     throw new ValidationError(`You cannot afford to buy this specialist.`);
+        // }
 
         carrier.specialistId = specialist.id;
-        player.credits -= cost;
+        // player.credits -= cost;
 
         await game.save();
 
@@ -120,12 +120,12 @@ module.exports = class SpecialistService {
         // Calculate how much the spec will cost.
         let cost = this.getSpecialistActualCost(game, specialist);
 
-        if (player.credits < cost) {
-            throw new ValidationError(`You cannot afford to buy this specialist.`);
-        }
+        // if (player.credits < cost) {
+        //     throw new ValidationError(`You cannot afford to buy this specialist.`);
+        // }
 
         star.specialistId = specialist.id;
-        player.credits -= cost;
+        // player.credits -= cost;
 
         await game.save();
 

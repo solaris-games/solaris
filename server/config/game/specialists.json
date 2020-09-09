@@ -2,9 +2,9 @@
     "carrier": [
         {
             "id": 1,
-            "name": "Speedy boi",
-            "description": "i am speed",
-            "baseCost": 1,
+            "name": "Admiral",
+            "description": "x2 Carrier speed between Stars and Warp Gates.",
+            "baseCost": 100,
             "modifiers": {
                 "local": {
                     "speed": 2
@@ -14,11 +14,48 @@
         {
             "id": 2,
             "name": "Lieutenant",
-            "description": "Grants +1 Weapons bonus to the carrier.",
-            "baseCost": 1,
+            "description": "Grants +1 Weapons bonus to the Carrier.",
+            "baseCost": 100,
             "modifiers": {
                 "local": {
                     "weapons": 1
+                }
+            }
+        },
+        {
+            "id": 3,
+            "name": "General",
+            "description": "Grants +3 Weapons bonus to the Carrier but 0.5x speed.",
+            "baseCost": 250,
+            "modifiers": {
+                "local": {
+                    "weapons": 3,
+                    "speed": 0.5
+                }
+            }
+        },
+        {
+            "id": 4,
+            "name": "Smuggler",
+            "description": "x3 Carrier speed between Stars and Warp Gates, -2 Weapons and -2 Hyperspace Range.",
+            "baseCost": 300,
+            "modifiers": {
+                "local": {
+                    "speed": 3,
+                    "weapons": -2,
+                    "hyperspace": -2
+                }
+            }
+        },
+        {
+            "id": 5,
+            "name": "Explorer",
+            "description": "+3 Hyperspace, -5 Weapons",
+            "baseCost": 500,
+            "modifiers": {
+                "local": {
+                    "weapons": -5,
+                    "hyperspace": 3
                 }
             }
         }
@@ -26,12 +63,46 @@
     "star": [
         {
             "id": 1,
-            "name": "Minister of Energy",
-            "description": "Grants +1 Scanning bonus to all owned stars.",
-            "baseCost": 1,
+            "name": "Tycoon",
+            "description": "+1 Manufacturing and -1 Scanning to all owned stars.",
+            "baseCost": 1000,
+            "modifiers": {
+                "global": {
+                    "manufacturing": 1,
+                    "scanning": -1
+                }
+            }
+        },
+        {
+            "id": 2,
+            "name": "Intelligence Officer",
+            "description": "+1 Scanning bonus to all owned stars.",
+            "baseCost": 500,
             "modifiers": {
                 "global": {
                     "scanning": 1
+                }
+            }
+        },
+        {
+            "id": 3,
+            "name": "Radar Scanner",
+            "description": "+3 Scanning to the star.",
+            "baseCost": 300,
+            "modifiers": {
+                "global": {
+                    "scanning": 3
+                }
+            }
+        },
+        {
+            "id": 4,
+            "name": "Tinkerer",
+            "description": "+2 Manufacturing to the star.",
+            "baseCost": 400,
+            "modifiers": {
+                "global": {
+                    "scanning": 2
                 }
             }
         }
