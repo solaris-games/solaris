@@ -97,6 +97,10 @@ module.exports = class TechnologyService {
     }
 
     getCarriersEffectiveWeaponsLevel(game, carriers) {
+        if (!carriers.length) {
+            return 1;
+        }
+        
         // Get the max tech level of all carriers in the array.
         let techLevels = carriers.map(c => this.getCarrierEffectiveTechnologyLevels(game, c).weapons);
 
