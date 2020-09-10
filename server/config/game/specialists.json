@@ -102,7 +102,7 @@
             "baseCost": 400,
             "modifiers": {
                 "global": {
-                    "scanning": 2
+                    "manufacturing": 2
                 }
             }
         }
