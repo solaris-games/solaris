@@ -77,46 +77,50 @@
     "star": [
         {
             "id": 1,
-            "name": "Radar Scanner",
-            "description": "Grants +1 Scanning Range to Star.",
-            "tier": 1,
+            "name": "Orbital Array",
+            "description": "Grants +1 Scanning Range, -1 Manufacturing to the Star.",
+            "tier": 2,
             "modifiers": {
                 "local": {
-                    "scanning": 1
+                    "scanning": 1,
+                    "manufacturing": -1
                 }
             }
         },
         {
             "id": 2,
-            "name": "Tinkerer",
-            "description": "Grants +1 Manufacturing to the Star.",
+            "name": "Space Dock",
+            "description": "Grants +1 Manufacturing, -1 Terraforming to the Star.",
             "tier": 2,
             "modifiers": {
                 "local": {
-                    "manufacturing": 1
+                    "manufacturing": 1,
+                    "terraforming": -1
                 }
             }
         },
         {
             "id": 3,
-            "name": "Miner",
-            "description": "Grants +2 Terraforming to the Star.",
+            "name": "Atmosphere Processor",
+            "description": "Grants +1 Terraforming, -1 Scanning to the Star.",
             "tier": 2,
             "modifiers": {
                 "local": {
-                    "terraforming": 2
+                    "terraforming": 1,
+                    "scanning": -1
                 }
             }
         },
         {
             "id": 4,
-            "name": "Drill Instructor",
-            "description": "Grants +1 Weapons, +1 Manufacturing to the Star.",
-            "tier": 3,
+            "name": "Orbital Cannon",
+            "description": "Grants +2 Weapons, -1 Scanning, -1 Terraforming to the Star.",
+            "tier": 2,
             "modifiers": {
                 "local": {
-                    "weapons": 1,
-                    "manufacturing": 1
+                    "weapons": 2,
+                    "scanning": -1,
+                    "terraforming": -1
                 }
             }
         }
