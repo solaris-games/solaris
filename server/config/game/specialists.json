@@ -64,12 +64,12 @@
         {
             "id": 6,
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -6 Weapons to the Carrier.",
+            "description": "Grants +3 Hyperspace Range, -3 Weapons to the Carrier.",
             "tier": 3,
             "modifiers": {
                 "local": {
                     "hyperspace": 3,
-                    "weapons": -6
+                    "weapons": -3
                 }
             }
         }
