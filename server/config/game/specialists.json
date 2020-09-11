@@ -3,12 +3,13 @@
         {
             "id": 1,
             "name": "Admiral",
-            "description": "Grants x2 Speed, -4 Weapons to the Carrier.",
+            "description": "Grants x1.5 Speed, -4 Weapons, -2 Hyperspace Range to the Carrier.",
             "tier": 3,
             "modifiers": {
                 "local": {
-                    "speed": 2,
-                    "weapons": -4
+                    "speed": 1.5,
+                    "weapons": -4,
+                    "hyperspace": -2
                 }
             }
         },
@@ -51,13 +52,13 @@
         {
             "id": 5,
             "name": "Smuggler",
-            "description": "Grants x3 Speed, -5 Weapons, -3 Hyperspace Range to the Carrier.",
+            "description": "Grants x2 Speed, -6 Weapons, -4 Hyperspace Range to the Carrier.",
             "tier": 5,
             "modifiers": {
                 "local": {
-                    "speed": 3,
-                    "weapons": -5,
-                    "hyperspace": -3
+                    "speed": 2,
+                    "weapons": -6,
+                    "hyperspace": -4
                 }
             }
         },
