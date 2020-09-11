@@ -4,8 +4,9 @@
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p v-if="userPlayer && carrier.ownedByPlayerId == userPlayer._id">A carrier under your command.<br/>Give it orders to capture more stars!</p>
+        <p v-if="userPlayer && carrier.ownedByPlayerId == userPlayer._id && !carrier.isGift">A carrier under your command.<br/>Give it orders to capture more stars!</p>
         <p v-if="carrier.ownedByPlayerId != null && (!userPlayer || carrier.ownedByPlayerId != userPlayer._id)">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
+        <p v-if="isGift" class="text-warning">This carrier is a gift.</p>
       </div>
     </div>
 
@@ -27,7 +28,7 @@
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-5">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated">Ship Transfer</button>
+          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="userPlayer && carrierOwningPlayer == userPlayer && !carrier.isGift && !userPlayer.defeated">Ship Transfer</button>
         </div>
       </div>
 
@@ -51,7 +52,7 @@
         </div>
       </div>
 
-      <div v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated && carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated && carrier.waypoints.length && !carrier.isGift" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
@@ -66,7 +67,7 @@
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
         <div class="col-5 mb-2">
-          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated">Edit Waypoints</button>
+          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="userPlayer && carrierOwningPlayer == userPlayer && !carrier.isGift && !userPlayer.defeated">Edit Waypoints</button>
         </div>
       </div>
     </div>

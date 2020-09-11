@@ -29,6 +29,14 @@ class CarrierService extends BaseApiService {
       { withCredentials: true })
   }
 
+  convertToGift (gameId, carrierId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/gift',
+      {
+        carrierId
+      },
+      { withCredentials: true })
+  }
+
   calculateCombat (gameId, defender, attacker) {
     return axios.post(this.BASE_URL + 'game/' + gameId + '/carrier/calculateCombat',
       {

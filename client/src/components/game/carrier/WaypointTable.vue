@@ -7,7 +7,7 @@
                 <td>Destination</td>
                 <td v-if="!showAction">ETA</td>
                 <td v-if="showAction">Action</td>
-                <td class="text-right">
+                <td class="text-right" v-if="!carrier.isGift">
                   <a href="javascript:;" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
                 </td>
             </tr>
@@ -15,6 +15,7 @@
         <tbody>
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
                         :waypoint="waypoint" :showAction="showAction"
+                        :showEdit="!carrier.isGift"
                         @onEditWaypointRequested="onEditWaypointRequested"
                         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>

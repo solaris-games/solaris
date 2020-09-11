@@ -16,6 +16,10 @@ module.exports = class WaypointService {
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
+        
+        if (carrier.isGift) {
+            throw new ValidationError('Cannot change waypoints of a carrier that is a gift.');
+        }
 
         let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
@@ -84,6 +88,10 @@ module.exports = class WaypointService {
         
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
+        }
+        
+        if (carrier.isGift) {
+            throw new ValidationError('Cannot loop waypoints of a carrier that is a gift.');
         }
 
         if (loop) {

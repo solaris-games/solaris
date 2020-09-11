@@ -193,8 +193,14 @@ module.exports = class GameTickService extends EventEmitter {
 
                 // If the star is owned by another player, then perform combat.
                 if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    if (combatStars.indexOf(destinationStar) < 0) {
-                        combatStars.push(destinationStar);
+                    // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
+                    // Otherwise, perform combat.
+                    if (carrier.isGift) {
+                        carrier.ownedByPlayerId = destinationStar.ownedByPlayerId;
+                    } else {
+                        if (combatStars.indexOf(destinationStar) < 0) {
+                            combatStars.push(destinationStar);
+                        }
                     }
                 }
 

@@ -89,6 +89,31 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        let errors = [];
+
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
+
+        try {
+            await container.carrierService.convertToGift(
+                req.game,
+                req.player,
+                req.params.carrierId);
+
+            // // Broadcast the event to the current player and also all other players within scanning range.
+            // let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            // playersWithinScanningRange.forEach(p => 
+            //     container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
         let errors = [];
 

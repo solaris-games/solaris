@@ -116,6 +116,7 @@ module.exports = class CarrierService {
                 ships: c.ships,
                 location: c.location,
                 waypoints: c.waypoints,
+                isGift: c.isGift,
                 specialistId: c.specialistId
             };
 
@@ -166,6 +167,38 @@ module.exports = class CarrierService {
         }
 
         return game.constants.distances.shipSpeed * distanceModifier;
+    }
+
+    async convertToGift(game, player, carrierId) {
+        let carrier = this.getById(game, carrierId);
+
+        if (!carrier.ownedByPlayerId.equals(player._id)) {
+            throw new ValidationError(`Cannot convert carrier into a gift, you do not own this carrier.`);
+        }
+
+        if (carrier.orbiting) {
+            throw new ValidationError(`The carrier must be in transit in order to be converted into a gift.`);
+        }
+
+        if (carrier.isGift) {
+            throw new ValidationError(`The carrier has already been converted into a gift.`);
+        }
+
+        // Convert the carrier into a gift.
+        // Remove all waypoints except from the first waypoint
+        // Set its waypoint action to be "do nothing"
+        carrier.isGift = true;
+        carrier.waypointsLooped = false;
+
+        let firstWaypoint = carrier.waypoints[0];
+
+        firstWaypoint.action = 'nothing';
+        firstWaypoint.actionShips = 0;
+        firstWaypoint.delayTicks = 0;
+
+        carrier.waypoints = [firstWaypoint];
+        
+        await game.save();
     }
     
 };

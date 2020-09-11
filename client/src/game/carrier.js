@@ -103,7 +103,9 @@ class Carrier extends EventEmitter {
 
     let totalGarrison = this.data.ships
 
-    this.text_garrison.text = totalGarrison
+    let garrisonText = totalGarrison.toString() + this.data.isGift ? '🎁' : ''
+
+    this.text_garrison.text = garrisonText
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 5
     this.text_garrison.visible = !this.data.orbiting && totalGarrison > 0 && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
