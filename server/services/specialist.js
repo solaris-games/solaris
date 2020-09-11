@@ -6,6 +6,14 @@ const TYPES = {
     STAR: "star"
 };
 
+const TIER_BASE_COSTS = {
+    "1": 25,
+    "2": 50,
+    "3": 100,
+    "4": 250,
+    "5": 500
+}
+
 module.exports = class SpecialistService {
 
     getById(id, type) {
@@ -49,7 +57,7 @@ module.exports = class SpecialistService {
     getSpecialistActualCost(game, specialist) {
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
 
-        let cost = specialist.baseCost * expenseConfig;
+        let cost = TIER_BASE_COSTS[specialist.tier.toString()] * expenseConfig;
 
         return cost;
     }
@@ -82,12 +90,12 @@ module.exports = class SpecialistService {
         // Calculate how much the spec will cost.
         let cost = this.getSpecialistActualCost(game, specialist);
 
-        // if (player.credits < cost) {
-        //     throw new ValidationError(`You cannot afford to buy this specialist.`);
-        // }
+        if (player.credits < cost) {
+            throw new ValidationError(`You cannot afford to buy this specialist.`);
+        }
 
         carrier.specialistId = specialist.id;
-        // player.credits -= cost;
+        player.credits -= cost;
 
         await game.save();
 
@@ -120,12 +128,12 @@ module.exports = class SpecialistService {
         // Calculate how much the spec will cost.
         let cost = this.getSpecialistActualCost(game, specialist);
 
-        // if (player.credits < cost) {
-        //     throw new ValidationError(`You cannot afford to buy this specialist.`);
-        // }
+        if (player.credits < cost) {
+            throw new ValidationError(`You cannot afford to buy this specialist.`);
+        }
 
         star.specialistId = specialist.id;
-        // player.credits -= cost;
+        player.credits -= cost;
 
         await game.save();
 

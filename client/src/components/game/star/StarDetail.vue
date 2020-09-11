@@ -120,9 +120,9 @@
       -->
     </div>
 
-    <h4 class="pt-2" v-if="canHireSpecialist && starOwningPlayer == userPlayer">Specialist</h4>
+    <h4 class="pt-2" v-if="canHireSpecialist && star.infrastructure">Specialist</h4>
 
-    <star-specialist v-if="canHireSpecialist" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
+    <star-specialist v-if="canHireSpecialist && star.infrastructure" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
 
     <playerOverview v-if="starOwningPlayer" :playerId="starOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"

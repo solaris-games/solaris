@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <h4 class="pt-2" v-if="canHireSpecialist && carrierOwningPlayer == userPlayer">Specialist</h4>
+    <h4 class="pt-2" v-if="canHireSpecialist">Specialist</h4>
 
     <carrier-specialist v-if="canHireSpecialist" :carrierId="carrier._id" @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
 

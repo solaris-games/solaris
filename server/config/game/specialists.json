@@ -3,30 +3,44 @@
         {
             "id": 1,
             "name": "Admiral",
-            "description": "x2 Carrier speed between Stars and Warp Gates.",
-            "baseCost": 100,
+            "description": "Grants x2 Speed, -4 Weapons to the Carrier.",
+            "tier": 3,
             "modifiers": {
                 "local": {
-                    "speed": 2
+                    "speed": 2,
+                    "weapons": -4
                 }
             }
         },
         {
             "id": 2,
             "name": "Lieutenant",
-            "description": "Grants +1 Weapons bonus to the Carrier.",
-            "baseCost": 100,
+            "description": "Grants +1 Weapons, -1 Hyperspace Range, x0.75 Speed to the Carrier.",
+            "tier": 2,
             "modifiers": {
                 "local": {
-                    "weapons": 1
+                    "weapons": 1,
+                    "speed": 0.75
                 }
             }
         },
         {
             "id": 3,
+            "name": "Colonel",
+            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.5 Speed to the Carrier.",
+            "tier": 3,
+            "modifiers": {
+                "local": {
+                    "weapons": 2,
+                    "speed": 0.5
+                }
+            }
+        },
+        {
+            "id": 4,
             "name": "General",
-            "description": "Grants +3 Weapons bonus to the Carrier but 0.5x speed.",
-            "baseCost": 250,
+            "description": "Grants +3 Weapons, -2 Hyperspace Range, x0.25 Speed to the Carrier.",
+            "tier": 4,
             "modifiers": {
                 "local": {
                     "weapons": 3,
@@ -35,27 +49,27 @@
             }
         },
         {
-            "id": 4,
+            "id": 5,
             "name": "Smuggler",
-            "description": "x3 Carrier speed between Stars and Warp Gates, -2 Weapons and -2 Hyperspace Range.",
-            "baseCost": 300,
+            "description": "Grants x3 Speed, -5 Weapons, -3 Hyperspace Range to the Carrier.",
+            "tier": 5,
             "modifiers": {
                 "local": {
                     "speed": 3,
-                    "weapons": -2,
-                    "hyperspace": -2
+                    "weapons": -5,
+                    "hyperspace": -3
                 }
             }
         },
         {
-            "id": 5,
+            "id": 6,
             "name": "Explorer",
-            "description": "+3 Hyperspace, -5 Weapons",
-            "baseCost": 500,
+            "description": "Grants +3 Hyperspace Range, -6 Weapons to the Carrier.",
+            "tier": 3,
             "modifiers": {
                 "local": {
-                    "weapons": -5,
-                    "hyperspace": 3
+                    "hyperspace": 3,
+                    "weapons": -6
                 }
             }
         }
@@ -63,46 +77,46 @@
     "star": [
         {
             "id": 1,
-            "name": "Tycoon",
-            "description": "+1 Manufacturing and -1 Scanning to all owned stars.",
-            "baseCost": 1000,
+            "name": "Radar Scanner",
+            "description": "Grants +1 Scanning Range to Star.",
+            "tier": 1,
             "modifiers": {
-                "global": {
-                    "manufacturing": 1,
-                    "scanning": -1
-                }
-            }
-        },
-        {
-            "id": 2,
-            "name": "Intelligence Officer",
-            "description": "+1 Scanning bonus to all owned stars.",
-            "baseCost": 500,
-            "modifiers": {
-                "global": {
+                "local": {
                     "scanning": 1
                 }
             }
         },
         {
-            "id": 3,
-            "name": "Radar Scanner",
-            "description": "+3 Scanning to the star.",
-            "baseCost": 300,
+            "id": 2,
+            "name": "Tinkerer",
+            "description": "Grants +1 Manufacturing to the Star.",
+            "tier": 2,
             "modifiers": {
-                "global": {
-                    "scanning": 3
+                "local": {
+                    "manufacturing": 1
+                }
+            }
+        },
+        {
+            "id": 3,
+            "name": "Miner",
+            "description": "Grants +2 Terraforming to the Star.",
+            "tier": 2,
+            "modifiers": {
+                "local": {
+                    "terraforming": 2
                 }
             }
         },
         {
             "id": 4,
-            "name": "Tinkerer",
-            "description": "+2 Manufacturing to the star.",
-            "baseCost": 400,
+            "name": "Drill Instructor",
+            "description": "Grants +1 Weapons, +1 Manufacturing to the Star.",
+            "tier": 3,
             "modifiers": {
-                "global": {
-                    "manufacturing": 2
+                "local": {
+                    "weapons": 1,
+                    "manufacturing": 1
                 }
             }
         }

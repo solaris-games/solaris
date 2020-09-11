@@ -26,7 +26,8 @@
                 <p>{{specialist.description}}</p>
             </div>
             <div class="col-auto">
-                <button class="btn btn-success mt-2" :disabled="isHiringSpecialist || (star.specialistId && star.specialist.id === specialist.id)" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+                <button class="btn btn-success mt-2" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+                <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
             </div>
         </div>
     </div>

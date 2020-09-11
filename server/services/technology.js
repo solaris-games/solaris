@@ -49,27 +49,30 @@ module.exports = class TechnologyService {
             manufacturing: player.research.manufacturing.level
         };
 
-        // Add global effects of stars.
-        let stars = game.galaxy.stars.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+        // TODO: Global effects needs to be split into different types.
+        // i.e global for the player (all stars and all carriers), global for all stars, and global for all carriers.
+        
+        // // Add global effects of stars.
+        // let stars = game.galaxy.stars.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
 
-        for (let star of stars) {
-            let specialist = this.specialistService.getByIdStar(star.specialistId);
+        // for (let star of stars) {
+        //     let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-            if (specialist.modifiers.global != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
-            }
-        }
+        //     if (specialist.modifiers.global != null) {
+        //         this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
+        //     }
+        // }
 
-        // Add global effects of carriers.
-        let carriers = game.galaxy.carriers.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+        // // Add global effects of carriers.
+        // let carriers = game.galaxy.carriers.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
 
-        for (let carrier of carriers) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+        // for (let carrier of carriers) {
+        //     let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (specialist.modifiers.global != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
-            }
-        }
+        //     if (specialist.modifiers.global != null) {
+        //         this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
+        //     }
+        // }
 
         return techs;
     }
