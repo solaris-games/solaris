@@ -59,33 +59,40 @@ module.exports = class CarrierService {
         return name;
     }
 
-    filterCarriersByScanningRange(game, player) {
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
-        let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
-
-        // Get all of the players stars.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let playerStarLocations = playerStars.map(s => s.location);
-
-        if (!playerStarLocations.length) {
+    getCarriersWithinScanningRangeOfStar(game, star) {
+        if (star.ownedByPlayerId == null) {
             return [];
         }
-        
-        return game.galaxy.carriers
-        .filter(c => {
-            // If the player owns the carrier then it will always be visible.
-            if (c.ownedByPlayerId.equals(player._id)) {
-                return true;
-            }
 
-            // Get the closest player star to this carrier.
-            let closest = this.distanceService.getClosestLocation(c.location, playerStarLocations);
-            let distance = this.distanceService.getDistanceBetweenLocations(c.location, closest);
+        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+        let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
 
-            let inRange = distance <= scanningRangeDistance;
-
-            return inRange;
+        // Go through all stars and find each star that is in scanning range.
+        let carriersInRange = game.galaxy.carriers.filter(c => {
+            return c.ownedByPlayerId.equals(star.ownedByPlayerId) ||
+                this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
         });
+
+        return carriersInRange;
+    }
+
+    filterCarriersByScanningRange(game, player) {
+        // Stars may have different scanning ranges independently so we need to check
+        // each star to check what is within its scanning range.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let inRange = [];
+
+        for (let star of playerStars) {
+            let carriers = this.getCarriersWithinScanningRangeOfStar(game, star);
+
+            for (let c of carriers) {
+                if (inRange.indexOf(c) === -1) {
+                    inRange.push(c);
+                }
+            }
+        }
+
+        return inRange;
     }
 
     sanitizeCarriersByPlayer(game, player) {
@@ -108,7 +115,8 @@ module.exports = class CarrierService {
                 name: c.name,
                 ships: c.ships,
                 location: c.location,
-                waypoints: c.waypoints
+                waypoints: c.waypoints,
+                specialistId: c.specialistId
             };
 
             carrierData.waypoints = this.clearCarrierWaypointsNonTransit(c, true);

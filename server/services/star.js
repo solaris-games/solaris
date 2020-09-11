@@ -67,6 +67,10 @@ module.exports = class StarService extends EventEmitter {
     }
 
     getStarsWithinScanningRangeOfStar(game, starId) {
+        return this.getStarsWithinScanningRangeOfStarByStars(game, starId, game.galaxy.stars);
+    }
+
+    getStarsWithinScanningRangeOfStarByStars(game, starId, stars) {
         // Get all of the stars owned by the player
         let star = this.getById(game, starId);
 
@@ -78,7 +82,7 @@ module.exports = class StarService extends EventEmitter {
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
 
         // Go through all stars and find each star that is in scanning range.
-        let starsInRange = game.galaxy.stars.filter(s => {
+        let starsInRange = stars.filter(s => {
             return s._id.toString() !== starId.toString() && // Not the current star
                 this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
         });
@@ -87,17 +91,41 @@ module.exports = class StarService extends EventEmitter {
     }
 
     filterStarsByScanningRange(game, player) {
+        // Stars may have different scanning ranges independently so we need to check
+        // each star to check what is within its scanning range.
         let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
-        let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
+        let starsToCheck = game.galaxy.stars;
+        let starsInRange = [];
 
-        let starsInRange = game.galaxy.stars.filter(s => {
-            return (s.ownedByPlayerId != null && s.ownedByPlayerId.equals(player._id))   // Owned by the current player
-                // Or any of the stars that the player owns is within scanning range
-                || playerStars.find(ps => this.starDistanceService.getDistanceBetweenStars(ps, s) <= scanningRangeDistance) != null;
-        });
+        for (let star of playerStars) {
+            let stars = this.getStarsWithinScanningRangeOfStar(game, star._id, starsToCheck);
+
+            for (let s of stars) {
+                if (starsInRange.indexOf(s) === -1) {
+                    starsInRange.push(s);
+                    //starsToCheck.splice(starsToCheck.indexOf(s), 1); // TODO: Have to instead clone the game.galaxy.stars otherwise this will screw up the game galaxy.
+                }
+            }
+        }
 
         return starsInRange;
+    }
+
+    isStarInScanningRangeOfPlayer(game, star, player) {
+        // Stars may have different scanning ranges independently so we need to check
+        // each star to check what is within its scanning range.
+        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let starsToCheck = game.galaxy.stars;
+
+        for (let playerStar of playerStars) {
+            let stars = this.getStarsWithinScanningRangeOfStar(game, playerStar._id, starsToCheck);
+
+            if (stars.indexOf(star) > -1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     calculateTerraformedResources(naturalResources, terraforming) {

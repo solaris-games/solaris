@@ -55,8 +55,14 @@ class GameHelper {
         carrier.inTransitTo === waypoint.destination
   }
 
-  getHyperspaceDistance (game, hyperspace) {
-    return ((hyperspace || 1) + 1.5) * game.constants.distances.lightYear
+  getHyperspaceDistance (game, player, carrier) {
+    let techLevel = player.research.hyperspace.effective
+    
+    if (carrier.specialist && carrier.specialist.modifiers.local) {
+      techLevel += carrier.specialist.modifiers.local.hyperspace || 0
+    }
+
+    return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
   }
 
   getDistanceBetweenLocations (loc1, loc2) {
@@ -209,7 +215,7 @@ class GameHelper {
     let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
 
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
-    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.effective)
+    let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)
 
     return distanceBetweenStars <= hyperspaceDistance
   }

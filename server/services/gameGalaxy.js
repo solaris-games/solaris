@@ -124,10 +124,6 @@ module.exports = class GameGalaxyService {
             doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
         }
 
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, player);
-
-        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, effectiveTechs.scanning);
-
         // Get all of the player's stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
 
@@ -156,14 +152,7 @@ module.exports = class GameGalaxyService {
             }
 
             // Get the closest player star to this star.
-            let inRange = false;
-
-            if (playerStars.length) {
-                let closest = this.starDistanceService.getClosestStar(s, playerStars);
-                let distance = this.starDistanceService.getDistanceBetweenStars(s, closest);
-    
-                inRange = distance <= scanningRangeDistance;
-            }
+            let inRange = this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
 
             // If its in range then its all good, send the star back as is.
             // Otherwise only return a subset of the data.

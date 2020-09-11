@@ -25,15 +25,13 @@ module.exports = class PlayerService {
     }
     
     getPlayersWithinScanningRangeOfStar(game, starId) {
-        let playerIdsWithinRange = [...new Set(
-            this.starService.getStarsWithinScanningRangeOfStar(game, starId) // Get all stars within the scanning range of the star
-                .filter(s => s.ownedByPlayerId != null)
-                .map(s => s.ownedByPlayerId.toString())
-        )];
+        let star = this.starService.getById(game, starId);
 
-        return game.galaxy.players.filter(p => {
-            return playerIdsWithinRange.find(id => id === p.id) != null
+        let playersWithinRange = game.galaxy.players.filter(p => {
+            return this.starService.isStarInScanningRangeOfPlayer(game, star, p);
         });
+
+        return playersWithinRange;
     }
 
     createEmptyPlayer(game, colour) {
