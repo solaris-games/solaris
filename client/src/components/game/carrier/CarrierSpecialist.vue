@@ -1,16 +1,17 @@
 <template>
     <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="carrier">
-        <div :class="{'col-7':canHireSpecialist,'col':!canHireSpecialist}">
+        <div class="col">
+            <h5 v-if="!carrier.specialist" class="pt-1">None Assigned</h5>
+            <h5 v-if="carrier.specialist" class="pt-1 text-warning">{{carrier.specialist.name}}</h5>
+        </div>
+        <div v-if="canHireSpecialist" class="col-auto">
+            <button class="btn btn-sm btn-success" @click="onViewHireCarrierSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
+        </div>
+        <div class="col-12 mt-2">
+              <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
             <p class="mb-2" v-if="!carrier.specialistId">
                 This carrier does not have a specialist assigned. <a href="javascript:;">Read More</a>.
             </p>
-            <div v-if="carrier.specialist">
-                <h5 class="mb-1 text-warning">{{carrier.specialist.name}}</h5>
-                <p>{{carrier.specialist.description}}</p>
-            </div>
-        </div>
-        <div v-if="canHireSpecialist" class="col-5">
-            <button class="btn btn-success" @click="onViewHireCarrierSpecialistRequested">Hire Specialist</button>
         </div>
     </div>
 </template>

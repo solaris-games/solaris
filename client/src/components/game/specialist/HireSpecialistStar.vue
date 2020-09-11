@@ -21,13 +21,15 @@
 
     <div v-if="!isLoadingSpecialists && specialists.length">
         <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 bg-secondary">
-            <div class="col">
-                <h5 class="mb-1 text-warning">{{specialist.name}}</h5>
-                <p>{{specialist.description}}</p>
+            <div class="col mt-2">
+                <h5 class="pt-1 text-warning">{{specialist.name}}</h5>
             </div>
-            <div class="col-auto">
-                <button class="btn btn-success mt-2" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+            <div class="col-auto mt-2">
+                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
                 <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
+            </div>
+            <div class="col-12 mt-2">
+                <p>{{specialist.description}}</p>
             </div>
         </div>
     </div>
