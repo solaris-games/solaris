@@ -77,6 +77,7 @@ export default new Vuex.Store({
           carrier.waypoints = reportCarrier.waypoints
           carrier.ticksEta = reportCarrier.ticksEta
           carrier.ticksEtaTotal = reportCarrier.ticksEtaTotal
+          carrier.isGift = reportCarrier.isGift
 
           GameContainer.reloadCarrier(carrier)
         }
@@ -258,12 +259,12 @@ export default new Vuex.Store({
     gameStarAbandoned (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalStars--
+
       star.ownedByPlayerId = null
       star.garrison = 0
       star.garrisonActual = 0
-
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalStars--
 
       // Redraw and remove carriers
       let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)

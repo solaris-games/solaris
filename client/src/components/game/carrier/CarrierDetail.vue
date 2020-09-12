@@ -4,9 +4,9 @@
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p v-if="userPlayer && carrier.ownedByPlayerId == userPlayer._id && !carrier.isGift">A carrier under your command.<br/>Give it orders to capture more stars!</p>
-        <p v-if="carrier.ownedByPlayerId != null && (!userPlayer || carrier.ownedByPlayerId != userPlayer._id)">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
-        <p v-if="isGift" class="text-warning">This carrier is a gift.</p>
+        <p v-if="isUserPlayerCarrier">A carrier under your command.</p>
+        <p v-if="isNotUserPlayerCarrier">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
+        <p v-if="carrier.isGift" class="text-warning">This carrier is a gift.</p>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <h4 class="pt-2" v-if="carrierOwningPlayer == userPlayer">Navigation</h4>
+    <h4 class="pt-2">Navigation</h4>
 
     <div class="mt-2">
       <div v-if="carrier.orbiting" class="row bg-secondary pt-2 pb-0 mb-0">
@@ -28,7 +28,7 @@
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-5">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="userPlayer && carrierOwningPlayer == userPlayer && !carrier.isGift && !userPlayer.defeated">Ship Transfer</button>
+          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="userPlayer && carrierOwningPlayer == userPlayer && carrier && !carrier.isGift && !userPlayer.defeated">Ship Transfer</button>
         </div>
       </div>
 
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <div v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated && carrier.waypoints.length && !carrier.isGift" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="userPlayer && carrierOwningPlayer == userPlayer && !userPlayer.defeated && carrier.waypoints.length && carrier && !carrier.isGift" class="row bg-primary pt-2 pb-0 mb-0">
         <div class="col-8">
           <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p>
         </div>
@@ -62,12 +62,12 @@
         </div>
       </div>
 
-      <div class="row bg-secondary pt-2 pb-0 mb-0">
-        <div class="col-7">
+      <div class="row bg-secondary pt-2 pb-0 mb-0" v-if="carrier.waypoints.length || canEditWaypoints">
+        <div :class="{'col-7':canEditWaypoints,'col':!canEditWaypoints}">
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
-        <div class="col-5 mb-2">
-          <button class="btn btn-block btn-success" @click="editWaypoints()" v-if="userPlayer && carrierOwningPlayer == userPlayer && !carrier.isGift && !userPlayer.defeated">Edit Waypoints</button>
+        <div class="mb-2 col-5" v-if="canEditWaypoints">
+          <button class="btn btn-block btn-success" @click="editWaypoints()">Edit Waypoints</button>
         </div>
       </div>
     </div>
@@ -76,9 +76,13 @@
 
     <carrier-specialist v-if="canHireSpecialist" :carrierId="carrier._id" @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
 
+    <h4 class="pt-2" v-if="canGiftCarrier">Gift Carrier</h4>
+
+    <gift-carrier v-if="canGiftCarrier" :carrierId="carrier._id"/>
+<!-- 
     <playerOverview v-if="carrierOwningPlayer" :playerId="carrierOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"/> -->
 </div>
 </template>
 
@@ -90,13 +94,15 @@ import PlayerOverview from '../player/Overview'
 import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
 import CarrierSpecialistVue from './CarrierSpecialist'
+import GiftCarrierVue from './GiftCarrier'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'playerOverview': PlayerOverview,
     'waypointTable': WaypointTable,
-    'carrier-specialist': CarrierSpecialistVue
+    'carrier-specialist': CarrierSpecialistVue,
+    'gift-carrier': GiftCarrierVue
   },
   props: {
     carrierId: String
@@ -219,6 +225,20 @@ export default {
           this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
         this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaTotalDate)
       }
+    }
+  },
+  computed: {
+    canGiftCarrier: function () {
+      return this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift
+    },
+    isUserPlayerCarrier: function () {
+      return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id
+    },
+    isNotUserPlayerCarrier: function () {
+      return this.carrier && !this.userPlayer || this.carrier.ownedByPlayerId != this.userPlayer._id
+    },
+    canEditWaypoints: function () {
+      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated
     }
   }
 }

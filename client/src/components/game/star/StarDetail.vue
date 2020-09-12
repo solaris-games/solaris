@@ -120,13 +120,13 @@
       -->
     </div>
 
-    <h4 class="pt-2" v-if="canHireSpecialist && star.infrastructure">Specialist</h4>
+    <h4 class="pt-2" v-if="canShowSpecialist">Specialist</h4>
 
-    <star-specialist v-if="canHireSpecialist && star.infrastructure" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
-
+    <star-specialist v-if="canShowSpecialist" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
+<!-- 
     <playerOverview v-if="starOwningPlayer" :playerId="starOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"/> -->
 
     <!-- Modals -->
 
@@ -183,7 +183,7 @@ export default {
       userPlayer: null,
       currentPlayerId: null,
       canBuildWarpGates: false,
-      canHireSpecialists: false
+      canShowSpecialist: false
     }
   },
   mounted () {
@@ -192,7 +192,11 @@ export default {
     this.starOwningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
-    this.canHireSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
+    
+    // Can display specialist section if sepcialists are enabled and the star is owned by a player.
+    // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
+    this.canShowSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' 
+      && (this.star.ownedByPlayerId || (this.star.infrastructure && this.star.specialistId))
   },
   methods: {
     onCloseRequested (e) {

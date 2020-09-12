@@ -184,6 +184,11 @@ module.exports = class GameTickService extends EventEmitter {
                 if (destinationStar.ownedByPlayerId == null) {
                     destinationStar.ownedByPlayerId = carrier.ownedByPlayerId;
 
+                    // Weird scenario, but could happen.
+                    if (carrier.isGift) {
+                        carrier.isGift = false;
+                    }
+
                     let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
                     let playerUser = await this.userService.getById(carrierPlayer.userId);
@@ -197,6 +202,7 @@ module.exports = class GameTickService extends EventEmitter {
                     // Otherwise, perform combat.
                     if (carrier.isGift) {
                         carrier.ownedByPlayerId = destinationStar.ownedByPlayerId;
+                        carrier.isGift = false;
                     } else {
                         if (combatStars.indexOf(destinationStar) < 0) {
                             combatStars.push(destinationStar);
@@ -719,7 +725,8 @@ module.exports = class GameTickService extends EventEmitter {
                 ships: carrier.ships,
                 location: carrier.location,
                 waypoints: carrier.waypoints,
-                name: carrier.name // Include the name because carriers can go in and out of scanning range.
+                name: carrier.name, // Include the name because carriers can go in and out of scanning range.
+                isGift: carrier.isGift // Carriers may have been successfully gifted.
             };
         });
     }
