@@ -121,6 +121,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="giftCarriers" class="col-form-label">Gift Carriers</label>
+        <select class="form-control" id="giftCarriers" v-model="settings.specialGalaxy.giftCarriers" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.giftCarriers" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <view-subtitle title="Player Settings"/>
 
       <div class="form-group">

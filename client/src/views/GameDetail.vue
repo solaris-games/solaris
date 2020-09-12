@@ -74,6 +74,10 @@
               <td>Dark Galaxy</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.darkGalaxy) }}</td>
             </tr>
+            <tr>
+              <td>Gift Carriers</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.giftCarriers) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>

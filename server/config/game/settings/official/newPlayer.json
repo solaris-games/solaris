@@ -12,7 +12,8 @@
     "warpgateCost": "standard",
     "specialistCost": "none",
     "randomGates": "none",
-    "darkGalaxy": "disabled"
+    "darkGalaxy": "disabled",
+    "giftCarriers": "enabled"
   },
   "galaxy": {
     "starsPerPlayer": 20,

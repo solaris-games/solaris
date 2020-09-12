@@ -25,6 +25,7 @@ const schema = new Schema({
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
+			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' }
         },
         galaxy: {
 			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30], default: 20 },

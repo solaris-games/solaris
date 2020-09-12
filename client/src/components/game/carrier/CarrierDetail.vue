@@ -229,7 +229,7 @@ export default {
   },
   computed: {
     canGiftCarrier: function () {
-      return this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift
+      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' && this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift
     },
     isUserPlayerCarrier: function () {
       return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id

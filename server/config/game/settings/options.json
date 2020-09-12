@@ -114,6 +114,16 @@
             "value": "start",
             "text": "Dark Start Only"
             }
+        ],
+        "giftCarriers": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
         ]
         },
         "galaxy": {

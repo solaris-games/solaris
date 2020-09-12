@@ -172,6 +172,10 @@ module.exports = class CarrierService {
     async convertToGift(game, player, carrierId) {
         let carrier = this.getById(game, carrierId);
 
+        if (game.settings.specialGalaxy.giftCarriers === 'disabled') {
+            throw new ValidationError(`Gifting carriers has been disabled in this game.`);
+        }
+
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError(`Cannot convert carrier into a gift, you do not own this carrier.`);
         }
