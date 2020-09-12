@@ -6,7 +6,9 @@ module.exports = class CombatService {
         this.technologyService = technologyService;
     }
 
-    calculate(defender, attacker, defenderBonus = true) {
+    calculate(game, defender, attacker) {
+        let defenderBonus = game.settings.specialGalaxy.defenderBonus === 'enabled';
+    
         let defenderShipsRemaining = defender.ships,
             attackerShipsRemaining = attacker.ships;
 
@@ -65,7 +67,10 @@ module.exports = class CombatService {
         // Use the highest weapons tech of the attacking players to calculate combat result.
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers);
 
-        let combatResult = this.calculate({
+        let defenderBonus = game.settings.specialGalaxy.defenderBonus === 'enabled';
+
+        let combatResult = this.calculate(game,
+        {
             weaponsLevel: defenderWeaponsTechLevel,
             ships: totalDefenders
         }, {

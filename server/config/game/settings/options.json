@@ -124,6 +124,16 @@
                 "value": "enabled",
                 "text": "Enabled"
             }
+        ],
+        "defenderBonus": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
         ]
         },
         "galaxy": {

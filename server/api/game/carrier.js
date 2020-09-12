@@ -114,7 +114,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, (req, res, next) => {
         let errors = [];
 
         if (req.body.defender.ships == null) {
@@ -155,6 +155,7 @@ module.exports = (router, io, container) => {
 
         try {
             let result = container.combatService.calculate(
+                req.game,
                 req.body.defender,
                 req.body.attacker);
 
