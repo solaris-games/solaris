@@ -130,6 +130,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="defenderBonus" class="col-form-label">Defender Bonus</label>
+        <select class="form-control" id="defenderBonus" v-model="settings.specialGalaxy.defenderBonus" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.defenderBonus" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <view-subtitle title="Player Settings"/>
 
       <div class="form-group">

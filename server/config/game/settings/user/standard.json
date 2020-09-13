@@ -13,8 +13,8 @@
         "specialistCost": "none",
         "randomGates": "none",
         "darkGalaxy": "start",
-        "giftCarriers": "enabled",
-        "defenderBonus": "disabled"
+        "giftCarriers": "disabled",
+        "defenderBonus": "enabled"
     },
     "galaxy": {
         "starsPerPlayer": 20,

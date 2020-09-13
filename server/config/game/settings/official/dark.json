@@ -14,7 +14,7 @@
     "randomGates": "none",
     "darkGalaxy": "enabled",
     "giftCarriers": "enabled",
-    "defenderBonus": "disabled"
+    "defenderBonus": "enabled"
   },
   "galaxy": {
     "starsPerPlayer": 20,
