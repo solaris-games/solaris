@@ -33,8 +33,12 @@
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated">
       <h4 class="mt-2">Trade</h4>
 
-      <sendTechnology v-if="player" :playerId="player._id"/>
-      <sendCredits :player="player" :userPlayer="userPlayer"/>
+      <div v-if="canTradeWithPlayer()">
+        <sendTechnology v-if="player" :playerId="player._id"/>
+        <sendCredits :player="player" :userPlayer="userPlayer"/>
+      </div>
+
+      <p v-if="!canTradeWithPlayer()" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
     </div>
 
     <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
@@ -149,6 +153,9 @@ export default {
     },
     onRenownSent (e) {
       this.user.achievements.renown += e
+    },
+    canTradeWithPlayer () {
+      return this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange)
     }
   },
   computed: {

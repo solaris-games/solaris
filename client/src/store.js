@@ -117,6 +117,7 @@ export default new Vuex.Store({
         player.defeated = reportPlayer.defeated
         player.afk = reportPlayer.afk
         player.stats = reportPlayer.stats
+        player.isInScanningRange = reportPlayer.isInScanningRange
       }
 
       // Update player research

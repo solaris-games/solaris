@@ -206,14 +206,14 @@
         </select>
       </div>
 
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label for="tradeScanning" class="col-form-label">Trade Scanning</label>
         <select class="form-control" id="tradeScanning" v-model="settings.player.tradeScanning" :disabled="isCreatingGame">
           <option v-for="opt in options.player.tradeScanning" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
-      </div> -->
+      </div>
 
       <view-subtitle title="Technology Settings"/>
 

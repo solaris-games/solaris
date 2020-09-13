@@ -766,6 +766,13 @@ module.exports = class GameTickService extends EventEmitter {
         // Get the end of galactic cycle report for the player if there is one.
         playerReport.playerGalacticCycleReport = report.playerGalacticCycleReport.find(r => r.playerId.equals(player._id)) || null;
 
+        // Calculate which players are in scanning range.
+        let playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(game, player);
+
+        playerReport.players.forEach(p => {
+            p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id) != null;
+        });
+
         // Perform a filter on the report stars, if the star is out of range
         // then only return basic info.
         let starsInRange = this.starService.filterStarsByScanningRange(game, player);

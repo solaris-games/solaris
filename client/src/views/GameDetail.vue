@@ -126,10 +126,10 @@
               <td>Trade Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.player.tradeCost) }} credits/level</td>
             </tr>
-            <!-- <tr>
+            <tr>
               <td>Trade Scanning</td>
               <td class="text-right">{{ getFriendlyText(game.settings.player.tradeScanning) }}</td>
-            </tr> -->
+            </tr>
           </tbody>
         </table>
       </div>

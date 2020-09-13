@@ -34,6 +34,34 @@ module.exports = class PlayerService {
         return playersWithinRange;
     }
 
+    getPlayersWithinScanningRangeOfPlayer(game, player) {
+        let inRange = [player];
+
+        for (let p of game.galaxy.players) {
+            if (inRange.indexOf(p) > -1) {
+                continue;
+            }
+
+            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+
+            let isInRange = playerStars.find(s => {
+                return this.starService.isStarInScanningRangeOfPlayer(game, s, player);       
+            });
+
+            if (isInRange) {
+                inRange.push(p);
+            }
+        }
+
+        return inRange;
+    }
+
+    isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
+        // TODO: Make this more efficient.
+        return this.getPlayersWithinScanningRangeOfPlayer(game, sourcePlayer)
+            .find(p => p._id.equals(targetPlayer._id)) != null;
+    }
+
     createEmptyPlayer(game, colour) {
         return {
             _id: mongoose.Types.ObjectId(),

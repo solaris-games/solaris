@@ -65,7 +65,7 @@ module.exports = class StarService extends EventEmitter {
     listStarsOwnedByPlayer(stars, playerId) {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
-
+    
     getStarsWithinScanningRangeOfStar(game, starId) {
         return this.getStarsWithinScanningRangeOfStarByStars(game, starId, game.galaxy.stars);
     }

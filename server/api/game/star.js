@@ -173,6 +173,8 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
+            // TODO: Send whether the player who owned the star is in scanning range to all other players.
+            
             container.broadcastService.gameStarAbandoned(req.game, req.body.starId);
 
             return res.sendStatus(200);

@@ -202,10 +202,19 @@ module.exports = class GameGalaxyService {
     }
 
     _setPlayerInfoBasic(doc, player) {
+        // Calculate which players are in scanning range.
+        let playersInRange = [];
+        
+        if (player) {
+            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, player);
+        }
+
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
             let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
+
+            p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
 
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
@@ -257,6 +266,7 @@ module.exports = class GameGalaxyService {
                     }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
+                isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
                 afk: p.afk,
                 _id: p._id,
