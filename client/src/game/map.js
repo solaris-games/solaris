@@ -42,6 +42,8 @@ class Map extends EventEmitter {
   }
 
   setup (game) {
+    this.game = game
+    
     // Cleanup events
     this.stars.forEach(s => s.removeAllListeners())
     this.carriers.forEach(s => s.removeAllListeners())

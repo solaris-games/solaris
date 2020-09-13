@@ -12,6 +12,8 @@ class RulerPoints extends EventEmitter {
     this.game = game
 
     this.rulerPoints = []
+    this.lightYearDistance = game.constants.distances.lightYear
+    this.techLevel = game.galaxy.players.find(x => x.userId).research.hyperspace.effective
 
     this.emit('onRulerPointsCleared')
 
@@ -26,6 +28,7 @@ class RulerPoints extends EventEmitter {
     this.clear()
 
     this.drawPaths()
+    this.drawHyperspaceRange()
   }
 
   drawPaths () {
@@ -47,6 +50,26 @@ class RulerPoints extends EventEmitter {
 
       graphics.lineTo(point.x, point.y)
     }
+
+    this.container.addChild(graphics)
+  }
+
+  drawHyperspaceRange () {
+    let lastPoint = this.rulerPoints[this.rulerPoints.length - 1]
+
+    if (!lastPoint) {
+      return
+    }
+
+    let graphics = new PIXI.Graphics()
+
+    let radius = ((this.techLevel || 1) + 1.5) * this.lightYearDistance
+    
+    graphics.lineStyle(1, 0xFFFFFF, 0.2)
+    graphics.beginFill(0xFFFFFF, 0.075)
+    graphics.drawStar(lastPoint.x, lastPoint.y, radius, radius, radius - 3)
+    graphics.endFill()
+    graphics.zIndex = -1
 
     this.container.addChild(graphics)
   }
