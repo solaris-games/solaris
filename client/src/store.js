@@ -118,6 +118,12 @@ export default new Vuex.Store({
         player.afk = reportPlayer.afk
         player.stats = reportPlayer.stats
         player.isInScanningRange = reportPlayer.isInScanningRange
+
+        let techKeys = Object.keys(reportPlayer.effectiveTechs).filter(k => k.match(/^[^_\$]/) != null)
+
+        for (let techKey of techKeys) {
+          player.research[techKey].effective = reportPlayer.effectiveTechs[techKey]
+        }
       }
 
       // Update player research

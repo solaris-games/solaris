@@ -10,8 +10,8 @@
 
     <loading-spinner :loading="isLoadingSpecialists"/>
 
-    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="!isLoadingSpecialists">
-        <div class="col" v-if="star">
+    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="!isLoadingSpecialists && star">
+        <div class="col">
             <a href="javascript:;" @click="onOpenStarDetailRequested(star)">{{star.name}}</a>
         </div>
         <div class="col-auto">

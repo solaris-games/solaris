@@ -751,11 +751,14 @@ module.exports = class GameTickService extends EventEmitter {
 
     _appendReportPlayers(game, report) {
         for (let player of game.galaxy.players) {
+            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+            
             report.players.push({
                 _id: player._id,
                 defeated: player.defeated,
                 afk: player.afk,
-                stats: this.playerService.getStats(game, player)
+                stats: this.playerService.getStats(game, player),
+                effectiveTechs
             });
         }
     }
