@@ -41,7 +41,7 @@ export default {
       isJoiningGame: false,
       isPasswordRequired: false,
       errors: [],
-      avatar: '22',
+      avatar: null,
       alias: '',
       password: ''
     }
@@ -70,6 +70,10 @@ export default {
 
       if (!this.alias) {
         this.errors.push('Alias is required.')
+      }
+
+      if (!this.avatar) {
+        this.errors.push('Please select an avatar.')
       }
 
       if (this.alias && this.alias.length < 3) {

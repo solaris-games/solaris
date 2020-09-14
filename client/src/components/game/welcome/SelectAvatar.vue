@@ -1,7 +1,8 @@
 <template>
 <div>
-    <div class="row">
-        <img :src="getAvatarImage()" width="128" height="128">
+    <div class="row avatar-container text-center">
+        <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
+        <p v-if="avatar == null" class="text-warning">Select an avatar</p>
     </div>
 
     <div class="row bg-primary">
@@ -19,7 +20,7 @@
 export default {
   data () {
     return {
-      avatar: '22',
+      avatar: null,
       avatars: []
     }
   },
@@ -34,6 +35,9 @@ export default {
       this.$emit('onAvatarChanged', this.avatar)
     },
     nextAvatar (e) {
+      if (this.avatar == null) {
+        this.avatar = '22'
+      } else {
         let currentIndex = this.avatars.indexOf(this.avatar)
 
         currentIndex++
@@ -43,10 +47,14 @@ export default {
         }
 
         this.avatar = this.avatars[currentIndex]
+      }
 
-        this.onAvatarChanged(this.avatar)
+      this.onAvatarChanged(this.avatar)
     },
     prevAvatar (e) {
+      if (this.avatar == null) {
+        this.avatar = '22'
+      } else {
         let currentIndex = this.avatars.indexOf(this.avatar)
 
         currentIndex--
@@ -56,15 +64,29 @@ export default {
         }
 
         this.avatar = this.avatars[currentIndex]
+      }
 
-        this.onAvatarChanged(this.avatar)
+      this.onAvatarChanged(this.avatar)
     },
     getAvatarImage () {
-        return require('../../../assets/avatars/' + this.avatar + '.png')
+      return require('../../../assets/avatars/' + this.avatar + '.png')
     }
   }
 }
 </script>
 
 <style scoped>
+.avatar-container {
+  width: 128px;
+  height: 128px;
+}
+
+p {
+  display: table-cell;
+  width: 128px;
+  height: 128px;
+  padding: 20px 0px;
+  border: 3px dashed #fff;
+  vertical-align: middle;
+}
 </style>
