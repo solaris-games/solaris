@@ -3,12 +3,12 @@
         {
             "id": 1,
             "name": "Admiral",
-            "description": "Grants x1.5 Speed, -4 Weapons, -2 Hyperspace Range to the Carrier.",
+            "description": "Grants x1.5 Speed, -2 Weapons, -2 Hyperspace Range to the Carrier.",
             "tier": 3,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
-                    "weapons": -4,
+                    "weapons": -2,
                     "hyperspace": -2
                 }
             }
@@ -21,6 +21,7 @@
             "modifiers": {
                 "local": {
                     "weapons": 1,
+                    "hyperspace": -1,
                     "speed": 0.75
                 }
             }
@@ -33,6 +34,7 @@
             "modifiers": {
                 "local": {
                     "weapons": 2,
+                    "hyperspace": -1,
                     "speed": 0.5
                 }
             }
@@ -40,11 +42,12 @@
         {
             "id": 4,
             "name": "General",
-            "description": "Grants +3 Weapons, -2 Hyperspace Range, x0.25 Speed to the Carrier.",
+            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.25 Speed to the Carrier.",
             "tier": 4,
             "modifiers": {
                 "local": {
                     "weapons": 3,
+                    "hyperspace": -1,
                     "speed": 0.5
                 }
             }
@@ -52,13 +55,13 @@
         {
             "id": 5,
             "name": "Smuggler",
-            "description": "Grants x2 Speed, -6 Weapons, -4 Hyperspace Range to the Carrier.",
+            "description": "Grants x2 Speed, -1 Weapons, -3 Hyperspace Range to the Carrier.",
             "tier": 5,
             "modifiers": {
                 "local": {
                     "speed": 2,
-                    "weapons": -6,
-                    "hyperspace": -4
+                    "weapons": -1,
+                    "hyperspace": -3
                 }
             }
         },
@@ -71,6 +74,18 @@
                 "local": {
                     "hyperspace": 3,
                     "weapons": -3
+                }
+            }
+        },
+        {
+            "id": 7,
+            "name": "Destroyer",
+            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.1 Speed to the Carrier.",
+            "tier": 5,
+            "modifiers": {
+                "local": {
+                    "hyperspace": -3,
+                    "weapons": 5
                 }
             }
         }

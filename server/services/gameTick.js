@@ -219,6 +219,11 @@ module.exports = class GameTickService extends EventEmitter {
                 let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 
                 carrier.location = nextLocation;
+
+                // TODO: Calculate whether there are any enemy carriers within a tick distance away from this carrier.
+                // If so, add it to an array so carrier combat can be performed.
+                // To do combat: Iterate over all carriers in above array, each carrier has a "combat zone".
+                // Splice out all carriers within the combat zone and perform combat.
             }
         }
 
