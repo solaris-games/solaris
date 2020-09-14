@@ -424,23 +424,27 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
-    this.clicks++
-
-    setTimeout(() => {
-      this.clicks = 0
-    }, 500)
-    
-    if (this.clicks > 1) {
-      this.emit('onStarDoubleClicked', this.data)
-      this.clicks = 0
-
-      // Need to do this otherwise sometimes text gets highlighted.
-      this.deselectAllText()
+    if (e.data.originalEvent.button === 2) {
+      this.emit('onStarRightClicked', this.data)
     } else {
-      this.emit('onStarClicked', this.data)
-    }
+      this.clicks++
 
-    this.drawActive(false)
+      setTimeout(() => {
+        this.clicks = 0
+      }, 500)
+      
+      if (this.clicks > 1) {
+        this.emit('onStarDoubleClicked', this.data)
+        this.clicks = 0
+
+        // Need to do this otherwise sometimes text gets highlighted.
+        this.deselectAllText()
+      } else {
+        this.emit('onStarClicked', this.data)
+      }
+
+      this.drawActive(false)
+    }
   }
 
   deselectAllText () {

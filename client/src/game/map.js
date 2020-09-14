@@ -109,6 +109,7 @@ class Map extends EventEmitter {
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
       star.on('onStarDoubleClicked', this.onStarDoubleClicked.bind(this))
+      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
     star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
@@ -402,6 +403,12 @@ class Map extends EventEmitter {
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onStarRightClicked (e) {
+    if (this.mode === 'galaxy') {
+      this.emit('onStarRightClicked', e)
+    }
   }
 
   onCarrierClicked (e) {

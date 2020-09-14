@@ -13,6 +13,7 @@
                   @onPlayerSelected="onPlayerSelected"/>
 
         <game-container @onStarDoubleClicked="onStarDoubleClicked"
+                    @onStarRightClicked="onStarRightClicked"
                     @onCarrierDoubleClicked="onCarrierDoubleClicked"
                     @onObjectsClicked="onObjectsClicked"/>
     </div>
@@ -110,6 +111,16 @@ export default {
     onStarDoubleClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.STAR_DETAIL
+
+      AudioService.click()
+    },
+    onStarRightClicked (e) {
+      let star = GameHelper.getStarById(this.$store.state.game, e)
+      let owningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, star)
+      
+      if (owningPlayer) {
+        this.onPlayerSelected(owningPlayer._id)
+      }
 
       AudioService.click()
     },
