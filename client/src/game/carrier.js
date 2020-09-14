@@ -149,20 +149,24 @@ class Carrier extends EventEmitter {
   }
 
   onClicked (e) {
-    this.clicks++
-
-    setTimeout(() => {
-      this.clicks = 0
-    }, 500)
-
-    if (this.clicks > 1) {
-      this.emit('onCarrierDoubleClicked', this.data)
-      this.clicks = 0
-
-      // Need to do this otherwise sometimes text gets highlighted.
-      this.deselectAllText()
+    if (e.data.originalEvent.button === 2) {
+      this.emit('onCarrierRightClicked', this.data)
     } else {
-      this.emit('onCarrierClicked', this.data)
+      this.clicks++
+
+      setTimeout(() => {
+        this.clicks = 0
+      }, 500)
+
+      if (this.clicks > 1) {
+        this.emit('onCarrierDoubleClicked', this.data)
+        this.clicks = 0
+
+        // Need to do this otherwise sometimes text gets highlighted.
+        this.deselectAllText()
+      } else {
+        this.emit('onCarrierClicked', this.data)
+      }
     }
   }
 

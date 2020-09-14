@@ -15,6 +15,7 @@
         <game-container @onStarDoubleClicked="onStarDoubleClicked"
                     @onStarRightClicked="onStarRightClicked"
                     @onCarrierDoubleClicked="onCarrierDoubleClicked"
+                    @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
     </div>
   </div>
@@ -127,6 +128,16 @@ export default {
     onCarrierDoubleClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.CARRIER_DETAIL
+
+      AudioService.click()
+    },
+    onCarrierRightClicked (e) {
+      let carrier = GameHelper.getCarrierById(this.$store.state.game, e)
+      let owningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, carrier)
+      
+      if (owningPlayer) {
+        this.onPlayerSelected(owningPlayer._id)
+      }
 
       AudioService.click()
     },

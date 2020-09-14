@@ -37,12 +37,14 @@ export default {
     this.onStarDoubleClickedHandler = this.onStarDoubleClicked.bind(this)
     this.onStarRightClickedHandler = this.onStarRightClicked.bind(this)
     this.onCarrierDoubleClickedHandler = this.onCarrierDoubleClicked.bind(this)
+    this.onCarrierRightClickedHandler = this.onCarrierRightClicked.bind(this)
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
     this.onObjectsClickedHandler = this.onObjectsClicked.bind(this)
 
     this.gameContainer.map.on('onStarDoubleClicked', this.onStarDoubleClickedHandler)
     this.gameContainer.map.on('onStarRightClicked', this.onStarRightClickedHandler)
     this.gameContainer.map.on('onCarrierDoubleClicked', this.onCarrierDoubleClickedHandler)
+    this.gameContainer.map.on('onCarrierRightClicked', this.onCarrierRightClickedHandler)
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
   },
@@ -51,6 +53,7 @@ export default {
     this.gameContainer.map.off('onStarDoubleClicked', this.onStarDoubleClickedHandler)
     this.gameContainer.map.off('onStarRightClicked', this.onStarRightClickedHandler)
     this.gameContainer.map.off('onCarrierDoubleClicked', this.onCarrierDoubleClickedHandler)
+    this.gameContainer.map.off('onCarrierRightClicked', this.onCarrierRightClickedHandler)
     this.gameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.off('onObjectsClicked', this.onObjectsClickedHandler)
   },
@@ -88,6 +91,9 @@ export default {
     },
     onCarrierDoubleClicked (e) {
       this.$emit('onCarrierDoubleClicked', e._id)
+    },
+    onCarrierRightClicked (e) {
+      this.$emit('onCarrierRightClicked', e._id)
     },
     onWaypointCreated (e) {
       this.$emit('onWaypointCreated', e)

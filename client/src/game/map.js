@@ -123,6 +123,7 @@ class Map extends EventEmitter {
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
       existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
+      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -142,6 +143,7 @@ class Map extends EventEmitter {
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     carrier.on('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
+    carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
     carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -241,6 +243,7 @@ class Map extends EventEmitter {
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
       existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
+      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -461,6 +464,12 @@ class Map extends EventEmitter {
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onCarrierRightClicked (e) {
+    if (this.mode === 'galaxy') {
+      this.emit('onCarrierRightClicked', e)
+    }
   }
 
   onCarrierMouseOver (e) {
