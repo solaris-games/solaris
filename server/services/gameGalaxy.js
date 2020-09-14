@@ -50,9 +50,9 @@ module.exports = class GameGalaxyService {
         } else {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
+            this._setCarrierInfoDetailed(game, player);
             this._setStarInfoDetailed(game, player);
             this._setPlayerInfoBasic(game, player);
-            this._setCarrierInfoDetailed(game, player);
     
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
         }
