@@ -49,11 +49,15 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    async getByIdInfo(id) {
-        return await this.getByIdLean(id, {
+    async getByIdInfo(id, userId) {
+        let game = await this.getByIdLean(id, {
             settings: 1,
             state: 1
         });
+
+        game.settings.general.isGameAdmin = game.settings.general.createdByUserId.equals(userId);
+
+        return game;
     }
 
     async getByIdMessages(id) {
@@ -230,6 +234,29 @@ module.exports = class GameService extends EventEmitter {
             game,
             player
         });
+    }
+
+    async delete(game, userId) {
+        if (game.state.startDate) {
+            throw new ValidationError('Cannot delete games that are in progress or completed.');
+        }
+
+        if (!game.settings.general.createdByUserId.equals(userId)) {
+            throw new ValidationError('Cannot delete this game, you did not create it.');
+        }
+
+        // Deduct "joined" count for all players who already joined the game.
+        for (let player of game.galaxy.players) {
+            if (player.userId) {
+                let user = await this.userService.getById(player.userId);
+
+                user.achievements.joined--;
+
+                await user.save();
+            }
+        }
+
+        await game.remove();
     }
 
     async getPlayerUser(game, playerId) {

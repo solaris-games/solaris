@@ -217,6 +217,10 @@
           </tbody>
         </table>
       </div>
+
+      <div>
+        <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
+      </div>
     </div>
   </view-container>
 </template>
@@ -227,6 +231,7 @@ import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
 import gameService from '../services/api/game'
+import router from '../router'
 
 export default {
   components: {
@@ -266,6 +271,23 @@ export default {
     this.isLoadingGame = false
   },
   methods: {
+    async deleteGame () {
+      if (confirm('Are you sure you want to delete this game?')) {
+        this.isDeletingGame = true
+
+        try {
+          let response = await gameService.delete(this.game._id)
+
+          if (response.status === 200) {
+            router.push({ name: 'main-menu' })
+          }
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isDeletingGame = false
+      }
+    },
     getFriendlyText (option) {
       return {
         'all': 'All',

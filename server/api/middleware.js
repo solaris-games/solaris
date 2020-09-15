@@ -60,7 +60,7 @@ module.exports = (container) => {
 
         async loadGameInfo(req, res, next) {
             if (req.params.gameId) {
-                req.game = await container.gameService.getByIdInfo(req.params.gameId);
+                req.game = await container.gameService.getByIdInfo(req.params.gameId, req.session.userId);
 
                 delete req.game.settings.general.password;
             }

@@ -137,6 +137,18 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.gameService.delete(
+                req.game,
+                req.session.userId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayers, async (req, res, next) => {
         try {
             let user = await container.gameService.getPlayerUserLean(
