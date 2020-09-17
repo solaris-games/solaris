@@ -55,7 +55,11 @@ module.exports = class GameService extends EventEmitter {
             state: 1
         });
 
-        game.settings.general.isGameAdmin = game.settings.general.createdByUserId.equals(userId);
+        if (game.settings.general.createdByUserId) {
+            game.settings.general.isGameAdmin = game.settings.general.createdByUserId.equals(userId);
+        } else {
+            game.settings.general.isGameAdmin = false;
+        }
 
         return game;
     }

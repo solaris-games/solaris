@@ -3,10 +3,11 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(distanceService, starService, technologyService) {
+    constructor(distanceService, starService, technologyService, specialistService) {
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
+        this.specialistService = specialistService;
     }
 
     getById(game, id) {
@@ -161,9 +162,12 @@ module.exports = class CarrierService {
     getCarrierDistancePerTick(game, carrier, warpSpeed = false) {
         let distanceModifier = warpSpeed ? 3 : 1;
 
-        // TODO: Get the specialist instead of relying on hard coded values.
-        if (carrier.specialistId === 1) { // Speedy boi TODO: Make this a constant.
-            distanceModifier *= 2; // TODO: This should come from the specialist definition instead of hard-coded here.
+        if (carrier.specialistId) {
+            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+            if (specialist.modifiers.local) {
+                distanceModifier *= (specialist.modifiers.local.speed || 1);
+            }
         }
 
         return game.constants.distances.shipSpeed * distanceModifier;
