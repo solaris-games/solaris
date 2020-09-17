@@ -103,7 +103,7 @@ export default {
   },
   mounted () {
     this.players = this.$store.state.game.galaxy.players
-    this.sortedPlayers = this.getSortedLeaderboardPlayerList()
+    this.sortedPlayers = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
   },
 
   methods: {
@@ -121,26 +121,6 @@ export default {
     },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
-    },
-    getSortedLeaderboardPlayerList () {
-      // Sort by total number of stars, then by total ships, then by total carriers.
-      return this.players
-        .sort((a, b) => {
-          // Sort by total stars descending
-          if (a.stats.totalStars > b.stats.totalStars) return -1
-          if (a.stats.totalStars < b.stats.totalStars) return 1
-
-          // Then by total ships descending
-          if (a.stats.totalShips > b.stats.totalShips) return -1
-          if (a.stats.totalShips < b.stats.totalShips) return 1
-
-          // Then by total carriers descending
-          if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
-          if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
-
-          // Then by defeated descending
-          return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
-        })
     },
     async concedeDefeat () {
       try {

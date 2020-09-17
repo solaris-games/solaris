@@ -162,6 +162,7 @@ module.exports = class PlayerService {
     resetPlayerForGameStart(game, player) {
         player.userId = null;
         player.alias = "Empty Slot";
+        player.avatar = null;
         player.credits = game.settings.player.startingCredits;
 
         // Reset the player's research

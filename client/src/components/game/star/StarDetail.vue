@@ -196,7 +196,7 @@ export default {
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.canShowSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' 
-      && (this.star.ownedByPlayerId || (this.star.infrastructure && this.star.specialistId))
+      && (this.star.specialistId || this.starOwningPlayer == this.userPlayer)
   },
   methods: {
     onCloseRequested (e) {
