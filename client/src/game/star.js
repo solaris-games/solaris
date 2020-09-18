@@ -94,8 +94,10 @@ class Star extends EventEmitter {
     let radius = 3
     let alpha = this._isInScanningRange() ? 1 : 0.3
 
+    let starPoints = radius * (this.data.specialistId ? 3 : 2);
+
     this.graphics_star.beginFill(0xFFFFFF, alpha)
-    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, radius * 2, radius, radius - 3)
+    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, starPoints, radius, radius - 3)
     this.graphics_star.endFill()
 
     this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)

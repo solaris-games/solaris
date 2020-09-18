@@ -61,17 +61,36 @@ class Carrier extends EventEmitter {
 
     this.graphics_ship.clear()
 
-    this.graphics_ship.lineStyle(0.3, 0x000000)
+    // this.graphics_ship.lineStyle(0.3, 0x000000)
     this.graphics_ship.beginFill(0xFFFFFF)
-    this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
-    this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
-    this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
-    this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
-    this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
+
+    if (this.data.specialistId) {
+      // Draw specialist carrier
+      this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
+      this.graphics_ship.lineTo(this.data.location.x + 2, this.data.location.y-1)
+      this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y-1.5)
+      this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
+      this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
+      this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
+      this.graphics_ship.lineTo(this.data.location.x - 1, this.data.location.y-1.5)
+      this.graphics_ship.lineTo(this.data.location.x - 2, this.data.location.y-1)
+      this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
+    } else {
+      // Draw normal carrier
+      this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
+      this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
+      this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
+      this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
+      this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
+      this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
+    }
     this.graphics_ship.endFill()
 
     this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
