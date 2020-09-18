@@ -24,7 +24,7 @@ module.exports = class UserService extends EventEmitter {
             resetPasswordToken: 0,
             premiumEndDate: 0
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -56,7 +56,7 @@ module.exports = class UserService extends EventEmitter {
             emailEnabled: 0,
             username: 0
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
     
@@ -75,7 +75,7 @@ module.exports = class UserService extends EventEmitter {
             contributor: 1,
             developer: 1
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
 

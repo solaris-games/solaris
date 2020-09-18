@@ -27,7 +27,7 @@ module.exports = class GameService extends EventEmitter {
     async getByIdLean(id, select) {
         return await this.gameModel.findById(id)
             .select(select)
-            .lean()
+            .lean({ defaults: true })
             .exec();
     }
 

@@ -22,7 +22,7 @@ module.exports = class LeaderboardService {
             'achievements.rank': 1,
             'achievements.renown': 1,
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
 
         for (let i = 0; i < leaderboard.length; i++) {

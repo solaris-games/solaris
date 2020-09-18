@@ -20,7 +20,7 @@ module.exports = class GameListService {
             'settings.general.playerLimit': 1,
             state: 1
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -34,7 +34,7 @@ module.exports = class GameListService {
             'settings.general.playerLimit': 1,
             state: 1
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -61,7 +61,7 @@ module.exports = class GameListService {
             'settings.general.playerLimit': 1,
             state: 1
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -81,7 +81,7 @@ module.exports = class GameListService {
             'settings.general.playerLimit': 1,
             state: 1
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
     }
 
