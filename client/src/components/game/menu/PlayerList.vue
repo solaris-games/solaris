@@ -57,7 +57,7 @@ export default {
     isThirdPlace (player) {
       let position = this.leaderboard.indexOf(player)
 
-      return position === 3
+      return position === 2
     }
   }
 }
