@@ -150,6 +150,38 @@
                     "lockWarpGates": true
                 }
             }
+        },
+        {
+            "id": 6,
+            "name": "World Builder",
+            "description": "Adds 1 to the Star's natural resources every tick, +1 Terraforming, -3 Scanning, -3 Weapons.",
+            "tier": 5,
+            "modifiers": {
+                "special": {
+                    "addNaturalResourcesOnTick": 1
+                },
+                "local": {
+                    "terraforming": 1,
+                    "scanning": -3,
+                    "weapons": -3
+                }
+            }
+        },
+        {
+            "id": 7,
+            "name": "War Machine",
+            "description": "Deducts 1 from the Star's natural resources every tick, +3 Manufacturing, +1 Weapons, -1 Terraforming. This specialist retires if the star reaches 0 natural resources.",
+            "tier": 5,
+            "modifiers": {
+                "special": {
+                    "deductNaturalResourcesOnTick": 1
+                },
+                "local": {
+                    "manufacturing": 3,
+                    "weapons": 1,
+                    "terraforming": -1
+                }
+            }
         }
     ]
 }

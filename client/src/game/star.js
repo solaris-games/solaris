@@ -194,6 +194,10 @@ class Star extends EventEmitter {
   }
 
   _getPlanetsCount () {
+    if (!this.data.naturalResources) {
+      return 0
+    }
+    
     return Math.floor(this.data.naturalResources / 45 * 3) // Anything over 45 gets 3 planets
   }
 

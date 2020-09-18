@@ -24,7 +24,7 @@
             Natural Resources
         </div>
         <div class="col text-right">
-            {{star.naturalResources || '???'}} <i class="fas fa-globe ml-1"></i>
+            {{star.naturalResources == null ? '???' : star.naturalResources}} <i class="fas fa-globe ml-1"></i>
         </div>
     </div>
 

@@ -4,7 +4,8 @@ const moment = require('moment');
 module.exports = class GameTickService extends EventEmitter {
     
     constructor(broadcastService, distanceService, starService, carrierService, 
-        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService) {
+        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
+        specialistService) {
         super();
             
         this.broadcastService = broadcastService;
@@ -20,6 +21,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.userService = userService;
         this.gameService = gameService;
         this.technologyService = technologyService;
+        this.specialistService = specialistService;
     }
 
     async tick(game) {
@@ -246,6 +248,7 @@ module.exports = class GameTickService extends EventEmitter {
         this._performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
+        this._applyStarSpecialistSpecialModifiers(game, report);
         this._produceShips(game, report);
 
         // 4c. Do the rest of the waypoint actions.
@@ -522,6 +525,46 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
+    _applyStarSpecialistSpecialModifiers(game, report) {
+        for (let i = 0; i < game.galaxy.stars.length; i++) {
+            // TODO: Put the logic below in the star service.
+            let star = game.galaxy.stars[i];
+
+            if (star.ownedByPlayerId) {
+                let hasModifiedStar = false;
+
+                if (star.specialistId) {
+                    let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+                    if (specialist.modifiers.special) {
+                        if (specialist.modifiers.special.addNaturalResourcesOnTick) {
+                            star.naturalResources += specialist.modifiers.special.addNaturalResourcesOnTick;
+
+                            hasModifiedStar = true;
+                        }
+
+                        if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
+                            star.naturalResources -= specialist.modifiers.special.deductNaturalResourcesOnTick;
+
+                            // Retire the specialist if there are no longer any natural resources.
+                            if (star.naturalResources < 0) {
+                                star.naturalResources = 0;
+                                star.specialistId = null;
+                            }
+
+                            hasModifiedStar = true;
+                        }
+                    }
+                }
+
+                // If the star isn't already in the report, add it.
+                if (hasModifiedStar && !report.stars.find(s => s.equals(star._id))) {
+                    report.stars.push(star._id);
+                }
+            }
+        }
+    }
+
     async _conductResearch(game, report) {
         // Add the current level of experimentation to the current 
         // tech being researched.
@@ -742,13 +785,18 @@ module.exports = class GameTickService extends EventEmitter {
 
         for (let starId of report.stars) {
             let star = this.starService.getByObjectId(game, starId);
+            let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+            let terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);
 
             // Add everything that could have changed
             starsData.push({
                 _id: star._id,
                 ownedByPlayerId: star.ownedByPlayerId,
+                naturalResources: star.naturalResources,
+                terraformedResources,
                 garrison: star.garrison,
-                infrastructure: star.infrastructure
+                infrastructure: star.infrastructure,
+                specialistId: star.specialistId // TODO: Also need to re-get the specialist but only if it has changed.
             });
         }
 

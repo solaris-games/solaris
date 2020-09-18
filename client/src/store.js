@@ -106,6 +106,8 @@ export default new Vuex.Store({
         star.ownedByPlayerId = reportStar.ownedByPlayerId
         star.garrison = reportStar.garrison
         star.infrastructure = reportStar.infrastructure
+        star.naturalResources = reportStar.naturalResources
+        star.terraformedResources = reportStar.terraformedResources
 
         GameContainer.reloadStar(star)
       }
