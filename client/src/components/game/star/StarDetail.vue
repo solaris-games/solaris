@@ -60,7 +60,7 @@
       <infrastructure
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
-      <infrastructureUpgrade v-if="userPlayer && starOwningPlayer != null && starOwningPlayer == userPlayer && !userPlayer.defeated && star.upgradeCosts != null"
+      <infrastructureUpgrade v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
         :star="star"
         :availableCredits="userPlayer.credits"
         :economy="star.upgradeCosts.economy"
@@ -76,7 +76,7 @@
     </div>
 
     <!-- TODO: Turn these into components -->
-    <div v-if="userPlayer && starOwningPlayer != null && starOwningPlayer == userPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
+    <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
@@ -130,12 +130,12 @@
 
     <!-- Modals -->
 
-    <dialogModal v-if="userPlayer && starOwningPlayer == userPlayer && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
+    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
       <p>Are you sure you want build a Carrier at <b>{{star.name}}</b>?</p>
       <p>The carrier will cost ${{star.upgradeCosts.carriers}}.</p>
     </dialogModal>
 
-    <dialogModal v-if="userPlayer && starOwningPlayer == userPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
       <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
       <p>The upgrade will cost ${{star.upgradeCosts.warpGate}}.</p>
     </dialogModal>
@@ -196,7 +196,7 @@ export default {
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.canShowSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' 
-      && (this.star.specialistId || this.starOwningPlayer == this.userPlayer)
+      && (this.star.specialistId || this.isOwnedByUserPlayer)
   },
   methods: {
     onCloseRequested (e) {
@@ -237,7 +237,7 @@ export default {
       }
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.starOwningPlayer._id)
+      this.$emit('onOpenPlayerDetailRequested', this.star.ownedByPlayerId)
     },
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
@@ -311,6 +311,13 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    }
+  },
+  computed: {
+    isOwnedByUserPlayer: function() {
+      let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
+
+      return owner && this.userPlayer && owner == this.userPlayer
     }
   }
 }
