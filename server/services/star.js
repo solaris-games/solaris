@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(randomService, nameService, distanceService, starDistanceService, technologyService) {
+    constructor(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService) {
         super();
         
         this.randomService = randomService;
@@ -12,6 +12,7 @@ module.exports = class StarService extends EventEmitter {
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
+        this.specialistService = specialistService;
     }
 
     generateUnownedStar(game, name, location, galaxyRadius) {
@@ -171,8 +172,40 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
-    canTravelAtWarpSpeed(starA, starB) {
-        return starA.warpGate && starB.warpGate && starA.ownedByPlayerId && starB.ownedByPlayerId;
+    canTravelAtWarpSpeed(player, sourceStar, destinationStar) {
+        // If both stars have warp gates and they are both owned by players...
+        if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
+            // If both stars are owned by the player then carriers can always move at warp.
+            if (destinationStar.ownedByPlayerId.equals(player._id) && sourceStar.ownedByPlayerId.equals(player._id)) {
+                return true;
+            }
+
+            // If one of the stars are not owned by the current player then we need to check for
+            // warp scramblers.
+
+            // If either star has a warp scrambler present then carriers cannot move at warp.
+            // Note that we only need to check for scramblers on stars that do not belong to the player.
+            if (!sourceStar.ownedByPlayerId.equals(player._id) && sourceStar.specialistId) {
+                let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
+
+                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                    return false;
+                }
+            }
+
+            if (!destinationStar.ownedByPlayerId.equals(player._id) && destinationStar.specialistId) {
+                let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
+
+                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                    return false;
+                }
+            }
+
+            // If none of the stars have scramblers then warp speed ahead.
+            return true;
+        }
+
+        return false;
     }
 
 }
