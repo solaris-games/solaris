@@ -155,7 +155,7 @@ module.exports = class GameTickService extends EventEmitter {
             let waypoint = carrier.waypoints[0];
             let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
             let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
-            let warpSpeed = sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId;
+            let warpSpeed = this.starService.canTravelAtWarpSpeed(sourceStar, destinationStar);
             let distancePerTick = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed);
 
             if (carrier.distanceToDestination <= distancePerTick) {

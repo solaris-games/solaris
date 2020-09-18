@@ -168,7 +168,7 @@ class GameHelper {
 
     if (sourceStar.warpGate && destinationStar.warpGate &&
       sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-      ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], 3) // TODO: Need a constant here
+      ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], game.constants.distances.warpSpeedMultiplier)
     } else {
       ticks = this.getTicksBetweenLocations(game, carrier, [source, destination])
     }

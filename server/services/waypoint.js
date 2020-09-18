@@ -149,7 +149,7 @@ module.exports = class WaypointService {
         }
 
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
-        let warpSpeed = sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId;
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
         let tickDistance = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed);

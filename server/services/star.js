@@ -171,4 +171,8 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
+    canTravelAtWarpSpeed(starA, starB) {
+        return starA.warpGate && starB.warpGate && starA.ownedByPlayerId && starB.ownedByPlayerId;
+    }
+
 }

@@ -160,7 +160,7 @@ module.exports = class CarrierService {
     }
 
     getCarrierDistancePerTick(game, carrier, warpSpeed = false) {
-        let distanceModifier = warpSpeed ? 3 : 1;
+        let distanceModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1;
 
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
