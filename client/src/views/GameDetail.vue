@@ -289,7 +289,7 @@ export default {
       }
     },
     getFriendlyText (option) {
-      return {
+      let text = {
         'all': 'All',
         'premium': 'Premium',
         'cheap': 'Cheap',
@@ -305,6 +305,8 @@ export default {
         'start': 'Start Only',
         'scanned': 'Scanned Only'
       }[option]
+
+      return text || option
     }
   }
 }
