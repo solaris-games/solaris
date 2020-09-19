@@ -16,33 +16,32 @@
         {
             "id": 2,
             "name": "Lieutenant",
-            "description": "Grants +1 Weapons, -1 Hyperspace Range, x0.75 Speed to the Carrier.",
+            "description": "Grants +1 Weapons, -1 Hyperspace Range to the Carrier.",
             "tier": 2,
             "modifiers": {
                 "local": {
                     "weapons": 1,
-                    "hyperspace": -1,
-                    "speed": 0.75
+                    "hyperspace": -1
                 }
             }
         },
         {
             "id": 3,
             "name": "Colonel",
-            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.5 Speed to the Carrier.",
+            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the Carrier.",
             "tier": 3,
             "modifiers": {
                 "local": {
                     "weapons": 2,
                     "hyperspace": -1,
-                    "speed": 0.5
+                    "speed": 0.75
                 }
             }
         },
         {
             "id": 4,
             "name": "General",
-            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.25 Speed to the Carrier.",
+            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the Carrier.",
             "tier": 4,
             "modifiers": {
                 "local": {
@@ -55,12 +54,11 @@
         {
             "id": 5,
             "name": "Smuggler",
-            "description": "Grants x2 Speed, -1 Weapons, -3 Hyperspace Range to the Carrier.",
+            "description": "Grants x2 Speed, -3 Hyperspace Range to the Carrier.",
             "tier": 5,
             "modifiers": {
                 "local": {
                     "speed": 2,
-                    "weapons": -1,
                     "hyperspace": -3
                 }
             }
@@ -80,11 +78,11 @@
         {
             "id": 7,
             "name": "Destroyer",
-            "description": "Grants +5 Weapons, -2 Hyperspace Range, x0.5 Speed to the Carrier.",
+            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the Carrier.",
             "tier": 5,
             "modifiers": {
                 "local": {
-                    "hyperspace": -2,
+                    "hyperspace": -3,
                     "weapons": 5,
                     "speed": 0.5
                 }
@@ -167,7 +165,7 @@
             "id": 6,
             "name": "World Builder",
             "description": "Adds 1 to the Star's natural resources every tick, +1 Terraforming, -3 Scanning, -3 Weapons.",
-            "tier": 5,
+            "tier": 4,
             "modifiers": {
                 "special": {
                     "addNaturalResourcesOnTick": 1
@@ -183,7 +181,7 @@
             "id": 7,
             "name": "War Machine",
             "description": "Deducts 1 from the Star's natural resources every tick, +3 Manufacturing, +1 Weapons, -1 Terraforming. This specialist retires if the star reaches 0 natural resources.",
-            "tier": 5,
+            "tier": 4,
             "modifiers": {
                 "special": {
                     "deductNaturalResourcesOnTick": 1
@@ -199,7 +197,7 @@
             "id": 8,
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
-            "tier": 4,
+            "tier": 3,
             "modifiers": {
                 "special": {
                     "hideStarGarrison": true
