@@ -163,6 +163,12 @@ module.exports = class GameGalaxyService {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
                 
+                let canSeeStarGarrison = this.starService.canPlayerSeeStarGarrison(player, s);
+
+                if (!canSeeStarGarrison) {
+                    s.garrison = null;
+                }
+
                 return s;
             } else {
                 // Return null if its dark mode
@@ -195,8 +201,8 @@ module.exports = class GameGalaxyService {
             .forEach(c => {
                 this.waypointService.populateCarrierWaypointEta(doc, c);
                 
-                if (c.specialistId) {
-                    c.specialist = this.specialistService.getByIdCarrier(c.specialistId);
+                if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                    c.ships = null;
                 }
             });
     }

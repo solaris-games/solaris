@@ -16,10 +16,10 @@
                         <h5><i class="fas fa-rocket"></i></h5>
                     </td>
                     <td v-if="mapObject.type === 'star'" class="bg-secondary text-center">
-                        <span>{{mapObject.data.garrison}}</span>
+                        <span>{{mapObject.data.garrison == null ? '???' : mapObject.data.garrison}}</span>
                     </td>
                     <td v-if="mapObject.type === 'carrier'" class="bg-secondary text-center">
-                        <span>{{mapObject.data.ships}}</span>
+                        <span>{{mapObject.data.ships == null ? '???' : mapObject.data.ships}}</span>
                     </td>
                     <td>
                         <span>{{mapObject.data.name}}</span>

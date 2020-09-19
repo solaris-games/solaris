@@ -1,7 +1,7 @@
 <template>
 	<div class="menu-page container" v-if="carrier">
     	<menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-			<span class="mr-2">{{carrier.ships}} <i class="fas fa-rocket"></i></span>
+			<span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
     	</menu-title>
 
 		Waypoints:

@@ -34,7 +34,7 @@ class Star extends EventEmitter {
   }
 
   _getStarCarrierGarrison () {
-    return this._getStarCarriers().reduce((sum, c) => sum + c.ships, 0)
+    return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
   _isInScanningRange () {
@@ -277,11 +277,19 @@ class Star extends EventEmitter {
     }
 
     let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let displayGarrison = ''
 
-    this.text_garrison.text = totalGarrison
+    if (totalGarrison > 0) {
+      displayGarrison = totalGarrison
+    }
+    else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
+      displayGarrison = '???'
+    }
+
+    this.text_garrison.text = displayGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+    this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   drawInfrastructure (force) {
@@ -308,43 +316,6 @@ class Star extends EventEmitter {
       this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
     } else {
       this.text_infrastructure.visible = false
-    }
-  }
-
-  // TODO: Not used, decide whether we actually want to display the player name on the map at all.
-  // If not, remove this.
-  drawPlayerName (force) {
-    if (force && this.text_playerName) {
-      this.container.removeChild(this.text_playerName)
-      this.text_playerName = null
-    }
-
-    if (!this.text_playerName) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
-
-      this.text_playerName = new PIXI.Text('', style)
-      this.text_playerName.resolution = 10
-
-      this.container.addChild(this.text_playerName)
-    }
-
-    // Get the player who owns the star.
-    let player = this._getStarPlayer()
-
-    if (player) {
-      this.text_playerName.text = player.alias
-      this.text_playerName.x = this.data.location.x - (this.text_playerName.width / 2)
-
-      if (this.data.garrison == null) {
-        this.text_playerName.y = this.data.location.y + 12
-      } else {
-        this.text_playerName.y = this.data.location.y + 17
-      }
-
-      this.text_playerName.visible = this.zoomPercent < 60
-    } else {
-      this.text_playerName.visible = false
     }
   }
 

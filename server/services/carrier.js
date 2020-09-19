@@ -118,8 +118,13 @@ module.exports = class CarrierService {
                 location: c.location,
                 waypoints: c.waypoints,
                 isGift: c.isGift,
-                specialistId: c.specialistId
+                specialistId: c.specialistId,
+                specialist: null
             };
+
+            if (carrierData.specialistId) {
+                carrierData.specialist = this.specialistService.getByIdCarrier(carrierData.specialistId)
+            }
 
             carrierData.waypoints = this.clearCarrierWaypointsNonTransit(c, true);
 
@@ -207,6 +212,21 @@ module.exports = class CarrierService {
         carrier.waypoints = [firstWaypoint];
         
         await game.save();
+    }
+
+    canPlayerSeeCarrierShips(player, carrier) {
+        if (carrier.specialistId) {
+            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+            // If the carrier has a hideCarrierShips spec and is not owned by the given player
+            // then that player cannot see the carrier's ships.
+            if (specialist.modifiers.special && specialist.modifiers.special.hideCarrierShips
+                && carrier.ownedByPlayerId.toString() !== player._id.toString()) {
+                return false;
+            }
+        }
+
+        return true;
     }
     
 };

@@ -69,7 +69,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.shipTransferService.transfer(
+            let report = await container.shipTransferService.transfer(
                 req.game,
                 req.player,
                 req.params.carrierId,
@@ -80,8 +80,14 @@ module.exports = (router, io, container) => {
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
-            playersWithinScanningRange.forEach(p => 
-                container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));
+            playersWithinScanningRange.forEach(p => {
+                let canSeeStarGarrison = container.starService.canPlayerSeeStarGarrison(p, report.star);
+                let canSeeCarrierShips = container.carrierService.canPlayerSeeCarrierShips(p, report.carrier);
+
+                container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, 
+                    req.body.starId, canSeeStarGarrison ? req.body.starShips : null, 
+                    req.params.carrierId, canSeeCarrierShips ? req.body.carrierShips : null);
+            });
 
             return res.sendStatus(200);
         } catch (err) {

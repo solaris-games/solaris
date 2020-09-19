@@ -50,6 +50,12 @@ module.exports = class ShipTransferService {
         star.garrison = Math.floor(star.garrisonActual);
 
         await game.save();
+
+        return {
+            player,
+            star,
+            carrier
+        };
     }
 
 };

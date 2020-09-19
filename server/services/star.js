@@ -208,4 +208,19 @@ module.exports = class StarService extends EventEmitter {
         return false;
     }
 
+    canPlayerSeeStarGarrison(player, star) {
+        if (star.specialistId) {
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+            // If the star has a hideStarGarrison spec and is not owned by the given player
+            // then that player cannot see the carrier's ships.
+            if (specialist.modifiers.special && specialist.modifiers.special.hideStarGarrison
+                && (star.ownedByPlayerId || '').toString() !== player._id.toString()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

@@ -775,7 +775,8 @@ module.exports = class GameTickService extends EventEmitter {
                 location: carrier.location,
                 waypoints: carrier.waypoints,
                 name: carrier.name, // Include the name because carriers can go in and out of scanning range.
-                isGift: carrier.isGift // Carriers may have been successfully gifted.
+                isGift: carrier.isGift, // Carriers may have been successfully gifted.
+                specialistId: carrier.specialistId
             };
         });
     }
@@ -837,6 +838,10 @@ module.exports = class GameTickService extends EventEmitter {
         playerReport.stars = playerReport.stars.map(s => {
             let isInRange = starsInRange.find(x => x._id.equals(s._id)) != null;
 
+            if (!this.starService.canPlayerSeeStarGarrison(player, s)) {
+                s.garrison = null;
+            }
+
             if (isInRange) {
                 return s;
             }
@@ -863,6 +868,10 @@ module.exports = class GameTickService extends EventEmitter {
 
             // The waypoint ETAs may have changed so make sure that they are updated.
             this.waypointService.populateCarrierWaypointEta(game, c);
+
+            if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                c.ships = null;
+            }
 
             return c;
         });

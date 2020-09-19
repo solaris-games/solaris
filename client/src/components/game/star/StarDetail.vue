@@ -49,7 +49,7 @@
           <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
         </div>
           <div class="col-auto">
-              {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+              {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
           </div>
       </div>
     </div>

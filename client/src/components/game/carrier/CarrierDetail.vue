@@ -11,12 +11,12 @@
     </div>
 
     <!-- TODO: This should be a component -->
-    <div v-if="carrier.ships" class="row mb-0 pt-3 pb-3 bg-primary">
+    <div class="row mb-0 pt-3 pb-3 bg-primary">
         <div class="col">
             Ships
         </div>
         <div class="col text-right">
-            {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
         </div>
     </div>
 

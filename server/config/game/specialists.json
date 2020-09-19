@@ -3,12 +3,12 @@
         {
             "id": 1,
             "name": "Admiral",
-            "description": "Grants x1.5 Speed, -2 Weapons, -2 Hyperspace Range to the Carrier.",
+            "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the Carrier.",
             "tier": 3,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
-                    "weapons": -2,
+                    "weapons": -1,
                     "hyperspace": -2
                 }
             }
@@ -80,12 +80,24 @@
         {
             "id": 7,
             "name": "Destroyer",
-            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.1 Speed to the Carrier.",
+            "description": "Grants +5 Weapons, -2 Hyperspace Range, x0.5 Speed to the Carrier.",
             "tier": 5,
             "modifiers": {
                 "local": {
-                    "hyperspace": -3,
-                    "weapons": 5
+                    "hyperspace": -2,
+                    "weapons": 5,
+                    "speed": 0.5
+                }
+            }
+        },
+        {
+            "id": 8,
+            "name": "Scrambler",
+            "description": "Prevents other players from seeing how many ships the Carrier has.",
+            "tier": 3,
+            "modifiers": {
+                "special": {
+                    "hideCarrierShips": true
                 }
             }
         }
@@ -180,6 +192,17 @@
                     "manufacturing": 3,
                     "weapons": 1,
                     "terraforming": -1
+                }
+            }
+        },
+        {
+            "id": 8,
+            "name": "Scrambler",
+            "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
+            "tier": 4,
+            "modifiers": {
+                "special": {
+                    "hideStarGarrison": true
                 }
             }
         }

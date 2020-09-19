@@ -247,7 +247,10 @@ export default new Vuex.Store({
       state.game.galaxy.carriers.push(data)
 
       let star = GameHelper.getStarById(state.game, data.orbiting)
-      star.garrison -= data.ships
+
+      if (star.garrison) {
+        star.garrison -= data.ships
+      }
 
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
       player.stats.totalCarriers++
