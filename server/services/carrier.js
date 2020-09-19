@@ -122,10 +122,6 @@ module.exports = class CarrierService {
                 specialist: null
             };
 
-            if (carrierData.specialistId) {
-                carrierData.specialist = this.specialistService.getByIdCarrier(carrierData.specialistId)
-            }
-
             carrierData.waypoints = this.clearCarrierWaypointsNonTransit(c, true);
 
             return carrierData;

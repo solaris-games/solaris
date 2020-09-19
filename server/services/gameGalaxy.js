@@ -201,6 +201,10 @@ module.exports = class GameGalaxyService {
             .forEach(c => {
                 this.waypointService.populateCarrierWaypointEta(doc, c);
                 
+                if (c.specialistId) {
+                    c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
+                }
+
                 if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
                     c.ships = null;
                 }
