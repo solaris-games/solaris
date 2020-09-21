@@ -148,86 +148,30 @@ module.exports = class GameTickService extends EventEmitter {
         // Because carriers are ordered by distance to their destination,
         // this means that always the carrier that is closest to its destination
         // will land first. This is important for unclaimed stars and defender bonuses.
+
         let combatStars = [];
         let actionWaypoints = [];
 
         for (let i = 0; i < carriers.length; i++) {
-    
             let carrier = carriers[i];
-            let waypoint = carrier.waypoints[0];
-            let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
-            let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
-            let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
-            let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, sourceStar, destinationStar);
-            let distancePerTick = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed);
+        
+            let carrierMovementReport = await this.carrierService.moveCarrier(game, carrier);
 
-            if (carrier.distanceToDestination <= distancePerTick) {
-                carrier.inTransitFrom = null;
-                carrier.inTransitTo = null;
-                carrier.orbiting = destinationStar._id;
-                carrier.location = destinationStar.location;
+            // Append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
+            actionWaypoints.push({
+                carrier,
+                star: carrierMovementReport.destinationStar,
+                waypoint: carrierMovementReport.waypoint
+            });
 
-                // Remove the current waypoint as we have arrived at the destination.
-                let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
-
-                // Append it to the array of action waypoints so that we can deal with it after combat.
-                actionWaypoints.push({
-                    star: destinationStar,
-                    carrier,
-                    waypoint: currentWaypoint
-                });
-
-                // If the carrier waypoints are looped then append the
-                // carrier waypoint back onto the waypoint stack.
-                if (carrier.waypointsLooped) {
-                    carrier.waypoints.push(currentWaypoint);
-                }
-
-                // If the star is unclaimed, then claim it.
-                if (destinationStar.ownedByPlayerId == null) {
-                    destinationStar.ownedByPlayerId = carrier.ownedByPlayerId;
-
-                    // Weird scenario, but could happen.
-                    if (carrier.isGift) {
-                        carrier.isGift = false;
-                    }
-
-                    let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
-
-                    let playerUser = await this.userService.getById(carrierPlayer.userId);
-                    playerUser.achievements.combat.stars.captured++;
-                    await playerUser.save();
-                }
-
-                // If the star is owned by another player, then perform combat.
-                if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
-                    // Otherwise, perform combat.
-                    if (carrier.isGift) {
-                        carrier.ownedByPlayerId = destinationStar.ownedByPlayerId;
-                        carrier.isGift = false;
-                    } else {
-                        if (combatStars.indexOf(destinationStar) < 0) {
-                            combatStars.push(destinationStar);
-                        }
-                    }
-                }
-
-                // The star has been affected by the game tick so append it to the report
-                // NOTE: We will get the data for it later at the end of the tick.
-                report.stars.push(destinationStar._id);
+            // Check if combat is required, if so add the destination star to the array of combat stars to check later.
+            if (carrierMovementReport.combatRequired && combatStars.indexOf(carrierMovementReport.destinationStar) < 0) {
+                combatStars.push(carrierMovementReport.destinationStar);
             }
-            // Otherwise, move X distance in the direction of the star.
-            else {
-                let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
-
-                carrier.location = nextLocation;
-
-                // TODO: Calculate whether there are any enemy carriers within a tick distance away from this carrier.
-                // If so, add it to an array so carrier combat can be performed.
-                // To do combat: Iterate over all carriers in above array, each carrier has a "combat zone".
-                // Splice out all carriers within the combat zone and perform combat.
-            }
+            
+            // The star has been affected by the game tick so append it to the report
+            // NOTE: We will get the data for it later at the end of the tick.
+            report.stars.push(carrierMovementReport.destinationStar._id);
         }
 
         // 3. Now that all carriers have finished moving, perform combat.

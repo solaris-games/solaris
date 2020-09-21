@@ -60,7 +60,7 @@ module.exports = (io) => {
     const starDistanceService = new StarDistanceService(distanceService);
     const specialistService = new SpecialistService();
     const technologyService = new TechnologyService(specialistService);
-    const starService = new StarService(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService);
+    const starService = new StarService(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
     const carrierService = new CarrierService(distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService);
     const standardMapService = new StandardMapService(randomService, starService, starDistanceService);

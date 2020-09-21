@@ -210,6 +210,15 @@ module.exports = class CarrierService {
         await game.save();
     }
 
+    transferGift(star, carrier) {
+        if (!star.ownedByPlayerId) {
+            throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
+        }
+
+        carrier.ownedByPlayerId = star.ownedByPlayerId;
+        carrier.isGift = false;
+    }
+
     canPlayerSeeCarrierShips(player, carrier) {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
@@ -223,6 +232,89 @@ module.exports = class CarrierService {
         }
 
         return true;
+    }
+
+    moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick) {
+        let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
+
+        carrier.location = nextLocation;
+    }
+
+    async arriveAtStar(game, carrier, destinationStar) {
+        // Remove the current waypoint as we have arrived at the destination.
+        let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
+
+        let report = {
+            waypoint: currentWaypoint,
+            combatRequired: false
+        };
+
+        carrier.inTransitFrom = null;
+        carrier.inTransitTo = null;
+        carrier.orbiting = destinationStar._id;
+        carrier.location = destinationStar.location;
+
+        // If the carrier waypoints are looped then append the
+        // carrier waypoint back onto the waypoint stack.
+        if (carrier.waypointsLooped) {
+            carrier.waypoints.push(currentWaypoint);
+        }
+
+        // If the star is unclaimed, then claim it.
+        if (destinationStar.ownedByPlayerId == null) {
+            await this.starService.claimUnownedStar(game, destinationStar, carrier);
+        }
+
+        // If the star is owned by another player, then perform combat.
+        if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
+            // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
+            // Otherwise, perform combat.
+            if (carrier.isGift) {
+                this.transferGift(destinationStar, carrier);
+            } else {
+                report.combatRequired = true;
+            }
+        }
+
+        return report;
+    }
+
+    async moveCarrier(game, carrier) {
+        let waypoint = carrier.waypoints[0];
+        let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
+        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, sourceStar, destinationStar);
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
+
+        let carrierMovementReport = {
+            carrier,
+            sourceStar,
+            destinationStar,
+            carrierOwner,
+            warpSpeed,
+            distancePerTick,
+            waypoint,
+            combatRequired: false
+        };
+        
+        if (carrier.distanceToDestination <= distancePerTick) {
+            let starArrivalReport = await this.arriveAtStar(game, carrier, destinationStar);
+            
+            carrierMovementReport.waypoint = starArrivalReport.waypoint;
+            carrierMovementReport.combatRequired = starArrivalReport.carrierMovementReport;
+        }
+        // Otherwise, move X distance in the direction of the star.
+        else {
+            this.moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick);
+
+            // TODO: Calculate whether there are any enemy carriers within a tick distance away from this carrier.
+            // If so, add it to an array so carrier combat can be performed.
+            // To do combat: Iterate over all carriers in above array, each carrier has a "combat zone".
+            // Splice out all carriers within the combat zone and perform combat.
+        }
+
+        return carrierMovementReport;
     }
     
 };

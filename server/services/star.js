@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService) {
+    constructor(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
         super();
         
         this.randomService = randomService;
@@ -13,6 +13,7 @@ module.exports = class StarService extends EventEmitter {
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.userService = userService;
     }
 
     generateUnownedStar(game, name, location, galaxyRadius) {
@@ -221,6 +222,25 @@ module.exports = class StarService extends EventEmitter {
         }
 
         return true;
+    }
+
+    async claimUnownedStar(game, star, carrier) {
+        if (star.ownedByPlayerId) {
+            throw new ValidationError(`Cannot claim an owned star`);
+        }
+
+        star.ownedByPlayerId = carrier.ownedByPlayerId;
+
+        // Weird scenario, but could happen.
+        if (carrier.isGift) {
+            carrier.isGift = false;
+        }
+
+        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+
+        let playerUser = await this.userService.getById(carrierPlayer.userId);
+        playerUser.achievements.combat.stars.captured++;
+        await playerUser.save();
     }
 
 }
