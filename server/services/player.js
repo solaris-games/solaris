@@ -324,4 +324,21 @@ module.exports = class PlayerService {
         player.lastSeen = moment().utc();
     }
 
+    givePlayerMoney(game, player) {
+        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+        let totalEco = this.calculateTotalEconomy(player, game.galaxy.stars);
+
+        let creditsFromEconomy = totalEco * 10;
+        let creditsFromBanking = effectiveTechs.banking * 75;
+        let creditsTotal = creditsFromEconomy + creditsFromBanking;
+
+        player.credits += creditsTotal;
+
+        return {
+            creditsFromEconomy,
+            creditsFromBanking,
+            creditsTotal
+        };
+    }
+
 }

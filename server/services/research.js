@@ -100,6 +100,25 @@ module.exports = class ResearchService extends EventEmitter {
         return report;
     }
 
+    async conductResearchAll(game, report) {
+        // Add the current level of experimentation to the current 
+        // tech being researched.
+        for (let i = 0; i < game.galaxy.players.length; i++) {
+            let player = game.galaxy.players[i];
+
+            // TODO: Defeated players do not conduct research or experiments?
+            if (player.defeated) {
+                continue;
+            }
+            
+            let researchReport = await this.conductResearch(game, player);
+
+            researchReport.playerId = player._id;
+
+            report.playerResearch.push(researchReport);
+        }
+    }
+
     getRequiredResearchProgress(game, technologyKey, technologyLevel) {
         const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
         const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];

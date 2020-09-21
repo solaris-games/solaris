@@ -243,4 +243,62 @@ module.exports = class StarService extends EventEmitter {
         await playerUser.save();
     }
 
+    applyStarSpecialistSpecialModifiers(game, report) {
+        for (let i = 0; i < game.galaxy.stars.length; i++) {
+            let star = game.galaxy.stars[i];
+
+            if (star.ownedByPlayerId) {
+                let hasModifiedStar = false;
+
+                if (star.specialistId) {
+                    let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+                    if (specialist.modifiers.special) {
+                        if (specialist.modifiers.special.addNaturalResourcesOnTick) {
+                            star.naturalResources += specialist.modifiers.special.addNaturalResourcesOnTick;
+
+                            hasModifiedStar = true;
+                        }
+
+                        if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
+                            star.naturalResources -= specialist.modifiers.special.deductNaturalResourcesOnTick;
+
+                            // Retire the specialist if there are no longer any natural resources.
+                            if (star.naturalResources < 0) {
+                                star.naturalResources = 0;
+                                star.specialistId = null;
+                            }
+
+                            hasModifiedStar = true;
+                        }
+                    }
+                }
+
+                // If the star isn't already in the report, add it.
+                if (hasModifiedStar && !report.stars.find(s => s.equals(star._id))) {
+                    report.stars.push(star._id);
+                }
+            }
+        }
+    }
+
+    produceShips(game, report) {
+        for (let i = 0; i < game.galaxy.stars.length; i++) {
+            let star = game.galaxy.stars[i];
+
+            if (star.ownedByPlayerId) {
+                let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+    
+                // Increase the number of ships garrisoned by how many are manufactured this tick.
+                star.garrisonActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry);
+                star.garrison = Math.floor(star.garrisonActual);
+
+                // If the star isn't already in the report, add it.
+                if (!report.stars.find(s => s.equals(star._id))) {
+                    report.stars.push(star._id);
+                }
+            }
+        }
+    }
+
 }

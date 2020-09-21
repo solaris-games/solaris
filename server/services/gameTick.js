@@ -73,7 +73,7 @@ module.exports = class GameTickService extends EventEmitter {
 
        await this._moveCarriers(game, report);
        logTime('Move carriers and produce ships');
-       await this._conductResearch(game, report);
+       await this.researchService.conductResearchAll(game, report);
        logTime('Conduct research');
        this._endOfGalacticCycleCheck(game, report);
        logTime('Galactic cycle check');
@@ -189,39 +189,15 @@ module.exports = class GameTickService extends EventEmitter {
 
         // 4a. Now that combat is done, perform any carrier waypoint actions.
         // Do the drops first
-        this._performWaypointActionsDrops(game, actionWaypoints);
+        this.waypointService.performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
-        this._applyStarSpecialistSpecialModifiers(game, report);
-        this._produceShips(game, report);
+        this.starService.applyStarSpecialistSpecialModifiers(game, report);
+        this.starService.produceShips(game, report);
 
         // 4c. Do the rest of the waypoint actions.
-        this._performWaypointActionsCollects(game, actionWaypoints);
-        this._performWaypointActionsGarrisons(game, actionWaypoints);
-    }
-
-    _performWaypointActions(game, actionWaypoints) {
-        for (let actionWaypoint of actionWaypoints) {
-            this.waypointService.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
-        }
-    }
-
-    _performFilteredWaypointActions(game, waypoints, waypointTypes) {
-        let actionWaypoints = waypoints.filter(w => waypointTypes.indexOf(w.waypoint.action) > -1);
-
-        this._performWaypointActions(game, actionWaypoints);
-    }
-
-    _performWaypointActionsDrops(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut']);
-    }
-
-    _performWaypointActionsCollects(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut']);
-    }
-
-    _performWaypointActionsGarrisons(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['garrison']);
+        this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
+        this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
     }
 
     async _performCombatAtStar(game, star, carriers, report) {
@@ -450,84 +426,6 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    _produceShips(game, report) {
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let star = game.galaxy.stars[i];
-
-            if (star.ownedByPlayerId) {
-                let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-    
-                // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.garrisonActual += this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry);
-                star.garrison = Math.floor(star.garrisonActual);
-
-                // If the star isn't already in the report, add it.
-                if (!report.stars.find(s => s.equals(star._id))) {
-                    report.stars.push(star._id);
-                }
-            }
-        }
-    }
-
-    _applyStarSpecialistSpecialModifiers(game, report) {
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
-            // TODO: Put the logic below in the star service.
-            let star = game.galaxy.stars[i];
-
-            if (star.ownedByPlayerId) {
-                let hasModifiedStar = false;
-
-                if (star.specialistId) {
-                    let specialist = this.specialistService.getByIdStar(star.specialistId);
-
-                    if (specialist.modifiers.special) {
-                        if (specialist.modifiers.special.addNaturalResourcesOnTick) {
-                            star.naturalResources += specialist.modifiers.special.addNaturalResourcesOnTick;
-
-                            hasModifiedStar = true;
-                        }
-
-                        if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
-                            star.naturalResources -= specialist.modifiers.special.deductNaturalResourcesOnTick;
-
-                            // Retire the specialist if there are no longer any natural resources.
-                            if (star.naturalResources < 0) {
-                                star.naturalResources = 0;
-                                star.specialistId = null;
-                            }
-
-                            hasModifiedStar = true;
-                        }
-                    }
-                }
-
-                // If the star isn't already in the report, add it.
-                if (hasModifiedStar && !report.stars.find(s => s.equals(star._id))) {
-                    report.stars.push(star._id);
-                }
-            }
-        }
-    }
-
-    async _conductResearch(game, report) {
-        // Add the current level of experimentation to the current 
-        // tech being researched.
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
-
-            // TODO: Defeated players do not conduct research or experiments?
-            if (player.defeated) {
-                continue;
-            }
-            
-            let researchReport = await this.researchService.conductResearch(game, player);
-
-            researchReport.playerId = player._id;
-
-            report.playerResearch.push(researchReport);
-        }
-    }
-
     _endOfGalacticCycleCheck(game, report) {
         game.state.tick++;
 
@@ -546,7 +444,7 @@ module.exports = class GameTickService extends EventEmitter {
                     continue;
                 }
                 
-                let creditsResult = this._givePlayerMoney(game, player);
+                let creditsResult = this.playerService.givePlayerMoney(game, player);
                 let experimentResult = this._conductExperiments(game, player, report);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
@@ -571,23 +469,6 @@ module.exports = class GameTickService extends EventEmitter {
                 game
             });
         }
-    }
-
-    _givePlayerMoney(game, player) {
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
-        let totalEco = this.playerService.calculateTotalEconomy(player, game.galaxy.stars);
-
-        let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = effectiveTechs.banking * 75;
-        let creditsTotal = creditsFromEconomy + creditsFromBanking;
-
-        player.credits += creditsTotal;
-
-        return {
-            creditsFromEconomy,
-            creditsFromBanking,
-            creditsTotal
-        };
     }
 
     _conductExperiments(game, player, report) {

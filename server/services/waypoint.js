@@ -245,6 +245,10 @@ module.exports = class WaypointService {
             this._performWaypointActionDropAll(carrier, star, waypoint);
         }
     }
+    
+    performWaypointActionsDrops(game, waypoints) {
+        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut']);
+    }
 
     _performWaypointActionCollect(carrier, star, waypoint) {
         // If the star has more ships than needs to be collected, then collect
@@ -258,6 +262,10 @@ module.exports = class WaypointService {
             // If there aren't enough ships, then do a collect all.
             this._performWaypointActionCollectAll(carrier, star, waypoint);
         }
+    }
+
+    performWaypointActionsCollects(game, waypoints) {
+        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut']);
     }
 
     _performWaypointActionDropAllBut(carrier, star, waypoint) {
@@ -308,6 +316,22 @@ module.exports = class WaypointService {
         }
 
         star.garrison = Math.floor(star.garrisonActual);
+    }
+
+    performWaypointActionsGarrisons(game, waypoints) {
+        this._performFilteredWaypointActions(game, waypoints, ['garrison']);
+    }
+
+    _performFilteredWaypointActions(game, waypoints, waypointTypes) {
+        let actionWaypoints = waypoints.filter(w => waypointTypes.indexOf(w.waypoint.action) > -1);
+
+        this._performWaypointActions(game, actionWaypoints);
+    }
+
+    _performWaypointActions(game, actionWaypoints) {
+        for (let actionWaypoint of actionWaypoints) {
+            this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
+        }
     }
 
 };
