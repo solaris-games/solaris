@@ -71,28 +71,30 @@ module.exports = class GameTickService extends EventEmitter {
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
-       await this._moveCarriers(game, report);
-       logTime('Move carriers and produce ships');
-       await this.researchService.conductResearchAll(game, report);
-       logTime('Conduct research');
-       this._endOfGalacticCycleCheck(game, report);
-       logTime('Galactic cycle check');
-       this._logHistory(game, report);
-       logTime('Log history');
-       await this._gameLoseCheck(game, report);
-       logTime('Game lose check');
-       await this._gameWinCheck(game, report);
-       logTime('Game win check');
+        // await this._combatCarriers(game, report);
+        // logTime('Combat carriers');
+        await this._moveCarriers(game, report);
+        logTime('Move carriers and produce ships');
+        await this.researchService.conductResearchAll(game, report);
+        logTime('Conduct research');
+        this._endOfGalacticCycleCheck(game, report);
+        logTime('Galactic cycle check');
+        this._logHistory(game, report);
+        logTime('Log history');
+        await this._gameLoseCheck(game, report);
+        logTime('Game lose check');
+        await this._gameWinCheck(game, report);
+        logTime('Game win check');
 
-       await game.save();
-       logTime('Save game');
+        await game.save();
+        logTime('Save game');
 
-       this._broadcastReport(game, report);       
-       logTime('Broadcast report');
+        this._broadcastReport(game, report);       
+        logTime('Broadcast report');
 
-       let endTime = process.hrtime(startTime);
+        let endTime = process.hrtime(startTime);
 
-       console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
+        console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     _canTick(game) {
@@ -101,6 +103,56 @@ module.exports = class GameTickService extends EventEmitter {
         let nextTick = moment(lastTick).utc().add(mins, 'm');
 
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
+    }
+
+    async _combatCarriers(game, report) {
+        // TODO: There is a problem where carriers can jump over carriers
+        // when launching initially. Need to figure out how to perform combat
+        // for a carrier as it launches.
+        
+        let combatCarriers = this.carrierService.getIntersectingCarriers(game);
+
+        // Iterate over all combat carriers and perform carrier-to-carrier combat.
+        for (let i = 0; i < combatCarriers.length; i++) {
+            let combatCarrier = combatCarriers[i];
+            let friendlyCarrier = combatCarrier.carrier;
+
+            let friendlyCarriers = combatCarriers.intersecting.filter(c => c.ships > 0 && c.ownedByPlayerId.equals(friendlyCarrier.ownedByPlayerId));
+
+            // If all other carriers are friendly then skip.
+            if (friendlyCarriers.length === combatCarrier.intersecting.length) {
+                continue;
+            }
+
+            let enemyCarriers = combatCarrier.intersecting.filter(c => c.ships > 0 && !c.ownedByPlayerId.equals(friendlyCarrier.ownedByPlayerId));
+
+            let friendlyCarrierDestroyed = false;
+
+            // Loop over each enemy carrier and fight them individually.
+            for (let q = 0; q < enemyCarriers.length; q++) {
+                let enemyCarrier = enemyCarriers[q];
+
+                let combatResult = this.combatService.calculateCarrier(game, friendlyCarrier, enemyCarrier);
+
+                friendlyCarrier.ships = combatResult.after.defender;
+                enemyCarrier.carrier.ships = combatResult.after.attacker;
+
+                if (enemyCarrier.carrier.ships <= 0) {
+                    game.galaxy.splice(game.galaxy.indexOf(enemyCarrier, 1));
+                    q--;
+                }
+
+                if (friendlyCarrier.ships <= 0) {
+                    friendlyCarrierDestroyed = true;
+                    break;
+                }
+            }
+
+            if (friendlyCarrierDestroyed) {
+                game.galaxy.splice(game.galaxy.indexOf(friendlyCarrier, 1));
+                i--;
+            }
+        }
     }
 
     async _moveCarriers(game, report) {
@@ -165,7 +217,7 @@ module.exports = class GameTickService extends EventEmitter {
             });
 
             // Check if combat is required, if so add the destination star to the array of combat stars to check later.
-            if (carrierMovementReport.combatRequired && combatStars.indexOf(carrierMovementReport.destinationStar) < 0) {
+            if (carrierMovementReport.combatRequiredStar && combatStars.indexOf(carrierMovementReport.destinationStar) < 0) {
                 combatStars.push(carrierMovementReport.destinationStar);
             }
             

@@ -246,7 +246,7 @@ module.exports = class CarrierService {
 
         let report = {
             waypoint: currentWaypoint,
-            combatRequired: false
+            combatRequiredStar: false
         };
 
         carrier.inTransitFrom = null;
@@ -272,7 +272,7 @@ module.exports = class CarrierService {
             if (carrier.isGift) {
                 this.transferGift(destinationStar, carrier);
             } else {
-                report.combatRequired = true;
+                report.combatRequiredStar = true;
             }
         }
 
@@ -295,26 +295,76 @@ module.exports = class CarrierService {
             warpSpeed,
             distancePerTick,
             waypoint,
-            combatRequired: false
+            combatRequiredStar: false
         };
         
         if (carrier.distanceToDestination <= distancePerTick) {
             let starArrivalReport = await this.arriveAtStar(game, carrier, destinationStar);
             
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
-            carrierMovementReport.combatRequired = starArrivalReport.carrierMovementReport;
+            carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
         }
         // Otherwise, move X distance in the direction of the star.
         else {
             this.moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick);
-
-            // TODO: Calculate whether there are any enemy carriers within a tick distance away from this carrier.
-            // If so, add it to an array so carrier combat can be performed.
-            // To do combat: Iterate over all carriers in above array, each carrier has a "combat zone".
-            // Splice out all carriers within the combat zone and perform combat.
         }
 
         return carrierMovementReport;
+    }
+
+    getIntersectingCarriers(game) {
+        // Calculate the next positions of all carriers in transit.
+        let transitCarriers = game.galaxy.carriers
+            .filter(c => !c.orbiting)
+            .map(c => {
+                let nextLocation = this.getNextLocationToWaypoint(game, c);
+
+                return {
+                    carrier: c,
+                    locationCurrent: c.location,
+                    locationNext: nextLocation
+                };
+            })
+
+        // For all carriers that are in transit, calculate whether any other carrier
+        // intersects the line of travel.
+        let intersectingCarriers = transitCarriers
+            .map(a => {
+                let intersecting = transitCarriers
+                // .filter(c => !c.ownedByPlayerId.equals(b.ownedByPlayerId))
+                .filter(b => {
+                    return this.distanceService.lineIntersects(
+                        a.locationCurrent.x,
+                        a.locationCurrent.y,
+                        a.locationNext.x,
+                        a.locationNext.y,
+                        b.locationCurrent.x,
+                        b.locationCurrent.y,
+                        b.locationNext.x,
+                        b.locationNext.y
+                    );
+                });
+
+                a.intersecting = intersecting;
+
+                return a;
+            })
+            .filter(c => c.intersecting.length);
+
+        return intersectingCarriers;
+    }
+
+    getNextLocationToWaypoint(game, carrier) {
+        let waypoint = carrier.waypoints[0];
+        let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
+        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, sourceStar, destinationStar);
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
+
+        let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
+
+        return nextLocation;
     }
     
 };
