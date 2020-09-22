@@ -3,7 +3,7 @@
         <li class="list-group-item grow" v-for="p in players" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
           :title="p.colour.alias + ' - ' + p.alias">
           <div class="player-icon text-center">
-            <img v-if="p.avatar" :src="getAvatarImage(p)">
+            <img v-if="p.avatar" :src="getAvatarImage(p)" :class="{'defeated-player': p.defeated}">
             <i v-if="!p.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:44px;"></i>
             <i v-if="p.userId" class="userIcon fas fa-user"></i>
             <i v-if="showMedals && isFirstPlace(p)" class="medalIcon gold fas fa-medal"></i>
@@ -116,6 +116,10 @@ ul {
 
 li {
   display: inline-block;
+}
+
+.defeated-player {
+  opacity: 0.3;
 }
 
 /* Track */
