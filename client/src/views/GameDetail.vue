@@ -82,6 +82,10 @@
               <td>Defender Bonus</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.defenderBonus) }}</td>
             </tr>
+            <tr>
+              <td>Carrier-to-Carrier Combat</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>

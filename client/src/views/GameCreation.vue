@@ -139,6 +139,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat</label>
+        <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <view-subtitle title="Player Settings"/>
 
       <div class="form-group">

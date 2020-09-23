@@ -81,13 +81,13 @@ module.exports = class CombatService {
         return combatResult;
     }
 
-    calculateCarrier(game, carrierA, carrierB) {
-        let totalDefenders = carrierA.ships;
-        let totalAttackers = carrierB.ships;
+    calculateCarrier(game, defenderCarriers, attackerCarriers) {
+        let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
+        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
 
         // Calculate the weapons tech levels
-        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, [carrierA]);
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, [carrierB]);
+        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenderCarriers);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers);
         
         let combatResult = this.calculate(game,
         {

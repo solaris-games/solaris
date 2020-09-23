@@ -134,6 +134,16 @@
                 "value": "enabled",
                 "text": "Enabled"
             }
+        ],
+        "carrierToCarrierCombat": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
         ]
         },
         "galaxy": {

@@ -349,6 +349,8 @@ class Star extends EventEmitter {
       techLevel += this.data.specialist.modifiers.local.scanning || 0
     }
 
+    techLevel = Math.max(1, techLevel)
+
     let radius = ((techLevel || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
@@ -389,6 +391,8 @@ class Star extends EventEmitter {
     if (this.data.specialist && this.data.specialist.modifiers.local) {
       techLevel += this.data.specialist.modifiers.local.hyperspace || 0
     }
+
+    techLevel = Math.max(1, techLevel)
 
     let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
 

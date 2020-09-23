@@ -97,6 +97,8 @@ class Waypoints extends EventEmitter {
       techLevel += this.carrier.specialist.modifiers.local.hyperspace || 0
     }
 
+    techLevel = Math.max(1, techLevel)
+
     let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
 
     graphics.lineStyle(1, player.colour.value, 0.2)

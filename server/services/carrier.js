@@ -295,7 +295,8 @@ module.exports = class CarrierService {
             warpSpeed,
             distancePerTick,
             waypoint,
-            combatRequiredStar: false
+            combatRequiredStar: false,
+            arrivedAtStar: false
         };
         
         if (carrier.distanceToDestination <= distancePerTick) {
@@ -303,6 +304,7 @@ module.exports = class CarrierService {
             
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
+            carrierMovementReport.arrivedAtStar = true;
         }
         // Otherwise, move X distance in the direction of the star.
         else {

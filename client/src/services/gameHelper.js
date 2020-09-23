@@ -62,6 +62,8 @@ class GameHelper {
       techLevel += carrier.specialist.modifiers.local.hyperspace || 0
     }
 
+    techLevel = Math.max(1, techLevel)
+
     return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
   }
 

@@ -85,8 +85,7 @@ module.exports = class StarService extends EventEmitter {
 
         // Go through all stars and find each star that is in scanning range.
         let starsInRange = stars.filter(s => {
-            return s._id.toString() !== starId.toString() && // Not the current star
-                this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
+            return this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
         });
 
         return starsInRange;
@@ -283,8 +282,10 @@ module.exports = class StarService extends EventEmitter {
     }
 
     produceShips(game, report) {
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let star = game.galaxy.stars[i];
+        let starsToProduce = game.galaxy.stars.filter(s => s.infrastructure.industry > 0);
+
+        for (let i = 0; i < starsToProduce.length; i++) {
+            let star = starsToProduce[i];
 
             if (star.ownedByPlayerId) {
                 let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);

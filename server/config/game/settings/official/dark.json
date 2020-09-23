@@ -10,11 +10,12 @@
   "specialGalaxy": {
     "carrierCost": "standard",
     "warpgateCost": "standard",
-    "specialistCost": "none",
+    "specialistCost": "standard",
     "randomGates": "none",
     "darkGalaxy": "enabled",
     "giftCarriers": "enabled",
-    "defenderBonus": "enabled"
+    "defenderBonus": "enabled",
+    "carrierToCarrierCombat": "enabled"
   },
   "galaxy": {
     "starsPerPlayer": 20,

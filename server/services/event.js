@@ -11,6 +11,7 @@ module.exports = class EventService {
 
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
+        PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
         PLAYER_RESEARCH_COMPLETE: 'playerResearchComplete',
         PLAYER_STAR_WARP_GATE_BUILT: 'playerStarWarpGateBuilt',
         PLAYER_STAR_WARP_GATE_DESTROYED: 'playerStarWarpGateDestroyed',
@@ -49,6 +50,8 @@ module.exports = class EventService {
         
         this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
             args.game, args.defender, args.attackers, args.star, args.combatResult));
+        this.gameTickService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
+            args.game, args.defender, args.attackers, args.combatResult));
         this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.capturedBy, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
             args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount));
@@ -200,6 +203,20 @@ module.exports = class EventService {
 
         for (let attacker of attackers) {
             await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+        }
+    }
+
+    async createPlayerCombatCarrierEvent(game, defender, attackers, combatResult) {
+        let data = {
+            playerIdDefender: defender._id,
+            playerIdAttackers: attackers.map(p => p._id),
+            combatResult
+        };
+
+        await this.createPlayerEvent(game, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+
+        for (let attacker of attackers) {
+            await this.createPlayerEvent(game, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
         }
     }
 

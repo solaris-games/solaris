@@ -93,6 +93,7 @@ export default {
         ],
         combat: [
           'playerCombatStar',
+          'playerCombatCarrier',
           'playerStarAbandoned',
           'playerStarCaptured'
         ]
