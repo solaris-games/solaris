@@ -463,29 +463,29 @@ export default {
       let chartData = {
         labels: [
           'Victories',
-          'Joined',
+          // 'Joined',
           'Completed',
           'Defeated',
-          'Quit',
-          'AFK'
+          // 'Quit',
+          // 'AFK'
         ],
         datasets: [
           {
             data: [
               this.user.achievements.victories,
-              this.user.achievements.joined,
+              // this.user.achievements.joined,
               this.user.achievements.completed,
               this.user.achievements.defeated,
-              this.user.achievements.quit,
-              this.user.achievements.afk
+              // this.user.achievements.quit,
+              // this.user.achievements.afk
             ],
             backgroundColor: [
               '#00bc8c',
-              '#375a7f',
+              // '#375a7f',
               '#3498DB',
               '#F39C12',
-              '#444',
-              '#E74C3C'
+              // '#444',
+              // '#E74C3C'
             ]
           }
         ]
