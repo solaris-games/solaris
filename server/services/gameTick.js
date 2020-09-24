@@ -155,12 +155,14 @@ module.exports = class GameTickService extends EventEmitter {
                 .filter(c => {
                     // Head to head combat:
                     return (c.carrier.ships > 0                                                 // Has ships (may have been involved in other combat)
+                            && !c.carrier.isGift                                                // And is not a gift
                             && c.destination.equals(friendlyCarrier.source)                         // Is heading to where the carrier came from
                             && c.source.equals(friendlyCarrier.destination)                         // Came from where the carrier is heading to
                             && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent    // Is currently in front of the carrier
                             && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext)         // Will be behind the carrier
                     // Combat from behind:
                         || (c.carrier.ships > 0
+                            && !c.carrier.isGift                                                // And is not a gift
                             && c.destination.equals(friendlyCarrier.destination)                    // Is heading in the same direction as the carrier
                             && c.source.equals(friendlyCarrier.source)
                             && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent   // Is current behind the carrier
@@ -299,7 +301,7 @@ module.exports = class GameTickService extends EventEmitter {
         // Get all defender carriers ordered by most carriers present descending.
         // Carriers who have the most ships will be target first in combat.
         let defenderCarriers = carriers
-                                .filter(c => c.ships > 0 && c.ownedByPlayerId.equals(player._id))
+                                .filter(c => c.ships > 0 && !c.isGift && c.ownedByPlayerId.equals(player._id))
                                 .sort((a, b) => b.ships - a.ships);
 
         // If in carrier-to-carrier combat, verify that there are carriers that can fight.
@@ -309,7 +311,7 @@ module.exports = class GameTickService extends EventEmitter {
 
         // Get all attacker carriers.
         let attackerCarriers = carriers
-                                .filter(c => c.ships > 0 && !c.ownedByPlayerId.equals(player._id))
+                                .filter(c => c.ships > 0 && !c.isGift && !c.ownedByPlayerId.equals(player._id))
                                 .sort((a, b) => b.ships - a.ships);
 
         // Double check that the attacking carriers can fight.
