@@ -314,48 +314,6 @@ module.exports = class CarrierService {
         return carrierMovementReport;
     }
 
-    getIntersectingCarriers(game) {
-        // Calculate the next positions of all carriers in transit.
-        let transitCarriers = game.galaxy.carriers
-            .filter(c => !c.orbiting)
-            .map(c => {
-                let nextLocation = this.getNextLocationToWaypoint(game, c);
-
-                return {
-                    carrier: c,
-                    locationCurrent: c.location,
-                    locationNext: nextLocation
-                };
-            })
-
-        // For all carriers that are in transit, calculate whether any other carrier
-        // intersects the line of travel.
-        let intersectingCarriers = transitCarriers
-            .map(a => {
-                let intersecting = transitCarriers
-                // .filter(c => !c.ownedByPlayerId.equals(b.ownedByPlayerId))
-                .filter(b => {
-                    return this.distanceService.lineIntersects(
-                        a.locationCurrent.x,
-                        a.locationCurrent.y,
-                        a.locationNext.x,
-                        a.locationNext.y,
-                        b.locationCurrent.x,
-                        b.locationCurrent.y,
-                        b.locationNext.x,
-                        b.locationNext.y
-                    );
-                });
-
-                a.intersecting = intersecting;
-
-                return a;
-            })
-            .filter(c => c.intersecting.length);
-
-        return intersectingCarriers;
-    }
-
     getNextLocationToWaypoint(game, carrier) {
         let waypoint = carrier.waypoints[0];
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
@@ -367,6 +325,14 @@ module.exports = class CarrierService {
         let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 
         return nextLocation;
+    }
+
+    isInTransit(carrier) {
+        return !carrier.orbiting;
+    }
+
+    isLaunching(carrier) {
+        return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
     }
     
 };

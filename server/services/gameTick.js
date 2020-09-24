@@ -117,7 +117,10 @@ module.exports = class GameTickService extends EventEmitter {
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
         let carrierPositions = game.galaxy.carriers
-            .filter(x => !x.orbiting)
+            .filter(x => 
+                this.carrierService.isInTransit(x)           // Carrier is already in transit
+                || this.carrierService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
+            )
             .map(c => {
                 let waypoint = c.waypoints[0];
                 let locationNext = this.carrierService.getNextLocationToWaypoint(game, c);
