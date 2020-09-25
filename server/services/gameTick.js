@@ -659,6 +659,7 @@ module.exports = class GameTickService extends EventEmitter {
             // if so increase their number of missed turns.
             if (this.gameService.isTurnBasedGame(game) && !player.ready) {
                 player.missedTurns++;
+                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
             }
 
             // Check if the player has been AFK.

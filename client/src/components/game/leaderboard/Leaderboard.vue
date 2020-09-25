@@ -11,7 +11,13 @@
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
             <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
-            <p>Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
+            <p class="mb-2">Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
+        </div>
+    </div>
+
+    <div class="row bg-secondary" v-if="!game.state.endDate">
+        <div class="col text-center pt-2 pb-0">
+            <p class="pb-0 mb-2">{{timeRemaining}}</p>
         </div>
     </div>
 
@@ -36,7 +42,6 @@
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
                           <h5>
-                            <i v-if="player.ready" class="fas fa-check text-success" title="This player is ready."></i>
                             {{player.alias}}
                             <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
                           </h5>
@@ -44,8 +49,9 @@
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1" v-if="isTurnBasedGame()">
-                          <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame()">
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
+                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -80,6 +86,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import router from '../../../router'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
@@ -103,14 +110,23 @@ export default {
   data () {
     return {
       players: [],
-      sortedPlayers: []
+      sortedPlayers: [],
+      timeRemaining: null
     }
   },
   mounted () {
     this.players = this.$store.state.game.galaxy.players
     this.sortedPlayers = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-  },
 
+    this.recalculateTimeRemaining()
+
+    if (GameHelper.isGameInProgress(this.$store.state.game)) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
+  },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
@@ -134,6 +150,20 @@ export default {
       let userPlayer = this.getUserPlayer()
 
       return userPlayer && userPlayer._id === player._id
+    },
+    recalculateTimeRemaining () {
+      if (this.$store.state.game.settings.gameTime.gameType === 'realTime') {
+        let time = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)
+
+        this.timeRemaining = `Next tick: ${time}`
+      } else {
+        // Calculate when the max wait limit date is.
+        let maxWaitLimitDate = moment(this.$store.state.game.state.startDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
+
+        let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
+
+        this.timeRemaining = `Next turn: ${time}`
+      }
     },
     async concedeDefeat () {
       try {
@@ -208,10 +238,17 @@ export default {
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
     })
+
+    this.sockets.subscribe('gamePlayerReady', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.ready = true
+    })
   },
   destroyed () {
     this.sockets.unsubscribe('gamePlayerJoined')
     this.sockets.unsubscribe('gamePlayerQuit')
+    this.sockets.unsubscribe('gamePlayerReady')
   },
 
   computed: {

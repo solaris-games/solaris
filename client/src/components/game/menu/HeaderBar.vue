@@ -1,7 +1,7 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-block mr-5">
+        <div class="col-auto d-none d-md-block mr-5" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
 
             {{game.settings.general.name}}

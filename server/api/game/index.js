@@ -143,6 +143,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.player);
                 
+            container.broadcastService.gamePlayerReady(req.game, req.player);
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
