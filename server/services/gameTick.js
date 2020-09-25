@@ -732,9 +732,11 @@ module.exports = class GameTickService extends EventEmitter {
             this.emit('onGameEnded', {
                 game
             });
+
+            return true;
         }
 
-        return winner != null;
+        return false;
     }
 
     _resetPlayersReadyStatus(game, report) {
