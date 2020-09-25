@@ -321,6 +321,16 @@
         ]
         },
         "gameTime": {
+        "gameType": [
+            {
+                "value": "realTime",
+                "text": "Real Time"
+            },
+            {
+                "value": "turnBased",
+                "text": "Turn Based"
+            }
+        ],
         "speed": [
             {
                 "value": 1,
@@ -363,6 +373,62 @@
             {
                 "value": 240,
                 "text": "4 Hours"
+            }
+        ],
+        "turnJumps": [
+            {
+                "value": 1,
+                "text": "1 Tick Jumps"
+            },
+            {
+                "value": 6,
+                "text": "6 Tick Jumps"
+            },
+            {
+                "value": 8,
+                "text": "8 Tick Jumps"
+            },
+            {
+                "value": 12,
+                "text": "12 Tick Jumps"
+            },
+            {
+                "value": 24,
+                "text": "24 Tick Jumps"
+            }
+        ],
+        "maxTurnWait": [
+            {
+                "value": 1,
+                "text": "1 Hour"
+            },
+            {
+                "value": 6,
+                "text": "6 Hours"
+            },
+            {
+                "value": 8,
+                "text": "8 Hours"
+            },
+            {
+                "value": 10,
+                "text": "10 Hours"
+            },
+            {
+                "value": 12,
+                "text": "12 Hours"
+            },
+            {
+                "value": 18,
+                "text": "18 Hours"
+            },
+            {
+                "value": 24,
+                "text": "24 Hours"
+            },
+            {
+                "value": 48,
+                "text": "48 Hours"
             }
         ]
     }

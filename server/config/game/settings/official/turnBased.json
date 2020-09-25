@@ -1,10 +1,10 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "Standard 4 Player",
+    "description": "Turn Based",
     "password": null,
     "starVictoryPercentage": 50,
-    "playerLimit": 4,
+    "playerLimit": 8,
     "playerType": "all"
   },
   "specialGalaxy": {
@@ -59,8 +59,8 @@
     }
   },
   "gameTime": {
-    "gameType": "realTime",
-    "speed": 30,
-    "startDelay": 30
+    "gameType": "turnBased",
+    "tickJumps": 8,
+    "maxTurnWait": 24
   }
 }

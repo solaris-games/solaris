@@ -316,6 +316,15 @@
       <view-subtitle title="Game Time Settings"/>
 
       <div class="form-group">
+        <label for="gameType" class="col-form-label">Game Type</label>
+        <select class="form-control" id="gameType" v-model="settings.gameTime.gameType" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.gameType" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
         <label for="gameSpeed" class="col-form-label">Game Speed</label>
         <select class="form-control" id="gameSpeed" v-model="settings.gameTime.speed" :disabled="isCreatingGame">
           <option v-for="opt in options.gameTime.speed" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -324,10 +333,28 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
         <label for="startDelay" class="col-form-label">Start Delay</label>
         <select class="form-control" id="startDelay" v-model="settings.gameTime.startDelay" :disabled="isCreatingGame">
           <option v-for="opt in options.gameTime.startDelay" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
+        <label for="turnJumps" class="col-form-label">Turn Jumps</label>
+        <select class="form-control" id="turnJumps" v-model="settings.gameTime.turnJumps" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.turnJumps" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
+        <label for="maxTurnWait" class="col-form-label">Max Turn Wait</label>
+        <select class="form-control" id="maxTurnWait" v-model="settings.gameTime.maxTurnWait" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.maxTurnWait" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>

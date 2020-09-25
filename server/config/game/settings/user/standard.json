@@ -59,6 +59,7 @@
         }
     },
     "gameTime": {
+        "gameType": "realTime",
         "speed": 30,
         "startDelay": 30
     }

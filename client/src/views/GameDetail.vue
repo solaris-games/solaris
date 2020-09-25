@@ -211,12 +211,24 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
+              <td>Game Type</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.gameTime.gameType) }}</td>
+            </tr>
+            <tr v-if="settings.gameTime.gameType === 'realTime'">
               <td>Game Time</td>
               <td class="text-right">{{ game.settings.gameTime.speed }} minute(s)/tick</td>
             </tr>
-            <tr>
+            <tr v-if="settings.gameTime.gameType === 'realTime'">
               <td>Start Delay</td>
               <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
+            </tr>
+            <tr v-if="settings.gameTime.gameType === 'turnBased'">
+              <td>Turn Jumps</td>
+              <td class="text-right">{{ game.settings.gameTime.turnJumps }} tick jumps</td>
+            </tr>
+            <tr v-if="settings.gameTime.gameType === 'turnBased'">
+              <td>Max Turn Wait</td>
+              <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
             </tr>
           </tbody>
         </table>
@@ -307,7 +319,9 @@ export default {
         'disabled': 'Disabled',
         'enabled': 'Enabled',
         'start': 'Start Only',
-        'scanned': 'Scanned Only'
+        'scanned': 'Scanned Only',
+        'realTime': 'Real Time',
+        'turnBased': 'Turn Based'
       }[option]
 
       return text || option

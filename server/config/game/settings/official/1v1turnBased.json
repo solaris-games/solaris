@@ -1,10 +1,10 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "Standard 4 Player",
+    "description": "1 vs. 1 - Turn Based",
     "password": null,
-    "starVictoryPercentage": 50,
-    "playerLimit": 4,
+    "starVictoryPercentage": 75,
+    "playerLimit": 2,
     "playerType": "all"
   },
   "specialGalaxy": {
@@ -12,17 +12,17 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
-    "darkGalaxy": "start",
-    "giftCarriers": "enabled",
+    "darkGalaxy": "disabled",
+    "giftCarriers": "disabled",
     "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled"
   },
   "galaxy": {
-    "starsPerPlayer": 20,
+    "starsPerPlayer": 10,
     "productionTicks": 24
   },
   "player": {
-    "startingStars": 6,
+    "startingStars": 3,
     "startingCredits": 500,
     "startingShips": 10,
     "startingInfrastructure": {
@@ -59,8 +59,8 @@
     }
   },
   "gameTime": {
-    "gameType": "realTime",
-    "speed": 30,
-    "startDelay": 30
+    "gameType": "turnBased",
+    "tickJumps": 6,
+    "maxTurnWait": 12
   }
 }

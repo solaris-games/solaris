@@ -14,7 +14,7 @@
     "randomGates": "none",
     "darkGalaxy": "disabled",
     "giftCarriers": "disabled",
-    "defenderBonus": "enabled",
+    "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled"
   },
   "galaxy": {
@@ -59,6 +59,7 @@
     }
   },
   "gameTime": {
+    "gameType": "realTime",
     "speed": 30,
     "startDelay": 10
   }
