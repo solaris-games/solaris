@@ -71,7 +71,7 @@ const schema = new Schema({
 			}
 		},
 		gameTime: {
-			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased' ], default: 'realTime' },
+			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
 			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 10 },
 			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
@@ -126,6 +126,9 @@ const schema = new Schema({
 				veryExpensive: { type: Types.Number, required: true, default: 8 },
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
 			}
+		},
+		turnBased: {
+			playerMissedTurnLimit: { type: Types.Number, required: true, default: 3 },
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }]

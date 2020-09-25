@@ -19,6 +19,7 @@ const schema = new Schema({
     afk: { type: Types.Boolean, required: false, default: false },
     renownToGive: { type: Types.Number, required: true, default: 8 },
     ready: { type: Types.Boolean, required: false, default: false },
+    missedTurns: { type: Types.Number, required: false, default: 0 },
     research: {
         // TODO: This would be arguably better if it was just progress points and remove level
         // and then we can calculate the level before sending it to the client.

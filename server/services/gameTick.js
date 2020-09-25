@@ -71,20 +71,32 @@ module.exports = class GameTickService extends EventEmitter {
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
-        await this._combatCarriers(game, report);
-        logTime('Combat carriers');
-        await this._moveCarriers(game, report);
-        logTime('Move carriers and produce ships');
-        await this.researchService.conductResearchAll(game, report);
-        logTime('Conduct research');
-        this._endOfGalacticCycleCheck(game, report);
-        logTime('Galactic cycle check');
-        this._logHistory(game, report);
-        logTime('Log history');
-        await this._gameLoseCheck(game, report);
-        logTime('Game lose check');
-        await this._gameWinCheck(game, report);
-        logTime('Game win check');
+        let iterations = 1;
+
+        // If we are in turn based mode, we need to repeat the tick X number of times.
+        if (this.gameService.isTurnBasedGame(game)) {
+            iterations = game.settings.gameTime.turnJumps;
+        }
+
+        do {
+            logTime(`Tick ${game.state.tick}`);
+            await this._combatCarriers(game, report);
+            logTime('Combat carriers');
+            await this._moveCarriers(game, report);
+            logTime('Move carriers and produce ships');
+            await this.researchService.conductResearchAll(game, report);
+            logTime('Conduct research');
+            this._endOfGalacticCycleCheck(game, report);
+            logTime('Galactic cycle check');
+            this._logHistory(game, report);
+            logTime('Log history');
+            await this._gameLoseCheck(game, report);
+            logTime('Game lose check');
+            await this._gameWinCheck(game, report);
+            logTime('Game win check');
+        } while (iterations--);
+
+        this._resetPlayersReadyStatus(game, report);
 
         await game.save();
         logTime('Save game');
@@ -98,18 +110,30 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _canTick(game) {
-        let mins = game.settings.gameTime.speed;
         let lastTick = moment(game.state.lastTickDate).utc();
-        let nextTick = moment(lastTick).utc().add(mins, 'm');
+        let nextTick;
 
+        if (this.gameService.isRealTimeGame(game)) {
+            // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+        } else if (this.gameService.isTurnBasedGame(game)) {
+            // If in turn based mode, then check if all undefeated players are ready.
+            // OR the max time wait limit has been reached.
+            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game);
+            
+            if (isAllPlayersReady) {
+                return true;
+            }
+
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+        } else {
+            throw new Error(`Unsupported game type.`);
+        }
+    
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
     async _combatCarriers(game, report) {
-        // TODO: Double check if there is a problem where carriers can jump over carriers
-        // when launching initially. May need to figure out how to perform combat
-        // for a carrier as it launches.
-
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
         }
@@ -577,7 +601,7 @@ module.exports = class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                // TODO: Defeated players do not conduct research or experiments?
+                // Defeated players do not conduct research or experiments?
                 if (player.defeated) {
                     continue;
                 }
@@ -631,8 +655,22 @@ module.exports = class GameTickService extends EventEmitter {
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            // Check if the player has been AFK for over 48 hours.
-            let isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+            // If in turn based mode, then check if the player wasn't ready when the game ticked
+            // if so increase their number of missed turns.
+            if (this.gameService.isTurnBasedGame(game) && !player.ready) {
+                player.missedTurns++;
+            }
+
+            // Check if the player has been AFK.
+            // If in real time mode, check if the player has not been seen for over 48 hours.
+            // OR if in turn based mode, check if the player has reached the maximum missed turn limit.
+            let isAfk = false;
+
+            if (this.gameService.isRealTimeGame(game)) {
+                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+            } else if (this.gameService.isTurnBasedGame(game)) {
+                isAfk = player.missedTurns > game.constants.turnBased.playerMissedTurnLimit;
+            }
 
             if (isAfk) {
                 player.defeated = true;
@@ -689,6 +727,12 @@ module.exports = class GameTickService extends EventEmitter {
             this.emit('onGameEnded', {
                 game
             });
+        }
+    }
+
+    _resetPlayersReadyStatus(game, report) {
+        for (let player of game.galaxy.players) {
+            player.ready = false;
         }
     }
 
@@ -779,6 +823,7 @@ module.exports = class GameTickService extends EventEmitter {
                 _id: player._id,
                 defeated: player.defeated,
                 afk: player.afk,
+                ready: false,
                 stats: this.playerService.getStats(game, player),
                 effectiveTechs
             });

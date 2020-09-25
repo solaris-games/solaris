@@ -301,4 +301,18 @@ module.exports = class GameService extends EventEmitter {
         game.state.winner = winnerPlayer._id;
     }
 
+    isRealTimeGame(game) {
+        return game.settings.gameTime.gameType === 'realTime';
+    }
+
+    isTurnBasedGame(game) {
+        return game.settings.gameTime.gameType === 'turnBased';
+    }
+
+    isAllUndefeatedPlayersReady(game) {
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+
+        return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+    }
+
 };
