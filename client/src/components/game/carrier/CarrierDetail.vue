@@ -215,16 +215,11 @@ export default {
     },
     recalculateTimeRemaining () {
       if (this.carrier.ticksEta) {
-        let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta,
-          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-        this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+        this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta)
       }
 
       if (this.carrier.ticksEtaTotal) {
-        let timeRemainingEtaTotalDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEtaTotal,
-          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-        this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaTotalDate)
+        this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal)
       }
     }
   },

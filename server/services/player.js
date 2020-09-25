@@ -341,4 +341,10 @@ module.exports = class PlayerService {
         };
     }
 
+    async declareReady(game, player) {
+        player.ready = true;
+
+        await game.save();
+    }
+
 }

@@ -279,6 +279,7 @@ module.exports = class GameGalaxyService {
                 isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
                 afk: p.afk,
+                ready: p.ready,
                 _id: p._id,
                 alias: p.alias,
                 avatar: p.avatar,

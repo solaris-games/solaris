@@ -94,6 +94,7 @@ import ResearchProgressVue from './ResearchProgress'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -181,15 +182,9 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
-        let currentTick = this.$store.state.game.state.tick
-        let currentProductionTick = this.$store.state.game.state.productionTick
+        let ticksToProduction = gameHelper.getTicksToProduction(this.$store.state.game)
 
-        let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
-        let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction,
-          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-        this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
+        this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }
     },
     gameIsPaused () {

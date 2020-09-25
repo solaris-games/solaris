@@ -144,10 +144,7 @@ export default {
       let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier,
         this.carrier.waypoints[this.carrier.waypoints.length - 1])
 
-      let totalEtaTime = GameHelper.calculateTimeByTicks(totalTicksEta,
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-      this.totalEtaTimeString = GameHelper.getCountdownTimeString(this.$store.state.game, totalEtaTime.toDate())
+      this.totalEtaTimeString = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicksEta)
     },
     recalculateLooped () {
       if (this.carrier.waypointsLooped) {

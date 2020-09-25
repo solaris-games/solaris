@@ -46,10 +46,7 @@ export default {
       gameContainer.map.panToLocation(this.carrier.location)
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta,
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta)
 
       // TODO: Get total time of carrier eta
       // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, this.carrier.ticksEtaTotal)

@@ -101,6 +101,16 @@ class GameHelper {
     return totalTicks
   }
 
+  getTicksToProduction (game) {
+    let productionTicks = game.settings.galaxy.productionTicks
+    let currentTick = game.state.tick
+    let currentProductionTick = game.state.productionTick
+
+    let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
+
+    return ticksToProduction;
+  }
+
   getCountdownTimeString (game, date) {
     if (date == null) {
       return 'Unknown'
@@ -110,6 +120,20 @@ class GameHelper {
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
     return this.getDateToString(t)
+  }
+
+  getCountdownTimeStringByTicks (game, ticks, useNowDate = false) {
+    if (game.settings.gameTime.gameType === 'realTime') {
+      let date = useNowDate ? moment().utc() : game.state.lastTickDate
+
+      let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
+  
+      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate)
+  
+      return timeRemainingEta
+    }
+
+    return `${ticks} ticks`
   }
 
   getDateToString (date) {

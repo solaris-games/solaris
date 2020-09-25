@@ -139,8 +139,10 @@ module.exports = class GameService extends EventEmitter {
         if (gameIsFull) {
             let start = moment().utc();
 
-            // Add the start delay to the start date.
-            start.add(game.settings.gameTime.startDelay, 'minute');
+            if (this.isRealTimeGame(game)) {
+                // Add the start delay to the start date.
+                start.add(game.settings.gameTime.startDelay, 'minute');
+            }
 
             game.state.paused = false;
             game.state.startDate = start;

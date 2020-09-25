@@ -119,10 +119,7 @@ export default {
       this.loadingNext = false
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.player.currentResearchTicksEta,
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.player.currentResearchTicksEta)
     }
   }
 }

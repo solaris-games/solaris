@@ -137,6 +137,18 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.declareReady(
+                req.game,
+                req.player);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         try {
             await container.gameService.delete(

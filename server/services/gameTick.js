@@ -78,7 +78,7 @@ module.exports = class GameTickService extends EventEmitter {
             iterations = game.settings.gameTime.turnJumps;
         }
 
-        do {
+        while (iterations--) {
             logTime(`Tick ${game.state.tick}`);
             await this._combatCarriers(game, report);
             logTime('Combat carriers');
@@ -94,7 +94,7 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Game lose check');
             await this._gameWinCheck(game, report);
             logTime('Game win check');
-        } while (iterations--);
+        }
 
         this._resetPlayersReadyStatus(game, report);
 

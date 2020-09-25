@@ -127,11 +127,8 @@ export default {
       let totalTicks = GameHelper.getTicksBetweenLocations(game, null, this.points)
       let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, this.points, game.constants.distances.warpSpeedMultiplier)
 
-      let totalTime = GameHelper.calculateTimeByTicks(totalTicks, game.settings.gameTime.speed, moment().utc())
-      let totalTimeString = GameHelper.getCountdownTimeString(game, totalTime)
-
-      let totalTimeWarp = GameHelper.calculateTimeByTicks(totalTicksWarp, game.settings.gameTime.speed, moment().utc())
-      let totalTimeWarpString = GameHelper.getCountdownTimeString(game, totalTimeWarp)
+      let totalTimeString = GameHelper.getCountdownTimeStringByTicks(game, totalTicks, true)
+      let totalTimeWarpString = GameHelper.getCountdownTimeStringByTicks(game, totalTicksWarp, true)
 
       this.totalEta = totalTimeString
       this.totalEtaWarp = totalTimeWarpString

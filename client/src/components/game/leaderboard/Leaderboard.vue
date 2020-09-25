@@ -44,8 +44,8 @@
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1">
-                          <button class="btn btn-success" v-if="isUserPlayer(player)" @click="confirmReady()" title="End your turn"><i class="fas fa-check"></i></button>
+                      <td class="fit pt-2 pb-2 pr-1" v-if="isTurnBasedGame()">
+                          <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -127,6 +127,9 @@ export default {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
+    isTurnBasedGame () {
+      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
     isUserPlayer (player) {
       let userPlayer = this.getUserPlayer()
 
@@ -158,7 +161,7 @@ export default {
         console.error(err)
       }
     },
-    async confirmReady () {
+    async confirmReady (player) {
       if (!confirm('Are you sure you want to end your turn?')) {
         return
       }
@@ -168,6 +171,8 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
+
+          player.ready = true
         }
       } catch (err) {
         console.error(err)

@@ -214,19 +214,19 @@
               <td>Game Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.gameTime.gameType) }}</td>
             </tr>
-            <tr v-if="settings.gameTime.gameType === 'realTime'">
+            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Game Time</td>
               <td class="text-right">{{ game.settings.gameTime.speed }} minute(s)/tick</td>
             </tr>
-            <tr v-if="settings.gameTime.gameType === 'realTime'">
+            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Start Delay</td>
               <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
             </tr>
-            <tr v-if="settings.gameTime.gameType === 'turnBased'">
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Turn Jumps</td>
               <td class="text-right">{{ game.settings.gameTime.turnJumps }} tick jumps</td>
             </tr>
-            <tr v-if="settings.gameTime.gameType === 'turnBased'">
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Max Turn Wait</td>
               <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
             </tr>
