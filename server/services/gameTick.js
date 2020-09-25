@@ -92,8 +92,12 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Log history');
             await this._gameLoseCheck(game, report);
             logTime('Game lose check');
-            await this._gameWinCheck(game, report);
+            let hasWinner = await this._gameWinCheck(game, report);
             logTime('Game win check');
+
+            if (hasWinner) {
+                break;
+            }
         }
 
         this._resetPlayersReadyStatus(game, report);
@@ -729,6 +733,8 @@ module.exports = class GameTickService extends EventEmitter {
                 game
             });
         }
+
+        return winner != null;
     }
 
     _resetPlayersReadyStatus(game, report) {
