@@ -35,12 +35,17 @@
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
-                          <h5>{{player.alias}}
+                          <h5>
+                            <i v-if="player.ready" class="fas fa-check text-success" title="This player is ready."></i>
+                            {{player.alias}}
                             <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
+                      </td>
+                      <td class="fit pt-2 pb-2 pr-1">
+                          <button class="btn btn-success" v-if="isUserPlayer(player)" @click="confirmReady()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -122,6 +127,11 @@ export default {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
+    isUserPlayer (player) {
+      let userPlayer = this.getUserPlayer()
+
+      return userPlayer && userPlayer._id === player._id
+    },
     async concedeDefeat () {
       try {
         let response = await gameService.concedeDefeat(this.$store.state.game._id)
@@ -143,6 +153,21 @@ export default {
           AudioService.quit()
           this.$toasted.show(`You have quit ${this.$store.state.game.settings.general.name}.`, { type: 'error' })
           router.push({ name: 'main-menu' })
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmReady () {
+      if (!confirm('Are you sure you want to end your turn?')) {
+        return
+      }
+      
+      try {
+        let response = await gameService.confirmReady(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
         }
       } catch (err) {
         console.error(err)
