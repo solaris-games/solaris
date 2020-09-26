@@ -108,7 +108,10 @@ export default new Vuex.Store({
         star.infrastructure = reportStar.infrastructure
         star.naturalResources = reportStar.naturalResources
         star.terraformedResources = reportStar.terraformedResources
+      }
 
+      // Reload all stars as they may have had changes, i.e carriers may have launched etc.
+      for (let star of state.game.galaxy.stars) {
         GameContainer.reloadStar(star)
       }
 
