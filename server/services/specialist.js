@@ -21,10 +21,18 @@ module.exports = class SpecialistService {
     }
 
     getByIdCarrier(id) {
+        if (!id) {
+            return null;
+        }
+
         return this.getById(id, TYPES.CARRIER);
     }
 
     getByIdStar(id) {
+        if (!id) {
+            return null;
+        }
+        
         return this.getById(id, TYPES.STAR);
     }
 

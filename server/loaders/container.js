@@ -62,7 +62,7 @@ module.exports = (io) => {
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
     const carrierService = new CarrierService(distanceService, starService, technologyService, specialistService);
-    const combatService = new CombatService(technologyService);
+    const combatService = new CombatService(technologyService, specialistService);
     const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.

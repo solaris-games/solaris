@@ -220,6 +220,8 @@ module.exports = class GameTickService extends EventEmitter {
                 return;
             }
 
+            // TODO: Check for specialists that affect pre-combat.
+
             await this._performCombat(game, friendlyPlayer, null, combatCarriers, report);
         }
     }

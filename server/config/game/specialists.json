@@ -98,6 +98,17 @@
                     "hideCarrierShips": true
                 }
             }
+        },
+        {
+            "id": 9,
+            "name": "Infiltrator",
+            "description": "When participating in combat, the enemy fights with -1 Weapons.",
+            "tier": 3,
+            "modifiers": {
+                "special": {
+                    "deductEnemyWeapons": 1
+                }
+            }
         }
     ],
     "star": [
