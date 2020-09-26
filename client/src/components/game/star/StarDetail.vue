@@ -257,6 +257,7 @@ export default {
 
           // this.$emit('onCarrierBuilt', this.star._id)
           // this.onOpenCarrierDetailRequested(response.data)
+          this.$store.state.game.galaxy.carriers.push(response.data)
           this.onEditWaypointsRequested(response.data)
           this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
