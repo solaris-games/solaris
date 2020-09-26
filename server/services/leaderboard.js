@@ -93,6 +93,8 @@ module.exports = class LeaderboardService {
                 user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
             }
 
+            user.achievements.rank = Math.round(user.achievements.rank);
+
             // If the player hasn't been defeated then add completed stats.
             if (!player.defeated) {
                 user.achievements.completed++;
