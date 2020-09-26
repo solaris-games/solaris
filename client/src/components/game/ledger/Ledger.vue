@@ -116,7 +116,7 @@ export default {
           let response = await LedgerApiService.settleDebt(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
-            this.$toasted.show(`You have paid off the debt you owe to ${playerAlias}.`, { type: 'success' })
+            this.$toasted.show(`You have paid off debt that you owe to ${playerAlias}.`, { type: 'success' })
           }
 
           this.userPlayer.credits -= Math.abs(ledger.debt)
