@@ -38,6 +38,7 @@ const LedgerService = require('../services/ledger');
 const SpecialistService = require('../services/specialist');
 
 const CircularMapService = require('../services/maps/circular');
+const SpiralMapService = require('../services/maps/spiral');
 
 const config = require('../config');
 const gameNames = require('../config/game/gameNames');
@@ -63,7 +64,8 @@ module.exports = (io) => {
     const carrierService = new CarrierService(distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService, specialistService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
-    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
+    const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService);
+    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const ledgerService = new LedgerService(playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);

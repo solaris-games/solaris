@@ -51,8 +51,8 @@
       <div class="form-group">
         <label for="galaxyType" class="col-form-label">Galaxy Type</label>
         <select class="form-control" id="galaxyType" v-model="settings.general.galaxyType" :disabled="isCreatingGame">
-          <option v-for="opt in options.general.galaxyType" v-bind:key="opt" v-bind:value="opt">
-            {{ opt }}
+          <option v-for="opt in options.general.galaxyType" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
           </option>
         </select>
       </div>

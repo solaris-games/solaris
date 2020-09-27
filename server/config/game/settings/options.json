@@ -39,6 +39,10 @@
             {
             "value": "circular",
             "text": "Circular"
+            },
+            {
+            "value": "spiral",
+            "text": "Spiral"
             }
         ]
         },

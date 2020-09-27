@@ -1,12 +1,15 @@
+const ValidationError = require("../errors/validation");
+
 module.exports = class MapService {
 
     constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService) {
+        circularMapService, spiralMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.nameService = nameService;
         this.circularMapService = circularMapService;
+        this.spiralMapService = spiralMapService;
     }
 
     generateStars(game, starCount, playerLimit, warpGatesSetting) {
@@ -22,8 +25,11 @@ module.exports = class MapService {
             case 'circular': 
                 starLocations = this.circularMapService.generateLocations(game, starCount);
                 break;
+            case 'spiral': 
+                starLocations = this.spiralMapService.generateLocations(game, starCount);
+                break;
             default:
-                throw new Error(`Galaxy type ${game.settings.general.galaxyType} is not supported.`);
+                throw new ValidationError(`Galaxy type ${game.settings.general.galaxyType} is not supported or has been disabled.`);
         }
 
         // Work out how large the radius of the circle used to determine natural resources.

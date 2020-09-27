@@ -270,11 +270,15 @@ class Map extends EventEmitter {
   }
   
   drawTerritories () {
-    this.territories.draw()
+    if (this.territories) {
+      this.territories.draw()
+    }
   }
 
   clearTerritories () {
-    this.territories.clear()
+    if (this.territories) {
+      this.territories.clear()
+    }
   }
 
   panToPlayer (game, player) {
