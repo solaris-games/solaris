@@ -37,7 +37,6 @@ const HistoryService = require('../services/history');
 const LedgerService = require('../services/ledger');
 const SpecialistService = require('../services/specialist');
 
-const StandardMapService = require('../services/maps/standard');
 const CircularMapService = require('../services/maps/circular');
 
 const config = require('../config');
@@ -63,9 +62,7 @@ module.exports = (io) => {
     const starService = new StarService(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
     const carrierService = new CarrierService(distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService, specialistService);
-    const standardMapService = new StandardMapService(randomService, starService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
-    // const mapService = new MapService(randomService, starService, starDistanceService, nameService, standardMapService); // TODO: Needs to be refactored to get the required service from a game setting.
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService);
     const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const ledgerService = new LedgerService(playerService);

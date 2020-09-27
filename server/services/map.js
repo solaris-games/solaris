@@ -1,11 +1,12 @@
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, nameService, starMapService) {
+    constructor(randomService, starService, starDistanceService, nameService, 
+        circularMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.nameService = nameService;
-        this.starMapService = starMapService;
+        this.circularMapService = circularMapService;
     }
 
     generateStars(game, starCount, playerLimit, warpGatesSetting) {
@@ -15,7 +16,15 @@ module.exports = class MapService {
         const starNames = this.nameService.getRandomStarNames(starCount);
 
         // Generate all of the locations for stars.
-        const starLocations = this.starMapService.generateLocations(game, starCount);
+        let starLocations = [];
+
+        switch (game.settings.general.galaxyType) {
+            case 'circular': 
+                starLocations = this.circularMapService.generateLocations(game, starCount);
+                break;
+            default:
+                throw new Error(`Galaxy type ${game.settings.general.galaxyType} is not supported.`);
+        }
 
         // Work out how large the radius of the circle used to determine natural resources.
         // The closer to the center of the galaxy, the more likely to find stars with higher resources.
