@@ -34,6 +34,12 @@
             "value": "premium",
             "text": "Premium Players Only"
             }
+        ],
+        "galaxyType": [
+            {
+            "value": "circular",
+            "text": "Circular"
+            }
         ]
         },
         "specialGalaxy": {

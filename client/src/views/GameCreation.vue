@@ -48,6 +48,15 @@
         </select>
       </div> -->
 
+      <div class="form-group">
+        <label for="galaxyType" class="col-form-label">Galaxy Type</label>
+        <select class="form-control" id="galaxyType" v-model="settings.general.galaxyType" :disabled="isCreatingGame">
+          <option v-for="opt in options.general.galaxyType" v-bind:key="opt" v-bind:value="opt">
+            {{ opt }}
+          </option>
+        </select>
+      </div>
+
       <form-error-list v-bind:errors="errors"/>
 
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>

@@ -30,6 +30,10 @@
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
             </tr> -->
+            <tr>
+              <td>Galaxy Type</td>
+              <td class="text-right">{{ game.settings.general.galaxyType }}</td>
+            </tr>
           </tbody>
         </table>
       </div>

@@ -5,7 +5,8 @@
     "password": null,
     "starVictoryPercentage": 75,
     "playerLimit": 2,
-    "playerType": "all"
+    "playerType": "all",
+    "galaxyType": "circular"
   },
   "specialGalaxy": {
     "carrierCost": "standard",
