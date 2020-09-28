@@ -12,6 +12,12 @@ module.exports = class StarDistanceService {
         return this.getClosestStars(star, stars, 1)[0];
     }
 
+    getDistanceToClosestStar(star, stars) {
+        let closest = this.getClosestStar(star, stars);
+
+        return this.distanceService.getDistanceBetweenLocations(star.location, closest.location);
+    }
+
     getClosestStars(star, stars, amount) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.

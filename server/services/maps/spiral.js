@@ -10,11 +10,12 @@ module.exports = class SpiralMapService {
     }
 
     generateLocations(game, count) {
-        const locations = this.generateSpiral(count);
+        let locations = this.generateSpiral(count);
 
         this.doWhateverTheFuckThisIs(locations);
         this.applyNoise(locations);
-        this.scaleUp(locations);
+
+        locations = this.scaleUp(game, locations);
 
         return locations;
     }
@@ -125,40 +126,63 @@ module.exports = class SpiralMapService {
         }
     }
 
-    scaleUp(locations) {
-        // TODO: Figure out how to sensibly scale the galaxy based
-        // on number of players and star count?
-        // TODO: Need to make sure that the scaled up galaxy is within
-        // bounds of the min and max star distances.
-        const C_HEIGHT = 1500
-        const C_WIDTH = 1500
+    scaleUp(game, locations) {
+        // Start out at the minimum possible galaxy size and increment up
+        // in steps until ALL stars are at least minimum distance away from others.
+        let C_HEIGHT = game.constants.distances.minDistanceBetweenStars;
+        let C_WIDTH = game.constants.distances.minDistanceBetweenStars;
+        let C_STEP = game.constants.distances.minDistanceBetweenStars;
+        
+        let isValidGalaxy = false;
 
-        let galaxy = this.getGalaxyMinMax(locations);
+        let locs;
 
-        let x_init = galaxy.x_min
-        let y_init = galaxy.y_min
+        do {
+            locs = JSON.parse(JSON.stringify(locations)); // Copy the locations so we can do it in isolation.
 
-        let x_delta = galaxy.x_max - galaxy.x_min
-        let y_delta = galaxy.y_max - galaxy.y_min
+            let galaxy = this.getGalaxyMinMax(locs);
 
-        let scale = 0;
+            let x_init = galaxy.x_min
+            let y_init = galaxy.y_min
 
-        if (x_delta < y_delta) {
-            scale =  C_HEIGHT  / y_delta 
-        } else {
-            scale = C_WIDTH / x_delta 
-        }
+            let x_delta = galaxy.x_max - galaxy.x_min
+            let y_delta = galaxy.y_max - galaxy.y_min
 
-        for (let i = 0; i < locations.length; i++) {
-            let location = locations[i];
-            let size = 10;
+            let scale = 0;
 
-            let x_center = (location.x - x_init) * scale - size / 2
-            let y_center = (location.y - y_init) * scale - size / 2
-            
-            location.x = x_center;
-            location.y = y_center;
-        }
+            if (x_delta < y_delta) {
+                scale =  C_HEIGHT  / y_delta 
+            } else {
+                scale = C_WIDTH / x_delta 
+            }
+
+            for (let i = 0; i < locs.length; i++) {
+                let location = locs[i];
+                let size = 10; // TODO: What should we set this to?
+
+                let x_center = (location.x - x_init) * scale - size / 2
+                let y_center = (location.y - y_init) * scale - size / 2
+                
+                location.x = x_center;
+                location.y = y_center;
+            }
+
+            C_WIDTH += C_STEP;
+            C_HEIGHT += C_STEP;
+
+            isValidGalaxy = this.isValidGalaxyCheck(game, locs);
+        } while (!isValidGalaxy);
+
+        return locs;
+    }
+
+    isValidGalaxyCheck(game, locations) {
+        // If the average distance to closest star is greater than the minimum distance allowed then the galaxy is valid.
+        let average = 
+            locations.reduce((sum, l) => sum + this.distanceService.getDistanceToClosestLocation(l, locations), 0) 
+                / locations.length;
+
+        return average >= game.constants.distances.minDistanceBetweenStars;
     }
 
     getGalaxyMinMax(locations) {
