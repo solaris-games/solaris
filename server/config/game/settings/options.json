@@ -43,6 +43,10 @@
             {
             "value": "spiral",
             "text": "Spiral"
+            },
+            {
+            "value": "doughnut",
+            "text": "Doughnut"
             }
         ]
         },

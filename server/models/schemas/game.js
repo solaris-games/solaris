@@ -18,7 +18,7 @@ const schema = new Schema({
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 16 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
-			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral'], default: 'circular' }
+			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut'], default: 'circular' }
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
