@@ -10,9 +10,13 @@ module.exports = class SpiralMapService {
     }
 
     generateLocations(game, count) {
-        let locations = this.generateSpiral(count, game.settings.general.playerLimit);
+        let branchCount = Math.max(4, game.settings.general.playerLimit);
+        let locations = this.generateSpiral(count, branchCount);
 
-        this.applyQuadraticStretch(locations);
+        // TODO: Temporarily removed this as it screws with player positioning.
+        // This service should be responsible for plotting where player home stars are as
+        // the current logic doesn't really work well when galaxies are stretched.
+        //this.applyQuadraticStretch(locations);
         this.setResources(game, locations);
         this.applyNoise(locations);
 
@@ -127,24 +131,35 @@ module.exports = class SpiralMapService {
     }
 
     setResources(game, locations) {
+        // TODO: Weighted resources?
+        // let RMIN = game.constants.star.resources.minNaturalResources;
+        // let RRANGE = game.constants.star.resources.maxNaturalResources - RMIN;
+        // let RADIUS = 3;
+
+        // let BASE = 2;
+        // let EXP = 2;
+        // let EXP2 = 2;
+
+        // for (let i = 0; i < locations.length; i++){
+        //     let location = locations[i];
+
+        //     let x_init = location.x;
+        //     let y_init = location.y;
+
+        //     let vector = Math.hypot(x_init, y_init);
+        //     let vectorScale = (RADIUS - vector) / RADIUS;
+
+        //     let r = (RMIN + (RRANGE * Math.pow(BASE, EXP * Math.pow(vectorScale, EXP2)))) / RADIUS;
+
+        //     location.resources = Math.floor(r);
+        // }
+
+        // Allocate random resources.
         let RMIN = game.constants.star.resources.minNaturalResources;
-        let RRANGE = game.constants.star.resources.maxNaturalResources - RMIN;
-        let RADIUS = 3;
+        let RMAX = game.constants.star.resources.maxNaturalResources;
 
-        let BASE = 2;
-        let EXP = -2;
-        let EXP2 = 2;
-
-        for (let i = 0; i < locations.length; i++){
-            let location = locations[i];
-
-            let x_init = location.x;
-            let y_init = location.y;
-
-            let vector = Math.hypot(x_init, y_init);
-            let vectorScale = (RADIUS - vector) / RADIUS;
-
-            let r = RMIN + (RRANGE * Math.pow(BASE, EXP * Math.pow(vectorScale, EXP2)));
+        for (let location of locations) {
+            let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
 
             location.resources = Math.floor(r);
         }

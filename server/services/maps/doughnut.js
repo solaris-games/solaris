@@ -55,6 +55,7 @@ module.exports = class DoughnutMapService {
     }
 
     setResources(game, locations) {
+        // Allocate random resources.
         let RMIN = game.constants.star.resources.minNaturalResources;
         let RMAX = game.constants.star.resources.maxNaturalResources;
 

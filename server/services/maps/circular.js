@@ -45,15 +45,26 @@ module.exports = class CircularMapService {
     }
 
     setResources(game, locations) {
-        // Work out how large the radius of the circle used to determine natural resources.
-        // The closer to the center of the galaxy, the more likely to find stars with higher resources.
-        const resourceRadius = this.getGalaxyDiameter(locations).x / 3;
+        // TODO: Weighted resources?
+        // // Work out how large the radius of the circle used to determine natural resources.
+        // // The closer to the center of the galaxy, the more likely to find stars with higher resources.
+        // const resourceRadius = this.getGalaxyDiameter(locations).x / 3;
         
-        for (let location of locations) {
-            let resources = this.randomService.generateStarNaturalResources(resourceRadius, location.x, location.y, 
-                game.constants.star.resources.minNaturalResources, game.constants.star.resources.maxNaturalResources, true);
+        // for (let location of locations) {
+        //     let resources = this.randomService.generateStarNaturalResources(resourceRadius, location.x, location.y, 
+        //         game.constants.star.resources.minNaturalResources, game.constants.star.resources.maxNaturalResources, true);
             
-            location.resources = resources;
+        //     location.resources = resources;
+        // }
+        
+        // Allocate random resources.
+        let RMIN = game.constants.star.resources.minNaturalResources;
+        let RMAX = game.constants.star.resources.maxNaturalResources;
+
+        for (let location of locations) {
+            let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
+
+            location.resources = Math.floor(r);
         }
     }
 
