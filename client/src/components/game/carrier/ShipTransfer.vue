@@ -141,15 +141,21 @@ export default {
       try {
         this.isTransferringShips = true
 
+        let cShips = parseInt(this.carrierShips)
+        let sShips = parseInt(this.starShips)
+
         let response = await CarrierApiService.transferShips(
           this.$store.state.game._id,
           this.carrier._id,
-          parseInt(this.carrierShips),
+          cShips,
           this.star._id,
-          parseInt(this.starShips))
+          sShips)
 
         if (response.status === 200) {
           this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
+
+          this.star.garrison = sShips
+          this.carrier.ships = cShips
 
           // Note: The web socket event handles setting the carrier and star ships.
           this.$emit('onShipsTransferred', this.carrier._id)
