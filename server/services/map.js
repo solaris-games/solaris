@@ -32,13 +32,16 @@ module.exports = class MapService {
                 throw new ValidationError(`Galaxy type ${game.settings.general.galaxyType} is not supported or has been disabled.`);
         }
 
-        // Work out how large the radius of the circle used to determine natural resources.
-        // The closer to the center of the galaxy, the more likely to find stars with higher resources.
-        const resourceRadius = this.getGalaxyDiameter(starLocations).x / 3;
-
         // Iterate over all star locations
         for (let i = 0; i < starLocations.length; i++) {
-            const star = this.starService.generateUnownedStar(game, starNames[i], starLocations[i], resourceRadius);
+            let starLocation = starLocations[i];
+
+            let loc = {
+                x: starLocation.x,
+                y: starLocation.y
+            };
+
+            const star = this.starService.generateUnownedStar(game, starNames[i], loc, starLocation.resources);
 
             stars.push(star);
         }

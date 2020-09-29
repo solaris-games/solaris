@@ -16,10 +16,7 @@ module.exports = class StarService extends EventEmitter {
         this.userService = userService;
     }
 
-    generateUnownedStar(game, name, location, galaxyRadius) {
-        let naturalResources = this.randomService.generateStarNaturalResources(galaxyRadius, location.x, location.y, 
-            game.constants.star.resources.minNaturalResources, game.constants.star.resources.maxNaturalResources, true);
-
+    generateUnownedStar(game, name, location, naturalResources) {
         return {
             _id: mongoose.Types.ObjectId(),
             name,

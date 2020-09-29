@@ -10,9 +10,10 @@ module.exports = class SpiralMapService {
     }
 
     generateLocations(game, count) {
-        let locations = this.generateSpiral(count);
+        let locations = this.generateSpiral(count, game.settings.general.playerLimit);
 
-        this.doWhateverTheFuckThisIs(locations);
+        this.applyQuadraticStretch(locations);
+        this.setResources(game, locations);
         this.applyNoise(locations);
 
         locations = this.scaleUp(game, locations);
@@ -20,10 +21,10 @@ module.exports = class SpiralMapService {
         return locations;
     }
 
-    generateSpiral(locationCount) {
+    generateSpiral(locationCount, branchCount) {
         const locations = [];
 
-        let BRANCHES = 8; // TODO: Number of players?
+        let BRANCHES = branchCount;
         let COPIES = 2;
 
         let DISTANCE_FACTOR = 0.15;
@@ -57,8 +58,7 @@ module.exports = class SpiralMapService {
         return locations;
     }
 
-    // TODO: Rename this.
-    doWhateverTheFuckThisIs(locations) {
+    applyQuadraticStretch(locations) {
         let RADIUS = 3
 
         let X_BASE = 2
@@ -126,6 +126,30 @@ module.exports = class SpiralMapService {
         }
     }
 
+    setResources(game, locations) {
+        let RMIN = game.constants.star.resources.minNaturalResources;
+        let RRANGE = game.constants.star.resources.maxNaturalResources - RMIN;
+        let RADIUS = 3;
+
+        let BASE = 2;
+        let EXP = -2;
+        let EXP2 = 2;
+
+        for (let i = 0; i < locations.length; i++){
+            let location = locations[i];
+
+            let x_init = location.x;
+            let y_init = location.y;
+
+            let vector = Math.hypot(x_init, y_init);
+            let vectorScale = (RADIUS - vector) / RADIUS;
+
+            let r = RMIN + (RRANGE * Math.pow(BASE, EXP * Math.pow(vectorScale, EXP2)));
+
+            location.resources = Math.floor(r);
+        }
+    }
+
     scaleUp(game, locations) {
         // Start out at the minimum possible galaxy size and increment up
         // in steps until ALL stars are at least minimum distance away from others.
@@ -158,7 +182,7 @@ module.exports = class SpiralMapService {
 
             for (let i = 0; i < locs.length; i++) {
                 let location = locs[i];
-                let size = 10; // TODO: What should we set this to?
+                let size = location.resources;
 
                 let x_center = (location.x - x_init) * scale - size / 2
                 let y_center = (location.y - y_init) * scale - size / 2
