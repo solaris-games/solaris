@@ -11,7 +11,15 @@ module.exports = class SpiralMapService {
     }
 
     generateLocations(game, count, resourceDistribution) {
-        let branchCount = Math.max(4, game.settings.general.playerLimit);
+        let branchCount = 4;
+
+        // Hard code branches for small games.
+        if (game.settings.general.playerLimit === 2) {
+            branchCount = 2;
+        } else if (game.settings.general.playerLimit === 3) {
+            branchCount = 3;
+        }
+
         let locations = this.generateSpiral(count, branchCount);
 
         // TODO: Temporarily removed this as it screws with player positioning.
@@ -20,6 +28,7 @@ module.exports = class SpiralMapService {
         //this.applyQuadraticStretch(locations);
         this.setResources(game, locations, resourceDistribution);
         this.applyNoise(locations);
+        this.applyPadding(locations);
 
         locations = this.scaleUp(game, locations);
 
@@ -180,6 +189,41 @@ module.exports = class SpiralMapService {
         }
     }
 
+    applyPadding(locations) {
+        let MIN_D = 0.2,
+            REPOS = 0.01,
+            MAX_REPOS = 0.1,
+            ITER = 5;
+
+        while (ITER--){
+            for (let i1 = 0; i1 < locations.length; i1++) {
+                let locationA = locations[i1];
+
+                for (let i2 = i1 + 1 ; i2 < locations.length; i2++) {
+                    let locationB = locations[i2];
+
+                    let dx = locationA.x - locationB.x;
+                    let dy = locationA.y - locationB.y;
+
+                    let distance = Math.hypot(dx, dy);
+
+                    if (distance < MIN_D) {
+                        let sin = dy / distance;
+                        let cos = dx / distance;
+
+                        let x_repos = cos * Math.min(MAX_REPOS, REPOS / distance);
+                        let y_repos = sin * Math.min(MAX_REPOS, REPOS / distance);
+
+                        locationA.x = locationA.x + x_repos;
+                        locationA.y = locationA.y + y_repos;
+                        locationB.x = locationB.x - x_repos;
+                        locationB.y = locationB.y - y_repos;
+                    }
+                }
+            }
+        }
+    }
+
     scaleUp(game, locations) {
         // Start out at the minimum possible galaxy size and increment up
         // in steps until ALL stars are at least minimum distance away from others.
@@ -236,7 +280,7 @@ module.exports = class SpiralMapService {
             locations.reduce((sum, l) => sum + this.distanceService.getDistanceToClosestLocation(l, locations), 0) 
                 / locations.length;
 
-        return average >= game.constants.distances.minDistanceBetweenStars;
+        return average >= game.constants.distances.minDistanceBetweenStars * 2;
     }
 
     getGalaxyMinMax(locations) {
