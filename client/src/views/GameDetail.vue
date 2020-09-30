@@ -329,7 +329,12 @@ export default {
         'start': 'Start Only',
         'scanned': 'Scanned Only',
         'realTime': 'Real Time',
-        'turnBased': 'Turn Based'
+        'turnBased': 'Turn Based',
+        'random': 'Random',
+        'weightedCenter': 'Weighted (Center)',
+        'circular': 'Circular',
+        'spiral': 'Spiral',
+        'doughnut': 'Doughnut'
       }[option]
 
       return text || option
