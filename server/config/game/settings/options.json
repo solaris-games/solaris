@@ -34,20 +34,6 @@
             "value": "premium",
             "text": "Premium Players Only"
             }
-        ],
-        "galaxyType": [
-            {
-            "value": "circular",
-            "text": "Circular"
-            },
-            {
-            "value": "spiral",
-            "text": "Spiral"
-            },
-            {
-            "value": "doughnut",
-            "text": "Doughnut"
-            }
         ]
         },
         "specialGalaxy": {
@@ -161,6 +147,20 @@
         ]
         },
         "galaxy": {
+        "galaxyType": [
+            {
+            "value": "circular",
+            "text": "Circular"
+            },
+            {
+            "value": "spiral",
+            "text": "Spiral"
+            },
+            {
+            "value": "doughnut",
+            "text": "Doughnut"
+            }
+        ],
         "starsPerPlayer": [
             {
             "value": 5,

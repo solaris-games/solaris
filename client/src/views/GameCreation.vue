@@ -48,15 +48,6 @@
         </select>
       </div> -->
 
-      <div class="form-group">
-        <label for="galaxyType" class="col-form-label">Galaxy Type</label>
-        <select class="form-control" id="galaxyType" v-model="settings.general.galaxyType" :disabled="isCreatingGame">
-          <option v-for="opt in options.general.galaxyType" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
       <form-error-list v-bind:errors="errors"/>
 
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>
@@ -64,6 +55,15 @@
       <loading-spinner :loading="isCreatingGame"/>
 
       <view-subtitle title="Galaxy Settings"/>
+
+      <div class="form-group">
+        <label for="galaxyType" class="col-form-label">Galaxy Type</label>
+        <select class="form-control" id="galaxyType" v-model="settings.galaxy.galaxyType" :disabled="isCreatingGame">
+          <option v-for="opt in options.galaxy.galaxyType" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
 
       <div class="form-group">
         <label for="starsPerPlayer" class="col-form-label">Stars per Player</label>

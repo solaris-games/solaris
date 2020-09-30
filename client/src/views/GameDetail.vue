@@ -30,10 +30,6 @@
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
             </tr> -->
-            <tr>
-              <td>Galaxy Type</td>
-              <td class="text-right">{{ game.settings.general.galaxyType }}</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -42,6 +38,10 @@
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
+            <tr>
+              <td>Galaxy Type</td>
+              <td class="text-right">{{ game.settings.galaxy.galaxyType }}</td>
+            </tr>
             <tr>
               <td>Stars Per Player</td>
               <td class="text-right">{{ game.settings.galaxy.starsPerPlayer }}</td>
