@@ -1,3 +1,5 @@
+const ValidationError = require("../../errors/validation");
+
 module.exports = class DoughnutMapService {
 
     constructor(randomService, starService, starDistanceService, distanceService) {
@@ -7,11 +9,12 @@ module.exports = class DoughnutMapService {
         this.distanceService = distanceService;
     }
 
-    generateLocations(game, count) {
+    generateLocations(game, count, resourceDistribution) {
         let locations = this.generateCircle(count);
 
-        this.setResources(game, locations);
+        this.setResources(game, locations, resourceDistribution);
         this.applyNoise(locations);
+        this.applyPadding(locations);
 
         locations = this.scaleUp(game, locations);
 
@@ -54,7 +57,46 @@ module.exports = class DoughnutMapService {
         }
     }
 
-    setResources(game, locations) {
+    applyPadding(locations) {
+        let MIN_D = 0.8,
+            REPOS = 0.01,
+            MAX_REPOS = 0.1,
+            ITER = 5;
+
+        while (ITER--){
+            for (let i1 = 0; i1 < locations.length; i1++) {
+                let locationA = locations[i1];
+
+                for (let i2 = i1 + 1 ; i2 < locations.length; i2++) {
+                    let locationB = locations[i2];
+
+                    let dx = locationA.x - locationB.x;
+                    let dy = locationA.y - locationB.y;
+
+                    let distance = Math.hypot(dx, dy);
+
+                    if (distance < MIN_D) {
+                        let sin = dy / distance;
+                        let cos = dx / distance;
+
+                        let x_repos = cos * Math.min(MAX_REPOS, REPOS / distance);
+                        let y_repos = sin * Math.min(MAX_REPOS, REPOS / distance);
+
+                        locationA.x = locationA.x + x_repos;
+                        locationA.y = locationA.y + y_repos;
+                        locationB.x = locationB.x - x_repos;
+                        locationB.y = locationB.y - y_repos;
+                    }
+                }
+            }
+        }
+    }
+
+    setResources(game, locations, resourceDistribution) {
+        if (resourceDistribution !== 'random') {
+            throw new ValidationError(`Doughnut Galaxies only support random resource distributions.`);
+        }
+
         // Allocate random resources.
         let RMIN = game.constants.star.resources.minNaturalResources;
         let RMAX = game.constants.star.resources.maxNaturalResources;

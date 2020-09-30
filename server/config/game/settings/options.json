@@ -34,20 +34,6 @@
             "value": "premium",
             "text": "Premium Players Only"
             }
-        ],
-        "galaxyType": [
-            {
-            "value": "circular",
-            "text": "Circular"
-            },
-            {
-            "value": "spiral",
-            "text": "Spiral"
-            },
-            {
-            "value": "doughnut",
-            "text": "Doughnut"
-            }
         ]
         },
         "specialGalaxy": {
@@ -158,9 +144,33 @@
                 "value": "enabled",
                 "text": "Enabled"
             }
+        ],
+        "resourceDistribution": [
+            {
+            "value": "random",
+            "text": "Random"
+            },
+            {
+            "value": "weightedCenter",
+            "text": "Weighted (Center)"
+            }
         ]
         },
         "galaxy": {
+        "galaxyType": [
+            {
+            "value": "circular",
+            "text": "Circular"
+            },
+            {
+            "value": "spiral",
+            "text": "Spiral"
+            },
+            {
+            "value": "doughnut",
+            "text": "Doughnut"
+            }
+        ],
         "starsPerPlayer": [
             {
             "value": 5,

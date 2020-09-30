@@ -30,10 +30,6 @@
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
             </tr> -->
-            <tr>
-              <td>Galaxy Type</td>
-              <td class="text-right">{{ game.settings.general.galaxyType }}</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -42,6 +38,10 @@
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
+            <tr>
+              <td>Galaxy Type</td>
+              <td class="text-right">{{ game.settings.galaxy.galaxyType }}</td>
+            </tr>
             <tr>
               <td>Stars Per Player</td>
               <td class="text-right">{{ game.settings.galaxy.starsPerPlayer }}</td>
@@ -89,6 +89,10 @@
             <tr>
               <td>Carrier-to-Carrier Combat</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
+            </tr>
+            <tr>
+              <td>Resource Distribution</td>
+              <td class="text-right">{{ game.settings.specialGalaxy.resourceDistribution }}</td>
             </tr>
           </tbody>
         </table>
@@ -325,7 +329,12 @@ export default {
         'start': 'Start Only',
         'scanned': 'Scanned Only',
         'realTime': 'Real Time',
-        'turnBased': 'Turn Based'
+        'turnBased': 'Turn Based',
+        'random': 'Random',
+        'weightedCenter': 'Weighted (Center)',
+        'circular': 'Circular',
+        'spiral': 'Spiral',
+        'doughnut': 'Doughnut'
       }[option]
 
       return text || option

@@ -17,8 +17,12 @@ const schema = new Schema({
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 16 },
-			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
-			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut'], default: 'circular' }
+			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' }
+        },
+        galaxy: {
+			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut'], default: 'circular' },
+			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30], default: 20 },
+			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -28,11 +32,8 @@ const schema = new Schema({
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
-			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' }
-        },
-        galaxy: {
-			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30], default: 20 },
-			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
+			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' }
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },

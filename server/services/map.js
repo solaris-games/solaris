@@ -22,18 +22,18 @@ module.exports = class MapService {
         // Generate all of the locations for stars.
         let starLocations = [];
 
-        switch (game.settings.general.galaxyType) {
+        switch (game.settings.galaxy.galaxyType) {
             case 'circular': 
-                starLocations = this.circularMapService.generateLocations(game, starCount);
+                starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'spiral': 
-                starLocations = this.spiralMapService.generateLocations(game, starCount);
+                starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'doughnut': 
-                starLocations = this.doughnutMapService.generateLocations(game, starCount);
+                starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             default:
-                throw new ValidationError(`Galaxy type ${game.settings.general.galaxyType} is not supported or has been disabled.`);
+                throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
 
         // Iterate over all star locations
