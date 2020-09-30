@@ -161,6 +161,16 @@
             "text": "Doughnut"
             }
         ],
+        "resourceDistribution": [
+            {
+            "value": "random",
+            "text": "Random"
+            },
+            {
+            "value": "weightedCenter",
+            "text": "Weighted (Center)"
+            }
+        ],
         "starsPerPlayer": [
             {
             "value": 5,

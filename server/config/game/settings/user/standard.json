@@ -9,6 +9,7 @@
     },
     "galaxy": {
         "galaxyType": "circular",
+        "resourceDistribution": "random",
         "starsPerPlayer": 20,
         "productionTicks": 24
     },
