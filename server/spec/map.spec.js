@@ -4,13 +4,22 @@ const CircularMapService = require('../services/maps/circular')
 
 const game = {
     settings: {
-        general: {
+        galaxy: {
             galaxyType: 'circular'
+        },
+        specialGalaxy: {
+            resourceDistribution: 'random'
         }
     },
     constants: {
         distances: {
             maxDistanceBetweenStars: 300
+        },
+        star: {
+            resources: {
+                minNaturalResources: 10,
+                maxNaturalResources: 50
+            }
         }
     }
 }
