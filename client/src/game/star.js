@@ -56,6 +56,7 @@ class Star extends EventEmitter {
     let force = this.isInScanningRange !== this._isInScanningRange()
 
     this.drawStar(force)
+    this.drawSpecialist(force)
     // this.drawTerritory(force)
     this.drawPlanets(force)
     this.drawColour(force)
@@ -100,7 +101,33 @@ class Star extends EventEmitter {
     this.graphics_star.drawStar(this.data.location.x, this.data.location.y, starPoints, radius, radius - 3)
     this.graphics_star.endFill()
 
+    if (this.hasSpecialist()) {
+      this.graphics_star.beginFill(0x000000)
+      this.graphics_star.lineStyle(0.3, 0xFFFFFF)
+      this.graphics_star.drawCircle(this.data.location.x, this.data.location.y, 2.2)
+      this.graphics_star.endFill()
+    }
+
     this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
+  }
+
+  drawSpecialist () {
+    if (!this.hasSpecialist()) {
+      return
+    }
+    
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
+    let specialistSprite = new PIXI.Sprite(specialistTexture)
+    specialistSprite.width = 3.5
+    specialistSprite.height = 3.5
+    specialistSprite.x = this.data.location.x - 1.75
+    specialistSprite.y = this.data.location.y - 1.75
+    
+    this.container.addChild(specialistSprite)
+  }
+
+  hasSpecialist () {
+    return this.data.specialistId && this.data.specialistId > 0
   }
 
   drawTerritory (force) {

@@ -32,6 +32,7 @@ class Carrier extends EventEmitter {
     this.drawColour()
     this.drawShip()
     this.drawGarrison()
+    this.drawSpecialist()
     this._drawCarrierWaypoints()
   }
 
@@ -64,34 +65,24 @@ class Carrier extends EventEmitter {
     // this.graphics_ship.lineStyle(0.3, 0x000000)
     this.graphics_ship.beginFill(0xFFFFFF)
 
-    if (this.data.specialistId) {
-      // Draw specialist carrier
-      this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
-      this.graphics_ship.lineTo(this.data.location.x + 2, this.data.location.y-1)
-      this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y-1.5)
-      this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
-      this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
-      this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
-      this.graphics_ship.lineTo(this.data.location.x - 1, this.data.location.y-1.5)
-      this.graphics_ship.lineTo(this.data.location.x - 2, this.data.location.y-1)
-      this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
-    } else {
-      // Draw normal carrier
-      this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
-      this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
-      this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
-      this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
-      this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
-      this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
-    }
+    // Draw normal carrier
+    this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
+    this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
+    this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
+    this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
+    this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
+    this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
     this.graphics_ship.endFill()
+
+    if (this.hasSpecialist()) {
+      this.graphics_ship.beginFill(0x000000)
+      this.graphics_ship.lineStyle(0.3, 0xFFFFFF)
+      this.graphics_ship.drawCircle(this.data.location.x, this.data.location.y, 2.2)
+      this.graphics_ship.endFill()
+    }
 
     this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
     this.graphics_ship.position.x = this.data.location.x
@@ -128,6 +119,25 @@ class Carrier extends EventEmitter {
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 5
     this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+  }
+
+  drawSpecialist () {
+    if (!this.hasSpecialist()) {
+      return
+    }
+    
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, true)
+    let specialistSprite = new PIXI.Sprite(specialistTexture)
+    specialistSprite.width = 3.5
+    specialistSprite.height = 3.5
+    specialistSprite.x = this.data.location.x - 1.75
+    specialistSprite.y = this.data.location.y - 1.75
+    
+    this.container.addChild(specialistSprite)
+  }
+
+  hasSpecialist () {
+    return this.data.specialistId && this.data.specialistId > 0
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {
