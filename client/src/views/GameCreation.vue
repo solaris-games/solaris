@@ -66,15 +66,6 @@
       </div>
 
       <div class="form-group">
-        <label for="resourceDistribution" class="col-form-label">Galaxy Type</label>
-        <select class="form-control" id="resourceDistribution" v-model="settings.galaxy.resourceDistribution" :disabled="isCreatingGame">
-          <option v-for="opt in options.galaxy.resourceDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
         <label for="starsPerPlayer" class="col-form-label">Stars per Player</label>
         <select class="form-control" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
           <option v-for="opt in options.galaxy.starsPerPlayer" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -161,6 +152,15 @@
         <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat</label>
         <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="resourceDistribution" class="col-form-label">Resource Distribution</label>
+        <select class="form-control" id="resourceDistribution" v-model="settings.specialGalaxy.resourceDistribution" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.resourceDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>

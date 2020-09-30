@@ -43,10 +43,6 @@
               <td class="text-right">{{ game.settings.galaxy.galaxyType }}</td>
             </tr>
             <tr>
-              <td>Resource Distribution</td>
-              <td class="text-right">{{ game.settings.galaxy.resourceDistribution }}</td>
-            </tr>
-            <tr>
               <td>Stars Per Player</td>
               <td class="text-right">{{ game.settings.galaxy.starsPerPlayer }}</td>
             </tr>
@@ -93,6 +89,10 @@
             <tr>
               <td>Carrier-to-Carrier Combat</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
+            </tr>
+            <tr>
+              <td>Resource Distribution</td>
+              <td class="text-right">{{ game.settings.specialGalaxy.resourceDistribution }}</td>
             </tr>
           </tbody>
         </table>

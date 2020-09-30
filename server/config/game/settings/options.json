@@ -144,6 +144,16 @@
                 "value": "enabled",
                 "text": "Enabled"
             }
+        ],
+        "resourceDistribution": [
+            {
+            "value": "random",
+            "text": "Random"
+            },
+            {
+            "value": "weightedCenter",
+            "text": "Weighted (Center)"
+            }
         ]
         },
         "galaxy": {
@@ -159,16 +169,6 @@
             {
             "value": "doughnut",
             "text": "Doughnut"
-            }
-        ],
-        "resourceDistribution": [
-            {
-            "value": "random",
-            "text": "Random"
-            },
-            {
-            "value": "weightedCenter",
-            "text": "Weighted (Center)"
             }
         ],
         "starsPerPlayer": [

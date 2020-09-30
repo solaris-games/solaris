@@ -21,7 +21,6 @@ const schema = new Schema({
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut'], default: 'circular' },
-			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30], default: 20 },
 			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
@@ -33,7 +32,8 @@ const schema = new Schema({
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
-			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' }
+			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' }
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },

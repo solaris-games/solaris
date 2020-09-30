@@ -24,13 +24,13 @@ module.exports = class MapService {
 
         switch (game.settings.galaxy.galaxyType) {
             case 'circular': 
-                starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.galaxy.resourceDistribution);
+                starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'spiral': 
-                starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.galaxy.resourceDistribution);
+                starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'doughnut': 
-                starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.galaxy.resourceDistribution);
+                starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);

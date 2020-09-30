@@ -9,7 +9,6 @@
   },
   "galaxy": {
     "galaxyType": "circular",
-    "resourceDistribution": "random",
     "starsPerPlayer": 20,
     "productionTicks": 24
   },
@@ -21,7 +20,8 @@
     "darkGalaxy": "enabled",
     "giftCarriers": "enabled",
     "defenderBonus": "disabled",
-    "carrierToCarrierCombat": "enabled"
+    "carrierToCarrierCombat": "enabled",
+    "resourceDistribution": "random"
   },
   "player": {
     "startingStars": 6,
