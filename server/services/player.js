@@ -62,12 +62,13 @@ module.exports = class PlayerService {
             .find(p => p._id.equals(targetPlayer._id)) != null;
     }
 
-    createEmptyPlayer(game, colour) {
+    createEmptyPlayer(game, colour, shape) {
         return {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
             colour: colour,
+            shape: shape,
             credits: game.settings.player.startingCredits,
             renownToGive: game.settings.general.playerLimit,
             carriers: [],
@@ -99,14 +100,22 @@ module.exports = class PlayerService {
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
+        let shapes = ['circle', 'triangle'];
+        let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
         // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < game.settings.general.playerLimit; i++) {
             // Get a random colour to assign to the player.
-            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+            if (!colours.length) {
+                colours = require('../config/game/colours').slice();
+                shapeIndex++;
+            }
 
-            let player = this.createEmptyPlayer(game, colour);
+            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+            let shape = shapes[shapeIndex];
+
+            let player = this.createEmptyPlayer(game, colour, shape);
 
             this._setDefaultResearchTechnology(game, player);
 

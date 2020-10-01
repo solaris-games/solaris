@@ -245,6 +245,7 @@ module.exports = class GameGalaxyService {
             // Return a subset of the user, key info only.
             return {
                 colour: p.colour,
+                shape: p.shape,
                 research: {
                     scanning: { 
                         level: p.research.scanning.level,

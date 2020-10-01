@@ -13,7 +13,7 @@ module.exports = class NameService {
     }
 
     getRandomStarNameInList(starNames) {
-        return starNames.splice(this.randomService.getRandomNumber(starNames.length - 1), 1);
+        return starNames.splice(this.randomService.getRandomNumber(starNames.length - 1), 1)[0];
     }
 
     getRandomGameName() {

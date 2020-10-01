@@ -3,7 +3,7 @@ const officialGameSettings = [
     require('../config/game/settings/official/standard'),
     require('../config/game/settings/official/standard4player'),
     require('../config/game/settings/official/standard32player'), // 32 player games are reserved only for official games.
-    require('../config/game/settings/official/standard64player'), // 64 player games are reserved only for official games.
+    // require('../config/game/settings/official/standard64player'), // 64 player games are reserved only for official games.
     require('../config/game/settings/official/dark'),
     require('../config/game/settings/official/turnBased'),
     require('../config/game/settings/official/1v1'),
