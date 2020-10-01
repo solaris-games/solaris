@@ -7,7 +7,8 @@
         <footer class="mt-3">
             <div class="text-right">
                 <a href="https://discord.com/invite/v7PD33d" target="_blank">Discord</a> |
-                <a href="https://github.com/mike-eason/solaris" target="_blank">Source Code</a>
+                <a href="https://github.com/mike-eason/solaris" target="_blank">Source Code</a> |
+                <a href="https://paypal.me/solarisgame?locale.x=en_GB" target="_blank">Donate</a>
             </div>
         </footer>
     </div>

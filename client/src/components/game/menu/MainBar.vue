@@ -11,7 +11,8 @@
       <!-- <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
       <div v-if="menuState == MENU_STATES.HELP">HELP</div> -->
 
-      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"/>
+      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
@@ -25,7 +26,8 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onEditWaypointsRequested="onEditWaypointsRequested"/>
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+        @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
@@ -33,7 +35,8 @@
         @onViewConversationRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
@@ -63,6 +66,14 @@
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
       <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested"/>
+      <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
+        :carrierId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
+        :starId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
     </div>
   </div>
 </div>
@@ -92,6 +103,8 @@ import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
+import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
+import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 
 export default {
   components: {
@@ -114,7 +127,9 @@ export default {
     'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
     'map-object-selector': MapObjectSelectorVue,
     'ruler': RulerVue,
-    'ledger': LedgerVue
+    'ledger': LedgerVue,
+    'hire-specialist-carrier': HireSpecialistCarrierVue,
+    'hire-specialist-star': HireSpecialistStarVue
   },
   props: {
     menuState: String,
@@ -167,6 +182,12 @@ export default {
     },
     onOpenInboxRequested (e) {
       this.changeMenuState(MENU_STATES.INBOX, e)
+    },
+    onViewHireCarrierSpecialistRequested (e) {
+      this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_CARRIER, e)
+    },
+    onViewHireStarSpecialistRequested (e) {
+      this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_STAR, e)
     }
   },
   computed: {

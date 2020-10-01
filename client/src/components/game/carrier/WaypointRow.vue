@@ -6,7 +6,7 @@
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
-        <td class="text-right">
+        <td class="text-right" v-if="showEdit">
           <a href="javascript:;" @click="editWaypoint">Edit</a>
         </td>
     </tr>
@@ -18,7 +18,8 @@ import GameHelper from '../../../services/gameHelper'
 export default {
   props: {
     waypoint: Object,
-    showAction: Boolean
+    showAction: Boolean,
+    showEdit: Boolean
   },
   data () {
     return {
@@ -68,10 +69,7 @@ export default {
       }
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.waypoint.ticksEta,
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.waypoint.ticksEta)
     }
   }
 }

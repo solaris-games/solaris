@@ -2,9 +2,9 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class AuthService {
     
-    constructor(bcrypt, userModel) {
-        this.bcrypt = bcrypt;
+    constructor(userModel, passwordService) {
         this.userModel = userModel;
+        this.passwordService = passwordService;
     }
 
     async login(email, password) {
@@ -20,7 +20,7 @@ module.exports = class AuthService {
         }
 
         // Compare the passwords and if they match then the user is authenticated.
-        let result = await this.bcrypt.compare(password, user.password);
+        let result = await this.passwordService.compare(password, user.password);
 
         if (result) {
             return user._id;

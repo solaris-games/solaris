@@ -1,11 +1,25 @@
 const RandomService = require('../services/random');
 const MapService = require('../services/map');
-const StandardMapService = require('../services/maps/standard')
+const CircularMapService = require('../services/maps/circular')
 
 const game = {
+    settings: {
+        galaxy: {
+            galaxyType: 'circular'
+        },
+        specialGalaxy: {
+            resourceDistribution: 'random'
+        }
+    },
     constants: {
         distances: {
             maxDistanceBetweenStars: 300
+        },
+        star: {
+            resources: {
+                minNaturalResources: 10,
+                maxNaturalResources: 50
+            }
         }
     }
 }
@@ -71,7 +85,7 @@ describe('map', () => {
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
-        starMapService = new StandardMapService(randomService, fakeStarService, fakeStarDistanceService);
+        starMapService = new CircularMapService(randomService, fakeStarService, fakeStarDistanceService, fakeDistanceService);
         mapService = new MapService(randomService, fakeStarService, fakeStarDistanceService, fakeStarNameService, starMapService);
     });
 

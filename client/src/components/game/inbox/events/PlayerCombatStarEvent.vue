@@ -1,7 +1,7 @@
 <template>
     <div v-if="star">
         <p>
-            Your forces have engaged the enemy in carrier-to-star combat at
+            Your forces have engaged the enemy in <span class="text-warning">carrier-to-star</span> combat at
             <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
         </p>
         <div class="table-responsive mt-2">

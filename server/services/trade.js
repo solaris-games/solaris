@@ -24,6 +24,8 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send credits to yourself.`);
         }
 
+        this._tradeScanningCheck(game, fromPlayer, toPlayer);
+
         if (fromPlayer.credits < amount) {
             throw new ValidationError(`The player does not own ${amount} credits.`);
         }
@@ -115,6 +117,8 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot trade technology with yourself.`);
         }
 
+        this._tradeScanningCheck(game, fromPlayer, toPlayer);
+
         let tradeTechs = this.getTradeableTechnologies(game, fromPlayer, toPlayerId);
 
         let tradeTech = tradeTechs.find(t => t.name === technology && t.level === techLevel);
@@ -205,6 +209,16 @@ module.exports = class TradeService extends EventEmitter {
         }
 
         return tradeTechs;
+    }
+
+    _tradeScanningCheck(game, fromPlayer, toPlayer) {
+        if (game.settings.player.tradeScanning === 'scanned') {
+            let isInRange = this.playerService.isInScanningRangeOfPlayer(game, fromPlayer, toPlayer);
+    
+            if (!isInRange) {
+                throw new ValidationError(`You cannot trade with this player, they are not within scanning range.`);
+            }
+        }
     }
 
 };

@@ -4,13 +4,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, carrierService, playerService) {
+    constructor(gameModel, userService, carrierService, playerService, passwordService) {
         super();
         
         this.gameModel = gameModel;
         this.userService = userService;
         this.carrierService = carrierService;
         this.playerService = playerService;
+        this.passwordService = passwordService;
     }
 
     async getByIdAll(id) {
@@ -26,7 +27,7 @@ module.exports = class GameService extends EventEmitter {
     async getByIdLean(id, select) {
         return await this.gameModel.findById(id)
             .select(select)
-            .lean()
+            .lean({ defaults: true })
             .exec();
     }
 
@@ -35,7 +36,7 @@ module.exports = class GameService extends EventEmitter {
             settings: 1,
             state: 1,
             galaxy: 1,
-            constants: 1
+            constants: 1,
         });
     }
 
@@ -48,11 +49,19 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    async getByIdInfo(id) {
-        return await this.getByIdLean(id, {
+    async getByIdInfo(id, userId) {
+        let game = await this.getByIdLean(id, {
             settings: 1,
             state: 1
         });
+
+        if (game.settings.general.createdByUserId) {
+            game.settings.general.isGameAdmin = game.settings.general.createdByUserId.equals(userId);
+        } else {
+            game.settings.general.isGameAdmin = false;
+        }
+
+        return game;
     }
 
     async getByIdMessages(id) {
@@ -73,7 +82,7 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    async join(game, userId, playerId, alias) {
+    async join(game, userId, playerId, alias, avatar, password) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {
             throw new ValidationError('The game has already started.');
@@ -86,6 +95,14 @@ module.exports = class GameService extends EventEmitter {
 
         if (game.quitters.find(x => x.equals(userId))) {
             throw new ValidationError('You cannot rejoin this game.');
+        }
+
+        if (game.settings.general.password) {
+            let passwordMatch = await this.passwordService.compare(password, game.settings.general.password);
+
+            if (!passwordMatch) {
+                throw new ValidationError('The password is invalid.');
+            }
         }
 
         // Disallow if they are already in the game as another player.
@@ -112,6 +129,7 @@ module.exports = class GameService extends EventEmitter {
         // Assign the user to the player.
         player.userId = userId;
         player.alias = alias;
+        player.avatar = avatar;
 
         // If the max player count is reached then start the game.
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
@@ -121,8 +139,10 @@ module.exports = class GameService extends EventEmitter {
         if (gameIsFull) {
             let start = moment().utc();
 
-            // Add the start delay to the start date.
-            start.add(game.settings.gameTime.startDelay, 'minute');
+            if (this.isRealTimeGame(game)) {
+                // Add the start delay to the start date.
+                start.add(game.settings.gameTime.startDelay, 'minute');
+            }
 
             game.state.paused = false;
             game.state.startDate = start;
@@ -222,6 +242,29 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async delete(game, userId) {
+        if (game.state.startDate) {
+            throw new ValidationError('Cannot delete games that are in progress or completed.');
+        }
+
+        if (!game.settings.general.createdByUserId.equals(userId)) {
+            throw new ValidationError('Cannot delete this game, you did not create it.');
+        }
+
+        // Deduct "joined" count for all players who already joined the game.
+        for (let player of game.galaxy.players) {
+            if (player.userId) {
+                let user = await this.userService.getById(player.userId);
+
+                user.achievements.joined--;
+
+                await user.save();
+            }
+        }
+
+        await game.remove();
+    }
+
     async getPlayerUser(game, playerId) {
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
 
@@ -258,6 +301,20 @@ module.exports = class GameService extends EventEmitter {
         game.state.paused = true;
         game.state.endDate = moment().utc();
         game.state.winner = winnerPlayer._id;
+    }
+
+    isRealTimeGame(game) {
+        return game.settings.gameTime.gameType === 'realTime';
+    }
+
+    isTurnBasedGame(game) {
+        return game.settings.gameTime.gameType === 'turnBased';
+    }
+
+    isAllUndefeatedPlayersReady(game) {
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+
+        return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
 };

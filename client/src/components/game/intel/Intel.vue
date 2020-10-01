@@ -1,5 +1,5 @@
 <template>
-<div class="bg-secondary pb-2">
+<div class="menu-page bg-secondary pb-2">
   <div class="container">
     <menu-title title="Intel" @onCloseRequested="onCloseRequested"/>
 

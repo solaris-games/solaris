@@ -3,7 +3,7 @@
     <td><i class="fas fa-circle" v-if="carrier.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
     <td><a href="javascript:;" @click="clickCarrier">{{carrier.name}}</a></td>
     <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
-    <td class="text-right">{{carrier.ships}}</td>
+    <td class="text-right">{{carrier.ships == null ? '???' : carrier.ships}}</td>
     <td class="text-right">{{carrier.waypoints.length}}</td>
     <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td>
     <td><span v-if="carrier.waypoints.length">{{timeRemainingEta}}</span></td>
@@ -46,10 +46,7 @@ export default {
       gameContainer.map.panToLocation(this.carrier.location)
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.carrier.ticksEta,
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta)
 
       // TODO: Get total time of carrier eta
       // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, this.carrier.ticksEtaTotal)

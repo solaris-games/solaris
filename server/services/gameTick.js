@@ -4,7 +4,8 @@ const moment = require('moment');
 module.exports = class GameTickService extends EventEmitter {
     
     constructor(broadcastService, distanceService, starService, carrierService, 
-        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService) {
+        researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
+        specialistService) {
         super();
             
         this.broadcastService = broadcastService;
@@ -19,6 +20,8 @@ module.exports = class GameTickService extends EventEmitter {
         this.leaderboardService = leaderboardService;
         this.userService = userService;
         this.gameService = gameService;
+        this.technologyService = technologyService;
+        this.specialistService = specialistService;
     }
 
     async tick(game) {
@@ -68,36 +71,159 @@ module.exports = class GameTickService extends EventEmitter {
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
-       await this._moveCarriers(game, report);
-       logTime('Move carriers and produce ships');
-       await this._conductResearch(game, report);
-       logTime('Conduct research');
-       this._endOfGalacticCycleCheck(game, report);
-       logTime('Galactic cycle check');
-       this._logHistory(game, report);
-       logTime('Log history');
-       await this._gameLoseCheck(game, report);
-       logTime('Game lose check');
-       await this._gameWinCheck(game, report);
-       logTime('Game win check');
+        let iterations = 1;
 
-       await game.save();
-       logTime('Save game');
+        // If we are in turn based mode, we need to repeat the tick X number of times.
+        if (this.gameService.isTurnBasedGame(game)) {
+            iterations = game.settings.gameTime.turnJumps;
+        }
 
-       this._broadcastReport(game, report);       
-       logTime('Broadcast report');
+        while (iterations--) {
+            logTime(`Tick ${game.state.tick}`);
+            await this._combatCarriers(game, report);
+            logTime('Combat carriers');
+            await this._moveCarriers(game, report);
+            logTime('Move carriers and produce ships');
+            await this.researchService.conductResearchAll(game, report);
+            logTime('Conduct research');
+            this._endOfGalacticCycleCheck(game, report);
+            logTime('Galactic cycle check');
+            this._logHistory(game, report);
+            logTime('Log history');
+            await this._gameLoseCheck(game, report);
+            logTime('Game lose check');
+            let hasWinner = await this._gameWinCheck(game, report);
+            logTime('Game win check');
 
-       let endTime = process.hrtime(startTime);
+            if (hasWinner) {
+                break;
+            }
+        }
 
-       console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
+        this._resetPlayersReadyStatus(game, report);
+
+        await game.save();
+        logTime('Save game');
+
+        this._broadcastReport(game, report);       
+        logTime('Broadcast report');
+
+        let endTime = process.hrtime(startTime);
+
+        console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     _canTick(game) {
-        let mins = game.settings.gameTime.speed;
         let lastTick = moment(game.state.lastTickDate).utc();
-        let nextTick = moment(lastTick).utc().add(mins, 'm');
+        let nextTick;
 
+        if (this.gameService.isRealTimeGame(game)) {
+            // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+        } else if (this.gameService.isTurnBasedGame(game)) {
+            // If in turn based mode, then check if all undefeated players are ready.
+            // OR the max time wait limit has been reached.
+            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game);
+            
+            if (isAllPlayersReady) {
+                return true;
+            }
+
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+        } else {
+            throw new Error(`Unsupported game type.`);
+        }
+    
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
+    }
+
+    async _combatCarriers(game, report) {
+        if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
+            return;
+        }
+
+        // Get all carriers that are in transit, their current locations
+        // and where they will be moving to.
+        let carrierPositions = game.galaxy.carriers
+            .filter(x => 
+                this.carrierService.isInTransit(x)           // Carrier is already in transit
+                || this.carrierService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
+            )
+            .map(c => {
+                let waypoint = c.waypoints[0];
+                let locationNext = this.carrierService.getNextLocationToWaypoint(game, c);
+
+                let sourceStar = this.starService.getById(game, waypoint.source);
+                let destinationStar = this.starService.getById(game, waypoint.destination);
+                let distanceToSourceCurrent = this.distanceService.getDistanceBetweenLocations(c.location, sourceStar.location);
+                let distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
+                let distanceToSourceNext = this.distanceService.getDistanceBetweenLocations(locationNext, sourceStar.location);
+                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext, destinationStar.location);
+
+                return {
+                    carrier: c,
+                    source: waypoint.source,
+                    destination: waypoint.destination,
+                    locationCurrent: c.location,
+                    locationNext,
+                    distanceToSourceCurrent,
+                    distanceToDestinationCurrent,
+                    distanceToSourceNext,
+                    distanceToDestinationNext
+                };
+            });
+
+        for (let i = 0; i < carrierPositions.length; i++) {
+            let friendlyCarrier = carrierPositions[i];
+
+            if (friendlyCarrier.carrier.ships <= 0) {
+                continue;
+            }
+
+            // First up, get all carriers that are heading from the destination and to the source
+            // and are in front of the carrier.
+            let collisionCarriers = carrierPositions
+                .filter(c => {
+                    // Head to head combat:
+                    return (c.carrier.ships > 0                                                 // Has ships (may have been involved in other combat)
+                            && !c.carrier.isGift                                                // And is not a gift
+                            && c.destination.equals(friendlyCarrier.source)                         // Is heading to where the carrier came from
+                            && c.source.equals(friendlyCarrier.destination)                         // Came from where the carrier is heading to
+                            && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent    // Is currently in front of the carrier
+                            && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext)         // Will be behind the carrier
+                    // Combat from behind:
+                        || (c.carrier.ships > 0
+                            && !c.carrier.isGift                                                // And is not a gift
+                            && c.destination.equals(friendlyCarrier.destination)                    // Is heading in the same direction as the carrier
+                            && c.source.equals(friendlyCarrier.source)
+                            && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent   // Is current behind the carrier
+                            && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext);       // Will be in front of the carrier 
+                });
+
+            // If all of the carriers that have collided are friendly then no need to do combat.
+            let friendlyCarriers = collisionCarriers
+                .filter(c => c.carrier.ships > 0 && c.carrier.ownedByPlayerId.equals(friendlyCarrier.carrier.ownedByPlayerId));
+
+            // If all other carriers are friendly then skip.
+            if (friendlyCarriers.length === collisionCarriers.length) {
+                continue;
+            }
+
+            let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
+            
+            let combatCarriers = collisionCarriers
+                .map(c => c.carrier)
+                .filter(c => c.ships > 0);
+
+            // Double check that there are carriers that can fight.
+            if (!combatCarriers.length) {
+                return;
+            }
+
+            // TODO: Check for specialists that affect pre-combat.
+
+            await this._performCombat(game, friendlyPlayer, null, combatCarriers, report);
+        }
     }
 
     async _moveCarriers(game, report) {
@@ -145,74 +271,33 @@ module.exports = class GameTickService extends EventEmitter {
         // Because carriers are ordered by distance to their destination,
         // this means that always the carrier that is closest to its destination
         // will land first. This is important for unclaimed stars and defender bonuses.
+
         let combatStars = [];
         let actionWaypoints = [];
 
         for (let i = 0; i < carriers.length; i++) {
-            let distancePerTick = game.constants.distances.shipSpeed;
-    
             let carrier = carriers[i];
-            let waypoint = carrier.waypoints[0];
-            let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
-            let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        
+            let carrierMovementReport = await this.carrierService.moveCarrier(game, carrier);
 
-            // If we are travelling to and from a warp gate, then we
-            // travel 3 times faster.
-            if (sourceStar.warpGate && destinationStar.warpGate
-                && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-                distancePerTick *= 3;
-            }
-
-            if (carrier.distanceToDestination <= distancePerTick) {
-                carrier.inTransitFrom = null;
-                carrier.inTransitTo = null;
-                carrier.orbiting = destinationStar._id;
-                carrier.location = destinationStar.location;
-
-                // Remove the current waypoint as we have arrived at the destination.
-                let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
-
-                // Append it to the array of action waypoints so that we can deal with it after combat.
+            // If the carrier has arrived at the star then
+            // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
+            if (carrierMovementReport.arrivedAtStar) {
                 actionWaypoints.push({
-                    star: destinationStar,
                     carrier,
-                    waypoint: currentWaypoint
+                    star: carrierMovementReport.destinationStar,
+                    waypoint: carrierMovementReport.waypoint
                 });
-
-                // If the carrier waypoints are looped then append the
-                // carrier waypoint back onto the waypoint stack.
-                if (carrier.waypointsLooped) {
-                    carrier.waypoints.push(currentWaypoint);
-                }
-
-                // If the star is unclaimed, then claim it.
-                if (destinationStar.ownedByPlayerId == null) {
-                    destinationStar.ownedByPlayerId = carrier.ownedByPlayerId;
-
-                    let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
-
-                    let playerUser = await this.userService.getById(carrierPlayer.userId);
-                    playerUser.achievements.combat.stars.captured++;
-                    await playerUser.save();
-                }
-
-                // If the star is owned by another player, then perform combat.
-                if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-                    if (combatStars.indexOf(destinationStar) < 0) {
-                        combatStars.push(destinationStar);
-                    }
-                }
-
-                // The star has been affected by the game tick so append it to the report
-                // NOTE: We will get the data for it later at the end of the tick.
-                report.stars.push(destinationStar._id);
             }
-            // Otherwise, move X distance in the direction of the star.
-            else {
-                let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 
-                carrier.location = nextLocation;
+            // Check if combat is required, if so add the destination star to the array of combat stars to check later.
+            if (carrierMovementReport.combatRequiredStar && combatStars.indexOf(carrierMovementReport.destinationStar) < 0) {
+                combatStars.push(carrierMovementReport.destinationStar);
             }
+            
+            // The star has been affected by the game tick so append it to the report
+            // NOTE: We will get the data for it later at the end of the tick.
+            report.stars.push(carrierMovementReport.destinationStar._id);
         }
 
         // 3. Now that all carriers have finished moving, perform combat.
@@ -222,7 +307,9 @@ module.exports = class GameTickService extends EventEmitter {
             // Get all carriers orbiting the star and perform combat.
             let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combatStar._id));
 
-            await this._performCombatAtStar(game, combatStar, carriersAtStar, report);
+            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
+
+            await this._performCombat(game, starOwningPlayer, combatStar, carriersAtStar, report);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
@@ -230,56 +317,45 @@ module.exports = class GameTickService extends EventEmitter {
 
         // 4a. Now that combat is done, perform any carrier waypoint actions.
         // Do the drops first
-        this._performWaypointActionsDrops(game, actionWaypoints);
+        this.waypointService.performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
-        this._produceShips(game, report);
+        this.starService.applyStarSpecialistSpecialModifiers(game, report);
+        this.starService.produceShips(game, report);
 
         // 4c. Do the rest of the waypoint actions.
-        this._performWaypointActionsCollects(game, actionWaypoints);
-        this._performWaypointActionsGarrisons(game, actionWaypoints);
+        this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
+        this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
     }
 
-    _performWaypointActions(game, actionWaypoints) {
-        for (let actionWaypoint of actionWaypoints) {
-            this.waypointService.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
-        }
-    }
+    async _performCombat(game, player, star, carriers, report) {
+        // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
-    _performFilteredWaypointActions(game, waypoints, waypointTypes) {
-        let actionWaypoints = waypoints.filter(w => waypointTypes.indexOf(w.waypoint.action) > -1);
-
-        this._performWaypointActions(game, actionWaypoints);
-    }
-
-    _performWaypointActionsDrops(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut']);
-    }
-
-    _performWaypointActionsCollects(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut']);
-    }
-
-    _performWaypointActionsGarrisons(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['garrison']);
-    }
-
-    async _performCombatAtStar(game, star, carriers, report) {
         // Get all defender carriers ordered by most carriers present descending.
         // Carriers who have the most ships will be target first in combat.
         let defenderCarriers = carriers
-                                .filter(c => c.ownedByPlayerId.equals(star.ownedByPlayerId))
+                                .filter(c => c.ships > 0 && !c.isGift && c.ownedByPlayerId.equals(player._id))
                                 .sort((a, b) => b.ships - a.ships);
+
+        // If in carrier-to-carrier combat, verify that there are carriers that can fight.
+        if (!star && !defenderCarriers.length) {
+            return;
+        }
 
         // Get all attacker carriers.
         let attackerCarriers = carriers
-                                .filter(c => !c.ownedByPlayerId.equals(star.ownedByPlayerId))
+                                .filter(c => c.ships > 0 && !c.isGift && !c.ownedByPlayerId.equals(player._id))
                                 .sort((a, b) => b.ships - a.ships);
+
+        // Double check that the attacking carriers can fight.
+        if (!attackerCarriers.length) {
+            return;
+        }
 
         // Get the players for the defender and all attackers.
         let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
 
-        let defender = this.playerService.getByObjectId(game, star.ownedByPlayerId);
+        let defender = player;
         let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
 
         let defenderUser = await this.userService.getById(defender.userId);
@@ -296,21 +372,14 @@ module.exports = class GameTickService extends EventEmitter {
             return users.find(u => u._id.toString() === player.userId.toString());
         };
 
-        // Calculate the combined combat result taking into account
-        // the star garrison and all defenders vs. all attackers
-        let totalDefenders = Math.floor(star.garrisonActual) + defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
-        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
-
-        // Use the highest weapons tech of the attacking players to calculate combat result.
-        let weaponsTechLevel = attackers.map(p => p.research.weapons.level).sort((a, b) => b - a)[0];
-
-        let combatResult = this.combatService.calculate({
-            weaponsLevel: defender.research.weapons.level,
-            ships: totalDefenders
-        }, {
-            weaponsLevel: weaponsTechLevel,
-            ships: totalAttackers
-        });
+        // Perform combat at the star.
+        let combatResult;
+        
+        if (star) {
+            combatResult = this.combatService.calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers);
+        } else {
+            combatResult = this.combatService.calculateCarrier(game, defenderCarriers, attackerCarriers);
+        }
         
         // Add all of the carriers to the combat result with a snapshot of
         // how many ships they had before combat occurs.
@@ -326,13 +395,15 @@ module.exports = class GameTickService extends EventEmitter {
             };
         });
 
-        // Do the same with the star.
-        combatResult.star = {
-            _id: star._id,
-            before: Math.floor(star.garrisonActual),
-            lost: 0,
-            after: Math.floor(star.garrisonActual)
-        };
+        if (star) {
+            // Do the same with the star.
+            combatResult.star = {
+                _id: star._id,
+                before: Math.floor(star.garrisonActual),
+                lost: 0,
+                after: Math.floor(star.garrisonActual)
+            };
+        }
 
         // Add combat result stats to defender achievements.
         defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
@@ -386,7 +457,7 @@ module.exports = class GameTickService extends EventEmitter {
             let defenderShipKilled = false;
 
             // Decide whether to attack the star or the carrier.
-            if (defenderCarrierIndex === -1) {
+            if (star && defenderCarrierIndex === -1) {
                 if (Math.floor(star.garrisonActual)) { // Only hit the star if there is garrison.
                     star.garrisonActual--;
                     star.garrison = Math.floor(star.garrisonActual);
@@ -435,15 +506,37 @@ module.exports = class GameTickService extends EventEmitter {
             defenderCarrierIndex++;
 
             if (defenderCarrierIndex > defenderCarriers.length - 1) {
-                defenderCarrierIndex = -1;
+                if (star) {
+                    defenderCarrierIndex = -1;
+                } else {
+                    defenderCarrierIndex = 0;
+                }
             }
         }
 
-        // If the defender has been eliminated then the attacker who travelled the shortest distance in the last tick
-        // captures the star. Repeat star combat until there is only one player remaining.
-        let defenderDefeated = !Math.floor(star.garrisonActual) && !defenderCarriers.length;
+        // Log the combat event
+        if (star) {
+            this.emit('onPlayerCombatStar', {
+                game,
+                defender,
+                attackers,
+                star,
+                combatResult
+            });
+        } else {
+            this.emit('onPlayerCombatCarrier', {
+                game,
+                defender,
+                attackers,
+                combatResult
+            });
+        }
 
-        if (defenderDefeated) {
+        // If the defender has been eliminated at the star then the attacker who travelled the shortest distance in the last tick
+        // captures the star. Repeat star combat until there is only one player remaining.
+        let starDefenderDefeated = star && !Math.floor(star.garrisonActual) && !defenderCarriers.length;
+
+        if (starDefenderDefeated) {
             let closestPlayerId = attackerCarriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].ownedByPlayerId;
 
             // Capture the star.
@@ -479,15 +572,6 @@ module.exports = class GameTickService extends EventEmitter {
             });
         }
 
-        // Log the combat event
-        this.emit('onPlayerCombatStar', {
-            game,
-            defender,
-            attackers,
-            star,
-            combatResult
-        });
-
         // Save user profile achievements.
         await defenderUser.save();
 
@@ -499,45 +583,14 @@ module.exports = class GameTickService extends EventEmitter {
         attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
 
         if (attackerPlayerIds.length > 1) {
-            await this._performCombatAtStar(game, star, attackerCarriers, report);
-        }
-    }
-
-    _produceShips(game, report) {
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let star = game.galaxy.stars[i];
-
-            if (star.ownedByPlayerId) {
-                let player = this.playerService.getByObjectId(game, star.ownedByPlayerId);
-    
-                // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.garrisonActual += this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, star.infrastructure.industry);
-                star.garrison = Math.floor(star.garrisonActual);
-
-                // If the star isn't already in the report, add it.
-                if (!report.stars.find(s => s.equals(star._id))) {
-                    report.stars.push(star._id);
-                }
+            // Get the next player to act as the defender.
+            if (star) {
+                player = this.playerService.getById(game, star.ownedByPlayerId);
+            } else {
+                player = this.playerService.getById(game, attackerPlayerIds[0]);
             }
-        }
-    }
 
-    async _conductResearch(game, report) {
-        // Add the current level of experimentation to the current 
-        // tech being researched.
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
-
-            // TODO: Defeated players do not conduct research or experiments?
-            if (player.defeated) {
-                continue;
-            }
-            
-            let researchReport = await this.researchService.conductResearch(game, player);
-
-            researchReport.playerId = player._id;
-
-            report.playerResearch.push(researchReport);
+            await this._performCombat(game, player, star, attackerCarriers, report);
         }
     }
 
@@ -554,12 +607,12 @@ module.exports = class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                // TODO: Defeated players do not conduct research or experiments?
+                // Defeated players do not conduct research or experiments?
                 if (player.defeated) {
                     continue;
                 }
                 
-                let creditsResult = this._givePlayerMoney(game, player);
+                let creditsResult = this.playerService.givePlayerMoney(game, player);
                 let experimentResult = this._conductExperiments(game, player, report);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
@@ -586,22 +639,6 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    _givePlayerMoney(game, player) {
-        let totalEco = this.playerService.calculateTotalEconomy(player, game.galaxy.stars);
-
-        let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = player.research.banking.level * 75;
-        let creditsTotal = creditsFromEconomy + creditsFromBanking;
-
-        player.credits += creditsTotal;
-
-        return {
-            creditsFromEconomy,
-            creditsFromBanking,
-            creditsTotal
-        };
-    }
-
     _conductExperiments(game, player, report) {
         let experimentReport = this.researchService.conductExperiments(game, player);
 
@@ -624,8 +661,23 @@ module.exports = class GameTickService extends EventEmitter {
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            // Check if the player has been AFK for over 48 hours.
-            let isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+            // If in turn based mode, then check if the player wasn't ready when the game ticked
+            // if so increase their number of missed turns.
+            if (this.gameService.isTurnBasedGame(game) && !player.ready) {
+                player.missedTurns++;
+                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
+            }
+
+            // Check if the player has been AFK.
+            // If in real time mode, check if the player has not been seen for over 48 hours.
+            // OR if in turn based mode, check if the player has reached the maximum missed turn limit.
+            let isAfk = false;
+
+            if (this.gameService.isRealTimeGame(game)) {
+                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+            } else if (this.gameService.isTurnBasedGame(game)) {
+                isAfk = player.missedTurns > game.constants.turnBased.playerMissedTurnLimit;
+            }
 
             if (isAfk) {
                 player.defeated = true;
@@ -682,6 +734,16 @@ module.exports = class GameTickService extends EventEmitter {
             this.emit('onGameEnded', {
                 game
             });
+
+            return true;
+        }
+
+        return false;
+    }
+
+    _resetPlayersReadyStatus(game, report) {
+        for (let player of game.galaxy.players) {
+            player.ready = false;
         }
     }
 
@@ -730,7 +792,9 @@ module.exports = class GameTickService extends EventEmitter {
                 ships: carrier.ships,
                 location: carrier.location,
                 waypoints: carrier.waypoints,
-                name: carrier.name // Include the name because carriers can go in and out of scanning range.
+                name: carrier.name, // Include the name because carriers can go in and out of scanning range.
+                isGift: carrier.isGift, // Carriers may have been successfully gifted.
+                specialistId: carrier.specialistId
             };
         });
     }
@@ -740,13 +804,22 @@ module.exports = class GameTickService extends EventEmitter {
 
         for (let starId of report.stars) {
             let star = this.starService.getByObjectId(game, starId);
+            let terraformedResources = null;
+
+            if (star.ownedByPlayerId) {
+                let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);    
+            }
 
             // Add everything that could have changed
             starsData.push({
                 _id: star._id,
                 ownedByPlayerId: star.ownedByPlayerId,
+                naturalResources: star.naturalResources,
+                terraformedResources,
                 garrison: star.garrison,
-                infrastructure: star.infrastructure
+                infrastructure: star.infrastructure,
+                specialistId: star.specialistId // TODO: Also need to re-get the specialist but only if it has changed.
             });
         }
 
@@ -755,11 +828,15 @@ module.exports = class GameTickService extends EventEmitter {
 
     _appendReportPlayers(game, report) {
         for (let player of game.galaxy.players) {
+            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+            
             report.players.push({
                 _id: player._id,
                 defeated: player.defeated,
                 afk: player.afk,
-                stats: this.playerService.getStats(game, player)
+                ready: false,
+                stats: this.playerService.getStats(game, player),
+                effectiveTechs
             });
         }
     }
@@ -770,12 +847,23 @@ module.exports = class GameTickService extends EventEmitter {
         // Get the end of galactic cycle report for the player if there is one.
         playerReport.playerGalacticCycleReport = report.playerGalacticCycleReport.find(r => r.playerId.equals(player._id)) || null;
 
+        // Calculate which players are in scanning range.
+        let playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(game, player);
+
+        playerReport.players.forEach(p => {
+            p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id) != null;
+        });
+
         // Perform a filter on the report stars, if the star is out of range
         // then only return basic info.
         let starsInRange = this.starService.filterStarsByScanningRange(game, player);
 
         playerReport.stars = playerReport.stars.map(s => {
             let isInRange = starsInRange.find(x => x._id.equals(s._id)) != null;
+
+            if (!this.starService.canPlayerSeeStarGarrison(player, s)) {
+                s.garrison = null;
+            }
 
             if (isInRange) {
                 return s;
@@ -803,6 +891,10 @@ module.exports = class GameTickService extends EventEmitter {
 
             // The waypoint ETAs may have changed so make sure that they are updated.
             this.waypointService.populateCarrierWaypointEta(game, c);
+
+            if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                c.ships = null;
+            }
 
             return c;
         });

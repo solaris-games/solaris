@@ -23,7 +23,7 @@ describe('auth', () => {
     let service;
 
     beforeAll(() => {
-        service = new AuthService(fakeBcrypt, fakeUserModel);
+        service = new AuthService(fakeUserModel, fakeBcrypt);
     });
 
     it('should compare passwords of a user', async (done) => {

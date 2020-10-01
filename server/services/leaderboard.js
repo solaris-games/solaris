@@ -22,7 +22,7 @@ module.exports = class LeaderboardService {
             'achievements.rank': 1,
             'achievements.renown': 1,
         })
-        .lean()
+        .lean({ defaults: true })
         .exec();
 
         for (let i = 0; i < leaderboard.length; i++) {
@@ -92,6 +92,8 @@ module.exports = class LeaderboardService {
                 user.achievements.rank += leaderboard.length / 2 - i;
                 user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
             }
+
+            user.achievements.rank = Math.round(user.achievements.rank);
 
             // If the player hasn't been defeated then add completed stats.
             if (!player.defeated) {

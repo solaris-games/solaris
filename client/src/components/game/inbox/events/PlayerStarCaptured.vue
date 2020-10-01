@@ -4,7 +4,7 @@
       The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a> has been captured
       by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
-  <p>
+  <p v-if="event.data.creditsReward">
       <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a> is awarded
       <span class="text-warning">${{event.data.creditsReward}}</span> credits.
   </p>

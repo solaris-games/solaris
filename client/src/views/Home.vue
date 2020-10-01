@@ -17,6 +17,10 @@
         <account-login></account-login>
       </div>
     </div>
+
+    <div class="row">
+      <img :src="require('../assets/screenshots/game1.png')" class="img-fluid w-100"/>
+    </div>
   </view-container>
 </template>
 

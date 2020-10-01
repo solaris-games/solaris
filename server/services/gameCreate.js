@@ -4,18 +4,32 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, nameService, mapService, playerService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService) {
         this.gameModel = gameModel;
+        this.gameListService = gameListService;
         this.nameService = nameService;
         this.mapService = mapService;
         this.playerService = playerService;
+        this.passwordService = passwordService;
     }
 
     async create(settings) {
-        // TODO: Prevent players from being able to create loads of games?
+        if (settings.general.createdByUserId) {
+            // Prevent players from being able to create loads of games?
+            let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
+
+            if (openGames.length) {
+                throw new ValidationError('Cannot create game, you already have another game waiting for players.');
+            }
+        }
         
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
             throw new ValidationError('Game name must be between 3 and 24 characters.');
+        }
+
+        if (settings.general.password) {
+            settings.general.password = await this.passwordService.hash(settings.general.password);
+            settings.general.passwordRequired = true;
         }
 
         let game = new this.gameModel({

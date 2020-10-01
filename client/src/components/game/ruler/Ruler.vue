@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="menu-page container">
     <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
         <button class="btn btn-primary" @click="resetRulerPoints">Reset</button>
     </menu-title>
@@ -90,7 +90,7 @@ export default {
     let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     if (userPlayer) {
-      this.hyperspaceRange = userPlayer.research.hyperspace.level
+      this.hyperspaceRange = userPlayer.research.hyperspace.effective
     }
   },
   destroyed () {
@@ -124,14 +124,11 @@ export default {
     recalculateETAs () {
       let game = this.$store.state.game
 
-      let totalTicks = GameHelper.getTicksBetweenLocations(game, this.points)
-      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, this.points, 3) // TODO: Need a constant here.
+      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, this.points)
+      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, this.points, game.constants.distances.warpSpeedMultiplier)
 
-      let totalTime = GameHelper.calculateTimeByTicks(totalTicks, game.settings.gameTime.speed, moment().utc())
-      let totalTimeString = GameHelper.getCountdownTimeString(game, totalTime)
-
-      let totalTimeWarp = GameHelper.calculateTimeByTicks(totalTicksWarp, game.settings.gameTime.speed, moment().utc())
-      let totalTimeWarpString = GameHelper.getCountdownTimeString(game, totalTimeWarp)
+      let totalTimeString = GameHelper.getCountdownTimeStringByTicks(game, totalTicks, true)
+      let totalTimeWarpString = GameHelper.getCountdownTimeStringByTicks(game, totalTicksWarp, true)
 
       this.totalEta = totalTimeString
       this.totalEtaWarp = totalTimeWarpString

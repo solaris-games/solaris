@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="menu-page container">
         <menu-title title="Combat Calculator" @onCloseRequested="onCloseRequested"/>
 
         <div class="row">
@@ -8,18 +8,18 @@
             </div>
             <form class="col-12" @submit="calculate">
                 <div class="form-group row">
-                    <label for="defenderWeaponTech" class="col-8 col-form-label">Defender Weapon Technology</label>
+                    <label for="defenderWeaponTech" class="col-8 col-form-label"><span class="text-success">Defender</span> Weapon Technology</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderWeaponTech" placeholder="Tech Level" v-model="defender.weaponsLevel" required="required">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="defenderShips" class="col-8 col-form-label">Defender Ships</label>
+                    <label for="defenderShips" class="col-8 col-form-label"><span class="text-success">Defender</span> Ships</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row" v-if="hasDefenderBonus">
                     <label class="col-8 col-form-label">Defender Bonus</label>
                     <label class="col-4 col-form-label text-right text-success">+1 Weapons</label>
                 </div>
@@ -27,13 +27,13 @@
                 <hr/>
 
                 <div class="form-group row">
-                    <label for="attackerWeaponTech" class="col-8 col-form-label">Attacker Weapon Technology</label>
+                    <label for="attackerWeaponTech" class="col-8 col-form-label"><span class="text-danger">Attacker</span> Weapon Technology</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerWeaponTech" placeholder="Tech Level" v-model="attacker.weaponsLevel" required="required">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="attackerShips" class="col-8 col-form-label">Attacker Ships</label>
+                    <label for="attackerShips" class="col-8 col-form-label"><span class="text-danger">Attacker</span> Ships</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerShips" placeholder="Ships" v-model="attacker.ships" required="required">
                     </div>
@@ -77,6 +77,7 @@ export default {
     return {
       isLoading: false,
       errors: [],
+      hasDefenderBonus: false,
       defender: {
         ships: 0,
         weaponsLevel: 1
@@ -87,6 +88,9 @@ export default {
       },
       result: null
     }
+  },
+  mounted () {
+    this.hasDefenderBonus = this.$store.state.game.settings.specialGalaxy.defenderBonus === 'enabled'
   },
   methods: {
     onCloseRequested (e) {

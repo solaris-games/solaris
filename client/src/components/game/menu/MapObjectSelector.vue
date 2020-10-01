@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="menu-page">
     <div class="container">
         <menu-title title="Select Object" @onCloseRequested="onCloseRequested"/>
     </div>
@@ -16,10 +16,10 @@
                         <h5><i class="fas fa-rocket"></i></h5>
                     </td>
                     <td v-if="mapObject.type === 'star'" class="bg-secondary text-center">
-                        <span>{{mapObject.data.garrison}}</span>
+                        <span>{{mapObject.data.garrison == null ? '???' : mapObject.data.garrison}}</span>
                     </td>
                     <td v-if="mapObject.type === 'carrier'" class="bg-secondary text-center">
-                        <span>{{mapObject.data.ships}}</span>
+                        <span>{{mapObject.data.ships == null ? '???' : mapObject.data.ships}}</span>
                     </td>
                     <td>
                         <span>{{mapObject.data.name}}</span>
@@ -34,7 +34,7 @@
                         <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
                         <button type="button" class="btn btn-primary"><i class="fas fa-chevron-down"></i></button>
                         <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary"><i class="fas fa-rocket"></i></button> -->
-                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
+                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
                         <button type="button" class="btn btn-primary ml-1" @click="onViewObjectRequested(mapObject)">View</button>
                     </td>
                 </tr>

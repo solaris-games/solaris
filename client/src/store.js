@@ -77,6 +77,7 @@ export default new Vuex.Store({
           carrier.waypoints = reportCarrier.waypoints
           carrier.ticksEta = reportCarrier.ticksEta
           carrier.ticksEtaTotal = reportCarrier.ticksEtaTotal
+          carrier.isGift = reportCarrier.isGift
 
           GameContainer.reloadCarrier(carrier)
         }
@@ -105,7 +106,12 @@ export default new Vuex.Store({
         star.ownedByPlayerId = reportStar.ownedByPlayerId
         star.garrison = reportStar.garrison
         star.infrastructure = reportStar.infrastructure
+        star.naturalResources = reportStar.naturalResources
+        star.terraformedResources = reportStar.terraformedResources
+      }
 
+      // Reload all stars as they may have had changes, i.e carriers may have launched etc.
+      for (let star of state.game.galaxy.stars) {
         GameContainer.reloadStar(star)
       }
 
@@ -115,7 +121,15 @@ export default new Vuex.Store({
 
         player.defeated = reportPlayer.defeated
         player.afk = reportPlayer.afk
+        player.ready = reportPlayer.ready
         player.stats = reportPlayer.stats
+        player.isInScanningRange = reportPlayer.isInScanningRange
+
+        let techKeys = Object.keys(reportPlayer.effectiveTechs).filter(k => k.match(/^[^_\$]/) != null)
+
+        for (let techKey of techKeys) {
+          player.research[techKey].effective = reportPlayer.effectiveTechs[techKey]
+        }
       }
 
       // Update player research
@@ -201,10 +215,23 @@ export default new Vuex.Store({
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
 
-        // TODO: Update the player stats
-
         GameContainer.reloadStar(star)
       })
+      
+      // Update player total stats.
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      switch (data.infrastructureType) {
+        case 'economy': 
+          player.stats.totalEconomy += data.upgraded 
+          break;
+        case 'industry': 
+          player.stats.totalIndustry += data.upgraded 
+          break;
+        case 'science': 
+          player.stats.totalScience += data.upgraded 
+          break;
+      }
     },
     gameStarWarpGateBuilt (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
@@ -221,10 +248,17 @@ export default new Vuex.Store({
       GameContainer.reloadStar(star)
     },
     gameStarCarrierBuilt (state, data) {
-      state.game.galaxy.carriers.push(data)
+      let carrier = GameHelper.getCarrierById(state.game, data._id)
+
+      if (!carrier) {
+        state.game.galaxy.carriers.push(data)
+      }
 
       let star = GameHelper.getStarById(state.game, data.orbiting)
-      star.garrison -= data.ships
+
+      if (star.garrison) {
+        star.garrison -= data.ships
+      }
 
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
       player.stats.totalCarriers++
@@ -245,12 +279,12 @@ export default new Vuex.Store({
     gameStarAbandoned (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
+      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
+      player.stats.totalStars--
+
       star.ownedByPlayerId = null
       star.garrison = 0
       star.garrisonActual = 0
-
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalStars--
 
       // Redraw and remove carriers
       let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)

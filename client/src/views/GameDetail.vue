@@ -28,7 +28,7 @@
             </tr>
             <!-- <tr>
               <td>Player Type</td>
-              <td class="text-right">{{ game.settings.general.playerType }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
             </tr> -->
           </tbody>
         </table>
@@ -38,6 +38,10 @@
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <tbody>
+            <tr>
+              <td>Galaxy Type</td>
+              <td class="text-right">{{ game.settings.galaxy.galaxyType }}</td>
+            </tr>
             <tr>
               <td>Stars Per Player</td>
               <td class="text-right">{{ game.settings.galaxy.starsPerPlayer }}</td>
@@ -56,19 +60,39 @@
           <tbody>
             <tr>
               <td>Carrier Cost</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.carrierCost }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierCost) }}</td>
             </tr>
             <tr>
               <td>Warpgate Cost</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.warpgateCost }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.warpgateCost) }}</td>
+            </tr>
+            <tr>
+              <td>Specialist Cost</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistCost) }}</td>
             </tr>
             <tr>
               <td>Random Gates</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.randomGates }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomGates) }}</td>
             </tr>
             <tr>
               <td>Dark Galaxy</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.darkGalaxy }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.darkGalaxy) }}</td>
+            </tr>
+            <tr>
+              <td>Gift Carriers</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.giftCarriers) }}</td>
+            </tr>
+            <tr>
+              <td>Defender Bonus</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.defenderBonus) }}</td>
+            </tr>
+            <tr>
+              <td>Carrier-to-Carrier Combat</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
+            </tr>
+            <tr>
+              <td>Resource Distribution</td>
+              <td class="text-right">{{ game.settings.specialGalaxy.resourceDistribution }}</td>
             </tr>
           </tbody>
         </table>
@@ -104,23 +128,23 @@
             </tr>
             <tr>
               <td>Economy Cost</td>
-              <td class="text-right">{{ game.settings.player.developmentCost.economy }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.player.developmentCost.economy) }}</td>
             </tr>
             <tr>
               <td>Industry Cost</td>
-              <td class="text-right">{{ game.settings.player.developmentCost.industry }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.player.developmentCost.industry) }}</td>
             </tr>
             <tr>
               <td>Science Cost</td>
-              <td class="text-right">{{ game.settings.player.developmentCost.science }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.player.developmentCost.science) }}</td>
             </tr>
             <tr>
               <td>Trade Cost</td>
-              <td class="text-right">{{ game.settings.player.tradeCost }} credits/level</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.player.tradeCost) }} credits/level</td>
             </tr>
             <tr>
               <td>Trade Scanning</td>
-              <td class="text-right">{{ game.settings.player.tradeScanning }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.player.tradeScanning) }}</td>
             </tr>
           </tbody>
         </table>
@@ -160,31 +184,31 @@
             </tr>
             <tr>
               <td>Terraforming Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.terraforming }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.terraforming) }}</td>
             </tr>
             <tr>
               <td>Experimentation Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.experimentation }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.experimentation) }}</td>
             </tr>
             <tr>
               <td>Scanning Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.scanning }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.scanning) }}</td>
             </tr>
             <tr>
               <td>Hyperspace Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.hyperspace }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.hyperspace) }}</td>
             </tr>
             <tr>
               <td>Manufacturing Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.manufacturing }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.manufacturing) }}</td>
             </tr>
             <tr>
               <td>Banking Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.banking }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.banking) }}</td>
             </tr>
             <tr>
               <td>Weapons Cost</td>
-              <td class="text-right">{{ game.settings.technology.researchCosts.weapons }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.weapons) }}</td>
             </tr>
           </tbody>
         </table>
@@ -195,15 +219,31 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
+              <td>Game Type</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.gameTime.gameType) }}</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Game Time</td>
               <td class="text-right">{{ game.settings.gameTime.speed }} minute(s)/tick</td>
             </tr>
-            <tr>
+            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Start Delay</td>
               <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
             </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
+              <td>Turn Jumps</td>
+              <td class="text-right">{{ game.settings.gameTime.turnJumps }} tick jumps</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
+              <td>Max Turn Wait</td>
+              <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
+            </tr>
           </tbody>
         </table>
+      </div>
+
+      <div>
+        <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
       </div>
     </div>
   </view-container>
@@ -215,6 +255,7 @@ import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
 import gameService from '../services/api/game'
+import router from '../router'
 
 export default {
   components: {
@@ -252,6 +293,52 @@ export default {
     }
 
     this.isLoadingGame = false
+  },
+  methods: {
+    async deleteGame () {
+      if (confirm('Are you sure you want to delete this game?')) {
+        this.isDeletingGame = true
+
+        try {
+          let response = await gameService.delete(this.game._id)
+
+          if (response.status === 200) {
+            router.push({ name: 'main-menu' })
+          }
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isDeletingGame = false
+      }
+    },
+    getFriendlyText (option) {
+      let text = {
+        'all': 'All',
+        'premium': 'Premium',
+        'cheap': 'Cheap',
+        'standard': 'Standard',
+        'expensive': 'Expensive',
+        'veryExpensive': 'Very Expensive',
+        'crazyExpensive': 'Crazy Expensive',
+        'none': 'None',
+        'rare': 'Rare',
+        'common': 'Common',
+        'disabled': 'Disabled',
+        'enabled': 'Enabled',
+        'start': 'Start Only',
+        'scanned': 'Scanned Only',
+        'realTime': 'Real Time',
+        'turnBased': 'Turn Based',
+        'random': 'Random',
+        'weightedCenter': 'Weighted (Center)',
+        'circular': 'Circular',
+        'spiral': 'Spiral',
+        'doughnut': 'Doughnut'
+      }[option]
+
+      return text || option
+    }
   }
 }
 </script>

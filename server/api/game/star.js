@@ -90,8 +90,10 @@ module.exports = (router, io, container) => {
                 // the stuff that the UI needs.
                 req.game.galaxy.players.forEach(p => {
                     let broadcastSummary = {
+                        playerId: req.player._id,
                         stars: summary.stars,
-                        infrastructureType: summary.infrastructureType
+                        infrastructureType: summary.infrastructureType,
+                        upgraded: summary.upgraded
                     };
     
                     // If it isn't the player who performed the bulk upgrade then strip out
@@ -171,6 +173,8 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
+            // TODO: Send whether the player who owned the star is in scanning range to all other players.
+            
             container.broadcastService.gameStarAbandoned(req.game, req.body.starId);
 
             return res.sendStatus(200);

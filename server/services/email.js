@@ -14,6 +14,11 @@ function getFakeTransport() {
     };
 }
 
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}   
 /*
     Emails will be sent via a local SMTP server using Postfix.
     See here: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-ubuntu-14-04
@@ -143,6 +148,8 @@ module.exports = class EmailService {
             
             if (user.emailEnabled) {
                 try {
+                    await sleep(2500); // This might work I dunno.
+                    
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
                         gameName,
                         gameUrl
@@ -163,6 +170,8 @@ module.exports = class EmailService {
             
             if (user.emailEnabled) {
                 try {
+                    await sleep(2500); // This might work I dunno.
+                    
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_FINISHED, [
                         gameName,
                         gameUrl
@@ -199,6 +208,8 @@ module.exports = class EmailService {
             
             if (user.emailEnabled) {
                 try {
+                    await sleep(2500); // This might work I dunno.
+
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
                         gameName,
                         gameUrl,

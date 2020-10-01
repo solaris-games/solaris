@@ -10,7 +10,7 @@
         <label class="col col-form-label">Researching Now:</label>
         <div class="col">
             <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow">
-                <option v-for="option in options" v-bind:value="option.value" v-bind:key="option.value">
+                <option v-for="option in optionsNow" v-bind:value="option.value" v-bind:key="option.value">
                     {{ option.text }}
                 </option>
             </select>
@@ -28,7 +28,7 @@
         <label class="col col-form-label">Research Next:</label>
         <div class="col">
             <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext">
-                <option v-for="option in options" v-bind:value="option.value" v-bind:key="option.value">
+                <option v-for="option in optionsNext" v-bind:value="option.value" v-bind:key="option.value">
                     {{ option.text }}
                 </option>
             </select>
@@ -51,7 +51,8 @@ export default {
       loadingNow: false,
       loadingNext: false,
       player: null,
-      options: [],
+      optionsNow: [],
+      optionsNext: [],
       timeRemainingEta: null,
       intervalFunction: null
     }
@@ -78,7 +79,10 @@ export default {
         { text: 'Manufacturing', value: 'manufacturing' }
       ]
 
-      this.options = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value))
+      this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value))
+      this.optionsNext = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value))
+
+      this.optionsNext.push({ text: 'Random', value: 'random' })
     },
     async updateResearchNow (e) {
       this.loadingNow = true
@@ -115,10 +119,7 @@ export default {
       this.loadingNext = false
     },
     recalculateTimeRemaining () {
-      let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.player.currentResearchTicksEta,
-        this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-      this.timeRemainingEta = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.player.currentResearchTicksEta)
     }
   }
 }

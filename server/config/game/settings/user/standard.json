@@ -7,15 +7,21 @@
         "playerLimit": 8,
         "playerType": "all"
     },
+    "galaxy": {
+        "galaxyType": "circular",
+        "starsPerPlayer": 20,
+        "productionTicks": 24
+    },
     "specialGalaxy": {
         "carrierCost": "standard",
         "warpgateCost": "standard",
+        "specialistCost": "standard",
         "randomGates": "none",
-        "darkGalaxy": "start"
-    },
-    "galaxy": {
-        "starsPerPlayer": 20,
-        "productionTicks": 24
+        "darkGalaxy": "disabled",
+        "giftCarriers": "disabled",
+        "defenderBonus": "enabled",
+        "carrierToCarrierCombat": "enabled",
+        "resourceDistribution": "random"
     },
     "player": {
         "startingStars": 6,
@@ -55,7 +61,10 @@
         }
     },
     "gameTime": {
+        "gameType": "realTime",
         "speed": 30,
-        "startDelay": 30
+        "startDelay": 30,
+        "turnJumps": 8,
+        "maxTurnWait": 24
     }
 }

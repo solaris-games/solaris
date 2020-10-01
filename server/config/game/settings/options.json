@@ -69,6 +69,24 @@
             "text": "Expensive"
             }
         ],
+        "specialistCost": [
+            {
+                "value": "none",
+                "text": "No"
+            },
+            {
+                "value": "cheap",
+                "text": "Cheap"
+            },
+            {
+                "value": "standard",
+                "text": "Standard"
+            },
+            {
+                "value": "expensive",
+                "text": "Expensive"
+            }
+        ],
         "randomGates": [
             {
             "value": "none",
@@ -96,9 +114,63 @@
             "value": "start",
             "text": "Dark Start Only"
             }
+        ],
+        "giftCarriers": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
+        ],
+        "defenderBonus": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
+        ],
+        "carrierToCarrierCombat": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
+        ],
+        "resourceDistribution": [
+            {
+            "value": "random",
+            "text": "Random"
+            },
+            {
+            "value": "weightedCenter",
+            "text": "Weighted (Center)"
+            }
         ]
         },
         "galaxy": {
+        "galaxyType": [
+            {
+            "value": "circular",
+            "text": "Circular"
+            },
+            {
+            "value": "spiral",
+            "text": "Spiral"
+            },
+            {
+            "value": "doughnut",
+            "text": "Doughnut"
+            }
+        ],
         "starsPerPlayer": [
             {
             "value": 5,
@@ -273,6 +345,16 @@
         ]
         },
         "gameTime": {
+        "gameType": [
+            {
+                "value": "realTime",
+                "text": "Real Time"
+            },
+            {
+                "value": "turnBased",
+                "text": "Turn Based"
+            }
+        ],
         "speed": [
             {
                 "value": 1,
@@ -292,7 +374,7 @@
             },
             {
                 "value": 60,
-                "text": "Slow Speed (1 tick = 1 hour)"
+                "text": "Slow (1 tick = 1 hour)"
             }
         ],
         "startDelay": [
@@ -315,6 +397,62 @@
             {
                 "value": 240,
                 "text": "4 Hours"
+            }
+        ],
+        "turnJumps": [
+            {
+                "value": 1,
+                "text": "1 Tick Jumps"
+            },
+            {
+                "value": 6,
+                "text": "6 Tick Jumps"
+            },
+            {
+                "value": 8,
+                "text": "8 Tick Jumps"
+            },
+            {
+                "value": 12,
+                "text": "12 Tick Jumps"
+            },
+            {
+                "value": 24,
+                "text": "24 Tick Jumps"
+            }
+        ],
+        "maxTurnWait": [
+            {
+                "value": 1,
+                "text": "1 Hour"
+            },
+            {
+                "value": 6,
+                "text": "6 Hours"
+            },
+            {
+                "value": 8,
+                "text": "8 Hours"
+            },
+            {
+                "value": 10,
+                "text": "10 Hours"
+            },
+            {
+                "value": 12,
+                "text": "12 Hours"
+            },
+            {
+                "value": 18,
+                "text": "18 Hours"
+            },
+            {
+                "value": 24,
+                "text": "24 Hours"
+            },
+            {
+                "value": 48,
+                "text": "48 Hours"
             }
         ]
     }

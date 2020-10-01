@@ -51,9 +51,9 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  joinGame (gameId, playerId, alias) {
+  joinGame (gameId, playerId, alias, avatar, password) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/join', {
-      playerId, alias
+      playerId, alias, avatar, password
     },
     { withCredentials: true })
   }
@@ -68,8 +68,18 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  getEvents (gameId) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/events',
+  delete (gameId) {
+    return axios.delete(this.BASE_URL + 'game/' + gameId,
+      { withCredentials: true })
+  }
+
+  getEvents (gameId, startTick = 0) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/events?startTick=' + startTick.toString(),
+      { withCredentials: true })
+  }
+
+  confirmReady (gameId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/ready', null,
       { withCredentials: true })
   }
 }

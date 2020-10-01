@@ -1,7 +1,7 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-block mr-5">
+        <div class="col-auto d-none d-md-block mr-5" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
 
             {{game.settings.general.name}}
@@ -17,7 +17,8 @@
             </span>
 
             <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
-
+        </div>
+        <div class="col-auto text-right infrastructure" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
             <span class="d-none d-sm-inline-block ml-4">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
@@ -93,6 +94,7 @@ import ResearchProgressVue from './ResearchProgress'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -162,6 +164,9 @@ export default {
     onViewResearchRequested (e) {
       this.setMenuState(this.MENU_STATES.RESEARCH, e)
     },
+    onViewBulkUpgradeRequested (e) {
+      this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE, e)
+    },
     fitGalaxy () {
       GameContainer.viewport.fitWorld()
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
@@ -177,15 +182,9 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let productionTicks = this.$store.state.game.settings.galaxy.productionTicks
-        let currentTick = this.$store.state.game.state.tick
-        let currentProductionTick = this.$store.state.game.state.productionTick
+        let ticksToProduction = gameHelper.getTicksToProduction(this.$store.state.game)
 
-        let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
-        let nextProductionTickDate = GameHelper.calculateTimeByTicks(ticksToProduction,
-          this.$store.state.game.settings.gameTime.speed, this.$store.state.game.state.lastTickDate)
-
-        this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, nextProductionTickDate)
+        this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }
     },
     gameIsPaused () {
@@ -232,4 +231,7 @@ export default {
     overflow: auto;
     overflow-x: hidden;
 } */
+.infrastructure {
+  cursor:pointer;
+}
 </style>

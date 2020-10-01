@@ -63,8 +63,10 @@ module.exports = class LedgerService extends EventEmitter {
 
         let debtAmount = Math.abs(ledgerA.debt);
 
+        // If the debtor cannot fully settle the debt then only
+        // pay what they can (their total credits)
         if (debtor.credits < debtAmount) {
-            throw new ValidationError('You do not have enough credits to fully settle the debt.')
+            debtAmount = debtor.credits;
         }
 
         ledgerA.debt += debtAmount;

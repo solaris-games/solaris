@@ -1,6 +1,6 @@
 <template>
 <!-- :style="{'background-image': 'linear-gradient(to right, ' + colour + ', #375a7f 50%)'}" -->
-<div class="container bg-primary pt-2" @click="openConversation">
+<div class="container bg-primary pt-2" @click="openConversation" :style="{'background-image': 'linear-gradient(to left, ' + colour + ', #375a7f 100%)'}">
     <div class="row">
         <div class="col">
             <span v-if="message && !message.read && getUserPlayer()._id === message.toPlayerId" class="mr-1">

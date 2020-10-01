@@ -1,11 +1,16 @@
+const ValidationError = require("../errors/validation");
+
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, nameService, starMapService) {
+    constructor(randomService, starService, starDistanceService, nameService, 
+        circularMapService, spiralMapService, doughnutMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.nameService = nameService;
-        this.starMapService = starMapService;
+        this.circularMapService = circularMapService;
+        this.spiralMapService = spiralMapService;
+        this.doughnutMapService = doughnutMapService;
     }
 
     generateStars(game, starCount, playerLimit, warpGatesSetting) {
@@ -15,11 +20,32 @@ module.exports = class MapService {
         const starNames = this.nameService.getRandomStarNames(starCount);
 
         // Generate all of the locations for stars.
-        const starLocations = this.starMapService.generateLocations(game, starCount);
+        let starLocations = [];
+
+        switch (game.settings.galaxy.galaxyType) {
+            case 'circular': 
+                starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
+                break;
+            case 'spiral': 
+                starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
+                break;
+            case 'doughnut': 
+                starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
+                break;
+            default:
+                throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
+        }
 
         // Iterate over all star locations
         for (let i = 0; i < starLocations.length; i++) {
-            const star = this.starService.generateUnownedStar(game, starNames[i], starLocations[i]);
+            let starLocation = starLocations[i];
+
+            let loc = {
+                x: starLocation.x,
+                y: starLocation.y
+            };
+
+            const star = this.starService.generateUnownedStar(game, starNames[i], loc, starLocation.resources);
 
             stars.push(star);
         }
@@ -53,10 +79,10 @@ module.exports = class MapService {
     }
 
     getGalaxyDiameter(stars) {
-        let maxX = stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
-        let maxY = stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
-        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
-        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
+        let maxX = stars.sort((a, b) => b.x - a.x)[0].x;
+        let maxY = stars.sort((a, b) => b.y - a.y)[0].y;
+        let minX = stars.sort((a, b) => a.x - b.x)[0].x;
+        let minY = stars.sort((a, b) => a.y - b.y)[0].y;
 
         return {
             x: Math.abs(minX) + Math.abs(maxX),
@@ -64,11 +90,11 @@ module.exports = class MapService {
         };
     }
 
-    getGalaxyCenter(stars) {
-        let maxX = stars.sort((a, b) => b.location.x - a.location.x)[0].location.x;
-        let maxY = stars.sort((a, b) => b.location.y - a.location.y)[0].location.y;
-        let minX = stars.sort((a, b) => a.location.x - b.location.x)[0].location.x;
-        let minY = stars.sort((a, b) => a.location.y - b.location.y)[0].location.y;
+    getGalaxyCenter(starLocations) {
+        let maxX = starLocations.sort((a, b) => b.x - a.x)[0].x;
+        let maxY = starLocations.sort((a, b) => b.y - a.y)[0].y;
+        let minX = starLocations.sort((a, b) => a.x - b.x)[0].x;
+        let minY = starLocations.sort((a, b) => a.y - b.y)[0].y;
 
         return {
             x: (minX + maxX) / 2,
@@ -76,13 +102,13 @@ module.exports = class MapService {
         };
     }
 
-    getGalaxyCenterOfMass(stars) {
-        let totalX = stars.reduce((total, s) => total += s.location.x, 0);
-        let totalY = stars.reduce((total, s) => total += s.location.y, 0);
+    getGalaxyCenterOfMass(starLocations) {
+        let totalX = starLocations.reduce((total, s) => total += s.x, 0);
+        let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 
         return {
-            x: totalX / stars.length,
-            y: totalY / stars.length,
+            x: totalX / starLocations.length,
+            y: totalY / starLocations.length,
         };
     }
 

@@ -15,8 +15,6 @@ module.exports = (router, io, container) => {
         req.body.general.createdByUserId = req.session.userId;
 
         try {
-            throw new ValidationError('Custom game creation has been disabled in the beta.');
-
             let game = await container.gameCreateService.create(req.body);
 
             return res.status(201).json(game._id);
@@ -97,7 +95,9 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.session.userId,
                 req.body.playerId,
-                req.body.alias);
+                req.body.alias,
+                req.body.avatar,
+                req.body.password);
 
             container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias);
 
@@ -137,6 +137,32 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.declareReady(
+                req.game,
+                req.player);
+                
+            container.broadcastService.gamePlayerReady(req.game, req.player);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+        try {
+            await container.gameService.delete(
+                req.game,
+                req.session.userId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayers, async (req, res, next) => {
         try {
             let user = await container.gameService.getPlayerUserLean(
@@ -151,10 +177,13 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+        let startTick = +req.query.startTick || 0;
+        
         try {
             let events = await container.eventService.getPlayerEvents(
                 req.game,
-                req.player
+                req.player,
+                startTick
             );
 
             return res.status(200).json(events);

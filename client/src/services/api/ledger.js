@@ -1,6 +1,7 @@
 import axios from 'axios'
 import BaseApiService from './base'
 
+// TODO: This is wrong, should be LedgerService.
 class CarrierService extends BaseApiService {
   getLedger (gameId) {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/ledger',

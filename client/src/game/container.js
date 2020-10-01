@@ -40,7 +40,8 @@ class GameContainer {
       stopPropagation: true,
       passiveWheel: true,
 
-      interaction: this.app.renderer.plugins.interaction // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
+      interaction: this.app.renderer.plugins.interaction, // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
+      disableOnContextMenu: true
     })
 
     // add the viewport to the stage
@@ -54,10 +55,10 @@ class GameContainer {
   setupViewport (game) {
     this.game = game
 
-    this.starFieldLeft = this._calculateMinStarX(game) - 500
-    this.starFieldRight = this._calculateMaxStarX(game) + 500
-    this.starFieldTop = this._calculateMinStarY(game) - 250
-    this.starFieldBottom = this._calculateMaxStarY(game) + 250
+    this.starFieldLeft = this._calculateMinStarX(game) - 1000
+    this.starFieldRight = this._calculateMaxStarX(game) + 1000
+    this.starFieldTop = this._calculateMinStarY(game) - 500
+    this.starFieldBottom = this._calculateMaxStarY(game) + 500
 
     // activate plugins
     this.viewport

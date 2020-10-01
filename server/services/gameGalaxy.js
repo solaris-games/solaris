@@ -4,7 +4,7 @@ module.exports = class GameGalaxyService {
 
     constructor(mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService) {
+        waypointService, researchService, specialistService, technologyService) {
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -14,6 +14,8 @@ module.exports = class GameGalaxyService {
         this.carrierService = carrierService;
         this.waypointService = waypointService;
         this.researchService = researchService;
+        this.specialistService = specialistService;
+        this.technologyService = technologyService;
     }
 
     async getGalaxy(game, userId) {
@@ -25,6 +27,10 @@ module.exports = class GameGalaxyService {
         if (game.state.startDate && !player) {
             throw new ValidationError('Cannot view information about this game, you are not playing.');
         }
+
+        // Remove who created the game.
+        delete game.settings.general.createdByUserId;
+        delete game.settings.general.password; // Don't really need to explain why this is removed.
 
         // TODO: If the game is completed then show everything.
 
@@ -44,8 +50,8 @@ module.exports = class GameGalaxyService {
         } else {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
-            this._setStarInfoDetailed(game, player);
             this._setCarrierInfoDetailed(game, player);
+            this._setStarInfoDetailed(game, player);
             this._setPlayerInfoBasic(game, player);
     
             // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
@@ -90,6 +96,10 @@ module.exports = class GameGalaxyService {
 
         doc.galaxy.stars = doc.galaxy.stars
         .map(s => {
+            if (s.specialistId) {
+                s.specialist = this.specialistService.getByIdStar(s.specialistId);
+            }
+
             return {
                 _id: s._id,
                 name: s.name,
@@ -97,7 +107,9 @@ module.exports = class GameGalaxyService {
                 location: s.location,
                 warpGate: s.warpGate,
                 stats: s.stats,
-                manufacturing: s.manufacturing
+                manufacturing: s.manufacturing,
+                specialistId: s.specialistId,
+                specialist: s.specialist
             }
         });
     }
@@ -112,8 +124,6 @@ module.exports = class GameGalaxyService {
             doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
         }
 
-        let scanningRangeDistance = this.distanceService.getScanningDistance(doc, player.research.scanning.level);
-
         // Get all of the player's stars.
         let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
 
@@ -122,9 +132,9 @@ module.exports = class GameGalaxyService {
         .map(s => {
             // Calculate the star's terraformed resources.
             if (s.ownedByPlayerId) {
-                let owningPlayer = doc.galaxy.players.find(x => x._id.equals(s.ownedByPlayerId));
+                let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
-                s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayer.research.terraforming.level);
+                s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayerEffectiveTechs.terraforming);
             }
 
             // Ignore stars the player owns, they will always be visible.
@@ -134,23 +144,30 @@ module.exports = class GameGalaxyService {
                 // Calculate infrastructure upgrades for the star.
                 this._setUpgradeCosts(doc, s);
                 
+                if (s.specialistId) {
+                    s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                }
+
                 return s;
             }
 
             // Get the closest player star to this star.
-            let inRange = false;
-
-            if (playerStars.length) {
-                let closest = this.starDistanceService.getClosestStar(s, playerStars);
-                let distance = this.starDistanceService.getDistanceBetweenStars(s, closest);
-    
-                inRange = distance <= scanningRangeDistance;
-            }
+            let inRange = this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
 
             // If its in range then its all good, send the star back as is.
             // Otherwise only return a subset of the data.
             if (inRange) {
                 // delete s.garrisonActual; // TODO: Don't need to send this back?
+
+                if (s.specialistId) {
+                    s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                }
+                
+                let canSeeStarGarrison = this.starService.canPlayerSeeStarGarrison(player, s);
+
+                if (!canSeeStarGarrison) {
+                    s.garrison = null;
+                }
 
                 return s;
             } else {
@@ -181,17 +198,46 @@ module.exports = class GameGalaxyService {
 
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
-            .forEach(c => this.waypointService.populateCarrierWaypointEta(doc, c));
+            .forEach(c => {
+                this.waypointService.populateCarrierWaypointEta(doc, c);
+                
+                if (c.specialistId) {
+                    c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
+                }
+
+                if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                    c.ships = null;
+                }
+            });
     }
 
     _setPlayerInfoBasic(doc, player) {
+        // Calculate which players are in scanning range.
+        let playersInRange = [];
+        
+        if (player) {
+            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, player);
+        }
+
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
+            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
+
+            p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
+
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
+
+                player.research.scanning.effective = effectiveTechs.scanning;
+                player.research.hyperspace.effective = effectiveTechs.hyperspace;
+                player.research.terraforming.effective = effectiveTechs.terraforming;
+                player.research.experimentation.effective = effectiveTechs.experimentation;
+                player.research.weapons.effective = effectiveTechs.weapons;
+                player.research.banking.effective = effectiveTechs.banking;
+                player.research.manufacturing.effective = effectiveTechs.manufacturing;
 
                 return p;
             }
@@ -200,19 +246,43 @@ module.exports = class GameGalaxyService {
             return {
                 colour: p.colour,
                 research: {
-                    scanning: { level: p.research.scanning.level },
-                    hyperspace: { level: p.research.hyperspace.level },
-                    terraforming: { level: p.research.terraforming.level },
-                    experimentation: { level: p.research.experimentation.level },
-                    weapons: { level: p.research.weapons.level },
-                    banking: { level: p.research.banking.level },
-                    manufacturing: { level: p.research.manufacturing.level }
+                    scanning: { 
+                        level: p.research.scanning.level,
+                        effective: effectiveTechs.scanning
+                    },
+                    hyperspace: { 
+                        level: p.research.hyperspace.level,
+                        effective: effectiveTechs.hyperspace
+                    },
+                    terraforming: { 
+                        level: p.research.terraforming.level,
+                        effective: effectiveTechs.terraforming
+                    },
+                    experimentation: { 
+                        level: p.research.experimentation.level,
+                        effective: effectiveTechs.experimentation
+                    },
+                    weapons: { 
+                        level: p.research.weapons.level,
+                        effective: effectiveTechs.weapons
+                    },
+                    banking: { 
+                        level: p.research.banking.level,
+                        effective: effectiveTechs.banking
+                    },
+                    manufacturing: { 
+                        level: p.research.manufacturing.level,
+                        effective: effectiveTechs.manufacturing
+                    }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
+                isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
                 afk: p.afk,
+                ready: p.ready,
                 _id: p._id,
                 alias: p.alias,
+                avatar: p.avatar,
                 homeStarId: p.homeStarId,
                 stats: p.stats
             };

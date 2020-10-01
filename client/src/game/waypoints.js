@@ -44,7 +44,7 @@ class Waypoints extends EventEmitter {
     let userPlayer = this.game.galaxy.players.find(p => p.userId)
 
     // Calculate which stars are in reach and draw highlights around them
-    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer.research.hyperspace.level)
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
 
     let stars = this.game.galaxy.stars.filter(s => {
       let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
@@ -90,7 +90,16 @@ class Waypoints extends EventEmitter {
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 
-    let radius = ((player.research.hyperspace.level || 1) + 1.5) * this.lightYearDistance
+    // TODO: Use the game helper instead?
+    let techLevel = player.research.hyperspace.effective
+    
+    if (this.carrier.specialist && this.carrier.specialist.modifiers.local) {
+      techLevel += this.carrier.specialist.modifiers.local.hyperspace || 0
+    }
+
+    techLevel = Math.max(1, techLevel)
+
+    let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
 
     graphics.lineStyle(1, player.colour.value, 0.2)
     graphics.beginFill(player.colour.value, 0.15)
@@ -133,7 +142,7 @@ class Waypoints extends EventEmitter {
     // a new waypoint to this star.
     let userPlayer = this.game.galaxy.players.find(p => p.userId)
 
-    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer.research.hyperspace.level)
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
 
     const lastLocation = this._getLastLocation()
     const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)

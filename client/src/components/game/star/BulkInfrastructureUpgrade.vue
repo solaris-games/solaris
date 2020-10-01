@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="menu-page container">
     <menu-title title="Bulk Upgrade" @onCloseRequested="onCloseRequested" />
 
     <div class="row">
@@ -78,6 +78,10 @@ export default {
     },
     async upgrade () {
       if (this.amount <= 0) {
+        return
+      }
+
+      if (!confirm(`Are you sure you want to spend $${this.amount} credits to upgrade ${this.selectedType} across all of your stars?`)) {
         return
       }
 

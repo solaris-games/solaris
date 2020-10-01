@@ -20,6 +20,7 @@ class Star extends EventEmitter {
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to force initial redraw
     this.zoomPercent = 0
+    this.clicks = 0
   }
 
   _getStarPlayer () {
@@ -33,7 +34,7 @@ class Star extends EventEmitter {
   }
 
   _getStarCarrierGarrison () {
-    return this._getStarCarriers().reduce((sum, c) => sum + c.ships, 0)
+    return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
   _isInScanningRange () {
@@ -55,6 +56,7 @@ class Star extends EventEmitter {
     let force = this.isInScanningRange !== this._isInScanningRange()
 
     this.drawStar(force)
+    this.drawSpecialist(force)
     // this.drawTerritory(force)
     this.drawPlanets(force)
     this.drawColour(force)
@@ -93,11 +95,39 @@ class Star extends EventEmitter {
     let radius = 3
     let alpha = this._isInScanningRange() ? 1 : 0.3
 
+    let starPoints = radius * (this.data.specialistId ? 3 : 2);
+
     this.graphics_star.beginFill(0xFFFFFF, alpha)
-    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, radius * 2, radius, radius - 3)
+    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, starPoints, radius, radius - 3)
     this.graphics_star.endFill()
 
+    if (this.hasSpecialist()) {
+      this.graphics_star.beginFill(0x000000)
+      this.graphics_star.lineStyle(0.3, 0xFFFFFF)
+      this.graphics_star.drawCircle(this.data.location.x, this.data.location.y, 2.2)
+      this.graphics_star.endFill()
+    }
+
     this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
+  }
+
+  drawSpecialist () {
+    if (!this.hasSpecialist()) {
+      return
+    }
+    
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
+    let specialistSprite = new PIXI.Sprite(specialistTexture)
+    specialistSprite.width = 3.5
+    specialistSprite.height = 3.5
+    specialistSprite.x = this.data.location.x - 1.75
+    specialistSprite.y = this.data.location.y - 1.75
+    
+    this.container.addChild(specialistSprite)
+  }
+
+  hasSpecialist () {
+    return this.data.specialistId && this.data.specialistId > 0
   }
 
   drawTerritory (force) {
@@ -191,7 +221,11 @@ class Star extends EventEmitter {
   }
 
   _getPlanetsCount () {
-    return Math.floor(this.data.naturalResources / 50 * 3)
+    if (!this.data.naturalResources) {
+      return 0
+    }
+    
+    return Math.floor(this.data.naturalResources / 45 * 3) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {
@@ -270,11 +304,19 @@ class Star extends EventEmitter {
     }
 
     let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let displayGarrison = ''
 
-    this.text_garrison.text = totalGarrison
+    if (totalGarrison > 0) {
+      displayGarrison = totalGarrison
+    }
+    else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
+      displayGarrison = '???'
+    }
+
+    this.text_garrison.text = displayGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = totalGarrison > 0 && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+    this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   drawInfrastructure (force) {
@@ -304,43 +346,6 @@ class Star extends EventEmitter {
     }
   }
 
-  // TODO: Not used, decide whether we actually want to display the player name on the map at all.
-  // If not, remove this.
-  drawPlayerName (force) {
-    if (force && this.text_playerName) {
-      this.container.removeChild(this.text_playerName)
-      this.text_playerName = null
-    }
-
-    if (!this.text_playerName) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
-
-      this.text_playerName = new PIXI.Text('', style)
-      this.text_playerName.resolution = 10
-
-      this.container.addChild(this.text_playerName)
-    }
-
-    // Get the player who owns the star.
-    let player = this._getStarPlayer()
-
-    if (player) {
-      this.text_playerName.text = player.alias
-      this.text_playerName.x = this.data.location.x - (this.text_playerName.width / 2)
-
-      if (this.data.garrison == null) {
-        this.text_playerName.y = this.data.location.y + 12
-      } else {
-        this.text_playerName.y = this.data.location.y + 17
-      }
-
-      this.text_playerName.visible = this.zoomPercent < 60
-    } else {
-      this.text_playerName.visible = false
-    }
-  }
-
   drawScanningRange (force) {
     if (force && this.graphics_scanningRange) {
       this.container.removeChild(this.graphics_scanningRange)
@@ -364,7 +369,16 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
-    let radius = ((player.research.scanning.level || 1) + 1) * this.lightYearDistance
+    // TODO: Use the game helper instead?
+    let techLevel = player.research.scanning.effective
+    
+    if (this.data.specialist && this.data.specialist.modifiers.local) {
+      techLevel += this.data.specialist.modifiers.local.scanning || 0
+    }
+
+    techLevel = Math.max(1, techLevel)
+
+    let radius = ((techLevel || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
@@ -398,7 +412,16 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
-    let radius = ((player.research.hyperspace.level || 1) + 1.5) * this.lightYearDistance
+    // TODO: Use the game helper instead?
+    let techLevel = player.research.hyperspace.effective
+    
+    if (this.data.specialist && this.data.specialist.modifiers.local) {
+      techLevel += this.data.specialist.modifiers.local.hyperspace || 0
+    }
+
+    techLevel = Math.max(1, techLevel)
+
+    let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
@@ -409,9 +432,32 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
-    this.emit('onStarClicked', this.data)
+    if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
+      this.emit('onStarRightClicked', this.data)
+    } else {
+      this.clicks++
 
-    this.drawActive(false)
+      setTimeout(() => {
+        this.clicks = 0
+      }, 500)
+      
+      if (this.clicks > 1) {
+        this.emit('onStarDoubleClicked', this.data)
+        this.clicks = 0
+
+        // Need to do this otherwise sometimes text gets highlighted.
+        this.deselectAllText()
+      } else {
+        this.emit('onStarClicked', this.data)
+      }
+
+      this.drawActive(false)
+    }
+  }
+
+  deselectAllText () {
+    if (window.getSelection) {window.getSelection().removeAllRanges();}
+    else if (document.selection) {document.selection.empty();}
   }
 
   onMouseOver (e) {

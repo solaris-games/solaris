@@ -69,7 +69,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.shipTransferService.transfer(
+            let report = await container.shipTransferService.transfer(
                 req.game,
                 req.player,
                 req.params.carrierId,
@@ -80,8 +80,14 @@ module.exports = (router, io, container) => {
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
-            playersWithinScanningRange.forEach(p => 
-                container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));
+            playersWithinScanningRange.forEach(p => {
+                let canSeeStarGarrison = container.starService.canPlayerSeeStarGarrison(p, report.star);
+                let canSeeCarrierShips = container.carrierService.canPlayerSeeCarrierShips(p, report.carrier);
+
+                container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, 
+                    req.body.starId, canSeeStarGarrison ? req.body.starShips : null, 
+                    req.params.carrierId, canSeeCarrierShips ? req.body.carrierShips : null);
+            });
 
             return res.sendStatus(200);
         } catch (err) {
@@ -89,7 +95,32 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        let errors = [];
+
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
+
+        try {
+            await container.carrierService.convertToGift(
+                req.game,
+                req.player,
+                req.params.carrierId);
+
+            // // Broadcast the event to the current player and also all other players within scanning range.
+            // let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            // playersWithinScanningRange.forEach(p => 
+            //     container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, (req, res, next) => {
         let errors = [];
 
         if (req.body.defender.ships == null) {
@@ -130,6 +161,7 @@ module.exports = (router, io, container) => {
 
         try {
             let result = container.combatService.calculate(
+                req.game,
                 req.body.defender,
                 req.body.attacker);
 

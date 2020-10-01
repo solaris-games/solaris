@@ -1,5 +1,5 @@
 <template>
-<div class="container" v-if="star">
+<div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary">
@@ -24,7 +24,7 @@
             Natural Resources
         </div>
         <div class="col text-right">
-            {{star.naturalResources || '???'}} <i class="fas fa-globe ml-1"></i>
+            {{star.naturalResources == null ? '???' : star.naturalResources}} <i class="fas fa-globe ml-1"></i>
         </div>
     </div>
 
@@ -49,7 +49,7 @@
           <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
         </div>
           <div class="col-auto">
-              {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+              {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
           </div>
       </div>
     </div>
@@ -60,7 +60,7 @@
       <infrastructure
         :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
-      <infrastructureUpgrade v-if="userPlayer && starOwningPlayer != null && starOwningPlayer == userPlayer && !userPlayer.defeated && star.upgradeCosts != null"
+      <infrastructureUpgrade v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
         :star="star"
         :availableCredits="userPlayer.credits"
         :economy="star.upgradeCosts.economy"
@@ -76,7 +76,7 @@
     </div>
 
     <!-- TODO: Turn these into components -->
-    <div v-if="userPlayer && starOwningPlayer != null && starOwningPlayer == userPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
+    <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
       <div class="row bg-secondary pt-2 pb-0 mb-1">
         <div class="col-8">
           <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
@@ -120,18 +120,22 @@
       -->
     </div>
 
+    <h4 class="pt-2" v-if="canShowSpecialist">Specialist</h4>
+
+    <star-specialist v-if="canShowSpecialist" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
+<!-- 
     <playerOverview v-if="starOwningPlayer" :playerId="starOwningPlayer._id"
       @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"/> -->
 
     <!-- Modals -->
 
-    <dialogModal v-if="userPlayer && starOwningPlayer == userPlayer && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
+    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
       <p>Are you sure you want build a Carrier at <b>{{star.name}}</b>?</p>
       <p>The carrier will cost ${{star.upgradeCosts.carriers}}.</p>
     </dialogModal>
 
-    <dialogModal v-if="userPlayer && starOwningPlayer == userPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
       <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
       <p>The upgrade will cost ${{star.upgradeCosts.warpGate}}.</p>
     </dialogModal>
@@ -157,6 +161,7 @@ import InfrastructureUpgrade from './InfrastructureUpgrade'
 import PlayerOverview from '../player/Overview'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
+import StarSpecialistVue from './StarSpecialist'
 
 export default {
   components: {
@@ -165,7 +170,8 @@ export default {
     'infrastructureUpgrade': InfrastructureUpgrade,
     'playerOverview': PlayerOverview,
     'modalButton': ModalButton,
-    'dialogModal': DialogModal
+    'dialogModal': DialogModal,
+    'star-specialist': StarSpecialistVue
   },
   props: {
     starId: String
@@ -176,7 +182,8 @@ export default {
       starOwningPlayer: null,
       userPlayer: null,
       currentPlayerId: null,
-      canBuildWarpGates: false
+      canBuildWarpGates: false,
+      canShowSpecialist: false
     }
   },
   mounted () {
@@ -185,6 +192,11 @@ export default {
     this.starOwningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
+    
+    // Can display specialist section if sepcialists are enabled and the star is owned by a player.
+    // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
+    this.canShowSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' 
+      && (this.star.specialistId || this.isOwnedByUserPlayer)
   },
   methods: {
     onCloseRequested (e) {
@@ -195,6 +207,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onViewHireStarSpecialistRequested (e) {
+      this.$emit('onViewHireStarSpecialistRequested', e)
     },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
@@ -222,7 +237,7 @@ export default {
       }
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.starOwningPlayer._id)
+      this.$emit('onOpenPlayerDetailRequested', this.star.ownedByPlayerId)
     },
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
@@ -242,6 +257,7 @@ export default {
 
           // this.$emit('onCarrierBuilt', this.star._id)
           // this.onOpenCarrierDetailRequested(response.data)
+          this.$store.state.game.galaxy.carriers.push(response.data)
           this.onEditWaypointsRequested(response.data)
           this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
@@ -296,6 +312,13 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    }
+  },
+  computed: {
+    isOwnedByUserPlayer: function() {
+      let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
+
+      return owner && this.userPlayer && owner == this.userPlayer
     }
   }
 }

@@ -13,7 +13,8 @@
                     </select>
                 </div>
                 <div class="col-5">
-                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" :disabled="!availableTechnologies.length">Share Technology</modalButton>
+                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
+                      :disabled="!availableTechnologies.length || selectedTechnology.cost > userPlayer.credits">Share Technology</modalButton>
                 </div>
             </div>
         </form>
@@ -86,6 +87,8 @@ export default {
           let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
 
           playerTech.level = this.selectedTechnology.level
+          
+          gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
           
           this.getTradeableTechnologies()
         }

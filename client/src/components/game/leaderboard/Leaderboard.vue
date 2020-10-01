@@ -1,5 +1,5 @@
 <template>
-<div class="container pb-2">
+<div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-primary">
@@ -11,7 +11,13 @@
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
             <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
-            <p>Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
+            <p class="mb-2">Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
+        </div>
+    </div>
+
+    <div class="row bg-secondary" v-if="!game.state.endDate">
+        <div class="col text-center pt-2 pb-0">
+            <p class="pb-0 mb-2">{{timeRemaining}}</p>
         </div>
     </div>
 
@@ -29,20 +35,23 @@
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
                   <tr v-for="player in sortedPlayers" :key="player._id">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                      <td class="col-avatar" :title="player.colour.alias">
-                          <!-- TODO: Prefer images over font awesome icons? -->
-                          <i class="far fa-user pl-2 pr-2 pt-2 pb-2" style="font-size:40px;"></i>
-                          <!-- <img src=""> -->
+                      <td class="col-avatar" :title="player.colour.alias" @click="onOpenPlayerDetailRequested(player)">
+                          <img v-if="player.avatar" :src="getAvatarImage(player)">
+                          <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:40px;"></i>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
-                          <h5>{{player.alias}}
-                            <span v-if="player.defeated && !player.afk">(DEFEATED)</span>
-                            <span v-if="player.defeated && player.afk">(AFK)</span>
+                          <h5>
+                            {{player.alias}}
+                            <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
+                      </td>
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame()">
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
+                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -77,6 +86,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import router from '../../../router'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
@@ -100,17 +110,29 @@ export default {
   data () {
     return {
       players: [],
-      sortedPlayers: []
+      sortedPlayers: [],
+      timeRemaining: null
     }
   },
   mounted () {
     this.players = this.$store.state.game.galaxy.players
-    this.sortedPlayers = this.getSortedLeaderboardPlayerList()
-  },
+    this.sortedPlayers = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
 
+    this.recalculateTimeRemaining()
+
+    if (GameHelper.isGameInProgress(this.$store.state.game)) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+    }
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
+  },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e._id)
     },
     panToPlayer (player) {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
@@ -121,25 +143,27 @@ export default {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
-    getSortedLeaderboardPlayerList () {
-      // Sort by total number of stars, then by total ships, then by total carriers.
-      return this.players
-        .sort((a, b) => {
-          // Sort by total stars descending
-          if (a.stats.totalStars > b.stats.totalStars) return -1
-          if (a.stats.totalStars < b.stats.totalStars) return 1
+    isTurnBasedGame () {
+      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
+    isUserPlayer (player) {
+      let userPlayer = this.getUserPlayer()
 
-          // Then by total ships descending
-          if (a.stats.totalShips > b.stats.totalShips) return -1
-          if (a.stats.totalShips < b.stats.totalShips) return 1
+      return userPlayer && userPlayer._id === player._id
+    },
+    recalculateTimeRemaining () {
+      if (this.$store.state.game.settings.gameTime.gameType === 'realTime') {
+        let time = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)
 
-          // Then by total carriers descending
-          if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
-          if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
+        this.timeRemaining = `Next tick: ${time}`
+      } else {
+        // Calculate when the max wait limit date is.
+        let maxWaitLimitDate = moment(this.$store.state.game.state.startDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
 
-          // Then by defeated descending
-          return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
-        })
+        let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
+
+        this.timeRemaining = `Next turn: ${time}`
+      }
     },
     async concedeDefeat () {
       try {
@@ -167,6 +191,23 @@ export default {
         console.error(err)
       }
     },
+    async confirmReady (player) {
+      if (!confirm('Are you sure you want to end your turn?')) {
+        return
+      }
+      
+      try {
+        let response = await gameService.confirmReady(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
+
+          player.ready = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -174,6 +215,12 @@ export default {
       let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
 
       return winnerPlayer.alias
+    },
+    getPlayerStatus (player) {
+      return GameHelper.getPlayerStatus(player)
+    },
+    getAvatarImage (player) {
+      return require(`../../../assets/avatars/${player.avatar}.png`)
     }
   },
 
@@ -191,10 +238,17 @@ export default {
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
     })
+
+    this.sockets.subscribe('gamePlayerReady', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.ready = true
+    })
   },
   destroyed () {
     this.sockets.unsubscribe('gamePlayerJoined')
     this.sockets.unsubscribe('gamePlayerQuit')
+    this.sockets.unsubscribe('gamePlayerReady')
   },
 
   computed: {
@@ -207,12 +261,12 @@ export default {
 
 <style scoped>
 img {
-    height: 48px;
-    width: 48px;
+    height: 55px;
 }
 
 .col-avatar {
-    width: 48px;
+    width: 55px;
+    cursor: pointer;
 }
 
 .table-sm td {

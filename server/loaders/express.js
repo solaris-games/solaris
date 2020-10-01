@@ -40,7 +40,7 @@ module.exports = async (app, io, container) => {
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.header('Access-Control-Allow-Headers', 'Content-Type');
         res.header('Access-Control-Allow-Credentials', 'true');
-        res.header('Access-Control-Allow-Methods', 'POST, PUT, GET, OPTIONS');
+        res.header('Access-Control-Allow-Methods', 'POST, PUT, GET, DELETE, OPTIONS');
         next();
     });
 
@@ -65,6 +65,7 @@ module.exports = async (app, io, container) => {
     const carrier = require('../api/game/carrier')(router, io, container);
     const message = require('../api/game/message')(router, io, container);
     const ledger = require('../api/game/ledger')(router, io, container);
+    const specialist = require('../api/game/specialist')(router, io, container);
     const auth = require('../api/auth')(router, io, container);
     const user = require('../api/user')(router, io, container);
 
@@ -77,6 +78,7 @@ module.exports = async (app, io, container) => {
     app.use(carrier);
     app.use(message);
     app.use(ledger);
+    app.use(specialist);
 
     return app;
 };

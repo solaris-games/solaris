@@ -4,6 +4,7 @@ import Star from './star'
 import Carrier from './carrier'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
+import Territories from './territories'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 import AnimationService from './animation'
@@ -31,7 +32,9 @@ class Map extends EventEmitter {
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
+    this.territoryContainer = new PIXI.Container()
 
+    this.container.addChild(this.territoryContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
@@ -39,6 +42,8 @@ class Map extends EventEmitter {
   }
 
   setup (game) {
+    this.game = game
+    
     // Cleanup events
     this.stars.forEach(s => s.removeAllListeners())
     this.carriers.forEach(s => s.removeAllListeners())
@@ -84,6 +89,13 @@ class Map extends EventEmitter {
     this.rulerPoints.onRulerPointsClearedHandler = this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
 
     this.rulerPointContainer.addChild(this.rulerPoints.container)
+
+    // -----------
+    // Setup Territories
+    this.territories = new Territories()
+    this.territories.setup(game)
+
+    this.territoryContainer.addChild(this.territories.container)
   }
 
   setupStar (game, starData) {
@@ -96,6 +108,8 @@ class Map extends EventEmitter {
       this.starContainer.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
+      star.on('onStarDoubleClicked', this.onStarDoubleClicked.bind(this))
+      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
     star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
@@ -108,6 +122,8 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
+      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -126,6 +142,8 @@ class Map extends EventEmitter {
     this.carrierContainer.addChild(carrier.container)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+    carrier.on('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
+    carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
     carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -224,6 +242,8 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
+      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
@@ -247,6 +267,18 @@ class Map extends EventEmitter {
 
   clearRulerPoints () {
     this.rulerPoints.setup(this.game)
+  }
+  
+  drawTerritories () {
+    if (this.territories) {
+      this.territories.draw()
+    }
+  }
+
+  clearTerritories () {
+    if (this.territories) {
+      this.territories.clear()
+    }
   }
 
   panToPlayer (game, player) {
@@ -346,13 +378,30 @@ class Map extends EventEmitter {
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
+      selectedStar.isSelected = !selectedStar.isSelected
+
+      this.unselectAllCarriers()
+      this.unselectAllStarsExcept(selectedStar)
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onStarClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onStarClicked(e)
+    }
+
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onStarDoubleClicked (e) {
+    // Clicking stars should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      let selectedStar = this.stars.find(x => x.data._id === e._id)
       selectedStar.isSelected = true
 
       this.unselectAllCarriers()
       this.unselectAllStarsExcept(selectedStar)
 
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onStarClicked', e)
+        this.emit('onStarDoubleClicked', e)
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
@@ -361,6 +410,12 @@ class Map extends EventEmitter {
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onStarRightClicked (e) {
+    if (this.mode === 'galaxy') {
+      this.emit('onStarRightClicked', e)
+    }
   }
 
   onCarrierClicked (e) {
@@ -374,13 +429,37 @@ class Map extends EventEmitter {
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
+      selectedCarrier.isSelected = !selectedCarrier.isSelected
+
+      this.unselectAllStars()
+      this.unselectAllCarriersExcept(selectedCarrier)
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onCarrierClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onCarrierClicked(e)
+    }
+
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onCarrierDoubleClicked (e) {
+    // Clicking carriers should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      // If the carrier is in orbit, pass the click over to the star instead.
+      if (e.orbiting) {
+        let star = this.stars.find(x => x.data._id === e.orbiting)
+
+        return this.onStarDoubleClicked(star.data)
+      }
+
+      let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
       selectedCarrier.isSelected = true
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
 
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierClicked', e)
+        this.emit('onCarrierDoubleClicked', e)
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
@@ -389,6 +468,12 @@ class Map extends EventEmitter {
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onCarrierRightClicked (e) {
+    if (this.mode === 'galaxy') {
+      this.emit('onCarrierRightClicked', e)
+    }
   }
 
   onCarrierMouseOver (e) {
@@ -465,6 +550,12 @@ class Map extends EventEmitter {
 
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
+
+    if (this.zoomPercent > 100) {
+      this.drawTerritories()
+    } else {
+      this.clearTerritories()
+    }
   }
 }
 

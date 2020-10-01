@@ -24,7 +24,7 @@ describe('user', () => {
     let service;
 
     beforeAll(() => {
-        service = new UserService(fakeBcrypt, fakeUserModel);
+        service = new UserService(fakeUserModel, fakeBcrypt);
 
         userList = [
             {

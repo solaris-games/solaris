@@ -27,6 +27,12 @@ module.exports = class DistanceService {
         return this.getClosestLocations(loc, locs, 1)[0];
     }
 
+    getDistanceToClosestLocation(loc, locs) {
+        let closest = this.getClosestLocation(loc, locs);
+
+        return this.getDistanceBetweenLocations(loc, closest);
+    }
+
     getFurthestLocations(loc, locs, amount) {
         return this.getClosestLocations(loc, locs, locs.length).reverse().slice(0, amount);
     }

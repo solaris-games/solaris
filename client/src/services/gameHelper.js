@@ -55,8 +55,16 @@ class GameHelper {
         carrier.inTransitTo === waypoint.destination
   }
 
-  getHyperspaceDistance (game, hyperspace) {
-    return ((hyperspace || 1) + 1.5) * game.constants.distances.lightYear
+  getHyperspaceDistance (game, player, carrier) {
+    let techLevel = player.research.hyperspace.effective
+    
+    if (carrier.specialist && carrier.specialist.modifiers.local) {
+      techLevel += carrier.specialist.modifiers.local.hyperspace || 0
+    }
+
+    techLevel = Math.max(1, techLevel)
+
+    return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
   }
 
   getDistanceBetweenLocations (loc1, loc2) {
@@ -69,9 +77,15 @@ class GameHelper {
     return Math.sqrt(xs + ys)
   }
 
-  getTicksBetweenLocations (game, locs, tickDistanceModifier = 1) {
+  getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
     let totalTicks = 0
     let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
+
+    // Factor in any local speed modifers
+    // TODO: Global speed modifiers.
+    if (carrier && carrier.specialist && carrier.specialist.modifiers.local) {
+      tickDistance *= carrier.specialist.modifiers.local.speed || 1
+    }
 
     for (let i = 1; i < locs.length; i++) {
       let prevLoc = locs[i - 1]
@@ -87,6 +101,16 @@ class GameHelper {
     return totalTicks
   }
 
+  getTicksToProduction (game) {
+    let productionTicks = game.settings.galaxy.productionTicks
+    let currentTick = game.state.tick
+    let currentProductionTick = game.state.productionTick
+
+    let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
+
+    return ticksToProduction;
+  }
+
   getCountdownTimeString (game, date) {
     if (date == null) {
       return 'Unknown'
@@ -96,6 +120,20 @@ class GameHelper {
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
     return this.getDateToString(t)
+  }
+
+  getCountdownTimeStringByTicks (game, ticks, useNowDate = false) {
+    if (game.settings.gameTime.gameType === 'realTime') {
+      let date = useNowDate ? moment().utc() : game.state.lastTickDate
+
+      let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
+  
+      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate)
+  
+      return timeRemainingEta
+    }
+
+    return `${ticks} ticks`
   }
 
   getDateToString (date) {
@@ -156,9 +194,9 @@ class GameHelper {
 
     if (sourceStar.warpGate && destinationStar.warpGate &&
       sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-      ticks = this.getTicksBetweenLocations(game, [source, destination], 3) // TODO: Need a constant here
+      ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], game.constants.distances.warpSpeedMultiplier)
     } else {
-      ticks = this.getTicksBetweenLocations(game, [source, destination])
+      ticks = this.getTicksBetweenLocations(game, carrier, [source, destination])
     }
 
     return ticks
@@ -203,7 +241,7 @@ class GameHelper {
     let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
 
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
-    let hyperspaceDistance = this.getHyperspaceDistance(game, player.research.hyperspace.level)
+    let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)
 
     return distanceBetweenStars <= hyperspaceDistance
   }
@@ -242,6 +280,71 @@ class GameHelper {
     }
 
     return 'Unknown'
+  }
+
+  userPlayerHasHighestTechLevel (game, techKey) {
+    let userPlayer = this.getUserPlayer(game)
+    
+    let levels = [...new Set(game.galaxy.players.map(p => {
+      return p.research[techKey].level
+    }))]
+
+    // If all players have the same level then nobody has the highest.
+    if (levels.length === 1) {
+      return false
+    }
+
+    let maxLevel = levels.sort((a, b) => b - a)[0]
+
+    return maxLevel === userPlayer.research[techKey].level
+  }
+
+  userPlayerHasLowestTechLevel (game, techKey) {
+    let userPlayer = this.getUserPlayer(game)
+    
+    let levels = [...new Set(game.galaxy.players.map(p => {
+      return p.research[techKey].level
+    }))]
+
+    // If all players have the same level then nobody has the lowest.
+    if (levels.length === 1) {
+      return false
+    }
+
+    let minLevel = levels.sort((a, b) => a - b)[0]
+
+    return minLevel === userPlayer.research[techKey].level
+  }
+
+  getPlayerStatus (player) {
+    if (player.defeated && !player.afk) {
+      return 'DEFEATED'
+    } else if (player.defeated && player.afk) {
+      return 'AFK'
+    }
+
+    return 'UNKNOWN'
+  }
+
+  getSortedLeaderboardPlayerList (game) {
+    // Sort by total number of stars, then by total ships, then by total carriers.
+    return game.galaxy.players
+      .sort((a, b) => {
+        // Sort by total stars descending
+        if (a.stats.totalStars > b.stats.totalStars) return -1
+        if (a.stats.totalStars < b.stats.totalStars) return 1
+
+        // Then by total ships descending
+        if (a.stats.totalShips > b.stats.totalShips) return -1
+        if (a.stats.totalShips < b.stats.totalShips) return 1
+
+        // Then by total carriers descending
+        if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
+        if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
+
+        // Then by defeated descending
+        return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
+      })
   }
 }
 

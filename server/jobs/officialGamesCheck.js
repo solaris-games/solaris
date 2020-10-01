@@ -3,7 +3,9 @@ const officialGameSettings = [
     require('../config/game/settings/official/standard'),
     require('../config/game/settings/official/standard4player'),
     require('../config/game/settings/official/dark'),
+    require('../config/game/settings/official/turnBased'),
     require('../config/game/settings/official/1v1'),
+    require('../config/game/settings/official/1v1turnBased'),
 ];
 
 module.exports = (container) => {

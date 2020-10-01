@@ -25,15 +25,41 @@ module.exports = class PlayerService {
     }
     
     getPlayersWithinScanningRangeOfStar(game, starId) {
-        let playerIdsWithinRange = [...new Set(
-            this.starService.getStarsWithinScanningRangeOfStar(game, starId) // Get all stars within the scanning range of the star
-                .filter(s => s.ownedByPlayerId != null)
-                .map(s => s.ownedByPlayerId.toString())
-        )];
+        let star = this.starService.getById(game, starId);
 
-        return game.galaxy.players.filter(p => {
-            return playerIdsWithinRange.find(id => id === p.id) != null
+        let playersWithinRange = game.galaxy.players.filter(p => {
+            return this.starService.isStarInScanningRangeOfPlayer(game, star, p);
         });
+
+        return playersWithinRange;
+    }
+
+    getPlayersWithinScanningRangeOfPlayer(game, player) {
+        let inRange = [player];
+
+        for (let p of game.galaxy.players) {
+            if (inRange.indexOf(p) > -1) {
+                continue;
+            }
+
+            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+
+            let isInRange = playerStars.find(s => {
+                return this.starService.isStarInScanningRangeOfPlayer(game, s, player);       
+            });
+
+            if (isInRange) {
+                inRange.push(p);
+            }
+        }
+
+        return inRange;
+    }
+
+    isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
+        // TODO: Make this more efficient.
+        return this.getPlayersWithinScanningRangeOfPlayer(game, sourcePlayer)
+            .find(p => p._id.equals(targetPlayer._id)) != null;
     }
 
     createEmptyPlayer(game, colour) {
@@ -43,6 +69,7 @@ module.exports = class PlayerService {
             alias: 'Empty Slot',
             colour: colour,
             credits: game.settings.player.startingCredits,
+            renownToGive: game.settings.general.playerLimit,
             carriers: [],
             research: {
                 terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },
@@ -62,11 +89,13 @@ module.exports = class PlayerService {
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
 
+        const starLocations = game.galaxy.stars.map(s => s.location);
+
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(game.galaxy.stars);
+        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
 
         // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars).x / 2 / 2;
+        const distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
@@ -133,6 +162,7 @@ module.exports = class PlayerService {
     resetPlayerForGameStart(game, player) {
         player.userId = null;
         player.alias = "Empty Slot";
+        player.avatar = null;
         player.credits = game.settings.player.startingCredits;
 
         // Reset the player's research
@@ -257,11 +287,15 @@ module.exports = class PlayerService {
         return totalScience;
     }
 
-    calculateTotalManufacturing(player, stars) {
+    calculateTotalManufacturing(game, player, stars) {
         let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
         // Calculate the manufacturing level for all of the stars the player owns.
-        playerStars.forEach(s => s.manufacturing = this.starService.calculateStarShipsByTicks(player.research.manufacturing.level, s.infrastructure.industry));
+        playerStars.forEach(s => {
+            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
+
+            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, s.infrastructure.industry)
+        });
 
         let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
 
@@ -282,12 +316,35 @@ module.exports = class PlayerService {
             totalEconomy: this.calculateTotalEconomy(player, game.galaxy.stars),
             totalIndustry: this.calculateTotalIndustry(player, game.galaxy.stars),
             totalScience: this.calculateTotalScience(player, game.galaxy.stars),
-            newShips: this.calculateTotalManufacturing(player, game.galaxy.stars)
+            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars)
         };
     }
 
     updateLastSeen(player) {
         player.lastSeen = moment().utc();
+    }
+
+    givePlayerMoney(game, player) {
+        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+        let totalEco = this.calculateTotalEconomy(player, game.galaxy.stars);
+
+        let creditsFromEconomy = totalEco * 10;
+        let creditsFromBanking = effectiveTechs.banking * 75;
+        let creditsTotal = creditsFromEconomy + creditsFromBanking;
+
+        player.credits += creditsTotal;
+
+        return {
+            creditsFromEconomy,
+            creditsFromBanking,
+            creditsTotal
+        };
+    }
+
+    async declareReady(game, player) {
+        player.ready = true;
+
+        await game.save();
     }
 
 }

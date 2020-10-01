@@ -1,18 +1,5 @@
 const moment = require('moment');
 
-const SELECTS = {
-    INFO: {
-        settings: 1,
-        state: 1
-    },
-    SETTINGS: {
-        settings: 1
-    },
-    GALAXY: {
-        galaxy: 1
-    }
-};
-
 module.exports = class GameListService {
     
     constructor(gameModel) {
@@ -27,8 +14,13 @@ module.exports = class GameListService {
         .sort({
             'settings.general.description': 1 // Sort description ascending
         })
-        .select(SELECTS.INFO)
-        .lean()
+        .select({
+            'settings.general.name': 1,
+            'settings.general.description': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -37,8 +29,12 @@ module.exports = class GameListService {
             'settings.general.createdByUserId': { $ne: null },
             'state.startDate': { $eq: null }
         })
-        .select(SELECTS.INFO)
-        .lean()
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -60,8 +56,12 @@ module.exports = class GameListService {
         .sort({
             'state.startDate': -1 // Sort start date descending (most recent started games appear first)
         })
-        .select(SELECTS.INFO)
-        .lean()
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -76,8 +76,12 @@ module.exports = class GameListService {
         .sort({
             'state.startDate': -1 // Sort start date descending (most recent finished games appear first)
         })
-        .select(SELECTS.INFO)
-        .lean()
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
+        .lean({ defaults: true })
         .exec();
     }
 
@@ -86,6 +90,14 @@ module.exports = class GameListService {
             'state.startDate': { $lte: moment().utc().toDate() },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
+        })
+        .exec();
+    }
+
+    async listOpenGamesCreatedByUser(userId) {
+        return await this.gameModel.find({
+            'settings.general.createdByUserId': { $eq: userId },
+            'state.startDate': { $eq: null }
         })
         .exec();
     }
