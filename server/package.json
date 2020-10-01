@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "agenda": "^3.1.0",
-    "bcrypt": "^3.0.8",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "connect-mongodb-session": "^2.3.3",
     "dotenv": "^8.2.0",
