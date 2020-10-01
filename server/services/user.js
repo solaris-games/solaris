@@ -81,6 +81,7 @@ module.exports = class UserService extends EventEmitter {
 
     async getUsernameByEmail(email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findOne({email}, {
             username: 1
@@ -96,6 +97,7 @@ module.exports = class UserService extends EventEmitter {
     async create(user) {
         user.username = user.username.trim();
         user.email = user.email.trim();
+        user.email = user.email.toLowerCase();
 
         if (user.username.length < 3 || user.username.length > 24) {
             throw new ValidationError('Username must be between 3 and 24 characters.');
@@ -114,9 +116,10 @@ module.exports = class UserService extends EventEmitter {
 
     async userExists(email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findOne({
-            email: email
+            email
         });
 
         return user != null;
@@ -142,6 +145,7 @@ module.exports = class UserService extends EventEmitter {
 
     async updateEmailAddress(id, email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findById(id);
         
@@ -192,6 +196,7 @@ module.exports = class UserService extends EventEmitter {
 
     async requestResetPassword(email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findOne({
             email

@@ -35,7 +35,9 @@ module.exports = (router, io, container) => {
                 throw new ValidationError(errors);
             }
 
-            let exists = await container.userService.userExists(req.body.email);
+            let email = req.body.email.toLowerCase();
+
+            let exists = await container.userService.userExists(email);
 
             if (exists) {
                 return res.status(400).json({
@@ -46,7 +48,7 @@ module.exports = (router, io, container) => {
             }
             
             let userId = await container.userService.create({
-                email: req.body.email,
+                email: email,
                 username: req.body.username,
                 password: req.body.password
             });

@@ -72,6 +72,15 @@ describe('user', () => {
         done();
     });
 
+    it('should check if a user exists in a different case', async (done) => {
+        let result = await service.userExists('tesT@test.com');
+
+        expect(result).toBeTruthy();
+
+        done();
+    });
+
+
     it('should check if a user does not exist', async (done) => {
         let result = await service.userExists('fffff');
 
