@@ -14,7 +14,10 @@
       </div>
       <div class="col-sm-12 col-md-6">
         <h4>Login</h4>
-        <account-login></account-login>
+
+        <loading-spinner :loading="isAutoLoggingIn"/>
+
+        <account-login v-if="!isAutoLoggingIn"></account-login>
       </div>
     </div>
 
@@ -27,11 +30,37 @@
 <script>
 import ViewContainer from '../components/ViewContainer'
 import AccountLoginVue from './AccountLogin'
+import ApiAuthService from '../services/api/auth'
+import router from '../router'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 
 export default {
   components: {
     'view-container': ViewContainer,
-    'account-login': AccountLoginVue
+    'account-login': AccountLoginVue,
+    'loading-spinner': LoadingSpinnerVue
+  },
+  data () {
+    return {
+      isAutoLoggingIn: false
+    }
+  },
+  async mounted () {
+    this.isAutoLoggingIn = true
+    
+    try {
+      let response = await ApiAuthService.verify()
+
+      if (response.status === 200) {
+        if (response.data.valid) {
+          router.push({ name: 'main-menu' })
+        }
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
+    this.isAutoLoggingIn = false
   }
 }
 </script>
