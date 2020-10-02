@@ -231,8 +231,12 @@ module.exports = class EmailService {
     }
 
     async trySendLastPlayerTurnReminder(game) {
-        if (game.settings.gameTime.gameType !== 'turnBased') {
+        if (!this.gameService.isTurnBasedGame(game)) {
             throw new Error('Cannot send a last turn reminder for non turn based games.');
+        }
+
+        if (!this.gameService.isInProgress(game)) {
+            return;
         }
 
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated && !p.ready);

@@ -167,6 +167,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.alias = "Empty Slot";
         player.avatar = null;
         player.credits = game.settings.player.startingCredits;
+        player.ready = false;
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);
