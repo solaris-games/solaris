@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const EventEmitter = require('events');
 
-module.exports = class PlayerService {
+module.exports = class PlayerService extends EventEmitter {
     
     constructor(randomService, mapService, starService, carrierService, starDistanceService, technologyService) {
+        super();
+        
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
@@ -345,6 +348,10 @@ module.exports = class PlayerService {
         player.ready = true;
 
         await game.save();
+
+        this.emit('onGamePlayerReady', {
+            game
+        });
     }
 
 }

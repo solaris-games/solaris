@@ -50,20 +50,26 @@ module.exports = class EmailService {
         GAME_CYCLE_SUMMARY: {
             fileName: 'gameCycleSummary.html',
             subject: 'A galactic cycle has ended - Upgrade your empire!'
+        },
+        YOUR_TURN_REMINDER: {
+            fileName: 'yourTurnReminder.html',
+            subject: 'Solaris - It\'s your turn to play!'
         }
     };
 
-    constructor(config, gameService, gameTickService, userService, leaderboardService) {
+    constructor(config, gameService, gameTickService, userService, leaderboardService, playerService) {
         this.config = config;
         this.gameService = gameService;
         this.gameTickService = gameTickService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
+        this.playerService = playerService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.game));
         this.gameTickService.on('onGameEnded', (data) => this.sendGameFinishedEmail(data.game));
         this.gameTickService.on('onGameGalacticCycleTicked', (data) => this.sendGameCycleSummaryEmail(data.game));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
+        this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.game));
     }
 
     _getTransport() {
@@ -216,6 +222,35 @@ module.exports = class EmailService {
                         game.state.starsForVictory.toString(),
                         game.state.stars.toString(),
                         leaderboardHtml
+                    ]);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    async trySendLastPlayerTurnReminder(game) {
+        if (game.settings.gameTime.gameType !== 'turnBased') {
+            throw new Error('Cannot send a last turn reminder for non turn based games.');
+        }
+
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated && !p.ready);
+
+        if (undefeatedPlayers.length === 1) {
+            let player = undefeatedPlayers[0];
+            let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+            let gameName = game.settings.general.name;
+
+            let user = await this.userService.getEmailById(player.userId);
+            
+            if (user.emailEnabled) {
+                try {
+                    await sleep(2500); // This might work I dunno.
+                    
+                    await this.sendTemplate(user.email, this.TEMPLATES.YOUR_TURN_REMINDER, [
+                        gameName,
+                        gameUrl
                     ]);
                 } catch (err) {
                     console.error(err);
