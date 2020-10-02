@@ -158,7 +158,7 @@ export default {
         this.timeRemaining = `Next tick: ${time}`
       } else {
         // Calculate when the max wait limit date is.
-        let maxWaitLimitDate = moment(this.$store.state.game.state.startDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
+        let maxWaitLimitDate = moment(this.$store.state.game.state.lastTickDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
 
         let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
 
