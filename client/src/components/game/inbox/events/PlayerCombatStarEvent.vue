@@ -23,6 +23,7 @@
                         <td>
                             <i class="fas fa-star mr-2"></i>
                             <span :style="{ 'color': getStarColour() }" v-if="star">{{star.name}}</span>
+                            <span v-if="star.specialist" :title="star.specialist.description"> ({{star.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.star.before}}</td>
                         <td class="text-right">{{event.data.combatResult.star.lost}}</td>
@@ -32,6 +33,7 @@
                         <td>
                             <i class="fas fa-rocket mr-2"></i>
                             <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
+                            <span v-if="star.specialist" :title="star.specialist.description"> ({{star.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
                         <td class="text-right">{{carrier.lost}}</td>
@@ -47,6 +49,7 @@
                         <td>
                             <i class="fas fa-rocket mr-2"></i>
                             <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
+                            <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
                         <td class="text-right">{{carrier.lost}}</td>
