@@ -243,15 +243,24 @@ module.exports = class EmailService {
 
         if (undefeatedPlayers.length === 1) {
             let player = undefeatedPlayers[0];
+
+            // If we have already sent a last turn reminder to this player then do not
+            // send one again, this prevents players from spamming ready/unready and sending
+            // the last player loads of emails.
+            if (player.hasSentTurnReminder) {
+                return;
+            }
+
+            player.hasSentTurnReminder = true;
+            await game.save();
+
             let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
             let user = await this.userService.getEmailById(player.userId);
             
             if (user && user.emailEnabled) {
-                try {
-                    await sleep(2500); // This might work I dunno.
-                    
+                try {                    
                     await this.sendTemplate(user.email, this.TEMPLATES.YOUR_TURN_REMINDER, [
                         gameName,
                         gameUrl

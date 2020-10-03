@@ -50,7 +50,7 @@
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame()">
-                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
                         <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
@@ -208,6 +208,21 @@ export default {
         console.error(err)
       }
     },
+    async unconfirmReady (player) {
+      if (!this.isUserPlayer(player)) {
+        return
+      }
+
+      try {
+        let response = await gameService.unconfirmReady(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          player.ready = false
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -244,11 +259,18 @@ export default {
 
       player.ready = true
     })
+
+    this.sockets.subscribe('gamePlayerNotReady', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.ready = false
+    })
   },
   destroyed () {
     this.sockets.unsubscribe('gamePlayerJoined')
     this.sockets.unsubscribe('gamePlayerQuit')
     this.sockets.unsubscribe('gamePlayerReady')
+    this.sockets.unsubscribe('gamePlayerNotReady')
   },
 
   computed: {
@@ -277,5 +299,9 @@ img {
 .table th.fit {
     white-space: nowrap;
     width: 1%;
+}
+
+.fa-check {
+  cursor: pointer;
 }
 </style>

@@ -355,4 +355,14 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
+    async undeclareReady(game, player) {
+        player.ready = false;
+
+        await game.save();
+
+        this.emit('onGamePlayerNotReady', {
+            game
+        });
+    }
+
 }
