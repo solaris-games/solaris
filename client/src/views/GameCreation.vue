@@ -48,6 +48,15 @@
         </select>
       </div> -->
 
+      <div class="form-group">
+        <label for="anonymity" class="col-form-label">Anonymity</label>
+        <select class="form-control" id="anonymity" v-model="settings.general.anonymity" :disabled="isCreatingGame">
+          <option v-for="opt in options.general.anonymity" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <form-error-list v-bind:errors="errors"/>
 
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>

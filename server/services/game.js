@@ -272,6 +272,10 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async getPlayerUserLean(game, playerId) {
+        if (game.settings.general.anonymity === 'extra') {
+            return null;
+        }
+        
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
 
         return await this.userService.getInfoByIdLean(player.userId);

@@ -30,6 +30,10 @@
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
             </tr> -->
+            <tr>
+              <td>Anonymity</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -334,7 +338,9 @@ export default {
         'weightedCenter': 'Weighted (Center)',
         'circular': 'Circular',
         'spiral': 'Spiral',
-        'doughnut': 'Doughnut'
+        'doughnut': 'Doughnut',
+        'normal': 'Normal',
+        'extra': 'Extra'
       }[option]
 
       return text || option

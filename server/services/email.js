@@ -152,7 +152,7 @@ module.exports = class EmailService {
         for (let player of game.galaxy.players) {
             let user = await this.userService.getEmailById(player.userId);
             
-            if (user.emailEnabled) {
+            if (user && user.emailEnabled) {
                 try {
                     await sleep(2500); // This might work I dunno.
                     
@@ -174,7 +174,7 @@ module.exports = class EmailService {
         for (let player of game.galaxy.players) {
             let user = await this.userService.getEmailById(player.userId);
             
-            if (user.emailEnabled) {
+            if (user && user.emailEnabled) {
                 try {
                     await sleep(2500); // This might work I dunno.
                     
@@ -212,7 +212,7 @@ module.exports = class EmailService {
         for (let player of undefeatedPlayers) {
             let user = await this.userService.getEmailById(player.userId);
             
-            if (user.emailEnabled) {
+            if (user && user.emailEnabled) {
                 try {
                     await sleep(2500); // This might work I dunno.
 
@@ -248,7 +248,7 @@ module.exports = class EmailService {
 
             let user = await this.userService.getEmailById(player.userId);
             
-            if (user.emailEnabled) {
+            if (user && user.emailEnabled) {
                 try {
                     await sleep(2500); // This might work I dunno.
                     

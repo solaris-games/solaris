@@ -105,18 +105,18 @@ export default {
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
-    if (!this.player.isEmptySlot) {
+    if (!this.player.isEmptySlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
       try {
         let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 
         this.user = response.data
-
-        if (this.user == null) {
-          this.user = {}
-        }
       } catch (err) {
         console.error(err)
       }
+    }
+
+    if (this.user == null) {
+      this.user = {}
     }
 
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)

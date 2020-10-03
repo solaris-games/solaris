@@ -5,7 +5,8 @@
     "password": null,
     "starVictoryPercentage": 50,
     "playerLimit": 8,
-    "playerType": "all"
+    "playerType": "all",
+    "anonymity": "normal"
   },
   "galaxy": {
     "galaxyType": "circular",
