@@ -317,4 +317,31 @@ module.exports = class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
+    async quitAllActiveGames(userId) {
+        let allGames = await this.gameModel.find({
+            'galaxy.players': {
+                $elemMatch: { 
+                    userId,             // User is in game
+                    defeated: false     // User has not been defeated
+                }
+            },
+            $and: [
+                { 'state.endDate': { $eq: null } } // The game hasn't ended.
+            ]
+        });
+
+        // Find all games that are pending start and quit.
+        // Find all games that are active and admit defeat.
+        for (let game of allGames) {
+            let player = this.playerService.getByUserId(game, userId);
+
+            if (this.isInProgress(game)) {
+                await this.concedeDefeat(game, player);
+            }
+            else {
+                await this.quit(game, player);
+            }
+        }
+    }
+
 };

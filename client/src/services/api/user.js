@@ -73,6 +73,11 @@ class UserService extends BaseApiService {
         }
       })
   }
+
+  closeAccount () {
+    return axios.delete(this.BASE_URL + 'user/closeAccount',
+    { withCredentials: true })
+  }
 }
 
 export default new UserService()

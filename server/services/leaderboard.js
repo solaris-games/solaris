@@ -73,6 +73,11 @@ module.exports = class LeaderboardService {
 
             let user = await this.userService.getById(player.userId);
 
+            // Double check user isn't deleted.
+            if (!user) {
+                continue;
+            }
+
             // Add to rank:
             // (Number of players / 2) - index of leaderboard
             // But 1st place will receive rank equal to the total number of players.

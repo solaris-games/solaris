@@ -216,6 +216,24 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.delete('/api/user/closeaccount', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.gameService.quitAllActiveGames(req.session.userId);
+            await container.userService.closeAccount(req.session.userId);
+
+            // Delete the session object.
+            req.session.destroy((err) => {
+                if (err) {
+                    return next(err);
+                }
+    
+                return res.sendStatus(200);
+            });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

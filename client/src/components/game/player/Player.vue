@@ -43,13 +43,13 @@
 
     <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
 
-    <h4 class="mt-2" v-if="player && !player.isEmptySlot && (user || userPlayer)">Achievements</h4>
+    <h4 class="mt-2" v-if="player && !player.isEmptySlot && isValidUser">Achievements</h4>
 
-    <achievements v-if="user" :victories="user.achievements.victories"
+    <achievements v-if="isValidUser" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"
+    <sendRenown v-if="isValidUser && game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
     <!--
@@ -110,6 +110,10 @@ export default {
         let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 
         this.user = response.data
+
+        if (this.user == null) {
+          this.user = {}
+        }
       } catch (err) {
         console.error(err)
       }
@@ -161,6 +165,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    isValidUser () {
+      return this.user && this.user.achievements
     }
   }
 }

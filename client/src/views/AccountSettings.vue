@@ -58,7 +58,8 @@
     </div>
 
     <div class="mt-3">
-      <router-link to="/account/reset-password" tag="button" class="btn btn-primary">Change Password</router-link>
+      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount">Close Account</button>
+      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
     </div>
   </view-container>
 </template>
@@ -68,6 +69,7 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import userService from '../services/api/user'
+import router from '../router'
 
 export default {
   components: {
@@ -101,6 +103,29 @@ export default {
       }
 
       this.isChangingEmailNotifications = false
+    },
+    async closeAccount () {
+      if (confirm('Are you sure you want to close your account?')) {
+        if (confirm('Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
+          if (!confirm('Last chance?')) {
+            return
+          }
+        }
+      }
+
+      try {
+        this.isClosingAccount = true
+
+        let response = await userService.closeAccount()
+
+        if (response.status === 200) {
+          router.push({ name: 'home' })
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isClosingAccount = false
     }
   }
 }

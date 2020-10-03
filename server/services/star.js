@@ -235,8 +235,11 @@ module.exports = class StarService extends EventEmitter {
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
         let playerUser = await this.userService.getById(carrierPlayer.userId);
-        playerUser.achievements.combat.stars.captured++;
-        await playerUser.save();
+
+        if (playerUser) {
+            playerUser.achievements.combat.stars.captured++;
+            await playerUser.save();
+        }
     }
 
     applyStarSpecialistSpecialModifiers(game, report) {
