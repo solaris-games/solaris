@@ -385,10 +385,13 @@ module.exports = class GameTickService extends EventEmitter {
         // how many ships they had before combat occurs.
         // We will update this as we go along with combat.
         combatResult.carriers = carriers.map(c => {
+            let specialist = this.specialistService.getByIdCarrierTrim(c.specialistId);
+
             return {
                 _id: c._id,
                 name: c.name,
                 ownedByPlayerId: c.ownedByPlayerId,
+                specialist,
                 before: c.ships,
                 lost: 0,
                 after: c.ships
@@ -396,9 +399,12 @@ module.exports = class GameTickService extends EventEmitter {
         });
 
         if (star) {
+            let specialist = this.specialistService.getByIdStarTrim(star.specialistId);
+
             // Do the same with the star.
             combatResult.star = {
                 _id: star._id,
+                specialist,
                 before: Math.floor(star.garrisonActual),
                 lost: 0,
                 after: Math.floor(star.garrisonActual)
