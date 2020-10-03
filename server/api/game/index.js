@@ -151,6 +151,20 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.undeclareReady(
+                req.game,
+                req.player);
+                
+            container.broadcastService.gamePlayerNotReady(req.game, req.player);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         try {
             await container.gameService.delete(

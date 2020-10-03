@@ -669,11 +669,15 @@ module.exports = class GameTickService extends EventEmitter {
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            // If in turn based mode, then check if the player wasn't ready when the game ticked
-            // if so increase their number of missed turns.
-            if (this.gameService.isTurnBasedGame(game) && !player.ready) {
-                player.missedTurns++;
-                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
+            if (this.gameService.isTurnBasedGame(game)) {
+                // Reset whether we have sent the player a turn reminder.
+                player.hasSentTurnReminder = false;
+
+                // If the player wasn't ready when the game ticked, increase their number of missed turns.
+                if (!player.ready) {
+                    player.missedTurns++;
+                    player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
+                }
             }
 
             // Check if the player has been AFK.
