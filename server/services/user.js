@@ -235,4 +235,8 @@ module.exports = class UserService extends EventEmitter {
         await user.save();
     }
 
+    async closeAccount(id) {
+        await this.userModel.deleteOne({_id: id});
+    }
+
 };

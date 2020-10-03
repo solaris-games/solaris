@@ -33,6 +33,10 @@ module.exports = class TradeService extends EventEmitter {
         let fromPlayerUser = await this.userService.getById(fromPlayer.userId);
         let toPlayerUser = await this.userService.getById(toPlayer.userId);
 
+        if (!toPlayerUser) {
+            throw new ValidationError(`There is no user associated with this player.`);
+        }
+
         fromPlayer.credits -= amount;
         fromPlayerUser.achievements.trade.creditsSent += amount;
 
@@ -84,6 +88,10 @@ module.exports = class TradeService extends EventEmitter {
         // Get the user of the player to award renown to.
         let fromUser = await this.userService.getById(fromPlayer.userId);
         let toUser = await this.userService.getById(toPlayer.userId);
+
+        if (!toUser) {
+            throw new ValidationError(`There is no user associated with this player.`);
+        }
 
         fromPlayer.renownToGive -= amount;
 
@@ -139,6 +147,10 @@ module.exports = class TradeService extends EventEmitter {
 
         let fromUser = await this.userService.getById(fromPlayer.userId);
         let toUser = await this.userService.getById(toPlayer.userId);
+
+        if (!toUser) {
+            throw new ValidationError(`There is no user associated with this player.`);
+        }
 
         toPlayerTech.level = tradeTech.level;
         toPlayerTech.progress = 0;

@@ -406,8 +406,10 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         // Add combat result stats to defender achievements.
-        defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
-        defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
+        if (defenderUser != null) {
+            defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
+            defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
+        }
         
         // Using the combat result, iterate over all of the defenders and attackers
         // and deduct from each ship/carrier until combat has been resolved.
@@ -427,7 +429,7 @@ module.exports = class GameTickService extends EventEmitter {
             // Deduct ships lost from attacker.
             let attackerUser = getCarrierUser(attackerCarrier, attackers, attackerUsers);
 
-            attackerUser.achievements.combat.losses.ships++;
+            if (attackerUser) attackerUser.achievements.combat.losses.ships++;
 
             // If the carrier has been destroyed, remove it from the game.
             if (!attackerCarrier.ships) {
@@ -438,8 +440,8 @@ module.exports = class GameTickService extends EventEmitter {
                 attackerCarriers.splice(attackerCarrierIndex, 1);
                 attackerCarrierIndex--;
 
-                attackerUser.achievements.combat.losses.carriers++;
-                defenderUser.achievements.combat.kills.carriers++;
+                if (attackerUser) attackerUser.achievements.combat.losses.carriers++;
+                if (defenderUser) defenderUser.achievements.combat.kills.carriers++;
             }
 
             attackerCarrierIndex++;
@@ -485,11 +487,11 @@ module.exports = class GameTickService extends EventEmitter {
                     defenderCarriers.splice(defenderCarrierIndex, 1);
                     defenderCarrierIndex--;
 
-                    defenderUser.achievements.combat.losses.carriers++;
+                    if (defenderUser) defenderUser.achievements.combat.losses.carriers++;
 
                     // Add carriers killed to attackers.
                     for (let attackerUser of attackerUsers) {
-                        attackerUser.achievements.combat.kills.carriers++;
+                        if (attackerUser) attackerUser.achievements.combat.kills.carriers++;
                     }
                 }
             } else {
@@ -499,7 +501,7 @@ module.exports = class GameTickService extends EventEmitter {
             if (defenderShipKilled) {
                 // Add ships killed to attackers.
                 for (let attackerUser of attackerUsers) {
-                    attackerUser.achievements.combat.kills.ships++;
+                    if (attackerUser) attackerUser.achievements.combat.kills.ships++;
                 }
             }
 
@@ -552,8 +554,8 @@ module.exports = class GameTickService extends EventEmitter {
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
-            defenderUser.achievements.combat.stars.lost++;
-            newStarUser.achievements.combat.stars.captured++;
+            if (defenderUser) defenderUser.achievements.combat.stars.lost++;
+            if (newStarUser) newStarUser.achievements.combat.stars.captured++;
 
             this.emit('onStarCaptured', {
                 game,
@@ -573,10 +575,10 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         // Save user profile achievements.
-        await defenderUser.save();
+        if (defenderUser) await defenderUser.save();
 
         for (let attackerUser of attackerUsers) {
-            await attackerUser.save();
+            if (attackerUser) await attackerUser.save();
         }
 
         // If there are still attackers remaining, recurse.
