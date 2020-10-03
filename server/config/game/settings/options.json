@@ -34,6 +34,16 @@
             "value": "premium",
             "text": "Premium Players Only"
             }
+        ],
+        "anonymity": [
+            {
+            "value": "normal",
+            "text": "Normal"
+            },
+            {
+            "value": "extra",
+            "text": "Extra"
+            }
         ]
         },
         "specialGalaxy": {
