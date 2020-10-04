@@ -44,7 +44,7 @@
           <tbody>
             <tr>
               <td>Galaxy Type</td>
-              <td class="text-right">{{ game.settings.galaxy.galaxyType }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.galaxy.galaxyType) }}</td>
             </tr>
             <tr>
               <td>Stars Per Player</td>
@@ -96,7 +96,7 @@
             </tr>
             <tr>
               <td>Resource Distribution</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.resourceDistribution }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.resourceDistribution) }}</td>
             </tr>
           </tbody>
         </table>
