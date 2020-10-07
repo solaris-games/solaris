@@ -17,7 +17,6 @@ class Carrier extends EventEmitter {
 
     this.isMouseOver = false
     this.zoomPercent = 0
-    this.clicks = 0
   }
 
   setup (data, stars, player, lightYearDistance) {
@@ -181,21 +180,10 @@ class Carrier extends EventEmitter {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onCarrierRightClicked', this.data)
     } else {
-      this.clicks++
+      this.emit('onCarrierClicked', {carrierData: this.data, eventData: e.data})
 
-      setTimeout(() => {
-        this.clicks = 0
-      }, 500)
-
-      if (this.clicks > 1) {
-        this.emit('onCarrierDoubleClicked', this.data)
-        this.clicks = 0
-
-        // Need to do this otherwise sometimes text gets highlighted.
-        this.deselectAllText()
-      } else {
-        this.emit('onCarrierClicked', {carrierData: this.data, eventData: e.data})
-      }
+      // Need to do this otherwise sometimes text gets highlighted.
+      this.deselectAllText()
     }
   }
 

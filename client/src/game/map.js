@@ -108,7 +108,6 @@ class Map extends EventEmitter {
       this.starContainer.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onStarDoubleClicked', this.onStarDoubleClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
@@ -122,7 +121,6 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
       existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
@@ -142,7 +140,6 @@ class Map extends EventEmitter {
     this.carrierContainer.addChild(carrier.container)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-    carrier.on('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
     carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
     carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
@@ -242,7 +239,6 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
       existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
@@ -415,10 +411,6 @@ class Map extends EventEmitter {
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
-  onStarDoubleClicked (e) {
-    return
-  }
-
   onStarRightClicked (e) {
     if (this.mode === 'galaxy') {
       this.emit('onStarRightClicked', e)
@@ -455,10 +447,6 @@ class Map extends EventEmitter {
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
-  }
-
-  onCarrierDoubleClicked (e) {
-    return
   }
 
   onCarrierRightClicked (e) {

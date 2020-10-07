@@ -20,7 +20,6 @@ class Star extends EventEmitter {
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to force initial redraw
     this.zoomPercent = 0
-    this.clicks = 0
   }
 
   _getStarPlayer () {
@@ -435,22 +434,10 @@ class Star extends EventEmitter {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onStarRightClicked', this.data)
     } else {
-      this.clicks++
+      this.emit('onStarClicked', {starData: this.data, eventData: e.data} )
 
-      setTimeout(() => {
-        this.clicks = 0
-      }, 500)
-      
-      if (this.clicks > 1) {
-        this.emit('onStarDoubleClicked', this.data)
-        this.clicks = 0
-
-        // Need to do this otherwise sometimes text gets highlighted.
-        this.deselectAllText()
-      } else {
-        this.emit('onStarClicked', {starData: this.data, eventData: e.data} )
-
-      }
+      // Need to do this otherwise sometimes text gets highlighted.
+      this.deselectAllText()
 
       this.drawActive(false)
     }
