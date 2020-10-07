@@ -403,7 +403,7 @@ class Map extends EventEmitter {
       this.unselectAllStarsExcept(selectedStar)
       
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onStarDoubleClicked', e)
+        this.emit('onStarClicked', e)
       }
       //TODO rename doubleClicked on the entire event chain
       
@@ -446,7 +446,7 @@ class Map extends EventEmitter {
       this.unselectAllCarriersExcept(selectedCarrier)
       
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierDoubleClicked', e)
+        this.emit('onCarrierClicked', e)
       }
     
     } else if (this.mode === 'waypoints') {
