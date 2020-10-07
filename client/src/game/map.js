@@ -405,7 +405,6 @@ class Map extends EventEmitter {
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onStarClicked', e)
       }
-      //TODO rename doubleClicked on the entire event chain
       
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
