@@ -374,7 +374,26 @@ class Map extends EventEmitter {
       })
   }
 
-  onStarClicked (e) {
+  onViewportPointerDown(e) {
+    //need Object.assign, wich is weird since pixie says it creates a new point each time
+    this.lastPointerDownPosition = Object.assign({}, e.data.global)
+  }
+
+  //not sure where to put this func
+  isDragMotion(position) {
+    let DRAG_THRESHOLD = 8 //max distance in pixels
+    let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition.x - position.x),2)
+    let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition.y - position.y),2)
+    let distance = Math.sqrt(dxSquared+dySquared)
+    
+    return (distance > DRAG_THRESHOLD)
+  }
+
+  onStarClicked (dic) {
+    // ignore clicks if its a drag motion
+    let e = dic.starData
+    if (this.isDragMotion(dic.eventData.global)) { return }
+    
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
@@ -382,6 +401,12 @@ class Map extends EventEmitter {
 
       this.unselectAllCarriers()
       this.unselectAllStarsExcept(selectedStar)
+      
+      if (!this.tryMultiSelect(e.location)) {
+        this.emit('onStarDoubleClicked', e)
+      }
+      //TODO rename doubleClicked on the entire event chain
+      
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
     } else if (this.mode === 'ruler') {
@@ -392,24 +417,7 @@ class Map extends EventEmitter {
   }
 
   onStarDoubleClicked (e) {
-    // Clicking stars should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
-      let selectedStar = this.stars.find(x => x.data._id === e._id)
-      selectedStar.isSelected = true
-
-      this.unselectAllCarriers()
-      this.unselectAllStarsExcept(selectedStar)
-
-      if (!this.tryMultiSelect(e.location)) {
-        this.emit('onStarDoubleClicked', e)
-      }
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onStarClicked(e)
-    } else if (this.mode === 'ruler') {
-      this.rulerPoints.onStarClicked(e)
-    }
-
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+    return
   }
 
   onStarRightClicked (e) {
@@ -418,14 +426,17 @@ class Map extends EventEmitter {
     }
   }
 
-  onCarrierClicked (e) {
+  onCarrierClicked (dic) {
+    // ignore clicks if its a drag motion
+    if (this.isDragMotion(dic.eventData.global)) { return }
+    
+    let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       // If the carrier is in orbit, pass the click over to the star instead.
       if (e.orbiting) {
         let star = this.stars.find(x => x.data._id === e.orbiting)
-
-        return this.onStarClicked(star.data)
+        return this.onStarClicked({starData: star.data, eventData: dic.eventData})
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
@@ -433,6 +444,11 @@ class Map extends EventEmitter {
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
+      
+      if (!this.tryMultiSelect(e.location)) {
+        this.emit('onCarrierDoubleClicked', e)
+      }
+    
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {
@@ -443,31 +459,7 @@ class Map extends EventEmitter {
   }
 
   onCarrierDoubleClicked (e) {
-    // Clicking carriers should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
-      // If the carrier is in orbit, pass the click over to the star instead.
-      if (e.orbiting) {
-        let star = this.stars.find(x => x.data._id === e.orbiting)
-
-        return this.onStarDoubleClicked(star.data)
-      }
-
-      let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
-      selectedCarrier.isSelected = true
-
-      this.unselectAllStars()
-      this.unselectAllCarriersExcept(selectedCarrier)
-
-      if (!this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierDoubleClicked', e)
-      }
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onCarrierClicked(e)
-    } else if (this.mode === 'ruler') {
-      this.rulerPoints.onCarrierClicked(e)
-    }
-
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+    return
   }
 
   onCarrierRightClicked (e) {

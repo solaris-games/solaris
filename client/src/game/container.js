@@ -83,6 +83,7 @@ class GameContainer {
       })
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
+    this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
   setup () {
