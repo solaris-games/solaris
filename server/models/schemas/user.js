@@ -77,6 +77,16 @@ const schema = new Schema({
             toxic: { type: Types.Number, default: 0 },
             topAlly: { type: Types.Number, default: 0 }
         }
+    },
+    gameSettings: {
+        interface: {
+            audio: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+            galaxyScreenUpgrades: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' }
+        },
+        carrier: {
+            defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },
+            defaultAmount: { type: Types.Number, required: false, default: 0 }
+        }
     }
 });
 

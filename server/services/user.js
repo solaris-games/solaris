@@ -41,7 +41,8 @@ module.exports = class UserService extends EventEmitter {
             credits: 0,
             email: 0,
             emailEnabled: 0,
-            username: 0
+            username: 0,
+            gameSettings: 0
         });
     }
 
@@ -54,7 +55,8 @@ module.exports = class UserService extends EventEmitter {
             credits: 0,
             email: 0,
             emailEnabled: 0,
-            username: 0
+            username: 0,
+            gameSettings: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -237,6 +239,24 @@ module.exports = class UserService extends EventEmitter {
 
     async closeAccount(id) {
         await this.userModel.deleteOne({_id: id});
+    }
+
+    async getGameSettings(userId) {
+        let user = await this.getMe(userId);
+
+        return user.gameSettings;
+    }
+
+    async saveGameSettings(userId, settings) {
+        if (+settings.carrier.defaultAmount < 0) {
+            throw new ValidationError(`Carrier default amount must be greater than 0.`);
+        }
+
+        let user = await this.getById(userId);
+
+        user.gameSettings = settings;
+
+        await user.save();
     }
 
 };

@@ -178,6 +178,7 @@ export default {
   },
   data () {
     return {
+      audio: null,
       star: null,
       starOwningPlayer: null,
       userPlayer: null,
@@ -187,6 +188,8 @@ export default {
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
     this.starOwningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
@@ -261,7 +264,7 @@ export default {
           this.onEditWaypointsRequested(response.data)
           this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
-          AudioService.join()
+          this.audio.join()
         }
       } catch (err) {
         console.error(err)
@@ -276,7 +279,7 @@ export default {
 
           // this.$emit('onStarAbandoned', this.star._id)
 
-          AudioService.leave()
+          this.audio.leave()
         }
       } catch (err) {
         console.error(err)
@@ -292,7 +295,7 @@ export default {
           // this.$emit('onUpgradedWarpGate', this.star._id)
           GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
 
-          AudioService.join()
+          this.audio.join()
         }
       } catch (err) {
         console.error(err)
@@ -307,7 +310,7 @@ export default {
 
           // this.$emit('onDestroyedWarpGate', this.star._id)
 
-          AudioService.leave()
+          this.audio.leave()
         }
       } catch (err) {
         console.error(err)

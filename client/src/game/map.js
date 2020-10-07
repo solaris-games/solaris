@@ -388,7 +388,7 @@ class Map extends EventEmitter {
   onStarClicked (dic) {
     // ignore clicks if its a drag motion
     let e = dic.starData
-    if (this.isDragMotion(dic.eventData.global)) { return }
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
     
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
@@ -419,7 +419,7 @@ class Map extends EventEmitter {
 
   onCarrierClicked (dic) {
     // ignore clicks if its a drag motion
-    if (this.isDragMotion(dic.eventData.global)) { return }
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
     
     let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
@@ -427,7 +427,9 @@ class Map extends EventEmitter {
       // If the carrier is in orbit, pass the click over to the star instead.
       if (e.orbiting) {
         let star = this.stars.find(x => x.data._id === e.orbiting)
-        return this.onStarClicked({starData: star.data, eventData: dic.eventData})
+        let eventData = dic ? dic.eventData : null
+  
+        return this.onStarClicked({starData: star.data, eventData})
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)

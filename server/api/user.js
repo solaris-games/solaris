@@ -58,6 +58,26 @@ module.exports = (router, io, container) => {
             return next(err);
         }
     }, middleware.handleError);
+    
+    router.get('/api/user/settings', middleware.authenticate, async (req, res, next) => {
+        try {
+            let settings = await container.userService.getGameSettings(req.session.userId);
+
+            return res.status(200).json(settings);
+        } catch (err) {
+            return next(err);
+        }
+    });
+
+    router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
+        try {
+            let settings = await container.userService.saveGameSettings(req.session.userId, req.body);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    });
 
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {

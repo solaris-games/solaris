@@ -35,10 +35,14 @@ export default {
   },
   data () {
     return {
+      data: null,
       isUpgradingEconomy: false,
       isUpgradingIndustry: false,
       isUpgradingScience: false
     }
+  },
+  mounted () {
+    this.audio = new AudioService(this.$store)
   },
   methods: {
     async upgradeEconomy (e) {
@@ -55,7 +59,7 @@ export default {
             data: response.data
           })
 
-          AudioService.hover()
+          this.audio.hover()
         }
       } catch (err) {
         console.error(err)
@@ -77,7 +81,7 @@ export default {
             data: response.data
           })
 
-          AudioService.hover()
+          this.audio.hover()
         }
       } catch (err) {
         console.error(err)
@@ -99,7 +103,7 @@ export default {
             data: response.data
           })
 
-          AudioService.hover()
+          this.audio.hover()
         }
       } catch (err) {
         console.error(err)

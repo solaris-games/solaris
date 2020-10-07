@@ -434,7 +434,9 @@ class Star extends EventEmitter {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onStarRightClicked', this.data)
     } else {
-      this.emit('onStarClicked', {starData: this.data, eventData: e.data} )
+      let eventData = e ? e.eventData : null
+
+      this.emit('onStarClicked', {starData: this.data, eventData} )
 
       // Need to do this otherwise sometimes text gets highlighted.
       this.deselectAllText()

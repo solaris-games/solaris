@@ -50,6 +50,7 @@ export default {
   },
   data () {
     return {
+      audio: null,
       isUpgrading: false,
       amount: 0,
       selectedType: 'economy',
@@ -70,6 +71,8 @@ export default {
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
   },
   methods: {
@@ -95,7 +98,7 @@ export default {
         )
 
         if (response.status === 200) {
-          AudioService.join()
+          this.audio.join()
 
           this.$emit('onBulkInfrastructureUpgraded', {
             type: this.selectedType,

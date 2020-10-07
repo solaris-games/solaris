@@ -180,7 +180,9 @@ class Carrier extends EventEmitter {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onCarrierRightClicked', this.data)
     } else {
-      this.emit('onCarrierClicked', {carrierData: this.data, eventData: e.data})
+      let eventData = e ? e.data : null
+
+      this.emit('onCarrierClicked', {carrierData: this.data, eventData})
 
       // Need to do this otherwise sometimes text gets highlighted.
       this.deselectAllText()

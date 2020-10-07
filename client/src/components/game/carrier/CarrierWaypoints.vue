@@ -56,6 +56,7 @@ export default {
   },
   data () {
     return {
+      audio: null,
       userPlayer: null,
       carrier: null,
       isSavingWaypoints: false,
@@ -65,6 +66,8 @@ export default {
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
@@ -116,7 +119,7 @@ export default {
         this.totalEtaTimeString = null
       }
 
-      AudioService.backspace()
+      this.audio.backspace()
 
       this.recalculateTotalEta()
       this.recalculateLooped()
@@ -129,13 +132,17 @@ export default {
 
       this.totalEtaTimeString = null
 
-      AudioService.backspace()
+      this.audio.backspace()
 
       this.recalculateTotalEta()
       this.recalculateLooped()
     },
-    onWaypointCreated () {
-      AudioService.type()
+    onWaypointCreated (e) {
+      // Overwrite the default action and default action ships
+      e.action = this.$store.state.settings.carrier.defaultAction
+      e.actionShips = this.$store.state.settings.carrier.defaultAmount
+
+      this.audio.type()
 
       this.recalculateTotalEta()
       this.recalculateLooped()
@@ -161,7 +168,7 @@ export default {
         let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.carrier.waypoints, this.carrier.waypointsLooped)
 
         if (response.status === 200) {
-          AudioService.join()
+          this.audio.join()
 
           // Update the waypoints
           this.carrier.ticksEta = response.data.ticksEta

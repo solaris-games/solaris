@@ -58,7 +58,7 @@
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)"><i class="fas fa-star mr-2"></i>Galaxy</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-                    <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a> -->
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
                 </div>
                 <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
                 <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
@@ -103,6 +103,7 @@ export default {
   },
   data () {
     return {
+      audio: null,
       forceRecomputeCounter: 0, // Need to use this hack to force vue to recalculate the time remaining
       MENU_STATES: MENU_STATES,
       timeRemaining: null,
@@ -112,6 +113,8 @@ export default {
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.setupTimer()
@@ -140,7 +143,7 @@ export default {
       this.setupTimer()
 
       this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
-      AudioService.download()
+      this.audio.download()
     },
     setupTimer () {
       this.recalculateTimeRemaining()
