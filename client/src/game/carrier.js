@@ -11,7 +11,7 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = true
 
     // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
-    this.container.on('pointerdown', this.onClicked.bind(this))
+    this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
@@ -194,7 +194,7 @@ class Carrier extends EventEmitter {
         // Need to do this otherwise sometimes text gets highlighted.
         this.deselectAllText()
       } else {
-        this.emit('onCarrierClicked', this.data)
+        this.emit('onCarrierClicked', {carrierData: this.data, eventData: e.data})
       }
     }
   }

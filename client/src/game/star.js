@@ -448,7 +448,8 @@ class Star extends EventEmitter {
         // Need to do this otherwise sometimes text gets highlighted.
         this.deselectAllText()
       } else {
-        this.emit('onStarClicked', this.data)
+        this.emit('onStarClicked', {starData: this.data, eventData: e.data} )
+
       }
 
       this.drawActive(false)
