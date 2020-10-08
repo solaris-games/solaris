@@ -434,7 +434,7 @@ class Star extends EventEmitter {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onStarRightClicked', this.data)
     } else {
-      let eventData = e ? e.eventData : null
+      let eventData = e ? e.data : null
 
       this.emit('onStarClicked', {starData: this.data, eventData} )
 
