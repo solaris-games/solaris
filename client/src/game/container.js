@@ -27,6 +27,8 @@ class GameContainer {
       autoResize: true
     })
 
+    this.app.ticker.add(this.onTick.bind(this))
+
     // create viewport
     this.viewport = new Viewport({
       screenWidth: window.innerWidth,
@@ -156,6 +158,10 @@ class GameContainer {
 
   resetMode () {
     this.map.resetMode()
+  }
+
+  onTick(deltaTime) {
+    this.map.refreshZoom(this.getViewportZoomPercentage())
   }
 }
 
