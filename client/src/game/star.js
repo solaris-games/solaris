@@ -46,6 +46,9 @@ class Star extends EventEmitter {
     this.players = players
     this.carriers = carriers
     this.lightYearDistance = lightYearDistance
+    
+    this.container.position.x = this.data.location.x
+    this.container.position.y = this.data.location.y
   }
 
   draw () {
@@ -100,8 +103,6 @@ class Star extends EventEmitter {
     this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 3)
     this.graphics_star.endFill()
 
-    this.graphics_star.position.x = this.data.location.x
-    this.graphics_star.position.y = this.data.location.y
 
     if (this.hasSpecialist()) {
       this.graphics_star.beginFill(0x000000)
@@ -154,8 +155,7 @@ class Star extends EventEmitter {
     this.graphics_territory.beginFill(player.colour.value, 0.1)
     this.graphics_territory.drawCircle(0, 0, this.lightYearDistance / 3)
     this.graphics_territory.endFill()
-    this.graphics_territory.position.x = this.data.location.x
-    this.graphics_territory.position.y = this.data.location.y
+    this.container.addChild(this.graphics_territory)
  
   }
 
@@ -188,8 +188,6 @@ class Star extends EventEmitter {
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
         orbitGraphics.drawCircle(0, 0, distanceToStar - (planetSize / 2))
-        orbitGraphics.position.x = this.data.location.x
-        orbitGraphics.position.y = this.data.location.y
         this.container.addChild(orbitGraphics)
 
         let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
@@ -271,8 +269,6 @@ class Star extends EventEmitter {
     } else {
       this.graphics_colour.drawCircle(0, 0, 5)
     }
-    this.graphics_colour.position.x = this.data.location.x
-    this.graphics_colour.position.y = this.data.location.y
   }
 
   drawName (force) {
@@ -286,10 +282,9 @@ class Star extends EventEmitter {
       style.fontSize = 4
 
       this.text_name = new PIXI.Text(this.data.name, style)
-      this.text_name.x = this.data.location.x - (this.text_name.width / 2)
+      this.text_name.x =  -(this.text_name.width / 2)
+      this.text_name.y = 7
       this.text_name.resolution = 10
-      this.text_name.position.x = this.data.location.x
-      this.text_name.position.y = this.data.location.y + 7
 
       this.container.addChild(this.text_name)
     }
@@ -324,8 +319,8 @@ class Star extends EventEmitter {
     }
 
     this.text_garrison.text = displayGarrison
-    this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-    this.text_garrison.y = this.data.location.y + 12
+    this.text_garrison.x = -(this.text_garrison.width / 2)
+    this.text_garrison.y = 12
     this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 150)
   }
 
@@ -347,8 +342,8 @@ class Star extends EventEmitter {
 
     if (this.data.ownedByPlayerId && this._isInScanningRange()) {
       this.text_infrastructure.text = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
-      this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
-      this.text_infrastructure.y = this.data.location.y - 12
+      this.text_infrastructure.x = -(this.text_infrastructure.width / 2)
+      this.text_infrastructure.y = -12
 
       this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 150
     } else {
@@ -481,7 +476,26 @@ class Star extends EventEmitter {
     // update scales to keep a constant size no matter what zoom level the map is
     // might move the scaling into the draw funcs
     // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
-    if (zoomPercent >= 200) {}
+    // probably move constants into contstructor or draw funcs
+    let STAR_SIZE = 4
+    let COLOR_SIZE = 2
+    let NAME_SIZE = 2
+    if (zoomPercent >= 200) {
+			/**
+      this.graphics_star.scale.x = STAR_SIZE*(100/zoomPercent)
+      this.graphics_star.scale.y = STAR_SIZE*(100/zoomPercent)
+      this.graphics_colour.scale.x = COLOR_SIZE*(100/zoomPercent)
+      this.graphics_colour.scale.y = COLOR_SIZE*(100/zoomPercent)
+      this.text_name.scale.x = NAME_SIZE*(100/zoomPercent)
+      this.text_name.scale.y = NAME_SIZE*(100/zoomPercent)
+      this.text_infrastructure.scale.x = NAME_SIZE*(100/zoomPercent)
+      this.text_infrastructure.scale.y = NAME_SIZE*(100/zoomPercent)
+      this.text_garrison.scale.x = NAME_SIZE*(100/zoomPercent)
+      this.text_garrison.scale.y = NAME_SIZE*(100/zoomPercent)
+      this.orbitGraphics.scale.x = NAME_SIZE*(100/zoomPercent)
+      this.orbitGraphics.scale.y = NAME_SIZE*(100/zoomPercent)
+			**/
+    }
     this.zoomPercent = zoomPercent
 
     // Note: Should never need to force a redraw when zooming
