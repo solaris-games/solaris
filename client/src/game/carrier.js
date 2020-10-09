@@ -90,8 +90,8 @@ class Carrier extends EventEmitter {
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
 
-    // Add a larger hit radius so that the star is easily clickable
-    this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+    // Add a larger hit radius so that the carrier is easily clickable
+    this.graphics_ship.hitArea = new PIXI.Circle(0, 0, 10)
   }
 
   drawGarrison () {
