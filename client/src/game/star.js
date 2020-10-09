@@ -97,8 +97,11 @@ class Star extends EventEmitter {
     let starPoints = radius * (this.data.specialistId ? 3 : 2);
 
     this.graphics_star.beginFill(0xFFFFFF, alpha)
-    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, starPoints, radius, radius - 3)
+    this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 3)
     this.graphics_star.endFill()
+
+    this.graphics_star.position.x = this.data.location.x
+    this.graphics_star.position.y = this.data.location.y
 
     if (this.hasSpecialist()) {
       this.graphics_star.beginFill(0x000000)
@@ -149,8 +152,11 @@ class Star extends EventEmitter {
     if (!player) { return }
 
     this.graphics_territory.beginFill(player.colour.value, 0.1)
-    this.graphics_territory.drawCircle(this.data.location.x, this.data.location.y, this.lightYearDistance / 3)
+    this.graphics_territory.drawCircle(0, 0, this.lightYearDistance / 3)
     this.graphics_territory.endFill()
+    this.graphics_territory.position.x = this.data.location.x
+    this.graphics_territory.position.y = this.data.location.y
+ 
   }
 
   drawPlanets (force) {
@@ -181,7 +187,9 @@ class Star extends EventEmitter {
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
-        orbitGraphics.drawCircle(this.data.location.x, this.data.location.y, distanceToStar - (planetSize / 2))
+        orbitGraphics.drawCircle(0, 0, distanceToStar - (planetSize / 2))
+        orbitGraphics.position.x = this.data.location.x
+        orbitGraphics.position.y = this.data.location.y
         this.container.addChild(orbitGraphics)
 
         let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
@@ -259,10 +267,12 @@ class Star extends EventEmitter {
     // If its a warp gate then draw a rectangle.
     // Otherwise draw a circle.
     if (this.data.warpGate) {
-      this.graphics_colour.drawRect(this.data.location.x - 5, this.data.location.y - 5, 10, 10)
+      this.graphics_colour.drawRect(-5, -5, 10, 10)
     } else {
-      this.graphics_colour.drawCircle(this.data.location.x, this.data.location.y, 5)
+      this.graphics_colour.drawCircle(0, 0, 5)
     }
+    this.graphics_colour.position.x = this.data.location.x
+    this.graphics_colour.position.y = this.data.location.y
   }
 
   drawName (force) {
@@ -277,8 +287,9 @@ class Star extends EventEmitter {
 
       this.text_name = new PIXI.Text(this.data.name, style)
       this.text_name.x = this.data.location.x - (this.text_name.width / 2)
-      this.text_name.y = this.data.location.y + 7
       this.text_name.resolution = 10
+      this.text_name.position.x = this.data.location.x
+      this.text_name.position.y = this.data.location.y + 7
 
       this.container.addChild(this.text_name)
     }
@@ -467,6 +478,10 @@ class Star extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
+    // update scales to keep a constant size no matter what zoom level the map is
+    // might move the scaling into the draw funcs
+    // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
+    if (zoomPercent >= 200) {}
     this.zoomPercent = zoomPercent
 
     // Note: Should never need to force a redraw when zooming
