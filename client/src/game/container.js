@@ -115,7 +115,7 @@ class GameContainer {
 
   getViewportZoomPercentage () {
     let viewportWidth = this.viewport.right - this.viewport.left
-    let viewportPercent = (viewportWidth / this.viewport.screenWidth) * 100
+    let viewportPercent = (this.viewport.screenWidth / viewportWidth) * 100
 
     return viewportPercent
   }
