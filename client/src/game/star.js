@@ -216,7 +216,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.container_planets)
     }
 
-    this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
+    this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > 200
   }
 
   _getPlanetsCount () {
@@ -283,7 +283,7 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_name)
     }
 
-    this.text_name.visible = this.isSelected || this.zoomPercent < 60
+    this.text_name.visible = this.isSelected || this.zoomPercent > 120
   }
 
   drawGarrison (force) {
@@ -315,7 +315,7 @@ class Star extends EventEmitter {
     this.text_garrison.text = displayGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+    this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 150)
   }
 
   drawInfrastructure (force) {
@@ -339,7 +339,7 @@ class Star extends EventEmitter {
       this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
       this.text_infrastructure.y = this.data.location.y - 12
 
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 150
     } else {
       this.text_infrastructure.visible = false
     }
