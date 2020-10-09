@@ -476,25 +476,10 @@ class Star extends EventEmitter {
     // update scales to keep a constant size no matter what zoom level the map is
     // might move the scaling into the draw funcs
     // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
-    // probably move constants into contstructor or draw funcs
     let STAR_SIZE = 4
-    let COLOR_SIZE = 2
-    let NAME_SIZE = 2
     if (zoomPercent >= 200) {
-			/**
-      this.graphics_star.scale.x = STAR_SIZE*(100/zoomPercent)
-      this.graphics_star.scale.y = STAR_SIZE*(100/zoomPercent)
-      this.graphics_colour.scale.x = COLOR_SIZE*(100/zoomPercent)
-      this.graphics_colour.scale.y = COLOR_SIZE*(100/zoomPercent)
-      this.text_name.scale.x = NAME_SIZE*(100/zoomPercent)
-      this.text_name.scale.y = NAME_SIZE*(100/zoomPercent)
-      this.text_infrastructure.scale.x = NAME_SIZE*(100/zoomPercent)
-      this.text_infrastructure.scale.y = NAME_SIZE*(100/zoomPercent)
-      this.text_garrison.scale.x = NAME_SIZE*(100/zoomPercent)
-      this.text_garrison.scale.y = NAME_SIZE*(100/zoomPercent)
-      this.orbitGraphics.scale.x = NAME_SIZE*(100/zoomPercent)
-      this.orbitGraphics.scale.y = NAME_SIZE*(100/zoomPercent)
-			**/
+      this.container.scale.x = STAR_SIZE*(100/zoomPercent)
+      this.container.scale.y = STAR_SIZE*(100/zoomPercent)
     }
     this.zoomPercent = zoomPercent
 
