@@ -25,6 +25,9 @@ class Carrier extends EventEmitter {
     this.player = player
     this.colour = player.colour.value
     this.lightYearDistance = lightYearDistance
+
+    this.container.position.x = data.location.x
+    this.container.position.y = data.location.y
   }
 
   draw () {
@@ -65,15 +68,15 @@ class Carrier extends EventEmitter {
     this.graphics_ship.beginFill(0xFFFFFF)
 
     // Draw normal carrier
-    this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
-    this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
-    this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
-    this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
-    this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
+    this.graphics_ship.moveTo(0, 0 - 4)
+    this.graphics_ship.lineTo(0 + 1.5, 0 + 1)
+    this.graphics_ship.lineTo(0 + 3, 0 + 2)
+    this.graphics_ship.lineTo(0 + 1, 0 + 2)
+    this.graphics_ship.lineTo(0 + 0, 0 + 3)
+    this.graphics_ship.lineTo(0 + -1, 0 + 2)
+    this.graphics_ship.lineTo(0 - 3, 0 + 2)
+    this.graphics_ship.lineTo(0 - 1.5, 0 + 1)
+    this.graphics_ship.lineTo(0, 0 - 4)
     this.graphics_ship.endFill()
 
     if (this.hasSpecialist()) {
@@ -83,9 +86,6 @@ class Carrier extends EventEmitter {
       this.graphics_ship.endFill()
     }
 
-    this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
-    this.graphics_ship.position.x = this.data.location.x
-    this.graphics_ship.position.y = this.data.location.y
     this.graphics_ship.scale.set(1)
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
@@ -214,6 +214,11 @@ class Carrier extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
+    let SIZE = 4
+    if (zoomPercent >= 200) {
+      this.container.scale.x = SIZE*(100/zoomPercent)
+      this.container.scale.y = SIZE*(100/zoomPercent)
+    }
     this.zoomPercent = zoomPercent
 
     this.drawGarrison()
