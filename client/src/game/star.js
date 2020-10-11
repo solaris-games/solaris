@@ -7,7 +7,6 @@ class Star extends EventEmitter {
     super()
 
     this.app = app
-
     this.container = new PIXI.Container()
     this.container.interactive = true
     this.container.buttonMode = true
@@ -63,6 +62,7 @@ class Star extends EventEmitter {
     this.drawHyperspaceRange()
     this.drawName()
     this.drawGarrison()
+    this.drawInfrastructure()
 
     this.isInScanningRange = this._isInScanningRange()
   }
@@ -255,48 +255,59 @@ class Star extends EventEmitter {
 
   drawGarrison () {
 
+    if ( this.text_garrison ) {
+      this.text_garrison.texture.destroy(true)
+      this.container.removeChild(this.text_garrison)
+      this.text_garrison = null
+    }
+
     if (!this.text_garrison) {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
 
-      this.text_garrison = new PIXI.Text('', style)
+      let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+      let displayGarrison = ''
+
+      if (totalGarrison > 0) {
+        displayGarrison = totalGarrison
+      }
+      else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
+        displayGarrison = '???'
+      }
+
+      this.text_garrison = new PIXI.Text(displayGarrison, style)
       this.text_garrison.resolution = 10
+
+      this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
+      this.text_garrison.y = this.data.location.y + 12
 
       this.container.addChild(this.text_garrison)
     }
 
-    let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
-    let displayGarrison = ''
-
-    if (totalGarrison > 0) {
-      displayGarrison = totalGarrison
-    }
-    else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
-      displayGarrison = '???'
-    }
-
-    this.text_garrison.text = displayGarrison
-    this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-    this.text_garrison.y = this.data.location.y + 12
   }
 
   drawInfrastructure () {
 
-    if (!this.text_infrastructure) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
-
-      this.text_infrastructure = new PIXI.Text('', style)
-      this.text_infrastructure.resolution = 10
-
-      this.container.addChild(this.text_infrastructure)
+    if ( this.text_infrastructure ) {
+      this.text_infrastructure.texture.destroy(true)
+      this.container.removeChild(this.text_infrastructure)
+      this.text_infrastructure = null
     }
 
-    if (this.data.ownedByPlayerId && this._isInScanningRange()) {
-      this.text_infrastructure.text = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
-      this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
-      this.text_infrastructure.y = this.data.location.y - 12
+    if (!this.text_infrastructure) {
+      if (this.data.ownedByPlayerId && this._isInScanningRange()) {
+        let style = TextureService.DEFAULT_FONT_STYLE
+        style.fontSize = 4
+        let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
+        this.text_infrastructure = new PIXI.Text(displayInfrastructure, style)
+        this.text_infrastructure.resolution = 10
+
+        this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
+        this.text_infrastructure.y = this.data.location.y - 12
+
+        this.container.addChild(this.text_infrastructure)
+      }
     }
 
   }
@@ -338,7 +349,6 @@ class Star extends EventEmitter {
 
     if (!this.graphics_hyperspaceRange) {
       this.graphics_hyperspaceRange = new PIXI.Graphics()
-
       this.container.addChild(this.graphics_hyperspaceRange)
     }
 
