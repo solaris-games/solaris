@@ -25,6 +25,8 @@ class Carrier extends EventEmitter {
     this.player = player
     this.colour = player.colour.value
     this.lightYearDistance = lightYearDistance
+    // Add a larger hit radius so that the star is easily clickable
+    this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
   draw () {
@@ -90,8 +92,6 @@ class Carrier extends EventEmitter {
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
 
-    // Add a larger hit radius so that the star is easily clickable
-    this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
   drawGarrison () {

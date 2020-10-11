@@ -18,7 +18,7 @@ class Star extends EventEmitter {
 
     this.isSelected = false
     this.isMouseOver = false
-    this.isInScanningRange = false // Default to false to force initial redraw
+    this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 0
   }
 
@@ -46,44 +46,39 @@ class Star extends EventEmitter {
     this.players = players
     this.carriers = carriers
     this.lightYearDistance = lightYearDistance
+    this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
   }
 
   draw () {
     // Note: The star may become visible/hidden due to changing scanning range.
-    // If a star is revealed or a star becomes masked then we want to force the entire
+    // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
-    let force = this.isInScanningRange !== this._isInScanningRange()
 
-    this.drawStar(force)
-    this.drawSpecialist(force)
-    // this.drawTerritory(force)
-    this.drawPlanets(force)
-    this.drawColour(force)
-    this.drawScanningRange(force)
-    this.drawHyperspaceRange(force)
-    this.drawName(force)
-    this.drawGarrison(force)
-    this.drawActive(force)
+    this.drawStar()
+    this.drawSpecialist()
+    // this.drawTerritory()
+    this.drawPlanets()
+    this.drawColour()
+    this.drawScanningRange()
+    this.drawHyperspaceRange()
+    this.drawName()
+    this.drawGarrison()
+    this.drawActive()
 
     this.isInScanningRange = this._isInScanningRange()
   }
 
-  drawActive (force) {
-    this.drawInfrastructure(force)
-    this.drawGarrison(force)
-    this.drawScanningRange(force)
-    this.drawHyperspaceRange(force)
+  drawActive () {
+    this.drawInfrastructure()
+    this.drawGarrison()
+    this.drawScanningRange()
+    this.drawHyperspaceRange()
   }
 
-  drawStar (force) {
-    if (force && this.graphics_star) {
-      this.container.removeChild(this.graphics_star)
-      this.graphics_star = null
-    }
+  drawStar () {
 
     if (!this.graphics_star) {
       this.graphics_star = new PIXI.Graphics()
-
       this.container.addChild(this.graphics_star)
     }
 
@@ -107,14 +102,13 @@ class Star extends EventEmitter {
       this.graphics_star.endFill()
     }
 
-    this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
   }
 
   drawSpecialist () {
     if (!this.hasSpecialist()) {
       return
     }
-    
+    //FIXME potential resource leak, should not create a new sprite every time
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 3.5
@@ -129,15 +123,10 @@ class Star extends EventEmitter {
     return this.data.specialistId && this.data.specialistId > 0
   }
 
-  drawTerritory (force) {
-    if (force && this.graphics_territory) {
-      this.container.removeChild(this.graphics_territory)
-      this.graphics_territory = null
-    }
+  drawTerritory () {
 
     if (!this.graphics_territory) {
       this.graphics_territory = new PIXI.Graphics()
-
       this.container.addChild(this.graphics_territory)
     }
 
@@ -153,11 +142,7 @@ class Star extends EventEmitter {
     this.graphics_territory.endFill()
   }
 
-  drawPlanets (force) {
-    if (force && this.container_planets) {
-      this.container.removeChild(this.container_planets)
-      this.container_planets = null
-    }
+  drawPlanets () {
 
     if (!this.container_planets) {
       this.container_planets = new PIXI.Container()
@@ -235,15 +220,10 @@ class Star extends EventEmitter {
     return Math.floor(Math.random() * (1000 - 500 + 1) + 500) // Random number between 500 and 1000
   }
 
-  drawColour (force) {
-    if (force && this.graphics_colour) {
-      this.container.removeChild(this.graphics_colour)
-      this.graphics_colour = null
-    }
+  drawColour () {
 
     if (!this.graphics_colour) {
       this.graphics_colour = new PIXI.Graphics()
-
       this.container.addChild(this.graphics_colour)
     }
 
@@ -265,11 +245,7 @@ class Star extends EventEmitter {
     }
   }
 
-  drawName (force) {
-    if (force && this.text_name) {
-      this.container.removeChild(this.text_name)
-      this.text_name = null
-    }
+  drawName () {
 
     if (!this.text_name) {
       let style = TextureService.DEFAULT_FONT_STYLE
@@ -286,11 +262,7 @@ class Star extends EventEmitter {
     this.text_name.visible = this.isSelected || this.zoomPercent < 60
   }
 
-  drawGarrison (force) {
-    if (force && this.text_garrison) {
-      this.container.removeChild(this.text_garrison)
-      this.text_garrison = null
-    }
+  drawGarrison () {
 
     if (!this.text_garrison) {
       let style = TextureService.DEFAULT_FONT_STYLE
@@ -318,11 +290,7 @@ class Star extends EventEmitter {
     this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
-  drawInfrastructure (force) {
-    if (force && this.text_infrastructure) {
-      this.container.removeChild(this.text_infrastructure)
-      this.text_infrastructure = null
-    }
+  drawInfrastructure () {
 
     if (!this.text_infrastructure) {
       let style = TextureService.DEFAULT_FONT_STYLE
@@ -345,11 +313,7 @@ class Star extends EventEmitter {
     }
   }
 
-  drawScanningRange (force) {
-    if (force && this.graphics_scanningRange) {
-      this.container.removeChild(this.graphics_scanningRange)
-      this.graphics_scanningRange = null
-    }
+  drawScanningRange () {
 
     if (!this.graphics_scanningRange) {
       this.graphics_scanningRange = new PIXI.Graphics()
@@ -387,11 +351,7 @@ class Star extends EventEmitter {
     this.container.zIndex = -1
   }
 
-  drawHyperspaceRange (force) {
-    if (force && this.graphics_hyperspaceRange) {
-      this.container.removeChild(this.graphics_hyperspaceRange)
-      this.graphics_hyperspaceRange = null
-    }
+  drawHyperspaceRange () {
 
     if (!this.graphics_hyperspaceRange) {
       this.graphics_hyperspaceRange = new PIXI.Graphics()
@@ -468,13 +428,11 @@ class Star extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
-
-    // Note: Should never need to force a redraw when zooming
-    // so we should be fine to pass in false to the force draw parameter.
-    this.drawName(false)
-    this.drawGarrison(false)
-    this.drawInfrastructure(false)
-    this.drawPlanets(false)
+		return
+    this.drawName()
+    this.drawGarrison()
+    this.drawInfrastructure()
+    this.drawPlanets()
   }
 }
 
