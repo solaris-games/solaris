@@ -332,7 +332,7 @@ class Map extends EventEmitter {
     this.stars
       .forEach(s => {
         s.isSelected = false
-        s.drawActive(false) // Should be fine to pass in false for force
+        s.updateVisibility() // Should be fine to pass in false for force
       })
   }
 
@@ -340,7 +340,7 @@ class Map extends EventEmitter {
     this.carriers
       .forEach(c => {
         c.isSelected = false
-        c.drawActive()
+        //c.updateVisibility()
       })
   }
 
@@ -353,7 +353,7 @@ class Map extends EventEmitter {
           s.isSelected = false
         }
 
-        s.drawActive(false) // Should be fine to pass in false for the force param
+        s.updateVisibility()
       })
   }
 
@@ -366,7 +366,7 @@ class Map extends EventEmitter {
           c.isSelected = false
         }
 
-        c.drawActive(false) // Should be fine to pass in false for the force param
+        //c.updateVisibility()
       })
   }
 

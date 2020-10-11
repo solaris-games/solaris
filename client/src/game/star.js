@@ -63,17 +63,10 @@ class Star extends EventEmitter {
     this.drawHyperspaceRange()
     this.drawName()
     this.drawGarrison()
-    this.drawActive()
 
     this.isInScanningRange = this._isInScanningRange()
   }
 
-  drawActive () {
-    this.drawInfrastructure()
-    this.drawGarrison()
-    this.drawScanningRange()
-    this.drawHyperspaceRange()
-  }
 
   drawStar () {
 
@@ -201,7 +194,6 @@ class Star extends EventEmitter {
       this.container.addChild(this.container_planets)
     }
 
-    this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
   }
 
   _getPlanetsCount () {
@@ -259,7 +251,6 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_name)
     }
 
-    this.text_name.visible = this.isSelected || this.zoomPercent < 60
   }
 
   drawGarrison () {
@@ -287,7 +278,6 @@ class Star extends EventEmitter {
     this.text_garrison.text = displayGarrison
     this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
     this.text_garrison.y = this.data.location.y + 12
-    this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   drawInfrastructure () {
@@ -307,25 +297,18 @@ class Star extends EventEmitter {
       this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
       this.text_infrastructure.y = this.data.location.y - 12
 
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
-    } else {
-      this.text_infrastructure.visible = false
     }
+
   }
 
   drawScanningRange () {
 
     if (!this.graphics_scanningRange) {
       this.graphics_scanningRange = new PIXI.Graphics()
-
       this.container.addChild(this.graphics_scanningRange)
     }
 
     this.graphics_scanningRange.clear()
-
-    if (!this.isSelected) {
-      return
-    }
 
     // Get the player who owns the star.
     let player = this._getStarPlayer()
@@ -363,7 +346,6 @@ class Star extends EventEmitter {
 
     if (!this.isSelected) {
       this.container.zIndex = 0
-      return
     }
 
     // Get the player who owns the star.
@@ -400,9 +382,27 @@ class Star extends EventEmitter {
 
       // Need to do this otherwise sometimes text gets highlighted.
       this.deselectAllText()
-
-      this.drawActive(false)
+      
+      if (this._getStarPlayer()) {
+        this.updateVisibility()
+      }
     }
+  }
+
+  updateVisibility() {
+
+    this.graphics_hyperspaceRange.visible = this.isSelected
+    this.graphics_scanningRange.visible = this.isSelected
+    this.text_name.visible = this.isSelected || this.zoomPercent < 60
+    this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
+
+    if (this.text_infrastructure) { // may not exist for stars out of range
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
+    }
+    if (this.text_garrison) {
+      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+    }
+
   }
 
   deselectAllText () {
@@ -413,26 +413,18 @@ class Star extends EventEmitter {
   onMouseOver (e) {
     this.isMouseOver = true
 
-    this.drawActive(false)
-
     this.emit('onStarMouseOver', this.data)
   }
 
   onMouseOut (e) {
     this.isMouseOver = false
 
-    this.drawActive(false)
-
     this.emit('onStarMouseOut', this.data)
   }
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
-		return
-    this.drawName()
-    this.drawGarrison()
-    this.drawInfrastructure()
-    this.drawPlanets()
+    this.updateVisibility()
   }
 }
 
