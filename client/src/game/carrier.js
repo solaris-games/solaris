@@ -28,6 +28,8 @@ class Carrier extends EventEmitter {
 
     this.container.position.x = data.location.x
     this.container.position.y = data.location.y
+    // Add a larger hit radius so that the star is easily clickable
+    this.container.hitArea = new PIXI.Circle(0, 0, 10)
   }
 
   draw () {
@@ -90,12 +92,12 @@ class Carrier extends EventEmitter {
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
 
-    // Add a larger hit radius so that the carrier is easily clickable
-    this.graphics_ship.hitArea = new PIXI.Circle(0, 0, 10)
   }
 
   drawGarrison () {
+
     if (this.text_garrison) {
+      this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
     }
@@ -104,20 +106,19 @@ class Carrier extends EventEmitter {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
 
-      this.text_garrison = new PIXI.Text('', style)
+      let totalGarrison = this.data.ships == null ? '???' : this.data.ships
+      
+      let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
+
+      this.text_garrison = new PIXI.Text(garrisonText, style)
       this.text_garrison.resolution = 10
+
+      this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
+      this.text_garrison.y = this.data.location.y + 5
 
       this.container.addChild(this.text_garrison)
     }
 
-    let totalGarrison = this.data.ships == null ? '???' : this.data.ships
-    
-    let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
-
-    this.text_garrison.text = garrisonText
-    this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-    this.text_garrison.y = this.data.location.y + 5
-    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   drawSpecialist () {
@@ -189,6 +190,10 @@ class Carrier extends EventEmitter {
     }
   }
 
+  updateVisibility() {
+    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+  }
+
   deselectAllText () {
     if (window.getSelection) {window.getSelection().removeAllRanges();}
     else if (document.selection) {document.selection.empty();}
@@ -220,8 +225,7 @@ class Carrier extends EventEmitter {
       this.container.scale.y = SIZE*(100/zoomPercent)
     }
     this.zoomPercent = zoomPercent
-
-    this.drawGarrison()
+    this.updateVisibility()
   }
 }
 
