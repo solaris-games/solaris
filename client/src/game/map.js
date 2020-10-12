@@ -340,7 +340,7 @@ class Map extends EventEmitter {
     this.carriers
       .forEach(c => {
         c.isSelected = false
-        //c.updateVisibility()
+        c.updateVisibility()
       })
   }
 
@@ -366,7 +366,7 @@ class Map extends EventEmitter {
           c.isSelected = false
         }
 
-        //c.updateVisibility()
+        c.updateVisibility()
       })
   }
 
