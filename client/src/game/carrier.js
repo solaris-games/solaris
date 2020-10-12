@@ -190,7 +190,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  updateVisible() {
+  updateVisibility() {
     this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
@@ -220,7 +220,7 @@ class Carrier extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
-    this.updateVisible()
+    this.updateVisibility()
   }
 }
 
