@@ -28,7 +28,7 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
