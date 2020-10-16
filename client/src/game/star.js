@@ -382,8 +382,19 @@ class Star extends EventEmitter {
     this.container.zIndex = -1
   }
 
-  onTick( deltaTime ) {
-   return
+  onTick( deltaTime, viewportData ) {
+
+   let deltax = Math.abs(viewportData.center.x - this.data.location.x)
+   let deltay = Math.abs(viewportData.center.y - this.data.location.y)
+ 
+   if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
+     this.container.visible = false
+   } 
+   else {
+     this.container.visible = true
+     this.updateVisibility()
+   }
+
   }
 
   onClicked (e) {
@@ -438,7 +449,6 @@ class Star extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
-    this.updateVisibility()
   }
 }
 
