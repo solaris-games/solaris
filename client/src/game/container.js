@@ -5,6 +5,21 @@ import Map from './map'
 class GameContainer {
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
+    this.frames = 0
+    this.dtAccum = 0
+  }
+
+  calcFPS(deltaTime) {
+    //assumes PIXI ticker is set to 60(default)
+    this.frames++
+    this.dtAccum += deltaTime/60.0
+    if (this.frames >= 60*5) {
+      let avg = this.dtAccum/(60.0*5.0)
+      console.log( 'avg dt: '+avg )
+      console.log( 'avg fps: '+1000.0/(1000.0*avg) )
+      this.frames = 0
+      this.dtAccum = 0
+    }
   }
 
   setupApp () {
@@ -27,6 +42,8 @@ class GameContainer {
       autoResize: true
     })
     this.app.ticker.add( this.onTick.bind(this) )
+
+    this.app.ticker.add( this.calcFPS.bind(this) )
 
     // create viewport
     this.viewport = new Viewport({
