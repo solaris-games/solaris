@@ -26,6 +26,7 @@ class GameContainer {
       resolution: window.devicePixelRatio || 1,
       autoResize: true
     })
+    this.app.ticker.add( this.onTick.bind(this) )
 
     // create viewport
     this.viewport = new Viewport({
@@ -142,6 +143,10 @@ class GameContainer {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+
+  onTick( deltaTime ) {
+    this.map.onTick( deltaTime )
   }
 
   onViewportZoomed (e) {

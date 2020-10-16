@@ -177,6 +177,10 @@ class Carrier extends EventEmitter {
     }
   }
 
+  onTick( deltaTime ) {
+   return
+  }
+
   onClicked (e) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onCarrierRightClicked', this.data)

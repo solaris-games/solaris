@@ -370,6 +370,11 @@ class Map extends EventEmitter {
       })
   }
 
+  onTick( deltaTime ) {
+    this.stars.forEach(s => s.onTick(deltaTime))
+    this.carriers.forEach(c => c.refreshZoom(deltaTime))
+  }
+
   onViewportPointerDown(e) {
     //need Object.assign, wich is weird since pixie says it creates a new point each time
     this.lastPointerDownPosition = Object.assign({}, e.data.global)
