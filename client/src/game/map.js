@@ -389,7 +389,7 @@ class Map extends EventEmitter {
     }
 
     this.stars.forEach(s => s.onTick(deltaTime, viewportData))
-    this.carriers.forEach(c => c.refreshZoom(deltaTime, viewportData))
+    this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
 
   }
 

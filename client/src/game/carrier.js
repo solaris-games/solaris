@@ -3,6 +3,9 @@ import EventEmitter from 'events'
 import TextureService from './texture'
 
 class Carrier extends EventEmitter {
+
+  static culling_margin = 16
+
   constructor () {
     super()
 
@@ -179,14 +182,21 @@ class Carrier extends EventEmitter {
 
   onTick( deltaTime, viewportData ) {
 
-   let deltax = Math.abs(viewportData.center.x - this.data.location.x)
-   let deltay = Math.abs(viewportData.center.y - this.data.location.y)
+   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
+   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
+
  
    if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
-     this.container.visible = false
+     //cannot set parent container visibility, since waypoints lines stretch away from carrier location
+     // maybe put waypoints on its own container, since this piece of code should remain as small as possible
+     this.graphics_colour.visible = false
+     this.graphics_ship.visible = false
+     this.text_garrison.visible = false
    } 
    else {
-     this.container.visible = true
+     this.graphics_colour.visible = true
+     this.graphics_ship.visible = true
+     this.text_garrison.visible = true
      this.updateVisibility()
    }
 
