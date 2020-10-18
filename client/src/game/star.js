@@ -3,6 +3,9 @@ import EventEmitter from 'events'
 import TextureService from './texture'
 
 class Star extends EventEmitter {
+
+  static culling_margin = 16
+
   constructor (app) {
     super()
 
@@ -382,6 +385,21 @@ class Star extends EventEmitter {
     this.container.zIndex = -1
   }
 
+  onTick( deltaTime, viewportData ) {
+
+   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
+   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
+ 
+   if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
+     this.container.visible = false
+   } 
+   else {
+     this.container.visible = true
+     this.updateVisibility()
+   }
+
+  }
+
   onClicked (e) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onStarRightClicked', this.data)
@@ -434,7 +452,6 @@ class Star extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
-    this.updateVisibility()
   }
 }
 

@@ -370,6 +370,29 @@ class Map extends EventEmitter {
       })
   }
 
+  onTick( deltaTime ) {
+
+    let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
+    let viewportHeight = gameContainer.viewport.bottom - gameContainer.viewport.top
+    
+    let viewportXRadius = viewportWidth/2.0
+    let viewportYRadius = viewportHeight/2.0
+    
+    let viewportCenter = gameContainer.viewport.center
+
+    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth)*100
+
+    let viewportData = {
+      center: viewportCenter,
+      xradius: viewportXRadius,
+      yradius: viewportYRadius
+    }
+
+    this.stars.forEach(s => s.onTick(deltaTime, viewportData))
+    this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
+
+  }
+
   onViewportPointerDown(e) {
     //need Object.assign, wich is weird since pixie says it creates a new point each time
     this.lastPointerDownPosition = Object.assign({}, e.data.global)
