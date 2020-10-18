@@ -346,6 +346,8 @@ class Star extends EventEmitter {
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
     this.container.zIndex = -1
+
+    this.graphics_scanningRange.visible = this.isSelected
   }
 
   drawHyperspaceRange () {
@@ -383,6 +385,8 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.endFill()
     this.graphics_hyperspaceRange.zIndex = -1
     this.container.zIndex = -1
+
+    this.graphics_hyperspaceRange.visible = this.isSelected
   }
 
   onTick( deltaTime, viewportData ) {
@@ -391,10 +395,18 @@ class Star extends EventEmitter {
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
  
    if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
-     this.container.visible = false
+     //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
+     // maybe put them on their own container, since this piece of code should remain as small as possible
+     this.graphics_star.visible = false
+     this.graphics_colour.visible = false
+     this.text_name.visible = false
+     this.container_planets.visible = false
+     if (this.text_infrastructure) { this.text_infrastructure.visible = false }
+     if (this.text_garrison) { this.text_garrison.visible = false }
    } 
    else {
-     this.container.visible = true
+     this.graphics_star.visible = true
+     this.graphics_colour.visible = true
      this.updateVisibility()
    }
 
