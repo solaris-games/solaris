@@ -188,16 +188,10 @@ class Carrier extends EventEmitter {
 
  
    if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
-     //cannot set parent container visibility, since waypoints lines stretch away from carrier location
-     // maybe put waypoints on its own container, since this piece of code should remain as small as possible
-     this.graphics_colour.visible = false
-     this.graphics_ship.visible = false
-     this.text_garrison.visible = false
+     this.container.visible = false
    } 
    else {
-     this.graphics_colour.visible = true
-     this.graphics_ship.visible = true
-     this.text_garrison.visible = true
+     this.container.visible = true
      if (constSize) {
        let SIZE = 4
        if (zoomPercent >= 400) {

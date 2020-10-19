@@ -402,22 +402,14 @@ class Star extends EventEmitter {
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
  
    if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
-     //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
-     // maybe put them on their own container, since this piece of code should remain as small as possible
-     this.graphics_star.visible = false
-     this.graphics_colour.visible = false
-     this.text_name.visible = false
-     this.container_planets.visible = false
-     if (this.text_infrastructure) { this.text_infrastructure.visible = false }
-     if (this.text_garrison) { this.text_garrison.visible = false }
+     this.container.visible = false
    } 
    else {
-     this.graphics_star.visible = true
-     this.graphics_colour.visible = true
-     // update scales to keep a constant size no matter what zoom level the map is
-     // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
+     this.container.visible = true
      if(constSize) {
-     let SIZE = 4
+       // update scales to keep a constant size no matter what zoom level the map is
+       // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
+       let SIZE = 4
        if (zoomPercent >= 400) {
          this.container.scale.x = SIZE*(100/zoomPercent)
          this.container.scale.y = SIZE*(100/zoomPercent)
