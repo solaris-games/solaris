@@ -10,6 +10,7 @@ class Carrier extends EventEmitter {
     super()
 
     this.container = new PIXI.Container()
+    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
     this.container.buttonMode = true
 
@@ -159,7 +160,7 @@ class Carrier extends EventEmitter {
   _drawCarrierWaypoints () {
     if (!this.graphics_waypoints) {
       this.graphics_waypoints = new PIXI.Graphics()
-      this.container.addChild(this.graphics_waypoints)
+      this.fixedContainer.addChild(this.graphics_waypoints)
     }
 
     this.graphics_waypoints.clear()

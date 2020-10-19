@@ -11,6 +11,7 @@ class Star extends EventEmitter {
 
     this.app = app
     this.container = new PIXI.Container()
+    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
     this.container.buttonMode = true
 
@@ -50,6 +51,8 @@ class Star extends EventEmitter {
     this.lightYearDistance = lightYearDistance
     this.container.position.x = this.data.location.x
     this.container.position.y = this.data.location.y
+    this.fixedContainer.position.x = this.data.location.x
+    this.fixedContainer.position.y = this.data.location.y
     this.container.hitArea = new PIXI.Circle(0, 0, 15)
   }
 
@@ -323,7 +326,7 @@ class Star extends EventEmitter {
 
     if (!this.graphics_scanningRange) {
       this.graphics_scanningRange = new PIXI.Graphics()
-      this.container.addChild(this.graphics_scanningRange)
+      this.fixedContainer.addChild(this.graphics_scanningRange)
     }
 
     this.graphics_scanningRange.clear()
@@ -358,7 +361,7 @@ class Star extends EventEmitter {
 
     if (!this.graphics_hyperspaceRange) {
       this.graphics_hyperspaceRange = new PIXI.Graphics()
-      this.container.addChild(this.graphics_hyperspaceRange)
+      this.fixedContainer.addChild(this.graphics_hyperspaceRange)
     }
 
     this.graphics_hyperspaceRange.clear()
