@@ -394,7 +394,7 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.visible = this.isSelected
   }
 
-  onTick( deltaTime, viewportData ) {
+  onTick( deltaTime, zoomPercent, viewportData, constSize ) {
 
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
@@ -412,6 +412,15 @@ class Star extends EventEmitter {
    else {
      this.graphics_star.visible = true
      this.graphics_colour.visible = true
+     // update scales to keep a constant size no matter what zoom level the map is
+     // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
+     if(constSize) {
+     let SIZE = 3
+       if (zoomPercent >= 200) {
+         this.container.scale.x = SIZE*(100/zoomPercent)
+         this.container.scale.y = SIZE*(100/zoomPercent)
+       }
+     }
      this.updateVisibility()
    }
 
@@ -468,14 +477,6 @@ class Star extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
-    // update scales to keep a constant size no matter what zoom level the map is
-    // might move the scaling into the draw funcs
-    // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
-    let STAR_SIZE = 4
-    if (zoomPercent >= 200) {
-      this.container.scale.x = STAR_SIZE*(100/zoomPercent)
-      this.container.scale.y = STAR_SIZE*(100/zoomPercent)
-    }
     this.zoomPercent = zoomPercent
   }
 }

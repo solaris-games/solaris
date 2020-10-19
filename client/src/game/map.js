@@ -15,8 +15,10 @@ class Map extends EventEmitter {
   // waypoints - Displays waypoints overlay for a given carrier
   mode = 'galaxy'
 
-  constructor (app) {
+  constructor (app, store) {
     super()
+
+    this.store = store
 
     this.app = app
     this.container = new PIXI.Container()
@@ -388,8 +390,10 @@ class Map extends EventEmitter {
       yradius: viewportYRadius
     }
 
-    this.stars.forEach(s => s.onTick(deltaTime, viewportData))
-    this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
+    let constSize = this.store.state.settings.map.style == 'constant-size'
+
+    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, constSize))
+    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, constSize))
 
   }
 

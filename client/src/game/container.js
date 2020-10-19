@@ -43,7 +43,6 @@ class GameContainer {
       resolution: window.devicePixelRatio || 1,
       autoResize: true
     })
-    this.app.ticker.add( this.onTick.bind(this) )
 
     if ( process.env.NODE_ENV == 'development') {
       this.app.ticker.add( this.calcFPS.bind(this) )
@@ -72,7 +71,7 @@ class GameContainer {
     this.app.stage.addChild(this.viewport)
 
     // Add a new map to the viewport
-    this.map = new Map(this.app)
+    this.map = new Map(this.app, store)
     this.viewport.addChild(this.map.container)
   }
 
@@ -186,9 +185,6 @@ class GameContainer {
     this.map.resetMode()
   }
 
-  onTick(deltaTime) {
-    this.map.refreshZoom(this.getViewportZoomPercentage())
-  }
 }
 
 export default new GameContainer()

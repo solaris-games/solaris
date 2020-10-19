@@ -180,7 +180,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  onTick( deltaTime, viewportData ) {
+  onTick( deltaTime, zoomPercent, viewportData, constSize ) {
 
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
@@ -197,6 +197,13 @@ class Carrier extends EventEmitter {
      this.graphics_colour.visible = true
      this.graphics_ship.visible = true
      this.text_garrison.visible = true
+     if (constSize) {
+     let SIZE = 3
+       if (zoomPercent >= 200) {
+         this.container.scale.x = SIZE*(100/zoomPercent)
+         this.container.scale.y = SIZE*(100/zoomPercent)
+       }
+     }
      this.updateVisibility()
    }
 
@@ -244,11 +251,6 @@ class Carrier extends EventEmitter {
   }
 
   refreshZoom (zoomPercent) {
-    let SIZE = 4
-    if (zoomPercent >= 200) {
-      this.container.scale.x = SIZE*(100/zoomPercent)
-      this.container.scale.y = SIZE*(100/zoomPercent)
-    }
     this.zoomPercent = zoomPercent
   }
 }
