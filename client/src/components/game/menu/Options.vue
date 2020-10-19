@@ -12,8 +12,8 @@
         <label for="audio" class="col col-form-label">Audio</label>
         <div class="col">
           <select class="form-control" id="audio" v-model="settings.interface.audio" :disabled="isSavingSettings">
-            <option value="disabled">Enabled</option>
-            <option value="enabled">Disabled</option>
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled</option>
           </select>
         </div>
       </div>

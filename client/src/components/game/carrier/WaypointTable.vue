@@ -8,7 +8,7 @@
                 <td v-if="!showAction">ETA</td>
                 <td v-if="showAction">Action</td>
                 <td class="text-right" v-if="!carrier.isGift">
-                  <a href="javascript:;" @click="toggleShowAction">Show {{showAction ? 'Action' : 'ETA'}}</a>
+                  <a href="javascript:;" @click="toggleShowAction">Show {{showAction ? 'ETA' : 'Action'}}</a>
                 </td>
             </tr>
         </thead>
