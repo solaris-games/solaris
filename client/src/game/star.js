@@ -97,7 +97,7 @@ class Star extends EventEmitter {
     if (this.hasSpecialist()) {
       this.graphics_star.beginFill(0x000000)
       this.graphics_star.lineStyle(0.3, 0xFFFFFF)
-      this.graphics_star.drawCircle(this.data.location.x, this.data.location.y, 2.2)
+      this.graphics_star.drawCircle(0, 0, 2.2)
       this.graphics_star.endFill()
     }
 
@@ -112,8 +112,8 @@ class Star extends EventEmitter {
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 3.5
     specialistSprite.height = 3.5
-    specialistSprite.x = this.data.location.x - 1.75
-    specialistSprite.y = this.data.location.y - 1.75
+    specialistSprite.x = -1.75
+    specialistSprite.y = -1.75
     
     this.container.addChild(specialistSprite)
   }
@@ -181,12 +181,11 @@ class Star extends EventEmitter {
         }
 
         planetContainer.pivot.set(distanceToStar, 0)
-        planetContainer.position.x = this.data.location.x
-        planetContainer.position.y = this.data.location.y
 
         let rotationSpeed = (planetCount - i) / rotationSpeedModifier
 
         this.app.ticker.add((delta) => {
+          //maybe check if visible? no need to rotate planets outside viewport
           if (rotationDirection) {
             planetContainer.rotation += rotationSpeed * delta
           } else {
@@ -347,7 +346,7 @@ class Star extends EventEmitter {
 
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
-    this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
+    this.graphics_scanningRange.drawStar(0, 0, radius, radius, radius - 2)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
     this.container.zIndex = -1
@@ -386,7 +385,7 @@ class Star extends EventEmitter {
 
     this.graphics_hyperspaceRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
-    this.graphics_hyperspaceRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 3)
+    this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()
     this.graphics_hyperspaceRange.zIndex = -1
     this.container.zIndex = -1
@@ -415,8 +414,8 @@ class Star extends EventEmitter {
      // update scales to keep a constant size no matter what zoom level the map is
      // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
      if(constSize) {
-     let SIZE = 3
-       if (zoomPercent >= 200) {
+     let SIZE = 4
+       if (zoomPercent >= 400) {
          this.container.scale.x = SIZE*(100/zoomPercent)
          this.container.scale.y = SIZE*(100/zoomPercent)
        }

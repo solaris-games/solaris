@@ -57,7 +57,7 @@ class Carrier extends EventEmitter {
 
     if (!this.data.orbiting) {
       this.graphics_colour.lineStyle(1, this.colour)
-      this.graphics_colour.drawCircle(this.data.location.x, this.data.location.y, 4)
+      this.graphics_colour.drawCircle(0, 0, 4)
     }
   }
 
@@ -87,7 +87,7 @@ class Carrier extends EventEmitter {
     if (this.hasSpecialist()) {
       this.graphics_ship.beginFill(0x000000)
       this.graphics_ship.lineStyle(0.3, 0xFFFFFF)
-      this.graphics_ship.drawCircle(this.data.location.x, this.data.location.y, 2.2)
+      this.graphics_ship.drawCircle(0, 0, 2.2)
       this.graphics_ship.endFill()
     }
 
@@ -116,8 +116,8 @@ class Carrier extends EventEmitter {
       this.text_garrison = new PIXI.Text(garrisonText, style)
       this.text_garrison.resolution = 10
 
-      this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-      this.text_garrison.y = this.data.location.y + 5
+      this.text_garrison.x = -(this.text_garrison.width / 2)
+      this.text_garrison.y = 5
 
       this.container.addChild(this.text_garrison)
     }
@@ -133,8 +133,8 @@ class Carrier extends EventEmitter {
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 3.5
     specialistSprite.height = 3.5
-    specialistSprite.x = this.data.location.x - 1.75
-    specialistSprite.y = this.data.location.y - 1.75
+    specialistSprite.x = -1.75
+    specialistSprite.y = -1.75
     
     this.container.addChild(specialistSprite)
   }
@@ -198,8 +198,8 @@ class Carrier extends EventEmitter {
      this.graphics_ship.visible = true
      this.text_garrison.visible = true
      if (constSize) {
-     let SIZE = 3
-       if (zoomPercent >= 200) {
+       let SIZE = 4
+       if (zoomPercent >= 400) {
          this.container.scale.x = SIZE*(100/zoomPercent)
          this.container.scale.y = SIZE*(100/zoomPercent)
        }
