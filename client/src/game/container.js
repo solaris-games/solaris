@@ -7,7 +7,9 @@ class GameContainer {
     PIXI.settings.SORTABLE_CHILDREN = true
   }
 
-  setupApp () {
+  setupApp ( store ) {
+
+    if (store) { this.store = store }
     // Cleanup if the app already exists.
     if (this.app) {
       this.app.destroy(false, {
