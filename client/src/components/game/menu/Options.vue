@@ -53,6 +53,18 @@
         </div>
       </div>
 
+      <h4 class="pt-2">Map</h4>
+      
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="map-style" class="col col-form-label">Style</label>
+        <div class="col">
+          <select class="form-control" id="map-style" v-model="settings.map.style" :disabled="isSavingSettings">
+            <option value="default">Default</option>
+            <option value="constant-size">Constant Size</option>
+          </select>
+        </div>
+      </div>
+
       <form-error-list v-bind:errors="errors"/>
 
       <div class="row mt-2">
