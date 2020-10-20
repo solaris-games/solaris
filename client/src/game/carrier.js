@@ -229,7 +229,7 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent > 150 )
   }
 
   deselectAllText () {
