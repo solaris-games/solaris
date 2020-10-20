@@ -405,17 +405,26 @@ class Star extends EventEmitter {
      this.container.visible = false
    } 
    else {
+
      this.container.visible = true
+     this.updateVisibility()
+
      if(constSize) {
-       // update scales to keep a constant size no matter what zoom level the map is
-       // maybe actually scale thing up, but only until a certain zoom (200) is reached, then keep constant- like NP does
        let SIZE = 4
        if (zoomPercent >= 400) {
          this.container.scale.x = SIZE*(100/zoomPercent)
          this.container.scale.y = SIZE*(100/zoomPercent)
        }
+       else {
+         this.container.scale.x = 1
+         this.container.scale.y = 1
+       }
      }
-     this.updateVisibility()
+     else {
+       this.container.scale.x = 1
+       this.container.scale.y = 1
+     }
+
    }
 
   }

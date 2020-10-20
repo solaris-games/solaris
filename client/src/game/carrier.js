@@ -191,15 +191,26 @@ class Carrier extends EventEmitter {
      this.container.visible = false
    } 
    else {
+
      this.container.visible = true
-     if (constSize) {
+     this.updateVisibility()
+
+     if(constSize) {
        let SIZE = 4
        if (zoomPercent >= 400) {
          this.container.scale.x = SIZE*(100/zoomPercent)
          this.container.scale.y = SIZE*(100/zoomPercent)
        }
+       else {
+         this.container.scale.x = 1
+         this.container.scale.y = 1
+       }
      }
-     this.updateVisibility()
+     else {
+       this.container.scale.x = 1
+       this.container.scale.y = 1
+     }
+
    }
 
   }
