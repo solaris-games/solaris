@@ -50,6 +50,8 @@ module.exports = (router, io, container) => {
                 req.params.carrierId,
                 +req.params.specialistId);
 
+            // TODO: Implement a socket to broadcast to other players.
+
             return res.status(200).json(result);
         } catch (err) {
             return next(err);
@@ -69,6 +71,8 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.params.starId,
                 +req.params.specialistId);
+
+            // TODO: Implement a socket to broadcast to other players.
 
             return res.status(200).json(result);
         } catch (err) {
