@@ -99,13 +99,13 @@ module.exports = (router, io, container) => {
                 req.body.avatar,
                 req.body.password);
 
+            res.sendStatus(200);
+
             container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias);
 
             if (gameIsFull) {
                 container.broadcastService.gameStarted(req.game);
             }
-
-            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -116,10 +116,10 @@ module.exports = (router, io, container) => {
             let player = await container.gameService.quit(
                 req.game,
                 req.player);
+
+            res.sendStatus(200);
                 
             container.broadcastService.gamePlayerQuit(req.game, player);
-
-            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -137,15 +137,29 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.playerService.declareReady(
                 req.game,
                 req.player);
-                
-            container.broadcastService.gamePlayerReady(req.game, req.player);
+            
+            res.sendStatus(200);
 
-            return res.sendStatus(200);
+            container.broadcastService.gamePlayerReady(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.undeclareReady(
+                req.game,
+                req.player);
+
+            res.sendStatus(200);
+                
+            container.broadcastService.gamePlayerNotReady(req.game, req.player);
         } catch (err) {
             return next(err);
         }

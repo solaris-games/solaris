@@ -17,7 +17,8 @@ const schema = new Schema({
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 64 },
-			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' }
+			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
+			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' }
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut'], default: 'circular' },

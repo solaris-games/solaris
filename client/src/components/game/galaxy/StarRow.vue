@@ -39,6 +39,7 @@ export default {
   },
   data () {
     return {
+      audio: null,
       availableCredits: 0,
       isUpgradingEconomy: false,
       isUpgradingIndustry: false,
@@ -46,6 +47,8 @@ export default {
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+
     this.refreshCredits()
   },
   methods: {
@@ -78,7 +81,7 @@ export default {
         data: data
       })
 
-      AudioService.hover()
+      this.audio.hover()
       gameContainer.reloadStar(this.star)
       this.refreshCredits()
     },

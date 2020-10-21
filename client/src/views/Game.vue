@@ -12,9 +12,9 @@
                   @onMenuStateChanged="onMenuStateChanged"
                   @onPlayerSelected="onPlayerSelected"/>
 
-        <game-container @onStarDoubleClicked="onStarDoubleClicked"
+        <game-container @onStarClicked="onStarClicked"
                     @onStarRightClicked="onStarRightClicked"
-                    @onCarrierDoubleClicked="onCarrierDoubleClicked"
+                    @onCarrierClicked="onCarrierClicked"
                     @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
     </div>
@@ -28,6 +28,7 @@ import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
 import gameService from '../services/api/game'
+import UserApiService from '../services/api/user'
 import GameHelper from '../services/gameHelper'
 import AudioService from '../game/audio'
 
@@ -40,19 +41,23 @@ export default {
   },
   data () {
     return {
+      audio: null,
       menuState: null,
       menuArguments: null,
       MENU_STATES: MENU_STATES
     }
   },
   async created () {
+    this.audio = new AudioService(this.$store)
+
     this.$store.commit('clearGame')
 
     this.subscribeToSockets()
 
     await this.reloadGame()
+    await this.reloadSettings()
 
-    // AudioService.download()
+    // this.audio.download()
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 
@@ -87,6 +92,17 @@ export default {
         console.error(err)
       }
     },
+    async reloadSettings () {
+      try {
+        let response = await UserApiService.getGameSettings()
+
+        if (response.status === 200) {
+          this.$store.commit('setSettings', response.data) // Persist to storage
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
@@ -109,11 +125,11 @@ export default {
 
       this.$emit('onPlayerSelected', e)
     },
-    onStarDoubleClicked (e) {
+    onStarClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.STAR_DETAIL
 
-      AudioService.click()
+      this.audio.click()
     },
     onStarRightClicked (e) {
       let star = GameHelper.getStarById(this.$store.state.game, e)
@@ -123,13 +139,13 @@ export default {
         this.onPlayerSelected(owningPlayer._id)
       }
 
-      AudioService.click()
+      this.audio.click()
     },
-    onCarrierDoubleClicked (e) {
+    onCarrierClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.CARRIER_DETAIL
 
-      AudioService.click()
+      this.audio.click()
     },
     onCarrierRightClicked (e) {
       let carrier = GameHelper.getCarrierById(this.$store.state.game, e)
@@ -139,13 +155,13 @@ export default {
         this.onPlayerSelected(owningPlayer._id)
       }
 
-      AudioService.click()
+      this.audio.click()
     },
     onObjectsClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
 
-      AudioService.open()
+      this.audio.open()
     },
 
     // --------------------
@@ -213,7 +229,7 @@ export default {
         ]
       })
 
-      AudioService.join()
+      this.audio.join()
     },
     onGameStarted (data) {
       this.$store.commit('gameStarted', data)

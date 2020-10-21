@@ -3,6 +3,9 @@ import EventEmitter from 'events'
 import TextureService from './texture'
 
 class Carrier extends EventEmitter {
+
+  static culling_margin = 16
+
   constructor () {
     super()
 
@@ -11,13 +14,12 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = true
 
     // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
-    this.container.on('pointerdown', this.onClicked.bind(this))
+    this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.isMouseOver = false
     this.zoomPercent = 0
-    this.clicks = 0
   }
 
   setup (data, stars, player, lightYearDistance) {
@@ -26,6 +28,8 @@ class Carrier extends EventEmitter {
     this.player = player
     this.colour = player.colour.value
     this.lightYearDistance = lightYearDistance
+    // Add a larger hit radius so that the star is easily clickable
+    this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
   draw () {
@@ -91,12 +95,12 @@ class Carrier extends EventEmitter {
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
 
-    // Add a larger hit radius so that the star is easily clickable
-    this.graphics_ship.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
   }
 
   drawGarrison () {
+
     if (this.text_garrison) {
+      this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
     }
@@ -105,20 +109,19 @@ class Carrier extends EventEmitter {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
 
-      this.text_garrison = new PIXI.Text('', style)
+      let totalGarrison = this.data.ships == null ? '???' : this.data.ships
+      
+      let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
+
+      this.text_garrison = new PIXI.Text(garrisonText, style)
       this.text_garrison.resolution = 10
+
+      this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
+      this.text_garrison.y = this.data.location.y + 5
 
       this.container.addChild(this.text_garrison)
     }
 
-    let totalGarrison = this.data.ships == null ? '???' : this.data.ships
-    
-    let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
-
-    this.text_garrison.text = garrisonText
-    this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-    this.text_garrison.y = this.data.location.y + 5
-    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   drawSpecialist () {
@@ -177,26 +180,43 @@ class Carrier extends EventEmitter {
     }
   }
 
+  onTick( deltaTime, viewportData ) {
+
+   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
+   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
+
+ 
+   if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
+     //cannot set parent container visibility, since waypoints lines stretch away from carrier location
+     // maybe put waypoints on its own container, since this piece of code should remain as small as possible
+     this.graphics_colour.visible = false
+     this.graphics_ship.visible = false
+     this.text_garrison.visible = false
+   } 
+   else {
+     this.graphics_colour.visible = true
+     this.graphics_ship.visible = true
+     this.text_garrison.visible = true
+     this.updateVisibility()
+   }
+
+  }
+
   onClicked (e) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onCarrierRightClicked', this.data)
     } else {
-      this.clicks++
+      let eventData = e ? e.data : null
 
-      setTimeout(() => {
-        this.clicks = 0
-      }, 500)
+      this.emit('onCarrierClicked', {carrierData: this.data, eventData})
 
-      if (this.clicks > 1) {
-        this.emit('onCarrierDoubleClicked', this.data)
-        this.clicks = 0
-
-        // Need to do this otherwise sometimes text gets highlighted.
-        this.deselectAllText()
-      } else {
-        this.emit('onCarrierClicked', this.data)
-      }
+      // Need to do this otherwise sometimes text gets highlighted.
+      this.deselectAllText()
     }
+  }
+
+  updateVisibility() {
+    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
   }
 
   deselectAllText () {
@@ -225,8 +245,6 @@ class Carrier extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
-
-    this.drawGarrison()
   }
 }
 

@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const EventEmitter = require('events');
 
-module.exports = class PlayerService {
+module.exports = class PlayerService extends EventEmitter {
     
     constructor(randomService, mapService, starService, carrierService, starDistanceService, technologyService) {
+        super();
+        
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
@@ -173,6 +176,7 @@ module.exports = class PlayerService {
         player.alias = "Empty Slot";
         player.avatar = null;
         player.credits = game.settings.player.startingCredits;
+        player.ready = false;
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);
@@ -354,6 +358,20 @@ module.exports = class PlayerService {
         player.ready = true;
 
         await game.save();
+
+        this.emit('onGamePlayerReady', {
+            game
+        });
+    }
+
+    async undeclareReady(game, player) {
+        player.ready = false;
+
+        await game.save();
+
+        this.emit('onGamePlayerNotReady', {
+            game
+        });
     }
 
 }

@@ -48,6 +48,7 @@ import AudioService from '../../../game/audio'
 export default {
   data: function () {
     return {
+      audio: null,
       loadingNow: false,
       loadingNext: false,
       player: null,
@@ -58,6 +59,8 @@ export default {
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+    
     this.player = GameHelper.getUserPlayer(this.$store.state.game)
     this.loadTechnologies()
 
@@ -91,7 +94,7 @@ export default {
         let result = await researchService.updateResearchNow(this.$store.state.game._id, this.player.researchingNow)
 
         if (result.status === 200) {
-          AudioService.join()
+          this.audio.join()
           this.player.currentResearchTicksEta = result.data.ticksEta
           this.recalculateTimeRemaining()
           this.$toasted.show(`Current research updated.`)
@@ -109,7 +112,7 @@ export default {
         let response = await researchService.updateResearchNext(this.$store.state.game._id, this.player.researchingNext)
 
         if (response.status === 200) {
-          AudioService.join()
+          this.audio.join()
           this.$toasted.show(`Next research updated.`)
         }
       } catch (err) {

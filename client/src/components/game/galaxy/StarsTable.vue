@@ -60,6 +60,8 @@ export default {
   },
   mounted () {
     this.tableData = this.getTableData()
+
+    this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled'
   },
   methods: {
     getUserPlayer () {

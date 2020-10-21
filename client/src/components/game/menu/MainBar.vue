@@ -28,7 +28,7 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
@@ -74,6 +74,8 @@
         :starId="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+      <options v-if="menuState == MENU_STATES.OPTIONS"
+        @onCloseRequested="onCloseRequested"/>
     </div>
   </div>
 </div>
@@ -81,7 +83,6 @@
 
 <script>
 import MENU_STATES from '../../data/menuStates'
-import AudioService from '../../../game/audio'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
 import PlayerVue from '../player/Player.vue'
@@ -105,6 +106,7 @@ import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
+import OptionsVue from './Options.vue'
 
 export default {
   components: {
@@ -129,7 +131,8 @@ export default {
     'ruler': RulerVue,
     'ledger': LedgerVue,
     'hire-specialist-carrier': HireSpecialistCarrierVue,
-    'hire-specialist-star': HireSpecialistStarVue
+    'hire-specialist-star': HireSpecialistStarVue,
+    'options': OptionsVue
   },
   props: {
     menuState: String,

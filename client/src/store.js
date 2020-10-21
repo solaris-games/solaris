@@ -31,6 +31,13 @@ export default new Vuex.Store({
       state.game = null
     },
 
+    setSettings (state, settings) {
+      state.settings = settings
+    },
+    clearSettings (state) {
+      state.settings = null
+    },
+
     // ----------------
     // Sockets
 

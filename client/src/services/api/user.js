@@ -10,6 +10,14 @@ class UserService extends BaseApiService {
     return axios.get(this.BASE_URL + 'user/achievements/' + userId, { withCredentials: true })
   }
 
+  getGameSettings () {
+    return axios.get(this.BASE_URL + 'user/settings', { withCredentials: true })
+  }
+
+  saveGameSettings (settings) {
+    return axios.put(this.BASE_URL + 'user/settings', settings, { withCredentials: true })
+  }
+
   createUser (email, username, password) {
     return axios.post(this.BASE_URL + 'user', {
       email: email,
@@ -72,6 +80,11 @@ class UserService extends BaseApiService {
           limit: limit
         }
       })
+  }
+
+  closeAccount () {
+    return axios.delete(this.BASE_URL + 'user/closeAccount',
+    { withCredentials: true })
   }
 }
 

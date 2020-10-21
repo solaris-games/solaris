@@ -28,12 +28,40 @@ module.exports = class SpecialistService {
         return this.getById(id, TYPES.CARRIER);
     }
 
+    getByIdCarrierTrim(id) {
+        let spec = this.getByIdCarrier(id);
+
+        if (spec) {
+            spec = {
+                id: spec.id,
+                name: spec.name,
+                description: spec.description
+            };
+        }
+
+        return spec;
+    }
+
     getByIdStar(id) {
         if (!id) {
             return null;
         }
         
         return this.getById(id, TYPES.STAR);
+    }
+
+    getByIdStarTrim(id) {
+        let spec = this.getByIdStar(id);
+
+        if (spec) {
+            spec = {
+                id: spec.id,
+                name: spec.name,
+                description: spec.description
+            };
+        }
+
+        return spec;
     }
 
     list(game, type) {

@@ -82,6 +82,11 @@ class GameService extends BaseApiService {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/ready', null,
       { withCredentials: true })
   }
+
+  unconfirmReady (gameId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/notready', null,
+      { withCredentials: true })
+  }
 }
 
 export default new GameService()

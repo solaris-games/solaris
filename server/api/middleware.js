@@ -87,7 +87,8 @@ module.exports = (container) => {
         async loadGamePlayers(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdLean(req.params.gameId, {
-                    'galaxy.players': 1
+                    'galaxy.players': 1,
+                    'settings': 1
                 });
             }
 

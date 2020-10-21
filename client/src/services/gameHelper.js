@@ -346,6 +346,10 @@ class GameHelper {
         return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
       })
   }
+
+  isNormalAnonymity (game) {
+    return game.settings.general.anonymity === 'normal'
+  }
 }
 
 export default new GameHelper()

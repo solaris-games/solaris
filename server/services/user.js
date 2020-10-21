@@ -41,7 +41,8 @@ module.exports = class UserService extends EventEmitter {
             credits: 0,
             email: 0,
             emailEnabled: 0,
-            username: 0
+            username: 0,
+            gameSettings: 0
         });
     }
 
@@ -54,7 +55,8 @@ module.exports = class UserService extends EventEmitter {
             credits: 0,
             email: 0,
             emailEnabled: 0,
-            username: 0
+            username: 0,
+            gameSettings: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -81,6 +83,7 @@ module.exports = class UserService extends EventEmitter {
 
     async getUsernameByEmail(email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findOne({email}, {
             username: 1
@@ -96,6 +99,7 @@ module.exports = class UserService extends EventEmitter {
     async create(user) {
         user.username = user.username.trim();
         user.email = user.email.trim();
+        user.email = user.email.toLowerCase();
 
         if (user.username.length < 3 || user.username.length > 24) {
             throw new ValidationError('Username must be between 3 and 24 characters.');
@@ -114,9 +118,10 @@ module.exports = class UserService extends EventEmitter {
 
     async userExists(email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findOne({
-            email: email
+            email
         });
 
         return user != null;
@@ -142,6 +147,7 @@ module.exports = class UserService extends EventEmitter {
 
     async updateEmailAddress(id, email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findById(id);
         
@@ -192,6 +198,7 @@ module.exports = class UserService extends EventEmitter {
 
     async requestResetPassword(email) {
         email = email.trim();
+        email = email.toLowerCase();
 
         let user = await this.userModel.findOne({
             email
@@ -226,6 +233,28 @@ module.exports = class UserService extends EventEmitter {
         
         user.password = hash;
         user.resetPasswordToken = null;
+
+        await user.save();
+    }
+
+    async closeAccount(id) {
+        await this.userModel.deleteOne({_id: id});
+    }
+
+    async getGameSettings(userId) {
+        let user = await this.getMe(userId);
+
+        return user.gameSettings;
+    }
+
+    async saveGameSettings(userId, settings) {
+        if (+settings.carrier.defaultAmount < 0) {
+            throw new ValidationError(`Carrier default amount must be greater than 0.`);
+        }
+
+        let user = await this.getById(userId);
+
+        user.gameSettings = settings;
 
         await user.save();
     }

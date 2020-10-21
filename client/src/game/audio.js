@@ -11,8 +11,17 @@ import openFile from '../assets/audio/open.mp3'
 import quitFile from '../assets/audio/quit.mp3'
 import typeFile from '../assets/audio/type.mp3'
 
+// TODO: This service doesn't really belong in the game folder, should be in the services folder instead.
 class AudioService {
+  constructor (store) {
+    this.store = store
+  }
+
   _play (audioFile) {
+    if (this.store.state.settings.interface.audio === 'disabled') {
+      return
+    }
+
     try {
       let audio = new Audio(audioFile)
       audio.play()
@@ -70,4 +79,4 @@ class AudioService {
   }
 }
 
-export default new AudioService()
+export default AudioService

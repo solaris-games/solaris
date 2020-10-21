@@ -50,7 +50,7 @@
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame()">
-                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
                         <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
@@ -109,12 +109,15 @@ export default {
 
   data () {
     return {
+      audio: null,
       players: [],
       sortedPlayers: [],
       timeRemaining: null
     }
   },
   mounted () {
+    this.audio = new AudioService(this.$store)
+
     this.players = this.$store.state.game.galaxy.players
     this.sortedPlayers = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
 
@@ -158,7 +161,7 @@ export default {
         this.timeRemaining = `Next tick: ${time}`
       } else {
         // Calculate when the max wait limit date is.
-        let maxWaitLimitDate = moment(this.$store.state.game.state.startDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
+        let maxWaitLimitDate = moment(this.$store.state.game.state.lastTickDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
 
         let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
 
@@ -170,7 +173,7 @@ export default {
         let response = await gameService.concedeDefeat(this.$store.state.game._id)
 
         if (response.status === 200) {
-          AudioService.quit()
+          this.audio.quit()
           this.$toasted.show(`You have conceded defeat, better luck next time.`, { type: 'error' })
           router.push({ name: 'main-menu' })
         }
@@ -183,7 +186,7 @@ export default {
         let response = await gameService.quitGame(this.$store.state.game._id)
 
         if (response.status === 200) {
-          AudioService.quit()
+          this.audio.quit()
           this.$toasted.show(`You have quit ${this.$store.state.game.settings.general.name}.`, { type: 'error' })
           router.push({ name: 'main-menu' })
         }
@@ -203,6 +206,21 @@ export default {
           this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
 
           player.ready = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async unconfirmReady (player) {
+      if (!this.isUserPlayer(player)) {
+        return
+      }
+
+      try {
+        let response = await gameService.unconfirmReady(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          player.ready = false
         }
       } catch (err) {
         console.error(err)
@@ -244,11 +262,18 @@ export default {
 
       player.ready = true
     })
+
+    this.sockets.subscribe('gamePlayerNotReady', (data) => {
+      let player = this.players.find(p => p._id === data.playerId)
+
+      player.ready = false
+    })
   },
   destroyed () {
     this.sockets.unsubscribe('gamePlayerJoined')
     this.sockets.unsubscribe('gamePlayerQuit')
     this.sockets.unsubscribe('gamePlayerReady')
+    this.sockets.unsubscribe('gamePlayerNotReady')
   },
 
   computed: {
@@ -277,5 +302,9 @@ img {
 .table th.fit {
     white-space: nowrap;
     width: 1%;
+}
+
+.fa-check {
+  cursor: pointer;
 }
 </style>

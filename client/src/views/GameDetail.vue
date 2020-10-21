@@ -30,6 +30,10 @@
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
             </tr> -->
+            <tr>
+              <td>Anonymity</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -40,7 +44,7 @@
           <tbody>
             <tr>
               <td>Galaxy Type</td>
-              <td class="text-right">{{ game.settings.galaxy.galaxyType }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.galaxy.galaxyType) }}</td>
             </tr>
             <tr>
               <td>Stars Per Player</td>
@@ -92,7 +96,7 @@
             </tr>
             <tr>
               <td>Resource Distribution</td>
-              <td class="text-right">{{ game.settings.specialGalaxy.resourceDistribution }}</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.resourceDistribution) }}</td>
             </tr>
           </tbody>
         </table>
@@ -334,7 +338,9 @@ export default {
         'weightedCenter': 'Weighted (Center)',
         'circular': 'Circular',
         'spiral': 'Spiral',
-        'doughnut': 'Doughnut'
+        'doughnut': 'Doughnut',
+        'normal': 'Normal',
+        'extra': 'Extra'
       }[option]
 
       return text || option

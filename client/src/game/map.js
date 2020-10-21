@@ -108,7 +108,6 @@ class Map extends EventEmitter {
       this.starContainer.addChild(star.container)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onStarDoubleClicked', this.onStarDoubleClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
@@ -122,7 +121,6 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
       existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
@@ -142,7 +140,6 @@ class Map extends EventEmitter {
     this.carrierContainer.addChild(carrier.container)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-    carrier.on('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
     carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
     carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
@@ -242,7 +239,6 @@ class Map extends EventEmitter {
 
     if (existing) {
       existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierDoubleClicked', this.onCarrierDoubleClicked.bind(this))
       existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
@@ -336,7 +332,7 @@ class Map extends EventEmitter {
     this.stars
       .forEach(s => {
         s.isSelected = false
-        s.drawActive(false) // Should be fine to pass in false for force
+        s.updateVisibility() // Should be fine to pass in false for force
       })
   }
 
@@ -344,7 +340,7 @@ class Map extends EventEmitter {
     this.carriers
       .forEach(c => {
         c.isSelected = false
-        c.drawActive()
+        c.updateVisibility()
       })
   }
 
@@ -357,7 +353,7 @@ class Map extends EventEmitter {
           s.isSelected = false
         }
 
-        s.drawActive(false) // Should be fine to pass in false for the force param
+        s.updateVisibility()
       })
   }
 
@@ -370,11 +366,53 @@ class Map extends EventEmitter {
           c.isSelected = false
         }
 
-        c.drawActive(false) // Should be fine to pass in false for the force param
+        c.updateVisibility()
       })
   }
 
-  onStarClicked (e) {
+  onTick( deltaTime ) {
+
+    let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
+    let viewportHeight = gameContainer.viewport.bottom - gameContainer.viewport.top
+    
+    let viewportXRadius = viewportWidth/2.0
+    let viewportYRadius = viewportHeight/2.0
+    
+    let viewportCenter = gameContainer.viewport.center
+
+    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth)*100
+
+    let viewportData = {
+      center: viewportCenter,
+      xradius: viewportXRadius,
+      yradius: viewportYRadius
+    }
+
+    this.stars.forEach(s => s.onTick(deltaTime, viewportData))
+    this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
+
+  }
+
+  onViewportPointerDown(e) {
+    //need Object.assign, wich is weird since pixie says it creates a new point each time
+    this.lastPointerDownPosition = Object.assign({}, e.data.global)
+  }
+
+  //not sure where to put this func
+  isDragMotion(position) {
+    let DRAG_THRESHOLD = 8 //max distance in pixels
+    let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition.x - position.x),2)
+    let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition.y - position.y),2)
+    let distance = Math.sqrt(dxSquared+dySquared)
+    
+    return (distance > DRAG_THRESHOLD)
+  }
+
+  onStarClicked (dic) {
+    // ignore clicks if its a drag motion
+    let e = dic.starData
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+    
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
@@ -382,27 +420,11 @@ class Map extends EventEmitter {
 
       this.unselectAllCarriers()
       this.unselectAllStarsExcept(selectedStar)
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onStarClicked(e)
-    } else if (this.mode === 'ruler') {
-      this.rulerPoints.onStarClicked(e)
-    }
-
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
-  }
-
-  onStarDoubleClicked (e) {
-    // Clicking stars should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
-      let selectedStar = this.stars.find(x => x.data._id === e._id)
-      selectedStar.isSelected = true
-
-      this.unselectAllCarriers()
-      this.unselectAllStarsExcept(selectedStar)
-
+      
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onStarDoubleClicked', e)
+        this.emit('onStarClicked', e)
       }
+      
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
     } else if (this.mode === 'ruler') {
@@ -418,14 +440,19 @@ class Map extends EventEmitter {
     }
   }
 
-  onCarrierClicked (e) {
+  onCarrierClicked (dic) {
+    // ignore clicks if its a drag motion
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+    
+    let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
       // If the carrier is in orbit, pass the click over to the star instead.
       if (e.orbiting) {
         let star = this.stars.find(x => x.data._id === e.orbiting)
-
-        return this.onStarClicked(star.data)
+        let eventData = dic ? dic.eventData : null
+  
+        return this.onStarClicked({starData: star.data, eventData})
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
@@ -433,34 +460,11 @@ class Map extends EventEmitter {
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onCarrierClicked(e)
-    } else if (this.mode === 'ruler') {
-      this.rulerPoints.onCarrierClicked(e)
-    }
-
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
-  }
-
-  onCarrierDoubleClicked (e) {
-    // Clicking carriers should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
-      // If the carrier is in orbit, pass the click over to the star instead.
-      if (e.orbiting) {
-        let star = this.stars.find(x => x.data._id === e.orbiting)
-
-        return this.onStarDoubleClicked(star.data)
-      }
-
-      let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
-      selectedCarrier.isSelected = true
-
-      this.unselectAllStars()
-      this.unselectAllCarriersExcept(selectedCarrier)
-
+      
       if (!this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierDoubleClicked', e)
+        this.emit('onCarrierClicked', e)
       }
+    
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {

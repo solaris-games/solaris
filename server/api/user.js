@@ -35,7 +35,9 @@ module.exports = (router, io, container) => {
                 throw new ValidationError(errors);
             }
 
-            let exists = await container.userService.userExists(req.body.email);
+            let email = req.body.email.toLowerCase();
+
+            let exists = await container.userService.userExists(email);
 
             if (exists) {
                 return res.status(400).json({
@@ -46,7 +48,7 @@ module.exports = (router, io, container) => {
             }
             
             let userId = await container.userService.create({
-                email: req.body.email,
+                email: email,
                 username: req.body.username,
                 password: req.body.password
             });
@@ -56,6 +58,26 @@ module.exports = (router, io, container) => {
             return next(err);
         }
     }, middleware.handleError);
+    
+    router.get('/api/user/settings', middleware.authenticate, async (req, res, next) => {
+        try {
+            let settings = await container.userService.getGameSettings(req.session.userId);
+
+            return res.status(200).json(settings);
+        } catch (err) {
+            return next(err);
+        }
+    });
+
+    router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.userService.saveGameSettings(req.session.userId, req.body);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    });
 
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {
@@ -209,6 +231,24 @@ module.exports = (router, io, container) => {
             }
 
             return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.delete('/api/user/closeaccount', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.gameService.quitAllActiveGames(req.session.userId);
+            await container.userService.closeAccount(req.session.userId);
+
+            // Delete the session object.
+            req.session.destroy((err) => {
+                if (err) {
+                    return next(err);
+                }
+    
+                return res.sendStatus(200);
+            });
         } catch (err) {
             return next(err);
         }

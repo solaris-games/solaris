@@ -45,6 +45,12 @@ module.exports = class BroadcastService {
         });
     }
 
+    gamePlayerNotReady(game, player) {
+        this.io.to(game.id).emit('gamePlayerNotReady', {
+            playerId: player.id
+        });
+    }
+
     gameStarEconomyUpgraded(game, playerId, starId, infrastructure) {
         this.io.to(playerId.toString()).emit('gameStarEconomyUpgraded', {
             starId,
