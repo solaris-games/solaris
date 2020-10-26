@@ -32,6 +32,12 @@
         <div class="col-auto dropleft ml-1">
             <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
+            <!-- Ready button -->
+            <button class="btn btn-sm ml-1" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-if="userPlayer && isTurnBasedGame()" v-on:click="toggleReadyStatus()">
+                <i class="fas fa-times" v-if="userPlayer.ready"></i>
+                <i class="fas fa-check" v-if="!userPlayer.ready"></i>
+            </button>
+
             <button class="btn btn-sm btn-info ml-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-bars"></i>
             </button>
@@ -71,6 +77,7 @@
             <button class="btn btn-sm btn-info ml-1" type="button">
                 <i class="fas fa-cog"></i>
             </button> -->
+
             <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
@@ -94,6 +101,7 @@ import ResearchProgressVue from './ResearchProgress'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
+import GameApiService from '../../../services/api/game'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
@@ -202,6 +210,9 @@ export default {
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)
     },
+    isTurnBasedGame () {
+      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
     async checkForUnreadMessages () {
       let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
@@ -214,6 +225,31 @@ export default {
 
         if (response.status === 200) {
           this.unreadMessages = response.data.unread
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async toggleReadyStatus () {      
+      try {
+        if (this.userPlayer.ready) {
+          let response = await GameApiService.unconfirmReady(this.$store.state.game._id)
+
+          if (response.status === 200) {
+            this.userPlayer.ready = false
+          }
+        } else {
+          if (!confirm('Are you sure you want to end your turn?')) {
+            return
+          }
+          
+          let response = await GameApiService.confirmReady(this.$store.state.game._id)
+
+          if (response.status === 200) {
+            this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
+
+            this.userPlayer.ready = true
+          }
         }
       } catch (err) {
         console.error(err)
