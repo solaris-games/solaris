@@ -173,10 +173,10 @@ export default {
       router.push({ name: 'game-active-games' })
     },
     onViewResearchRequested (e) {
-      this.setMenuState(this.MENU_STATES.RESEARCH, e)
+      this.setMenuState(this.MENU_STATES.RESEARCH)
     },
     onViewBulkUpgradeRequested (e) {
-      this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE, e)
+      this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
     },
     fitGalaxy () {
       GameContainer.viewport.fitWorld()
@@ -242,7 +242,7 @@ export default {
           if (!confirm('Are you sure you want to end your turn?')) {
             return
           }
-          
+
           let response = await GameApiService.confirmReady(this.$store.state.game._id)
 
           if (response.status === 200) {
