@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import gameContainer from './container'
+import Background from './background'
 import Star from './star'
 import Carrier from './carrier'
 import Waypoints from './waypoints'
@@ -28,12 +29,14 @@ class Map extends EventEmitter {
   }
 
   _setupContainers () {
+    this.backgroundContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
 
+    this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
@@ -96,6 +99,14 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
+
+    // -----------
+    // Setup Background
+    this.background = new Background()
+    this.background.setup(game)
+
+    this.backgroundContainer.addChild(this.background.container)
+    this.background.draw()
   }
 
   setupStar (game, starData) {
@@ -298,6 +309,7 @@ class Map extends EventEmitter {
     let player = GameHelper.getUserPlayer(game)
 
     if (!player) {
+      this.panToLocation({ x: 0, y: 0 })
       return
     }
 
