@@ -5,6 +5,7 @@ class TextureService {
 
     PLANET_BASE_TEXTURE = null
     PLANET_TEXTURES = []
+    NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
 
     constructor () {
@@ -84,6 +85,12 @@ class TextureService {
       this._loadPlanetTexture(116, 369, 28, 28)
       this._loadPlanetTexture(153, 369, 28, 28)
       this._loadPlanetTexture(190, 369, 28, 28)
+
+      // NEBULAS
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1.png'))))
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb2.png'))))
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb3.png'))))
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb4.png'))))
 
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')

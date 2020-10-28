@@ -216,7 +216,6 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
-
     if (!this.graphics_colour) {
       this.graphics_colour = new PIXI.Graphics()
       this.container.addChild(this.graphics_colour)
@@ -226,10 +225,15 @@ class Star extends EventEmitter {
 
     // Get the player who owns the star.
     let player = this._getStarPlayer()
+    let colour = '0x00000'
+    let lineWidth = 1
 
-    if (!player) { return }
+    if (player) {
+      colour = player.colour.value
+      lineWidth = 2
+    }
 
-    this.graphics_colour.lineStyle(2, player.colour.value)
+    this.graphics_colour.lineStyle(lineWidth, colour)
 
     // If its a warp gate then draw a rectangle.
     // Otherwise draw a circle.
