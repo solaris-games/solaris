@@ -44,8 +44,8 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="pl-2">
                     <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy"><i class="fas fa-compass"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomByPercent(0.5)"><i class="fas fa-search-plus"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomByPercent(-0.3)"><i class="fas fa-search-minus"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()"><i class="fas fa-search-plus"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()"><i class="fas fa-search-minus"></i></button>
                     <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)"><i class="fas fa-calculator"></i></button>
                     <div v-if="userPlayer">
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()"><i class="fas fa-home"></i></button>
@@ -130,6 +130,8 @@ export default {
     this.checkForUnreadMessages()
   },
   created () {
+    document.addEventListener('keydown', this.handleKeyDown)
+
     this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameMessagesAllRead', this.checkForUnreadMessages.bind(this))
@@ -141,6 +143,8 @@ export default {
     })
   },
   destroyed () {
+    document.removeEventListener('keydown', this.handleKeyDown)
+
     clearInterval(this.intervalFunction)
 
     this.sockets.unsubscribe('gameStarted')
@@ -183,8 +187,11 @@ export default {
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
       GameContainer.viewport.moveCenter(0, 0)
     },
-    zoomByPercent (percent) {
-      GameContainer.viewport.zoomPercent(percent, true)
+    zoomIn () {
+      GameContainer.zoomIn()
+    },
+    zoomOut () {
+      GameContainer.zoomOut()
     },
     panToHomeStar () {
       GameContainer.map.panToUser(this.$store.state.game)
@@ -253,6 +260,45 @@ export default {
         }
       } catch (err) {
         console.error(err)
+      }
+    },
+    handleKeyDown (e) {
+      console.log(e.keyCode || e.which)
+
+      switch (e.keyCode || e.which) {
+        case 61: // +
+          GameContainer.zoomIn()
+          break
+        case 173: // -
+          GameContainer.zoomOut()
+          break
+        case 82: // R
+          this.setMenuState(MENU_STATES.RESEARCH)
+          break
+        case 83: // S
+          this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
+          break
+        case 70: // F
+          this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
+          break
+        case 71: // G
+          this.setMenuState(MENU_STATES.INTEL)
+          break
+        case 76: // L
+          this.setMenuState(MENU_STATES.LEADERBOARD)
+          break
+        case 79: // O
+          this.setMenuState(MENU_STATES.OPTIONS)
+          break
+        case 73: // I
+          this.setMenuState(MENU_STATES.INBOX)
+          break
+        case 67: // C
+          this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
+          break
+        case 86: // V
+          this.setMenuState(MENU_STATES.RULER)
+          break
       }
     }
   },

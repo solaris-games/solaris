@@ -72,6 +72,14 @@ class GameContainer {
     this.viewport.addChild(this.map.container)
   }
 
+  zoomIn () {
+    this.viewport.zoomPercent(0.5, true)
+  }
+
+  zoomOut () {
+    this.viewport.zoomPercent(-0.3, true)
+  }
+
   setupViewport (game) {
     this.game = game
 
