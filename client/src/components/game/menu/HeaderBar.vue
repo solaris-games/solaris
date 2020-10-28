@@ -266,10 +266,10 @@ export default {
       console.log(e.keyCode || e.which)
 
       switch (e.keyCode || e.which) {
-        case 61: // +
+        case 187: // +
           GameContainer.zoomIn()
           break
-        case 173: // -
+        case 189: // -
           GameContainer.zoomOut()
           break
         case 82: // R
