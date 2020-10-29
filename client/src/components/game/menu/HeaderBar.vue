@@ -263,7 +263,7 @@ export default {
       }
     },
     handleKeyDown (e) {
-      console.log(e.keyCode || e.which)
+      if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
       switch (e.keyCode || e.which) {
         case 187: // +
