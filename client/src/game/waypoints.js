@@ -111,7 +111,7 @@ class Waypoints extends EventEmitter {
 
   _highlightLocation (location, opacity) {
     let graphics = new PIXI.Graphics()
-    let radius = 10
+    let radius = 12
 
     graphics.lineStyle(1, 0xFFFFFF, opacity)
     graphics.drawStar(location.x, location.y, radius, radius, radius - 3)

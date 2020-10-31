@@ -72,7 +72,6 @@ class Star extends EventEmitter {
 
 
   drawStar () {
-
     if (!this.graphics_star) {
       this.graphics_star = new PIXI.Graphics()
       this.container.addChild(this.graphics_star)
@@ -80,37 +79,26 @@ class Star extends EventEmitter {
 
     this.graphics_star.clear()
 
-    this.graphics_star.visible = !this._getStarCarriers().length
-
-    let radius = 3
+    let radius = 5
     let alpha = this._isInScanningRange() ? 1 : 0.3
 
-    let starPoints = radius * (this.data.specialistId ? 3 : 2);
-
     this.graphics_star.beginFill(0xFFFFFF, alpha)
-    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, starPoints, radius, radius - 3)
+    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, 6, radius, radius - 3)
     this.graphics_star.endFill()
-
-    if (this.hasSpecialist()) {
-      this.graphics_star.beginFill(0x000000)
-      this.graphics_star.lineStyle(0.3, 0xFFFFFF)
-      this.graphics_star.drawCircle(this.data.location.x, this.data.location.y, 2.2)
-      this.graphics_star.endFill()
-    }
-
   }
 
   drawSpecialist () {
     if (!this.hasSpecialist()) {
       return
     }
+    
     //FIXME potential resource leak, should not create a new sprite every time
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
-    specialistSprite.width = 3.5
-    specialistSprite.height = 3.5
-    specialistSprite.x = this.data.location.x - 1.75
-    specialistSprite.y = this.data.location.y - 1.75
+    specialistSprite.width = 10
+    specialistSprite.height = 10
+    specialistSprite.x = this.data.location.x - 5
+    specialistSprite.y = this.data.location.y - 5
     
     this.container.addChild(specialistSprite)
   }
@@ -139,7 +127,6 @@ class Star extends EventEmitter {
   }
 
   drawPlanets () {
-
     if (!this.container_planets) {
       this.container_planets = new PIXI.Container()
 
@@ -156,7 +143,7 @@ class Star extends EventEmitter {
       for (let i = 0; i < planetCount; i++) {
         let planetContainer = new PIXI.Container()
 
-        let distanceToStar = 10 + (4 * i)
+        let distanceToStar = 15 + (5 * i)
         let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 3 + 1
 
         let orbitGraphics = new PIXI.Graphics()
@@ -196,7 +183,6 @@ class Star extends EventEmitter {
 
       this.container.addChild(this.container_planets)
     }
-
   }
 
   _getPlanetsCount () {
@@ -216,53 +202,59 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
-    if (!this.graphics_colour) {
-      this.graphics_colour = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour)
+    if (!this.graphics_colour_arc) {
+      this.graphics_colour_arc = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_arc)
+    }
+    if (!this.graphics_colour_cir) {
+      this.graphics_colour_cir = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_cir)
     }
 
-    this.graphics_colour.clear()
+    this.graphics_colour_arc.clear()
+    this.graphics_colour_cir.clear()
 
     // Get the player who owns the star.
     let player = this._getStarPlayer()
-    let colour = '0x00000'
-    let lineWidth = 1
 
-    if (player) {
-      colour = player.colour.value
-      lineWidth = 2
+    if (!player) {
+      return
     }
-
-    this.graphics_colour.lineStyle(lineWidth, colour)
+    
+    this.graphics_colour_arc.lineStyle(3, player.colour.value)
+    this.graphics_colour_cir.lineStyle(3, player.colour.value)
 
     // If its a warp gate then draw a rectangle.
     // Otherwise draw a circle.
     if (this.data.warpGate) {
-      this.graphics_colour.drawRect(this.data.location.x - 5, this.data.location.y - 5, 10, 10)
+      this.graphics_colour_arc.drawRect(this.data.location.x - 5, this.data.location.y - 5, 10, 10)
     } else {
-      this.graphics_colour.drawCircle(this.data.location.x, this.data.location.y, 5)
+      this.graphics_colour_arc.arc(this.data.location.x, this.data.location.y, 7, 0.785398, -0.785398)
+      this.graphics_colour_cir.drawCircle(this.data.location.x, this.data.location.y, 7)
     }
   }
 
   drawName () {
-
     if (!this.text_name) {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
 
       this.text_name = new PIXI.Text(this.data.name, style)
-      this.text_name.x = this.data.location.x - (this.text_name.width / 2)
-      this.text_name.y = this.data.location.y + 7
+      this.text_name.x = this.data.location.x + 5
       this.text_name.resolution = 10
+
+      if (this.getGarrisonText()) {
+        this.text_name.y = this.data.location.y
+      } else {
+        this.text_name.y = this.data.location.y - (this.text_name.height / 2)
+      }
 
       this.container.addChild(this.text_name)
     }
-
   }
 
   drawGarrison () {
-
-    if ( this.text_garrison ) {
+    if (this.text_garrison) {
       this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
@@ -272,29 +264,50 @@ class Star extends EventEmitter {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
 
-      let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
-      let displayGarrison = ''
+      let displayGarrison = this.getGarrisonText()
+      let carrierCount = this._getStarCarriers().length
 
-      if (totalGarrison > 0) {
-        displayGarrison = totalGarrison
+      let garrisonText = ''
+
+      if (displayGarrison) {
+        garrisonText += displayGarrison.toString()
       }
-      else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
-        displayGarrison = '???'
+      if (displayGarrison && carrierCount) {
+        garrisonText += '/'
+      }
+      if (carrierCount) {
+        garrisonText += carrierCount.toString()
       }
 
-      this.text_garrison = new PIXI.Text(displayGarrison, style)
-      this.text_garrison.resolution = 10
+      if (garrisonText) {
+        this.text_garrison = new PIXI.Text(garrisonText, style)
+        this.text_garrison.scale.x = 1.5
+        this.text_garrison.scale.y = 1.5
+        this.text_garrison.resolution = 10
 
-      this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-      this.text_garrison.y = this.data.location.y + 12
+        this.text_garrison.x = this.data.location.x + 5
+        this.text_garrison.y = this.data.location.y - this.text_garrison.height + 1.5
 
-      this.container.addChild(this.text_garrison)
+        this.container.addChild(this.text_garrison)
+      }
+    }
+  }
+
+  getGarrisonText () {
+    let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let displayGarrison = ''
+
+    if (totalGarrison > 0) {
+      displayGarrison = totalGarrison
+    }
+    else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
+      displayGarrison = '???'
     }
 
+    return displayGarrison
   }
 
   drawInfrastructure () {
-
     if ( this.text_infrastructure ) {
       this.text_infrastructure.texture.destroy(true)
       this.container.removeChild(this.text_infrastructure)
@@ -311,16 +324,14 @@ class Star extends EventEmitter {
         this.text_infrastructure.resolution = 10
 
         this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
-        this.text_infrastructure.y = this.data.location.y - 12
+        this.text_infrastructure.y = this.data.location.y - 15
 
         this.container.addChild(this.text_infrastructure)
       }
     }
-
   }
 
   drawScanningRange () {
-
     if (!this.graphics_scanningRange) {
       this.graphics_scanningRange = new PIXI.Graphics()
       this.container.addChild(this.graphics_scanningRange)
@@ -394,27 +405,24 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.visible = this.isSelected
   }
 
-  onTick( deltaTime, viewportData ) {
-
+  onTick(deltaTime, viewportData) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
  
-   if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
+   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
      //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
      // maybe put them on their own container, since this piece of code should remain as small as possible
      this.graphics_star.visible = false
-     this.graphics_colour.visible = false
+     this.graphics_colour_arc.visible = false
+     this.graphics_colour_cir.visible = false
      this.text_name.visible = false
      this.container_planets.visible = false
      if (this.text_infrastructure) { this.text_infrastructure.visible = false }
      if (this.text_garrison) { this.text_garrison.visible = false }
    } 
    else {
-     this.graphics_star.visible = true
-     this.graphics_colour.visible = true
      this.updateVisibility()
    }
-
   }
 
   onClicked (e) {
@@ -435,19 +443,20 @@ class Star extends EventEmitter {
   }
 
   updateVisibility() {
-
+    this.graphics_star.visible = !this.hasSpecialist()
+    this.graphics_colour_arc.visible = this.zoomPercent < 60
+    this.graphics_colour_cir.visible = this.zoomPercent >= 60
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
     this.text_name.visible = this.isSelected || this.zoomPercent < 60
     this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
 
     if (this.text_infrastructure) { // may not exist for stars out of range
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 40
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 35
     }
     if (this.text_garrison) {
-      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 60)
     }
-
   }
 
   deselectAllText () {
