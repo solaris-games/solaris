@@ -210,9 +210,19 @@ class Star extends EventEmitter {
       this.graphics_colour_cir = new PIXI.Graphics()
       this.container.addChild(this.graphics_colour_cir)
     }
+    if (!this.graphics_colour_warp_arc) {
+      this.graphics_colour_warp_arc = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_warp_arc)
+    }
+    if (!this.graphics_colour_warp_cir) {
+      this.graphics_colour_warp_cir = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_warp_cir)
+    }
 
     this.graphics_colour_arc.clear()
     this.graphics_colour_cir.clear()
+    this.graphics_colour_warp_arc.clear()
+    this.graphics_colour_warp_cir.clear()
 
     // Get the player who owns the star.
     let player = this._getStarPlayer()
@@ -223,15 +233,14 @@ class Star extends EventEmitter {
     
     this.graphics_colour_arc.lineStyle(3, player.colour.value)
     this.graphics_colour_cir.lineStyle(3, player.colour.value)
+    this.graphics_colour_warp_arc.lineStyle(2, player.colour.value)
+    this.graphics_colour_warp_cir.lineStyle(2, player.colour.value)
 
-    // If its a warp gate then draw a rectangle.
-    // Otherwise draw a circle.
-    if (this.data.warpGate) {
-      this.graphics_colour_arc.drawRect(this.data.location.x - 5, this.data.location.y - 5, 10, 10)
-    } else {
-      this.graphics_colour_arc.arc(this.data.location.x, this.data.location.y, 7, 0.785398, -0.785398)
-      this.graphics_colour_cir.drawCircle(this.data.location.x, this.data.location.y, 7)
-    }
+    this.graphics_colour_arc.arc(this.data.location.x, this.data.location.y, 7, 0.785398, -0.785398)
+    this.graphics_colour_cir.drawCircle(this.data.location.x, this.data.location.y, 7)
+    
+    this.graphics_colour_warp_arc.arc(this.data.location.x, this.data.location.y, 10, 0.785398, -0.785398)
+    this.graphics_colour_warp_cir.drawCircle(this.data.location.x, this.data.location.y, 10)
   }
 
   drawName () {
@@ -415,6 +424,8 @@ class Star extends EventEmitter {
      this.graphics_star.visible = false
      this.graphics_colour_arc.visible = false
      this.graphics_colour_cir.visible = false
+     this.graphics_colour_warp_arc.visible = false
+     this.graphics_colour_warp_cir.visible = false
      this.text_name.visible = false
      this.container_planets.visible = false
      if (this.text_infrastructure) { this.text_infrastructure.visible = false }
@@ -446,6 +457,8 @@ class Star extends EventEmitter {
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_colour_arc.visible = this.zoomPercent < 60
     this.graphics_colour_cir.visible = this.zoomPercent >= 60
+    this.graphics_colour_warp_arc.visible = this.zoomPercent < 60 && this.data.warpGate
+    this.graphics_colour_warp_cir.visible = this.zoomPercent >= 60 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
     this.text_name.visible = this.isSelected || this.zoomPercent < 60
