@@ -182,7 +182,7 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
-    canTravelAtWarpSpeed(player, sourceStar, destinationStar) {
+    canTravelAtWarpSpeed(player, carrier, sourceStar, destinationStar) {
         // If both stars have warp gates and they are both owned by players...
         if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
             // If both stars are owned by the player then carriers can always move at warp.
@@ -192,6 +192,16 @@ module.exports = class StarService extends EventEmitter {
 
             // If one of the stars are not owned by the current player then we need to check for
             // warp scramblers.
+
+            // But if the carrier has the warp stablizer specialist then it can travel at warp speed no matter
+            // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
+            if (carrier.specialistId) {
+                let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+        
+                if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
+                    return true;
+                }
+            }
 
             // If either star has a warp scrambler present then carriers cannot move at warp.
             // Note that we only need to check for scramblers on stars that do not belong to the player.
