@@ -150,7 +150,7 @@ class Star extends EventEmitter {
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
         orbitGraphics.drawCircle(this.data.location.x, this.data.location.y, distanceToStar - (planetSize / 2))
-        this.container.addChild(orbitGraphics)
+        this.container_planets.addChild(orbitGraphics)
 
         let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
 
