@@ -183,9 +183,9 @@ export default {
       this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
     },
     fitGalaxy () {
+      GameContainer.viewport.moveCenter(0, 0)
       GameContainer.viewport.fitWorld()
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
-      GameContainer.viewport.moveCenter(0, 0)
     },
     zoomIn () {
       GameContainer.zoomIn()
