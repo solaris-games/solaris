@@ -318,10 +318,10 @@ class Map extends EventEmitter {
 
   panToStar (star) {
     this.panToLocation(star.location)
+  }
 
-    let zoomPercent = gameContainer.getViewportZoomPercentage()
-
-    this.refreshZoom(zoomPercent)
+  panToCarrier (carrier) {
+    this.panToLocation(carrier.location)
   }
 
   panToLocation (location) {

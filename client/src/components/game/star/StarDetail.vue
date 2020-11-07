@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container" v-if="star">
-    <menu-title :title="star.name" @onCloseRequested="onCloseRequested"/>
+    <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
+      <button @click="viewOnMap" class="btn btn-info"><i class="fas fa-eye"></i></button>
+    </menu-title>
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
@@ -162,6 +164,7 @@ import PlayerOverview from '../player/Overview'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import StarSpecialistVue from './StarSpecialist'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -247,6 +250,9 @@ export default {
     },
     onEditWaypointsRequested (carrier) {
       this.$emit('onEditWaypointsRequested', carrier._id)
+    },
+    viewOnMap (e) {
+      GameContainer.map.panToStar(this.star)
     },
     async confirmBuildCarrier (e) {
       try {
