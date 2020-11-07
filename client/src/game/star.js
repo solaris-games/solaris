@@ -459,16 +459,16 @@ class Star extends EventEmitter {
     this.graphics_colour_cir.visible = this.zoomPercent >= 60
     this.graphics_colour_warp_arc.visible = this.zoomPercent < 60 && this.data.warpGate
     this.graphics_colour_warp_cir.visible = this.zoomPercent >= 60 && this.data.warpGate
-    this.graphics_hyperspaceRange.visible = this.isSelected
-    this.graphics_scanningRange.visible = this.isSelected
-    this.text_name.visible = this.isSelected || this.zoomPercent < 60
+    this.graphics_hyperspaceRange.visible = this.isSelected && this.zoomPercent < 60
+    this.graphics_scanningRange.visible = this.isSelected && this.zoomPercent < 60
+    this.text_name.visible = this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) 
     this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
 
     if (this.text_infrastructure) { // may not exist for stars out of range
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent < 35
+      this.text_infrastructure.visible = this.zoomPercent < 35 || (this.isSelected && this.zoomPercent < 35) || (this.isMouseOver && this.zoomPercent < 35)
     }
     if (this.text_garrison) {
-      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent < 60)
+      this.text_garrison.visible = this.data.infrastructure && (this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) || (this.isMouseOver && this.zoomPercent < 60))
     }
   }
 
