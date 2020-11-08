@@ -10,10 +10,10 @@
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
                     <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
                     <td v-if="mapObject.type === 'star'" class="col-auto text-center">
-                        <h5><i class="fas fa-star"></i></h5>
+                        <specialist-icon :type="'star'" :specialist="mapObject.data.specialist" />
                     </td>
                     <td v-if="mapObject.type === 'carrier'" class="col-auto text-center">
-                        <h5><i class="fas fa-rocket"></i></h5>
+                        <specialist-icon :type="'carrier'" :specialist="mapObject.data.specialist" />
                     </td>
                     <td v-if="mapObject.type === 'star'" class="bg-secondary text-center">
                         <span>{{mapObject.data.garrison == null ? '???' : mapObject.data.garrison}}</span>
@@ -48,10 +48,12 @@
 import gameHelper from '../../../services/gameHelper'
 import gameContainer from '../../../game/container'
 import MenuTitleVue from '../MenuTitle'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
 
 export default {
   components: {
-    'menu-title': MenuTitleVue
+    'menu-title': MenuTitleVue,
+    'specialist-icon': SpecialistIconVue
   },
   props: {
     mapObjects: Array

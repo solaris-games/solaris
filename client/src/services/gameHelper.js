@@ -385,6 +385,50 @@ class GameHelper {
 
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
+
+  getSpecialistName (type, specialistId) {
+    if (type === 'carrier') {
+      switch (specialistId) {
+        case 1:
+          return 'mecha-head'
+        case 2:
+          return 'mecha-mask'
+        case 3:
+          return 'android-mask'
+        case 4:
+          return 'hazmat-suit'
+        case 5:
+          return 'cyborg-face'
+        case 6:
+          return 'lunar-module'
+        case 7:
+          return 'spaceship'
+        case 8:
+          return 'power-generator'
+        case 9:
+          return 'energise'
+      }
+    } else {
+      switch (specialistId) {
+        case 1:
+          return 'sattelite'
+        case 2:
+          return 'airtight-hatch'
+        case 3:
+          return 'cannister'
+        case 4:
+          return 'defense-satellite'
+        case 5:
+          return 'habitat-dome'
+        case 6:
+          return 'techno-heart'
+        case 7:
+          return 'missile-pod'
+        case 8:
+          return 'power-generator'
+      }
+    }
+  }
 }
 
 export default new GameHelper()

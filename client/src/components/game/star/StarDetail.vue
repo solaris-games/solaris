@@ -43,9 +43,12 @@
       <h4 class="pt-2">Carriers</h4>
 
       <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-2 pt-1 pb-1 bg-secondary">
-          <div class="col">
-            <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
-          </div>
+        <div class="col-auto">
+          <specialist-icon :type="'carrier'" :specialist="carrier.specialist"/>
+        </div>
+        <div class="col">
+          <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
+        </div>
         <div class="col-auto">
           <i class="fas fa-map-marker-alt"></i>
           <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
@@ -164,6 +167,7 @@ import PlayerOverview from '../player/Overview'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import StarSpecialistVue from './StarSpecialist'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
 import GameContainer from '../../../game/container'
 import gameHelper from '../../../services/gameHelper'
 
@@ -175,7 +179,8 @@ export default {
     'playerOverview': PlayerOverview,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
-    'star-specialist': StarSpecialistVue
+    'star-specialist': StarSpecialistVue,
+    'specialist-icon': SpecialistIconVue
   },
   props: {
     starId: String

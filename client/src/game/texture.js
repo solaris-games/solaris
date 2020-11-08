@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import gameHelper from '../services/gameHelper'
 
 class TextureService {
     DEFAULT_FONT_STYLE = null
@@ -135,47 +136,9 @@ class TextureService {
     }
 
     getSpecialistTexture(specialistId, isCarrier) {
-      if (isCarrier) {
-        switch (specialistId) {
-          case 1:
-            return this.SPECIALIST_TEXTURES['mecha-head']
-          case 2:
-            return this.SPECIALIST_TEXTURES['mecha-mask']
-          case 3:
-            return this.SPECIALIST_TEXTURES['android-mask']
-          case 4:
-            return this.SPECIALIST_TEXTURES['hazmat-suit']
-          case 5:
-            return this.SPECIALIST_TEXTURES['cyborg-face']
-          case 6:
-            return this.SPECIALIST_TEXTURES['lunar-module']
-          case 7:
-            return this.SPECIALIST_TEXTURES['spaceship']
-          case 8:
-            return this.SPECIALIST_TEXTURES['power-generator']
-          case 9:
-            return this.SPECIALIST_TEXTURES['energise']
-        }
-      } else {
-        switch (specialistId) {
-          case 1:
-            return this.SPECIALIST_TEXTURES['sattelite']
-          case 2:
-            return this.SPECIALIST_TEXTURES['airtight-hatch']
-          case 3:
-            return this.SPECIALIST_TEXTURES['cannister']
-          case 4:
-            return this.SPECIALIST_TEXTURES['defense-satellite']
-          case 5:
-            return this.SPECIALIST_TEXTURES['habitat-dome']
-          case 6:
-            return this.SPECIALIST_TEXTURES['techno-heart']
-          case 7:
-            return this.SPECIALIST_TEXTURES['missile-pod']
-          case 8:
-            return this.SPECIALIST_TEXTURES['power-generator']
-        }
-      }
+      let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
+
+      return this.SPECIALIST_TEXTURES[name]
     }
 }
 
