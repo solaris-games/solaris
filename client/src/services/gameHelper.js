@@ -77,6 +77,17 @@ class GameHelper {
     return Math.sqrt(xs + ys)
   }
 
+  getAngleBetweenLocations (loc1, loc2) {
+    return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x);
+  }
+
+  getPointFromLocation (loc, angle, distance) {
+    return {
+        x: loc.x + (Math.cos(angle) * distance),
+        y: loc.y + (Math.sin(angle) * distance)
+    };
+  }
+
   getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
     let totalTicks = 0
     let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
@@ -349,6 +360,30 @@ class GameHelper {
 
   isNormalAnonymity (game) {
     return game.settings.general.anonymity === 'normal'
+  }
+
+  calculateMinStarX (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
+  }
+
+  calculateMinStarY (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
+  }
+
+  calculateMaxStarX (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
+  }
+
+  calculateMaxStarY (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 }
 

@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import * as Voronoi from 'voronoi'
+import gameHelper from '../services/gameHelper'
 
 class Territories {
   constructor () {
@@ -24,18 +25,20 @@ class Territories {
   }
 
   drawTerritories () {
+    const maxDistance = 100
+
     let voronoi = new Voronoi()
 
-    let minX = this._calculateMinStarX(this.game)
-    let minY = this._calculateMinStarY(this.game)
-    let maxX = this._calculateMaxStarX(this.game)
-    let maxY = this._calculateMaxStarY(this.game)
+    let minX = gameHelper.calculateMinStarX(this.game)
+    let minY = gameHelper.calculateMinStarY(this.game)
+    let maxX = gameHelper.calculateMaxStarX(this.game)
+    let maxY = gameHelper.calculateMaxStarY(this.game)
 
     let boundingBox = {
-      xl: minX - 100,
-      xr: maxX + 100,
-      yt: minY - 100,
-      yb: maxY + 100
+      xl: minX - maxDistance,
+      xr: maxX + maxDistance,
+      yt: minY - maxDistance,
+      yb: maxY + maxDistance
     }
 
     let sites = this.game.galaxy.stars.map(s => s.location)
@@ -62,11 +65,11 @@ class Territories {
       let sanitizedPoints = []
 
       for (let point of points) {
-        let distance = this._getDistanceBetweenLocations(cell.site, point)
+        let distance = gameHelper.getDistanceBetweenLocations(cell.site, point)
 
-        if (distance > 100) {
-          let angle = this._getAngleBetweenPoints(cell.site, point)
-          let newPoint = this._getMaxPointFromSite(cell.site, angle, 100)
+        if (distance > maxDistance) {
+          let angle = gameHelper.getAngleBetweenLocations(cell.site, point)
+          let newPoint = gameHelper.getPointFromLocation(cell.site, angle, maxDistance)
 
           sanitizedPoints.push(newPoint)
         }
@@ -93,50 +96,6 @@ class Territories {
     }
   }
 
-  _getMaxPointFromSite (site, angle, distance) {
-    return {
-        x: site.x + (Math.cos(angle) * distance),
-        y: site.y + (Math.sin(angle) * distance)
-    };
-  }
-
-  _getAngleBetweenPoints (p1, p2) {
-    return Math.atan2(p2.y - p1.y, p2.x - p1.x);
-  }
-
-  _getDistanceBetweenLocations (loc1, loc2) {
-      let xs = loc2.x - loc1.x,
-          ys = loc2.y - loc1.y;
-
-      xs *= xs;
-      ys *= ys;
-
-      return Math.sqrt(xs + ys);
-  }
-
-  _calculateMinStarX (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
-  }
-
-  _calculateMinStarY (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
-  }
-
-  _calculateMaxStarX (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
-  }
-
-  _calculateMaxStarY (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
-  }
 }
 
 export default Territories
