@@ -64,6 +64,7 @@
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)"><i class="fas fa-star mr-2"></i>Galaxy</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)"><i class="fas fa-book-open mr-2"></i>Notes</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
                 </div>
                 <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
@@ -298,6 +299,9 @@ export default {
           break
         case 86: // V
           this.setMenuState(MENU_STATES.RULER)
+          break
+        case 78: // N
+          this.setMenuState(MENU_STATES.GAME_NOTES)
           break
       }
     }

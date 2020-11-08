@@ -165,6 +165,31 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let notes = await container.playerService.getGameNotes(
+                req.game,
+                req.player);
+            
+            res.status(200).json({ notes });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.updateGameNotes(
+                req.game,
+                req.player,
+                req.body.notes);
+            
+            res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
         try {
             await container.gameService.delete(
