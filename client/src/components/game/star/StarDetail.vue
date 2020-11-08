@@ -165,6 +165,7 @@ import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import StarSpecialistVue from './StarSpecialist'
 import GameContainer from '../../../game/container'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -266,8 +267,11 @@ export default {
 
           // this.$emit('onCarrierBuilt', this.star._id)
           // this.onOpenCarrierDetailRequested(response.data)
-          this.$store.state.game.galaxy.carriers.push(response.data)
-          this.onEditWaypointsRequested(response.data)
+          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
+
+          let star = gameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
+
+          this.onEditWaypointsRequested(response.data.carrier)
           this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
           this.audio.join()
