@@ -243,6 +243,13 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_cir.drawCircle(this.data.location.x, this.data.location.y, 10)
   }
 
+  _hasUnknownShips() {
+      let carriersOrbiting = this._getStarCarriers()
+      let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+      let scrambler = this.data.garrison == null 
+      return ( (scramblers || scrambler) && this._isInScanningRange() )
+  }
+
   drawName () {
     if (!this.text_name) {
       let style = TextureService.DEFAULT_FONT_STYLE
@@ -252,7 +259,8 @@ class Star extends EventEmitter {
       this.text_name.x = this.data.location.x + 5
       this.text_name.resolution = 10
 
-      if (this.getGarrisonText()) {
+      let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+      if ( (totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips() ) {
         this.text_name.y = this.data.location.y
       } else {
         this.text_name.y = this.data.location.y - (this.text_name.height / 2)
@@ -273,18 +281,28 @@ class Star extends EventEmitter {
       let style = TextureService.DEFAULT_FONT_STYLE
       style.fontSize = 4
 
-      let displayGarrison = this.getGarrisonText()
-      let carrierCount = this._getStarCarriers().length
+      let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+
+      let carriersOrbiting = this._getStarCarriers()
+      let carrierCount = carriersOrbiting.length
 
       let garrisonText = ''
+      let scramblers = 0
+      if (carriersOrbiting) {
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+      }
+      if ( (scramblers == carrierCount) && (this.data.garrison == null) ) {
+        garrisonText = '???'
+      }
+      else {
+        garrisonText = totalKnownGarrison
+        if( (scramblers > 0) || (this.data.garrison == null) ) {
+          garrisonText += '*'
+        }
+      }
 
-      if (displayGarrison) {
-        garrisonText += displayGarrison.toString()
-      }
-      if (displayGarrison && carrierCount) {
-        garrisonText += '/'
-      }
       if (carrierCount) {
+        garrisonText += '/'
         garrisonText += carrierCount.toString()
       }
 
@@ -300,20 +318,6 @@ class Star extends EventEmitter {
         this.container.addChild(this.text_garrison)
       }
     }
-  }
-
-  getGarrisonText () {
-    let totalGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
-    let displayGarrison = ''
-
-    if (totalGarrison > 0) {
-      displayGarrison = totalGarrison
-    }
-    else if (this.data.garrison == null && this.data.infrastructure) { // Has no garrison but is in scanning range
-      displayGarrison = '???'
-    }
-
-    return displayGarrison
   }
 
   drawInfrastructure () {
