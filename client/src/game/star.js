@@ -243,11 +243,11 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_cir.drawCircle(this.data.location.x, this.data.location.y, 10)
   }
 
-  hasAnyScrambler() {
+  _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
       let scrambler = this.data.garrison == null 
-      return (scramblers || scrambler)
+      return ( (scramblers || scrambler) && this._isInScanningRange() )
   }
 
   drawName () {
@@ -260,7 +260,7 @@ class Star extends EventEmitter {
       this.text_name.resolution = 10
 
       let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
-      if ( (totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this.hasAnyScrambler() ) {
+      if ( (totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips() ) {
         this.text_name.y = this.data.location.y
       } else {
         this.text_name.y = this.data.location.y - (this.text_name.height / 2)
