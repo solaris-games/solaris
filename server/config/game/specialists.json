@@ -114,7 +114,7 @@
             "id": 10,
             "name": "Warp Stablizer",
             "description": "Warp Scramblers do not affect the carrier.",
-            "tier": 3,
+            "tier": 4,
             "modifiers": {
                 "special": {
                     "unlockWarpGates": true

@@ -115,6 +115,7 @@ export default new Vuex.Store({
         star.infrastructure = reportStar.infrastructure
         star.naturalResources = reportStar.naturalResources
         star.terraformedResources = reportStar.terraformedResources
+        star.warpGate = reportStar.warpGate
       }
 
       // Reload all stars as they may have had changes, i.e carriers may have launched etc.

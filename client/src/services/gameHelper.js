@@ -407,6 +407,8 @@ class GameHelper {
           return 'power-generator'
         case 9:
           return 'energise'
+        case 10:
+          return 'afterburn'
       }
     } else {
       switch (specialistId) {

@@ -25,7 +25,7 @@
                         <span>{{mapObject.data.name}}</span>
                     </td>
                     <td class="text-right">
-                        <span v-if="mapObject.type === 'carrier'">
+                        <span v-if="mapObject.type === 'carrier' && (userOwnsObject(mapObject) || mapObject.data.waypoints.length)">
                           <i class="fas fa-map-marker-alt"></i>
                           <i class="fas fa-sync ml-1" v-if="mapObject.data.waypointsLooped"></i>
                           {{mapObject.data.waypoints.length}}</span>

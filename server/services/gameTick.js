@@ -678,6 +678,9 @@ module.exports = class GameTickService extends EventEmitter {
                     player.missedTurns++;
                     player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
                 }
+                else {
+                    player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
+                }
             }
 
             // Check if the player has been AFK.
@@ -686,9 +689,9 @@ module.exports = class GameTickService extends EventEmitter {
             let isAfk = false;
 
             if (this.gameService.isRealTimeGame(game)) {
-                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
             } else if (this.gameService.isTurnBasedGame(game)) {
-                isAfk = player.missedTurns > game.constants.turnBased.playerMissedTurnLimit;
+                isAfk = player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
             }
 
             if (isAfk) {
@@ -827,6 +830,7 @@ module.exports = class GameTickService extends EventEmitter {
             starsData.push({
                 _id: star._id,
                 ownedByPlayerId: star.ownedByPlayerId,
+                warpGate: star.warpGate,    // The warp gate would not have changed but may go in and out of scanning range.
                 naturalResources: star.naturalResources,
                 terraformedResources,
                 garrison: star.garrison,
@@ -883,7 +887,8 @@ module.exports = class GameTickService extends EventEmitter {
 
             return {
                 _id: s._id,
-                ownedByPlayerId: s.ownedByPlayerId
+                ownedByPlayerId: s.ownedByPlayerId,
+                warpGate: false // Players cannot see warp gates if they are out of scanning range.
             }
         });
 

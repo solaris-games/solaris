@@ -1,24 +1,24 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-block mr-5" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
+        <div class="col-auto d-none d-md-block mr-5 pointer" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
 
             {{game.settings.general.name}}
         </div>
         <div class="col">
-            <span v-if="gameIsPaused()">Paused</span>
-            <span v-if="gameIsInProgress()">Production: {{timeRemaining}}</span>
-            <span v-if="gameIsPendingStart()">Starts In: {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPaused()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Paused</span>
+            <span class="pointer" v-if="gameIsInProgress()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
         </div>
         <div class="col-auto text-right" v-if="userPlayer">
-            <span>
+            <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
             </span>
 
             <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
-        <div class="col-auto text-right infrastructure" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
+        <div class="col-auto text-right pointer" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
             <span class="d-none d-sm-inline-block ml-4">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
@@ -320,7 +320,7 @@ export default {
     overflow: auto;
     overflow-x: hidden;
 } */
-.infrastructure {
+.pointer {
   cursor:pointer;
 }
 </style>

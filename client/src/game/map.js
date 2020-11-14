@@ -332,12 +332,14 @@ class Map extends EventEmitter {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
+    star.isSelected = true
   }
 
   clickCarrier (carrierId) {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
     carrier.onClicked()
+    carrier.isSelected = true
   }
 
   unselectAllStars () {
@@ -435,8 +437,9 @@ class Map extends EventEmitter {
       
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onStarClicked', e)
+      } else {
+        selectedStar.isSelected = false // If multi-select then do not select the star.
       }
-      
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
     } else if (this.mode === 'ruler') {
@@ -475,8 +478,9 @@ class Map extends EventEmitter {
       
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
+      } else {
+        selectedCarrier.isSelected = false
       }
-    
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {

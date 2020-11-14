@@ -177,8 +177,10 @@ export default {
 
           this.oldWaypoints = this.carrier.waypoints
 
-          			this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 
+          GameContainer.reloadCarrier(this.carrier)
+          
           if (saveAndEdit) {
             if (this.carrier.waypoints.length) {
               this.$emit('onEditWaypointRequested', {

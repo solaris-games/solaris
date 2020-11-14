@@ -181,7 +181,7 @@ module.exports = class GameGalaxyService {
                     name: s.name,
                     ownedByPlayerId: s.ownedByPlayerId,
                     location: s.location,
-                    warpGate: s.warpGate
+                    warpGate: false // Hide warp gates outside of scanning range.
                 }
             }
         })

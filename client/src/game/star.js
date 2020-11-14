@@ -79,12 +79,21 @@ class Star extends EventEmitter {
 
     this.graphics_star.clear()
 
-    let radius = 5
-    let alpha = this._isInScanningRange() ? 1 : 0.3
+    let isInScanningRange = this._isInScanningRange()
+    let radius = 4
+    let alpha = isInScanningRange ? 1 : 0.5
 
-    this.graphics_star.beginFill(0xFFFFFF, alpha)
-    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, 6, radius, radius - 3)
-    this.graphics_star.endFill()
+    this.graphics_star.lineStyle(1, 0xFFFFFF, alpha)
+
+    if (isInScanningRange) {
+      this.graphics_star.beginFill(0xFFFFFF, alpha)
+    }
+
+    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, 6, radius, radius - 2)
+
+    if (isInScanningRange) {
+      this.graphics_star.endFill()
+    }
   }
 
   drawSpecialist () {
@@ -190,7 +199,7 @@ class Star extends EventEmitter {
       return 0
     }
     
-    return Math.floor(this.data.naturalResources / 45 * 3) // Anything over 45 gets 3 planets
+    return Math.min(Math.floor(this.data.naturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {
@@ -459,8 +468,8 @@ class Star extends EventEmitter {
     this.graphics_colour_cir.visible = this.zoomPercent >= 60
     this.graphics_colour_warp_arc.visible = this.zoomPercent < 60 && this.data.warpGate
     this.graphics_colour_warp_cir.visible = this.zoomPercent >= 60 && this.data.warpGate
-    this.graphics_hyperspaceRange.visible = this.isSelected && this.zoomPercent < 60
-    this.graphics_scanningRange.visible = this.isSelected && this.zoomPercent < 60
+    this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
+    this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
     this.text_name.visible = this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) 
     this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
 

@@ -100,6 +100,8 @@ export default {
                 this.star.specialistId = specialist.id
                 this.star.specialist = specialist
                 this.userPlayer.credits -= specialist.cost
+
+                GameContainer.reloadStar(this.star)
             }
         } catch (err) {
             console.error(err)
