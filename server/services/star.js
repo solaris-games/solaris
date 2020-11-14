@@ -193,7 +193,7 @@ module.exports = class StarService extends EventEmitter {
             // If one of the stars are not owned by the current player then we need to check for
             // warp scramblers.
 
-            // But if the carrier has the warp stablizer specialist then it can travel at warp speed no matter
+            // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
             // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
             if (carrier.specialistId) {
                 let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
