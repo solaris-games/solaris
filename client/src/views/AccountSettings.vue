@@ -110,7 +110,11 @@ export default {
           if (!confirm('Last chance?')) {
             return
           }
+        } else {
+          return
         }
+      } else {
+        return
       }
 
       try {

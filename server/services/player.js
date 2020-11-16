@@ -374,4 +374,14 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
+    async getGameNotes(game, player) {
+        return player.notes;
+    }
+
+    async updateGameNotes(game, player, notes) {
+        player.notes = notes;
+
+        await game.save();
+    }
+
 }

@@ -104,6 +104,8 @@ export default {
                 this.carrier.specialistId = specialist.id
                 this.carrier.specialist = specialist
                 this.userPlayer.credits -= specialist.cost
+
+                GameContainer.reloadCarrier(this.carrier)
             }
         } catch (err) {
             console.error(err)

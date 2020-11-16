@@ -33,7 +33,7 @@
                         <td>
                             <i class="fas fa-rocket mr-2"></i>
                             <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
-                            <span v-if="star.specialist" :title="star.specialist.description"> ({{star.specialist.name}})</span>
+                            <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
                         <td class="text-right">{{carrier.lost}}</td>

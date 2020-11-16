@@ -33,5 +33,6 @@ export default {
   RULER: 'ruler',
   LEDGER: 'ledger',
   HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier',
-  HIRE_SPECIALIST_STAR: 'hireSpecialistStar'
+  HIRE_SPECIALIST_STAR: 'hireSpecialistStar',
+  GAME_NOTES: 'gameNotes'
 }

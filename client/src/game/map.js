@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import gameContainer from './container'
+import Background from './background'
 import Star from './star'
 import Carrier from './carrier'
 import Waypoints from './waypoints'
@@ -28,12 +29,14 @@ class Map extends EventEmitter {
   }
 
   _setupContainers () {
+    this.backgroundContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
 
+    this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
@@ -96,6 +99,14 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
+
+    // -----------
+    // Setup Background
+    this.background = new Background()
+    this.background.setup(game)
+
+    this.backgroundContainer.addChild(this.background.container)
+    this.background.draw()
   }
 
   setupStar (game, starData) {
@@ -298,6 +309,7 @@ class Map extends EventEmitter {
     let player = GameHelper.getUserPlayer(game)
 
     if (!player) {
+      this.panToLocation({ x: 0, y: 0 })
       return
     }
 
@@ -306,10 +318,10 @@ class Map extends EventEmitter {
 
   panToStar (star) {
     this.panToLocation(star.location)
+  }
 
-    let zoomPercent = gameContainer.getViewportZoomPercentage()
-
-    this.refreshZoom(zoomPercent)
+  panToCarrier (carrier) {
+    this.panToLocation(carrier.location)
   }
 
   panToLocation (location) {
@@ -320,12 +332,14 @@ class Map extends EventEmitter {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
+    star.isSelected = true
   }
 
   clickCarrier (carrierId) {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
     carrier.onClicked()
+    carrier.isSelected = true
   }
 
   unselectAllStars () {
@@ -423,8 +437,9 @@ class Map extends EventEmitter {
       
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onStarClicked', e)
+      } else {
+        selectedStar.isSelected = false // If multi-select then do not select the star.
       }
-      
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
     } else if (this.mode === 'ruler') {
@@ -463,8 +478,9 @@ class Map extends EventEmitter {
       
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
+      } else {
+        selectedCarrier.isSelected = false
       }
-    
     } else if (this.mode === 'waypoints') {
       this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {

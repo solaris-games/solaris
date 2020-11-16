@@ -123,7 +123,10 @@ module.exports = (router, io, container) => {
 
             res.status(200).json(report);
 
-            container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId));
         } catch (err) {
             return next(err);
         }
@@ -138,7 +141,10 @@ module.exports = (router, io, container) => {
 
             res.sendStatus(200);
 
-            container.broadcastService.gameStarWarpGateDestroyed(req.game, req.body.starId);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateDestroyed(req.game, req.body.starId));
         } catch (err) {
             return next(err);
         }
@@ -148,19 +154,19 @@ module.exports = (router, io, container) => {
         let ships = +req.body.ships || 1;
 
         try {
-            let carrier = await container.starUpgradeService.buildCarrier(
+            let report = await container.starUpgradeService.buildCarrier(
                 req.game,
                 req.player,
                 req.body.starId,
                 ships);
 
-            res.status(200).json(carrier);
+            res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
             playersWithinScanningRange.forEach(p => 
-                container.broadcastService.gameStarCarrierBuilt(req.game, p._id, carrier));
+                container.broadcastService.gameStarCarrierBuilt(req.game, p._id, report));
         } catch (err) {
             return next(err);
         }

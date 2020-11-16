@@ -74,6 +74,8 @@
         :starId="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+      <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
+        @onCloseRequested="onCloseRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
         @onCloseRequested="onCloseRequested"/>
     </div>
@@ -106,6 +108,7 @@ import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
+import GameNotesVue from '../notes/GameNotes.vue'
 import OptionsVue from './Options.vue'
 
 export default {
@@ -132,6 +135,7 @@ export default {
     'ledger': LedgerVue,
     'hire-specialist-carrier': HireSpecialistCarrierVue,
     'hire-specialist-star': HireSpecialistStarVue,
+    'game-notes': GameNotesVue,
     'options': OptionsVue
   },
   props: {

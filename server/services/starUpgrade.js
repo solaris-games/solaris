@@ -136,7 +136,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             carrier
         });
 
-        return carrier;
+        return {
+            carrier,
+            starGarrison: star.garrison
+        };
     }
 
     async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback) {

@@ -109,6 +109,17 @@
                     "deductEnemyWeapons": 1
                 }
             }
+        },
+        {
+            "id": 10,
+            "name": "Warp Stabilizer",
+            "description": "Warp Scramblers do not affect the carrier.",
+            "tier": 4,
+            "modifiers": {
+                "special": {
+                    "unlockWarpGates": true
+                }
+            }
         }
     ],
     "star": [

@@ -1,10 +1,13 @@
 import * as PIXI from 'pixi.js'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
+import gameHelper from '../services/gameHelper'
 
 class GameContainer {
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
+    PIXI.GRAPHICS_CURVES.minSegments = 20 // Smooth arcs
+
     this.frames = 0
     this.dtAccum = 0
   }
@@ -72,13 +75,21 @@ class GameContainer {
     this.viewport.addChild(this.map.container)
   }
 
+  zoomIn () {
+    this.viewport.zoomPercent(0.5, true)
+  }
+
+  zoomOut () {
+    this.viewport.zoomPercent(-0.3, true)
+  }
+
   setupViewport (game) {
     this.game = game
 
-    this.starFieldLeft = this._calculateMinStarX(game) - 1000
-    this.starFieldRight = this._calculateMaxStarX(game) + 1000
-    this.starFieldTop = this._calculateMinStarY(game) - 500
-    this.starFieldBottom = this._calculateMaxStarY(game) + 500
+    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1000
+    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1000
+    this.starFieldTop = gameHelper.calculateMinStarY(game) - 500
+    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 500
 
     // activate plugins
     this.viewport
@@ -138,30 +149,6 @@ class GameContainer {
     let viewportPercent = (viewportWidth / this.viewport.screenWidth) * 100
 
     return viewportPercent
-  }
-
-  _calculateMinStarX (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
-  }
-
-  _calculateMinStarY (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
-  }
-
-  _calculateMaxStarX (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
-  }
-
-  _calculateMaxStarY (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
   onTick( deltaTime ) {

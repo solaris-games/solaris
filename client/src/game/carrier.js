@@ -81,24 +81,15 @@ class Carrier extends EventEmitter {
     this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
     this.graphics_ship.endFill()
 
-    if (this.hasSpecialist()) {
-      this.graphics_ship.beginFill(0x000000)
-      this.graphics_ship.lineStyle(0.3, 0xFFFFFF)
-      this.graphics_ship.drawCircle(this.data.location.x, this.data.location.y, 2.2)
-      this.graphics_ship.endFill()
-    }
-
     this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
     this.graphics_ship.position.x = this.data.location.x
     this.graphics_ship.position.y = this.data.location.y
     this.graphics_ship.scale.set(1)
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
-
   }
 
   drawGarrison () {
-
     if (this.text_garrison) {
       this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
@@ -121,20 +112,19 @@ class Carrier extends EventEmitter {
 
       this.container.addChild(this.text_garrison)
     }
-
   }
 
   drawSpecialist () {
-    if (!this.hasSpecialist()) {
+    if (!this.hasSpecialist() || this.data.orbiting) {
       return
     }
     
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, true)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
-    specialistSprite.width = 3.5
-    specialistSprite.height = 3.5
-    specialistSprite.x = this.data.location.x - 1.75
-    specialistSprite.y = this.data.location.y - 1.75
+    specialistSprite.width = 6
+    specialistSprite.height = 6
+    specialistSprite.x = this.data.location.x - 3
+    specialistSprite.y = this.data.location.y - 3
     
     this.container.addChild(specialistSprite)
   }
@@ -180,13 +170,11 @@ class Carrier extends EventEmitter {
     }
   }
 
-  onTick( deltaTime, viewportData ) {
-
+  onTick (deltaTime, viewportData) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
 
- 
-   if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
+   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
      //cannot set parent container visibility, since waypoints lines stretch away from carrier location
      // maybe put waypoints on its own container, since this piece of code should remain as small as possible
      this.graphics_colour.visible = false
@@ -195,11 +183,9 @@ class Carrier extends EventEmitter {
    } 
    else {
      this.graphics_colour.visible = true
-     this.graphics_ship.visible = true
      this.text_garrison.visible = true
      this.updateVisibility()
    }
-
   }
 
   onClicked (e) {
@@ -216,7 +202,8 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent < 50)
+    this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
+    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) || (this.isMouseOver && this.zoomPercent < 60))
   }
 
   deselectAllText () {

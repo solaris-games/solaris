@@ -130,6 +130,8 @@ module.exports = class GameGalaxyService {
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = doc.galaxy.stars
         .map(s => {
+            delete s.garrisonActual; // Don't need to send this back.
+
             // Calculate the star's terraformed resources.
             if (s.ownedByPlayerId) {
                 let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
@@ -157,8 +159,6 @@ module.exports = class GameGalaxyService {
             // If its in range then its all good, send the star back as is.
             // Otherwise only return a subset of the data.
             if (inRange) {
-                // delete s.garrisonActual; // TODO: Don't need to send this back?
-
                 if (s.specialistId) {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
@@ -181,7 +181,7 @@ module.exports = class GameGalaxyService {
                     name: s.name,
                     ownedByPlayerId: s.ownedByPlayerId,
                     location: s.location,
-                    warpGate: s.warpGate
+                    warpGate: false // Hide warp gates outside of scanning range.
                 }
             }
         })
@@ -238,6 +238,8 @@ module.exports = class GameGalaxyService {
                 player.research.weapons.effective = effectiveTechs.weapons;
                 player.research.banking.effective = effectiveTechs.banking;
                 player.research.manufacturing.effective = effectiveTechs.manufacturing;
+
+                delete p.notes; // Don't need to send this back.
 
                 return p;
             }

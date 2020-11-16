@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container" v-if="star">
-    <menu-title :title="star.name" @onCloseRequested="onCloseRequested"/>
+    <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
+      <button @click="viewOnMap" class="btn btn-info"><i class="fas fa-eye"></i></button>
+    </menu-title>
 
     <div class="row bg-secondary">
       <div class="col text-center pt-3">
@@ -41,9 +43,12 @@
       <h4 class="pt-2">Carriers</h4>
 
       <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-2 pt-1 pb-1 bg-secondary">
-          <div class="col">
-            <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
-          </div>
+        <div class="col-auto">
+          <specialist-icon :type="'carrier'" :specialist="carrier.specialist"/>
+        </div>
+        <div class="col">
+          <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
+        </div>
         <div class="col-auto">
           <i class="fas fa-map-marker-alt"></i>
           <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
@@ -162,6 +167,9 @@ import PlayerOverview from '../player/Overview'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import StarSpecialistVue from './StarSpecialist'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
+import GameContainer from '../../../game/container'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -171,7 +179,8 @@ export default {
     'playerOverview': PlayerOverview,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
-    'star-specialist': StarSpecialistVue
+    'star-specialist': StarSpecialistVue,
+    'specialist-icon': SpecialistIconVue
   },
   props: {
     starId: String
@@ -248,6 +257,9 @@ export default {
     onEditWaypointsRequested (carrier) {
       this.$emit('onEditWaypointsRequested', carrier._id)
     },
+    viewOnMap (e) {
+      GameContainer.map.panToStar(this.star)
+    },
     async confirmBuildCarrier (e) {
       try {
         // Build the carrier with the entire star garrison.
@@ -260,8 +272,11 @@ export default {
 
           // this.$emit('onCarrierBuilt', this.star._id)
           // this.onOpenCarrierDetailRequested(response.data)
-          this.$store.state.game.galaxy.carriers.push(response.data)
-          this.onEditWaypointsRequested(response.data)
+          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
+
+          let star = gameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
+
+          this.onEditWaypointsRequested(response.data.carrier)
           this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
           this.audio.join()
