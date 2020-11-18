@@ -5,45 +5,117 @@
     </menu-title>
 
     <div class="row bg-secondary">
-      <div class="col text-center pt-3">
-        <p v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
-        <p v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
-        <p v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
+      <div class="col text-center pt-2">
+        <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
+        <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
+        <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
+      </div>
+    </div>
+    
+    <div v-if="isCompactUIStyle && star.infrastructure">
+      <div class="row mt-2">
+        <div class="col">
+          <span title="Natural Resources / Terraformed Resources">
+            <i class="fas fa-globe"></i>
+            {{star.naturalResources == null ? '???' : star.naturalResources}}
+            <span v-if="star.ownedByPlayerId">/ {{star.terraformedResources || '???'}}</span>
+          </span>
+        </div>
+        <div class="col-auto">
+          <span title="Warp Gate" v-if="star.warpGate">
+            <i class="fas fa-dungeon ml-1"></i>
+          </span>
+        </div>
+      </div>
+      
+      <div class="row mt-2 pb-2">
+        <div class="col">
+          <span v-if="star.infrastructure" title="Economic Infrastructure">
+              <i class="fas fa-money-bill-wave text-success"></i> {{star.infrastructure.economy}}
+          </span>
+          <span v-if="star.infrastructure" title="Industrial Infrastructure" class="ml-2">
+              <i class="fas fa-tools text-warning"></i> {{star.infrastructure.industry}}
+          </span>
+          <span v-if="star.infrastructure" title="Scientific Infrastructure" class="ml-2">
+              <i class="fas fa-flask text-info"></i> {{star.infrastructure.science}}
+          </span>
+        </div>
+        <div class="col-auto">
+          <span title="Total Known Garrison" v-if="star.ownedByPlayerId">
+            {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="row pb-2" v-if="canShowSpecialist || (star.ownedByPlayerId && star.manufacturing != null)">
+        <div class="col">
+          <span v-if="canShowSpecialist && isOwnedByUserPlayer">
+            <i class="fas fa-user-astronaut"></i>
+            <a href="javascript:;" @click="onViewHireStarSpecialistRequested">
+              <span class="ml-2" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
+              <span class="ml-2" v-if="!star.specialistId">No Specialist</span>
+            </a>
+          </span>
+          <span v-if="canShowSpecialist && !isOwnedByUserPlayer">
+            <i class="fas fa-user-astronaut"></i>
+            <span v-if="!isOwnedByUserPlayer">
+              {{star.specialist.name}}
+            </span>
+          </span>
+        </div>
+        <div class="col-auto">
+          <span v-if="star.ownedByPlayerId && star.manufacturing != null" title="Ship Production">
+            {{star.manufacturing}} <i class="fas fa-wrench ml-1"></i>
+          </span>
+        </div>
+      </div>
+
+      <div class="mb-0">
+        <infrastructureUpgradeCompact 
+          v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
+          :star="star"
+          :availableCredits="userPlayer.credits"
+          :economy="star.upgradeCosts.economy"
+          :industry="star.upgradeCosts.industry"
+          :science="star.upgradeCosts.science"
+          v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
       </div>
     </div>
 
-    <div v-if="star.ownedByPlayerId" class="row mb-0 pt-3 pb-3 bg-primary">
-        <div class="col">
-            Ships
-        </div>
-        <div class="col text-right">
-            {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
-        </div>
-    </div>
+    <div v-if="isStandardUIStyle">
+      <div v-if="star.ownedByPlayerId" class="row mb-0 pt-3 pb-3 bg-primary">
+          <div class="col">
+              Ships
+          </div>
+          <div class="col text-right">
+              {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
+          </div>
+      </div>
 
-    <div class="row pt-1 pb-1 bg-secondary">
-        <div class="col">
-            Natural Resources
-        </div>
-        <div class="col text-right">
-            {{star.naturalResources == null ? '???' : star.naturalResources}} <i class="fas fa-globe ml-1"></i>
-        </div>
-    </div>
+      <div class="row pt-1 pb-1 bg-secondary">
+          <div class="col">
+              Natural Resources
+          </div>
+          <div class="col text-right">
+              {{star.naturalResources == null ? '???' : star.naturalResources}} <i class="fas fa-globe ml-1"></i>
+          </div>
+      </div>
 
-    <div v-if="star.ownedByPlayerId" class="row mb-2 pt-1 pb-1 bg-secondary">
-        <div class="col">
-            Terraformed Resources
-        </div>
-        <div class="col text-right">
-            {{star.terraformedResources || '???'}} <i class="fas fa-globe ml-1"></i>
-        </div>
+      <div v-if="star.ownedByPlayerId" class="row mb-2 pt-1 pb-1 bg-secondary">
+          <div class="col">
+              Terraformed Resources
+          </div>
+          <div class="col text-right">
+              {{star.terraformedResources || '???'}} <i class="fas fa-globe ml-1"></i>
+          </div>
+      </div>
     </div>
 
     <div v-if="getCarriersInOrbit().length">
       <h4 class="pt-2">Carriers</h4>
 
       <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-2 pt-1 pb-1 bg-secondary">
-        <div class="col-auto">
+        <div class="col-auto pr-0">
           <specialist-icon :type="'carrier'" :specialist="carrier.specialist"/>
         </div>
         <div class="col">
@@ -59,79 +131,63 @@
       </div>
     </div>
 
-    <div v-if="star.infrastructure">
-      <h4 class="pt-2">Infrastructure</h4>
+    <div v-if="isStandardUIStyle">
+      <div v-if="star.infrastructure">
+        <h4 class="pt-2">Infrastructure</h4>
 
-      <infrastructure
-        :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
+        <infrastructure
+          :economy="star.infrastructure.economy" :industry="star.infrastructure.industry" :science="star.infrastructure.science"/>
 
-      <infrastructureUpgrade v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
-        :star="star"
-        :availableCredits="userPlayer.credits"
-        :economy="star.upgradeCosts.economy"
-        :industry="star.upgradeCosts.industry"
-        :science="star.upgradeCosts.science"
-        v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
+        <infrastructureUpgrade v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
+          :star="star"
+          :availableCredits="userPlayer.credits"
+          :economy="star.upgradeCosts.economy"
+          :industry="star.upgradeCosts.industry"
+          :science="star.upgradeCosts.science"
+          v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
+      </div>
+
+      <div class="row bg-secondary mt-2 mb-2" v-if="star.ownedByPlayerId && star.manufacturing != null">
+        <div class="col text-center pt-3">
+          <p>This star builds <b>{{star.manufacturing}}</b> ships every tick.</p>
+        </div>
+      </div>
+
+      <!-- TODO: Turn these into components -->
+      <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
+        <div class="row bg-secondary pt-2 pb-0 mb-1">
+          <div class="col-8">
+            <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
+          </div>
+          <div class="col-4">
+            <modalButton :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
+          </div>
+        </div>
+
+        <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="canBuildWarpGates">
+          <div class="col-8">
+            <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
+          </div>
+          <div class="col-4">
+            <modalButton v-if="!star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+            <modalButton v-if="star.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
+          </div>
+        </div>
+
+        <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="isGameInProgress()">
+          <div class="col-8">
+            <p class="mb-2">Abandon this star for another player to claim. <a href="javascript:;">Read More</a>.</p>
+          </div>
+          <div class="col-4">
+            <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger mb-2">Abandon Star</modalButton>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="pt-2" v-if="canShowSpecialist">Specialist</h4>
+
+      <star-specialist v-if="canShowSpecialist" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
     </div>
-
-    <div class="row bg-secondary mt-2 mb-2" v-if="star.ownedByPlayerId && star.manufacturing != null">
-      <div class="col text-center pt-3">
-        <p>This star builds <b>{{star.manufacturing}}</b> ships every tick.</p>
-      </div>
-    </div>
-
-    <!-- TODO: Turn these into components -->
-    <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
-      <div class="row bg-secondary pt-2 pb-0 mb-1">
-        <div class="col-8">
-          <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
-        </div>
-        <div class="col-4">
-          <modalButton :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
-        </div>
-      </div>
-
-      <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="canBuildWarpGates">
-        <div class="col-8">
-          <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
-        </div>
-        <div class="col-4">
-          <modalButton v-if="!star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-          <modalButton v-if="star.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
-        </div>
-      </div>
-
-      <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="isGameInProgress()">
-        <div class="col-8">
-          <p class="mb-2">Abandon this star for another player to claim. <a href="javascript:;">Read More</a>.</p>
-        </div>
-        <div class="col-4">
-          <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger mb-2">Abandon Star</modalButton>
-        </div>
-      </div>
-
-      <!--
-      <h4 class="pt-2 text-success">Premium Features</h4>
-
-      <div class="row">
-        <div class="col-8">
-          TODO: Wording
-          <p class="mb-2">Make your mark on the galaxy by renaming this star. <a href="javascript:;">Read More</a>.</p>
-        </div>
-        <div class="col-4">
-          <button class="btn btn-block btn-primary">Rename</button>
-        </div>
-      </div>
-      -->
-    </div>
-
-    <h4 class="pt-2" v-if="canShowSpecialist">Specialist</h4>
-
-    <star-specialist v-if="canShowSpecialist" :starId="star._id" @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
-<!-- 
-    <playerOverview v-if="starOwningPlayer" :playerId="starOwningPlayer._id"
-      @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/> -->
 
     <!-- Modals -->
 
@@ -163,7 +219,7 @@ import GameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import Infrastructure from '../shared/Infrastructure'
 import InfrastructureUpgrade from './InfrastructureUpgrade'
-import PlayerOverview from '../player/Overview'
+import InfrastructureUpgradeCompact from './InfrastructureUpgradeCompact'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import StarSpecialistVue from './StarSpecialist'
@@ -176,7 +232,7 @@ export default {
     'menu-title': MenuTitle,
     'infrastructure': Infrastructure,
     'infrastructureUpgrade': InfrastructureUpgrade,
-    'playerOverview': PlayerOverview,
+    'infrastructureUpgradeCompact': InfrastructureUpgradeCompact,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
     'star-specialist': StarSpecialistVue,
@@ -193,10 +249,16 @@ export default {
       userPlayer: null,
       currentPlayerId: null,
       canBuildWarpGates: false,
-      canShowSpecialist: false
+      isSpecialistsEnabled: false,
+      canShowSpecialist: false,
+      isStandardUIStyle: false,
+      isCompactUIStyle: false
     }
   },
   mounted () {
+    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
+    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+
     this.audio = new AudioService(this.$store)
 
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
@@ -207,8 +269,8 @@ export default {
     
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
-    this.canShowSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' 
-      && (this.star.specialistId || this.isOwnedByUserPlayer)
+    this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
+    this.canShowSpecialist = this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer)
   },
   methods: {
     onCloseRequested (e) {
@@ -221,7 +283,7 @@ export default {
       this.$emit('onViewCompareIntelRequested', e)
     },
     onViewHireStarSpecialistRequested (e) {
-      this.$emit('onViewHireStarSpecialistRequested', e)
+      this.$emit('onViewHireStarSpecialistRequested', this.starId)
     },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)

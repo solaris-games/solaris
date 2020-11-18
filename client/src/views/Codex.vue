@@ -5,19 +5,19 @@
     <view-subtitle title="Table of Contents"/>
 
     <ul>
-      <li><a @click="scrollTo('introduction')" href="javascript:void;">Introduction</a></li>
-      <li><a @click="scrollTo('diplomacy')" href="javascript:void;">Diplomacy</a></li>
-      <li><a @click="scrollTo('galaxy')" href="javascript:void;">Galaxy</a></li>
-      <li><a @click="scrollTo('stars')" href="javascript:void;">Stars</a></li>
-      <li><a @click="scrollTo('infrastructure')" href="javascript:void;">Infrastructure</a></li>
-      <li><a @click="scrollTo('carriers')" href="javascript:void;">Carriers</a></li>
-      <li><a @click="scrollTo('combat')" href="javascript:void;">Combat</a></li>
-      <li><a @click="scrollTo('scienceTechnology')" href="javascript:void;">Science &amp; Technology</a></li>
-      <li><a @click="scrollTo('trade')" href="javascript:void;">Trade</a></li>
-      <li><a @click="scrollTo('specialists')" href="javascript:void;">Specialists</a></li>
-      <li><a @click="scrollTo('turnBasedGames')" href="javascript:void;">Turn Based Games</a></li>
-      <li><a @click="scrollTo('achievements')" href="javascript:void;">Achievements</a></li>
-      <!-- <li><a @click="scrollTo('keyboardShortcuts')" href="javascript:void;">Keyboard Shortcuts</a></li> -->
+      <li><a @click="scrollTo('introduction')" href="javascript:;">Introduction</a></li>
+      <li><a @click="scrollTo('diplomacy')" href="javascript:;">Diplomacy</a></li>
+      <li><a @click="scrollTo('galaxy')" href="javascript:;">Galaxy</a></li>
+      <li><a @click="scrollTo('stars')" href="javascript:;">Stars</a></li>
+      <li><a @click="scrollTo('infrastructure')" href="javascript:;">Infrastructure</a></li>
+      <li><a @click="scrollTo('carriers')" href="javascript:;">Carriers</a></li>
+      <li><a @click="scrollTo('combat')" href="javascript:;">Combat</a></li>
+      <li><a @click="scrollTo('scienceTechnology')" href="javascript:;">Science &amp; Technology</a></li>
+      <li><a @click="scrollTo('trade')" href="javascript:;">Trade</a></li>
+      <li><a @click="scrollTo('specialists')" href="javascript:;">Specialists</a></li>
+      <li><a @click="scrollTo('turnBasedGames')" href="javascript:;">Turn Based Games</a></li>
+      <li><a @click="scrollTo('achievements')" href="javascript:;">Achievements</a></li>
+      <!-- <li><a @click="scrollTo('keyboardShortcuts')" href="javascript:;">Keyboard Shortcuts</a></li> -->
     </ul>
 
     <div ref="introduction">
