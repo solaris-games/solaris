@@ -170,6 +170,16 @@ class Carrier extends EventEmitter {
     }
   }
 
+  enableInteractivity() {
+   this.container.interactive = true
+   this.container.buttonMode = true
+  }
+
+  disableInteractivity() {
+   this.container.interactive = false
+   this.container.buttonMode = false
+  }
+
   onTick (deltaTime, viewportData) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin

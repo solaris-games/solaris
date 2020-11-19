@@ -127,16 +127,6 @@ class Waypoints extends EventEmitter {
     this._createWaypoint(e.location, e._id)
   }
 
-  onCarrierClicked (e) {
-    if (!this.carrier) {
-      return
-    }
-
-    if (e.orbiting) {
-      this._createWaypoint(e.location, e.orbiting)
-    }
-  }
-
   _createWaypoint (desiredLocation, starId) {
     // If the star that was clicked is within hyperspace range then append
     // a new waypoint to this star.

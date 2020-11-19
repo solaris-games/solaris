@@ -203,6 +203,16 @@ class Map extends EventEmitter {
     }
   }
 
+
+  _disableCarriersInteractivity() {
+    this.carriers.forEach( c => c.disableInteractivity() )
+  }
+
+  _enableCarriersInteractivity() {
+    this.carriers.forEach( c => c.enableInteractivity() )
+  }
+
+
   setMode (mode, args) {
     this.mode = mode
     this.modeArgs = args
@@ -211,14 +221,18 @@ class Map extends EventEmitter {
       this.unselectAllCarriers()
       this.unselectAllStars()
     }
+    if (this.mode == 'waypoints') {
+      this._disableCarriersInteractivity()
+    }
+    else {
+      this._enableCarriersInteractivity()
+    }
 
     this.draw()
   }
 
   resetMode () {
-    this.mode = 'galaxy'
-
-    this.draw()
+    this.setMode( 'galaxy', this.modeArgs )
   }
 
   drawStars () {
@@ -481,8 +495,6 @@ class Map extends EventEmitter {
       } else {
         selectedCarrier.isSelected = false
       }
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
     }
