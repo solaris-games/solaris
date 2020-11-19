@@ -9,7 +9,7 @@ import store from './store'
 import 'bootstrap'
 import 'bootswatch/dist/darkly/bootstrap.min.css'
 
-import 'pixi.js'
+import 'pixi.js-legacy'
 import 'pixi-viewport'
 
 Vue.config.productionTip = false

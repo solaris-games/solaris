@@ -16,7 +16,7 @@
     "jquery": "^3.5.0",
     "moment": "^2.26.0",
     "pixi-viewport": "^4.11.1",
-    "pixi.js": "^5.2.3",
+    "pixi.js-legacy": "^5.3.3",
     "popper.js": "^1.16.1",
     "voronoi": "^1.0.0",
     "vue": "^2.6.11",
