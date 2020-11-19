@@ -22,8 +22,11 @@
               title="Upgrade Science">
         <i class="fas fa-flask"></i> ${{science}}
       </button>
+      <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1" class="btn btn-sm btn-info mr-1" @click="confirmBuildCarrier">
+        <i class="fas fa-rocket"></i> ${{star.upgradeCosts.carriers}}
+      </button>
     </div>
-    <div class="col-auto">
+    <div class="col-auto" v-if="userPlayer">
       <button v-if="canBuildWarpGates && !star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate" class="btn btn-sm btn-primary mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon"></i> ${{star.upgradeCosts.warpGate}}
       </button>
@@ -182,6 +185,33 @@ export default {
           this.$toasted.show(`${this.star.name} has been abandoned.`)
 
           this.audio.leave()
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmBuildCarrier (e) {
+      if (!confirm(`Are you sure you want build a Carrier at ${this.star.name}? The carrier will cost ${this.star.upgradeCosts.carriers}.`)) {
+        return
+      }
+
+      try {
+        // Build the carrier with the entire star garrison.
+        let ships = this.star.garrison
+
+        let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id, ships)
+
+        if (response.status === 200) {
+          this.$toasted.show(`Carrier built at ${this.star.name}.`)
+
+          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
+
+          let star = GameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
+
+          this.$emit('onEditWaypointsRequested', response.data.carrier._id)
+          this.userPlayer.credits -= this.star.upgradeCosts.carriers
+
+          this.audio.join()
         }
       } catch (err) {
         console.error(err)
