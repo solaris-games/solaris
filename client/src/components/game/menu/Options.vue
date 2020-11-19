@@ -9,6 +9,16 @@
       <h4 class="pt-2">Interface</h4>
       
       <div class="row bg-secondary pt-1 pb-1">
+        <label for="uiStyle" class="col col-form-label">UI Style (Experimental)</label>
+        <div class="col">
+          <select class="form-control" id="uiStyle" v-model="settings.interface.uiStyle" :disabled="isSavingSettings">
+            <option value="standard">Standard</option>
+            <option value="compact">Compact</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="row bg-secondary pt-1 pb-1">
         <label for="audio" class="col col-form-label">Audio</label>
         <div class="col">
           <select class="form-control" id="audio" v-model="settings.interface.audio" :disabled="isSavingSettings">
