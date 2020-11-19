@@ -97,7 +97,6 @@ import gameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import AudioService from '../../../game/audio'
 import ShareLinkVue from '../welcome/ShareLink'
-import { DEG_TO_RAD } from 'pixi.js'
 
 export default {
   components: {

@@ -78,7 +78,8 @@
           :economy="star.upgradeCosts.economy"
           :industry="star.upgradeCosts.industry"
           :science="star.upgradeCosts.science"
-          v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"/>
+          v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"
+          v-on:onEditWaypointsRequested="onEditWaypointsRequested"/>
       </div>
     </div>
 
@@ -316,8 +317,8 @@ export default {
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
     },
-    onEditWaypointsRequested (carrier) {
-      this.$emit('onEditWaypointsRequested', carrier._id)
+    onEditWaypointsRequested (carrierId) {
+      this.$emit('onEditWaypointsRequested', carrierId)
     },
     viewOnMap (e) {
       GameContainer.map.panToStar(this.star)
@@ -338,7 +339,7 @@ export default {
 
           let star = gameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
 
-          this.onEditWaypointsRequested(response.data.carrier)
+          this.onEditWaypointsRequested(response.data.carrier._id)
           this.userPlayer.credits -= this.star.upgradeCosts.carriers
 
           this.audio.join()

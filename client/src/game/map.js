@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import gameContainer from './container'
 import Background from './background'
 import Star from './star'
