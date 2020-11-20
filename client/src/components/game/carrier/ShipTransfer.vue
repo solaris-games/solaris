@@ -27,17 +27,30 @@
     </div>
 
     <div class="row mb-2">
-        <div class="col-3">
-            <button type="button" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
+        <div class="col-6">
+            <div class="row no-gutters">
+                <div class="col-4">
+                    <button type="button" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
+                </div>
+                <div class="col">
+                        <button type="button" title="1" class="btn btn-primary float-right ml-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
+                        <button type="button" title="10"  class="btn btn-primary ml-1 float-right" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
+                        <button type="button" title="100"  class="btn btn-primary float-right" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
+                </div>
+            </div>
         </div>
-        <div class="col-3">
-            <button type="button" class="btn btn-primary float-right" @click="onTransferLeftClicked" :disabled="carrierShips <= 1"><i class="fas fa-chevron-left"></i></button>
-        </div>
-        <div class="col-3">
-            <button type="button" class="btn btn-primary" @click="onTransferRightClicked" :disabled="starShips <= 0"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <div class="col-3">
-            <button type="button" class="btn btn-success btn-block float-right" @click="onMaxShipsClicked">Max</button>
+
+        <div class="col-6">
+            <div class="row no-gutters">
+                <div class="col">
+                        <button type="button"  title="1" class="btn btn-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
+                        <button type="button" title="10"  class="btn btn-primary ml-1" @click="onTransferRightClicked(10)" :disabled="starShips <= 10"><i class="fas fa-angle-double-right"></i></button>
+                        <button type="button" title="100"  class="btn btn-primary ml-1 " @click="onTransferRightClicked(100)" :disabled="starShips <= 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-success btn-block " @click="onMaxShipsClicked">Max</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -130,12 +143,12 @@ export default {
       this.carrierShips = this.carrier.ships + this.star.garrison
     },
     onTransferLeftClicked (e) {
-      this.starShips++
-      this.carrierShips--
+      this.starShips+=e
+      this.carrierShips-=e
     },
     onTransferRightClicked (e) {
-      this.carrierShips++
-      this.starShips--
+      this.carrierShips+=e
+      this.starShips-=e
     },
     async saveTransfer (e) {
       try {
