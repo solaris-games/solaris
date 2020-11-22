@@ -12,13 +12,14 @@
     </div>
 
     <div class="pt-2">
-        <conversation-message v-for="conversation in conversations"
+        <conversation-preview v-for="conversation in conversations"
           v-bind:key="conversation.playerId"
           :sender="getPlayer(conversation.playerId)"
           :message="conversation.lastMessage"
           :colour="getPlayerColour(conversation.playerId)"
           :isUnread="conversation.hasUnread"
           :isTruncated="true"
+          :isFullWidth="true"
           @onConversationOpenRequested="onConversationOpenRequested"
           class="mb-2"/>
     </div>
@@ -29,13 +30,13 @@
 <script>
 import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
-import ConversationMessageVue from './ConversationMessage'
+import ConversationPreviewVue from './ConversationPreview'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
-    'conversation-message': ConversationMessageVue
+    'conversation-preview': ConversationPreviewVue
   },
   data () {
     return {

@@ -15,7 +15,6 @@
             :sender="getPlayer(message.fromPlayerId)"
             :message="message"
             :colour="getPlayerColour(message.fromPlayerId)"
-            :isTruncated="false"
             class="mb-1"/>
     </div>
 
