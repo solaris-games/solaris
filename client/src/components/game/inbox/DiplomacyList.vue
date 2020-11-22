@@ -12,7 +12,7 @@
     </div>
 
     <div class="pt-2">
-        <conversation-message v-for="conversation in conversations"
+        <conversation-message v-for="conversation in orderedConversations"
           v-bind:key="conversation.playerId"
           :sender="getPlayer(conversation.playerId)"
           :message="conversation.lastMessage"
@@ -40,6 +40,24 @@ export default {
   data () {
     return {
       conversations: null
+    }
+  },
+  computed: {
+    orderedConversations: function() {
+      return this.conversations.sort(function(a,b) {
+        if (a === b) {
+          return 0
+        }
+        else if (a.lastMessage === null) {
+          return 1
+        }
+        else if (b.lastMessage === null) {
+          return -1
+        }
+        else {
+          return b.lastMessage.sentDate.localeCompare(a.lastMessage.sentDate)
+        }
+      });
     }
   },
   mounted () {
