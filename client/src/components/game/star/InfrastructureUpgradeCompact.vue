@@ -1,5 +1,5 @@
 <template>
-  <div class="row bg-secondary pt-2 pb-2">
+  <div class="row bg-secondary pt-2 pb-2" v-if="userPlayer">
     <div class="col">
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"

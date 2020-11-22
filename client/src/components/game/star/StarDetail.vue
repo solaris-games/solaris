@@ -50,7 +50,7 @@
       <div class="row pb-2" v-if="canShowSpecialist || (star.ownedByPlayerId && star.manufacturing != null)">
         <div class="col">
           <span v-if="canShowSpecialist && isOwnedByUserPlayer">
-            <i class="fas fa-user-astronaut"></i>
+            <i class="fas fa-user-astronaut mr-1"></i>
             <a href="javascript:;" @click="onViewHireStarSpecialistRequested">
               <span class="ml-2" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
               <span class="ml-2" v-if="!star.specialistId">No Specialist</span>
@@ -67,6 +67,12 @@
           <span v-if="star.ownedByPlayerId && star.manufacturing != null" title="Ship Production">
             {{star.manufacturing}} <i class="fas fa-wrench ml-1"></i>
           </span>
+        </div>
+      </div>
+
+      <div class="row pb-2" v-if="star.specialist">
+        <div class="col">
+          <p class="mb-0"><small>{{star.specialist.description}}</small></p>
         </div>
       </div>
 
