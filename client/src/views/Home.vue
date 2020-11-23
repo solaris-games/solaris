@@ -8,7 +8,7 @@
 
     <div class="row">
       <div class="col-sm-12 col-md-6">
-        <p>Discover a slow paced space strategy game filled with conquest, betrayal and subterfuge.</p>
+        <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p>Will you conquer the galaxy?</p>
       </div>

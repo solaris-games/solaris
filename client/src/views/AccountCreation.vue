@@ -5,7 +5,7 @@
     <div class="row">
       <div class="col-sm-12 col-md-6">
         <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
-        <p>Discover a slow paced space strategy game filled with conquest, betrayal and subterfuge.</p>
+        <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade with allies and build up huge fleets of ships.</p>
         <p>Will you conquer the galaxy?</p>
