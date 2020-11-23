@@ -5,7 +5,7 @@
       <a href="javascript:;" @click="onOpenPlayerDetailRequested(creditor)">{{debtor.alias}}</a>.
   </p>
   <p v-if="!isCreditor">
-    <a href="javascript:;" @click="onOpenPlayerDetailRequested(debtor)">{{debtor.alias}}</a> has forgiven
+    <a href="javascript:;" @click="onOpenPlayerDetailRequested(debtor)">{{creditor.alias}}</a> has forgiven
     <span class="text-warning">${{event.data.amount}}</span> of debt you owed to them.
   </p>
 </div>
