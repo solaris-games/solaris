@@ -5,10 +5,10 @@
     <div class="row">
       <div class="col-sm-12 col-md-6">
         <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
-        <p>Login throughout the day to command epic fleets of spacecraft in a desperate struggle to conquer the galaxy!</p>
+        <p>Discover a slow paced space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade with allies and build up huge fleets of ships.</p>
-        <p>Every story needs heroes and villains, <b>which will you be?</b></p>
+        <p>Will you conquer the galaxy?</p>
       </div>
       <div class="col-sm-12 col-md-6">
         <form-error-list v-bind:errors="errors"/>
