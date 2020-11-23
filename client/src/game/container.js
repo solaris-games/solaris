@@ -117,21 +117,24 @@ class GameContainer {
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
-  setup () {
-    this.map.setup(this.game)
+  setup (game, userSettings) {
+    this.userSettings = userSettings
+    
+    this.map.setup(this.game, userSettings)
   }
 
   draw () {
     this.map.draw()
   }
 
-  reloadGame (game) {
+  reloadGame (game, userSettings) {
     this.game = game
-    this.map.reloadGame(game)
+    this.userSettings = userSettings
+    this.map.reloadGame(game, userSettings)
   }
 
   reloadStar (star) {
-    let starObject = this.map.setupStar(this.game, star)
+    let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)
   }
 

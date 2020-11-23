@@ -37,6 +37,16 @@
           </select>
         </div>
       </div>
+      
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="drawPlanets" class="col col-form-label">Draw Planets</label>
+        <div class="col">
+          <select class="form-control" id="drawPlanets" v-model="settings.interface.drawPlanets" :disabled="isSavingSettings">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
 
       <h4 class="pt-2">Carriers</h4>
 
@@ -81,6 +91,7 @@ import MenuTitle from '../MenuTitle'
 import LoadingSpinnerVue from '../../LoadingSpinner'
 import FormErrorList from '../../FormErrorList'
 import UserApiService from '../../../services/api/user'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -133,6 +144,8 @@ export default {
           
           this.$store.commit('setSettings', this.settings)
 
+          GameContainer.reloadGame(this.$store.state.game, this.$store.state.settings)
+          
           this.onCloseRequested()
         }
       } catch (err) {

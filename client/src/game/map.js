@@ -44,7 +44,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.carrierContainer)
   }
 
-  setup (game) {
+  setup (game, userSettings) {
     this.game = game
     
     // Cleanup events
@@ -60,7 +60,7 @@ class Map extends EventEmitter {
 
     // Add stars
     for (let i = 0; i < game.galaxy.stars.length; i++) {
-      this.setupStar(game, game.galaxy.stars[i])
+      this.setupStar(game, userSettings, game.galaxy.stars[i])
     }
 
     // Add carriers
@@ -109,7 +109,7 @@ class Map extends EventEmitter {
     this.background.draw()
   }
 
-  setupStar (game, starData) {
+  setupStar (game, userSettings, starData) {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
@@ -122,7 +122,7 @@ class Map extends EventEmitter {
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
-    star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear, userSettings.interface.drawPlanets)
 
     return star
   }
@@ -175,13 +175,13 @@ class Map extends EventEmitter {
     }
   }
 
-  reloadGame (game) {
+  reloadGame (game, userSettings) {
     // Update all of the stars.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
       let starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
-      existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+      existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear, userSettings.interface.drawPlanets)
       existing.draw()
     }
 

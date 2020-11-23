@@ -43,11 +43,12 @@ class Star extends EventEmitter {
     return !(typeof this.data.infrastructure === 'undefined')
   }
 
-  setup (data, players, carriers, lightYearDistance) {
+  setup (data, players, carriers, lightYearDistance, drawPlanetsAtStars) {
     this.data = data
     this.players = players
     this.carriers = carriers
     this.lightYearDistance = lightYearDistance
+    this.drawPlanetsAtStars = drawPlanetsAtStars
     this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
   }
 
@@ -136,6 +137,10 @@ class Star extends EventEmitter {
   }
 
   drawPlanets () {
+    if (!this.drawPlanetsAtStars) {
+      return
+    }
+
     if (!this.container_planets) {
       this.container_planets = new PIXI.Container()
 
@@ -440,7 +445,7 @@ class Star extends EventEmitter {
      this.graphics_colour_warp_arc.visible = false
      this.graphics_colour_warp_cir.visible = false
      this.text_name.visible = false
-     this.container_planets.visible = false
+     if (this.container_planets) this.container_planets.visible = false
      if (this.text_infrastructure) { this.text_infrastructure.visible = false }
      if (this.text_garrison) { this.text_garrison.visible = false }
    } 
@@ -475,7 +480,10 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
     this.text_name.visible = this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) 
-    this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
+    
+    if (this.container_planets) {
+      this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
+    }
 
     if (this.text_infrastructure) { // may not exist for stars out of range
       this.text_infrastructure.visible = this.zoomPercent < 35 || (this.isSelected && this.zoomPercent < 35) || (this.isMouseOver && this.zoomPercent < 35)
