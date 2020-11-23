@@ -22,7 +22,7 @@
           </span>
         </div>
         <div class="col-auto">
-          <span title="Warp Gate" v-if="star.warpGate">
+          <span :title="star.warpGate ? 'Warp Gate':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
             <i class="fas fa-dungeon ml-1"></i>
           </span>
         </div>
@@ -412,4 +412,7 @@ export default {
 </script>
 
 <style scoped>
+.no-warp-gate {
+  opacity: 0.1;
+}
 </style>

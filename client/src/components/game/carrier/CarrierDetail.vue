@@ -116,7 +116,7 @@
         </div>
       </div>
 
-      <div v-if="!carrier.waypoints.length" class="row bg-primary pt-2 pb-0 mb-0">
+      <div v-if="isStandardUIStyle && !carrier.waypoints.length" class="row bg-primary pt-2 pb-2 mb-0">
         <div class="col">
           <p class="mb-0">Waypoints: None.</p>
         </div>
@@ -129,16 +129,7 @@
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
-      <div v-if="carrier.waypoints.length && carrierOwningPlayer != userPlayer" class="row mb-0 pt-2 pb-3">
-        <div class="col">
-            Destination
-        </div>
-        <div class="col text-right">
-          <a href="javascript:;" @click="onOpenFirstWaypointStarDetailRequested">{{getFirstWaypointDestination().name}}</a> <i class="fas fa-map-marker-alt ml-2"></i>
-        </div>
-      </div>
-
-      <div class="row bg-primary pt-2 pb-0 mb-0" v-if="carrier.waypoints.length || canEditWaypoints">
+      <div class="row bg-primary pt-2 pb-0 mb-0" v-if="carrier.waypoints.length">
         <div class="col">
           <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
@@ -396,7 +387,7 @@ export default {
       return this.isUserPlayerCarrier && this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated
     },
     canShowSpecialist: function () {
-      return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.carrierOwningPlayer == this.userPlayer)
+      return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
       return this.canShowSpecialist && this.carrier.orbiting
