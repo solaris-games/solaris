@@ -103,7 +103,6 @@ import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
 import GameApiService from '../../../services/api/game'
-import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -201,7 +200,7 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let ticksToProduction = gameHelper.getTicksToProduction(this.$store.state.game)
+        let ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game)
 
         this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }
@@ -266,6 +265,46 @@ export default {
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
+      let isInGame = this.userPlayer != null
+
+      // Handle keyboard shortcuts for screens only available for users
+      // who are players.
+      if (isInGame) {
+        switch (e.keyCode || e.which) {
+          case 187: // +
+            GameContainer.zoomIn()
+            break
+          case 189: // -
+            GameContainer.zoomOut()
+            break
+          case 82: // R
+            this.setMenuState(MENU_STATES.RESEARCH)
+            break
+          case 83: // S
+            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
+            break
+          case 70: // F
+            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
+            break
+          case 71: // G
+            this.setMenuState(MENU_STATES.INTEL)
+            break
+          case 73: // I
+            this.setMenuState(MENU_STATES.INBOX)
+            break
+          case 67: // C
+            this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
+            break
+          case 86: // V
+            this.setMenuState(MENU_STATES.RULER)
+            break
+          case 78: // N
+            this.setMenuState(MENU_STATES.GAME_NOTES)
+            break
+        }
+      }
+
+      // Handle keyboard shortcuts for any user type.
       switch (e.keyCode || e.which) {
         case 187: // +
           GameContainer.zoomIn()
@@ -273,35 +312,11 @@ export default {
         case 189: // -
           GameContainer.zoomOut()
           break
-        case 82: // R
-          this.setMenuState(MENU_STATES.RESEARCH)
-          break
-        case 83: // S
-          this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
-          break
-        case 70: // F
-          this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
-          break
-        case 71: // G
-          this.setMenuState(MENU_STATES.INTEL)
-          break
         case 76: // L
           this.setMenuState(MENU_STATES.LEADERBOARD)
           break
         case 79: // O
           this.setMenuState(MENU_STATES.OPTIONS)
-          break
-        case 73: // I
-          this.setMenuState(MENU_STATES.INBOX)
-          break
-        case 67: // C
-          this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
-          break
-        case 86: // V
-          this.setMenuState(MENU_STATES.RULER)
-          break
-        case 78: // N
-          this.setMenuState(MENU_STATES.GAME_NOTES)
           break
       }
     }
