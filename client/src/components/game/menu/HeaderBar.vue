@@ -65,8 +65,8 @@
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)"><i class="fas fa-book-open mr-2"></i>Notes</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
                 </div>
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
                 <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
                 <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
             </div>
@@ -292,9 +292,6 @@ export default {
           case 73: // I
             this.setMenuState(MENU_STATES.INBOX)
             break
-          case 67: // C
-            this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
-            break
           case 86: // V
             this.setMenuState(MENU_STATES.RULER)
             break
@@ -314,6 +311,9 @@ export default {
           break
         case 76: // L
           this.setMenuState(MENU_STATES.LEADERBOARD)
+          break
+        case 67: // C
+          this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
           break
         case 79: // O
           this.setMenuState(MENU_STATES.OPTIONS)
