@@ -110,7 +110,7 @@ class TextureService {
       this._loadSpecialistTexture('habitat-dome')
       this._loadSpecialistTexture('techno-heart')
       this._loadSpecialistTexture('missile-pod')
-      this._loadSpecialistTexture('power-generator')
+      this._loadSpecialistTexture('space-suit')
     }
 
     getPlanetTexture (x, y) {

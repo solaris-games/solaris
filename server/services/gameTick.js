@@ -545,6 +545,18 @@ module.exports = class GameTickService extends EventEmitter {
         let starDefenderDefeated = star && !Math.floor(star.garrisonActual) && !defenderCarriers.length;
 
         if (starDefenderDefeated) {
+            // TODO: move all this into the star service. captureStar()?
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+            // If the star had a specialist that destroys infrastructure then perform demolition.
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.destroyInfrastructureOnLoss) {
+                star.specialistId = null;
+                star.infrastructure.economy = 0;
+                star.infrastructure.industry = 0;
+                star.infrastructure.science = 0;
+                star.warpGate = false;
+            }
+
             let closestPlayerId = attackerCarriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].ownedByPlayerId;
 
             // Capture the star.

@@ -428,6 +428,8 @@ class GameHelper {
           return 'missile-pod'
         case 8:
           return 'power-generator'
+        case 9:
+          return 'space-suit'
       }
     }
   }
