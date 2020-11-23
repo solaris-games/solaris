@@ -1,14 +1,20 @@
 <template>
 <div class="table-responsive">
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover mb-1">
         <thead>
             <tr class="bg-primary">
                 <td>Delay</td>
                 <td>Destination</td>
-                <td v-if="!showAction">ETA</td>
-                <td v-if="showAction">Action</td>
-                <td class="text-right" v-if="!carrier.isGift">
-                  <a href="javascript:;" @click="toggleShowAction">Show {{showAction ? 'ETA' : 'Action'}}</a>
+                <td v-if="!showAction">
+                  <a href="javascript:;" @click="toggleShowAction">ETA</a>
+                </td>
+                <td v-if="showAction">
+                  <a href="javascript:;" @click="toggleShowAction">Action</a>
+                </td>
+                <td class="text-right" v-if="!carrier.isGift" @click="onEditWaypointsRequested">
+                  <a href="javascript:;">
+                    <i class="fas fa-pencil-alt"></i>
+                  </a>
                 </td>
             </tr>
         </thead>
@@ -44,6 +50,9 @@ export default {
     },
     onEditWaypointRequested (e) {
       this.$emit('onEditWaypointRequested', e)
+    },
+    onEditWaypointsRequested (e) {
+      this.$emit('onEditWaypointsRequested', e)
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)
