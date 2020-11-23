@@ -116,6 +116,12 @@ export default new Vuex.Store({
         star.naturalResources = reportStar.naturalResources
         star.terraformedResources = reportStar.terraformedResources
         star.warpGate = reportStar.warpGate
+
+        // There may be new upgrade costs on the star, update them but do not
+        // replace any upgrade costs that are already present.
+        if (reportStar.upgradeCosts) {
+          star.upgradeCosts = reportStar.upgradeCosts
+        }
       }
 
       // Reload all stars as they may have had changes, i.e carriers may have launched etc.

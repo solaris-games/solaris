@@ -144,7 +144,7 @@ module.exports = class GameGalaxyService {
 
             if (isOwnedByCurrentPlayer) {
                 // Calculate infrastructure upgrades for the star.
-                this._setUpgradeCosts(doc, s);
+                this.starUpgradeService.setUpgradeCosts(doc, s);
                 
                 if (s.specialistId) {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
@@ -297,23 +297,6 @@ module.exports = class GameGalaxyService {
 
     _clearPlayerCarriers(doc) {
         doc.galaxy.carriers = [];
-    }
-
-    _setUpgradeCosts(game, star) {
-        const economyExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
-        const industryExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
-        const scienceExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
-        const warpGateExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
-        const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
-
-        // Calculate upgrade costs for the star.
-        star.upgradeCosts = { };
-
-        star.upgradeCosts.economy = this.starUpgradeService.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
-        star.upgradeCosts.industry = this.starUpgradeService.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
-        star.upgradeCosts.science = this.starUpgradeService.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
-        star.upgradeCosts.warpGate = this.starUpgradeService.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
-        star.upgradeCosts.carriers = this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
 };

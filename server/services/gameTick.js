@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(broadcastService, distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService) {
+        specialistService, starUpgradeService) {
         super();
             
         this.broadcastService = broadcastService;
@@ -22,6 +22,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.gameService = gameService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.starUpgradeService = starUpgradeService;
     }
 
     async tick(game) {
@@ -832,10 +833,14 @@ module.exports = class GameTickService extends EventEmitter {
         for (let starId of report.stars) {
             let star = this.starService.getByObjectId(game, starId);
             let terraformedResources = null;
+            let upgradeCosts = null;
 
             if (star.ownedByPlayerId) {
                 let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);    
+                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);   
+                
+                star.terraformedResources = terraformedResources; // Need to set this first before calling setUpgradeCosts
+                upgradeCosts = this.starUpgradeService.setUpgradeCosts(game, star);
             }
 
             // Add everything that could have changed
@@ -847,7 +852,8 @@ module.exports = class GameTickService extends EventEmitter {
                 terraformedResources,
                 garrison: star.garrison,
                 infrastructure: star.infrastructure,
-                specialistId: star.specialistId // TODO: Also need to re-get the specialist but only if it has changed.
+                specialistId: star.specialistId, // TODO: Also need to re-get the specialist but only if it has changed.
+                upgradeCosts
             });
         }
 

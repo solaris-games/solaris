@@ -7,7 +7,7 @@
     <div class="row bg-secondary">
       <div class="col text-center pt-2">
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
-        <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
+        <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getStarOwningPlayer().alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
       </div>
     </div>
@@ -251,13 +251,10 @@ export default {
   data () {
     return {
       audio: null,
-      star: null,
-      starOwningPlayer: null,
       userPlayer: null,
       currentPlayerId: null,
       canBuildWarpGates: false,
       isSpecialistsEnabled: false,
-      canShowSpecialist: false,
       isStandardUIStyle: false,
       isCompactUIStyle: false
     }
@@ -269,15 +266,12 @@ export default {
     this.audio = new AudioService(this.$store)
 
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
-    this.starOwningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
-    this.canShowSpecialist = this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer)
   },
   methods: {
     onCloseRequested (e) {
@@ -302,7 +296,7 @@ export default {
       return GameHelper.isGameInProgress(this.$store.state.game)
     },
     onInfrastructureUpgraded (e) {
-      let starOwningPlayer = this.starOwningPlayer
+      let starOwningPlayer = this.getStarOwningPlayer()
 
       starOwningPlayer.credits -= e.data.cost
 
@@ -402,6 +396,12 @@ export default {
     }
   },
   computed: {
+    star: function () {
+      return GameHelper.getStarById(this.$store.state.game, this.starId)
+    },
+    canShowSpecialist: function () {
+      return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer)
+    },
     isOwnedByUserPlayer: function() {
       let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
