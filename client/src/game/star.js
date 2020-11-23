@@ -279,14 +279,15 @@ class Star extends EventEmitter {
       this.text_name.x = this.data.location.x + 5
       this.text_name.resolution = 10
 
-      let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
-      if ( (totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips() ) {
-        this.text_name.y = this.data.location.y
-      } else {
-        this.text_name.y = this.data.location.y - (this.text_name.height / 2)
-      }
-
       this.container.addChild(this.text_name)
+    }
+
+    let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+
+    if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
+      this.text_name.y = this.data.location.y
+    } else {
+      this.text_name.y = this.data.location.y - (this.text_name.height / 2)
     }
   }
 
