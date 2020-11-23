@@ -37,13 +37,15 @@
           </select>
         </div>
       </div>
+
+      <h4 class="pt-2">Map</h4>
       
       <div class="row bg-secondary pt-1 pb-1">
-        <label for="drawPlanets" class="col col-form-label">Draw Planets</label>
+        <label for="naturalResources" class="col col-form-label">Natural Resources</label>
         <div class="col">
-          <select class="form-control" id="drawPlanets" v-model="settings.interface.drawPlanets" :disabled="isSavingSettings">
-            <option value="true">Yes</option>
-            <option value="false">No</option>
+          <select class="form-control" id="naturalResources" v-model="settings.map.naturalResources" :disabled="isSavingSettings">
+            <option value="planets">Planets</option>
+            <option value="single-ring">Single Ring</option>
           </select>
         </div>
       </div>

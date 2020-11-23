@@ -43,12 +43,12 @@ class Star extends EventEmitter {
     return !(typeof this.data.infrastructure === 'undefined')
   }
 
-  setup (data, players, carriers, lightYearDistance, drawPlanetsAtStars) {
+  setup (data, userSettings, players, carriers, lightYearDistance) {
     this.data = data
     this.players = players
     this.carriers = carriers
     this.lightYearDistance = lightYearDistance
-    this.drawPlanetsAtStars = drawPlanetsAtStars
+    this.userSettings = userSettings
     this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
   }
 
@@ -59,8 +59,8 @@ class Star extends EventEmitter {
 
     this.drawStar()
     this.drawSpecialist()
-    // this.drawTerritory()
     this.drawPlanets()
+    this.drawNaturalResourcesRing()
     this.drawColour()
     this.drawScanningRange()
     this.drawHyperspaceRange()
@@ -117,27 +117,13 @@ class Star extends EventEmitter {
     return this.data.specialistId && this.data.specialistId > 0
   }
 
-  drawTerritory () {
-
-    if (!this.graphics_territory) {
-      this.graphics_territory = new PIXI.Graphics()
-      this.container.addChild(this.graphics_territory)
-    }
-
-    this.graphics_territory.clear()
-
-    // Get the player who owns the star.
-    let player = this._getStarPlayer()
-
-    if (!player) { return }
-
-    this.graphics_territory.beginFill(player.colour.value, 0.1)
-    this.graphics_territory.drawCircle(this.data.location.x, this.data.location.y, this.lightYearDistance / 3)
-    this.graphics_territory.endFill()
-  }
-
   drawPlanets () {
-    if (!this.drawPlanetsAtStars) {
+    if (this.userSettings.map.naturalResources !== 'planets') {
+      if (this.container_planets) {
+        this.container.removeChild(this.container_planets)
+        this.container_planets = null
+      }
+
       return
     }
 
@@ -197,6 +183,26 @@ class Star extends EventEmitter {
 
       this.container.addChild(this.container_planets)
     }
+  }
+
+  drawNaturalResourcesRing () {
+    if (this.userSettings.map.naturalResources !== 'single-ring') {
+      if (this.graphics_natural_resources_ring) {
+        this.container.removeChild(this.graphics_natural_resources_ring)
+        this.graphics_natural_resources_ring = null
+      }
+
+      return
+    }
+
+    if (!this.graphics_natural_resources_ring) {
+      this.graphics_natural_resources_ring = new PIXI.Graphics()
+      this.container.addChild(this.graphics_natural_resources_ring)
+    }
+
+    this.graphics_natural_resources_ring.clear()
+    this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
+    this.graphics_natural_resources_ring.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources * 0.75)
   }
 
   _getPlanetsCount () {
@@ -445,6 +451,7 @@ class Star extends EventEmitter {
      this.graphics_colour_warp_arc.visible = false
      this.graphics_colour_warp_cir.visible = false
      this.text_name.visible = false
+     if (this.graphics_natural_resources_ring) this.graphics_natural_resources_ring.visible = false
      if (this.container_planets) this.container_planets.visible = false
      if (this.text_infrastructure) { this.text_infrastructure.visible = false }
      if (this.text_garrison) { this.text_garrison.visible = false }
@@ -480,6 +487,10 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
     this.text_name.visible = this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) 
+
+    if (this.graphics_natural_resources_ring) {
+      this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent < 60
+    }
     
     if (this.container_planets) {
       this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60

@@ -122,7 +122,7 @@ class Map extends EventEmitter {
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
-    star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear, userSettings.interface.drawPlanets)
+    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -181,7 +181,7 @@ class Map extends EventEmitter {
       let starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
-      existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear, userSettings.interface.drawPlanets)
+      existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       existing.draw()
     }
 
