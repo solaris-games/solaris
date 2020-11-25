@@ -200,9 +200,11 @@ class Star extends EventEmitter {
       this.container.addChild(this.graphics_natural_resources_ring)
     }
 
+    let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
+
     this.graphics_natural_resources_ring.clear()
     this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
-    this.graphics_natural_resources_ring.drawCircle(this.data.location.x, this.data.location.y, this.data.naturalResources * 0.75)
+    this.graphics_natural_resources_ring.drawCircle(this.data.location.x, this.data.location.y, ringRadius * 0.75)
   }
 
   _getPlanetsCount () {
