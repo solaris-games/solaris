@@ -85,6 +85,8 @@ export default {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
     async loadMessages () {
+      let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
       this.messages = []
 
       try {
@@ -92,9 +94,19 @@ export default {
         let tradesResponse = await GameApiService.getTradeEvents(this.$store.state.game._id, 0)
 
         if (messagesResponse.status === 200 && tradesResponse.status === 200) {
+          // Filter the trades between only the two players in the conversation.
+          // TODO: This was a quick fix, this should be done server side instead.
+          let tradesBetweenPlayer = tradesResponse.data
+            .filter(t =>
+              (t.playerId === userPlayer._id && t.data.fromPlayerId === this.fromPlayerId) ||
+              (t.playerId === this.fromPlayerId && t.data.fromPlayerId === userPlayer._id) ||
+              (t.playerId === userPlayer._id && t.data.toPlayerId === this.fromPlayerId) ||
+              (t.playerId === this.fromPlayerId && t.data.toPlayerId === userPlayer._id)
+            );
+
           this.messages = [
             ...messagesResponse.data,
-            ...tradesResponse.data
+            ...tradesBetweenPlayer
           ]
         
           this.scrollToEnd()
