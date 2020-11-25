@@ -231,6 +231,22 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+        let startTick = +req.query.startTick || 0;
+        
+        try {
+            let events = await container.eventService.getPlayerTradeEvents(
+                req.game,
+                req.player,
+                startTick
+            );
+
+            return res.status(200).json(events);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

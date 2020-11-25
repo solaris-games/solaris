@@ -8,17 +8,23 @@
 
   <loading-spinner :loading="!messages"/>
 
-  <div v-if="messages">
-    <div class="pt-0 mb-2 mt-2 messages-container" v-if="messages.length">
-        <conversation-message v-for="message in messages"
-            v-bind:key="message._id"
+  <div v-if="sortedMessages">
+    <div class="pt-0 mb-2 mt-2 messages-container" v-if="sortedMessages.length">
+      <div v-for="message in sortedMessages" v-bind:key="message._id">
+        <div v-if="!message.sentDate">
+          <conversation-trade-event :event="message"/>
+        </div>
+
+        <conversation-message 
+            v-if="message.sentDate"
             :sender="getPlayer(message.fromPlayerId)"
             :message="message"
             :colour="getPlayerColour(message.fromPlayerId)"
             class="mb-1"/>
+      </div>
     </div>
 
-    <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
+    <div class="pt-0 mb-2 mt-2" v-if="!sortedMessages.length">
         <p class="mb-0">No messages.</p>
     </div>
 
@@ -30,11 +36,14 @@
 <script>
 import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
+import GameApiService from '../../../services/api/game'
 import MenuTitle from '../MenuTitle'
 import PlayerTitleVue from '../player/PlayerTitle'
 import ComposeMessage from './ComposeMessage'
 import ConversationMessageVue from './ConversationMessage'
+import ConversationTradeEventVue from './ConversationTradeEvent'
 import gameHelper from '../../../services/gameHelper'
+import moment from 'moment'
 
 export default {
   components: {
@@ -42,6 +51,7 @@ export default {
     'menu-title': MenuTitle,
     'compose-message': ComposeMessage,
     'conversation-message': ConversationMessageVue,
+    'conversation-trade-event': ConversationTradeEventVue,
     'player-title': PlayerTitleVue
   },
   props: {
@@ -78,11 +88,15 @@ export default {
       this.messages = []
 
       try {
-        let response = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
+        let messagesResponse = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
+        let tradesResponse = await GameApiService.getTradeEvents(this.$store.state.game._id, 0)
 
-        if (response.status === 200) {
-          this.messages = response.data
-
+        if (messagesResponse.status === 200 && tradesResponse.status === 200) {
+          this.messages = [
+            ...messagesResponse.data,
+            ...tradesResponse.data
+          ]
+        
           this.scrollToEnd()
         }
       } catch (e) {
@@ -106,6 +120,28 @@ export default {
           messagesContainer.scrollTop = messagesContainer.scrollHeight
         }
       }, 100)
+    }
+  },
+  computed: {
+    sortedMessages: function () {
+      if (!this.messages) {
+        return []
+      }
+
+      // Sort messages and trade events together ordered by date ascending.
+      return this.messages.sort((a, b) => {
+        // Text messages will have a "sent date" on them.
+        let aMessageSentDate = a.sentDate ? moment(a.sentDate) : null
+        let bMessageSentDate = b.sentDate ? moment(b.sentDate) : null
+        // Trade events will have a "date" on them.
+        let aTradeSentDate = a.date ? moment(a.date) : null
+        let bTradeSentDate = b.date ? moment(b.date) : null
+
+        let aDate = aMessageSentDate || aTradeSentDate
+        let bDate = bMessageSentDate || bTradeSentDate
+
+        return aDate - bDate;
+      });
     }
   }
 }

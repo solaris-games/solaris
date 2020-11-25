@@ -78,6 +78,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
+  getTradeEvents (gameId, startTick = 0) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/events/trade?startTick=' + startTick.toString(),
+      { withCredentials: true })
+  }
+
   confirmReady (gameId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/ready', null,
       { withCredentials: true })
