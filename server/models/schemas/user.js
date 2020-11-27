@@ -81,7 +81,11 @@ const schema = new Schema({
     gameSettings: {
         interface: {
             audio: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
-            galaxyScreenUpgrades: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' }
+            galaxyScreenUpgrades: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+            uiStyle: { type: Types.String, required: false, enum: ['standard', 'compact'], default: 'standard' },
+        },
+        map: {
+            naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },

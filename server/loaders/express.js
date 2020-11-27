@@ -50,7 +50,7 @@ module.exports = async (app, io, container) => {
     
     const limiter = rateLimit({
         windowMs: 1000, // 1 second
-        max: 5 // limit each IP to X requests per windowMs
+        max: 10 // limit each IP to X requests per windowMs
     });
     
     //  apply to all requests

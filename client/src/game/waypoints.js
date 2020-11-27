@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 
@@ -111,7 +111,7 @@ class Waypoints extends EventEmitter {
 
   _highlightLocation (location, opacity) {
     let graphics = new PIXI.Graphics()
-    let radius = 10
+    let radius = 12
 
     graphics.lineStyle(1, 0xFFFFFF, opacity)
     graphics.drawStar(location.x, location.y, radius, radius, radius - 3)
@@ -125,16 +125,6 @@ class Waypoints extends EventEmitter {
     }
 
     this._createWaypoint(e.location, e._id)
-  }
-
-  onCarrierClicked (e) {
-    if (!this.carrier) {
-      return
-    }
-
-    if (e.orbiting) {
-      this._createWaypoint(e.location, e.orbiting)
-    }
   }
 
   _createWaypoint (desiredLocation, starId) {

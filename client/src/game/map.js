@@ -1,5 +1,6 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import gameContainer from './container'
+import Background from './background'
 import Star from './star'
 import Carrier from './carrier'
 import Waypoints from './waypoints'
@@ -30,12 +31,14 @@ class Map extends EventEmitter {
   }
 
   _setupContainers () {
+    this.backgroundContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
 
+    this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
@@ -43,7 +46,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.carrierContainer)
   }
 
-  setup (game) {
+  setup (game, userSettings) {
     this.game = game
     
     // Cleanup events
@@ -59,7 +62,7 @@ class Map extends EventEmitter {
 
     // Add stars
     for (let i = 0; i < game.galaxy.stars.length; i++) {
-      this.setupStar(game, game.galaxy.stars[i])
+      this.setupStar(game, userSettings, game.galaxy.stars[i])
     }
 
     // Add carriers
@@ -98,9 +101,17 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
+
+    // -----------
+    // Setup Background
+    this.background = new Background()
+    this.background.setup(game)
+
+    this.backgroundContainer.addChild(this.background.container)
+    this.background.draw()
   }
 
-  setupStar (game, starData) {
+  setupStar (game, userSettings, starData) {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
@@ -114,7 +125,7 @@ class Map extends EventEmitter {
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
-    star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -169,13 +180,13 @@ class Map extends EventEmitter {
     }
   }
 
-  reloadGame (game) {
+  reloadGame (game, userSettings) {
     // Update all of the stars.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
       let starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
-      existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+      existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       existing.draw()
     }
 
@@ -197,6 +208,16 @@ class Map extends EventEmitter {
     }
   }
 
+
+  _disableCarriersInteractivity() {
+    this.carriers.forEach( c => c.disableInteractivity() )
+  }
+
+  _enableCarriersInteractivity() {
+    this.carriers.forEach( c => c.enableInteractivity() )
+  }
+
+
   setMode (mode, args) {
     this.mode = mode
     this.modeArgs = args
@@ -205,14 +226,18 @@ class Map extends EventEmitter {
       this.unselectAllCarriers()
       this.unselectAllStars()
     }
+    if (this.mode == 'waypoints') {
+      this._disableCarriersInteractivity()
+    }
+    else {
+      this._enableCarriersInteractivity()
+    }
 
     this.draw()
   }
 
   resetMode () {
-    this.mode = 'galaxy'
-
-    this.draw()
+    this.setMode( 'galaxy', this.modeArgs )
   }
 
   drawStars () {
@@ -304,6 +329,7 @@ class Map extends EventEmitter {
     let player = GameHelper.getUserPlayer(game)
 
     if (!player) {
+      this.panToLocation({ x: 0, y: 0 })
       return
     }
 
@@ -312,10 +338,10 @@ class Map extends EventEmitter {
 
   panToStar (star) {
     this.panToLocation(star.location)
+  }
 
-    let zoomPercent = gameContainer.getViewportZoomPercentage()
-
-    this.refreshZoom(zoomPercent)
+  panToCarrier (carrier) {
+    this.panToLocation(carrier.location)
   }
 
   panToLocation (location) {
@@ -326,12 +352,14 @@ class Map extends EventEmitter {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
+    star.isSelected = true
   }
 
   clickCarrier (carrierId) {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
     carrier.onClicked()
+    carrier.isSelected = true
   }
 
   unselectAllStars () {
@@ -431,8 +459,9 @@ class Map extends EventEmitter {
       
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onStarClicked', e)
+      } else {
+        selectedStar.isSelected = false // If multi-select then do not select the star.
       }
-      
     } else if (this.mode === 'waypoints') {
       this.waypoints.onStarClicked(e)
     } else if (this.mode === 'ruler') {
@@ -471,10 +500,9 @@ class Map extends EventEmitter {
       
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
+      } else {
+        selectedCarrier.isSelected = false
       }
-    
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
     }

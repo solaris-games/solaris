@@ -109,6 +109,17 @@
                     "deductEnemyWeapons": 1
                 }
             }
+        },
+        {
+            "id": 10,
+            "name": "Warp Stabilizer",
+            "description": "Warp Scramblers do not affect the carrier.",
+            "tier": 4,
+            "modifiers": {
+                "special": {
+                    "unlockWarpGates": true
+                }
+            }
         }
     ],
     "star": [
@@ -212,6 +223,17 @@
             "modifiers": {
                 "special": {
                     "hideStarGarrison": true
+                }
+            }
+        },
+        {
+            "id": 9,
+            "name": "Demolition Controller",
+            "description": "If the Star is captured, all infrastructure is destroyed.",
+            "tier": 4,
+            "modifiers": {
+                "special": {
+                    "destroyInfrastructureOnLoss": true
                 }
             }
         }

@@ -33,6 +33,9 @@ The client uses the following tech:
 
 *Note: Development work is to be based on the `master` branch, for a new feature or bug fix, create a branch from `master`.*
 
+### Setup Scripts
+See the `scripts/` directory for scripts that will perform the setup automatically.
+
 ### Common Fixes
 - If you're on Windows and you get an error running `npm install` in `server/` complaining about `node-gyp`, try the following command:
     - `npm install --global --production windows-build-tools`

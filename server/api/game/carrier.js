@@ -77,6 +77,8 @@ module.exports = (router, io, container) => {
                 req.body.starId,
                 req.body.starShips);
 
+            res.sendStatus(200);
+
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
@@ -88,8 +90,6 @@ module.exports = (router, io, container) => {
                     req.body.starId, canSeeStarGarrison ? req.body.starShips : null, 
                     req.params.carrierId, canSeeCarrierShips ? req.body.carrierShips : null);
             });
-
-            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -108,6 +108,7 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.params.carrierId);
 
+            // TODO Implement this socket.
             // // Broadcast the event to the current player and also all other players within scanning range.
             // let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 

@@ -1,4 +1,6 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
+import * as Voronoi from 'voronoi'
+import gameHelper from '../services/gameHelper'
 
 class Territories {
   constructor () {
@@ -23,19 +25,73 @@ class Territories {
   }
 
   drawTerritories () {
-    for (let player of this.game.galaxy.players) {
-      let playerStars = this.game.galaxy.stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
+    const maxDistance = 100
 
-      let territoryGraphic = new PIXI.Graphics()
-      territoryGraphic.beginFill(player.colour.value)
+    let voronoi = new Voronoi()
 
-      for (let star of playerStars) {
-        territoryGraphic.drawCircle(star.location.x, star.location.y, this.game.constants.distances.lightYear)
+    let minX = gameHelper.calculateMinStarX(this.game)
+    let minY = gameHelper.calculateMinStarY(this.game)
+    let maxX = gameHelper.calculateMaxStarX(this.game)
+    let maxY = gameHelper.calculateMaxStarY(this.game)
+
+    let boundingBox = {
+      xl: minX - maxDistance,
+      xr: maxX + maxDistance,
+      yt: minY - maxDistance,
+      yb: maxY + maxDistance
+    }
+
+    let sites = this.game.galaxy.stars.map(s => s.location)
+
+    let diagram = voronoi.compute(sites, boundingBox)
+
+    for (let cell of diagram.cells) {
+      let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
+
+      let colour = 0x000000
+
+      if (star.ownedByPlayerId) {
+        colour = this.game.galaxy.players.find(p => p._id === star.ownedByPlayerId).colour.value
       }
 
-      territoryGraphic.endFill()
-      territoryGraphic.cacheAsBitmap = true
+      let points = []
+      
+      for (let halfedge of cell.halfedges) {
+        points.push(halfedge.getStartpoint())
+        points.push(halfedge.getEndpoint())
+      }
 
+      // Do not draw points that are more than X distance away from the star.
+      let sanitizedPoints = []
+
+      for (let point of points) {
+        let distance = gameHelper.getDistanceBetweenLocations(cell.site, point)
+
+        if (distance > maxDistance) {
+          let angle = gameHelper.getAngleBetweenLocations(cell.site, point)
+          let newPoint = gameHelper.getPointFromLocation(cell.site, angle, maxDistance)
+
+          sanitizedPoints.push(newPoint)
+        }
+        else {
+          sanitizedPoints.push(point)
+        }
+      }
+      
+      // Draw the graphic
+      let territoryGraphic = new PIXI.Graphics()
+      territoryGraphic.lineStyle(1, 0xFFFFFF, 1)
+      territoryGraphic.beginFill(colour, 1)
+      territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
+
+      for (let point of sanitizedPoints) {
+        territoryGraphic.lineTo(point.x, point.y)
+      }
+
+      // Draw another line back to the origin.
+      territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
+
+      territoryGraphic.endFill()
       this.container.addChild(territoryGraphic)
     }
   }

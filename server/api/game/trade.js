@@ -30,15 +30,15 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.tradeService.sendCredits(
+            let trade = await container.tradeService.sendCredits(
                 req.game,
                 req.player,
                 req.body.toPlayerId,
                 req.body.amount);
+            
+            res.sendStatus(200);
 
-            container.broadcastService.gamePlayerCreditsReceived(req.game, req.body.toPlayerId, req.body.amount);
-
-            return res.sendStatus(200);
+            container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer.id, trade.toPlayer.id, trade.amount, trade.date);
         } catch (err) {
             return next(err);
         }
@@ -66,7 +66,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.tradeService.sendRenown(
+            let trade = await container.tradeService.sendRenown(
                 req.game,
                 req.player,
                 req.body.toPlayerId,
@@ -75,7 +75,9 @@ module.exports = (router, io, container) => {
             // TODO: Implement receiving renown on the UI, should use a user socket.
             //container.broadcastService.userRenownReceived(req.game, // to user id, req.body.amount);
 
-            return res.sendStatus(200);
+            res.sendStatus(200);
+
+            container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer.id, trade.toPlayer.id, trade.amount, trade.date);
         } catch (err) {
             return next(err);
         }
@@ -93,14 +95,16 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            await container.tradeService.sendTechnology(
+            let trade = await container.tradeService.sendTechnology(
                 req.game,
                 req.player,
                 req.body.toPlayerId,
                 req.body.technology,
                 req.body.level);
 
-            return res.sendStatus(200);
+            res.sendStatus(200);
+
+            container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer.id, trade.toPlayer.id, trade.technology, trade.date);
         } catch (err) {
             return next(err);
         }

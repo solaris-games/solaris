@@ -11,11 +11,11 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.params.fromPlayerId);
 
+            res.status(200).json(result);
+
             let messageIds = result.map(m => m._id);
 
             container.broadcastService.gameMessagesRead(req.game, req.player._id, messageIds);
-
-            return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }
@@ -51,9 +51,9 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.player);
 
-            container.broadcastService.gameMessagesAllRead(req.game, req.player._id);
+            res.sendStatus(200);
 
-            return res.sendStatus(200);
+            container.broadcastService.gameMessagesAllRead(req.game, req.player._id);
         } catch (err) {
             return next(err);
         }
@@ -81,9 +81,9 @@ module.exports = (router, io, container) => {
                 req.body.toPlayerId,
                 req.body.message);
 
-            container.broadcastService.gameMessageSent(req.game, message, req.body.toPlayerId)
+            res.sendStatus(200);
 
-            return res.sendStatus(200);
+            container.broadcastService.gameMessageSent(req.game, message, req.body.toPlayerId);
         } catch (err) {
             return next(err);
         }

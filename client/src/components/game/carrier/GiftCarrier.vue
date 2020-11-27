@@ -35,7 +35,7 @@ export default {
   data () {
     return {
       carrier: null,
-      canHireSpecialist: false,
+      canGiftCarrier: false,
       isGiftingCarrier: false
     }
   },

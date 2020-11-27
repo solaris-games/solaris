@@ -4,7 +4,7 @@
     <view-title title="Main Menu" :hideHomeButton="true"></view-title>
     <div class="row">
       <div class="col-sm-12 col-md-6 col-lg-5">
-        <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
+        <p>A space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-7">

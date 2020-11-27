@@ -115,6 +115,13 @@ export default new Vuex.Store({
         star.infrastructure = reportStar.infrastructure
         star.naturalResources = reportStar.naturalResources
         star.terraformedResources = reportStar.terraformedResources
+        star.warpGate = reportStar.warpGate
+
+        // There may be new upgrade costs on the star, update them but do not
+        // replace any upgrade costs that are already present.
+        if (reportStar.upgradeCosts) {
+          star.upgradeCosts = reportStar.upgradeCosts
+        }
       }
 
       // Reload all stars as they may have had changes, i.e carriers may have launched etc.
@@ -255,22 +262,20 @@ export default new Vuex.Store({
       GameContainer.reloadStar(star)
     },
     gameStarCarrierBuilt (state, data) {
-      let carrier = GameHelper.getCarrierById(state.game, data._id)
+      let carrier = GameHelper.getCarrierById(state.game, data.carrier._id)
 
       if (!carrier) {
         state.game.galaxy.carriers.push(data)
       }
 
-      let star = GameHelper.getStarById(state.game, data.orbiting)
+      let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
 
-      if (star.garrison) {
-        star.garrison -= data.ships
-      }
+      star.garrison = data.starGarrison
 
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
       player.stats.totalCarriers++
 
-      GameContainer.reloadCarrier(data)
+      GameContainer.reloadCarrier(data.carrier)
       GameContainer.reloadStar(star)
     },
     gameStarCarrierShipTransferred (state, data) {
@@ -291,7 +296,6 @@ export default new Vuex.Store({
 
       star.ownedByPlayerId = null
       star.garrison = 0
-      star.garrisonActual = 0
 
       // Redraw and remove carriers
       let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)

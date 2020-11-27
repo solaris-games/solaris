@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 module.exports = class EventService {
 
     EVENT_TYPES = {
@@ -120,7 +122,45 @@ module.exports = class EventService {
             tick: -1, // Sort by tick descending
             _id: -1
         })
+        .lean({ defaults: true })
         .exec();
+    }
+
+    async getPlayerTradeEvents(game, player, startTick = 0) {
+        let tradeEvents = await this.eventModel.find({
+            gameId: game._id,
+            tick: { $gte: startTick },
+            playerId: {
+                $in: [
+                    player._id,
+                    null
+                ]
+            },
+            type: {
+                $in: [
+                    this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT,
+                    this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_CREDITS_SENT,
+                    this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_RENOWN_SENT,
+                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
+                ]
+            }
+        })
+        .sort({
+            tick: -1, // Sort by tick descending
+            _id: -1
+        })
+        .lean({ defaults: true })
+        .exec();
+
+        // Calculate when the event was created.
+        // TODO: Is this more efficient than storing the UTC in the document itself?
+        tradeEvents.forEach(t => {
+            t.date = moment(t._id.getTimestamp())
+        });
+
+        return tradeEvents;
     }
 
     /* GLOBAL EVENTS */

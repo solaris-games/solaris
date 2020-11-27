@@ -99,13 +99,13 @@ module.exports = (router, io, container) => {
                 req.body.avatar,
                 req.body.password);
 
+            res.sendStatus(200);
+
             container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias);
 
             if (gameIsFull) {
                 container.broadcastService.gameStarted(req.game);
             }
-
-            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -116,10 +116,10 @@ module.exports = (router, io, container) => {
             let player = await container.gameService.quit(
                 req.game,
                 req.player);
+
+            res.sendStatus(200);
                 
             container.broadcastService.gamePlayerQuit(req.game, player);
-
-            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -142,10 +142,10 @@ module.exports = (router, io, container) => {
             await container.playerService.declareReady(
                 req.game,
                 req.player);
-                
-            container.broadcastService.gamePlayerReady(req.game, req.player);
+            
+            res.sendStatus(200);
 
-            return res.sendStatus(200);
+            container.broadcastService.gamePlayerReady(req.game, req.player);
         } catch (err) {
             return next(err);
         }
@@ -156,10 +156,35 @@ module.exports = (router, io, container) => {
             await container.playerService.undeclareReady(
                 req.game,
                 req.player);
+
+            res.sendStatus(200);
                 
             container.broadcastService.gamePlayerNotReady(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
-            return res.sendStatus(200);
+    router.get('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let notes = await container.playerService.getGameNotes(
+                req.game,
+                req.player);
+            
+            res.status(200).json({ notes });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.updateGameNotes(
+                req.game,
+                req.player,
+                req.body.notes);
+            
+            res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -195,6 +220,22 @@ module.exports = (router, io, container) => {
         
         try {
             let events = await container.eventService.getPlayerEvents(
+                req.game,
+                req.player,
+                startTick
+            );
+
+            return res.status(200).json(events);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+        let startTick = +req.query.startTick || 0;
+        
+        try {
+            let events = await container.eventService.getPlayerTradeEvents(
                 req.game,
                 req.player,
                 startTick

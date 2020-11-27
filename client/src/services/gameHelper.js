@@ -77,6 +77,17 @@ class GameHelper {
     return Math.sqrt(xs + ys)
   }
 
+  getAngleBetweenLocations (loc1, loc2) {
+    return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x);
+  }
+
+  getPointFromLocation (loc, angle, distance) {
+    return {
+        x: loc.x + (Math.cos(angle) * distance),
+        y: loc.y + (Math.sin(angle) * distance)
+    };
+  }
+
   getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
     let totalTicks = 0
     let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
@@ -349,6 +360,87 @@ class GameHelper {
 
   isNormalAnonymity (game) {
     return game.settings.general.anonymity === 'normal'
+  }
+
+  calculateMinStarX (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
+  }
+
+  calculateMinStarY (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
+  }
+
+  calculateMaxStarX (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
+  }
+
+  calculateMaxStarY (game) {
+    if (!game.galaxy.stars.length) { return 0 }
+
+    return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+
+  getSpecialistName (type, specialistId) {
+    if (type === 'carrier') {
+      switch (specialistId) {
+        case 1:
+          return 'mecha-head'
+        case 2:
+          return 'mecha-mask'
+        case 3:
+          return 'android-mask'
+        case 4:
+          return 'hazmat-suit'
+        case 5:
+          return 'cyborg-face'
+        case 6:
+          return 'lunar-module'
+        case 7:
+          return 'spaceship'
+        case 8:
+          return 'power-generator'
+        case 9:
+          return 'energise'
+        case 10:
+          return 'afterburn'
+      }
+    } else {
+      switch (specialistId) {
+        case 1:
+          return 'sattelite'
+        case 2:
+          return 'airtight-hatch'
+        case 3:
+          return 'cannister'
+        case 4:
+          return 'defense-satellite'
+        case 5:
+          return 'habitat-dome'
+        case 6:
+          return 'techno-heart'
+        case 7:
+          return 'missile-pod'
+        case 8:
+          return 'power-generator'
+        case 9:
+          return 'space-suit'
+      }
+    }
+  }
+
+  getDateString (date) {
+    date = moment(date).utc().toDate()
+
+    let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    let monthOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+    return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
   }
 }
 

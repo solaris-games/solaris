@@ -139,13 +139,13 @@ export default {
   },
   computed: {
     canUpgradeEconomy () {
-      return this.allowUpgrades && this.star.upgradeCosts && !this.isUpgradingEconomy && this.availableCredits >= this.star.upgradeCosts.economy
+      return this.allowUpgrades && this.star.upgradeCosts && !this.isUpgradingEconomy && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.economy
     },
     canUpgradeIndustry () {
-      return this.allowUpgrades && this.star.upgradeCosts && !this.isUpgradingIndustry && this.availableCredits >= this.star.upgradeCosts.industry
+      return this.allowUpgrades && this.star.upgradeCosts && !this.isUpgradingIndustry && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.industry
     },
     canUpgradeScience () {
-      return this.allowUpgrades && this.star.upgradeCosts && !this.isUpgradingScience && this.availableCredits >= this.star.upgradeCosts.science
+      return this.allowUpgrades && this.star.upgradeCosts && !this.isUpgradingScience && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.science
     }
   }
 }

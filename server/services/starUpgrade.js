@@ -136,7 +136,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             carrier
         });
 
-        return carrier;
+        return {
+            carrier,
+            starGarrison: star.garrison
+        };
     }
 
     async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback) {
@@ -323,4 +326,26 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return (expenseConfig * game.constants.star.infrastructureCostMultipliers.carrier) + 5;
     }
 
+    setUpgradeCosts(game, star) {
+        if (star.terraformedResources == null) {
+            throw new Error(`terraformedResources must be set before calling setUpgradeCosts`);
+        }
+        
+        const economyExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
+        const industryExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
+        const scienceExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
+        const warpGateExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
+        const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
+
+        // Calculate upgrade costs for the star.
+        star.upgradeCosts = { };
+
+        star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
+        star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
+        star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
+        star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
+        star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
+
+        return star.upgradeCosts;
+    }
 };

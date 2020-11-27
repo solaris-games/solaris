@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
 
@@ -92,14 +92,15 @@ class Carrier extends EventEmitter {
       this.graphics_ship.endFill()
     }
 
+    this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
+    this.graphics_ship.position.x = this.data.location.x
+    this.graphics_ship.position.y = this.data.location.y
     this.graphics_ship.scale.set(1)
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
-
   }
 
   drawGarrison () {
-
     if (this.text_garrison) {
       this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
@@ -122,20 +123,19 @@ class Carrier extends EventEmitter {
 
       this.container.addChild(this.text_garrison)
     }
-
   }
 
   drawSpecialist () {
-    if (!this.hasSpecialist()) {
+    if (!this.hasSpecialist() || this.data.orbiting) {
       return
     }
     
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, true)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
-    specialistSprite.width = 3.5
-    specialistSprite.height = 3.5
-    specialistSprite.x = -1.75
-    specialistSprite.y = -1.75
+    specialistSprite.width = 6
+    specialistSprite.height = 6
+    specialistSprite.x = -3
+    specialistSprite.y = -3
     
     this.container.addChild(specialistSprite)
   }
@@ -181,18 +181,30 @@ class Carrier extends EventEmitter {
     }
   }
 
-  onTick( deltaTime, zoomPercent, viewportData, constSize ) {
+  enableInteractivity() {
+   this.container.interactive = true
+   this.container.buttonMode = true
+  }
 
+  disableInteractivity() {
+   this.container.interactive = false
+   this.container.buttonMode = false
+  }
+
+  onTick( deltaTime, zoomPercent, viewportData, constSize ) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
 
- 
-   if ( (deltax > viewportData.xradius) || (deltay > viewportData.yradius) ) {
-     this.container.visible = false
+   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
+     //cannot set parent container visibility, since waypoints lines stretch away from carrier location
+     // maybe put waypoints on its own container, since this piece of code should remain as small as possible
+     this.graphics_colour.visible = false
+     this.graphics_ship.visible = false
+     this.text_garrison.visible = false
    } 
    else {
-
-     this.container.visible = true
+     this.graphics_colour.visible = true
+     this.text_garrison.visible = true
      this.updateVisibility()
 
      if(constSize) {
@@ -212,7 +224,6 @@ class Carrier extends EventEmitter {
      }
 
    }
-
   }
 
   onClicked (e) {
@@ -229,7 +240,8 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-    this.text_garrison.visible = !this.data.orbiting && (this.isSelected || this.isMouseOver || this.zoomPercent > 150 )
+    this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
+    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > 150 || (this.isSelected && this.zoomPercent > 150 ) || (this.isMouseOver && this.zoomPercent >150))
   }
 
   deselectAllText () {

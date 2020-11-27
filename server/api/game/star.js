@@ -25,13 +25,13 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
+            res.status(200).json(report);
+
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
             playersWithinScanningRange.forEach(p => 
                 container.broadcastService.gameStarEconomyUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
-
-            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }
@@ -44,13 +44,13 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
+            res.status(200).json(report);
+
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
             playersWithinScanningRange.forEach(p => 
                 container.broadcastService.gameStarIndustryUpgraded(req.game, p._id, req.body.starId, report.infrastructure, report.manufacturing));
-
-            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }
@@ -63,13 +63,13 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
+            res.status(200).json(report);
+
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
             playersWithinScanningRange.forEach(p => 
                 container.broadcastService.gameStarScienceUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
-
-            return res.status(200).json(report);
         } catch (err) {
             return next(err);
         }
@@ -82,6 +82,8 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.infrastructure,
                 +req.body.amount);
+
+            res.status(200).json(summary);
 
             if (summary.upgraded) {
                 // For all of the other players, we'll need to broadcast the summary containing only the stars
@@ -107,8 +109,6 @@ module.exports = (router, io, container) => {
                     container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);
                 });
             }
-
-            return res.status(200).json(summary);
         } catch (err) {
             return next(err);
         }
@@ -121,9 +121,12 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
-            container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId);
+            res.status(200).json(report);
 
-            return res.status(200).json(report);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId));
         } catch (err) {
             return next(err);
         }
@@ -136,9 +139,12 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
-            container.broadcastService.gameStarWarpGateDestroyed(req.game, req.body.starId);
+            res.sendStatus(200);
 
-            return res.sendStatus(200);
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateDestroyed(req.game, req.body.starId));
         } catch (err) {
             return next(err);
         }
@@ -148,19 +154,19 @@ module.exports = (router, io, container) => {
         let ships = +req.body.ships || 1;
 
         try {
-            let carrier = await container.starUpgradeService.buildCarrier(
+            let report = await container.starUpgradeService.buildCarrier(
                 req.game,
                 req.player,
                 req.body.starId,
                 ships);
 
+            res.status(200).json(report);
+
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
             playersWithinScanningRange.forEach(p => 
-                container.broadcastService.gameStarCarrierBuilt(req.game, p._id, carrier));
-
-            return res.status(200).json(carrier);
+                container.broadcastService.gameStarCarrierBuilt(req.game, p._id, report));
         } catch (err) {
             return next(err);
         }
@@ -173,11 +179,11 @@ module.exports = (router, io, container) => {
                 req.player,
                 req.body.starId);
 
+            res.sendStatus(200);
+
             // TODO: Send whether the player who owned the star is in scanning range to all other players.
             
             container.broadcastService.gameStarAbandoned(req.game, req.body.starId);
-
-            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }

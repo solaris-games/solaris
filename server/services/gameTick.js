@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(broadcastService, distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService) {
+        specialistService, starUpgradeService) {
         super();
             
         this.broadcastService = broadcastService;
@@ -22,6 +22,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.gameService = gameService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.starUpgradeService = starUpgradeService;
     }
 
     async tick(game) {
@@ -545,6 +546,18 @@ module.exports = class GameTickService extends EventEmitter {
         let starDefenderDefeated = star && !Math.floor(star.garrisonActual) && !defenderCarriers.length;
 
         if (starDefenderDefeated) {
+            // TODO: move all this into the star service. captureStar()?
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+            // If the star had a specialist that destroys infrastructure then perform demolition.
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.destroyInfrastructureOnLoss) {
+                star.specialistId = null;
+                star.infrastructure.economy = 0;
+                star.infrastructure.industry = 0;
+                star.infrastructure.science = 0;
+                star.warpGate = false;
+            }
+
             let closestPlayerId = attackerCarriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].ownedByPlayerId;
 
             // Capture the star.
@@ -678,6 +691,9 @@ module.exports = class GameTickService extends EventEmitter {
                     player.missedTurns++;
                     player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
                 }
+                else {
+                    player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
+                }
             }
 
             // Check if the player has been AFK.
@@ -686,9 +702,9 @@ module.exports = class GameTickService extends EventEmitter {
             let isAfk = false;
 
             if (this.gameService.isRealTimeGame(game)) {
-                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
             } else if (this.gameService.isTurnBasedGame(game)) {
-                isAfk = player.missedTurns > game.constants.turnBased.playerMissedTurnLimit;
+                isAfk = player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
             }
 
             if (isAfk) {
@@ -817,21 +833,27 @@ module.exports = class GameTickService extends EventEmitter {
         for (let starId of report.stars) {
             let star = this.starService.getByObjectId(game, starId);
             let terraformedResources = null;
+            let upgradeCosts = null;
 
             if (star.ownedByPlayerId) {
                 let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);    
+                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);   
+                
+                star.terraformedResources = terraformedResources; // Need to set this first before calling setUpgradeCosts
+                upgradeCosts = this.starUpgradeService.setUpgradeCosts(game, star);
             }
 
             // Add everything that could have changed
             starsData.push({
                 _id: star._id,
                 ownedByPlayerId: star.ownedByPlayerId,
+                warpGate: star.warpGate,    // The warp gate would not have changed but may go in and out of scanning range.
                 naturalResources: star.naturalResources,
                 terraformedResources,
                 garrison: star.garrison,
                 infrastructure: star.infrastructure,
-                specialistId: star.specialistId // TODO: Also need to re-get the specialist but only if it has changed.
+                specialistId: star.specialistId, // TODO: Also need to re-get the specialist but only if it has changed.
+                upgradeCosts
             });
         }
 
@@ -883,7 +905,8 @@ module.exports = class GameTickService extends EventEmitter {
 
             return {
                 _id: s._id,
-                ownedByPlayerId: s.ownedByPlayerId
+                ownedByPlayerId: s.ownedByPlayerId,
+                warpGate: false // Players cannot see warp gates if they are out of scanning range.
             }
         });
 

@@ -71,7 +71,7 @@ module.exports = (router, io, container) => {
 
     router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
         try {
-            let settings = await container.userService.saveGameSettings(req.session.userId, req.body);
+            await container.userService.saveGameSettings(req.session.userId, req.body);
 
             return res.sendStatus(200);
         } catch (err) {

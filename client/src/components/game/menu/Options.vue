@@ -9,6 +9,16 @@
       <h4 class="pt-2">Interface</h4>
       
       <div class="row bg-secondary pt-1 pb-1">
+        <label for="uiStyle" class="col col-form-label">UI Style (Experimental)</label>
+        <div class="col">
+          <select class="form-control" id="uiStyle" v-model="settings.interface.uiStyle" :disabled="isSavingSettings">
+            <option value="standard">Standard</option>
+            <option value="compact">Compact</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="row bg-secondary pt-1 pb-1">
         <label for="audio" class="col col-form-label">Audio</label>
         <div class="col">
           <select class="form-control" id="audio" v-model="settings.interface.audio" :disabled="isSavingSettings">
@@ -24,6 +34,18 @@
           <select class="form-control" id="galaxyScreenUpgrades" v-model="settings.interface.galaxyScreenUpgrades" :disabled="isSavingSettings">
             <option value="enabled">Allow Upgrades</option>
             <option value="disabled">No Upgrades</option>
+          </select>
+        </div>
+      </div>
+
+      <h4 class="pt-2">Map</h4>
+      
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="naturalResources" class="col col-form-label">Natural Resources</label>
+        <div class="col">
+          <select class="form-control" id="naturalResources" v-model="settings.map.naturalResources" :disabled="isSavingSettings">
+            <option value="planets">Planets</option>
+            <option value="single-ring">Single Ring</option>
           </select>
         </div>
       </div>
@@ -83,6 +105,7 @@ import MenuTitle from '../MenuTitle'
 import LoadingSpinnerVue from '../../LoadingSpinner'
 import FormErrorList from '../../FormErrorList'
 import UserApiService from '../../../services/api/user'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -135,6 +158,8 @@ export default {
           
           this.$store.commit('setSettings', this.settings)
 
+          GameContainer.reloadGame(this.$store.state.game, this.$store.state.settings)
+          
           this.onCloseRequested()
         }
       } catch (err) {

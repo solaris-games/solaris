@@ -1,10 +1,12 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
+import gameHelper from '../services/gameHelper'
 
 class TextureService {
     DEFAULT_FONT_STYLE = null
 
     PLANET_BASE_TEXTURE = null
     PLANET_TEXTURES = []
+    NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
 
     constructor () {
@@ -85,6 +87,12 @@ class TextureService {
       this._loadPlanetTexture(153, 369, 28, 28)
       this._loadPlanetTexture(190, 369, 28, 28)
 
+      // NEBULAS
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1.png'))))
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb2.png'))))
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb3.png'))))
+      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb4.png'))))
+
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')
       this._loadSpecialistTexture('mecha-mask')
@@ -102,7 +110,7 @@ class TextureService {
       this._loadSpecialistTexture('habitat-dome')
       this._loadSpecialistTexture('techno-heart')
       this._loadSpecialistTexture('missile-pod')
-      this._loadSpecialistTexture('power-generator')
+      this._loadSpecialistTexture('space-suit')
     }
 
     getPlanetTexture (x, y) {
@@ -128,47 +136,9 @@ class TextureService {
     }
 
     getSpecialistTexture(specialistId, isCarrier) {
-      if (isCarrier) {
-        switch (specialistId) {
-          case 1:
-            return this.SPECIALIST_TEXTURES['mecha-head']
-          case 2:
-            return this.SPECIALIST_TEXTURES['mecha-mask']
-          case 3:
-            return this.SPECIALIST_TEXTURES['android-mask']
-          case 4:
-            return this.SPECIALIST_TEXTURES['hazmat-suit']
-          case 5:
-            return this.SPECIALIST_TEXTURES['cyborg-face']
-          case 6:
-            return this.SPECIALIST_TEXTURES['lunar-module']
-          case 7:
-            return this.SPECIALIST_TEXTURES['spaceship']
-          case 8:
-            return this.SPECIALIST_TEXTURES['power-generator']
-          case 9:
-            return this.SPECIALIST_TEXTURES['energise']
-        }
-      } else {
-        switch (specialistId) {
-          case 1:
-            return this.SPECIALIST_TEXTURES['sattelite']
-          case 2:
-            return this.SPECIALIST_TEXTURES['airtight-hatch']
-          case 3:
-            return this.SPECIALIST_TEXTURES['cannister']
-          case 4:
-            return this.SPECIALIST_TEXTURES['defense-satellite']
-          case 5:
-            return this.SPECIALIST_TEXTURES['habitat-dome']
-          case 6:
-            return this.SPECIALIST_TEXTURES['techno-heart']
-          case 7:
-            return this.SPECIALIST_TEXTURES['missile-pod']
-          case 8:
-            return this.SPECIALIST_TEXTURES['power-generator']
-        }
-      }
+      let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
+
+      return this.SPECIALIST_TEXTURES[name]
     }
 }
 

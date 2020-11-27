@@ -1,10 +1,13 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
+import gameHelper from '../services/gameHelper'
 
 class GameContainer {
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
+    PIXI.GRAPHICS_CURVES.minSegments = 20 // Smooth arcs
+
     this.frames = 0
     this.dtAccum = 0
   }
@@ -75,13 +78,21 @@ class GameContainer {
     this.viewport.addChild(this.map.container)
   }
 
+  zoomIn () {
+    this.viewport.zoomPercent(0.5, true)
+  }
+
+  zoomOut () {
+    this.viewport.zoomPercent(-0.3, true)
+  }
+
   setupViewport (game) {
     this.game = game
 
-    this.starFieldLeft = this._calculateMinStarX(game) - 1000
-    this.starFieldRight = this._calculateMaxStarX(game) + 1000
-    this.starFieldTop = this._calculateMinStarY(game) - 500
-    this.starFieldBottom = this._calculateMaxStarY(game) + 500
+    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1000
+    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1000
+    this.starFieldTop = gameHelper.calculateMinStarY(game) - 500
+    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 500
 
     // activate plugins
     this.viewport
@@ -109,21 +120,24 @@ class GameContainer {
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
-  setup () {
-    this.map.setup(this.game)
+  setup (game, userSettings) {
+    this.userSettings = userSettings
+    
+    this.map.setup(this.game, userSettings)
   }
 
   draw () {
     this.map.draw()
   }
 
-  reloadGame (game) {
+  reloadGame (game, userSettings) {
     this.game = game
-    this.map.reloadGame(game)
+    this.userSettings = userSettings
+    this.map.reloadGame(game, userSettings)
   }
 
   reloadStar (star) {
-    let starObject = this.map.setupStar(this.game, star)
+    let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)
   }
 
@@ -141,30 +155,6 @@ class GameContainer {
     let viewportPercent = (this.viewport.screenWidth / viewportWidth) * 100
 
     return viewportPercent
-  }
-
-  _calculateMinStarX (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
-  }
-
-  _calculateMinStarY (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
-  }
-
-  _calculateMaxStarX (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
-  }
-
-  _calculateMaxStarY (game) {
-    if (!game.galaxy.stars.length) { return 0 }
-
-    return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
   onTick( deltaTime ) {

@@ -64,66 +64,79 @@ module.exports = class StarService extends EventEmitter {
     listStarsOwnedByPlayer(stars, playerId) {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
-    
-    getStarsWithinScanningRangeOfStar(game, starId) {
-        return this.getStarsWithinScanningRangeOfStarByStars(game, starId, game.galaxy.stars);
+
+    isStarWithinScanningRangeOfStars(game, star, stars) {
+        // Go through all of the stars one by one and calculate
+        // whether any one of them is within scanning range.
+        for (let otherStar of stars) {
+            if (otherStar.ownedByPlayerId == null) {
+                continue;
+            }
+
+            // Use the effective scanning range of the other star to check if it can "see" the given star.
+            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, otherStar);
+            let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
+            let distance = this.starDistanceService.getDistanceBetweenStars(star, otherStar);
+
+            if (distance <= scanningRangeDistance) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    getStarsWithinScanningRangeOfStarByStars(game, starId, stars) {
-        // Get all of the stars owned by the player
-        let star = this.getById(game, starId);
+    filterStarsByScanningRange(game, player) {
+        let starIdsInRange = [];
 
+        // Stars may have different scanning ranges independently so we need to check
+        // each star to check what is within its scanning range.
+        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let starIdsToCheck = game.galaxy.stars.map(s => s._id);
+
+        for (let star of playerStars) {
+            let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star._id, starIdsToCheck);
+
+            for (let starId of starIds) {
+                if (starIdsInRange.indexOf(starId) === -1) {
+                    starIdsInRange.push(starId);
+                    starIdsToCheck.splice(starIdsToCheck.indexOf(starId), 1);
+                }
+            }
+        }
+
+        return starIdsInRange.map(s => this.getByObjectId(game, s));
+    }
+    
+    getStarsWithinScanningRangeOfStarByStarIds(game, starId, starIds) {
+        let star = this.getByObjectId(game, starId);
+
+        // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
             return [];
         }
 
+        // Calculate the scanning distance of the given star.
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
+
+        let stars = starIds.map(s => this.getByObjectId(game, s));
 
         // Go through all stars and find each star that is in scanning range.
         let starsInRange = stars.filter(s => {
             return this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
         });
 
-        return starsInRange;
-    }
-
-    filterStarsByScanningRange(game, player) {
-        // Stars may have different scanning ranges independently so we need to check
-        // each star to check what is within its scanning range.
-        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let starsToCheck = game.galaxy.stars;
-        let starsInRange = [];
-
-        for (let star of playerStars) {
-            let stars = this.getStarsWithinScanningRangeOfStar(game, star._id, starsToCheck);
-
-            for (let s of stars) {
-                if (starsInRange.indexOf(s) === -1) {
-                    starsInRange.push(s);
-                    //starsToCheck.splice(starsToCheck.indexOf(s), 1); // TODO: Have to instead clone the game.galaxy.stars otherwise this will screw up the game galaxy.
-                }
-            }
-        }
-
-        return starsInRange;
+        return starsInRange.map(s => s._id);
     }
 
     isStarInScanningRangeOfPlayer(game, star, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
         let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let starsToCheck = game.galaxy.stars;
+        let isInScanRange = this.isStarWithinScanningRangeOfStars(game, star, playerStars);
 
-        for (let playerStar of playerStars) {
-            let stars = this.getStarsWithinScanningRangeOfStar(game, playerStar._id, starsToCheck);
-
-            if (stars.indexOf(star) > -1) {
-                return true;
-            }
-        }
-
-        return false;
+        return isInScanRange;
     }
 
     calculateTerraformedResources(naturalResources, terraforming) {
@@ -169,7 +182,7 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
-    canTravelAtWarpSpeed(player, sourceStar, destinationStar) {
+    canTravelAtWarpSpeed(player, carrier, sourceStar, destinationStar) {
         // If both stars have warp gates and they are both owned by players...
         if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
             // If both stars are owned by the player then carriers can always move at warp.
@@ -179,6 +192,16 @@ module.exports = class StarService extends EventEmitter {
 
             // If one of the stars are not owned by the current player then we need to check for
             // warp scramblers.
+
+            // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
+            // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
+            if (carrier.specialistId) {
+                let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+        
+                if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
+                    return true;
+                }
+            }
 
             // If either star has a warp scrambler present then carriers cannot move at warp.
             // Note that we only need to check for scramblers on stars that do not belong to the player.
