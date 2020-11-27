@@ -139,7 +139,7 @@ export default {
 
     this.sockets.subscribe('playerCreditsReceived', (data) => {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
-      player.credits += data
+      player.credits += data.data.credits
     })
   },
   destroyed () {

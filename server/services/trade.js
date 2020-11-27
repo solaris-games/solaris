@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const moment = require('moment');
 const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
@@ -49,19 +50,18 @@ module.exports = class TradeService extends EventEmitter {
         await fromPlayerUser.save();
         await toPlayerUser.save();
 
-        this.emit('onPlayerCreditsReceived', {
+        let eventObject = {
             game,
             fromPlayer,
             toPlayer,
-            amount
-        });
+            amount,
+            date: moment().utc()
+        };
 
-        this.emit('onPlayerCreditsSent', {
-            game,
-            fromPlayer,
-            toPlayer,
-            amount
-        });
+        this.emit('onPlayerCreditsReceived', eventObject);
+        this.emit('onPlayerCreditsSent', eventObject);
+
+        return eventObject;
     }
 
     async sendRenown(game, fromPlayer, toPlayerId, amount) {
@@ -102,19 +102,18 @@ module.exports = class TradeService extends EventEmitter {
         await fromUser.save();
         await toUser.save();
 
-        this.emit('onPlayerRenownReceived', {
+        let eventObject = {
             game,
             fromPlayer,
             toPlayer,
-            amount
-        });
+            amount,
+            date: moment().utc()
+        };
 
-        this.emit('onPlayerRenownSent', {
-            game,
-            fromPlayer,
-            toPlayer,
-            amount
-        });
+        this.emit('onPlayerRenownReceived', eventObject);
+        this.emit('onPlayerRenownSent', eventObject);
+
+        return eventObject;
     }
 
     async sendTechnology(game, fromPlayer, toPlayerId, technology, techLevel) {
@@ -165,24 +164,21 @@ module.exports = class TradeService extends EventEmitter {
         await fromUser.save();
         await toUser.save();
 
-        let eventTech = {
-            name: tradeTech.name,
-            level: tradeTech.level
+        let eventObject = {
+            game,
+            fromPlayer,
+            toPlayer,
+            technology: {
+                name: tradeTech.name,
+                level: tradeTech.level
+            },
+            date: moment().utc()
         };
 
-        this.emit('onPlayerTechnologyReceived', {
-            game,
-            fromPlayer,
-            toPlayer,
-            technology: eventTech
-        });
+        this.emit('onPlayerTechnologyReceived', eventObject);
+        this.emit('onPlayerTechnologySent', eventObject);
 
-        this.emit('onPlayerTechnologySent', {
-            game,
-            fromPlayer,
-            toPlayer,
-            technology: eventTech
-        });
+        return eventObject;
     }
 
     getTradeableTechnologies(game, fromPlayer, toPlayerId) {

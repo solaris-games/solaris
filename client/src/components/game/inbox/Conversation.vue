@@ -59,17 +59,26 @@ export default {
   },
   data () {
     return {
-      messages: null
+      messages: null,
+      userPlayer: null
     }
   },
   mounted () {
+    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
     this.loadMessages()
   },
   created () {
     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+    this.sockets.subscribe('playerCreditsReceived', this.onTradeEventReceived)
+    this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
+    this.sockets.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
   },
   destroyed () {
     this.sockets.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('playerRenownReceived')
+    this.sockets.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     onCloseRequested (e) {
@@ -85,24 +94,20 @@ export default {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
     async loadMessages () {
-      let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-
       this.messages = []
 
       try {
-        let messagesResponse = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
-        let tradesResponse = await GameApiService.getTradeEvents(this.$store.state.game._id, 0)
+        let [messagesResponse, tradesResponse] = await Promise.all(
+          [
+            MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId), 
+            GameApiService.getTradeEvents(this.$store.state.game._id, 0)
+          ]
+        );
 
         if (messagesResponse.status === 200 && tradesResponse.status === 200) {
           // Filter the trades between only the two players in the conversation.
           // TODO: This was a quick fix, this should be done server side instead.
-          let tradesBetweenPlayer = tradesResponse.data
-            .filter(t =>
-              (t.playerId === userPlayer._id && t.data.fromPlayerId === this.fromPlayerId) ||
-              (t.playerId === this.fromPlayerId && t.data.fromPlayerId === userPlayer._id) ||
-              (t.playerId === userPlayer._id && t.data.toPlayerId === this.fromPlayerId) ||
-              (t.playerId === this.fromPlayerId && t.data.toPlayerId === userPlayer._id)
-            );
+          let tradesBetweenPlayer = tradesResponse.data.filter(this.isTradeEventBetweenPlayers);
 
           this.messages = [
             ...messagesResponse.data,
@@ -116,12 +121,30 @@ export default {
       }
     },
     onMessageSent (e) {
-      this.loadMessages()
+      this.messages.push(e)
+
+      this.scrollToEnd()
+
+      // this.loadMessages()
     },
     onMessageReceived (e) {
       this.messages.push(e)
 
       this.scrollToEnd()
+    },
+    onTradeEventReceived (e) {
+      console.log(e)
+      if (this.isTradeEventBetweenPlayers(e)) {
+        this.messages.push(e)
+
+        this.scrollToEnd()
+      }
+    },
+    isTradeEventBetweenPlayers (t) {
+      return (t.playerId === this.userPlayer._id && t.data.fromPlayerId === this.fromPlayerId) ||
+        (t.playerId === this.fromPlayerId && t.data.fromPlayerId === this.userPlayer._id) ||
+        (t.playerId === this.userPlayer._id && t.data.toPlayerId === this.fromPlayerId) ||
+        (t.playerId === this.fromPlayerId && t.data.toPlayerId === this.userPlayer._id)
     },
     scrollToEnd () {
       // This doesn't seem to work inline, have to wait 100ms so that the UI can update itself
