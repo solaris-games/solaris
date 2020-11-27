@@ -77,7 +77,7 @@ module.exports = (io) => {
     const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService, technologyService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService);
     const starUpgradeService = new StarUpgradeService(starService, carrierService, userService, researchService, technologyService);
-    const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService);
+    const gameGalaxyService = new GameGalaxyService(gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService);
     const historyService = new HistoryService(HistoryModel, playerService);
     const gameTickService = new GameTickService(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService);
     const messageService = new MessageService();
