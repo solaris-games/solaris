@@ -4,7 +4,7 @@
             <h5 v-if="!carrier.specialist" class="pt-1 text-danger">None Assigned</h5>
             <h5 v-if="carrier.specialist" class="pt-1 text-warning">{{carrier.specialist.name}}</h5>
         </div>
-        <div v-if="canHireSpecialist" class="col-auto">
+        <div v-if="canHireSpecialist && !isGameFinished" class="col-auto">
             <button class="btn btn-sm btn-success" @click="onViewHireCarrierSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">
@@ -42,6 +42,11 @@ export default {
   methods: {
     onViewHireCarrierSpecialistRequested() {
         this.$emit('onViewHireCarrierSpecialistRequested', this.carrierId)
+    }
+  },
+  computed: {
+    isGameFinished: function () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

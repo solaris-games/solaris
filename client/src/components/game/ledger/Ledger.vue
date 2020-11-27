@@ -28,8 +28,8 @@
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                         <!-- <modalButton :disabled="ledger.debt <= 0" modalName="forgiveDebtModal" classText="btn btn-info">Forgive Debt</modalButton> -->
-                          <button class="btn btn-danger" :disabled="ledger.debt >= 0 || ledger.isSettlingDebt" @click="settleDebt(ledger)" title="Settle Debt"><i class="fas fa-money-check-alt"></i></button>
-                          <button class="btn btn-success ml-1" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt" @click="forgiveDebt(ledger)" title="Forgive Debt"><i class="fas fa-hands-helping"></i></button>
+                          <button class="btn btn-danger" :disabled="ledger.debt >= 0 || ledger.isSettlingDebt || isGameFinished" @click="settleDebt(ledger)" title="Settle Debt"><i class="fas fa-money-check-alt"></i></button>
+                          <button class="btn btn-success ml-1" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt || isGameFinished" @click="forgiveDebt(ledger)" title="Forgive Debt"><i class="fas fa-hands-helping"></i></button>
                       </td>
                   </tr>
               </tbody>
@@ -165,6 +165,11 @@ export default {
       }
       
       return require(`../../../assets/avatars/${player.avatar}.png`)
+    }
+  },
+  computed: {
+    isGameFinished: function () {
+      return gameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

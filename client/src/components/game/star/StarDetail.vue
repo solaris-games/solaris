@@ -49,17 +49,20 @@
 
       <div class="row pb-2" v-if="canShowSpecialist || (star.ownedByPlayerId && star.manufacturing != null)">
         <div class="col">
-          <span v-if="canShowSpecialist && isOwnedByUserPlayer">
+          <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
             <i class="fas fa-user-astronaut mr-1"></i>
             <a href="javascript:;" @click="onViewHireStarSpecialistRequested">
               <span class="ml-2" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
               <span class="ml-2" v-if="!star.specialistId">No Specialist</span>
             </a>
           </span>
-          <span v-if="canShowSpecialist && !isOwnedByUserPlayer">
+          <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
             <i class="fas fa-user-astronaut"></i>
-            <span v-if="!isOwnedByUserPlayer">
+            <span v-if="star.specialist">
               {{star.specialist.name}}
+            </span>
+            <span v-if="!star.specialist">
+              No Specialist
             </span>
           </span>
         </div>
@@ -167,7 +170,7 @@
             <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
           </div>
           <div class="col-4">
-            <modalButton :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
+            <modalButton :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
           </div>
         </div>
 
@@ -176,8 +179,8 @@
             <p class="mb-2">Build a Warp Gate to accelerate carrier movement. <a href="javascript:;">Read More</a>.</p>
           </div>
           <div class="col-4">
-            <modalButton v-if="!star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-            <modalButton v-if="star.warpGate" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
+            <modalButton v-if="!star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+            <modalButton v-if="star.warpGate" :disabled="isGameFinished" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
           </div>
         </div>
 
@@ -402,10 +405,16 @@ export default {
     canShowSpecialist: function () {
       return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer)
     },
+    canHireSpecialist: function () {
+      return this.canShowSpecialist && !GameHelper.isGameFinished(this.$store.state.game)
+    },
     isOwnedByUserPlayer: function() {
       let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
 
       return owner && this.userPlayer && owner == this.userPlayer
+    },
+    isGameFinished: function () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

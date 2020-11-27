@@ -2,13 +2,13 @@
 <div class="container">
   <div class="row mb-2">
     <div class="col">
-      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
         <span v-if="!showAll">Show All Stars</span>
         <span v-if="showAll">Show Your Stars</span>
       </button>
     </div>
     <div class="col-auto">
-      <select class="form-control" v-model="allowUpgrades">
+      <select class="form-control" v-if="!isGameFinished" v-model="allowUpgrades">
         <option :value="true">Enable Upgrades</option>
         <option :value="false">Disable Upgrades</option>
       </select>
@@ -61,7 +61,7 @@ export default {
   mounted () {
     this.tableData = this.getTableData()
 
-    this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled'
+    this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished
   },
   methods: {
     getUserPlayer () {
@@ -115,6 +115,9 @@ export default {
         // Descending
         return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
       })
+    },
+    isGameFinished: function () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

@@ -30,7 +30,7 @@
             </select>
           </div>
           <div class="form-group">
-            <button class="btn btn-success btn-block" @click="upgrade" :disabled="isUpgrading">Upgrade</button>
+            <button class="btn btn-success btn-block" @click="upgrade" :disabled="isUpgrading || gameIsFinished()">Upgrade</button>
           </div>
         </form>
       </div>
@@ -78,6 +78,9 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     },
     async upgrade () {
       if (this.amount <= 0) {
