@@ -37,7 +37,7 @@ class Carrier extends EventEmitter {
     this.drawShip()
     this.drawGarrison()
     this.drawSpecialist()
-    this._drawCarrierWaypoints()
+    this.drawCarrierWaypoints()
   }
 
   drawActive () {
@@ -146,7 +146,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  _drawCarrierWaypoints () {
+  drawCarrierWaypoints () {
     if (!this.graphics_waypoints) {
       this.graphics_waypoints = new PIXI.Graphics()
       this.container.addChild(this.graphics_waypoints)
@@ -158,7 +158,7 @@ class Carrier extends EventEmitter {
     let lineAlpha = this.data.waypointsLooped ? 0.1 : 0.3
 
     this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
-    this.graphics_waypoints.lineStyle(lineWidth, 0xFFFFFF, lineAlpha)
+    this.graphics_waypoints.lineStyle(lineWidth, this.colour, lineAlpha)
 
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]
