@@ -89,11 +89,12 @@ class Star extends EventEmitter {
     let isInScanningRange = this._isInScanningRange()
     let radius = 4
     let alpha = isInScanningRange ? 1 : 0.5
+    let starPoints = 6
 
     this.graphics_star.lineStyle(1, 0xFFFFFF, alpha)
 
     this.graphics_star.beginFill(0xFFFFFF, alpha)
-    this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 3)
+    this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 2)
     this.graphics_star.endFill()
 
 
@@ -212,7 +213,7 @@ class Star extends EventEmitter {
 
     this.graphics_natural_resources_ring.clear()
     this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
-    this.graphics_natural_resources_ring.drawCircle(this.data.location.x, this.data.location.y, ringRadius * 0.75)
+    this.graphics_natural_resources_ring.drawCircle(0, 0, ringRadius * 0.75)
   }
 
   _getPlanetsCount () {
@@ -266,11 +267,11 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_arc.lineStyle(2, player.colour.value)
     this.graphics_colour_warp_cir.lineStyle(2, player.colour.value)
 
-    this.graphics_colour_arc.arc(this.data.location.x, this.data.location.y, 7, 0.785398, -0.785398)
-    this.graphics_colour_cir.drawCircle(this.data.location.x, this.data.location.y, 7)
+    this.graphics_colour_arc.arc(0, 0, 7, 0.785398, -0.785398)
+    this.graphics_colour_cir.drawCircle(0, 0, 7)
     
-    this.graphics_colour_warp_arc.arc(this.data.location.x, this.data.location.y, 10, 0.785398, -0.785398)
-    this.graphics_colour_warp_cir.drawCircle(this.data.location.x, this.data.location.y, 10)
+    this.graphics_colour_warp_arc.arc(0, 0, 10, 0.785398, -0.785398)
+    this.graphics_colour_warp_cir.drawCircle(0, 0, 10)
   }
 
   _hasUnknownShips() {
@@ -286,8 +287,7 @@ class Star extends EventEmitter {
       style.fontSize = 4
 
       this.text_name = new PIXI.Text(this.data.name, style)
-      this.text_name.x =  -(this.text_name.width / 2)
-      this.text_name.y = 7
+      this.text_name.x = 5
       this.text_name.resolution = 10
 
       this.container.addChild(this.text_name)
@@ -296,9 +296,9 @@ class Star extends EventEmitter {
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
     if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
-      this.text_name.y = this.data.location.y
+      this.text_name.y = 0
     } else {
-      this.text_name.y = this.data.location.y - (this.text_name.height / 2)
+      this.text_name.y = - (this.text_name.height / 2)
     }
   }
 
@@ -345,7 +345,7 @@ class Star extends EventEmitter {
         this.text_garrison.resolution = 10
 
         this.text_garrison.x = 5
-        this.text_garrison.y = this.text_garrison.height + 1.5
+        this.text_garrison.y = -this.text_garrison.height + 1.5
 
         this.container.addChild(this.text_garrison)
       }
@@ -511,16 +511,16 @@ class Star extends EventEmitter {
   updateVisibility() {
 
     this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_colour_arc.visible = this.zoomPercent < 200
-    this.graphics_colour_cir.visible = this.zoomPercent >= 200
-    this.graphics_colour_warp_arc.visible = this.zoomPercent < 200 && this.data.warpGate
-    this.graphics_colour_warp_cir.visible = this.zoomPercent >= 200 && this.data.warpGate
+    this.graphics_colour_arc.visible = this.zoomPercent > 200
+    this.graphics_colour_cir.visible = this.zoomPercent <= 200
+    this.graphics_colour_warp_arc.visible = this.zoomPercent > 200 && this.data.warpGate
+    this.graphics_colour_warp_cir.visible = this.zoomPercent <= 200 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
     this.text_name.visible = this.isSelected || this.zoomPercent > 120
 
     if (this.graphics_natural_resources_ring) {
-      this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent < 200
+      this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200
     }
     
     if (this.container_planets) {
