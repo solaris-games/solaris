@@ -23,6 +23,8 @@ class Territories {
 
     this.drawTerritories()
     this.drawPlayerNames()
+
+    this.refreshZoom(this.zoomPercent || 0)
   }
 
   drawPlayerNames () {

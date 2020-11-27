@@ -265,7 +265,7 @@ export default new Vuex.Store({
       let carrier = GameHelper.getCarrierById(state.game, data.carrier._id)
 
       if (!carrier) {
-        state.game.galaxy.carriers.push(data)
+        state.game.galaxy.carriers.push(data.carrier)
       }
 
       let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
