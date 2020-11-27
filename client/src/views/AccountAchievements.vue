@@ -206,6 +206,14 @@
               <td class="text-right">{{ user.achievements.trade.technologyReceived }}</td>
             </tr>
             <tr>
+              <td>Gifts Sent</td>
+              <td class="text-right">{{ user.achievements.trade.giftsSent }}</td>
+            </tr>
+            <tr>
+              <td>Gifts Received</td>
+              <td class="text-right">{{ user.achievements.trade.giftsReceived }}</td>
+            </tr>
+            <tr>
               <td>Renown Sent</td>
               <td class="text-right">{{ user.achievements.trade.renownSent }}</td>
             </tr>

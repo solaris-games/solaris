@@ -3,7 +3,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(distanceService, starService, technologyService, specialistService) {
+    constructor(userService, distanceService, starService, technologyService, specialistService) {
+        this.userService = userService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
@@ -208,15 +209,21 @@ module.exports = class CarrierService {
         carrier.waypoints = [firstWaypoint];
         
         await game.save();
+
+        await this.userService.incrementGiftsSent(player.userId, carrier.ships);
     }
 
-    transferGift(star, carrier) {
+    async transferGift(game, star, carrier) {
         if (!star.ownedByPlayerId) {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
         }
 
         carrier.ownedByPlayerId = star.ownedByPlayerId;
         carrier.isGift = false;
+
+        let player = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
+
+        await this.userService.incrementGiftsReceived(player.userId, carrier.ships);
     }
 
     canPlayerSeeCarrierShips(player, carrier) {
@@ -270,7 +277,7 @@ module.exports = class CarrierService {
             // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
             // Otherwise, perform combat.
             if (carrier.isGift) {
-                this.transferGift(destinationStar, carrier);
+                await this.transferGift(game, destinationStar, carrier);
             } else {
                 report.combatRequiredStar = true;
             }

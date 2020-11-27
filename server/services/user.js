@@ -259,6 +259,8 @@ module.exports = class UserService extends EventEmitter {
         await user.save();
     }
 
+    // TODO: Move all this into an achievements service.
+
     async incrementSpecialistsHired(userId) {
         // TODO: We should this type of update every time we need to
         // increment achievements.
@@ -271,14 +273,22 @@ module.exports = class UserService extends EventEmitter {
         .exec();
     }
 
-    async incrementSpecialistsDestroyed(userId) {
-        // TODO: We should this type of update every time we need to
-        // increment achievements.
+    async incrementGiftsSent(userId, amount) {
         await this.userModel.updateOne({
             _id: userId
         },
         {
-            $inc: { 'achievements.infrastructure.specialistsDestroyed': 1 }
+            $inc: { 'achievements.trade.giftsSent': amount }
+        })
+        .exec();
+    }
+
+    async incrementGiftsReceived(userId, amount) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.trade.giftsReceived': amount }
         })
         .exec();
     }

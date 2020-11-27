@@ -61,6 +61,8 @@ const schema = new Schema({
             creditsReceived: { type: Types.Number, default: 0 },
             technologySent: { type: Types.Number, default: 0 },
             technologyReceived: { type: Types.Number, default: 0 },
+            giftsSent: { type: Types.Number, default: 0 },
+            giftsReceived: { type: Types.Number, default: 0 },
             renownSent: { type: Types.Number, default: 0 },
         },
         badges: {
