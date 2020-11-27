@@ -83,6 +83,14 @@
               <td class="text-right">{{ user.achievements.combat.losses.carriers }}</td>
             </tr>
             <tr>
+              <td>Specialist Kills</td>
+              <td class="text-right">{{ user.achievements.combat.kills.specialists }}</td>
+            </tr>
+            <tr>
+              <td>Specialist Losses</td>
+              <td class="text-right">{{ user.achievements.combat.losses.specialists }}</td>
+            </tr>
+            <tr>
               <td>Stars Captured</td>
               <td class="text-right">{{ user.achievements.combat.stars.captured }}</td>
             </tr>
@@ -122,6 +130,10 @@
             <tr>
               <td>Warp Gates Destroyed</td>
               <td class="text-right">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
+            </tr>
+            <tr>
+              <td>Specialists Hired</td>
+              <td class="text-right">{{ user.achievements.infrastructure.specialistsHired }}</td>
             </tr>
           </tbody>
         </table>

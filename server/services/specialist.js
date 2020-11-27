@@ -16,6 +16,10 @@ const TIER_BASE_COSTS = {
 
 module.exports = class SpecialistService {
 
+    constructor(userService) {
+        this.userService = userService;
+    }
+
     getById(id, type) {
         return specialists[type].find(x => x.id === id);
     }
@@ -135,6 +139,8 @@ module.exports = class SpecialistService {
 
         await game.save();
 
+        await this.userService.incrementSpecialistsHired(player.userId);
+
         // TODO: The carrier may have its waypoint ETAs changed based on the specialist so need to 
         // return the new data.
         // TODO: Need to consider local and global effects and update the UI accordingly.
@@ -172,6 +178,8 @@ module.exports = class SpecialistService {
         player.credits -= cost;
 
         await game.save();
+
+        await this.userService.incrementSpecialistsHired(player.userId);
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.
         // TODO: Need to consider local and global effects and update the UI accordingly.

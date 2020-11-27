@@ -259,4 +259,28 @@ module.exports = class UserService extends EventEmitter {
         await user.save();
     }
 
+    async incrementSpecialistsHired(userId) {
+        // TODO: We should this type of update every time we need to
+        // increment achievements.
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.infrastructure.specialistsHired': 1 }
+        })
+        .exec();
+    }
+
+    async incrementSpecialistsDestroyed(userId) {
+        // TODO: We should this type of update every time we need to
+        // increment achievements.
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.infrastructure.specialistsDestroyed': 1 }
+        })
+        .exec();
+    }
+
 };

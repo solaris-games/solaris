@@ -26,10 +26,12 @@ const schema = new Schema({
             kills: {
                 ships: { type: Types.Number, default: 0 },
                 carriers: { type: Types.Number, default: 0 },
+                specialists: { type: Types.Number, default: 0 },
             },
             losses: {
                 ships: { type: Types.Number, default: 0 },
                 carriers: { type: Types.Number, default: 0 },
+                specialists: { type: Types.Number, default: 0 },
             },
             stars: {
                 captured: { type: Types.Number, default: 0 },
@@ -43,6 +45,7 @@ const schema = new Schema({
             warpGates: { type: Types.Number, default: 0 },
             warpGatesDestroyed: { type: Types.Number, default: 0 },
             carriers: { type: Types.Number, default: 0 },
+            specialistsHired: { type: Types.Number, default: 0 },
         },
         research: {
             scanning: { type: Types.Number, default: 0 },
