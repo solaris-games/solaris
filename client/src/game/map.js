@@ -99,6 +99,7 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
+    this.territories.draw()
 
     // -----------
     // Setup Background
@@ -201,6 +202,9 @@ class Map extends EventEmitter {
 
       existing.draw()
     }
+
+    this.territories.setup(game)
+    this.territories.draw()
   }
 
 
@@ -288,18 +292,6 @@ class Map extends EventEmitter {
 
   clearRulerPoints () {
     this.rulerPoints.setup(this.game)
-  }
-  
-  drawTerritories () {
-    if (this.territories) {
-      this.territories.draw()
-    }
-  }
-
-  clearTerritories () {
-    if (this.territories) {
-      this.territories.clear()
-    }
   }
 
   panToPlayer (game, player) {
@@ -582,12 +574,7 @@ class Map extends EventEmitter {
 
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
-
-    if (this.zoomPercent > 100) {
-      this.drawTerritories()
-    } else {
-      this.clearTerritories()
-    }
+    this.territories.refreshZoom(zoomPercent)
   }
 }
 
