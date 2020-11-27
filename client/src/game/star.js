@@ -474,7 +474,7 @@ class Star extends EventEmitter {
 
      let SIZE = 2//pick this from user options
      if(constSize) {
-       let zoomStart = 400
+       let zoomStart = 200
        let scaleStart = zoomStart/100
        if (zoomPercent >= zoomStart) {
          this.container.scale.x = scaleStart*(100/zoomPercent) * SIZE
@@ -519,7 +519,7 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_cir.visible = this.zoomPercent <= 200 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.text_name.visible = this.isSelected || this.zoomPercent > 120
+    this.text_name.visible = this.isSelected || this.zoomPercent > 200
 
     if (this.graphics_natural_resources_ring) {
       this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200
@@ -530,10 +530,10 @@ class Star extends EventEmitter {
     }
 
     if (this.text_infrastructure) { // may not exist for stars out of range
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 150
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 200
     }
     if (this.text_garrison) {
-      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 150)
+      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 200)
     }
   }
 

@@ -209,7 +209,7 @@ class Carrier extends EventEmitter {
 
      let SIZE = 2//pick this from user options
      if(constSize) {
-       let zoomStart = 400
+       let zoomStart = 200
        let scaleStart = zoomStart/100
        if (zoomPercent >= zoomStart) {
          this.container.scale.x = scaleStart*(100/zoomPercent) * SIZE
@@ -243,7 +243,7 @@ class Carrier extends EventEmitter {
 
   updateVisibility() {
     this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > 150 || (this.isSelected && this.zoomPercent > 150 ) || (this.isMouseOver && this.zoomPercent >150))
+    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > 200 || (this.isSelected && this.zoomPercent > 200 ) || (this.isMouseOver && this.zoomPercent >200))
   }
 
   deselectAllText () {
