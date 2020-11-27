@@ -7,7 +7,7 @@
             {{game.settings.general.name}}
         </div>
         <div class="col">
-            <span class="pointer" v-if="gameIsPaused()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Paused</span>
+            <span class="pointer" v-if="gameIsPaused()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText()}}</span>
             <span class="pointer" v-if="gameIsInProgress()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
         </div>
