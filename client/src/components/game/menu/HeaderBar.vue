@@ -33,7 +33,7 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-if="userPlayer && isTurnBasedGame()" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-if="userPlayer && isTurnBasedGame() && !gameIsFinished()" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
@@ -213,6 +213,9 @@ export default {
     },
     gameIsPendingStart () {
       return GameHelper.isGamePendingStart(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     },
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)

@@ -11,8 +11,8 @@
                 <td v-if="showAction">
                   <a href="javascript:;" @click="toggleShowAction">Action</a>
                 </td>
-                <td class="text-right" v-if="!carrier.isGift" @click="onEditWaypointsRequested">
-                  <a href="javascript:;">
+                <td class="text-right">
+                  <a href="javascript:;" v-if="canEditWaypoints" @click="onEditWaypointsRequested">
                     <i class="fas fa-pencil-alt"></i>
                   </a>
                 </td>
@@ -20,6 +20,7 @@
         </thead>
         <tbody>
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
+                        :carrier="carrier"
                         :waypoint="waypoint" :showAction="showAction"
                         :showEdit="!carrier.isGift"
                         @onEditWaypointRequested="onEditWaypointRequested"
@@ -31,6 +32,7 @@
 
 <script>
 import WaypointRow from './WaypointRow'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -56,6 +58,11 @@ export default {
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)
+    }
+  },
+  computed: {
+    canEditWaypoints: function () {
+      return !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

@@ -76,15 +76,15 @@
           </button>
         </div>
         <div class="col-auto">
-          <button class="btn btn-success btn-sm" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-success btn-sm" v-if="canEditWaypoints && carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
             <i class="fas fa-sync"></i>
           </button>
-          <button class="btn btn-danger  btn-sm ml-1" v-if="carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-danger  btn-sm ml-1" v-if="canEditWaypoints && carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Unloop
             <i class="fas fa-map-marker-alt"></i>
           </button>
-          <button class="btn btn-sm btn-success ml-1" @click="editWaypoints()">
+          <button class="btn btn-sm btn-success ml-1" v-if="canEditWaypoints" @click="editWaypoints()">
             Waypoints
             <i class="fas fa-pencil-alt"></i>
           </button>
@@ -372,7 +372,7 @@ export default {
   },
   computed: {
     canGiftCarrier: function () {
-      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' && this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated
+      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' && this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     isUserPlayerCarrier: function () {
       return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id
@@ -381,16 +381,16 @@ export default {
       return this.carrier && !this.userPlayer || this.carrier.ownedByPlayerId != this.userPlayer._id
     },
     canEditWaypoints: function () {
-      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated
+      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canTransferShips: function () {
-      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated
+      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canShowSpecialist: function () {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && this.carrier.orbiting
+      return this.canShowSpecialist && this.carrier.orbiting && !GameHelper.isGameFinished(this.$store.state.game)
     },
     isOwnedByUserPlayer: function () {
       let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
