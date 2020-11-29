@@ -70,7 +70,7 @@ module.exports = class WaypointService {
         carrier.waypointsLooped = looped;
 
         // Update the DB.
-        await this.gameModel.update({
+        await this.gameModel.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {
@@ -115,7 +115,7 @@ module.exports = class WaypointService {
         }
         
         // Update the DB.
-        await this.gameModel.update({
+        await this.gameModel.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {

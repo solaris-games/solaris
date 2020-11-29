@@ -3,8 +3,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(userService, distanceService, starService, technologyService, specialistService) {
-        this.userService = userService;
+    constructor(achievementService, distanceService, starService, technologyService, specialistService) {
+        this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
@@ -210,7 +210,7 @@ module.exports = class CarrierService {
         
         await game.save();
 
-        await this.userService.incrementGiftsSent(player.userId, carrier.ships);
+        await this.achievementService.incrementGiftsSent(player.userId, carrier.ships);
     }
 
     async transferGift(game, star, carrier) {
@@ -223,7 +223,7 @@ module.exports = class CarrierService {
 
         let player = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
 
-        await this.userService.incrementGiftsReceived(player.userId, carrier.ships);
+        await this.achievementService.incrementGiftsReceived(player.userId, carrier.ships);
     }
 
     canPlayerSeeCarrierShips(player, carrier) {

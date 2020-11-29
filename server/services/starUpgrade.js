@@ -3,12 +3,13 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(starService, carrierService, userService, researchService, technologyService) {
+    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService) {
         super();
         
+        this.gameModel = gameModel;
         this.starService = starService;
         this.carrierService = carrierService;
-        this.userService = userService;
+        this.achievementService = achievementService;
         this.researchService = researchService;
         this.technologyService = technologyService;
     }
@@ -43,11 +44,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
         star.warpGate = true;
         player.credits -= cost;
 
-        await game.save();
+        // Update the DB.
+        await this.gameModel.bulkWrite([
+            this._getDeductPlayerCreditsDBWrite(game, player, cost),
+            this._getSetStarWarpGateDBWrite(game, star, true)
+        ]);
 
-        let user = await this.userService.getById(player.userId);
-        user.achievements.infrastructure.warpGates++;
-        await user.save();
+        await this.achievementService.incrementWarpGatesBuilt(player.userId);
 
         this.emit('onPlayerWarpGateBuilt', {
             game,
@@ -74,13 +77,12 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`The star does not have a warp gate to destroy.`);
         }
 
-        star.warpGate = false;
+        // Update the DB.
+        await this.gameModel.bulkWrite([
+            this._getSetStarWarpGateDBWrite(game, star, false)
+        ]);
 
-        await game.save();
-
-        let user = await this.userService.getById(player.userId);
-        user.achievements.infrastructure.warpGatesDestroyed++;
-        await user.save();
+        await this.achievementService.incrementWarpGatesDestroyed(player.userId);
 
         this.emit('onPlayerWarpGateDestroyed', {
             game,
@@ -123,11 +125,36 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // Deduct the cost of the carrier from the player's credits.
         player.credits -= cost;
 
-        await game.save();
+        // Update the DB.
+        await this.gameModel.bulkWrite([
+            this._getDeductPlayerCreditsDBWrite(game, player, cost),
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.stars._id': star._id
+                    },
+                    update: {
+                        'galaxy.stars.$.garrisonActual': star.garrisonActual,
+                        'galaxy.stars.$.garrison': star.garrison
+                    }
+                }
+            },
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id
+                    },
+                    update: {
+                        $push: {
+                            'galaxy.carriers': carrier
+                        }
+                    }
+                }
+            }
+        ]);
 
-        let user = await this.userService.getById(player.userId);
-        user.achievements.infrastructure.carriers++;
-        await user.save();
+        await this.achievementService.incrementCarriersBuilt(player.userId);
 
         this.emit('onPlayerCarrierBuilt', {
             game,
@@ -165,11 +192,62 @@ module.exports = class StarUpgradeService extends EventEmitter {
         star.infrastructure[economyType]++;
         player.credits -= cost;
 
-        await game.save();
+        let dbWrites = [
+            this._getDeductPlayerCreditsDBWrite(game, player, cost)
+        ];
 
-        let user = await this.userService.getById(player.userId);
-        user.achievements.infrastructure[economyType]++;
-        await user.save();
+        switch (economyType) {
+            case 'economy':
+                dbWrites.push({
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            $inc: {
+                                'galaxy.stars.$.infrastructure.economy': 1
+                            }
+                        }
+                    }
+                });
+                break;
+            case 'industry':
+                dbWrites.push({
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            $inc: {
+                                'galaxy.stars.$.infrastructure.industry': 1
+                            }
+                        }
+                    }
+                });
+                break;
+            case 'science':
+                dbWrites.push({
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            $inc: {
+                                'galaxy.stars.$.infrastructure.science': 1
+                            }
+                        }
+                    }
+                });
+                break;
+        }
+
+        // Update the DB.
+        await this.gameModel.bulkWrite(dbWrites);
+
+        await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
 
         let nextCost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
@@ -347,5 +425,35 @@ module.exports = class StarUpgradeService extends EventEmitter {
         star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
 
         return star.upgradeCosts;
+    }
+
+    _getDeductPlayerCreditsDBWrite(game, player, cost) {
+        return {
+            updateOne: {
+                filter: {
+                    _id: game._id,
+                    'galaxy.players._id': player._id
+                },
+                update: {
+                    $inc: {
+                        'galaxy.players.$.credits': -cost
+                    }
+                }
+            }
+        };
+    }
+
+    _getSetStarWarpGateDBWrite(game, star, warpGate) {
+        return {
+            updateOne: {
+                filter: {
+                    _id: game._id,
+                    'galaxy.stars._id': star._id
+                },
+                update: {
+                    'galaxy.stars.$.warpGate': warpGate
+                }
+            }
+        }
     }
 };
