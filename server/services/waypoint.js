@@ -2,7 +2,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(carrierService, starService, distanceService, starDistanceService, technologyService) {
+    constructor(gameModel, carrierService, starService, distanceService, starDistanceService, technologyService) {
+        this.gameModel = gameModel;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
@@ -68,7 +69,16 @@ module.exports = class WaypointService {
 
         carrier.waypointsLooped = looped;
 
-        await game.save();
+        // Update the DB.
+        await this.gameModel.update({
+            _id: game._id,
+            'galaxy.carriers._id': carrier._id
+        }, {
+            $set: {
+                'galaxy.carriers.$.waypoints': waypoints,
+                'galaxy.carriers.$.waypointsLooped': looped,
+            }
+        })
 
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.
@@ -104,9 +114,15 @@ module.exports = class WaypointService {
             }
         }
         
-        carrier.waypointsLooped = loop;
-
-        await game.save();
+        // Update the DB.
+        await this.gameModel.update({
+            _id: game._id,
+            'galaxy.carriers._id': carrier._id
+        }, {
+            $set: {
+                'galaxy.carriers.$.waypointsLooped': loop,
+            }
+        })
     }
 
     canLoop(game, player, carrier) {
