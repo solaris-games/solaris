@@ -22,7 +22,7 @@
                         <span>{{mapObject.data.ships == null ? '???' : mapObject.data.ships}}</span>
                     </td>
                     <td>
-                        <span>{{mapObject.data.name}}</span>
+                        <span><a href="javascript:;" @click="onViewObjectRequested(mapObject)">{{mapObject.data.name}}</a></span>
                     </td>
                     <td class="text-right">
                         <span v-if="mapObject.type === 'carrier' && (userOwnsObject(mapObject) || mapObject.data.waypoints.length)">
@@ -30,12 +30,12 @@
                           <i class="fas fa-sync ml-1" v-if="mapObject.data.waypointsLooped"></i>
                           {{mapObject.data.waypoints.length}}</span>
                     </td>
-                    <td class="text-right" style="width:30%;">
-                        <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
-                        <button type="button" class="btn btn-primary"><i class="fas fa-chevron-down"></i></button>
-                        <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary"><i class="fas fa-rocket"></i></button> -->
-                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
-                        <button type="button" class="btn btn-primary ml-1" @click="onViewObjectRequested(mapObject)">View</button>
+                    <td class="text-right" style="">
+                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject)">
+                        <i class="fas fa-plus"></i> </button>
+                        <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary  ml-1"><i class="fas fa-rocket"></i></button>
+                        <button v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1"><i class="fas fa-chevron-up"></i></button>
+                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 "><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
             </tbody>
