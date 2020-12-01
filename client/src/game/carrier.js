@@ -138,7 +138,13 @@ class Carrier extends EventEmitter {
     // between the carrier's current position and the destination.
     if (this.data.waypoints.length) {
       let waypoint = this.data.waypoints[0]
-      let destination = this.stars.find(s => s.data._id === waypoint.destination).data.location
+      let starDestination = this.stars.find(s => s.data._id === waypoint.destination)
+
+      if (!starDestination) {
+        return
+      }
+
+      let destination = starDestination.data.location
 
       let angle = this.getAngleTowardsLocation(this.data.location, destination)
 
@@ -166,6 +172,10 @@ class Carrier extends EventEmitter {
       // Draw a line to each destination along the waypoints.
       let star = this.stars.find(s => s.data._id === waypoint.destination)
 
+      if (!star) {
+        break
+      }
+      
       this.graphics_waypoints.lineTo(star.data.location.x, star.data.location.y)
     }
   }
@@ -189,11 +199,11 @@ class Carrier extends EventEmitter {
      // maybe put waypoints on its own container, since this piece of code should remain as small as possible
      this.graphics_colour.visible = false
      this.graphics_ship.visible = false
-     this.text_garrison.visible = false
+     if (this.text_garrison) this.text_garrison.visible = false
    } 
    else {
      this.graphics_colour.visible = true
-     this.text_garrison.visible = true
+     if (this.text_garrison) this.text_garrison.visible = true
      this.updateVisibility()
    }
   }
@@ -213,7 +223,10 @@ class Carrier extends EventEmitter {
 
   updateVisibility() {
     this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) || (this.isMouseOver && this.zoomPercent < 60))
+
+    if (this.text_garrison) {
+      this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) || (this.isMouseOver && this.zoomPercent < 60))
+    }
   }
 
   deselectAllText () {
