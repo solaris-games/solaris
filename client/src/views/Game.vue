@@ -201,7 +201,13 @@ export default {
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
 
       // Show a toast only if the user isn't already in the conversation.
-      if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === e.fromPlayerId) {
+      // if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === e.fromPlayerId) {
+      //   return
+      // }
+
+      // TODO: If the player is in a conversation and the message was from another player, then allow
+      // then to open the other conversation.
+      if (this.menuState === MENU_STATES.CONVERSATION) {
         return
       }
 
