@@ -325,19 +325,19 @@ module.exports = class PlayerService extends EventEmitter {
         };
     }
 
-    async updateLastSeen(game, player, persistToDB = false) {
+    updateLastSeen(game, player) {
         player.lastSeen = moment().utc();
+    }
 
-        if (persistToDB) {
-            await this.gameModel.updateOne({
-                _id: game._id,
-                'galaxy.players._id': player._id
-            }, {
-                $set: {
-                    'galaxy.players.$.lastSeen': player.lastSeen
-                }
-            });
-        }
+    async updateLastSeenLean(gameId, userId) {
+        await this.gameModel.updateOne({
+            _id: gameId,
+            'galaxy.players.userId': userId
+        }, {
+            $set: {
+                'galaxy.players.$.lastSeen': moment().utc()
+            }
+        });
     }
 
     givePlayerMoney(game, player) {
