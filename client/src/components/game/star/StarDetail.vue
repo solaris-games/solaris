@@ -88,7 +88,8 @@
           :industry="star.upgradeCosts.industry"
           :science="star.upgradeCosts.science"
           v-on:onInfrastructureUpgraded="onInfrastructureUpgraded"
-          v-on:onEditWaypointsRequested="onEditWaypointsRequested"/>
+          v-on:onEditWaypointsRequested="onEditWaypointsRequested"
+          v-on:onBuildCarrierRequested="onBuildCarrierRequested"/>
       </div>
     </div>
 
@@ -128,7 +129,7 @@
         <div class="col-auto pr-0">
           <specialist-icon :type="'carrier'" :specialist="carrier.specialist"/>
         </div>
-        <div class="col">
+        <div class="col pl-1">
           <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
         </div>
         <div class="col-auto">
@@ -136,7 +137,7 @@
           <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
         </div>
           <div class="col-auto">
-              {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+            <i class="fas fa-rocket"></i> {{carrier.ships == null ? '???' : carrier.ships}}
           </div>
       </div>
     </div>
@@ -170,7 +171,7 @@
             <p class="mb-2">Build a carrier to transport ships through hyperspace. <a href="javascript:;">Read More</a>.</p>
           </div>
           <div class="col-4">
-            <modalButton :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" modalName="buildCarrierModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.carriers}}</modalButton>
+            <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-block btn-primary mb-2" @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
           </div>
         </div>
 
@@ -200,11 +201,6 @@
     </div>
 
     <!-- Modals -->
-
-    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildCarrierModal" titleText="Build Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildCarrier">
-      <p>Are you sure you want build a Carrier at <b>{{star.name}}</b>?</p>
-      <p>The carrier will cost ${{star.upgradeCosts.carriers}}.</p>
-    </dialogModal>
 
     <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
       <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
@@ -323,33 +319,11 @@ export default {
     onEditWaypointsRequested (carrierId) {
       this.$emit('onEditWaypointsRequested', carrierId)
     },
+    onBuildCarrierRequested () {
+      this.$emit('onBuildCarrierRequested', this.star._id)
+    },
     viewOnMap (e) {
       GameContainer.map.panToStar(this.star)
-    },
-    async confirmBuildCarrier (e) {
-      try {
-        // Build the carrier with the entire star garrison.
-        let ships = this.star.garrison
-
-        let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id, ships)
-
-        if (response.status === 200) {
-          this.$toasted.show(`Carrier built at ${this.star.name}.`)
-
-          // this.$emit('onCarrierBuilt', this.star._id)
-          // this.onOpenCarrierDetailRequested(response.data)
-          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
-
-          let star = gameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
-
-          this.onEditWaypointsRequested(response.data.carrier._id)
-          this.userPlayer.credits -= this.star.upgradeCosts.carriers
-
-          this.audio.join()
-        }
-      } catch (err) {
-        console.error(err)
-      }
     },
     async confirmAbandonStar (e) {
       try {

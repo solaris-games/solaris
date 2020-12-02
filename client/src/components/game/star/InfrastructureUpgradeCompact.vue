@@ -22,7 +22,7 @@
               title="Upgrade Science">
         <i class="fas fa-flask"></i> ${{science}}
       </button>
-      <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info mr-1" @click="confirmBuildCarrier">
+      <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info mr-1" @click="onBuildCarrierRequested">
         <i class="fas fa-rocket"></i> ${{star.upgradeCosts.carriers}}
       </button>
     </div>
@@ -71,6 +71,9 @@ export default {
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
   },
   methods: {
+    onBuildCarrierRequested () {
+      this.$emit('onBuildCarrierRequested', this.star._id)
+    },
     async upgradeEconomy (e) {
       try {
         this.isUpgradingEconomy = true
@@ -185,33 +188,6 @@ export default {
           this.$toasted.show(`${this.star.name} has been abandoned.`)
 
           this.audio.leave()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async confirmBuildCarrier (e) {
-      if (!confirm(`Are you sure you want build a Carrier at ${this.star.name}? The carrier will cost ${this.star.upgradeCosts.carriers}.`)) {
-        return
-      }
-
-      try {
-        // Build the carrier with the entire star garrison.
-        let ships = this.star.garrison
-
-        let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id, ships)
-
-        if (response.status === 200) {
-          this.$toasted.show(`Carrier built at ${this.star.name}.`)
-
-          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
-
-          let star = GameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
-
-          this.$emit('onEditWaypointsRequested', response.data.carrier._id)
-          this.userPlayer.credits -= this.star.upgradeCosts.carriers
-
-          this.audio.join()
         }
       } catch (err) {
         console.error(err)

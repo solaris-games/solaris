@@ -1,10 +1,11 @@
 <template>
 	<div class="menu-page container" v-if="carrier">
-    	<menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
+    <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
 			<span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
-    	</menu-title>
+    </menu-title>
 
 		Waypoints:
+    <span v-if="!carrier.waypoints.length" class="text-warning">None</span>
 		<ul class="pl-4 mt-2">
 			<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
 				<!-- <a href="javascript:;" @click="onOpenStarDetailRequested(waypoint.destination)">{{getStarName(waypoint.destination)}}</a> -->
@@ -25,7 +26,7 @@
 
 		<div class="row bg-secondary pt-2 pb-2">
 			<div class="col-12">
-				<p v-if="totalEtaTimeString">ETA: {{totalEtaTimeString}}</p>
+				<p v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
 			</div>
 			<div class="col">
 				<button class="btn btn-danger" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-minus"></i></button>
@@ -33,8 +34,8 @@
 				<button class="btn ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop"><i class="fas fa-sync"></i></button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">Save</button>
-				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">Save &amp; Edit</button>
+				<button class="btn btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
+				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
 			</div>
 		</div>
 	</div>
