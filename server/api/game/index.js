@@ -215,7 +215,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
         let startTick = +req.query.startTick || 0;
         
         try {
@@ -231,7 +231,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
         let startTick = +req.query.startTick || 0;
         
         try {
