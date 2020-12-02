@@ -9,16 +9,16 @@
             <tbody>
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
                     <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
-                    <td v-if="mapObject.type === 'star'" class="col-auto text-center">
+                    <td v-if="mapObject.type === 'star'" class="col-auto text-center" style="width:12.5%">
                         <specialist-icon :type="'star'" :specialist="mapObject.data.specialist" />
                     </td>
-                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center">
+                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center" style="width:12.5%">
                         <specialist-icon :type="'carrier'" :specialist="mapObject.data.specialist" />
                     </td>
-                    <td v-if="mapObject.type === 'star'" class="bg-secondary text-center">
+                    <td v-if="mapObject.type === 'star'" class="bg-secondary text-center" style="width:12.5%">
                         <span>{{mapObject.data.garrison == null ? '???' : mapObject.data.garrison}}</span>
                     </td>
-                    <td v-if="mapObject.type === 'carrier'" class="bg-secondary text-center">
+                    <td v-if="mapObject.type === 'carrier'" class="bg-secondary text-center" style="width:12.5%">
                         <span>{{mapObject.data.ships == null ? '???' : mapObject.data.ships}}</span>
                     </td>
                     <td>
@@ -28,14 +28,15 @@
                         <span v-if="mapObject.type === 'carrier' && (userOwnsObject(mapObject) || mapObject.data.waypoints.length)">
                           <i class="fas fa-map-marker-alt"></i>
                           <i class="fas fa-sync ml-1" v-if="mapObject.data.waypointsLooped"></i>
-                          {{mapObject.data.waypoints.length}}</span>
+                          {{mapObject.data.waypoints.length}}
+                        </span>
                     </td>
-                    <td class="text-right" style="">
-                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject)">
+                    <td v-if="userOwnsObject(mapObject)" class="text-right" style="">
+                        <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
                         <i class="fas fa-plus"></i> </button>
-                        <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary  ml-1"><i class="fas fa-rocket"></i></button>
+                        <button v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary  ml-1" @click="quickBuildCarrier(mapObject)"><i class="fas fa-rocket"></i></button>
                         <button v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1"><i class="fas fa-chevron-up"></i></button>
-                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 "><i class="fas fa-exchange-alt"></i></button>
+                        <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
             </tbody>
@@ -46,9 +47,11 @@
 
 <script>
 import gameHelper from '../../../services/gameHelper'
+import AudioService from '../../../game/audio'
 import gameContainer from '../../../game/container'
 import MenuTitleVue from '../MenuTitle'
 import SpecialistIconVue from '../specialist/SpecialistIcon'
+import starService from '../../../services/api/star'
 
 export default {
   components: {
@@ -58,7 +61,51 @@ export default {
   props: {
     mapObjects: Array
   },
+  data () {
+    return {
+      audio: null,
+      isStandardUIStyle: false,
+      isCompactUIStyle: false
+    }
+  },
+  mounted () {
+    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
+    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+
+    this.audio = new AudioService(this.$store)
+  },
   methods: {
+    hasEnoughCredits(mapObject) {
+      let star = mapObject
+      let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+      let availableCredits = userPlayer.credits
+      return (availableCredits >= star.data.upgradeCosts.carriers)
+    },
+    async quickBuildCarrier (star) {
+      try {
+        // Build the carrier with the entire star garrison.
+        let ships = star.data.garrison
+
+        let response = await starService.buildCarrier(this.$store.state.game._id, star.data._id, ships)
+        if (response.status === 200) {
+          this.$toasted.show(`Carrier built at ${star.data.name}.`)
+
+          // this.$emit('onCarrierBuilt', this.star._id)
+          // this.onOpenCarrierDetailRequested(response.data)
+          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
+
+          gameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
+
+          let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+          userPlayer.credits -= star.data.upgradeCosts.carriers
+          this.onEditWaypointsRequested(response.data.carrier._id)
+          
+          this.audio.join()
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     userOwnsObject (mapObject) {
       let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
 
@@ -110,8 +157,11 @@ export default {
           break
       }
     },
-    onEditWaypointsRequested (mapObject) {
-      this.$emit('onEditWaypointsRequested', mapObject.data._id)
+    onEditWaypointsRequested (carrierID) {
+      this.$emit('onEditWaypointsRequested', carrierID)
+    },
+    onShipTransferRequested (mapObject) {
+      this.$emit('onShipTransferRequested', mapObject.data._id)
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
