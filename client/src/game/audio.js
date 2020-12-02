@@ -13,69 +13,80 @@ import typeFile from '../assets/audio/type.mp3'
 
 // TODO: This service doesn't really belong in the game folder, should be in the services folder instead.
 class AudioService {
-  _play (audioFile) {
+  
+  _play (audio) {
     if (this.store && this.store.state.settings.interface.audio === 'disabled') {
       return
     }
+    audio.play()
+  }
 
-    try {
-      let audio = new Audio(audioFile)
-      audio.play()
-    } catch (err) {
-      console.error(err)
-    }
+  preload() {
+    this.backspaceAudio = new Audio(backspaceFile)
+    this.clickAudio = new Audio(clickFile)
+    this.closeAudio = new Audio(closeFile)
+    this.dialogOpenAudio = new Audio(dialogOpenFile)
+    this.downloadAudio = new Audio(downloadFile)
+    this.hoverAudio = new Audio(hoverFile)
+    this.joinAudio = new Audio(joinFile)
+    this.leaveAudio = new Audio(leaveFile)
+    this.loadingAudio = new Audio(loadingFile)
+    this.openAudio = new Audio(openFile)
+    this.quitAudio = new Audio(quitFile)
+    this.typeAudio = new Audio(typeFile)
   }
 
   loadStore (store) {
     this.store = store
+    this.preload()
   }
 
   backspace () {
-    this._play(backspaceFile)
+    this._play(this.backspaceAudio)
   }
 
   click () {
-    this._play(clickFile)
+    this._play(this.clickAudio)
   }
 
   close () {
-    this._play(closeFile)
+    this._play(this.closeAudio)
   }
 
   dialogOpen () {
-    this._play(dialogOpenFile)
+    this._play(this.dialogOpenAudio)
   }
 
   download () {
-    this._play(downloadFile)
+    this._play(this.downloadAudio)
   }
 
   hover () {
-    this._play(hoverFile)
+    this._play(this.hoverAudio)
   }
 
   join () {
-    this._play(joinFile)
+    this._play(this.joinAudio)
   }
 
   leave () {
-    this._play(leaveFile)
+    this._play(this.leaveAudio)
   }
 
   loading () {
-    this._play(loadingFile)
+    this._play(this.loadingAudio)
   }
 
   open () {
-    this._play(openFile)
+    this._play(this.openAudio)
   }
 
   quit () {
-    this._play(quitFile)
+    this._play(this.quitAudio)
   }
 
   type () {
-    this._play(typeFile)
+    this._play(this.typeAudio)
   }
 }
 
