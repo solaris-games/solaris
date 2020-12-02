@@ -91,9 +91,12 @@
         {
             "id": 8,
             "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships the Carrier has.",
+            "description": "Prevents other players from seeing how many ships the Carrier has. -1 Weapons.",
             "tier": 3,
             "modifiers": {
+                "local": {
+                    "weapons": -1
+                },
                 "special": {
                     "hideCarrierShips": true
                 }
@@ -126,23 +129,22 @@
         {
             "id": 1,
             "name": "Orbital Array",
-            "description": "Grants +1 Scanning Range, -1 Manufacturing to the Star.",
+            "description": "Grants +1 Scanning Range to the Star.",
             "tier": 2,
             "modifiers": {
                 "local": {
-                    "scanning": 1,
-                    "manufacturing": -1
+                    "scanning": 1
                 }
             }
         },
         {
             "id": 2,
             "name": "Space Dock",
-            "description": "Grants +1 Manufacturing, -1 Terraforming to the Star.",
+            "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
             "tier": 2,
             "modifiers": {
                 "local": {
-                    "manufacturing": 1,
+                    "manufacturing": 2,
                     "terraforming": -1
                 }
             }
@@ -150,11 +152,11 @@
         {
             "id": 3,
             "name": "Atmosphere Processor",
-            "description": "Grants +1 Terraforming, -1 Scanning to the Star.",
+            "description": "Grants +2 Terraforming, -1 Scanning to the Star.",
             "tier": 2,
             "modifiers": {
                 "local": {
-                    "terraforming": 1,
+                    "terraforming": 2,
                     "scanning": -1
                 }
             }
@@ -175,9 +177,12 @@
         {
             "id": 5,
             "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent other players from using it.",
+            "description": "Locks the Warp Gate at the Star to prevent other players from using it. Weapons -1.",
             "tier": 3,
             "modifiers": {
+                "local": {
+                    "weapons": -1
+                },
                 "special": {
                     "lockWarpGates": true
                 }
@@ -186,43 +191,44 @@
         {
             "id": 6,
             "name": "World Builder",
-            "description": "Adds 1 to the Star's natural resources every tick, +1 Terraforming, -3 Scanning, -3 Weapons.",
+            "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
             "tier": 4,
             "modifiers": {
                 "special": {
                     "addNaturalResourcesOnTick": 1
                 },
                 "local": {
-                    "terraforming": 1,
                     "scanning": -3,
-                    "weapons": -3
+                    "weapons": -5
                 }
             }
         },
         {
             "id": 7,
             "name": "War Machine",
-            "description": "Deducts 1 from the Star's natural resources every tick, +3 Manufacturing, +1 Weapons, -1 Terraforming. This specialist retires if the star reaches 0 natural resources.",
+            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. This specialist retires if the star reaches 0 natural resources.",
             "tier": 4,
             "modifiers": {
                 "special": {
                     "deductNaturalResourcesOnTick": 1
                 },
                 "local": {
-                    "manufacturing": 3,
-                    "weapons": 1,
-                    "terraforming": -1
+                    "manufacturing": 5,
+                    "weapons": 5
                 }
             }
         },
         {
             "id": 8,
             "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
+            "description": "Prevents other players from seeing how many ships are garrisoned at the Star. -1 Weapons.",
             "tier": 3,
             "modifiers": {
                 "special": {
                     "hideStarGarrison": true
+                },
+                "local": {
+                    "weapons": -1
                 }
             }
         },
