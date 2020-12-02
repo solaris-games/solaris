@@ -42,9 +42,6 @@ export default {
       isUpgradingScience: false
     }
   },
-  mounted () {
-    this.audio = new AudioService(this.$store)
-  },
   methods: {
     async upgradeEconomy (e) {
       try {
@@ -60,7 +57,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -82,7 +79,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -104,7 +101,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)

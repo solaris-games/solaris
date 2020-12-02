@@ -13,12 +13,8 @@ import typeFile from '../assets/audio/type.mp3'
 
 // TODO: This service doesn't really belong in the game folder, should be in the services folder instead.
 class AudioService {
-  constructor (store) {
-    this.store = store
-  }
-
   _play (audioFile) {
-    if (this.store.state.settings.interface.audio === 'disabled') {
+    if (this.store && this.store.state.settings.interface.audio === 'disabled') {
       return
     }
 
@@ -28,6 +24,10 @@ class AudioService {
     } catch (err) {
       console.error(err)
     }
+  }
+
+  loadStore (store) {
+    this.store = store
   }
 
   backspace () {
@@ -79,4 +79,4 @@ class AudioService {
   }
 }
 
-export default AudioService
+export default new AudioService()

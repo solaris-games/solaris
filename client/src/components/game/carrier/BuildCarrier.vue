@@ -93,8 +93,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
     this.starShips = 0
@@ -153,7 +151,7 @@ export default {
                 this.$emit('onEditWaypointsRequested', response.data.carrier._id)
                 GameHelper.getUserPlayer(this.$store.state.game).credits -= this.star.upgradeCosts.carriers
 
-                this.audio.join()
+                AudioService.join()
             }
         } catch (err) {
             console.error(err)

@@ -115,8 +115,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.players = this.$store.state.game.galaxy.players
     this.sortedPlayers = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
 
@@ -172,7 +170,7 @@ export default {
         let response = await gameService.concedeDefeat(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.audio.quit()
+          AudioService.quit()
           this.$toasted.show(`You have conceded defeat, better luck next time.`, { type: 'error' })
           router.push({ name: 'main-menu' })
         }
@@ -185,7 +183,7 @@ export default {
         let response = await gameService.quitGame(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.audio.quit()
+          AudioService.quit()
           this.$toasted.show(`You have quit ${this.$store.state.game.settings.general.name}.`, { type: 'error' })
           router.push({ name: 'main-menu' })
         }

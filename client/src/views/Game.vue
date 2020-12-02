@@ -48,7 +48,7 @@ export default {
     }
   },
   async created () {
-    this.audio = new AudioService(this.$store)
+    AudioService.loadStore(this.$store)
 
     this.$store.commit('clearGame')
 
@@ -57,7 +57,7 @@ export default {
     await this.reloadGame()
     await this.reloadSettings()
 
-    // this.audio.download()
+    // AudioService.download()
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 
@@ -129,7 +129,7 @@ export default {
       this.menuArguments = e
       this.menuState = MENU_STATES.STAR_DETAIL
 
-      this.audio.click()
+      AudioService.click()
     },
     onStarRightClicked (e) {
       let star = GameHelper.getStarById(this.$store.state.game, e)
@@ -139,13 +139,13 @@ export default {
         this.onPlayerSelected(owningPlayer._id)
       }
 
-      this.audio.click()
+      AudioService.click()
     },
     onCarrierClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.CARRIER_DETAIL
 
-      this.audio.click()
+      AudioService.click()
     },
     onCarrierRightClicked (e) {
       let carrier = GameHelper.getCarrierById(this.$store.state.game, e)
@@ -155,13 +155,13 @@ export default {
         this.onPlayerSelected(owningPlayer._id)
       }
 
-      this.audio.click()
+      AudioService.click()
     },
     onObjectsClicked (e) {
       this.menuArguments = e
       this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
 
-      this.audio.open()
+      AudioService.open()
     },
 
     // --------------------
@@ -235,7 +235,7 @@ export default {
         ]
       })
 
-      this.audio.join()
+      AudioService.join()
     },
     onGameStarted (data) {
       this.$store.commit('gameStarted', data)

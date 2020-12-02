@@ -262,8 +262,6 @@ export default {
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
-    this.audio = new AudioService(this.$store)
-
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
@@ -334,7 +332,7 @@ export default {
 
           // this.$emit('onStarAbandoned', this.star._id)
 
-          this.audio.leave()
+          AudioService.leave()
         }
       } catch (err) {
         console.error(err)
@@ -350,7 +348,7 @@ export default {
           // this.$emit('onUpgradedWarpGate', this.star._id)
           GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
 
-          this.audio.join()
+          AudioService.join()
         }
       } catch (err) {
         console.error(err)
@@ -365,7 +363,7 @@ export default {
 
           // this.$emit('onDestroyedWarpGate', this.star._id)
 
-          this.audio.leave()
+          AudioService.leave()
         }
       } catch (err) {
         console.error(err)

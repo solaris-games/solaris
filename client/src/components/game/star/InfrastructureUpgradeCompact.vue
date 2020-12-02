@@ -65,8 +65,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
   },
@@ -88,7 +86,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -110,7 +108,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -132,7 +130,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -153,7 +151,7 @@ export default {
 
           GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
 
-          this.audio.join()
+          AudioService.join()
         }
       } catch (err) {
         console.error(err)
@@ -170,7 +168,7 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
 
-          this.audio.leave()
+          AudioService.leave()
         }
       } catch (err) {
         console.error(err)
@@ -187,7 +185,7 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`${this.star.name} has been abandoned.`)
 
-          this.audio.leave()
+          AudioService.leave()
         }
       } catch (err) {
         console.error(err)
