@@ -102,6 +102,11 @@ class GameService extends BaseApiService {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/notes', { notes },
       { withCredentials: true })
   }
+
+  touchPlayer (gameId) {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/player/touch', {},
+      { withCredentials: true })
+  }
 }
 
 export default new GameService()

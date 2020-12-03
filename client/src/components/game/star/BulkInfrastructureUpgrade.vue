@@ -71,8 +71,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
   },
   methods: {
@@ -101,7 +99,7 @@ export default {
         )
 
         if (response.status === 200) {
-          this.audio.join()
+          AudioService.join()
 
           this.$emit('onBulkInfrastructureUpgraded', {
             type: this.selectedType,

@@ -215,7 +215,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
         let startTick = +req.query.startTick || 0;
         
         try {
@@ -231,7 +231,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
         let startTick = +req.query.startTick || 0;
         
         try {
@@ -246,6 +246,16 @@ module.exports = (router, io, container) => {
             return next(err);
         }
     }, middleware.handleError);
+
+    router.patch('/api/game/:gameId/player/touch', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);    
 
     return router;
 

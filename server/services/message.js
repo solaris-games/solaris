@@ -15,6 +15,10 @@ function filterForConversation(game, fromPlayerId, toPlayerId) {
 
 module.exports = class MessageService {
     
+    constructor(gameModel) {
+        this.gameModel = gameModel;
+    }
+    
     async getConversation(game, toPlayer, fromPlayerId, markAsRead = true) {
         let conversation = filterForConversation(game, fromPlayerId, toPlayer._id);
 
@@ -100,7 +104,13 @@ module.exports = class MessageService {
 
         game.messages.push(newMessage);
 
-        await game.save();
+        await this.gameModel.updateOne({
+            _id: game._id
+        }, {
+            $push: {
+                messages: newMessage
+            }
+        })
 
         return newMessage;
     }

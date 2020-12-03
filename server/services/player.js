@@ -4,9 +4,10 @@ const EventEmitter = require('events');
 
 module.exports = class PlayerService extends EventEmitter {
     
-    constructor(randomService, mapService, starService, carrierService, starDistanceService, technologyService) {
+    constructor(gameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService) {
         super();
         
+        this.gameModel = gameModel;
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
@@ -324,8 +325,19 @@ module.exports = class PlayerService extends EventEmitter {
         };
     }
 
-    updateLastSeen(player) {
+    updateLastSeen(game, player) {
         player.lastSeen = moment().utc();
+    }
+
+    async updateLastSeenLean(gameId, userId) {
+        await this.gameModel.updateOne({
+            _id: gameId,
+            'galaxy.players.userId': userId
+        }, {
+            $set: {
+                'galaxy.players.$.lastSeen': moment().utc()
+            }
+        });
     }
 
     givePlayerMoney(game, player) {

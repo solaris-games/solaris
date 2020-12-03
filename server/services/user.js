@@ -69,18 +69,6 @@ module.exports = class UserService extends EventEmitter {
         });
     }
 
-    async getAchievements(id) {
-        return await this.userModel.findById(id, {
-            // Remove fields we don't want to send back.
-            achievements: 1,
-            username: 1,
-            contributor: 1,
-            developer: 1
-        })
-        .lean({ defaults: true })
-        .exec();
-    }
-
     async getUsernameByEmail(email) {
         email = email.trim();
         email = email.toLowerCase();
@@ -257,40 +245,6 @@ module.exports = class UserService extends EventEmitter {
         user.gameSettings = settings;
 
         await user.save();
-    }
-
-    // TODO: Move all this into an achievements service.
-
-    async incrementSpecialistsHired(userId) {
-        // TODO: We should this type of update every time we need to
-        // increment achievements.
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.specialistsHired': 1 }
-        })
-        .exec();
-    }
-
-    async incrementGiftsSent(userId, amount) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.trade.giftsSent': amount }
-        })
-        .exec();
-    }
-
-    async incrementGiftsReceived(userId, amount) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.trade.giftsReceived': amount }
-        })
-        .exec();
     }
 
 };

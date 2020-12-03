@@ -120,8 +120,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.setupTimer()
@@ -154,7 +152,7 @@ export default {
       this.setupTimer()
 
       this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
-      this.audio.download()
+      AudioService.download()
     },
     setupTimer () {
       this.recalculateTimeRemaining()
