@@ -52,10 +52,8 @@ class Background {
 
         sprite.parallax = this.rng.random()
           
-        // origin must compensate for galaxy not beeing centered 
-        let compensation = sprite.parallax //only works because parallax clamped to [0-1]
-        sprite.originX = sprite.x*compensation
-        sprite.originY = sprite.y*compensation
+        sprite.originX = sprite.x
+        sprite.originY = sprite.y
 
         this.container.addChild(sprite)
     }
