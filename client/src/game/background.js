@@ -48,8 +48,23 @@ class Background {
         let sprite = new PIXI.Sprite(texture)
         sprite.x = star.location.x - 320 // Note: the file isn't loaded at this point so we need to use hard coded width and height
         sprite.y = star.location.y - 320
+        sprite.originX = sprite.x
+        sprite.originY = sprite.y
+        sprite.parallax = Math.random() // TODO: Should this be some kind of set value to ensure consistency between refreshes?
         
         this.container.addChild(sprite)
+    }
+  }
+
+  onTick (deltaTime, viewportData) {
+    let deltax = viewportData.center.x
+    let deltay = viewportData.center.y
+ 
+    for (let i = 0; i < this.container.children.length; i++) {
+      let child = this.container.children[i]
+
+      child.x = child.originX + deltax * child.parallax
+      child.y = child.originY + deltay * child.parallax
     }
   }
 }

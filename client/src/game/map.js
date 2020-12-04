@@ -390,17 +390,16 @@ class Map extends EventEmitter {
       })
   }
 
-  onTick( deltaTime ) {
-
+  onTick(deltaTime) {
     let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
     let viewportHeight = gameContainer.viewport.bottom - gameContainer.viewport.top
     
-    let viewportXRadius = viewportWidth/2.0
-    let viewportYRadius = viewportHeight/2.0
+    let viewportXRadius = viewportWidth / 2.0
+    let viewportYRadius = viewportHeight / 2.0
     
     let viewportCenter = gameContainer.viewport.center
 
-    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth)*100
+    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -411,6 +410,7 @@ class Map extends EventEmitter {
     this.stars.forEach(s => s.onTick(deltaTime, viewportData))
     this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
 
+    this.background.onTick(deltaTime, viewportData)
   }
 
   onViewportPointerDown(e) {

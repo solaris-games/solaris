@@ -44,10 +44,11 @@ class GameContainer {
       resolution: window.devicePixelRatio || 1,
       autoResize: true
     })
-    this.app.ticker.add( this.onTick.bind(this) )
+
+    this.app.ticker.add(this.onTick.bind(this))
 
     if ( process.env.NODE_ENV == 'development') {
-      this.app.ticker.add( this.calcFPS.bind(this) )
+      this.app.ticker.add(this.calcFPS.bind(this))
     }
 
     // create viewport
@@ -154,8 +155,8 @@ class GameContainer {
     return viewportPercent
   }
 
-  onTick( deltaTime ) {
-    this.map.onTick( deltaTime )
+  onTick (deltaTime) {
+    this.map.onTick(deltaTime)
   }
 
   onViewportZoomed (e) {
