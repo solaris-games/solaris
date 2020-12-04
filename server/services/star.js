@@ -107,6 +107,26 @@ module.exports = class StarService extends EventEmitter {
 
         return starIdsInRange.map(s => this.getByObjectId(game, s));
     }
+
+    filterStarsByScanningRangeAndWaypointDestinations(game, player) {
+        // Get all stars within the player's normal scanning vision.
+        let starsInScanningRange = this.filterStarsByScanningRange(game, player);
+
+        // If in dark mode then we need to also include any stars that are 
+        // being travelled to by carriers in transit for the current player.
+        let inTransitStars = game.galaxy.carriers
+            .filter(c => c.ownedByPlayerId.equals(player._id) && !c.orbiting)
+            .map(c => c.waypoints[0].destination)
+            .map(d => this.getByObjectId(game, d));
+
+        for (let transitStar of inTransitStars) {
+            if (starsInScanningRange.indexOf(transitStar) < 0) {
+                starsInScanningRange.push(transitStar);
+            }
+        }
+
+        return starsInScanningRange;
+    }
     
     getStarsWithinScanningRangeOfStarByStarIds(game, starId, starIds) {
         let star = this.getByObjectId(game, starId);

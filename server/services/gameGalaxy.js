@@ -119,7 +119,11 @@ module.exports = class GameGalaxyService {
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
         if (!isFinished && (isDarkMode || (isDarkStart && !doc.state.startDate))) {
-            doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
+            if (isDarkMode) {
+                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, player);
+            } else {
+                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
+            }
         }
 
         // Get all of the player's stars.
@@ -169,11 +173,6 @@ module.exports = class GameGalaxyService {
 
                 return s;
             } else {
-                // Return null if its dark mode
-                if (isDarkMode) {
-                    return null;
-                }
-
                 return {
                     _id: s._id,
                     name: s.name,
@@ -182,9 +181,7 @@ module.exports = class GameGalaxyService {
                     warpGate: false // Hide warp gates outside of scanning range.
                 }
             }
-        })
-        // Filter out nulls because those are the ones that have been excluded by dark mode.
-        .filter(x => x != null);
+        });
     }
         
     _setCarrierInfoDetailed(doc, player) {

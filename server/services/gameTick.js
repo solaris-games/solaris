@@ -327,6 +327,13 @@ module.exports = class GameTickService extends EventEmitter {
         // 4c. Do the rest of the waypoint actions.
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
+
+        this._sanitiseDarkModeCarrierWaypoints(game);
+    }
+
+    _sanitiseDarkModeCarrierWaypoints(game) {
+        game.galaxy.carriers.forEach(c => 
+            this.waypointService.sanitiseDarkModeCarrierWaypoints(game, c));
     }
 
     async _performCombat(game, player, star, carriers, report) {

@@ -321,6 +321,10 @@ module.exports = class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
+    isDarkMode(game) {
+        return game.settings.specialGalaxy.darkGalaxy === 'enabled';
+    }
+    
     async quitAllActiveGames(userId) {
         let allGames = await this.gameModel.find({
             'galaxy.players': {
