@@ -35,7 +35,7 @@
                         <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
                         <i class="fas fa-plus"></i> </button>
                         <button v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary  ml-1" @click="quickBuildCarrier(mapObject)"><i class="fas fa-rocket"></i></button>
-                        <button v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1"><i class="fas fa-chevron-up"></i></button>
+                        <button v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="garrisonAllShips(mapObject)"><i class="fas fa-chevron-up"></i></button>
                         <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
@@ -72,7 +72,6 @@ export default {
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
-    this.audio = new AudioService(this.$store)
   },
   methods: {
     hasEnoughCredits(mapObject) {
@@ -80,6 +79,22 @@ export default {
       let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
       let availableCredits = userPlayer.credits
       return (availableCredits >= star.data.upgradeCosts.carriers)
+    },
+    async garrisonAllShips(star) {
+      try {
+        let response = await starService.garrisonAllShips(this.$store.state.game._id, star.data._id)
+        if (response.status === 200) {
+          this.$toasted.show(`All ships transfered to ${star.data.name}.`)
+          let carriers = response.data.carriersAtStar
+          carriers.forEach( responseCarrier => {
+            let mapObjectCarrier = gameHelper.getCarrierById(responseCarrier._id) 
+            mapObjectCarrier.data.garrison = responseCarrier.garrison
+          })
+          
+        }
+      } catch (err) {
+        console.log(err)
+      }
     },
     async quickBuildCarrier (star) {
       try {
@@ -100,7 +115,7 @@ export default {
           userPlayer.credits -= star.data.upgradeCosts.carriers
           this.onEditWaypointsRequested(response.data.carrier._id)
           
-          this.audio.join()
+          AudioService.join()
         }
       } catch (err) {
         console.error(err)
