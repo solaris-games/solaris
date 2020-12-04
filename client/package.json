@@ -18,6 +18,7 @@
     "pixi-viewport": "^4.11.1",
     "pixi.js-legacy": "^5.3.3",
     "popper.js": "^1.16.1",
+    "random-seed": "^0.3.0",
     "voronoi": "^1.0.0",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.0",
