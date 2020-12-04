@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import TextureService from './texture'
+import * as rng from 'random-seed'
 
 class Background {
   constructor () {
@@ -9,7 +10,7 @@ class Background {
 
   setup (game) {
     this.game = game
-
+    this.rng = rng.create(game._id)
     this.clear()
   }
 
@@ -48,10 +49,14 @@ class Background {
         let sprite = new PIXI.Sprite(texture)
         sprite.x = star.location.x - 320 // Note: the file isn't loaded at this point so we need to use hard coded width and height
         sprite.y = star.location.y - 320
-        sprite.originX = sprite.x
-        sprite.originY = sprite.y
-        sprite.parallax = Math.random() // TODO: Should this be some kind of set value to ensure consistency between refreshes?
-        
+
+        sprite.parallax = this.rng.random()
+          
+        // origin must compensate for galaxy not beeing centered 
+        let compensation = sprite.parallax //only works because parallax clamped to [0-1]
+        sprite.originX = sprite.x*compensation
+        sprite.originY = sprite.y*compensation
+
         this.container.addChild(sprite)
     }
   }
