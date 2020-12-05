@@ -49,6 +49,18 @@
           </select>
         </div>
       </div>
+      
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="nebulaDensity" class="col col-form-label">Nebula Density</label>
+        <div class="col">
+          <select class="form-control" id="nebulaDensity" v-model="settings.map.nebulaDensity" :disabled="isSavingSettings">
+            <option value="none">None</option>
+            <option value="sparse">Sparse</option>
+            <option value="standard">Standard</option>
+            <option value="abundant">Abundant</option>
+          </select>
+        </div>
+      </div>
 
       <h4 class="pt-2">Carriers</h4>
 

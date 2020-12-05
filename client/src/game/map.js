@@ -104,7 +104,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Background
     this.background = new Background()
-    this.background.setup(game)
+    this.background.setup(game, userSettings)
 
     this.backgroundContainer.addChild(this.background.container)
     this.background.draw()
