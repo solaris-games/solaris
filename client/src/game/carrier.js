@@ -160,11 +160,12 @@ class Carrier extends EventEmitter {
 
     this.graphics_waypoints.clear()
 
-    let lineWidth = this.data.waypointsLooped ? 0.5 : 1
-    let lineAlpha = this.data.waypointsLooped ? 0.1 : 0.3
+    let lineWidth = this.data.waypointsLooped ? 1 : 2
+    let lineAlpha = this.data.waypointsLooped ? 0.2 : 0.4
 
     this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
     this.graphics_waypoints.lineStyle(lineWidth, this.colour, lineAlpha)
+    this.graphics_waypoints._lineStyle.cap = PIXI.LINE_CAP.ROUND
 
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]
