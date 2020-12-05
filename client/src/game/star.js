@@ -137,6 +137,9 @@ class Star extends EventEmitter {
         return
       }
 
+      let player = this._getStarPlayer()
+      let playerColour = player ? player.colour.value : 0xFFFFFF
+
       let rotationDirection = this._getPlanetOrbitDirection()
       let rotationSpeedModifier = this._getPlanetOrbitSpeed()
 
@@ -144,23 +147,24 @@ class Star extends EventEmitter {
         let planetContainer = new PIXI.Container()
 
         let distanceToStar = 15 + (5 * i)
-        let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 3 + 1
+        let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
 
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
-        orbitGraphics.drawCircle(this.data.location.x, this.data.location.y, distanceToStar - (planetSize / 2))
+        orbitGraphics.drawCircle(this.data.location.x, this.data.location.y, distanceToStar)
         this.container_planets.addChild(orbitGraphics)
 
-        let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
-
-        let sprite = new PIXI.Sprite(planetTexture)
-        sprite.width = planetSize
-        sprite.height = planetSize
+        let planetGraphics = new PIXI.Graphics()
+        planetGraphics.beginFill(playerColour)
+        planetGraphics.drawCircle(0, 0, planetSize)
+        planetGraphics.endFill()
 
         if (!this._isInScanningRange()) {
-          sprite.alpha = 0.3
+          planetGraphics.alpha = 0.3
         }
+
+        planetContainer.addChild(planetGraphics)
 
         planetContainer.pivot.set(distanceToStar, 0)
         planetContainer.position.x = this.data.location.x
@@ -175,8 +179,6 @@ class Star extends EventEmitter {
             planetContainer.rotation -= rotationSpeed * delta
           }
         })
-
-        planetContainer.addChild(sprite)
 
         this.container_planets.addChild(planetContainer)
       }
