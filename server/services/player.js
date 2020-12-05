@@ -313,7 +313,22 @@ module.exports = class PlayerService extends EventEmitter {
         return playerCarriers.length;
     }
 
+    calculateTotalStarSpecialists(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        return playerStars.filter(s => s.specialistId).length;
+    }
+
+    calculateTotalCarrierSpecialists(player, carriers) {
+        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
+
+        return playerCarriers.filter(c => c.specialistId).length;
+    }
+
     getStats(game, player) {
+        let totalStarSpecialists = this.calculateTotalStarSpecialists(player, game.galaxy.stars);
+        let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(player, game.galaxy.carriers);
+
         return {
             totalStars: this.calculateTotalStars(player, game.galaxy.stars),
             totalCarriers: this.calculateTotalCarriers(player, game.galaxy.carriers),
@@ -321,7 +336,10 @@ module.exports = class PlayerService extends EventEmitter {
             totalEconomy: this.calculateTotalEconomy(player, game.galaxy.stars),
             totalIndustry: this.calculateTotalIndustry(player, game.galaxy.stars),
             totalScience: this.calculateTotalScience(player, game.galaxy.stars),
-            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars)
+            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars),
+            totalStarSpecialists,
+            totalCarrierSpecialists,
+            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
         };
     }
 
