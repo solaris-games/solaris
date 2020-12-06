@@ -472,13 +472,17 @@ class Star extends EventEmitter {
    else {
      this.updateVisibility()
 
-     let SIZE = 2//pick this from user options
+     let SIZE = 1
+     let MIN_SCALE = 2//pick this from user options
+     let MAX_SCALE = 4
      if(constSize) {
-       let zoomStart = 200
-       let scaleStart = zoomStart/100
-       if (zoomPercent >= zoomStart) {
-         this.container.scale.x = scaleStart*(100/zoomPercent) * SIZE
-         this.container.scale.y = scaleStart*(100/zoomPercent) * SIZE
+       let currentScale = zoomPercent/100
+       if (currentScale < MIN_SCALE) {
+         this.container.scale.x = (1/currentScale)*MIN_SCALE
+         this.container.scale.y = (1/currentScale)*MIN_SCALE
+       } else if (currentScale > MAX_SCALE) {
+         this.container.scale.x = (1/currentScale)*MAX_SCALE
+         this.container.scale.y = (1/currentScale)*MAX_SCALE
        }
        else {
          this.container.scale.x = SIZE
