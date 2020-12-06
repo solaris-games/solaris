@@ -30,9 +30,6 @@ export default {
       isSendingMessage: false
     }
   },
-  mounted () {
-    this.audio = new AudioService(this.$store)
-  },
   methods: {
     async send () {
       try {
@@ -41,7 +38,7 @@ export default {
         let response = await MessageApiService.send(this.$store.state.game._id, this.toPlayerId, this.message)
 
         if (response.status === 200) {
-          this.audio.type()
+          AudioService.type()
 
           this.$emit('onMessageSent', {
             fromPlayerId: GameHelper.getUserPlayer(this.$store.state.game)._id,

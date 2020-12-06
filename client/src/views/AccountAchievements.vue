@@ -83,6 +83,14 @@
               <td class="text-right">{{ user.achievements.combat.losses.carriers }}</td>
             </tr>
             <tr>
+              <td>Specialist Kills</td>
+              <td class="text-right">{{ user.achievements.combat.kills.specialists }}</td>
+            </tr>
+            <tr>
+              <td>Specialist Losses</td>
+              <td class="text-right">{{ user.achievements.combat.losses.specialists }}</td>
+            </tr>
+            <tr>
               <td>Stars Captured</td>
               <td class="text-right">{{ user.achievements.combat.stars.captured }}</td>
             </tr>
@@ -122,6 +130,10 @@
             <tr>
               <td>Warp Gates Destroyed</td>
               <td class="text-right">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
+            </tr>
+            <tr>
+              <td>Specialists Hired</td>
+              <td class="text-right">{{ user.achievements.infrastructure.specialistsHired }}</td>
             </tr>
           </tbody>
         </table>
@@ -192,6 +204,14 @@
             <tr>
               <td>Technology Received</td>
               <td class="text-right">{{ user.achievements.trade.technologyReceived }}</td>
+            </tr>
+            <tr>
+              <td>Gifts Sent</td>
+              <td class="text-right">{{ user.achievements.trade.giftsSent }}</td>
+            </tr>
+            <tr>
+              <td>Gifts Received</td>
+              <td class="text-right">{{ user.achievements.trade.giftsReceived }}</td>
             </tr>
             <tr>
               <td>Renown Sent</td>
@@ -632,6 +652,17 @@ export default {
               '#3498DB'
             ],
             label: 'Technology'
+          },
+          {
+            data: [
+              this.user.achievements.trade.giftsSent,
+              this.user.achievements.trade.giftsReceived
+            ],
+            backgroundColor: [
+              '#00bc8c',
+              '#3498DB'
+            ],
+            label: 'Gifts'
           },
           {
             data: [

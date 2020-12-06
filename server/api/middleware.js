@@ -112,22 +112,6 @@ module.exports = (container) => {
 
             req.player = player;
 
-            container.playerService.updateLastSeen(player);
-
-            await req.game.save();
-
-            return next();
-        },
-
-        async loadPlayerLean(req, res, next) {
-            let player = container.playerService.getByUserId(req.game, req.session.userId);
-
-            if (!player) {
-                throw new ValidationError('You are not participating in this game.');
-            }
-
-            req.player = player;
-
             return next();
         },
 

@@ -5,7 +5,7 @@ import gameHelper from '../services/gameHelper'
 class Territories {
   constructor () {
     this.container = new PIXI.Container()
-    this.container.alpha = 0.3
+    this.zoomPercent = 0
   }
 
   setup (game) {
@@ -22,9 +22,59 @@ class Territories {
     this.clear()
 
     this.drawTerritories()
+    this.drawPlayerNames()
+
+    this.refreshZoom(this.zoomPercent || 0)
+  }
+
+  drawPlayerNames () {
+    if (this.playerNamesContainer) {
+      this.container.removeChild(this.playerNamesContainer)
+      this.playerNamesContainer = null
+    }
+
+    this.playerNamesContainer = new PIXI.Container()
+    this.playerNamesContainer.alpha = 0.8
+
+    for (let player of this.game.galaxy.players) {
+      // Get all of the player's stars.
+      let playerStars = gameHelper.getStarsOwnedByPlayer(player, this.game.galaxy.stars)
+
+      if (!playerStars.length) {
+        continue
+      }
+
+      // Work out the center point of all stars
+      let centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
+      let centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
+
+      let style = new PIXI.TextStyle({
+        fontFamily: `'Space Mono', monospace`,
+        fill: 0xFFFFFF,
+        padding: 3,
+        fontSize: 50
+      })
+
+      let text_name = new PIXI.Text(player.alias, style)
+      text_name.x = centerX - (text_name.width / 2)
+      text_name.y = centerY - (text_name.height / 2)
+      text_name.resolution = 10
+
+      this.playerNamesContainer.addChild(text_name)
+    }
+
+    this.container.addChild(this.playerNamesContainer)
   }
 
   drawTerritories () {
+    if (this.voronoiContainer) {
+      this.container.removeChild(this.voronoiContainer)
+      this.voronoiContainer = null
+    }
+
+    this.voronoiContainer = new PIXI.Container()
+    this.voronoiContainer.alpha = 0.3
+
     const maxDistance = 100
 
     let voronoi = new Voronoi()
@@ -92,7 +142,22 @@ class Territories {
       territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
       territoryGraphic.endFill()
-      this.container.addChild(territoryGraphic)
+
+      this.voronoiContainer.addChild(territoryGraphic)
+    }
+
+    this.container.addChild(this.voronoiContainer)
+  }
+
+  refreshZoom (zoomPercent) {
+    this.zoomPercent = zoomPercent
+
+    if (this.voronoiContainer) {
+      this.voronoiContainer.visible = zoomPercent > 100
+    }
+
+    if (this.playerNamesContainer) {
+      this.playerNamesContainer.visible = zoomPercent > 150
     }
   }
 

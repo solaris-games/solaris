@@ -16,6 +16,11 @@ const TIER_BASE_COSTS = {
 
 module.exports = class SpecialistService {
 
+    constructor(gameModel, achievementService) {
+        this.gameModel = gameModel;
+        this.achievementService = achievementService;
+    }
+
     getById(id, type) {
         return specialists[type].find(x => x.id === id);
     }
@@ -133,11 +138,45 @@ module.exports = class SpecialistService {
         carrier.specialistId = specialist.id;
         player.credits -= cost;
 
-        await game.save();
+        // Update the DB.
+        await this.gameModel.bulkWrite([
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': player._id
+                    },
+                    update: {
+                        $inc: {
+                            'galaxy.players.$.credits': -cost
+                        }
+                    }
+                }
+            },
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.carriers._id': carrier._id
+                    },
+                    update: {
+                        'galaxy.carriers.$.specialistId': carrier.specialistId
+                    }
+                }
+            }
+        ]);
+
+        await this.achievementService.incrementSpecialistsHired(player.userId);
 
         // TODO: The carrier may have its waypoint ETAs changed based on the specialist so need to 
         // return the new data.
         // TODO: Need to consider local and global effects and update the UI accordingly.
+
+        return {
+            carrier,
+            specialist,
+            cost
+        };
     }
 
     async hireStarSpecialist(game, player, starId, specialistId) {
@@ -171,10 +210,44 @@ module.exports = class SpecialistService {
         star.specialistId = specialist.id;
         player.credits -= cost;
 
-        await game.save();
+        // Update the DB.
+        await this.gameModel.bulkWrite([
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': player._id
+                    },
+                    update: {
+                        $inc: {
+                            'galaxy.players.$.credits': -cost
+                        }
+                    }
+                }
+            },
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.stars._id': star._id
+                    },
+                    update: {
+                        'galaxy.stars.$.specialistId': star.specialistId
+                    }
+                }
+            }
+        ]);
+
+        await this.achievementService.incrementSpecialistsHired(player.userId);
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.
         // TODO: Need to consider local and global effects and update the UI accordingly.
+
+        return {
+            star,
+            specialist,
+            cost
+        };
     }
     
 };

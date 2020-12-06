@@ -327,6 +327,13 @@ module.exports = class GameTickService extends EventEmitter {
         // 4c. Do the rest of the waypoint actions.
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
+
+        this._sanitiseDarkModeCarrierWaypoints(game);
+    }
+
+    _sanitiseDarkModeCarrierWaypoints(game) {
+        game.galaxy.carriers.forEach(c => 
+            this.waypointService.sanitiseDarkModeCarrierWaypoints(game, c));
     }
 
     async _performCombat(game, player, star, carriers, report) {
@@ -447,8 +454,16 @@ module.exports = class GameTickService extends EventEmitter {
                 attackerCarriers.splice(attackerCarrierIndex, 1);
                 attackerCarrierIndex--;
 
-                if (attackerUser) attackerUser.achievements.combat.losses.carriers++;
-                if (defenderUser) defenderUser.achievements.combat.kills.carriers++;
+                if (attackerUser) {
+                    attackerUser.achievements.combat.losses.carriers++;
+
+                    if (attackerCarrier.specialistId) attackerUser.achievements.combat.losses.specialists++;
+                }
+                if (defenderUser) {
+                    defenderUser.achievements.combat.kills.carriers++;
+
+                    if (attackerCarrier.specialistId) defenderUser.achievements.combat.kills.specialists++;
+                }
             }
 
             attackerCarrierIndex++;
@@ -494,11 +509,19 @@ module.exports = class GameTickService extends EventEmitter {
                     defenderCarriers.splice(defenderCarrierIndex, 1);
                     defenderCarrierIndex--;
 
-                    if (defenderUser) defenderUser.achievements.combat.losses.carriers++;
+                    if (defenderUser) {
+                        defenderUser.achievements.combat.losses.carriers++;
+
+                        if (defenderCarrier.specialistId) defenderUser.achievements.combat.losses.specialists++;
+                    }
 
                     // Add carriers killed to attackers.
                     for (let attackerUser of attackerUsers) {
-                        if (attackerUser) attackerUser.achievements.combat.kills.carriers++;
+                        if (attackerUser) {
+                            attackerUser.achievements.combat.kills.carriers++;
+
+                            if (defenderCarrier.specialistId) attackerUser.achievements.combat.kills.specialists++;
+                        }
                     }
                 }
             } else {
@@ -573,8 +596,13 @@ module.exports = class GameTickService extends EventEmitter {
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
-            if (defenderUser) defenderUser.achievements.combat.stars.lost++;
-            if (newStarUser) newStarUser.achievements.combat.stars.captured++;
+            if (defenderUser) {
+                defenderUser.achievements.combat.stars.lost++;
+            }
+            
+            if (newStarUser) {
+                newStarUser.achievements.combat.stars.captured++;
+            }
 
             this.emit('onStarCaptured', {
                 game,

@@ -101,11 +101,12 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
+    this.territories.draw()
 
     // -----------
     // Setup Background
     this.background = new Background()
-    this.background.setup(game)
+    this.background.setup(game, userSettings)
 
     this.backgroundContainer.addChild(this.background.container)
     this.background.draw()
@@ -206,6 +207,9 @@ class Map extends EventEmitter {
 
       existing.draw()
     }
+
+    this.territories.setup(game)
+    this.territories.draw()
   }
 
 
@@ -294,18 +298,6 @@ class Map extends EventEmitter {
 
   clearRulerPoints () {
     this.rulerPoints.setup(this.game)
-  }
-  
-  drawTerritories () {
-    if (this.territories) {
-      this.territories.draw()
-    }
-  }
-
-  clearTerritories () {
-    if (this.territories) {
-      this.territories.clear()
-    }
   }
 
   panToPlayer (game, player) {
@@ -404,17 +396,16 @@ class Map extends EventEmitter {
       })
   }
 
-  onTick( deltaTime ) {
-
+  onTick(deltaTime) {
     let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
     let viewportHeight = gameContainer.viewport.bottom - gameContainer.viewport.top
     
-    let viewportXRadius = viewportWidth/2.0
-    let viewportYRadius = viewportHeight/2.0
+    let viewportXRadius = viewportWidth / 2.0
+    let viewportYRadius = viewportHeight / 2.0
     
     let viewportCenter = gameContainer.viewport.center
 
-    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth)*100
+    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -427,6 +418,7 @@ class Map extends EventEmitter {
     this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, clampedScalling))
     this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, clampedScalling))
 
+    this.background.onTick(deltaTime, viewportData)
   }
 
   onViewportPointerDown(e) {
@@ -596,6 +588,7 @@ class Map extends EventEmitter {
     } else {
       this.clearTerritories()
     }
+    //this.territories.refreshZoom(zoomPercent)
   }
 }
 

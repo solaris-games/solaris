@@ -2,9 +2,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(mapService, playerService, starService, distanceService, 
+    constructor(gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService) {
+        this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
         this.starService = starService;
@@ -32,8 +33,6 @@ module.exports = class GameGalaxyService {
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
 
-        // TODO: If the game is completed then show everything.
-
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
@@ -53,8 +52,6 @@ module.exports = class GameGalaxyService {
             this._setCarrierInfoDetailed(game, player);
             this._setStarInfoDetailed(game, player);
             this._setPlayerInfoBasic(game, player);
-    
-            // TODO: Scanning galaxy setting, i.e can't see player so show '???' instead.
         }
         
         return game;
@@ -115,13 +112,18 @@ module.exports = class GameGalaxyService {
     }
 
     _setStarInfoDetailed(doc, player) { 
+        const isFinished = this.gameService.isFinished(doc);
         const isDarkStart = this._isDarkStart(doc);
         const isDarkMode = this._isDarkMode(doc);
 
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
-        if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
-            doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
+        if (!isFinished && (isDarkMode || (isDarkStart && !doc.state.startDate))) {
+            if (isDarkMode) {
+                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, player);
+            } else {
+                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
+            }
         }
 
         // Get all of the player's stars.
@@ -154,7 +156,7 @@ module.exports = class GameGalaxyService {
             }
 
             // Get the closest player star to this star.
-            let inRange = this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
+            let inRange = isFinished || this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
 
             // If its in range then its all good, send the star back as is.
             // Otherwise only return a subset of the data.
@@ -171,11 +173,6 @@ module.exports = class GameGalaxyService {
 
                 return s;
             } else {
-                // Return null if its dark mode
-                if (isDarkMode) {
-                    return null;
-                }
-
                 return {
                     _id: s._id,
                     name: s.name,
@@ -184,17 +181,18 @@ module.exports = class GameGalaxyService {
                     warpGate: false // Hide warp gates outside of scanning range.
                 }
             }
-        })
-        // Filter out nulls because those are the ones that have been excluded by dark mode.
-        .filter(x => x != null);
+        });
     }
         
     _setCarrierInfoDetailed(doc, player) {
-        doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, player);
+        // If the game hasn't finished we need to filter and sanitize carriers.
+        if (!this.gameService.isFinished(doc)) {
+            doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, player);
         
-        // Remove all waypoints (except those in transit) for all carriers that do not belong
-        // to the player.
-        doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, player);
+            // Remove all waypoints (except those in transit) for all carriers that do not belong
+            // to the player.
+            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, player);
+        }
 
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers

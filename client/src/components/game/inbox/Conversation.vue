@@ -128,9 +128,11 @@ export default {
       // this.loadMessages()
     },
     onMessageReceived (e) {
-      this.messages.push(e)
+      if (e.fromPlayerId === this.fromPlayerId) {
+        this.messages.push(e)
 
-      this.scrollToEnd()
+        this.scrollToEnd()
+      }
     },
     onTradeEventReceived (e) {
       console.log(e)

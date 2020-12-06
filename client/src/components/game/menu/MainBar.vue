@@ -27,7 +27,8 @@
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
-        @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"/>
+        @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
+        @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
@@ -48,6 +49,11 @@
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
+        :starId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX"
         @onCloseRequested="onCloseRequested"
         @onConversationOpenRequested="onConversationOpenRequested"
@@ -95,6 +101,7 @@ import CarrierDetailVue from '../carrier/CarrierDetail.vue'
 import CarrierWaypointsVue from '../carrier/CarrierWaypoints.vue'
 import CarrierWaypointVue from '../carrier/CarrierWaypoint.vue'
 import ShipTransferVue from '../carrier/ShipTransfer.vue'
+import BuildCarrierVue from '../carrier/BuildCarrier.vue'
 import InboxVue from '../inbox/Inbox.vue'
 import ConversationVue from '../inbox/Conversation.vue'
 import IntelVue from '../intel/Intel.vue'
@@ -125,6 +132,7 @@ export default {
     'carrier-waypoint': CarrierWaypointVue,
     'combat-calculator': CombatCalculatorVue,
     'ship-transfer': ShipTransferVue,
+    'build-carrier': BuildCarrierVue,
     'inbox': InboxVue,
     'conversation': ConversationVue,
     'intel': IntelVue,
@@ -195,6 +203,9 @@ export default {
     },
     onViewHireStarSpecialistRequested (e) {
       this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_STAR, e)
+    },
+    onBuildCarrierRequested (e) {
+      this.changeMenuState(MENU_STATES.BUILD_CARRIER, e)
     }
   },
   computed: {

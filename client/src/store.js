@@ -106,10 +106,19 @@ export default new Vuex.Store({
         }
       }
 
+      // TODO: In dark mode stars can go in and out of scanning range
+      // so they may not always be present therefore cannot be updated.
+      // We need to add new stars to the map if they come into scanning range
+      // on game tick.
+
       // Update stars
       for (let reportStar of report.stars) {
         let star = GameHelper.getStarById(state.game, reportStar._id)
 
+        if (!star) {
+          continue
+        }
+        
         star.ownedByPlayerId = reportStar.ownedByPlayerId
         star.garrison = reportStar.garrison
         star.infrastructure = reportStar.infrastructure
@@ -265,7 +274,7 @@ export default new Vuex.Store({
       let carrier = GameHelper.getCarrierById(state.game, data.carrier._id)
 
       if (!carrier) {
-        state.game.galaxy.carriers.push(data)
+        state.game.galaxy.carriers.push(data.carrier)
       }
 
       let star = GameHelper.getStarById(state.game, data.carrier.orbiting)

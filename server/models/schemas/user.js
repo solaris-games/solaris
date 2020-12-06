@@ -26,10 +26,12 @@ const schema = new Schema({
             kills: {
                 ships: { type: Types.Number, default: 0 },
                 carriers: { type: Types.Number, default: 0 },
+                specialists: { type: Types.Number, default: 0 },
             },
             losses: {
                 ships: { type: Types.Number, default: 0 },
                 carriers: { type: Types.Number, default: 0 },
+                specialists: { type: Types.Number, default: 0 },
             },
             stars: {
                 captured: { type: Types.Number, default: 0 },
@@ -43,6 +45,7 @@ const schema = new Schema({
             warpGates: { type: Types.Number, default: 0 },
             warpGatesDestroyed: { type: Types.Number, default: 0 },
             carriers: { type: Types.Number, default: 0 },
+            specialistsHired: { type: Types.Number, default: 0 },
         },
         research: {
             scanning: { type: Types.Number, default: 0 },
@@ -58,6 +61,8 @@ const schema = new Schema({
             creditsReceived: { type: Types.Number, default: 0 },
             technologySent: { type: Types.Number, default: 0 },
             technologyReceived: { type: Types.Number, default: 0 },
+            giftsSent: { type: Types.Number, default: 0 },
+            giftsReceived: { type: Types.Number, default: 0 },
             renownSent: { type: Types.Number, default: 0 },
         },
         badges: {
@@ -88,7 +93,8 @@ const schema = new Schema({
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
             objectsScalling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8 },
-            objectsMaximumScale: { type: Types.Number, required: false, default: 16 }
+            objectsMaximumScale: { type: Types.Number, required: false, default: 16 },
+            nebulaDensity: { type: Types.String, required: false, enum: ['none', 'sparse', 'standard', 'abundant'], default: 'standard' }
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },

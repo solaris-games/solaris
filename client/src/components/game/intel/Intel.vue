@@ -15,6 +15,9 @@
           <option key="totalScience" value="totalScience">Total Science</option>
           <option key="totalShips" value="totalShips">Total Ships</option>
           <option key="totalCarriers" value="totalCarriers">Total Carriers</option>
+          <option key="totalSpecialists" value="totalSpecialists">Total Specialists</option>
+          <option key="totalStarSpecialists" value="totalStarSpecialists">Total Specialists (Stars)</option>
+          <option key="totalCarrierSpecialists" value="totalCarrierSpecialists">Total Specialists (Carriers)</option>
           <option key="weapons" value="weapons">Weapons</option>
           <option key="banking" value="banking">Banking</option>
           <option key="manufacturing" value="manufacturing">Manufacturing</option>

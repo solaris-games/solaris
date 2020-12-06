@@ -43,7 +43,7 @@ class Carrier extends EventEmitter {
     this.drawShip()
     this.drawGarrison()
     this.drawSpecialist()
-    this._drawCarrierWaypoints()
+    this.drawCarrierWaypoints()
   }
 
   drawActive () {
@@ -151,7 +151,13 @@ class Carrier extends EventEmitter {
     // between the carrier's current position and the destination.
     if (this.data.waypoints.length) {
       let waypoint = this.data.waypoints[0]
-      let destination = this.stars.find(s => s.data._id === waypoint.destination).data.location
+      let starDestination = this.stars.find(s => s.data._id === waypoint.destination)
+
+      if (!starDestination) {
+        return
+      }
+
+      let destination = starDestination.data.location
 
       let angle = this.getAngleTowardsLocation(this.data.location, destination)
 
@@ -159,7 +165,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  _drawCarrierWaypoints () {
+  drawCarrierWaypoints () {
     if (!this.graphics_waypoints) {
       this.graphics_waypoints = new PIXI.Graphics()
       this.fixedContainer.addChild(this.graphics_waypoints)
@@ -167,11 +173,12 @@ class Carrier extends EventEmitter {
 
     this.graphics_waypoints.clear()
 
-    let lineWidth = this.data.waypointsLooped ? 0.5 : 1
-    let lineAlpha = this.data.waypointsLooped ? 0.1 : 0.3
+    let lineWidth = this.data.waypointsLooped ? 1 : 2
+    let lineAlpha = this.data.waypointsLooped ? 0.2 : 0.4
 
     this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
-    this.graphics_waypoints.lineStyle(lineWidth, 0xFFFFFF, lineAlpha)
+    this.graphics_waypoints.lineStyle(lineWidth, this.colour, lineAlpha)
+    this.graphics_waypoints._lineStyle.cap = PIXI.LINE_CAP.ROUND
 
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]
@@ -179,6 +186,10 @@ class Carrier extends EventEmitter {
       // Draw a line to each destination along the waypoints.
       let star = this.stars.find(s => s.data._id === waypoint.destination)
 
+      if (!star) {
+        break
+      }
+      
       this.graphics_waypoints.lineTo(star.data.location.x, star.data.location.y)
     }
   }
@@ -202,11 +213,11 @@ class Carrier extends EventEmitter {
      // maybe put waypoints on its own container, since this piece of code should remain as small as possible
      this.graphics_colour.visible = false
      this.graphics_ship.visible = false
-     this.text_garrison.visible = false
+     if (this.text_garrison) this.text_garrison.visible = false
    } 
    else {
      this.graphics_colour.visible = true
-     this.text_garrison.visible = true
+     if (this.text_garrison) this.text_garrison.visible = true
      this.updateVisibility()
 
      let SIZE = 1

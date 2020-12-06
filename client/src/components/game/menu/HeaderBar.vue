@@ -50,7 +50,6 @@
                     <div v-if="userPlayer">
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()"><i class="fas fa-home"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)"><i class="fas fa-ruler"></i></button>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-bolt"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" v-if="!userPlayer.defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)"><i class="fas fa-money-bill"></i></button>
                     </div>
                 </div>
@@ -121,8 +120,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.setupTimer()
@@ -155,7 +152,7 @@ export default {
       this.setupTimer()
 
       this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
-      this.audio.download()
+      AudioService.download()
     },
     setupTimer () {
       this.recalculateTimeRemaining()

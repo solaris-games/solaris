@@ -69,18 +69,6 @@ module.exports = class UserService extends EventEmitter {
         });
     }
 
-    async getAchievements(id) {
-        return await this.userModel.findById(id, {
-            // Remove fields we don't want to send back.
-            achievements: 1,
-            username: 1,
-            contributor: 1,
-            developer: 1
-        })
-        .lean({ defaults: true })
-        .exec();
-    }
-
     async getUsernameByEmail(email) {
         email = email.trim();
         email = email.toLowerCase();

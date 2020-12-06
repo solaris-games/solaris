@@ -36,6 +36,7 @@ const UserService = require('../services/user');
 const HistoryService = require('../services/history');
 const LedgerService = require('../services/ledger');
 const SpecialistService = require('../services/specialist');
+const AchievementService = require('../services/achievement');
 
 const CircularMapService = require('../services/maps/circular');
 const SpiralMapService = require('../services/maps/spiral');
@@ -59,30 +60,31 @@ module.exports = (io) => {
     const gameListService = new GameListService(GameModel);
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
-    const specialistService = new SpecialistService();
+    const achievementService = new AchievementService(UserModel);
+    const specialistService = new SpecialistService(GameModel, achievementService);
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
-    const carrierService = new CarrierService(distanceService, starService, technologyService, specialistService);
+    const carrierService = new CarrierService(achievementService, distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService, specialistService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService);
     const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService);
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService);
-    const playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
+    const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const ledgerService = new LedgerService(playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);
     const gameService = new GameService(GameModel, userService, carrierService, playerService, passwordService);
     const researchService = new ResearchService(technologyService, randomService, playerService, userService, technologyService);
     const tradeService = new TradeService(userService, playerService, ledgerService);
-    const waypointService = new WaypointService(carrierService, starService, distanceService, starDistanceService, technologyService);
+    const waypointService = new WaypointService(GameModel, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService);
-    const starUpgradeService = new StarUpgradeService(starService, carrierService, userService, researchService, technologyService);
-    const gameGalaxyService = new GameGalaxyService(mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService);
+    const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService);
+    const gameGalaxyService = new GameGalaxyService(gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService);
     const historyService = new HistoryService(HistoryModel, playerService);
     const gameTickService = new GameTickService(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService);
-    const messageService = new MessageService();
+    const messageService = new MessageService(GameModel);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
-    const shipTransferService = new ShipTransferService(carrierService, starService);
+    const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService);
@@ -119,5 +121,6 @@ module.exports = (io) => {
         historyService,
         ledgerService,
         specialistService,
+        achievementService,
     };
 };

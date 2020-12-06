@@ -49,8 +49,8 @@
 				<button class="btn ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop"><i class="fas fa-sync"></i></button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">Save</button>
-				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">Save &amp; Edit</button>
+				<button class="btn btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
+				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
 			</div>
 		</div>
 	</div>

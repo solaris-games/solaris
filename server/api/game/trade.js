@@ -110,7 +110,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGameLean, middleware.validateGameInProgress, middleware.loadPlayerLean, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGameLean, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let techs = await container.tradeService.getTradeableTechnologies(
                 req.game,
