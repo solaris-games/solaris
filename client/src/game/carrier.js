@@ -23,7 +23,7 @@ class Carrier extends EventEmitter {
     this.zoomPercent = 0
   }
 
-  setup (data, stars, player, lightYearDistance) {
+  setup (data, userSettings, stars, player, lightYearDistance) {
     this.data = data
     this.stars = stars
     this.player = player
@@ -34,6 +34,8 @@ class Carrier extends EventEmitter {
     this.container.position.y = data.location.y
     // Add a larger hit radius so that the star is easily clickable
     this.container.hitArea = new PIXI.Circle(0, 0, 10)
+
+    this.userSettings = userSettings
   }
 
   draw () {
@@ -191,7 +193,7 @@ class Carrier extends EventEmitter {
    this.container.buttonMode = false
   }
 
-  onTick( deltaTime, zoomPercent, viewportData, constSize ) {
+  onTick( deltaTime, zoomPercent, viewportData, clampedScalling ) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
 
@@ -208,9 +210,9 @@ class Carrier extends EventEmitter {
      this.updateVisibility()
 
      let SIZE = 1
-     let MIN_SCALE = 2//pick this from user options
-     let MAX_SCALE = 4
-     if(constSize) {
+     let MIN_SCALE = this.userSettings.map.objectsMinimumScale/4.0
+     let MAX_SCALE = this.userSettings.map.objectsMaximumScale/4.0
+     if(clampedScalling) {
        let currentScale = zoomPercent/100
        if (currentScale < MIN_SCALE) {
          this.container.scale.x = (1/currentScale)*MIN_SCALE

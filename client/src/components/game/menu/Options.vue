@@ -39,8 +39,31 @@
       </div>
 
       <h4 class="pt-2">Map</h4>
-      
+
       <div class="row bg-secondary pt-1 pb-1">
+        <label for="objects-scalling" class="col col-form-label">Objects Scalling</label>
+        <div class="col">
+          <select class="form-control" id="objects-scalling" v-model="settings.map.objectsScalling" :disabled="isSavingSettings">
+            <option value="default">Default</option>
+            <option value="clamped">Clamped</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.objectsScalling=='clamped'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="minimum-scale" class="col col-form-label">Minimum Scale</label>
+        <div class="col">
+          <input type="number" class="form-control" id="minimum-scale" v-model="settings.map.objectsMinimumScale" :disabled="isSavingSettings">
+        </div>
+      </div>
+      <div v-if="settings.map.objectsScalling=='clamped'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="maximum-scale" class="col col-form-label">Maximum Scale</label>
+        <div class="col">
+          <input type="number" class="form-control" id="maximum-scale" v-model="settings.map.objectsMaximumScale" :disabled="isSavingSettings">
+        </div>
+      </div>
+      
+      <div  class="row bg-secondary pt-1 pb-1">
         <label for="naturalResources" class="col col-form-label">Natural Resources</label>
         <div class="col">
           <select class="form-control" id="naturalResources" v-model="settings.map.naturalResources" :disabled="isSavingSettings">
@@ -77,15 +100,6 @@
 
       <h4 class="pt-2">Map</h4>
       
-      <div class="row bg-secondary pt-1 pb-1">
-        <label for="map-style" class="col col-form-label">Style</label>
-        <div class="col">
-          <select class="form-control" id="map-style" v-model="settings.map.style" :disabled="isSavingSettings">
-            <option value="default">Default</option>
-            <option value="constant-size">Constant Size</option>
-          </select>
-        </div>
-      </div>
 
       <form-error-list v-bind:errors="errors"/>
 

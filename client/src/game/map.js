@@ -67,7 +67,7 @@ class Map extends EventEmitter {
 
     // Add carriers
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
-      this.setupCarrier(game, game.galaxy.carriers[i])
+      this.setupCarrier(game, userSettings, game.galaxy.carriers[i])
     }
 
     // -----------
@@ -130,7 +130,7 @@ class Map extends EventEmitter {
     return star
   }
 
-  setupCarrier (game, carrierData) {
+  setupCarrier (game, userSettings, carrierData) {
     let existing = this.carriers.find(x => x.data._id === carrierData._id)
 
     if (existing) {
@@ -148,7 +148,7 @@ class Map extends EventEmitter {
     let carrier = new Carrier()
     let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-    carrier.setup(carrierData, this.stars, player, game.constants.distances.lightYear)
+    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
 
     this.carriers.push(carrier)
 
@@ -199,9 +199,9 @@ class Map extends EventEmitter {
       if (existing) {
         let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-        existing.setup(carrierData, this.stars, player, game.constants.distances.lightYear)
+        existing.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
       } else {
-        existing = this.setupCarrier(game, carrierData)
+        existing = this.setupCarrier(game, userSettings, carrierData)
       }
 
       existing.draw()
@@ -422,10 +422,10 @@ class Map extends EventEmitter {
       yradius: viewportYRadius
     }
 
-    let constSize = this.store.state.settings.map.style == 'constant-size'
+    let clampedScalling = this.store.state.settings.map.objectsScalling == 'clamped'
 
-    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, constSize))
-    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, constSize))
+    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, clampedScalling))
+    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, clampedScalling))
 
   }
 

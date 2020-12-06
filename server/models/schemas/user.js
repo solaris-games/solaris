@@ -86,13 +86,13 @@ const schema = new Schema({
         },
         map: {
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
+            objectsScalling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
+            objectsMinimumScale: { type: Types.Number, required: false, default: 8 },
+            objectsMaximumScale: { type: Types.Number, required: false, default: 16 }
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },
             defaultAmount: { type: Types.Number, required: false, default: 0 }
-        },
-        map: {
-            style: { type: Types.String, required: false, enum: ['default', 'constant-size'], default: 'default' }
         }
     }
 });
