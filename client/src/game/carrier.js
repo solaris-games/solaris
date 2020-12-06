@@ -94,9 +94,7 @@ class Carrier extends EventEmitter {
       this.graphics_ship.endFill()
     }
 
-    this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
-    this.graphics_ship.position.x = this.data.location.x
-    this.graphics_ship.position.y = this.data.location.y
+    this.graphics_ship.pivot.set(0, 0)
     this.graphics_ship.scale.set(1)
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
