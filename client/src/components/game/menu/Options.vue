@@ -110,9 +110,6 @@
         </div>
       </div>
 
-      <h4 class="pt-2">Map</h4>
-      
-
       <form-error-list v-bind:errors="errors"/>
 
       <div class="row mt-2">

@@ -153,11 +153,11 @@ class Territories {
     this.zoomPercent = zoomPercent
 
     if (this.voronoiContainer) {
-      this.voronoiContainer.visible = zoomPercent > 100
+      this.voronoiContainer.visible = zoomPercent < 100
     }
 
     if (this.playerNamesContainer) {
-      this.playerNamesContainer.visible = zoomPercent > 150
+      this.playerNamesContainer.visible = zoomPercent < 75
     }
   }
 

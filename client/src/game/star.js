@@ -163,7 +163,7 @@ class Star extends EventEmitter {
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
           orbitGraphics.drawCircle(0, 0, distanceToStar - (planetSize / 2))
-        this.container.addChild(orbitGraphics)
+        this.container_planets.addChild(orbitGraphics)
 
         let planetGraphics = new PIXI.Graphics()
         planetGraphics.beginFill(playerColour)
