@@ -87,13 +87,6 @@ class Carrier extends EventEmitter {
     this.graphics_ship.lineTo(0, 0 - 4)
     this.graphics_ship.endFill()
 
-    if (this.hasSpecialist()) {
-      this.graphics_ship.beginFill(0x000000)
-      this.graphics_ship.lineStyle(0.3, 0xFFFFFF)
-      this.graphics_ship.drawCircle(0, 0, 2.2)
-      this.graphics_ship.endFill()
-    }
-
     this.graphics_ship.pivot.set(0, 0)
     this.graphics_ship.scale.set(1)
 
