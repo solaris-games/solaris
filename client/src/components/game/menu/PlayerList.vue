@@ -65,8 +65,8 @@ export default {
 
 <style scoped>
 .player-icon, img {
-    width: 60px;
-    height: 60px;
+    width: 59px;
+    height: 59px;
 }
 
 .player-icon .userIcon {
@@ -102,7 +102,8 @@ export default {
     cursor: pointer;
     border-radius: 0 !important;
     height: 68px;
-    width: 60px;
+    width: 59px;
+    min-width: 59px;
 }
 
 .colour-bar {
@@ -112,6 +113,7 @@ export default {
 ul {
   overflow: visible;
   white-space: nowrap;
+  overflow-x: auto;
 }
 
 li {
