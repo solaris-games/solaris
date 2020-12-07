@@ -202,7 +202,7 @@ class Carrier extends EventEmitter {
    this.container.buttonMode = false
   }
 
-  onTick( deltaTime, zoomPercent, viewportData, clampedScalling ) {
+  onTick( deltaTime, zoomPercent, viewportData, clampedScaling ) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
 
@@ -221,7 +221,7 @@ class Carrier extends EventEmitter {
      let SIZE = 1
      let MIN_SCALE = this.userSettings.map.objectsMinimumScale/4.0
      let MAX_SCALE = this.userSettings.map.objectsMaximumScale/4.0
-     if(clampedScalling) {
+     if(clampedScaling) {
        let currentScale = zoomPercent/100
        if (currentScale < MIN_SCALE) {
          this.container.scale.x = (1/currentScale)*MIN_SCALE
