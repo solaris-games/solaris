@@ -104,7 +104,7 @@ module.exports = class PlayerService extends EventEmitter {
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
-        let shapes = ['circle', 'triangle'];
+        let shapes = ['circle', 'square'];
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 

@@ -226,6 +226,24 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
+
+    if (!player) {
+      return
+    }
+
+    switch (player.shape) {
+      case 'circle': 
+        this._drawColourCircle(player)
+        break
+      case 'square': 
+        this._drawColourSquare(player)
+        break
+    }
+  }
+
+  _drawColourCircle (player) {
     if (!this.graphics_colour_arc) {
       this.graphics_colour_arc = new PIXI.Graphics()
       this.container.addChild(this.graphics_colour_arc)
@@ -248,13 +266,6 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_arc.clear()
     this.graphics_colour_warp_cir.clear()
 
-    // Get the player who owns the star.
-    let player = this._getStarPlayer()
-
-    if (!player) {
-      return
-    }
-    
     this.graphics_colour_arc.lineStyle(3, player.colour.value)
     this.graphics_colour_cir.lineStyle(3, player.colour.value)
     this.graphics_colour_warp_arc.lineStyle(2, player.colour.value)
@@ -265,6 +276,49 @@ class Star extends EventEmitter {
     
     this.graphics_colour_warp_arc.arc(this.data.location.x, this.data.location.y, 10, 0.785398, -0.785398)
     this.graphics_colour_warp_cir.drawCircle(this.data.location.x, this.data.location.y, 10)
+  }
+
+  _drawColourSquare (player) {
+    if (!this.graphics_colour_square_partial) {
+      this.graphics_colour_square_partial = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_square_partial)
+    }
+    if (!this.graphics_colour_square) {
+      this.graphics_colour_square = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_square)
+    }
+    if (!this.graphics_colour_warp_square_partial) {
+      this.graphics_colour_warp_square_partial = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_warp_square_partial)
+    }
+    if (!this.graphics_colour_warp_square) {
+      this.graphics_colour_warp_square = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_warp_square)
+    }
+
+    this.graphics_colour_square_partial.clear()
+    this.graphics_colour_square.clear()
+    this.graphics_colour_warp_square_partial.clear()
+    this.graphics_colour_warp_square.clear()
+
+    this.graphics_colour_square_partial.lineStyle(3, player.colour.value)
+    this.graphics_colour_square.lineStyle(3, player.colour.value)
+    this.graphics_colour_warp_square_partial.lineStyle(2, player.colour.value)
+    this.graphics_colour_warp_square.lineStyle(2, player.colour.value)
+
+    this.graphics_colour_square_partial.moveTo(this.data.location.x + 7, this.data.location.y - 7)
+    this.graphics_colour_square_partial.lineTo(this.data.location.x - 7, this.data.location.y - 7)
+    this.graphics_colour_square_partial.lineTo(this.data.location.x - 7, this.data.location.y + 7)
+    this.graphics_colour_square_partial.lineTo(this.data.location.x + 7, this.data.location.y + 7)
+    
+    this.graphics_colour_square.drawRect(this.data.location.x - 7, this.data.location.y - 7, 14, 14)
+
+    this.graphics_colour_warp_square_partial.moveTo(this.data.location.x + 7, this.data.location.y - 10)
+    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x - 10, this.data.location.y - 10)
+    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x - 10, this.data.location.y + 10)
+    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x + 7, this.data.location.y + 10)
+
+    this.graphics_colour_warp_square.drawRect(this.data.location.x - 10, this.data.location.y - 10, 20, 20)
   }
 
   _hasUnknownShips() {
@@ -451,11 +505,15 @@ class Star extends EventEmitter {
      //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
      // maybe put them on their own container, since this piece of code should remain as small as possible
      this.graphics_star.visible = false
-     this.graphics_colour_arc.visible = false
-     this.graphics_colour_cir.visible = false
-     this.graphics_colour_warp_arc.visible = false
-     this.graphics_colour_warp_cir.visible = false
-     this.text_name.visible = false
+     if (this.text_name) this.text_name.visible = false
+     if (this.graphics_colour_arc) this.graphics_colour_arc.visible = false
+     if (this.graphics_colour_cir) this.graphics_colour_cir.visible = false
+     if (this.graphics_colour_warp_arc) this.graphics_colour_warp_arc.visible = false
+     if (this.graphics_colour_warp_cir) this.graphics_colour_warp_cir.visible = false
+     if (this.graphics_colour_square_partial) this.graphics_colour_square_partial.visible = false
+     if (this.graphics_colour_square) this.graphics_colour_square.visible = false
+     if (this.graphics_colour_warp_square_partial) this.graphics_colour_warp_square_partial.visible = false
+     if (this.graphics_colour_warp_square) this.graphics_colour_warp_square.visible = false
      if (this.graphics_natural_resources_ring) this.graphics_natural_resources_ring.visible = false
      if (this.container_planets) this.container_planets.visible = false
      if (this.text_infrastructure) { this.text_infrastructure.visible = false }
@@ -485,10 +543,14 @@ class Star extends EventEmitter {
 
   updateVisibility() {
     this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_colour_arc.visible = this.zoomPercent < 60
-    this.graphics_colour_cir.visible = this.zoomPercent >= 60
-    this.graphics_colour_warp_arc.visible = this.zoomPercent < 60 && this.data.warpGate
-    this.graphics_colour_warp_cir.visible = this.zoomPercent >= 60 && this.data.warpGate
+    if (this.graphics_colour_arc) this.graphics_colour_arc.visible = this.zoomPercent < 60
+    if (this.graphics_colour_cir) this.graphics_colour_cir.visible = this.zoomPercent >= 60
+    if (this.graphics_colour_warp_arc) this.graphics_colour_warp_arc.visible = this.zoomPercent < 60 && this.data.warpGate
+    if (this.graphics_colour_warp_cir) this.graphics_colour_warp_cir.visible = this.zoomPercent >= 60 && this.data.warpGate
+    if (this.graphics_colour_square_partial) this.graphics_colour_square_partial.visible = this.zoomPercent < 60
+    if (this.graphics_colour_square) this.graphics_colour_square.visible = this.zoomPercent >= 60
+    if (this.graphics_colour_warp_square_partial) this.graphics_colour_warp_square_partial.visible = this.zoomPercent < 60 && this.data.warpGate
+    if (this.graphics_colour_warp_square) this.graphics_colour_warp_square.visible = this.zoomPercent >= 60 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
     this.text_name.visible = this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) 

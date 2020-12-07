@@ -16,7 +16,7 @@ const schema = new Schema({
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 75, 90, 100], default: 50 },
-			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 64 },
+			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' }
         },
