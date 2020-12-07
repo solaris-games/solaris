@@ -413,10 +413,10 @@ class Map extends EventEmitter {
       yradius: viewportYRadius
     }
 
-    let clampedScalling = this.store.state.settings.map.objectsScalling == 'clamped'
+    let clampedScaling = this.store.state.settings.map.objectsScaling == 'clamped'
 
-    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, clampedScalling))
-    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, clampedScalling))
+    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, clampedScaling))
+    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, clampedScaling))
 
     this.background.onTick(deltaTime, viewportData)
   }
