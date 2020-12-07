@@ -141,7 +141,7 @@ class GameContainer {
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map.setupCarrier(this.game, carrier)
+    let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
     this.map.drawCarrier(carrierObject)
   }
 
