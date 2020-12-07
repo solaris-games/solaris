@@ -16,10 +16,8 @@ class Map extends EventEmitter {
   // waypoints - Displays waypoints overlay for a given carrier
   mode = 'galaxy'
 
-  constructor (app, store) {
+  constructor (app) {
     super()
-
-    this.store = store
 
     this.app = app
     this.container = new PIXI.Container()
@@ -413,10 +411,8 @@ class Map extends EventEmitter {
       yradius: viewportYRadius
     }
 
-    let clampedScaling = this.store.state.settings.map.objectsScaling == 'clamped'
-
-    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData, clampedScaling))
-    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData, clampedScaling))
+    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData))
+    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData))
 
     this.background.onTick(deltaTime, viewportData)
   }

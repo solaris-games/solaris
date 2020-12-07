@@ -453,7 +453,7 @@ class Star extends EventEmitter {
   }
 
 
-  onTick( deltaTime, zoomPercent, viewportData, clampedScaling ) {
+  onTick( deltaTime, zoomPercent, viewportData) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
  
@@ -474,6 +474,7 @@ class Star extends EventEmitter {
    else {
      this.updateVisibility()
 
+     let clampedScaling = this.userSettings.map.objectsScaling
      let SIZE = 1
      let MIN_SCALE = this.userSettings.map.objectsMinimumScale/4.0 //divide by 4 to allow more control while keeping the UI as int
      let MAX_SCALE = this.userSettings.map.objectsMaximumScale/4.0
