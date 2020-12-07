@@ -93,9 +93,13 @@ class Star extends EventEmitter {
 
     this.graphics_star.lineStyle(1, 0xFFFFFF, alpha)
 
-    this.graphics_star.beginFill(0xFFFFFF, alpha)
+    if (isInScanningRange) {
+      this.graphics_star.beginFill(0xFFFFFF, alpha)
+    }
     this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 2)
-    this.graphics_star.endFill()
+    if (isInScanningRange) {
+      this.graphics_star.endFill()
+    }
 
 
     if (this.hasSpecialist()) {
