@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 module.exports = class EventService {
 
     EVENT_TYPES = {
@@ -27,6 +29,8 @@ module.exports = class EventService {
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
+        PLAYER_STAR_SPECIALIST_HIRED: 'playerStarSpecialistHired',
+        PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
     }
 
     constructor(eventModel, broadcastService,
@@ -120,7 +124,45 @@ module.exports = class EventService {
             tick: -1, // Sort by tick descending
             _id: -1
         })
+        .lean({ defaults: true })
         .exec();
+    }
+
+    async getPlayerTradeEvents(game, player, startTick = 0) {
+        let tradeEvents = await this.eventModel.find({
+            gameId: game._id,
+            tick: { $gte: startTick },
+            playerId: {
+                $in: [
+                    player._id,
+                    null
+                ]
+            },
+            type: {
+                $in: [
+                    this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT,
+                    this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_CREDITS_SENT,
+                    this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_RENOWN_SENT,
+                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
+                ]
+            }
+        })
+        .sort({
+            tick: -1, // Sort by tick descending
+            _id: -1
+        })
+        .lean({ defaults: true })
+        .exec();
+
+        // Calculate when the event was created.
+        // TODO: Is this more efficient than storing the UTC in the document itself?
+        tradeEvents.forEach(t => {
+            t.date = moment(t._id.getTimestamp())
+        });
+
+        return tradeEvents;
     }
 
     /* GLOBAL EVENTS */
@@ -365,6 +407,31 @@ module.exports = class EventService {
         await this.createPlayerEvent(game, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
 
         this.broadcastService.gamePlayerDebtForgiven(game, debtorPlayerId, creditorPlayerId, amount);
+    }
+
+    async createPlayerStarSpecialistHired(game, player, star, specialist) {
+        let data = {
+            starId: star._id,
+            specialistId: specialist.id,
+            // Need to keep these values just in case specs are changed in future.
+            specialistName: specialist.name,
+            specialistDescription: specialist.description
+        }
+
+        await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data);
+    }
+
+    async createPlayerCarrierSpecialistHired(game, player, carrier, specialist) {
+        let data = {
+            carrierId: carrier._id,
+            carrierName: carrier.name, // Carriers may be destroyed so we need to keep track of the name separately
+            specialistId: specialist.id,
+            // Need to keep these values just in case specs are changed in future.
+            specialistName: specialist.name,
+            specialistDescription: specialist.description
+        }
+
+        await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data);
     }
 
 };

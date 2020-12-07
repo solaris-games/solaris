@@ -11,8 +11,10 @@
 </template>
 
 <script>
+import moment from 'moment'
 import MessageApiService from '../../../services/api/message'
 import AudioService from '../../../game/audio'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -28,9 +30,6 @@ export default {
       isSendingMessage: false
     }
   },
-  mounted () {
-    this.audio = new AudioService(this.$store)
-  },
   methods: {
     async send () {
       try {
@@ -39,14 +38,16 @@ export default {
         let response = await MessageApiService.send(this.$store.state.game._id, this.toPlayerId, this.message)
 
         if (response.status === 200) {
-          this.audio.type()
-
-          this.message = ''
+          AudioService.type()
 
           this.$emit('onMessageSent', {
+            fromPlayerId: GameHelper.getUserPlayer(this.$store.state.game)._id,
             toPlayerId: this.toPlayerId,
-            message: this.message
+            message: this.message,
+            sentDate: moment().utc()
           })
+
+          this.message = ''
         }
       } catch (e) {
         console.error(e)

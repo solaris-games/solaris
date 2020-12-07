@@ -34,7 +34,7 @@
                         <!-- <button type="button" class="btn btn-primary"><i class="fas fa-chevron-up"></i></button>
                         <button type="button" class="btn btn-primary"><i class="fas fa-chevron-down"></i></button>
                         <button v-if="mapObject.type === 'star' && mapObject.data.garrison" type="button" class="btn btn-primary"><i class="fas fa-rocket"></i></button> -->
-                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
+                        <button v-if="mapObject.type === 'carrier' && userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject)"><i class="fas fa-plus"></i></button>
                         <button type="button" class="btn btn-primary ml-1" @click="onViewObjectRequested(mapObject)">View</button>
                     </td>
                 </tr>
@@ -68,6 +68,9 @@ export default {
         case 'carrier':
           return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
       }
+    },
+    isGameFinished () {
+      return gameHelper.isGameFinished(this.$store.state.game)
     },
     getObjectOwningPlayer (mapObject) {
       switch (mapObject.type) {

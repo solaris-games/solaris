@@ -3,19 +3,19 @@
         <div class="col text-center bg-secondary pt-2 pb-2">
             <button class="btn btn-block"
               :class="{'btn-success': availableCredits >= economy, 'btn-secondary': availableCredits < economy}"
-              :disabled="isUpgradingEconomy || availableCredits < economy"
+              :disabled="isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"><small>Buy for ${{economy}}</small></button>
         </div>
         <div class="col text-center bg-primary pt-2 pb-2">
             <button class="btn btn-block"
               :class="{'btn-success': availableCredits >= industry, 'btn-secondary': availableCredits < industry}"
-              :disabled="isUpgradingIndustry || availableCredits < industry"
+              :disabled="isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"><small>Buy for ${{industry}}</small></button>
         </div>
         <div class="col text-center bg-secondary pt-2 pb-2">
             <button class="btn btn-block"
               :class="{'btn-success': availableCredits >= science, 'btn-secondary': availableCredits < science}"
-              :disabled="isUpgradingScience || availableCredits < science"
+              :disabled="isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"><small>Buy for ${{science}}</small></button>
         </div>
     </div>
@@ -23,6 +23,7 @@
 
 <script>
 import starService from '../../../services/api/star'
+import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
 
 export default {
@@ -41,9 +42,6 @@ export default {
       isUpgradingScience: false
     }
   },
-  mounted () {
-    this.audio = new AudioService(this.$store)
-  },
   methods: {
     async upgradeEconomy (e) {
       try {
@@ -59,7 +57,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -81,7 +79,7 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
@@ -103,13 +101,18 @@ export default {
             data: response.data
           })
 
-          this.audio.hover()
+          AudioService.hover()
         }
       } catch (err) {
         console.error(err)
       }
 
       this.isUpgradingScience = false
+    }
+  },
+  computed: {
+    isGameFinished: function () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

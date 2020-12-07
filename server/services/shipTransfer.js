@@ -2,7 +2,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ShipTransferService {
 
-    constructor(carrierService, starService) {
+    constructor(gameModel, carrierService, starService) {
+        this.gameModel = gameModel;
         this.carrierService = carrierService;
         this.starService = starService;
     }
@@ -49,7 +50,32 @@ module.exports = class ShipTransferService {
         star.garrisonActual = starShips + garrisonFraction;
         star.garrison = Math.floor(star.garrisonActual);
 
-        await game.save();
+        // Update the DB.
+        await this.gameModel.bulkWrite([
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.stars._id': star._id
+                    },
+                    update: {
+                        'galaxy.stars.$.garrisonActual': star.garrisonActual,
+                        'galaxy.stars.$.garrison': star.garrison
+                    }
+                }
+            },
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.carriers._id': carrier._id
+                    },
+                    update: {
+                        'galaxy.carriers.$.ships': carrier.ships
+                    }
+                }
+            }
+        ]);
 
         return {
             player,

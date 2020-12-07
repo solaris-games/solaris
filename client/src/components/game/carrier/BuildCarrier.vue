@@ -1,10 +1,10 @@
 <template>
-<div class="menu-page container">
-    <menu-title title="Ship Transfer" @onCloseRequested="onCloseRequested"/>
+<div class="menu-page container" v-if="star">
+    <menu-title title="Build Carrier" @onCloseRequested="onCloseRequested"/>
 
     <div class="row bg-secondary mb-2">
       <div class="col text-center pt-3">
-        <p>While in orbit of a star you may move ships to and from a fleet Carrier. It's free to transfer ships.</p>
+        <p>Build a new Carrier at <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>, decide how many ships the new Carrier will have.</p>
       </div>
     </div>
 
@@ -12,8 +12,8 @@
         <div class="col" v-if="star">
             <p class="mb-0">{{star.name}}</p>
         </div>
-        <div class="col" v-if="carrier">
-            <p class="mb-0">{{carrier.name}}</p>
+        <div class="col">
+            <p class="mb-0">New Carrier</p>
         </div>
     </div>
 
@@ -55,92 +55,68 @@
     </div>
 
     <div class="row pb-2 pt-2 bg-secondary">
-        <div class="col-6"></div>
-        <div class="col pr-0">
-            <button type="button" class="btn btn-success btn-block mr-1" :disabled="isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
+        <div class="col">
+            <button type="button" class="btn btn-danger" :disabled="isBuildingCarrier" @click="onOpenStarDetailRequested">
+                <i class="fas fa-arrow-left"></i>
+                Back to Star
+            </button>
         </div>
-        <div class="col-auto pl-1">
-            <button type="button" class="btn btn-primary" @click="onOpenCarrierDetailRequested"><i class="fas fa-plus"></i></button>
+        <div class="col-auto">
+            <button type="button" class="btn btn-success btn-block" :disabled="isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+                <i class="fas fa-rocket"></i>
+                Build for ${{star.upgradeCosts.carriers}}
+            </button>
         </div>
     </div>
 </div>
 </template>
 
 <script>
+import starService from '../../../services/api/star'
+import AudioService from '../../../game/audio'
 import GameHelper from '../../../services/gameHelper'
-import CarrierApiService from '../../../services/api/carrier'
 import MenuTitle from '../MenuTitle'
-import GameContainer from '../../../game/container'
 
 export default {
   components: {
     'menu-title': MenuTitle
   },
   props: {
-    carrierId: String
+    starId: String
   },
   data () {
     return {
-      carrier: null,
       star: null,
       starShips: 0,
       carrierShips: 0,
-      isTransferringShips: false
+      isBuildingCarrier: false
     }
   },
   mounted () {
-    this.sockets.subscribe('gameTicked', (data) => this.onGameTicked(data))
+    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
-
-    this.starShips = this.star.garrison
-    this.carrierShips = this.carrier.ships
-  },
-  destroyed () {
-    this.sockets.unsubscribe('gameTicked')
+    this.starShips = 0
+    this.carrierShips = this.star.garrison
   },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onGameTicked (data) {
-      // When the game ticks there may have been ships built at the star.
-      // Find the star in the tick report and compare the garrison, then add
-      // the difference to the star ships side on the transfer.
-
-      // NOTE: At this stage the star will have the latest data for its garrison
-      // as the store deals with updating the star.
-      this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
-      this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
-
-      // If the game ticks then check to see if any ships have been built at the star.
-      let totalInTransfer = this.starShips + this.carrierShips
-      let totalOriginal = this.star.garrison + this.carrier.ships
-      let difference = totalOriginal - totalInTransfer
-
-      // If there is a difference then this means that ship(s) have been built at the star
-      // while the user has been on this screen, in that case, add the new ships to the star total
-      if (difference) {
-        this.starShips += difference
-        this.onStarShipsChanged()
-      }
-    },
     onStarShipsChanged (e) {
       let difference = parseInt(this.starShips) - this.star.garrison
-      this.carrierShips = this.carrier.ships - difference
+      this.carrierShips = Math.abs(difference)
     },
     onCarrierShipsChanged (e) {
-      let difference = parseInt(this.carrierShips) - this.carrier.ships
+      let difference = parseInt(this.carrierShips)
       this.starShips = this.star.garrison - difference
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
-      this.starShips = this.carrier.ships + this.star.garrison - 1
+      this.starShips = this.star.garrison - 1
     },
     onMaxShipsClicked (e) {
       this.starShips = 0
-      this.carrierShips = this.carrier.ships + this.star.garrison
+      this.carrierShips = this.star.garrison
     },
     onTransferLeftClicked (e) {
       this.starShips+=e
@@ -150,37 +126,38 @@ export default {
       this.carrierShips+=e
       this.starShips-=e
     },
+    onOpenStarDetailRequested (e) {
+        this.$emit('onOpenStarDetailRequested', this.star._id)
+    },
     async saveTransfer (e) {
-      try {
-        this.isTransferringShips = true
-
-        let cShips = parseInt(this.carrierShips)
-        let sShips = parseInt(this.starShips)
-
-        let response = await CarrierApiService.transferShips(
-          this.$store.state.game._id,
-          this.carrier._id,
-          cShips,
-          this.star._id,
-          sShips)
-
-        if (response.status === 200) {
-          this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
-
-          this.star.garrison = sShips
-          this.carrier.ships = cShips
-
-          // Note: The web socket event handles setting the carrier and star ships.
-          this.$emit('onShipsTransferred', this.carrier._id)
-        }
-      } catch (err) {
-        console.log(err)
+      if (!confirm(`Are you sure you want to build a Carrier at ${this.star.name}? The carrier will cost ${this.star.upgradeCosts.carriers}.`)) {
+        return
       }
 
-      this.isTransferringShips = false
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
+        this.isBuildingCarrier = true
+
+        try {
+            let ships = this.carrierShips
+
+            let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id, ships)
+
+            if (response.status === 200) {
+                this.$toasted.show(`Carrier built at ${this.star.name}.`)
+
+                this.$store.state.game.galaxy.carriers.push(response.data.carrier)
+
+                let star = GameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
+
+                this.$emit('onEditWaypointsRequested', response.data.carrier._id)
+                GameHelper.getUserPlayer(this.$store.state.game).credits -= this.star.upgradeCosts.carriers
+
+                AudioService.join()
+            }
+        } catch (err) {
+            console.error(err)
+        }
+
+        this.isBuildingCarrier = false
     }
   }
 }

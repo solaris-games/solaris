@@ -5,6 +5,7 @@
 <script>
 import { mapState } from 'vuex'
 import GameContainer from '../../game/container'
+import GameApiService from '../../services/api/game'
 
 export default {
   data () {
@@ -47,6 +48,10 @@ export default {
     this.gameContainer.map.on('onCarrierRightClicked', this.onCarrierRightClickedHandler)
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
+
+    setInterval(this.touchPlayer, 60000)
+
+    this.touchPlayer()
   },
 
   destroyed () {
@@ -65,16 +70,23 @@ export default {
   methods: {
     loadGame (game) {
       this.gameContainer.setupViewport(game)
-      this.gameContainer.setup(game)
+      this.gameContainer.setup(game, this.$store.state.settings)
     },
     updateGame (game) {
-      this.gameContainer.reloadGame(game)
+      this.gameContainer.reloadGame(game, this.$store.state.settings)
     },
     drawGame (game, panToUser = true) {
       this.gameContainer.draw()
 
       if (panToUser) {
         this.gameContainer.map.panToUser(game)
+      }
+    },
+    async touchPlayer () {
+      try {
+        await GameApiService.touchPlayer(this.$store.state.game._id)
+      } catch (e) {
+        console.error(e)
       }
     },
     handleResize (e) {

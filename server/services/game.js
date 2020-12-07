@@ -149,7 +149,7 @@ module.exports = class GameService extends EventEmitter {
             game.state.lastTickDate = start;
 
             for (let player of game.galaxy.players) {
-                this.playerService.updateLastSeen(player);
+                this.playerService.updateLastSeen(game, player);
             }
         }
 
@@ -321,6 +321,10 @@ module.exports = class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
+    isDarkMode(game) {
+        return game.settings.specialGalaxy.darkGalaxy === 'enabled';
+    }
+    
     async quitAllActiveGames(userId) {
         let allGames = await this.gameModel.find({
             'galaxy.players': {

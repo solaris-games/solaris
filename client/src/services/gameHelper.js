@@ -32,6 +32,10 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
+  getStarsOwnedByPlayer (player, stars) {
+    return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
+  }
+
   getCarrierOwningPlayer (game, carrier) {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
@@ -428,8 +432,19 @@ class GameHelper {
           return 'missile-pod'
         case 8:
           return 'power-generator'
+        case 9:
+          return 'space-suit'
       }
     }
+  }
+
+  getDateString (date) {
+    date = moment(date).utc().toDate()
+
+    let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    let monthOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+    return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
   }
 }
 

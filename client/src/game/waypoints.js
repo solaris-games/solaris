@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 
@@ -125,16 +125,6 @@ class Waypoints extends EventEmitter {
     }
 
     this._createWaypoint(e.location, e._id)
-  }
-
-  onCarrierClicked (e) {
-    if (!this.carrier) {
-      return
-    }
-
-    if (e.orbiting) {
-      this._createWaypoint(e.location, e.orbiting)
-    }
   }
 
   _createWaypoint (desiredLocation, starId) {

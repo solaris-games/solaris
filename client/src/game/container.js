@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
 import gameHelper from '../services/gameHelper'
@@ -44,10 +44,11 @@ class GameContainer {
       resolution: window.devicePixelRatio || 1,
       autoResize: true
     })
-    this.app.ticker.add( this.onTick.bind(this) )
+
+    this.app.ticker.add(this.onTick.bind(this))
 
     if ( process.env.NODE_ENV == 'development') {
-      this.app.ticker.add( this.calcFPS.bind(this) )
+      this.app.ticker.add(this.calcFPS.bind(this))
     }
 
     // create viewport
@@ -117,21 +118,24 @@ class GameContainer {
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
-  setup () {
-    this.map.setup(this.game)
+  setup (game, userSettings) {
+    this.userSettings = userSettings
+    
+    this.map.setup(this.game, userSettings)
   }
 
   draw () {
     this.map.draw()
   }
 
-  reloadGame (game) {
+  reloadGame (game, userSettings) {
     this.game = game
-    this.map.reloadGame(game)
+    this.userSettings = userSettings
+    this.map.reloadGame(game, userSettings)
   }
 
   reloadStar (star) {
-    let starObject = this.map.setupStar(this.game, star)
+    let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)
   }
 
@@ -151,8 +155,8 @@ class GameContainer {
     return viewportPercent
   }
 
-  onTick( deltaTime ) {
-    this.map.onTick( deltaTime )
+  onTick (deltaTime) {
+    this.map.onTick(deltaTime)
   }
 
   onViewportZoomed (e) {

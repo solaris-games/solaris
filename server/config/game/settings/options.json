@@ -367,14 +367,6 @@
         ],
         "speed": [
             {
-                "value": 1,
-                "text": "Blitz (1 tick = 1 minute)"
-            },
-            {
-                "value": 5,
-                "text": "Bullet (1 tick = 5 minutes)"
-            },
-            {
                 "value": 10,
                 "text": "Fast (1 tick = 10 minutes)"
             },

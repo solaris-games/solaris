@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(broadcastService, distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService) {
+        specialistService, starUpgradeService) {
         super();
             
         this.broadcastService = broadcastService;
@@ -22,6 +22,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.gameService = gameService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.starUpgradeService = starUpgradeService;
     }
 
     async tick(game) {
@@ -326,6 +327,13 @@ module.exports = class GameTickService extends EventEmitter {
         // 4c. Do the rest of the waypoint actions.
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
+
+        this._sanitiseDarkModeCarrierWaypoints(game);
+    }
+
+    _sanitiseDarkModeCarrierWaypoints(game) {
+        game.galaxy.carriers.forEach(c => 
+            this.waypointService.sanitiseDarkModeCarrierWaypoints(game, c));
     }
 
     async _performCombat(game, player, star, carriers, report) {
@@ -446,8 +454,16 @@ module.exports = class GameTickService extends EventEmitter {
                 attackerCarriers.splice(attackerCarrierIndex, 1);
                 attackerCarrierIndex--;
 
-                if (attackerUser) attackerUser.achievements.combat.losses.carriers++;
-                if (defenderUser) defenderUser.achievements.combat.kills.carriers++;
+                if (attackerUser) {
+                    attackerUser.achievements.combat.losses.carriers++;
+
+                    if (attackerCarrier.specialistId) attackerUser.achievements.combat.losses.specialists++;
+                }
+                if (defenderUser) {
+                    defenderUser.achievements.combat.kills.carriers++;
+
+                    if (attackerCarrier.specialistId) defenderUser.achievements.combat.kills.specialists++;
+                }
             }
 
             attackerCarrierIndex++;
@@ -493,11 +509,19 @@ module.exports = class GameTickService extends EventEmitter {
                     defenderCarriers.splice(defenderCarrierIndex, 1);
                     defenderCarrierIndex--;
 
-                    if (defenderUser) defenderUser.achievements.combat.losses.carriers++;
+                    if (defenderUser) {
+                        defenderUser.achievements.combat.losses.carriers++;
+
+                        if (defenderCarrier.specialistId) defenderUser.achievements.combat.losses.specialists++;
+                    }
 
                     // Add carriers killed to attackers.
                     for (let attackerUser of attackerUsers) {
-                        if (attackerUser) attackerUser.achievements.combat.kills.carriers++;
+                        if (attackerUser) {
+                            attackerUser.achievements.combat.kills.carriers++;
+
+                            if (defenderCarrier.specialistId) attackerUser.achievements.combat.kills.specialists++;
+                        }
                     }
                 }
             } else {
@@ -545,6 +569,18 @@ module.exports = class GameTickService extends EventEmitter {
         let starDefenderDefeated = star && !Math.floor(star.garrisonActual) && !defenderCarriers.length;
 
         if (starDefenderDefeated) {
+            // TODO: move all this into the star service. captureStar()?
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+            // If the star had a specialist that destroys infrastructure then perform demolition.
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.destroyInfrastructureOnLoss) {
+                star.specialistId = null;
+                star.infrastructure.economy = 0;
+                star.infrastructure.industry = 0;
+                star.infrastructure.science = 0;
+                star.warpGate = false;
+            }
+
             let closestPlayerId = attackerCarriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].ownedByPlayerId;
 
             // Capture the star.
@@ -560,8 +596,13 @@ module.exports = class GameTickService extends EventEmitter {
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
-            if (defenderUser) defenderUser.achievements.combat.stars.lost++;
-            if (newStarUser) newStarUser.achievements.combat.stars.captured++;
+            if (defenderUser) {
+                defenderUser.achievements.combat.stars.lost++;
+            }
+            
+            if (newStarUser) {
+                newStarUser.achievements.combat.stars.captured++;
+            }
 
             this.emit('onStarCaptured', {
                 game,
@@ -820,10 +861,14 @@ module.exports = class GameTickService extends EventEmitter {
         for (let starId of report.stars) {
             let star = this.starService.getByObjectId(game, starId);
             let terraformedResources = null;
+            let upgradeCosts = null;
 
             if (star.ownedByPlayerId) {
                 let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);    
+                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);   
+                
+                star.terraformedResources = terraformedResources; // Need to set this first before calling setUpgradeCosts
+                upgradeCosts = this.starUpgradeService.setUpgradeCosts(game, star);
             }
 
             // Add everything that could have changed
@@ -835,7 +880,8 @@ module.exports = class GameTickService extends EventEmitter {
                 terraformedResources,
                 garrison: star.garrison,
                 infrastructure: star.infrastructure,
-                specialistId: star.specialistId // TODO: Also need to re-get the specialist but only if it has changed.
+                specialistId: star.specialistId, // TODO: Also need to re-get the specialist but only if it has changed.
+                upgradeCosts
             });
         }
 

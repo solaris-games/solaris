@@ -8,9 +8,9 @@
 
     <div class="row">
       <div class="col-sm-12 col-md-6">
-        <p>The multiplayer game of Strategy, Intrigue and Galactic Conquest.</p>
-        <h4>A board game for the web!</h4>
-        <p>Login throughout the day to command epic fleets of spacecraft in a desperate struggle to conquer the galaxy!</p>
+        <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
+        <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
+        <p>Will you conquer the galaxy?</p>
       </div>
       <div class="col-sm-12 col-md-6">
         <h4>Login</h4>

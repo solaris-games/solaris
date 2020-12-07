@@ -101,7 +101,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/user/achievements/:id', middleware.authenticate, async (req, res, next) => {
         try {
-            let achievements = await container.userService.getAchievements(req.params.id);
+            let achievements = await container.achievementService.getAchievements(req.params.id);
 
             return res.status(200).json(achievements);
         } catch (err) {

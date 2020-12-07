@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js-legacy'
 import gameContainer from './container'
 import Background from './background'
 import Star from './star'
@@ -44,7 +44,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.carrierContainer)
   }
 
-  setup (game) {
+  setup (game, userSettings) {
     this.game = game
     
     // Cleanup events
@@ -60,7 +60,7 @@ class Map extends EventEmitter {
 
     // Add stars
     for (let i = 0; i < game.galaxy.stars.length; i++) {
-      this.setupStar(game, game.galaxy.stars[i])
+      this.setupStar(game, userSettings, game.galaxy.stars[i])
     }
 
     // Add carriers
@@ -99,17 +99,18 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
+    this.territories.draw()
 
     // -----------
     // Setup Background
     this.background = new Background()
-    this.background.setup(game)
+    this.background.setup(game, userSettings)
 
     this.backgroundContainer.addChild(this.background.container)
     this.background.draw()
   }
 
-  setupStar (game, starData) {
+  setupStar (game, userSettings, starData) {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
@@ -122,7 +123,7 @@ class Map extends EventEmitter {
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
-    star.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -175,13 +176,13 @@ class Map extends EventEmitter {
     }
   }
 
-  reloadGame (game) {
+  reloadGame (game, userSettings) {
     // Update all of the stars.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
       let starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
-      existing.setup(starData, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+      existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       existing.draw()
     }
 
@@ -201,7 +202,20 @@ class Map extends EventEmitter {
 
       existing.draw()
     }
+
+    this.territories.setup(game)
+    this.territories.draw()
   }
+
+
+  _disableCarriersInteractivity() {
+    this.carriers.forEach( c => c.disableInteractivity() )
+  }
+
+  _enableCarriersInteractivity() {
+    this.carriers.forEach( c => c.enableInteractivity() )
+  }
+
 
   setMode (mode, args) {
     this.mode = mode
@@ -211,14 +225,18 @@ class Map extends EventEmitter {
       this.unselectAllCarriers()
       this.unselectAllStars()
     }
+    if (this.mode == 'waypoints') {
+      this._disableCarriersInteractivity()
+    }
+    else {
+      this._enableCarriersInteractivity()
+    }
 
     this.draw()
   }
 
   resetMode () {
-    this.mode = 'galaxy'
-
-    this.draw()
+    this.setMode( 'galaxy', this.modeArgs )
   }
 
   drawStars () {
@@ -274,18 +292,6 @@ class Map extends EventEmitter {
 
   clearRulerPoints () {
     this.rulerPoints.setup(this.game)
-  }
-  
-  drawTerritories () {
-    if (this.territories) {
-      this.territories.draw()
-    }
-  }
-
-  clearTerritories () {
-    if (this.territories) {
-      this.territories.clear()
-    }
   }
 
   panToPlayer (game, player) {
@@ -384,17 +390,16 @@ class Map extends EventEmitter {
       })
   }
 
-  onTick( deltaTime ) {
-
+  onTick(deltaTime) {
     let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
     let viewportHeight = gameContainer.viewport.bottom - gameContainer.viewport.top
     
-    let viewportXRadius = viewportWidth/2.0
-    let viewportYRadius = viewportHeight/2.0
+    let viewportXRadius = viewportWidth / 2.0
+    let viewportYRadius = viewportHeight / 2.0
     
     let viewportCenter = gameContainer.viewport.center
 
-    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth)*100
+    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -405,6 +410,7 @@ class Map extends EventEmitter {
     this.stars.forEach(s => s.onTick(deltaTime, viewportData))
     this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
 
+    this.background.onTick(deltaTime, viewportData)
   }
 
   onViewportPointerDown(e) {
@@ -481,8 +487,6 @@ class Map extends EventEmitter {
       } else {
         selectedCarrier.isSelected = false
       }
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
     }
@@ -570,12 +574,7 @@ class Map extends EventEmitter {
 
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
-
-    if (this.zoomPercent > 100) {
-      this.drawTerritories()
-    } else {
-      this.clearTerritories()
-    }
+    this.territories.refreshZoom(zoomPercent)
   }
 }
 

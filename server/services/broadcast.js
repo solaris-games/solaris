@@ -120,8 +120,43 @@ module.exports = class BroadcastService {
         this.io.to(playerId).emit('gameMessagesAllRead');
     }
 
-    gamePlayerCreditsReceived(game, toPlayerId, credits) {
-        this.io.to(toPlayerId).emit('playerCreditsReceived', credits);
+    gamePlayerCreditsReceived(game, fromPlayerId, toPlayerId, credits, date) {
+        this.io.to(toPlayerId).emit('playerCreditsReceived', {
+            playerId: toPlayerId,
+            type: 'playerCreditsReceived',
+            date,
+            data: {
+                fromPlayerId,
+                toPlayerId,
+                credits
+            }
+        });
+    }
+
+    gamePlayerRenownReceived(game, fromPlayerId, toPlayerId, renown, date) {
+        this.io.to(toPlayerId).emit('playerRenownReceived', {
+            playerId: toPlayerId,
+            type: 'playerRenownReceived',
+            date,
+            data: {
+                fromPlayerId,
+                toPlayerId,
+                renown
+            }
+        });
+    }
+
+    gamePlayerTechnologyReceived(game, fromPlayerId, toPlayerId, technology, date) {
+        this.io.to(toPlayerId).emit('playerTechnologyReceived', {
+            playerId: toPlayerId,
+            type: 'playerTechnologyReceived',
+            date,
+            data: {
+                fromPlayerId,
+                toPlayerId,
+                technology
+            }
+        });
     }
 
     gamePlayerDebtAdded(game, debtorPlayerId, creditorPlayerId, amount) {

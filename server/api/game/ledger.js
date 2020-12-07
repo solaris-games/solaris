@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/api/game/:gameId/ledger', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayerLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/ledger', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {

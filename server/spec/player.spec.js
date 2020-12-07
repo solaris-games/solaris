@@ -138,7 +138,7 @@ describe('player', () => {
         nameService = new NameService(gameNames, starNames, randomService);
         mapService = new MapService(randomService, starService, distanceService, starDistanceService, nameService);
         technologyService = new TechnologyService();
-        playerService = new PlayerService(randomService, mapService, starService, carrierService, starDistanceService, technologyService);
+        playerService = new PlayerService(null, randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     });
 
     it('should create an empty player', () => {

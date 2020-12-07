@@ -12,13 +12,14 @@
     </div>
 
     <div class="pt-2">
-        <conversation-message v-for="conversation in conversations"
+        <conversation-preview v-for="conversation in orderedConversations"
           v-bind:key="conversation.playerId"
           :sender="getPlayer(conversation.playerId)"
           :message="conversation.lastMessage"
           :colour="getPlayerColour(conversation.playerId)"
           :isUnread="conversation.hasUnread"
           :isTruncated="true"
+          :isFullWidth="true"
           @onConversationOpenRequested="onConversationOpenRequested"
           class="mb-2"/>
     </div>
@@ -29,17 +30,35 @@
 <script>
 import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
-import ConversationMessageVue from './ConversationMessage'
+import ConversationPreviewVue from './ConversationPreview'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
-    'conversation-message': ConversationMessageVue
+    'conversation-preview': ConversationPreviewVue
   },
   data () {
     return {
       conversations: null
+    }
+  },
+  computed: {
+    orderedConversations: function() {
+      return this.conversations.sort(function(a,b) {
+        if (a === b) {
+          return 0
+        }
+        else if (a.lastMessage === null) {
+          return 1
+        }
+        else if (b.lastMessage === null) {
+          return -1
+        }
+        else {
+          return b.lastMessage.sentDate.localeCompare(a.lastMessage.sentDate)
+        }
+      });
     }
   },
   mounted () {

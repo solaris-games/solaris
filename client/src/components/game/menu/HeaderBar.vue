@@ -7,7 +7,7 @@
             {{game.settings.general.name}}
         </div>
         <div class="col">
-            <span class="pointer" v-if="gameIsPaused()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Paused</span>
+            <span class="pointer" v-if="gameIsPaused()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText()}}</span>
             <span class="pointer" v-if="gameIsInProgress()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
         </div>
@@ -33,7 +33,7 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-if="userPlayer && isTurnBasedGame()" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-if="userPlayer && isTurnBasedGame() && !gameIsFinished()" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
@@ -50,7 +50,6 @@
                     <div v-if="userPlayer">
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()"><i class="fas fa-home"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)"><i class="fas fa-ruler"></i></button>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-bolt"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" v-if="!userPlayer.defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)"><i class="fas fa-money-bill"></i></button>
                     </div>
                 </div>
@@ -65,8 +64,8 @@
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)"><i class="fas fa-book-open mr-2"></i>Notes</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
                 </div>
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
                 <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
                 <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
             </div>
@@ -103,7 +102,6 @@ import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import MessageApiService from '../../../services/api/message'
 import GameApiService from '../../../services/api/game'
-import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -122,8 +120,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.setupTimer()
@@ -140,7 +136,7 @@ export default {
 
     this.sockets.subscribe('playerCreditsReceived', (data) => {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
-      player.credits += data
+      player.credits += data.data.credits
     })
   },
   destroyed () {
@@ -156,7 +152,7 @@ export default {
       this.setupTimer()
 
       this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
-      this.audio.download()
+      AudioService.download()
     },
     setupTimer () {
       this.recalculateTimeRemaining()
@@ -201,7 +197,7 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let ticksToProduction = gameHelper.getTicksToProduction(this.$store.state.game)
+        let ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game)
 
         this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }
@@ -214,6 +210,9 @@ export default {
     },
     gameIsPendingStart () {
       return GameHelper.isGamePendingStart(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     },
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)
@@ -266,6 +265,43 @@ export default {
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
+      let isInGame = this.userPlayer != null
+
+      // Handle keyboard shortcuts for screens only available for users
+      // who are players.
+      if (isInGame) {
+        switch (e.keyCode || e.which) {
+          case 187: // +
+            GameContainer.zoomIn()
+            break
+          case 189: // -
+            GameContainer.zoomOut()
+            break
+          case 82: // R
+            this.setMenuState(MENU_STATES.RESEARCH)
+            break
+          case 83: // S
+            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
+            break
+          case 70: // F
+            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
+            break
+          case 71: // G
+            this.setMenuState(MENU_STATES.INTEL)
+            break
+          case 73: // I
+            this.setMenuState(MENU_STATES.INBOX)
+            break
+          case 86: // V
+            this.setMenuState(MENU_STATES.RULER)
+            break
+          case 78: // N
+            this.setMenuState(MENU_STATES.GAME_NOTES)
+            break
+        }
+      }
+
+      // Handle keyboard shortcuts for any user type.
       switch (e.keyCode || e.which) {
         case 187: // +
           GameContainer.zoomIn()
@@ -273,35 +309,14 @@ export default {
         case 189: // -
           GameContainer.zoomOut()
           break
-        case 82: // R
-          this.setMenuState(MENU_STATES.RESEARCH)
-          break
-        case 83: // S
-          this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
-          break
-        case 70: // F
-          this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
-          break
-        case 71: // G
-          this.setMenuState(MENU_STATES.INTEL)
-          break
         case 76: // L
           this.setMenuState(MENU_STATES.LEADERBOARD)
-          break
-        case 79: // O
-          this.setMenuState(MENU_STATES.OPTIONS)
-          break
-        case 73: // I
-          this.setMenuState(MENU_STATES.INBOX)
           break
         case 67: // C
           this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
           break
-        case 86: // V
-          this.setMenuState(MENU_STATES.RULER)
-          break
-        case 78: // N
-          this.setMenuState(MENU_STATES.GAME_NOTES)
+        case 79: // O
+          this.setMenuState(MENU_STATES.OPTIONS)
           break
       }
     }

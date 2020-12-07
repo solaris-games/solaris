@@ -1,7 +1,7 @@
 <template>
 <div class="container">
   <div class="mb-2">
-      <button class="btn" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
         <span v-if="!showAll">Show All Carriers</span>
         <span v-if="showAll">Show Your Carriers</span>
       </button>
@@ -12,12 +12,12 @@
           <thead>
               <tr class="bg-primary">
                   <td><i class="fas fa-user"></i></td>
-                  <td><a href="javascript:;" @click="sort('name')">Name</a></td>
+                  <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
                   <td></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort('ships')"><i class="fas fa-rocket"></i></a></td>
-                  <td class="text-right"><i class="fas fa-map-marker-alt"></i></td>
+                  <td class="text-right"><a href="javascript:;" @click="sort(['ships'])"><i class="fas fa-rocket"></i></a></td>
+                  <td class="text-right"><a href="javascript:;" @click="sort(['waypoints', 'length'])"><i class="fas fa-map-marker-alt"></i></a></td>
                   <td></td>
-                  <td>ETA</td>
+                  <td><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
                   <!-- <td>Total ETA</td> -->
               </tr>
           </thead>
@@ -74,7 +74,7 @@ export default {
     },
     sort (columnName) {
       // If sorting by a new column, reset the sort.
-      if (this.sortBy !== columnName) {
+      if (JSON.stringify(this.sortBy) !== JSON.stringify(columnName)) {
         this.sortBy = columnName
         this.sortDirection = true
       } else {
@@ -85,17 +85,23 @@ export default {
   },
   computed: {
     sortedTableData () {
+      // here be dragons
+      const getNestedObject = (nestedObj, pathArr) => {
+        return pathArr.reduce((obj, key) =>
+          (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+      }
+
       if (this.sortBy == null) {
         return this.tableData
       }
 
       return this.tableData.sort((a, b) => {
         if (this.sortDirection) { // Ascending
-          return b[this.sortBy] < a[this.sortBy] ? 1 : -1
+          return getNestedObject(b, this.sortBy) < getNestedObject(a, this.sortBy) ? 1 : -1
         }
 
         // Descending
-        return a[this.sortBy] <= b[this.sortBy] ? 1 : -1
+        return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
       })
     }
   }

@@ -9,7 +9,7 @@
     <div class="form-group row pt-2 pb-2 mb-0 bg-secondary" v-if="!player.defeated">
         <label class="col col-form-label">Researching Now:</label>
         <div class="col">
-            <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow">
+            <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow" :disabled="isGameFinished">
                 <option v-for="option in optionsNow" v-bind:value="option.value" v-bind:key="option.value">
                     {{ option.text }}
                 </option>
@@ -27,7 +27,7 @@
     <div class="form-group row pt-2 pb-2 mb-2 bg-secondary" v-if="!player.defeated">
         <label class="col col-form-label">Research Next:</label>
         <div class="col">
-            <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext">
+            <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext" :disabled="isGameFinished">
                 <option v-for="option in optionsNext" v-bind:value="option.value" v-bind:key="option.value">
                     {{ option.text }}
                 </option>
@@ -59,8 +59,6 @@ export default {
     }
   },
   mounted () {
-    this.audio = new AudioService(this.$store)
-    
     this.player = GameHelper.getUserPlayer(this.$store.state.game)
     this.loadTechnologies()
 
@@ -94,7 +92,7 @@ export default {
         let result = await researchService.updateResearchNow(this.$store.state.game._id, this.player.researchingNow)
 
         if (result.status === 200) {
-          this.audio.join()
+          AudioService.join()
           this.player.currentResearchTicksEta = result.data.ticksEta
           this.recalculateTimeRemaining()
           this.$toasted.show(`Current research updated.`)
@@ -112,7 +110,7 @@ export default {
         let response = await researchService.updateResearchNext(this.$store.state.game._id, this.player.researchingNext)
 
         if (response.status === 200) {
-          this.audio.join()
+          AudioService.join()
           this.$toasted.show(`Next research updated.`)
         }
       } catch (err) {
@@ -123,6 +121,11 @@ export default {
     },
     recalculateTimeRemaining () {
       this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.player.currentResearchTicksEta)
+    }
+  },
+  computed: {
+    isGameFinished: function () {
+      return GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

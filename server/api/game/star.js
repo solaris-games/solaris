@@ -165,8 +165,11 @@ module.exports = (router, io, container) => {
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
-            playersWithinScanningRange.forEach(p => 
-                container.broadcastService.gameStarCarrierBuilt(req.game, p._id, report));
+            playersWithinScanningRange.forEach(p => {
+                if (!p._id.equals(req.player._id)) {
+                    container.broadcastService.gameStarCarrierBuilt(req.game, p._id, report);
+                }
+            });
         } catch (err) {
             return next(err);
         }

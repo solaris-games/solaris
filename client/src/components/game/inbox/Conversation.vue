@@ -8,18 +8,23 @@
 
   <loading-spinner :loading="!messages"/>
 
-  <div v-if="messages">
-    <div class="pt-0 mb-2 mt-2 messages-container" v-if="messages.length">
-        <conversation-message v-for="message in messages"
-            v-bind:key="message._id"
+  <div v-if="sortedMessages">
+    <div class="pt-0 mb-2 mt-2 messages-container" v-if="sortedMessages.length">
+      <div v-for="message in sortedMessages" v-bind:key="message._id">
+        <div v-if="!message.sentDate">
+          <conversation-trade-event :event="message"/>
+        </div>
+
+        <conversation-message 
+            v-if="message.sentDate"
             :sender="getPlayer(message.fromPlayerId)"
             :message="message"
             :colour="getPlayerColour(message.fromPlayerId)"
-            :isTruncated="false"
             class="mb-1"/>
+      </div>
     </div>
 
-    <div class="pt-0 mb-2 mt-2" v-if="!messages.length">
+    <div class="pt-0 mb-2 mt-2" v-if="!sortedMessages.length">
         <p class="mb-0">No messages.</p>
     </div>
 
@@ -31,11 +36,14 @@
 <script>
 import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MessageApiService from '../../../services/api/message'
+import GameApiService from '../../../services/api/game'
 import MenuTitle from '../MenuTitle'
 import PlayerTitleVue from '../player/PlayerTitle'
 import ComposeMessage from './ComposeMessage'
 import ConversationMessageVue from './ConversationMessage'
+import ConversationTradeEventVue from './ConversationTradeEvent'
 import gameHelper from '../../../services/gameHelper'
+import moment from 'moment'
 
 export default {
   components: {
@@ -43,6 +51,7 @@ export default {
     'menu-title': MenuTitle,
     'compose-message': ComposeMessage,
     'conversation-message': ConversationMessageVue,
+    'conversation-trade-event': ConversationTradeEventVue,
     'player-title': PlayerTitleVue
   },
   props: {
@@ -50,17 +59,26 @@ export default {
   },
   data () {
     return {
-      messages: null
+      messages: null,
+      userPlayer: null
     }
   },
   mounted () {
+    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
     this.loadMessages()
   },
   created () {
     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+    this.sockets.subscribe('playerCreditsReceived', this.onTradeEventReceived)
+    this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
+    this.sockets.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
   },
   destroyed () {
     this.sockets.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('playerRenownReceived')
+    this.sockets.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     onCloseRequested (e) {
@@ -79,11 +97,23 @@ export default {
       this.messages = []
 
       try {
-        let response = await MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId)
+        let [messagesResponse, tradesResponse] = await Promise.all(
+          [
+            MessageApiService.getConversation(this.$store.state.game._id, this.fromPlayerId), 
+            GameApiService.getTradeEvents(this.$store.state.game._id, 0)
+          ]
+        );
 
-        if (response.status === 200) {
-          this.messages = response.data
+        if (messagesResponse.status === 200 && tradesResponse.status === 200) {
+          // Filter the trades between only the two players in the conversation.
+          // TODO: This was a quick fix, this should be done server side instead.
+          let tradesBetweenPlayer = tradesResponse.data.filter(this.isTradeEventBetweenPlayers);
 
+          this.messages = [
+            ...messagesResponse.data,
+            ...tradesBetweenPlayer
+          ]
+        
           this.scrollToEnd()
         }
       } catch (e) {
@@ -91,12 +121,32 @@ export default {
       }
     },
     onMessageSent (e) {
-      this.loadMessages()
-    },
-    onMessageReceived (e) {
       this.messages.push(e)
 
       this.scrollToEnd()
+
+      // this.loadMessages()
+    },
+    onMessageReceived (e) {
+      if (e.fromPlayerId === this.fromPlayerId) {
+        this.messages.push(e)
+
+        this.scrollToEnd()
+      }
+    },
+    onTradeEventReceived (e) {
+      console.log(e)
+      if (this.isTradeEventBetweenPlayers(e)) {
+        this.messages.push(e)
+
+        this.scrollToEnd()
+      }
+    },
+    isTradeEventBetweenPlayers (t) {
+      return (t.playerId === this.userPlayer._id && t.data.fromPlayerId === this.fromPlayerId) ||
+        (t.playerId === this.fromPlayerId && t.data.fromPlayerId === this.userPlayer._id) ||
+        (t.playerId === this.userPlayer._id && t.data.toPlayerId === this.fromPlayerId) ||
+        (t.playerId === this.fromPlayerId && t.data.toPlayerId === this.userPlayer._id)
     },
     scrollToEnd () {
       // This doesn't seem to work inline, have to wait 100ms so that the UI can update itself
@@ -107,6 +157,28 @@ export default {
           messagesContainer.scrollTop = messagesContainer.scrollHeight
         }
       }, 100)
+    }
+  },
+  computed: {
+    sortedMessages: function () {
+      if (!this.messages) {
+        return []
+      }
+
+      // Sort messages and trade events together ordered by date ascending.
+      return this.messages.sort((a, b) => {
+        // Text messages will have a "sent date" on them.
+        let aMessageSentDate = a.sentDate ? moment(a.sentDate) : null
+        let bMessageSentDate = b.sentDate ? moment(b.sentDate) : null
+        // Trade events will have a "date" on them.
+        let aTradeSentDate = a.date ? moment(a.date) : null
+        let bTradeSentDate = b.date ? moment(b.date) : null
+
+        let aDate = aMessageSentDate || aTradeSentDate
+        let bDate = bMessageSentDate || bTradeSentDate
+
+        return aDate - bDate;
+      });
     }
   }
 }
