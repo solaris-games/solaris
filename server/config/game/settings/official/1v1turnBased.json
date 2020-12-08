@@ -22,7 +22,8 @@
     "giftCarriers": "disabled",
     "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled",
-    "resourceDistribution": "random"
+    "resourceDistribution": "random",
+    "playerDistribution": "circular"
   },
   "player": {
     "startingStars": 3,

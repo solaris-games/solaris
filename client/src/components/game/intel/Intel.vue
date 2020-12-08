@@ -50,7 +50,9 @@
                 class="btn mr-1 mb-1"
                 :class="{'btn-primary': playerFilter.enabled}"
                 @click="togglePlayerFilter(playerFilter)">
-                <i class="fas fa-circle" :style="{'color': playerFilter.colour}"></i>
+                <i class="fas" 
+                  :class="{'fa-circle': playerFilter.shape === 'circle','fa-square': playerFilter.shape === 'square'}"
+                  :style="{'color': playerFilter.colour}"></i>
               </button>
             </div>
         </div>
@@ -110,6 +112,7 @@ export default {
       return {
         enabled: true,
         playerId: p._id,
+        shape: p.shape,
         colour: GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
     })

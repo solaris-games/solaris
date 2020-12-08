@@ -21,7 +21,8 @@
     "giftCarriers": "enabled",
     "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled",
-    "resourceDistribution": "random"
+    "resourceDistribution": "random",
+    "playerDistribution": "random"
   },
   "player": {
     "startingStars": 6,
@@ -38,7 +39,7 @@
       "science": "standard"
     },
     "tradeCost": 15,
-    "tradeScanning": "all"
+    "tradeScanning": "scanned"
   },
   "technology": {
     "startingTechnologyLevel": {

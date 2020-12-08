@@ -165,7 +165,9 @@ module.exports = class DoughnutMapService {
             locations.reduce((sum, l) => sum + this.distanceService.getDistanceToClosestLocation(l, locations), 0) 
                 / locations.length;
 
-        return average >= game.constants.distances.minDistanceBetweenStars;
+        // This galaxy type seems to need a slightly larger min average than normal otherwise
+        // stars spawn too close to eachother.
+        return average >= game.constants.distances.minDistanceBetweenStars * 1.5;
     }
 
     getGalaxyMinMax(locations) {

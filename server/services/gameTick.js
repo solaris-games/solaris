@@ -785,7 +785,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
-            await this.leaderboardService.addGameRankings(leaderboard);
+            await this.leaderboardService.addGameRankings(game, leaderboard);
 
             this.emit('onGameEnded', {
                 game

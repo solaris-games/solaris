@@ -223,6 +223,7 @@ module.exports = class GameGalaxyService {
             let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
 
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
+            p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
 
             // If the user is in the game and it is the current
             // player we are looking at then return everything.

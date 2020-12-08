@@ -446,6 +446,28 @@ class GameHelper {
 
     return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
   }
+
+  getPlayerEmpireCenter (game, player) {
+    // Get all of the player's stars.
+    let playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
+
+    if (!playerStars.length) {
+      return null
+    }
+
+    // Work out the center point of all stars
+    let centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
+    let centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
+
+    return {
+      x: centerX,
+      y: centerY
+    }
+  }
+
+  getGamePlayerShapesCount (game) {
+    return new Set([...game.galaxy.players.map(p => p.shape)]).length > 1
+  }
 }
 
 export default new GameHelper()

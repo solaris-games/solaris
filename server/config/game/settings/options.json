@@ -164,6 +164,16 @@
             "value": "weightedCenter",
             "text": "Weighted (Center)"
             }
+        ],
+        "playerDistribution": [
+            {
+            "value": "circular",
+            "text": "Circular"
+            },
+            {
+            "value": "random",
+            "text": "Random"
+            }
         ]
         },
         "galaxy": {

@@ -295,16 +295,13 @@ class Map extends EventEmitter {
   }
 
   panToPlayer (game, player) {
-    // Find the home star the player owns.
-    let homeStar = game.galaxy.stars.find(x => {
-      return x._id === player.homeStarId
-    })
+    let empireCenter = GameHelper.getPlayerEmpireCenter(game, player)
 
-    if (!homeStar) {
+    if (!empireCenter) {
       return
     }
 
-    gameContainer.viewport.moveCenter(homeStar.location.x, homeStar.location.y)
+    gameContainer.viewport.moveCenter(empireCenter.x, empireCenter.y)
 
     let zoomPercent = gameContainer.getViewportZoomPercentage()
 
