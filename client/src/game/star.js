@@ -57,7 +57,7 @@ class Star extends EventEmitter {
 
     this.userSettings = userSettings
 
-    // maybe all these could be static variables since these are all the same for every star
+    // TODO maybe all these could be static variables since these are all the same for every star
     this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
     this.baseScale = 1 //TODO add user setting for this independent of clamped or default
     //divide these by 4 to allow more control while keeping the UI as int
@@ -165,7 +165,7 @@ class Star extends EventEmitter {
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
-          orbitGraphics.drawCircle(0, 0, distanceToStar - (planetSize / 2))
+          orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
         this.container_planets.addChild(orbitGraphics)
 
         let planetGraphics = new PIXI.Graphics()
@@ -184,7 +184,7 @@ class Star extends EventEmitter {
         let rotationSpeed = (planetCount - i) / rotationSpeedModifier
 
         this.app.ticker.add((delta) => {
-          //maybe check if visible? no need to rotate planets outside viewport
+          //TODO maybe check if visible? no need to rotate planets outside viewport
           if (rotationDirection) {
             planetContainer.rotation += rotationSpeed * delta
           } else {
