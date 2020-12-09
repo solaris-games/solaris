@@ -36,6 +36,11 @@ class Carrier extends EventEmitter {
     this.container.hitArea = new PIXI.Circle(0, 0, 10)
 
     this.userSettings = userSettings
+
+    this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
+    this.baseScale = 1
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
   }
 
   draw () {
@@ -210,31 +215,29 @@ class Carrier extends EventEmitter {
      this.graphics_colour.visible = true
      if (this.text_garrison) this.text_garrison.visible = true
      this.updateVisibility()
+     this.setScale(zoomPercent)
+   }
+  }
 
-     let clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
-     let SIZE = 1
-     let MIN_SCALE = this.userSettings.map.objectsMinimumScale/4.0
-     let MAX_SCALE = this.userSettings.map.objectsMaximumScale/4.0
-     if(clampedScaling) {
+  setScale( zoomPercent ) {
+     if(this.clampedScaling) {
        let currentScale = zoomPercent/100
-       if (currentScale < MIN_SCALE) {
-         this.container.scale.x = (1/currentScale)*MIN_SCALE
-         this.container.scale.y = (1/currentScale)*MIN_SCALE
-       } else if (currentScale > MAX_SCALE) {
-         this.container.scale.x = (1/currentScale)*MAX_SCALE
-         this.container.scale.y = (1/currentScale)*MAX_SCALE
+       if (currentScale < this.minScale) {
+         this.container.scale.x = (1/currentScale)*this.minScale
+         this.container.scale.y = (1/currentScale)*this.minScale
+       } else if (currentScale > this.maxScale) {
+         this.container.scale.x = (1/currentScale)*this.maxScale
+         this.container.scale.y = (1/currentScale)*this.maxScale
        }
        else {
-         this.container.scale.x = SIZE
-         this.container.scale.y = SIZE
+         this.container.scale.x = this.baseScale
+         this.container.scale.y = this.baseScale
        }
      }
      else {
-       this.container.scale.x = SIZE
-       this.container.scale.y = SIZE
+       this.container.scale.x = this.baseScale
+       this.container.scale.y = this.baseScale
      }
-
-   }
   }
 
   onClicked (e) {
