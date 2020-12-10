@@ -65,7 +65,7 @@ class Map extends EventEmitter {
 
     // Add carriers
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
-      this.setupCarrier(game, game.galaxy.carriers[i])
+      this.setupCarrier(game, userSettings, game.galaxy.carriers[i])
     }
 
     // -----------
@@ -118,6 +118,7 @@ class Map extends EventEmitter {
       this.stars.push(star)
 
       this.starContainer.addChild(star.container)
+      this.starContainer.addChild(star.fixedContainer)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
@@ -128,7 +129,7 @@ class Map extends EventEmitter {
     return star
   }
 
-  setupCarrier (game, carrierData) {
+  setupCarrier (game, userSettings, carrierData) {
     let existing = this.carriers.find(x => x.data._id === carrierData._id)
 
     if (existing) {
@@ -138,6 +139,7 @@ class Map extends EventEmitter {
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
       this.carrierContainer.removeChild(existing.container)
+      this.carrierContainer.removeChild(existing.fixedContainer)
 
       this.carriers.splice(this.carriers.indexOf(existing), 1)
     }
@@ -145,11 +147,12 @@ class Map extends EventEmitter {
     let carrier = new Carrier()
     let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-    carrier.setup(carrierData, this.stars, player, game.constants.distances.lightYear)
+    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
 
     this.carriers.push(carrier)
 
     this.carrierContainer.addChild(carrier.container)
+    this.carrierContainer.addChild(carrier.fixedContainer)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
@@ -195,9 +198,9 @@ class Map extends EventEmitter {
       if (existing) {
         let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-        existing.setup(carrierData, this.stars, player, game.constants.distances.lightYear)
+        existing.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
       } else {
-        existing = this.setupCarrier(game, carrierData)
+        existing = this.setupCarrier(game, userSettings, carrierData)
       }
 
       existing.draw()
@@ -273,6 +276,7 @@ class Map extends EventEmitter {
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
       this.carrierContainer.removeChild(existing.container)
+      this.carrierContainer.removeChild(existing.fixedcontainer)
 
       this.carriers.splice(this.carriers.indexOf(existing), 1)
     }
@@ -404,8 +408,8 @@ class Map extends EventEmitter {
       yradius: viewportYRadius
     }
 
-    this.stars.forEach(s => s.onTick(deltaTime, viewportData))
-    this.carriers.forEach(c => c.onTick(deltaTime, viewportData))
+    this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData))
+    this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData))
 
     this.background.onTick(deltaTime, viewportData)
   }
@@ -571,6 +575,7 @@ class Map extends EventEmitter {
 
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
+
     this.territories.refreshZoom(zoomPercent)
   }
 }

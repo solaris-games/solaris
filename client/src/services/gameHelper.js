@@ -366,6 +366,18 @@ class GameHelper {
     return game.settings.general.anonymity === 'normal'
   }
 
+  calculateGalaxyCenterX (game) {
+    let starFieldLeft = this.calculateMinStarX(game)
+    let starFieldRight = this.calculateMaxStarX(game)
+    return starFieldLeft + ( (starFieldRight-starFieldLeft)/2.0 )
+  }
+
+  calculateGalaxyCenterY (game) {
+    let starFieldTop = this.calculateMinStarY(game)
+    let starFieldBottom = this.calculateMaxStarY(game)
+    return starFieldTop + ( (starFieldBottom-starFieldTop)/2.0 )
+  }
+
   calculateMinStarX (game) {
     if (!game.galaxy.stars.length) { return 0 }
 

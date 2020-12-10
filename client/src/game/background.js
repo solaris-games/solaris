@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import TextureService from './texture'
 import * as rng from 'random-seed'
+import gameHelper from '../services/gameHelper'
 
 class Background {
   NEBULA_GENERATION = {
@@ -19,6 +20,8 @@ class Background {
     this.game = game
     this.userSettings = userSettings
     this.rng = rng.create(game._id)
+    this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
+    this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()
   }
 
@@ -65,8 +68,8 @@ class Background {
   }
 
   onTick (deltaTime, viewportData) {
-    let deltax = viewportData.center.x
-    let deltay = viewportData.center.y
+    let deltax = viewportData.center.x-this.galaxyCenterX
+    let deltay = viewportData.center.y-this.galaxyCenterY
  
     for (let i = 0; i < this.container.children.length; i++) {
       let child = this.container.children[i]
