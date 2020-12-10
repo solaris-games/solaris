@@ -124,6 +124,12 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('This player spot has already been taken by another user.');
         }
 
+        let aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
+
+        if (aliasCheckPlayer) {
+            throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
+        }
+
         // TODO: Factor in player type setting. i.e premium players only.
 
         // Assign the user to the player.
