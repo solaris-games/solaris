@@ -239,6 +239,7 @@ module.exports = class GameGalaxyService {
                 player.research.manufacturing.effective = effectiveTechs.manufacturing;
 
                 delete p.notes; // Don't need to send this back.
+                delete p.lastSeenIP; // Super sensitive data.
 
                 return p;
             }

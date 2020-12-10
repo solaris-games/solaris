@@ -14,6 +14,7 @@ const schema = new Schema({
     },
     shape: { type: Types.String, required: true, enum: ['circle', 'square'], default: 'circle' },
     lastSeen: { type: Types.Date, required: false },
+    lastSeenIP: { type: Types.String, required: false },
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },

@@ -381,13 +381,14 @@ module.exports = class PlayerService extends EventEmitter {
         player.lastSeen = moment().utc();
     }
 
-    async updateLastSeenLean(gameId, userId) {
+    async updateLastSeenLean(gameId, userId, ipAddress) {
         await this.gameModel.updateOne({
             _id: gameId,
             'galaxy.players.userId': userId
         }, {
             $set: {
-                'galaxy.players.$.lastSeen': moment().utc()
+                'galaxy.players.$.lastSeen': moment().utc(),
+                'galaxy.players.$.lastSeenIP': ipAddress
             }
         });
     }
