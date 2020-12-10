@@ -4,7 +4,7 @@
         <!-- <label for="txtMessage">Compose Message</label> -->
         <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." v-model="message"></textarea>
     </div>
-    <div class="form-group text-right">
+    <div class="form-group text-right mb-1">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">Submit</button>
     </div>
 </form>

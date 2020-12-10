@@ -44,13 +44,13 @@
 
 		<div class="row bg-secondary pt-2 pb-2">
 			<div class="col">
-				<button class="btn btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-chevron-left"></i></button>
-				<button class="btn btn-primary ml-1" @click="nextWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-chevron-right"></i></button>
-				<button class="btn ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop"><i class="fas fa-sync"></i></button>
+				<button class="btn btn-sm btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-chevron-left"></i> Prev</button>
+				<button class="btn btn-sm btn-primary ml-1" @click="nextWaypoint()" :disabled="isSavingWaypoints">Next <i class="fas fa-chevron-right"></i></button>
+				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints"><i class="fas fa-sync"></i></button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
-				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
+				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
 			</div>
 		</div>
 	</div>
@@ -105,19 +105,19 @@ export default {
         case 'nothing':
           return 'Do Nothing'
         case 'collectAll':
-          return 'Collect All Ships'
+          return 'Collect All'
         case 'dropAll':
-          return 'Drop All Ships'
+          return 'Drop All'
         case 'collect':
-          return `Collect ${waypoint.actionShips} Ships`
+          return `Collect ${waypoint.actionShips}`
         case 'drop':
-          return `Drop ${waypoint.actionShips} Ships`
+          return `Drop ${waypoint.actionShips}`
         case 'collectAllBut':
-          return `Collect All But ${waypoint.actionShips} Ships`
+          return `Collect All But ${waypoint.actionShips}`
         case 'dropAllBut':
-          return `Drop All But ${waypoint.actionShips} Ships`
+          return `Drop All But ${waypoint.actionShips}`
         case 'garrison':
-          return `Garrison ${waypoint.actionShips} Ships`
+          return `Garrison ${waypoint.actionShips}`
       }
     },
     isActionRequiresShips (action) {

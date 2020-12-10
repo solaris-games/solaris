@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
-        <button class="btn btn-primary" @click="resetRulerPoints">Reset</button>
+        <button class="btn btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
     </menu-title>
 
     <div class="row bg-secondary pt-2 pb-2">
@@ -9,7 +9,7 @@
             Waypoints
         </div>
         <div class="col-6 text-right">
-            {{points.length}}
+            <i class="fas fa-map-marker-alt"></i> {{points.length}}
         </div>
     </div>
 
@@ -36,7 +36,7 @@
             Hyperspace Range
         </div>
         <div class="col-6 text-right">
-            {{hyperspaceRange}}
+            <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
         </div>
     </div>
 
@@ -45,7 +45,7 @@
             ETA Base Speed
         </div>
         <div class="col-6 text-right">
-            {{totalEta}}
+            {{totalEta || 'N/A'}}
         </div>
     </div>
 
@@ -54,7 +54,7 @@
             ETA Warp Speed
         </div>
         <div class="col-6 text-right">
-            {{totalEtaWarp}}
+            {{totalEtaWarp || 'N/A'}}
         </div>
     </div>
 </div>

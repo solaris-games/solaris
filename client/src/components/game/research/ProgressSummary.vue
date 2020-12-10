@@ -2,7 +2,7 @@
 <div class="row bg-primary">
     <div class="col">
       <div class="table-responsive mb-0">
-        <table class="table table-sm" v-if="research">
+        <table class="table table-sm mb-1" v-if="research">
             <tbody>
                 <tr>
                     <td class="row-icon"><i :class="getIcon('scanning')"></i></td>

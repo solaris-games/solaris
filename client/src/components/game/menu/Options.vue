@@ -9,7 +9,7 @@
       <h4 class="pt-2">Interface</h4>
       
       <div class="row bg-secondary pt-1 pb-1">
-        <label for="uiStyle" class="col col-form-label">UI Style (Experimental)</label>
+        <label for="uiStyle" class="col col-form-label">UI Style</label>
         <div class="col">
           <select class="form-control" id="uiStyle" v-model="settings.interface.uiStyle" :disabled="isSavingSettings">
             <option value="standard">Standard</option>

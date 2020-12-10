@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-5">
                     <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
-                      :disabled="!availableTechnologies.length || selectedTechnology.cost > userPlayer.credits">Share Technology</modalButton>
+                      :disabled="!availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
                 </div>
             </div>
         </form>

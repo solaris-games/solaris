@@ -10,7 +10,7 @@
         <div class="col-12 mt-2">
               <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
             <p class="mb-2" v-if="!carrier.specialistId">
-                This carrier does not have a specialist assigned. <a href="javascript:;">Read More</a>.
+                This carrier does not have a specialist assigned..
             </p>
         </div>
     </div>

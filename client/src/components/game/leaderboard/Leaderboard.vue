@@ -69,7 +69,7 @@
       </div>
         <div class="col text-right pr-2">
             <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">Quit Game</modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger">Concede Defeat</modalButton>
+            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger"><i class="fas fa-skull-crossbones"></i> Concede Defeat</modalButton>
         </div>
     </div>
 

@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="form-group row mb-0 bg-primary" v-if="!player.defeated">
-        <label class="col col-form-label">Current Research ETA:</label>
+        <label class="col col-form-label" title="Current Research ETA">ETA:</label>
         <div class="col text-right">
             <label class="col-form-label">{{timeRemainingEta}}</label>
         </div>

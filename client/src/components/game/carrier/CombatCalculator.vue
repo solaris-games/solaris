@@ -8,13 +8,13 @@
             </div>
             <form class="col-12" @submit="calculate">
                 <div class="form-group row">
-                    <label for="defenderWeaponTech" class="col-8 col-form-label"><span class="text-success">Defender</span> Weapon Technology</label>
+                    <label for="defenderWeaponTech" class="col-8 col-form-label"><i class="fas fa-fighter-jet"></i> <span class="text-success ml-2">Defender</span> Weapons</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderWeaponTech" placeholder="Tech Level" v-model="defender.weaponsLevel" required="required">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="defenderShips" class="col-8 col-form-label"><span class="text-success">Defender</span> Ships</label>
+                    <label for="defenderShips" class="col-8 col-form-label"><i class="fas fa-rocket"></i> <span class="text-success ml-2">Defender</span> Ships</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
                     </div>
@@ -27,13 +27,13 @@
                 <hr/>
 
                 <div class="form-group row">
-                    <label for="attackerWeaponTech" class="col-8 col-form-label"><span class="text-danger">Attacker</span> Weapon Technology</label>
+                    <label for="attackerWeaponTech" class="col-8 col-form-label"><i class="fas fa-fighter-jet"></i> <span class="text-danger ml-2">Attacker</span> Weapons</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerWeaponTech" placeholder="Tech Level" v-model="attacker.weaponsLevel" required="required">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="attackerShips" class="col-8 col-form-label"><span class="text-danger">Attacker</span> Ships</label>
+                    <label for="attackerShips" class="col-8 col-form-label"><i class="fas fa-rocket"></i> <span class="text-danger ml-2">Attacker</span> Ships</label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerShips" placeholder="Ships" v-model="attacker.ships" required="required">
                     </div>
@@ -42,7 +42,7 @@
                 <div class="form-group row">
                     <div class="col-8"></div>
                     <div class="col-4">
-                        <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">Fight</button>
+                        <button type="submit" class="btn btn-success btn-block" :disabled="isLoading"><i class="fas fa-fist-raised"></i> Fight</button>
                     </div>
                 </div>
             </form>

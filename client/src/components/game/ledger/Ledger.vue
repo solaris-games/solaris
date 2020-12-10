@@ -10,7 +10,7 @@
 
     <div v-if="!isLoadingLedger" class="row">
         <div class="table-responsive" v-if="ledgers.length">
-          <table class="table table-sm table-striped">
+          <table class="table table-sm table-striped mb-0">
               <tbody>
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
                   <tr v-for="ledger in ledgers" :key="ledger.playerId">

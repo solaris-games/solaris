@@ -7,7 +7,7 @@
                   <p class="mb-2"><span class="text-warning">{{userPlayer.renownToGive == null ? 0 : userPlayer.renownToGive}} Renown</span> to distribute.</p>
               </div>
               <div class="col-5">
-                  <button type="button" class="btn btn-success btn-block" @click="confirmAwardRenown" :disabled="isAwardingRenown || !userPlayer.renownToGive">Award Renown</button>
+                  <button type="button" class="btn btn-success btn-block" @click="confirmAwardRenown" :disabled="isAwardingRenown || !userPlayer.renownToGive"><i class="fas fa-heart"></i> Award Renown</button>
               </div>
             </div>
         </form>
