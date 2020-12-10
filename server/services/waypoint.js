@@ -52,6 +52,11 @@ module.exports = class WaypointService {
             let sourceStar = this.starService.getByObjectId(game, waypoint.source);
             let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
+            // Make sure delay ticks isn't a decimal.
+            if (+waypoint.delayTicks % 1 != 0) {
+                throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} delay cannot be a decimal.`);
+            }
+
             let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
 
             if (distanceBetweenStars > hyperspaceDistance) {
