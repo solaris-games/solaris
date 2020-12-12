@@ -318,19 +318,19 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_square_partial.lineStyle(2, player.colour.value)
     this.graphics_colour_warp_square.lineStyle(2, player.colour.value)
 
-    this.graphics_colour_square_partial.moveTo(this.data.location.x + 7, this.data.location.y - 7)
-    this.graphics_colour_square_partial.lineTo(this.data.location.x - 7, this.data.location.y - 7)
-    this.graphics_colour_square_partial.lineTo(this.data.location.x - 7, this.data.location.y + 7)
-    this.graphics_colour_square_partial.lineTo(this.data.location.x + 7, this.data.location.y + 7)
+    this.graphics_colour_square_partial.moveTo(7, -7)
+    this.graphics_colour_square_partial.lineTo(-7, -7)
+    this.graphics_colour_square_partial.lineTo(-7, 7)
+    this.graphics_colour_square_partial.lineTo(7, 7)
     
-    this.graphics_colour_square.drawRect(this.data.location.x - 7, this.data.location.y - 7, 14, 14)
+    this.graphics_colour_square.drawRect(-7, -7, 14, 14)
 
-    this.graphics_colour_warp_square_partial.moveTo(this.data.location.x + 7, this.data.location.y - 10)
-    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x - 10, this.data.location.y - 10)
-    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x - 10, this.data.location.y + 10)
-    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x + 7, this.data.location.y + 10)
+    this.graphics_colour_warp_square_partial.moveTo(7, -10)
+    this.graphics_colour_warp_square_partial.lineTo(-10, -10)
+    this.graphics_colour_warp_square_partial.lineTo(-10, 10)
+    this.graphics_colour_warp_square_partial.lineTo(7, 10)
 
-    this.graphics_colour_warp_square.drawRect(this.data.location.x - 10, this.data.location.y - 10, 20, 20)
+    this.graphics_colour_warp_square.drawRect(-10, -10, 20, 20)
   }
 
   _hasUnknownShips() {
