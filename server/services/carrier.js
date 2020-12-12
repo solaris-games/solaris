@@ -20,7 +20,7 @@ module.exports = class CarrierService {
     }
 
     getCarriersAtStar(game, starId) {
-      return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId)
+      return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
     }
 
     createAtStar(star, carriers, ships = 1) {

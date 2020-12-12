@@ -9,16 +9,16 @@
             <tbody>
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
                     <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
-                    <td v-if="mapObject.type === 'star'" class="col-auto text-center" style="width:12.5%">
+                    <td v-if="mapObject.type === 'star'" class="col-auto text-center col-percent-12-5" @click="onViewObjectRequested(mapObject)">
                         <specialist-icon :type="'star'" :specialist="mapObject.data.specialist" />
                     </td>
-                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center" style="width:12.5%">
+                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center col-percent-12-5" @click="onViewObjectRequested(mapObject)">
                         <specialist-icon :type="'carrier'" :specialist="mapObject.data.specialist" />
                     </td>
-                    <td v-if="mapObject.type === 'star'" class="bg-secondary text-center" style="width:12.5%">
+                    <td v-if="mapObject.type === 'star'" class="bg-secondary text-center col-percent-12-5">
                         <span>{{mapObject.data.garrison == null ? '???' : mapObject.data.garrison}}</span>
                     </td>
-                    <td v-if="mapObject.type === 'carrier'" class="bg-secondary text-center" style="width:12.5%">
+                    <td v-if="mapObject.type === 'carrier'" class="bg-secondary text-center col-percent-12-5">
                         <span>{{mapObject.data.ships == null ? '???' : mapObject.data.ships}}</span>
                     </td>
                     <td>
@@ -32,11 +32,11 @@
                         </span>
                     </td>
                     <td v-if="userOwnsObject(mapObject)" class="text-right" style="">
-                        <button title="Edit waypoints." v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
+                        <button title="Edit waypoints" v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
                         <i class="fas fa-plus"></i> </button>
-                        <button title="Create a carrier." v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary  ml-1" @click="quickBuildCarrier(mapObject)"><i class="fas fa-rocket"></i></button>
-                        <button title="Transfer all ships to the star." v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
-                        <button title="Transfer ships." v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
+                        <button title="Build a carrier" v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary ml-1" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>
+                        <button title="Transfer all ships to the star" v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
+                        <button title="Transfer ships" v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
             </tbody>
@@ -63,62 +63,35 @@ export default {
   },
   data () {
     return {
-      audio: null,
-      isStandardUIStyle: false,
-      isCompactUIStyle: false
+      audio: null
     }
   },
-  mounted () {
-    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
-    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
-
-  },
   methods: {
+    onBuildCarrierRequested (starId) {
+      this.$emit('onBuildCarrierRequested', starId)
+    },
     hasEnoughCredits(mapObject) {
       let star = mapObject
       let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
       let availableCredits = userPlayer.credits
+
       return (availableCredits >= star.data.upgradeCosts.carriers)
     },
     async transferAllToStar(star) {
       try {
         let response = await starService.transferAllToStar(this.$store.state.game._id, star.data._id)
+
         if (response.status === 200) {
           this.$toasted.show(`All ships transfered to ${star.data.name}.`)
           let carriers = response.data.carriersAtStar
-          carriers.forEach( responseCarrier => {
+
+          carriers.forEach(responseCarrier => {
             let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
             mapObjectCarrier.ships = responseCarrier.ships
           })
-          
         }
       } catch (err) {
         console.log(err)
-      }
-    },
-    async quickBuildCarrier (star) {
-      try {
-        // Build the carrier with the entire star garrison.
-        let ships = star.data.garrison
-
-        let response = await starService.buildCarrier(this.$store.state.game._id, star.data._id, ships)
-        if (response.status === 200) {
-          this.$toasted.show(`Carrier built at ${star.data.name}.`)
-
-          // this.$emit('onCarrierBuilt', this.star._id)
-          // this.onOpenCarrierDetailRequested(response.data)
-          this.$store.state.game.galaxy.carriers.push(response.data.carrier)
-
-          gameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
-
-          let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-          userPlayer.credits -= star.data.upgradeCosts.carriers
-          this.onEditWaypointsRequested(response.data.carrier._id)
-          
-          AudioService.join()
-        }
-      } catch (err) {
-        console.error(err)
       }
     },
     userOwnsObject (mapObject) {
@@ -188,5 +161,9 @@ export default {
 <style scoped>
 td {
   vertical-align: middle !important;
+}
+
+.col-percent-12-5 {
+  width: 12.5%;
 }
 </style>

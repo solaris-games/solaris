@@ -9,56 +9,55 @@ module.exports = class ShipTransferService {
     }
 
     async transferAllToStar(game, player, starId) {
-        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
-        let star = this.starService.getById(game, starId)
+        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId);
+        let star = this.starService.getById(game, starId);
 
         if (!star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 
-        let shipsToTransfer = 0
-        for (let i=0; i < carriersAtStar.length; i++) {
-          let carrier = carriersAtStar[i]
-          if(carrier.ships > 1) {
-              shipsToTransfer += (carrier.ships-1)
-              carrier.ships = 1
-          }
+        let shipsToTransfer = 0;
+        
+        for (let carrier of carriersAtStar) {
+            if (carrier.ships > 1) {
+                shipsToTransfer += (carrier.ships-1)
+                carrier.ships = 1
+            }
         }
 
-        star.garrisonActual += shipsToTransfer
+        star.garrisonActual += shipsToTransfer;
         star.garrison = Math.floor(star.garrisonActual);
 
-        // Update the DB.
-        await this.gameModel.bulkWrite([
-            {
+        // Generate an array of all requires DB updates.
+        let dbWrites = carriersAtStar.map(c => {
+            return {
                 updateOne: {
                     filter: {
                         _id: game._id,
-                        'galaxy.stars._id': star._id
+                        'galaxy.carriers._id': c._id
                     },
                     update: {
-                        'galaxy.stars.$.garrisonActual': star.garrisonActual,
-                        'galaxy.stars.$.garrison': star.garrison
+                        'galaxy.carriers.$.ships': c.ships
                     }
                 }
+            };
+        });
+
+        dbWrites.push({
+            updateOne: {
+                filter: {
+                    _id: game._id,
+                    'galaxy.stars._id': star._id
+                },
+                update: {
+                    'galaxy.stars.$.garrisonActual': star.garrisonActual,
+                    'galaxy.stars.$.garrison': star.garrison
+                }
             }
-        ]);
-        for (let i=0; i < carriersAtStar.length; i++) {
-          let carrier = carriersAtStar[i]
-          await this.gameModel.bulkWrite([
-              {
-                  updateOne: {
-                      filter: {
-                          _id: game._id,
-                          'galaxy.carriers._id': carrier._id
-                      },
-                      update: {
-                          'galaxy.carriers.$.ships': carrier.ships
-                      }
-                  }
-              }
-          ]);
-        }
+        });
+
+        // Update the DB.
+        await this.gameModel.bulkWrite(dbWrites);
 
         return {
             player,

@@ -28,7 +28,8 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
-        @onBuildCarrierRequested="onBuildCarrierRequested"/>
+        @onBuildCarrierRequested="onBuildCarrierRequested"
+        @onShipTransferRequested="onShipTransferRequested"/>
       <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
@@ -69,7 +70,14 @@
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested"/>
-      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" @onCloseRequested="onCloseRequested" :mapObjects="menuArguments" @onOpenStarDetailRequested="onOpenStarDetailRequested" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" @onEditWaypointsRequested="onEditWaypointsRequested" @onShipTransferRequested="onShipTransferRequested"/>
+      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" 
+        @onCloseRequested="onCloseRequested" 
+        :mapObjects="menuArguments" 
+        @onOpenStarDetailRequested="onOpenStarDetailRequested" 
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" 
+        @onEditWaypointsRequested="onEditWaypointsRequested" 
+        @onShipTransferRequested="onShipTransferRequested"
+        @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
       <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested"/>
       <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
