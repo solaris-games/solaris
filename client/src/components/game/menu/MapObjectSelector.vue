@@ -35,7 +35,7 @@
                         <button title="Edit waypoints." v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
                         <i class="fas fa-plus"></i> </button>
                         <button title="Create a carrier." v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary  ml-1" @click="quickBuildCarrier(mapObject)"><i class="fas fa-rocket"></i></button>
-                        <button title="Transfer all ships to the star." v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="garrisonAllShips(mapObject)"><i class="fas fa-chevron-up"></i></button>
+                        <button title="Transfer all ships to the star." v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
                         <button title="Transfer ships." v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
@@ -80,15 +80,15 @@ export default {
       let availableCredits = userPlayer.credits
       return (availableCredits >= star.data.upgradeCosts.carriers)
     },
-    async garrisonAllShips(star) {
+    async transferAllToStar(star) {
       try {
-        let response = await starService.garrisonAllShips(this.$store.state.game._id, star.data._id)
+        let response = await starService.transferAllToStar(this.$store.state.game._id, star.data._id)
         if (response.status === 200) {
           this.$toasted.show(`All ships transfered to ${star.data.name}.`)
           let carriers = response.data.carriersAtStar
           carriers.forEach( responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(responseCarrier._id) 
-            mapObjectCarrier.data.garrison = responseCarrier.garrison
+            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
+            mapObjectCarrier.ships = responseCarrier.ships
           })
           
         }
