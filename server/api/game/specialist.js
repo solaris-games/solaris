@@ -50,9 +50,16 @@ module.exports = (router, io, container) => {
                 req.params.carrierId,
                 +req.params.specialistId);
 
+            await container.eventService.createPlayerCarrierSpecialistHired(
+                req.game,
+                req.player,
+                result.carrier,
+                result.specialist
+            );
+
             // TODO: Implement a socket to broadcast to other players.
 
-            return res.status(200).json(result);
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -72,9 +79,16 @@ module.exports = (router, io, container) => {
                 req.params.starId,
                 +req.params.specialistId);
 
+            await container.eventService.createPlayerStarSpecialistHired(
+                req.game,
+                req.player,
+                result.star,
+                result.specialist
+            );
+
             // TODO: Implement a socket to broadcast to other players.
 
-            return res.status(200).json(result);
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }

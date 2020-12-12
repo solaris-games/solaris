@@ -26,6 +26,7 @@ class GameContainer {
   }
 
   setupApp () {
+
     // Cleanup if the app already exists.
     if (this.app) {
       this.app.destroy(false, {
@@ -44,10 +45,11 @@ class GameContainer {
       resolution: window.devicePixelRatio || 1,
       autoResize: true
     })
-    this.app.ticker.add( this.onTick.bind(this) )
+
+    this.app.ticker.add(this.onTick.bind(this))
 
     if ( process.env.NODE_ENV == 'development') {
-      this.app.ticker.add( this.calcFPS.bind(this) )
+      this.app.ticker.add(this.calcFPS.bind(this))
     }
 
     // create viewport
@@ -139,7 +141,7 @@ class GameContainer {
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map.setupCarrier(this.game, carrier)
+    let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
     this.map.drawCarrier(carrierObject)
   }
 
@@ -149,13 +151,13 @@ class GameContainer {
 
   getViewportZoomPercentage () {
     let viewportWidth = this.viewport.right - this.viewport.left
-    let viewportPercent = (viewportWidth / this.viewport.screenWidth) * 100
+    let viewportPercent = (this.viewport.screenWidth / viewportWidth) * 100
 
     return viewportPercent
   }
 
-  onTick( deltaTime ) {
-    this.map.onTick( deltaTime )
+  onTick (deltaTime) {
+    this.map.onTick(deltaTime)
   }
 
   onViewportZoomed (e) {
@@ -171,6 +173,7 @@ class GameContainer {
   resetMode () {
     this.map.resetMode()
   }
+
 }
 
 export default new GameContainer()

@@ -37,17 +37,12 @@ class Territories {
     this.playerNamesContainer.alpha = 0.8
 
     for (let player of this.game.galaxy.players) {
-      // Get all of the player's stars.
-      let playerStars = gameHelper.getStarsOwnedByPlayer(player, this.game.galaxy.stars)
+      let empireCenter = gameHelper.getPlayerEmpireCenter(this.game, player)
 
-      if (!playerStars.length) {
+      if (empireCenter == null) {
         continue
       }
-
-      // Work out the center point of all stars
-      let centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
-      let centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
-
+      
       let style = new PIXI.TextStyle({
         fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
@@ -56,8 +51,8 @@ class Territories {
       })
 
       let text_name = new PIXI.Text(player.alias, style)
-      text_name.x = centerX - (text_name.width / 2)
-      text_name.y = centerY - (text_name.height / 2)
+      text_name.x = empireCenter.x - (text_name.width / 2)
+      text_name.y = empireCenter.y - (text_name.height / 2)
       text_name.resolution = 10
 
       this.playerNamesContainer.addChild(text_name)
@@ -153,11 +148,11 @@ class Territories {
     this.zoomPercent = zoomPercent
 
     if (this.voronoiContainer) {
-      this.voronoiContainer.visible = zoomPercent > 100
+      this.voronoiContainer.visible = zoomPercent <= 100
     }
 
     if (this.playerNamesContainer) {
-      this.playerNamesContainer.visible = zoomPercent > 150
+      this.playerNamesContainer.visible = zoomPercent <= 90
     }
   }
 

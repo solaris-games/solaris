@@ -2,13 +2,16 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(gameModel, carrierService, starService, distanceService, starDistanceService, technologyService) {
+    constructor(gameModel, carrierService, starService, distanceService, 
+        starDistanceService, technologyService, gameService, playerService) {
         this.gameModel = gameModel;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
+        this.gameService = gameService;
+        this.playerService = playerService;
     }
 
     async saveWaypoints(game, player, carrierId, waypoints, looped) {
@@ -49,13 +52,18 @@ module.exports = class WaypointService {
             let sourceStar = this.starService.getByObjectId(game, waypoint.source);
             let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
+            // Make sure delay ticks isn't a decimal.
+            if (+waypoint.delayTicks % 1 != 0) {
+                throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} delay cannot be a decimal.`);
+            }
+
             let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
 
             if (distanceBetweenStars > hyperspaceDistance) {
                 throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} exceeds hyperspace range.`);
             }
 
-            if (+waypoint.actionShips < 0) {
+            if (waypoint.actionShips == null || +waypoint.actionShips < 0) {
                 throw new ValidationError(`The waypoint ${sourceStar.name} --> ${destinationStar.name} cannot have action ships less than 0.`);
             }
         }
@@ -347,6 +355,39 @@ module.exports = class WaypointService {
     _performWaypointActions(game, actionWaypoints) {
         for (let actionWaypoint of actionWaypoints) {
             this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
+        }
+    }
+
+    sanitiseDarkModeCarrierWaypoints(game, carrier) {
+        // If in dark mode then we need to verify that waypoints are still valid.
+        // For example, if a star is captured then it may no longer be in scanning range
+        // so any waypoints to it should be removed unless already in transit.
+        const isDarkMode = this.gameService.isDarkMode(game);
+
+        if (!isDarkMode) {
+            return;
+        }
+
+        let player = this.playerService.getById(game, carrier.ownedByPlayerId);
+        let startIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
+
+        for (let i = startIndex; i < carrier.waypoints.length; i++) {
+            let waypoint = carrier.waypoints[i];
+            let destination = this.starService.getById(game, waypoint.destination);
+
+            // If the destination is not within scanning range of the player, remove it
+            // and all subsequent waypoints.
+            let inRange = this.starService.isStarInScanningRangeOfPlayer(game, destination, player);
+
+            if (!inRange) {
+                carrier.waypoints.splice(i);
+
+                if (carrier.waypointsLooped) {
+                    carrier.waypointsLooped = this.canLoop(game, player, carrier);
+                }
+
+                break;
+            }
         }
     }
 

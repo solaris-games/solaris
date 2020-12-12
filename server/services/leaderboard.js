@@ -61,7 +61,7 @@ module.exports = class LeaderboardService {
         return leaderboard;
     }
 
-    async addGameRankings(leaderboard) {
+    async addGameRankings(game, leaderboard) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
 
         // Remove any afk players from the leaderboard, they will not
@@ -92,7 +92,11 @@ module.exports = class LeaderboardService {
             if (i == 0) {
                 user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 user.achievements.victories++; // Increase the winner's victory count
-                user.credits++; // Give the winner a galactic credit.
+
+                // Give the winner a galactic credit for official games.
+                if (game.settings.general.createdByUserId == null) {
+                    user.credits++;
+                }
             } else {
                 user.achievements.rank += leaderboard.length / 2 - i;
                 user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.

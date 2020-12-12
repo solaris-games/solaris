@@ -77,8 +77,10 @@ export default {
   },
   destroyed () {
     this.unsubscribeToSockets()
-
+    
     this.$socket.emit('gameRoomLeft')
+
+    document.title = 'Solaris'
   },
   methods: {
     async reloadGame () {

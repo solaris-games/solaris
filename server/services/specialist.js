@@ -171,6 +171,12 @@ module.exports = class SpecialistService {
         // TODO: The carrier may have its waypoint ETAs changed based on the specialist so need to 
         // return the new data.
         // TODO: Need to consider local and global effects and update the UI accordingly.
+
+        return {
+            carrier,
+            specialist,
+            cost
+        };
     }
 
     async hireStarSpecialist(game, player, starId, specialistId) {
@@ -236,6 +242,12 @@ module.exports = class SpecialistService {
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.
         // TODO: Need to consider local and global effects and update the UI accordingly.
+
+        return {
+            star,
+            specialist,
+            cost
+        };
     }
     
 };

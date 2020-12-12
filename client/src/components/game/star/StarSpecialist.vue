@@ -10,7 +10,7 @@
         <div class="col-12 mt-2">
               <p v-if="star.specialist">{{star.specialist.description}}</p>
             <p class="mb-2" v-if="!star.specialistId">
-                This star does not have a specialist assigned. <a href="javascript:;">Read More</a>.
+                This star does not have a specialist assigned.
             </p>
         </div>
     </div>

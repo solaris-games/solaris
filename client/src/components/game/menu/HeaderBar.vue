@@ -265,12 +265,19 @@ export default {
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
+      let keyCode = e.keyCode || e.which
+
+      // Check for modifier keys and ignore the keypress if there is one.
+      if (e.altKey || e.shiftKey || e.ctrlKey) {
+        return
+      }
+
       let isInGame = this.userPlayer != null
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
       if (isInGame) {
-        switch (e.keyCode || e.which) {
+        switch (keyCode) {
           case 187: // +
             GameContainer.zoomIn()
             break
@@ -302,7 +309,7 @@ export default {
       }
 
       // Handle keyboard shortcuts for any user type.
-      switch (e.keyCode || e.which) {
+      switch (keyCode) {
         case 187: // +
           GameContainer.zoomIn()
           break

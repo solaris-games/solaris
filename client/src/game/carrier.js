@@ -10,6 +10,7 @@ class Carrier extends EventEmitter {
     super()
 
     this.container = new PIXI.Container()
+    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
     this.container.buttonMode = true
 
@@ -22,14 +23,24 @@ class Carrier extends EventEmitter {
     this.zoomPercent = 0
   }
 
-  setup (data, stars, player, lightYearDistance) {
+  setup (data, userSettings, stars, player, lightYearDistance) {
     this.data = data
     this.stars = stars
     this.player = player
     this.colour = player.colour.value
     this.lightYearDistance = lightYearDistance
+
+    this.container.position.x = data.location.x
+    this.container.position.y = data.location.y
     // Add a larger hit radius so that the star is easily clickable
-    this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 10)
+    this.container.hitArea = new PIXI.Circle(0, 0, 10)
+
+    this.userSettings = userSettings
+
+    this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
+    this.baseScale = 1
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
   }
 
   draw () {
@@ -54,7 +65,7 @@ class Carrier extends EventEmitter {
 
     if (!this.data.orbiting) {
       this.graphics_colour.lineStyle(1, this.colour)
-      this.graphics_colour.drawCircle(this.data.location.x, this.data.location.y, 4)
+      this.graphics_colour.drawCircle(0, 0, 4)
     }
   }
 
@@ -70,20 +81,18 @@ class Carrier extends EventEmitter {
     this.graphics_ship.beginFill(0xFFFFFF)
 
     // Draw normal carrier
-    this.graphics_ship.moveTo(this.data.location.x, this.data.location.y - 4)
-    this.graphics_ship.lineTo(this.data.location.x + 1.5, this.data.location.y + 1)
-    this.graphics_ship.lineTo(this.data.location.x + 3, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x + 1, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x + 0, this.data.location.y + 3)
-    this.graphics_ship.lineTo(this.data.location.x + -1, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x - 3, this.data.location.y + 2)
-    this.graphics_ship.lineTo(this.data.location.x - 1.5, this.data.location.y + 1)
-    this.graphics_ship.lineTo(this.data.location.x, this.data.location.y - 4)
+    this.graphics_ship.moveTo(0, 0 - 4)
+    this.graphics_ship.lineTo(0 + 1.5, 0 + 1)
+    this.graphics_ship.lineTo(0 + 3, 0 + 2)
+    this.graphics_ship.lineTo(0 + 1, 0 + 2)
+    this.graphics_ship.lineTo(0 + 0, 0 + 3)
+    this.graphics_ship.lineTo(0 + -1, 0 + 2)
+    this.graphics_ship.lineTo(0 - 3, 0 + 2)
+    this.graphics_ship.lineTo(0 - 1.5, 0 + 1)
+    this.graphics_ship.lineTo(0, 0 - 4)
     this.graphics_ship.endFill()
 
-    this.graphics_ship.pivot.set(this.data.location.x, this.data.location.y)
-    this.graphics_ship.position.x = this.data.location.x
-    this.graphics_ship.position.y = this.data.location.y
+    this.graphics_ship.pivot.set(0, 0)
     this.graphics_ship.scale.set(1)
 
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
@@ -107,8 +116,8 @@ class Carrier extends EventEmitter {
       this.text_garrison = new PIXI.Text(garrisonText, style)
       this.text_garrison.resolution = 10
 
-      this.text_garrison.x = this.data.location.x - (this.text_garrison.width / 2)
-      this.text_garrison.y = this.data.location.y + 5
+      this.text_garrison.x = -(this.text_garrison.width / 2)
+      this.text_garrison.y = 5
 
       this.container.addChild(this.text_garrison)
     }
@@ -123,8 +132,8 @@ class Carrier extends EventEmitter {
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 6
     specialistSprite.height = 6
-    specialistSprite.x = this.data.location.x - 3
-    specialistSprite.y = this.data.location.y - 3
+    specialistSprite.x = -3
+    specialistSprite.y = -3
     
     this.container.addChild(specialistSprite)
   }
@@ -155,16 +164,17 @@ class Carrier extends EventEmitter {
   drawCarrierWaypoints () {
     if (!this.graphics_waypoints) {
       this.graphics_waypoints = new PIXI.Graphics()
-      this.container.addChild(this.graphics_waypoints)
+      this.fixedContainer.addChild(this.graphics_waypoints)
     }
 
     this.graphics_waypoints.clear()
 
-    let lineWidth = this.data.waypointsLooped ? 0.5 : 1
-    let lineAlpha = this.data.waypointsLooped ? 0.1 : 0.3
+    let lineWidth = this.data.waypointsLooped ? 1 : 2
+    let lineAlpha = this.data.waypointsLooped ? 0.2 : 0.4
 
     this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
     this.graphics_waypoints.lineStyle(lineWidth, this.colour, lineAlpha)
+    this.graphics_waypoints._lineStyle.cap = PIXI.LINE_CAP.ROUND
 
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]
@@ -190,7 +200,7 @@ class Carrier extends EventEmitter {
    this.container.buttonMode = false
   }
 
-  onTick (deltaTime, viewportData) {
+  onTick( deltaTime, zoomPercent, viewportData) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
 
@@ -205,7 +215,29 @@ class Carrier extends EventEmitter {
      this.graphics_colour.visible = true
      if (this.text_garrison) this.text_garrison.visible = true
      this.updateVisibility()
+     this.setScale(zoomPercent)
    }
+  }
+
+  setScale( zoomPercent ) {
+     if(this.clampedScaling) {
+       let currentScale = zoomPercent/100
+       if (currentScale < this.minScale) {
+         this.container.scale.x = (1/currentScale)*this.minScale
+         this.container.scale.y = (1/currentScale)*this.minScale
+       } else if (currentScale > this.maxScale) {
+         this.container.scale.x = (1/currentScale)*this.maxScale
+         this.container.scale.y = (1/currentScale)*this.maxScale
+       }
+       else {
+         this.container.scale.x = this.baseScale
+         this.container.scale.y = this.baseScale
+       }
+     }
+     else {
+       this.container.scale.x = this.baseScale
+       this.container.scale.y = this.baseScale
+     }
   }
 
   onClicked (e) {
@@ -223,10 +255,7 @@ class Carrier extends EventEmitter {
 
   updateVisibility() {
     this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-
-    if (this.text_garrison) {
-      this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) || (this.isMouseOver && this.zoomPercent < 60))
-    }
+    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > 200 || (this.isSelected && this.zoomPercent > 200 ) || (this.isMouseOver && this.zoomPercent >200))
   }
 
   deselectAllText () {

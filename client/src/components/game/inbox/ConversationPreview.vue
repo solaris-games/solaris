@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col">
           <span>
-              <i class="fas fa-circle" :style="{'color': colour}"></i>
+              <i class="fas" :class="{'fa-circle': sender.shape === 'circle','fa-square': sender.shape === 'square'}" :style="{'color': colour}"></i>
               {{sender.alias}}
           </span>
         </div>

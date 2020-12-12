@@ -91,6 +91,10 @@ const schema = new Schema({
         },
         map: {
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
+            objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
+            objectsMinimumScale: { type: Types.Number, required: false, default: 8 },
+            objectsMaximumScale: { type: Types.Number, required: false, default: 16 },
+            nebulaDensity: { type: Types.String, required: false, enum: ['none', 'sparse', 'standard', 'abundant'], default: 'standard' }
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },

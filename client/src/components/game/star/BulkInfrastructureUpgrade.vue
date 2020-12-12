@@ -3,38 +3,35 @@
     <menu-title title="Bulk Upgrade" @onCloseRequested="onCloseRequested" />
 
     <div class="row">
-      <div class="col-7">
-        <p>Select an amount of money to spend and the kind of infrastructure you would like to buy. The cheapest infrastructure will be purchased throughout your empire.</p>
-      </div>
-      <div class="col-5">
-        <form @submit.prevent>
-          <div class="form-group input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text">$</span>
-            </div>
-            <input
-              class="form-control"
-              id="amount"
-              v-model="amount"
-              type="number"
-              required="required"
-            />
-          </div>
-          <div class="form-group">
-            <select class="form-control" id="infrastructureType" v-model="selectedType">
-              <option
-                v-for="opt in types"
-                v-bind:key="opt.key"
-                v-bind:value="opt.key"
-              >{{ opt.name }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <button class="btn btn-success btn-block" @click="upgrade" :disabled="isUpgrading || gameIsFinished()">Upgrade</button>
-          </div>
-        </form>
-      </div>
+      <p class="col-12">Select an amount of money to spend and the kind of infrastructure you would like to buy. The cheapest infrastructure will be purchased throughout your empire.</p>
     </div>
+
+    <form class="row no-gutters" @submit.prevent>
+      <div class="form-group input-group col-4 pr-1">
+        <div class="input-group-prepend">
+          <span class="input-group-text">$</span>
+        </div>
+        <input
+          class="form-control"
+          id="amount"
+          v-model="amount"
+          type="number"
+          required="required"
+        />
+      </div>
+      <div class="form-group col-4">
+        <select class="form-control" id="infrastructureType" v-model="selectedType">
+          <option
+            v-for="opt in types"
+            v-bind:key="opt.key"
+            v-bind:value="opt.key"
+          >{{ opt.name }}</option>
+        </select>
+      </div>
+      <div class="form-group col-4 pl-1">
+        <button class="btn btn-success btn-block" @click="upgrade" :disabled="isUpgrading || gameIsFinished()"><i class="fas fa-hammer"></i> Upgrade</button>
+      </div>
+    </form>
   </div>
 </template>
 

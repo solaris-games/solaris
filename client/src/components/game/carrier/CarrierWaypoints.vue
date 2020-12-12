@@ -4,9 +4,9 @@
 			<span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
     </menu-title>
 
-		Waypoints:
+		<strong>Waypoints</strong>:
     <span v-if="!carrier.waypoints.length" class="text-warning">None</span>
-		<ul class="pl-4 mt-2">
+		<ul class="pl-4 mt-2" v-if="isStandardUIStyle">
 			<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
 				<!-- <a href="javascript:;" @click="onOpenStarDetailRequested(waypoint.destination)">{{getStarName(waypoint.destination)}}</a> -->
 				<span>{{getStarName(waypoint.destination)}}</span>
@@ -24,18 +24,20 @@
 			</li>
 		</ul>
 
-		<div class="row bg-secondary pt-2 pb-2">
+    <span v-if="isCompactUIStyle">{{waypointAsList}}</span>
+
+		<div class="row bg-secondary pt-2 pb-2 mt-2">
 			<div class="col-12">
-				<p v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
+				<p class="mb-1" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
 			</div>
 			<div class="col">
-				<button class="btn btn-danger" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-minus"></i></button>
-				<button class="btn btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-times"></i></button>
-				<button class="btn ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop"><i class="fas fa-sync"></i></button>
+				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-undo"></i> Last</button>
+				<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-trash"></i> All</button>
+				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints"><i class="fas fa-sync"></i></button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
-				<button class="btn btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
 			</div>
 		</div>
 	</div>
@@ -63,10 +65,15 @@ export default {
       isSavingWaypoints: false,
       oldWaypoints: [],
       totalEtaTimeString: null,
-      waypointCreatedHandler: null
+      waypointCreatedHandler: null,
+      isStandardUIStyle: false,
+      isCompactUIStyle: false
     }
   },
   mounted () {
+    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
+    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
@@ -203,6 +210,9 @@ export default {
   computed: {
     canLoop () {
       return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
+    },
+    waypointAsList () {
+      return this.carrier.waypoints.map(w => this.getStarName(w.destination)).join(', ')
     }
   }
 }

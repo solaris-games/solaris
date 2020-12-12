@@ -29,6 +29,8 @@ module.exports = class EventService {
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
+        PLAYER_STAR_SPECIALIST_HIRED: 'playerStarSpecialistHired',
+        PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
     }
 
     constructor(eventModel, broadcastService,
@@ -405,6 +407,31 @@ module.exports = class EventService {
         await this.createPlayerEvent(game, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
 
         this.broadcastService.gamePlayerDebtForgiven(game, debtorPlayerId, creditorPlayerId, amount);
+    }
+
+    async createPlayerStarSpecialistHired(game, player, star, specialist) {
+        let data = {
+            starId: star._id,
+            specialistId: specialist.id,
+            // Need to keep these values just in case specs are changed in future.
+            specialistName: specialist.name,
+            specialistDescription: specialist.description
+        }
+
+        await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data);
+    }
+
+    async createPlayerCarrierSpecialistHired(game, player, carrier, specialist) {
+        let data = {
+            carrierId: carrier._id,
+            carrierName: carrier.name, // Carriers may be destroyed so we need to keep track of the name separately
+            specialistId: specialist.id,
+            // Need to keep these values just in case specs are changed in future.
+            specialistName: specialist.name,
+            specialistDescription: specialist.description
+        }
+
+        await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data);
     }
 
 };

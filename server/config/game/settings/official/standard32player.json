@@ -1,16 +1,15 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "1 vs. 1 - Turn Based",
+    "description": "Standard 32 Player",
     "password": null,
-    "starVictoryPercentage": 75,
-    "playerLimit": 2,
-    "playerType": "all",
-    "anonymity": "normal"
+    "starVictoryPercentage": 50,
+    "playerLimit": 32,
+    "playerType": "all"
   },
   "galaxy": {
-    "galaxyType": "circular",
-    "starsPerPlayer": 10,
+    "galaxyType": "doughnut",
+    "starsPerPlayer": 20,
     "productionTicks": 24
   },
   "specialGalaxy": {
@@ -18,15 +17,15 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
-    "darkGalaxy": "disabled",
-    "giftCarriers": "disabled",
+    "darkGalaxy": "start",
+    "giftCarriers": "enabled",
     "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
-    "playerDistribution": "circular"
+    "playerDistribution": "random"
   },
   "player": {
-    "startingStars": 3,
+    "startingStars": 6,
     "startingCredits": 500,
     "startingShips": 10,
     "startingInfrastructure": {
@@ -40,7 +39,7 @@
       "science": "standard"
     },
     "tradeCost": 15,
-    "tradeScanning": "all"
+    "tradeScanning": "scanned"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -63,8 +62,8 @@
     }
   },
   "gameTime": {
-    "gameType": "turnBased",
-    "tickJumps": 6,
-    "maxTurnWait": 12
+    "gameType": "realTime",
+    "speed": 30,
+    "startDelay": 30
   }
 }

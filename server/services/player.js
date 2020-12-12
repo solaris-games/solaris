@@ -66,12 +66,13 @@ module.exports = class PlayerService extends EventEmitter {
             .find(p => p._id.equals(targetPlayer._id)) != null;
     }
 
-    createEmptyPlayer(game, colour) {
+    createEmptyPlayer(game, colour, shape) {
         return {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
             colour: colour,
+            shape: shape,
             credits: game.settings.player.startingCredits,
             renownToGive: game.settings.general.playerLimit,
             carriers: [],
@@ -90,9 +91,12 @@ module.exports = class PlayerService extends EventEmitter {
     createEmptyPlayers(game) {
         let players = [];
 
+        let shapes = ['circle', 'square'];
+        let shapeIndex = 0;
+        let colours = require('../config/game/colours').slice();
+
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
-
         const starLocations = game.galaxy.stars.map(s => s.location);
 
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
@@ -103,22 +107,22 @@ module.exports = class PlayerService extends EventEmitter {
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
-        let colours = require('../config/game/colours').slice();
-
         // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < game.settings.general.playerLimit; i++) {
             // Get a random colour to assign to the player.
-            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+            if (!colours.length) {
+                colours = require('../config/game/colours').slice();
+                shapeIndex++;
+            }
 
-            let player = this.createEmptyPlayer(game, colour);
+            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+            let shape = shapes[shapeIndex];
+
+            let player = this.createEmptyPlayer(game, colour, shape);
 
             this._setDefaultResearchTechnology(game, player);
 
-            // Get the player's starting location.
-            let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
-
-            // Find the star that is closest to this location, that will be the player's home star.
-            let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, game.galaxy.stars);
+            let homeStar = this._getNewPlayerHomeStar(game, starLocations, galaxyCenter, distanceFromCenter, radians);
 
             // Set up the home star
             this.starService.setupHomeStar(game, homeStar, player, game.settings);
@@ -186,6 +190,36 @@ module.exports = class PlayerService extends EventEmitter {
         let homeCarrier = this.createHomeStarCarrier(game, player);
         
         game.galaxy.carriers.push(homeCarrier);
+    }
+
+    _getNewPlayerHomeStar(game, starLocations, galaxyCenter, distanceFromCenter, radians) {
+        switch (game.settings.specialGalaxy.playerDistribution) {
+            case 'circular':
+                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians);
+            case 'random':
+                return this._getNewPlayerHomeStarRandom(game);
+        }
+
+        throw new Error(`Unsupported player distribution setting: ${game.settings.specialGalaxy.playerDistribution}`);
+    }
+
+    _getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians) {
+        // Get the player's starting location.
+        let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
+
+        // Find the star that is closest to this location, that will be the player's home star.
+        let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, game.galaxy.stars);
+
+        return homeStar;
+    }
+
+    _getNewPlayerHomeStarRandom(game) {
+        // Pick a random unowned star.
+        let unownedStars = game.galaxy.stars.filter(s => s.ownedByPlayerId == null);
+
+        let rnd = this.randomService.getRandomNumber(unownedStars.length);
+
+        return unownedStars[rnd];
     }
 
     _getPlayerStartingLocationRadians(playerCount) {
@@ -313,7 +347,22 @@ module.exports = class PlayerService extends EventEmitter {
         return playerCarriers.length;
     }
 
+    calculateTotalStarSpecialists(player, stars) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+
+        return playerStars.filter(s => s.specialistId).length;
+    }
+
+    calculateTotalCarrierSpecialists(player, carriers) {
+        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
+
+        return playerCarriers.filter(c => c.specialistId).length;
+    }
+
     getStats(game, player) {
+        let totalStarSpecialists = this.calculateTotalStarSpecialists(player, game.galaxy.stars);
+        let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(player, game.galaxy.carriers);
+
         return {
             totalStars: this.calculateTotalStars(player, game.galaxy.stars),
             totalCarriers: this.calculateTotalCarriers(player, game.galaxy.carriers),
@@ -321,7 +370,10 @@ module.exports = class PlayerService extends EventEmitter {
             totalEconomy: this.calculateTotalEconomy(player, game.galaxy.stars),
             totalIndustry: this.calculateTotalIndustry(player, game.galaxy.stars),
             totalScience: this.calculateTotalScience(player, game.galaxy.stars),
-            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars)
+            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars),
+            totalStarSpecialists,
+            totalCarrierSpecialists,
+            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
         };
     }
 
@@ -329,13 +381,14 @@ module.exports = class PlayerService extends EventEmitter {
         player.lastSeen = moment().utc();
     }
 
-    async updateLastSeenLean(gameId, userId) {
+    async updateLastSeenLean(gameId, userId, ipAddress) {
         await this.gameModel.updateOne({
             _id: gameId,
             'galaxy.players.userId': userId
         }, {
             $set: {
-                'galaxy.players.$.lastSeen': moment().utc()
+                'galaxy.players.$.lastSeen': moment().utc(),
+                'galaxy.players.$.lastSeenIP': ipAddress
             }
         });
     }
@@ -384,7 +437,14 @@ module.exports = class PlayerService extends EventEmitter {
     async updateGameNotes(game, player, notes) {
         player.notes = notes;
 
-        await game.save();
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.notes': notes
+            }
+        });
     }
 
 }

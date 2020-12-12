@@ -12,7 +12,7 @@
                   <input type="number" class="form-control" v-model="amount"/>
                 </div>
                 <div class="col-5">
-                    <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block">Send Credits</modalButton>
+                    <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block"><i class="fas fa-paper-plane"></i> Send</modalButton>
                 </div>
             </div>
         </form>

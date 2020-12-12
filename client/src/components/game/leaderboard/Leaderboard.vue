@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <div class="row bg-secondary" v-if="!game.state.endDate">
+    <div class="row bg-secondary" v-if="game.state.startDate && !game.state.endDate">
         <div class="col text-center pt-2 pb-0">
             <p class="pb-0 mb-2">{{timeRemaining}}</p>
         </div>
@@ -36,12 +36,11 @@
                   <tr v-for="player in sortedPlayers" :key="player._id">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
                       <td class="col-avatar" :title="player.colour.alias" @click="onOpenPlayerDetailRequested(player)">
-                          <img v-if="player.avatar" :src="getAvatarImage(player)">
-                          <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:40px;"></i>
+                          <player-avatar :player="player"/>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
-                          <h5>
+                          <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
                           </h5>
@@ -70,7 +69,7 @@
       </div>
         <div class="col text-right pr-2">
             <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">Quit Game</modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger">Concede Defeat</modalButton>
+            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger"><i class="fas fa-skull-crossbones"></i> Concede Defeat</modalButton>
         </div>
     </div>
 
@@ -97,13 +96,15 @@ import gameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import AudioService from '../../../game/audio'
 import ShareLinkVue from '../welcome/ShareLink'
+import PlayerAvatarVue from '../menu/PlayerAvatar'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
-    'share-link': ShareLinkVue
+    'share-link': ShareLinkVue,
+    'player-avatar': PlayerAvatarVue
   },
 
   data () {
@@ -287,8 +288,17 @@ img {
 }
 
 .col-avatar {
-    width: 55px;
-    cursor: pointer;
+  position:absolute;
+  width: 59px;
+  cursor: pointer;
+}
+
+.alias-title {
+  padding-left: 59px;
+}
+
+table tr {
+  height: 59px;
 }
 
 .table-sm td {

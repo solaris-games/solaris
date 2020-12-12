@@ -8,6 +8,7 @@
       </span>
       <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-info"><i class="fas fa-chevron-left"></i></button>
       <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
+      <button @click="panToPlayer" class="btn btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <overview v-if="player" :playerId="player._id"
@@ -74,6 +75,7 @@ import SendRenown from './SendRenown'
 import Badges from './Badges'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -131,6 +133,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    panToPlayer (e) {
+      GameContainer.map.panToPlayer(this.$store.state.game, this.player)
     },
     onOpenPrevPlayerDetailRequested (e) {
       let prevIndex = this.playerIndex - 1

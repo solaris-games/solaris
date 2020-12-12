@@ -366,6 +366,18 @@ class GameHelper {
     return game.settings.general.anonymity === 'normal'
   }
 
+  calculateGalaxyCenterX (game) {
+    let starFieldLeft = this.calculateMinStarX(game)
+    let starFieldRight = this.calculateMaxStarX(game)
+    return starFieldLeft + ( (starFieldRight-starFieldLeft)/2.0 )
+  }
+
+  calculateGalaxyCenterY (game) {
+    let starFieldTop = this.calculateMinStarY(game)
+    let starFieldBottom = this.calculateMaxStarY(game)
+    return starFieldTop + ( (starFieldBottom-starFieldTop)/2.0 )
+  }
+
   calculateMinStarX (game) {
     if (!game.galaxy.stars.length) { return 0 }
 
@@ -445,6 +457,28 @@ class GameHelper {
     let monthOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
     return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
+  }
+
+  getPlayerEmpireCenter (game, player) {
+    // Get all of the player's stars.
+    let playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
+
+    if (!playerStars.length) {
+      return null
+    }
+
+    // Work out the center point of all stars
+    let centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
+    let centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
+
+    return {
+      x: centerX,
+      y: centerY
+    }
+  }
+
+  getGamePlayerShapesCount (game) {
+    return new Set([...game.galaxy.players.map(p => p.shape)]).length > 1
   }
 }
 

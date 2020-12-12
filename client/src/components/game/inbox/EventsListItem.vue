@@ -53,6 +53,10 @@
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-debt-settled :event="event" v-if="event.type === 'playerDebtSettled'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-star-specialist-hired :event="event" v-if="event.type === 'playerStarSpecialistHired'"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-carrier-specialist-hired :event="event" v-if="event.type === 'playerCarrierSpecialistHired'"
+            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
     </div>
 </div>
 </template>
@@ -83,6 +87,8 @@ import PlayerTechnologyReceivedVue from './events/PlayerTechnologyReceived'
 import PlayerTechnologySentVue from './events/PlayerTechnologySent'
 import PlayerDebtForgivenVue from './events/PlayerDebtForgiven'
 import PlayerDebtSettledVue from './events/PlayerDebtSettled'
+import PlayerStarSpecialistHiredVue from './events/PlayerStarSpecialistHired'
+import PlayerCarrierSpecialistHiredVue from './events/PlayerCarrierSpecialistHired'
 
 export default {
   components: {
@@ -110,7 +116,9 @@ export default {
     'player-technology-received': PlayerTechnologyReceivedVue,
     'player-technology-sent': PlayerTechnologySentVue,
     'player-debt-forgiven': PlayerDebtForgivenVue,
-    'player-debt-settled': PlayerDebtSettledVue
+    'player-debt-settled': PlayerDebtSettledVue,
+    'player-star-specialist-hired': PlayerStarSpecialistHiredVue,
+    'player-carrier-specialist-hired': PlayerCarrierSpecialistHiredVue
   },
   props: {
     event: Object

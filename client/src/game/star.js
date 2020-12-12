@@ -11,6 +11,7 @@ class Star extends EventEmitter {
 
     this.app = app
     this.container = new PIXI.Container()
+    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
     this.container.buttonMode = true
 
@@ -48,8 +49,20 @@ class Star extends EventEmitter {
     this.players = players
     this.carriers = carriers
     this.lightYearDistance = lightYearDistance
+    this.container.position.x = this.data.location.x
+    this.container.position.y = this.data.location.y
+    this.fixedContainer.position.x = this.data.location.x
+    this.fixedContainer.position.y = this.data.location.y
+    this.container.hitArea = new PIXI.Circle(0, 0, 15)
+
     this.userSettings = userSettings
-    this.container.hitArea = new PIXI.Circle(this.data.location.x, this.data.location.y, 15)
+
+    // TODO maybe all these could be static variables since these are all the same for every star
+    this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
+    this.baseScale = 1 //TODO add user setting for this independent of clamped or default
+    //divide these by 4 to allow more control while keeping the UI as int
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
   }
 
   draw () {
@@ -83,18 +96,18 @@ class Star extends EventEmitter {
     let isInScanningRange = this._isInScanningRange()
     let radius = 4
     let alpha = isInScanningRange ? 1 : 0.5
+    let starPoints = 6
 
     this.graphics_star.lineStyle(1, 0xFFFFFF, alpha)
 
     if (isInScanningRange) {
       this.graphics_star.beginFill(0xFFFFFF, alpha)
     }
-
-    this.graphics_star.drawStar(this.data.location.x, this.data.location.y, 6, radius, radius - 2)
-
+    this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 2)
     if (isInScanningRange) {
       this.graphics_star.endFill()
     }
+
   }
 
   drawSpecialist () {
@@ -105,10 +118,11 @@ class Star extends EventEmitter {
     //FIXME potential resource leak, should not create a new sprite every time
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
+
     specialistSprite.width = 10
     specialistSprite.height = 10
-    specialistSprite.x = this.data.location.x - 5
-    specialistSprite.y = this.data.location.y - 5
+    specialistSprite.x = -5
+    specialistSprite.y = -5
     
     this.container.addChild(specialistSprite)
   }
@@ -126,7 +140,6 @@ class Star extends EventEmitter {
 
       return
     }
-
     if (!this.container_planets) {
       this.container_planets = new PIXI.Container()
 
@@ -137,6 +150,9 @@ class Star extends EventEmitter {
         return
       }
 
+      let player = this._getStarPlayer()
+      let playerColour = player ? player.colour.value : 0xFFFFFF
+
       let rotationDirection = this._getPlanetOrbitDirection()
       let rotationSpeedModifier = this._getPlanetOrbitSpeed()
 
@@ -144,39 +160,37 @@ class Star extends EventEmitter {
         let planetContainer = new PIXI.Container()
 
         let distanceToStar = 15 + (5 * i)
-        let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 3 + 1
+        let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
 
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
-        orbitGraphics.drawCircle(this.data.location.x, this.data.location.y, distanceToStar - (planetSize / 2))
+          orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
         this.container_planets.addChild(orbitGraphics)
 
-        let planetTexture = TextureService.getPlanetTexture(this.data.location.x * planetSize, this.data.location.y * distanceToStar)
-
-        let sprite = new PIXI.Sprite(planetTexture)
-        sprite.width = planetSize
-        sprite.height = planetSize
+        let planetGraphics = new PIXI.Graphics()
+        planetGraphics.beginFill(playerColour)
+        planetGraphics.drawCircle(0, 0, planetSize)
+        planetGraphics.endFill()
 
         if (!this._isInScanningRange()) {
-          sprite.alpha = 0.3
+          planetGraphics.alpha = 0.3
         }
 
+        planetContainer.addChild(planetGraphics)
+
         planetContainer.pivot.set(distanceToStar, 0)
-        planetContainer.position.x = this.data.location.x
-        planetContainer.position.y = this.data.location.y
 
         let rotationSpeed = (planetCount - i) / rotationSpeedModifier
 
         this.app.ticker.add((delta) => {
+          //TODO maybe check if visible? no need to rotate planets outside viewport
           if (rotationDirection) {
             planetContainer.rotation += rotationSpeed * delta
           } else {
             planetContainer.rotation -= rotationSpeed * delta
           }
         })
-
-        planetContainer.addChild(sprite)
 
         this.container_planets.addChild(planetContainer)
       }
@@ -204,7 +218,7 @@ class Star extends EventEmitter {
 
     this.graphics_natural_resources_ring.clear()
     this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
-    this.graphics_natural_resources_ring.drawCircle(this.data.location.x, this.data.location.y, ringRadius * 0.75)
+    this.graphics_natural_resources_ring.drawCircle(0, 0, ringRadius * 0.75)
   }
 
   _getPlanetsCount () {
@@ -224,6 +238,24 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
+    // Get the player who owns the star.
+    let player = this._getStarPlayer()
+
+    if (!player) {
+      return
+    }
+
+    switch (player.shape) {
+      case 'circle': 
+        this._drawColourCircle(player)
+        break
+      case 'square': 
+        this._drawColourSquare(player)
+        break
+    }
+  }
+
+  _drawColourCircle (player) {
     if (!this.graphics_colour_arc) {
       this.graphics_colour_arc = new PIXI.Graphics()
       this.container.addChild(this.graphics_colour_arc)
@@ -246,23 +278,59 @@ class Star extends EventEmitter {
     this.graphics_colour_warp_arc.clear()
     this.graphics_colour_warp_cir.clear()
 
-    // Get the player who owns the star.
-    let player = this._getStarPlayer()
-
-    if (!player) {
-      return
-    }
-    
     this.graphics_colour_arc.lineStyle(3, player.colour.value)
     this.graphics_colour_cir.lineStyle(3, player.colour.value)
     this.graphics_colour_warp_arc.lineStyle(2, player.colour.value)
     this.graphics_colour_warp_cir.lineStyle(2, player.colour.value)
 
-    this.graphics_colour_arc.arc(this.data.location.x, this.data.location.y, 7, 0.785398, -0.785398)
-    this.graphics_colour_cir.drawCircle(this.data.location.x, this.data.location.y, 7)
+    this.graphics_colour_arc.arc(0, 0, 7, 0.785398, -0.785398)
+    this.graphics_colour_cir.drawCircle(0, 0, 7)
     
-    this.graphics_colour_warp_arc.arc(this.data.location.x, this.data.location.y, 10, 0.785398, -0.785398)
-    this.graphics_colour_warp_cir.drawCircle(this.data.location.x, this.data.location.y, 10)
+    this.graphics_colour_warp_arc.arc(0, 0, 10, 0.785398, -0.785398)
+    this.graphics_colour_warp_cir.drawCircle(0, 0, 10)
+  }
+
+  _drawColourSquare (player) {
+    if (!this.graphics_colour_square_partial) {
+      this.graphics_colour_square_partial = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_square_partial)
+    }
+    if (!this.graphics_colour_square) {
+      this.graphics_colour_square = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_square)
+    }
+    if (!this.graphics_colour_warp_square_partial) {
+      this.graphics_colour_warp_square_partial = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_warp_square_partial)
+    }
+    if (!this.graphics_colour_warp_square) {
+      this.graphics_colour_warp_square = new PIXI.Graphics()
+      this.container.addChild(this.graphics_colour_warp_square)
+    }
+
+    this.graphics_colour_square_partial.clear()
+    this.graphics_colour_square.clear()
+    this.graphics_colour_warp_square_partial.clear()
+    this.graphics_colour_warp_square.clear()
+
+    this.graphics_colour_square_partial.lineStyle(3, player.colour.value)
+    this.graphics_colour_square.lineStyle(3, player.colour.value)
+    this.graphics_colour_warp_square_partial.lineStyle(2, player.colour.value)
+    this.graphics_colour_warp_square.lineStyle(2, player.colour.value)
+
+    this.graphics_colour_square_partial.moveTo(this.data.location.x + 7, this.data.location.y - 7)
+    this.graphics_colour_square_partial.lineTo(this.data.location.x - 7, this.data.location.y - 7)
+    this.graphics_colour_square_partial.lineTo(this.data.location.x - 7, this.data.location.y + 7)
+    this.graphics_colour_square_partial.lineTo(this.data.location.x + 7, this.data.location.y + 7)
+    
+    this.graphics_colour_square.drawRect(this.data.location.x - 7, this.data.location.y - 7, 14, 14)
+
+    this.graphics_colour_warp_square_partial.moveTo(this.data.location.x + 7, this.data.location.y - 10)
+    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x - 10, this.data.location.y - 10)
+    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x - 10, this.data.location.y + 10)
+    this.graphics_colour_warp_square_partial.lineTo(this.data.location.x + 7, this.data.location.y + 10)
+
+    this.graphics_colour_warp_square.drawRect(this.data.location.x - 10, this.data.location.y - 10, 20, 20)
   }
 
   _hasUnknownShips() {
@@ -278,7 +346,7 @@ class Star extends EventEmitter {
       style.fontSize = 4
 
       this.text_name = new PIXI.Text(this.data.name, style)
-      this.text_name.x = this.data.location.x + 5
+      this.text_name.x = 5
       this.text_name.resolution = 10
 
       this.container.addChild(this.text_name)
@@ -287,9 +355,9 @@ class Star extends EventEmitter {
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
     if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
-      this.text_name.y = this.data.location.y
+      this.text_name.y = 0
     } else {
-      this.text_name.y = this.data.location.y - (this.text_name.height / 2)
+      this.text_name.y = - (this.text_name.height / 2)
     }
   }
 
@@ -335,8 +403,8 @@ class Star extends EventEmitter {
         this.text_garrison.scale.y = 1.5
         this.text_garrison.resolution = 10
 
-        this.text_garrison.x = this.data.location.x + 5
-        this.text_garrison.y = this.data.location.y - this.text_garrison.height + 1.5
+        this.text_garrison.x = 5
+        this.text_garrison.y = -this.text_garrison.height + 1.5
 
         this.container.addChild(this.text_garrison)
       }
@@ -359,8 +427,8 @@ class Star extends EventEmitter {
         this.text_infrastructure = new PIXI.Text(displayInfrastructure, style)
         this.text_infrastructure.resolution = 10
 
-        this.text_infrastructure.x = this.data.location.x - (this.text_infrastructure.width / 2)
-        this.text_infrastructure.y = this.data.location.y - 15
+        this.text_infrastructure.x = -(this.text_infrastructure.width / 2)
+        this.text_infrastructure.y = -15
 
         this.container.addChild(this.text_infrastructure)
       }
@@ -370,7 +438,7 @@ class Star extends EventEmitter {
   drawScanningRange () {
     if (!this.graphics_scanningRange) {
       this.graphics_scanningRange = new PIXI.Graphics()
-      this.container.addChild(this.graphics_scanningRange)
+      this.fixedContainer.addChild(this.graphics_scanningRange)
     }
 
     this.graphics_scanningRange.clear()
@@ -394,7 +462,7 @@ class Star extends EventEmitter {
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
     // this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
-    this.graphics_scanningRange.drawCircle(this.data.location.x, this.data.location.y, radius)
+    this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
     this.container.zIndex = -1
@@ -406,7 +474,7 @@ class Star extends EventEmitter {
 
     if (!this.graphics_hyperspaceRange) {
       this.graphics_hyperspaceRange = new PIXI.Graphics()
-      this.container.addChild(this.graphics_hyperspaceRange)
+      this.fixedContainer.addChild(this.graphics_hyperspaceRange)
     }
 
     this.graphics_hyperspaceRange.clear()
@@ -433,7 +501,7 @@ class Star extends EventEmitter {
 
     this.graphics_hyperspaceRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
-    this.graphics_hyperspaceRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 3)
+    this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()
     this.graphics_hyperspaceRange.zIndex = -1
     this.container.zIndex = -1
@@ -441,7 +509,8 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.visible = this.isSelected
   }
 
-  onTick(deltaTime, viewportData) {
+
+  onTick( deltaTime, zoomPercent, viewportData ) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
  
@@ -449,11 +518,15 @@ class Star extends EventEmitter {
      //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
      // maybe put them on their own container, since this piece of code should remain as small as possible
      this.graphics_star.visible = false
-     this.graphics_colour_arc.visible = false
-     this.graphics_colour_cir.visible = false
-     this.graphics_colour_warp_arc.visible = false
-     this.graphics_colour_warp_cir.visible = false
-     this.text_name.visible = false
+     if (this.text_name) this.text_name.visible = false
+     if (this.graphics_colour_arc) this.graphics_colour_arc.visible = false
+     if (this.graphics_colour_cir) this.graphics_colour_cir.visible = false
+     if (this.graphics_colour_warp_arc) this.graphics_colour_warp_arc.visible = false
+     if (this.graphics_colour_warp_cir) this.graphics_colour_warp_cir.visible = false
+     if (this.graphics_colour_square_partial) this.graphics_colour_square_partial.visible = false
+     if (this.graphics_colour_square) this.graphics_colour_square.visible = false
+     if (this.graphics_colour_warp_square_partial) this.graphics_colour_warp_square_partial.visible = false
+     if (this.graphics_colour_warp_square) this.graphics_colour_warp_square.visible = false
      if (this.graphics_natural_resources_ring) this.graphics_natural_resources_ring.visible = false
      if (this.container_planets) this.container_planets.visible = false
      if (this.text_infrastructure) { this.text_infrastructure.visible = false }
@@ -461,7 +534,29 @@ class Star extends EventEmitter {
    } 
    else {
      this.updateVisibility()
+     this.setScale(zoomPercent)
    }
+  }
+
+  setScale( zoomPercent ) {
+     if(this.clampedScaling) {
+       let currentScale = zoomPercent/100
+       if (currentScale < this.minScale) {
+         this.container.scale.x = (1/currentScale)*this.minScale
+         this.container.scale.y = (1/currentScale)*this.minScale
+       } else if (currentScale > this.maxScale) {
+         this.container.scale.x = (1/currentScale)*this.maxScale
+         this.container.scale.y = (1/currentScale)*this.maxScale
+       }
+       else {
+         this.container.scale.x = this.baseScale
+         this.container.scale.y = this.baseScale
+       }
+     }
+     else {
+       this.container.scale.x = this.baseScale
+       this.container.scale.y = this.baseScale
+     }
   }
 
   onClicked (e) {
@@ -482,28 +577,34 @@ class Star extends EventEmitter {
   }
 
   updateVisibility() {
+
     this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_colour_arc.visible = this.zoomPercent < 60
-    this.graphics_colour_cir.visible = this.zoomPercent >= 60
-    this.graphics_colour_warp_arc.visible = this.zoomPercent < 60 && this.data.warpGate
-    this.graphics_colour_warp_cir.visible = this.zoomPercent >= 60 && this.data.warpGate
+    
+    if (this.graphics_colour_arc) this.graphics_colour_arc.visible = this.zoomPercent > 200
+    if (this.graphics_colour_cir) this.graphics_colour_cir.visible = this.zoomPercent <= 200
+    if (this.graphics_colour_warp_arc) this.graphics_colour_warp_arc.visible = this.zoomPercent > 200 && this.data.warpGate
+    if (this.graphics_colour_warp_cir) this.graphics_colour_warp_cir.visible = this.zoomPercent <= 200 && this.data.warpGate
+    if (this.graphics_colour_square_partial) this.graphics_colour_square_partial.visible = this.zoomPercent > 200
+    if (this.graphics_colour_square) this.graphics_colour_square.visible = this.zoomPercent <= 200
+    if (this.graphics_colour_warp_square_partial) this.graphics_colour_warp_square_partial.visible = this.zoomPercent > 200 && this.data.warpGate
+    if (this.graphics_colour_warp_square) this.graphics_colour_warp_square.visible = this.zoomPercent <= 200 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.text_name.visible = this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) 
+    this.text_name.visible = this.isSelected || this.zoomPercent > 200
 
     if (this.graphics_natural_resources_ring) {
-      this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent < 60
+      this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200
     }
     
     if (this.container_planets) {
-      this.container_planets.visible = this._isInScanningRange() && this.zoomPercent < 60
+      this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > 200
     }
 
     if (this.text_infrastructure) { // may not exist for stars out of range
-      this.text_infrastructure.visible = this.zoomPercent < 35 || (this.isSelected && this.zoomPercent < 35) || (this.isMouseOver && this.zoomPercent < 35)
+      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 200
     }
     if (this.text_garrison) {
-      this.text_garrison.visible = this.data.infrastructure && (this.zoomPercent < 60 || (this.isSelected && this.zoomPercent < 60) || (this.isMouseOver && this.zoomPercent < 60))
+      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 200)
     }
   }
 

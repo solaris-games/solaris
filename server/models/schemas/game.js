@@ -16,7 +16,7 @@ const schema = new Schema({
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 75, 90, 100], default: 50 },
-			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 16 },
+			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' }
         },
@@ -34,7 +34,8 @@ const schema = new Schema({
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' }
+			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
+			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },

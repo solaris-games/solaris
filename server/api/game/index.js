@@ -249,7 +249,9 @@ module.exports = (router, io, container) => {
 
     router.patch('/api/game/:gameId/player/touch', middleware.authenticate, async (req, res, next) => {
         try {
-            await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId);
+            let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
 
             return res.sendStatus(200);
         } catch (err) {

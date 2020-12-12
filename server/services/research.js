@@ -3,9 +3,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ResearchService extends EventEmitter {
 
-    constructor(technologyService, randomService, playerService, userService) {
+    constructor(gameModel, technologyService, randomService, playerService, userService) {
         super();
         
+        this.gameModel = gameModel;
         this.technologyService = technologyService;
         this.randomService = randomService;
         this.playerService = playerService;
@@ -21,7 +22,14 @@ module.exports = class ResearchService extends EventEmitter {
 
         player.researchingNow = preference;
 
-        await game.save();
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.researchingNow': preference
+            }
+        });
 
         let ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
         
@@ -38,6 +46,15 @@ module.exports = class ResearchService extends EventEmitter {
         }
 
         player.researchingNext = preference;
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.researchingNext': preference
+            }
+        });
 
         return await game.save();
     }

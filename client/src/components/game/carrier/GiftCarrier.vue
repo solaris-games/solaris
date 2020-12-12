@@ -3,7 +3,7 @@
     <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="carrier">
         <div class="col">
             <p class="mb-2">
-                Convert this Carrier into a gift. <a href="javascript:;">Read More</a>.
+                Convert this Carrier into a gift.
             </p>
         </div>
         <div v-if="canGiftCarrier" class="col-auto">

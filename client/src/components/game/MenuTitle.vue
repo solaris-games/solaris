@@ -24,7 +24,7 @@ export default {
 </script>
 
 <style scoped>
-h2 {
-    margin-bottom: 0;
+h3 {
+  font-size: 1.8rem;
 }
 </style>
