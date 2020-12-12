@@ -175,6 +175,35 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/star/transferall', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            let report = await container.shipTransferService.transferAllToStar(
+                req.game,
+                req.player,
+                req.body.starId);
+
+            res.status(200).json(report);
+
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+
+            playersWithinScanningRange.forEach(p => {
+                for (let carrier of report.carriersAtStar) {
+                    // To prevent snooping, only return the data that player can see.
+                    let canSeeStarGarrison = container.starService.canPlayerSeeStarGarrison(p, report.star);
+                    let canSeeCarrierShips = container.carrierService.canPlayerSeeCarrierShips(p, carrier);
+
+                    container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id,
+                        report.star._id, canSeeStarGarrison ? report.star.garrison: null,
+                        carrier._id, canSeeCarrierShips ? carrier.ships : null);
+                }
+            });
+
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.put('/api/game/:gameId/star/abandon', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.starService.abandonStar(

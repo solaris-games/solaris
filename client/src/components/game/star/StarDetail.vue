@@ -123,22 +123,32 @@
     </div>
 
     <div v-if="getCarriersInOrbit().length">
-      <h4 class="pt-2">Carriers</h4>
+      <div class="row pt-2">
+        <div class="col">
+          <h4>Carriers</h4>
+        </div>
+        <div class="col-auto">
+          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-primary" @click="transferAllToStar()"><i class="fas fa-chevron-up"></i></button>
+        </div>
+      </div>
 
-      <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-2 pt-1 pb-1 bg-secondary">
+      <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-1 pt-1 pb-0 bg-secondary">
         <div class="col-auto pr-0">
           <specialist-icon :type="'carrier'" :specialist="carrier.specialist"/>
         </div>
         <div class="col pl-1">
           <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
         </div>
-        <div class="col-auto">
+        <div class="col-auto pr-0">
           <i class="fas fa-map-marker-alt"></i>
           <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
         </div>
-          <div class="col-auto">
-            <i class="fas fa-rocket"></i> {{carrier.ships == null ? '???' : carrier.ships}}
-          </div>
+        <div class="col-3 text-right">
+          <i class="fas fa-rocket"></i> {{carrier.ships == null ? '???' : carrier.ships}}
+        </div>
+        <div class="col-auto pl-0">
+          <a href="javascript:;" v-if="isOwnedByUserPlayer && !isGameFinished" title="Transfer ships" @click="onShipTransferRequested(carrier)"><i class="fas fa-exchange-alt"></i></a>
+        </div>
       </div>
     </div>
 
@@ -283,6 +293,11 @@ export default {
     onViewHireStarSpecialistRequested (e) {
       this.$emit('onViewHireStarSpecialistRequested', this.starId)
     },
+    onShipTransferRequested (e) {
+      if (e.orbiting) {
+        this.$emit('onShipTransferRequested', e._id)
+      }
+    },
     getStarOwningPlayer () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
     },
@@ -367,6 +382,24 @@ export default {
         }
       } catch (err) {
         console.error(err)
+      }
+    },
+    async transferAllToStar() {
+      try {
+        let response = await starService.transferAllToStar(this.$store.state.game._id, this.star._id)
+        
+        if (response.status === 200) {
+          let carriers = response.data.carriersAtStar
+
+          carriers.forEach(responseCarrier => {
+            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
+            mapObjectCarrier.ships = responseCarrier.ships
+          })
+
+          this.$toasted.show(`All ships transfered to ${this.star.name}.`)
+        }
+      } catch (err) {
+        console.log(err)
       }
     }
   },

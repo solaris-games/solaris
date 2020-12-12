@@ -59,6 +59,12 @@ class StarService extends BaseApiService {
     },
     { withCredentials: true })
   }
+  transferAllToStar(gameId, starId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/transferall', {
+      starId
+    },
+    { withCredentials: true })
+  }
 }
 
 export default new StarService()

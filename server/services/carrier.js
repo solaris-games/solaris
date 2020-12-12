@@ -19,6 +19,10 @@ module.exports = class CarrierService {
         return game.galaxy.carriers.find(s => s._id.equals(id));
     }
 
+    getCarriersAtStar(game, starId) {
+      return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
+    }
+
     createAtStar(star, carriers, ships = 1) {
         if (!Math.floor(star.garrisonActual)) {
             throw new ValidationError('Star must have a garrison to build a carrier.');

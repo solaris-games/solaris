@@ -8,6 +8,64 @@ module.exports = class ShipTransferService {
         this.starService = starService;
     }
 
+    async transferAllToStar(game, player, starId) {
+        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId);
+        let star = this.starService.getById(game, starId);
+
+        if (!star.ownedByPlayerId.equals(player._id)) {
+            throw new ValidationError('The player does not own this star.');
+        }
+
+        let shipsToTransfer = 0;
+        
+        for (let carrier of carriersAtStar) {
+            if (carrier.ships > 1) {
+                shipsToTransfer += (carrier.ships-1)
+                carrier.ships = 1
+            }
+        }
+
+        star.garrisonActual += shipsToTransfer;
+        star.garrison = Math.floor(star.garrisonActual);
+
+        // Generate an array of all requires DB updates.
+        let dbWrites = carriersAtStar.map(c => {
+            return {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.carriers._id': c._id
+                    },
+                    update: {
+                        'galaxy.carriers.$.ships': c.ships
+                    }
+                }
+            };
+        });
+
+        dbWrites.push({
+            updateOne: {
+                filter: {
+                    _id: game._id,
+                    'galaxy.stars._id': star._id
+                },
+                update: {
+                    'galaxy.stars.$.garrisonActual': star.garrisonActual,
+                    'galaxy.stars.$.garrison': star.garrison
+                }
+            }
+        });
+
+        // Update the DB.
+        await this.gameModel.bulkWrite(dbWrites);
+
+        return {
+            player,
+            star,
+            carriersAtStar
+        };
+    }
+
     async transfer(game, player, carrierId, carrierShips, starId, starShips) {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
