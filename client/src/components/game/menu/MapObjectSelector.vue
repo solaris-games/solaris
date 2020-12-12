@@ -32,11 +32,11 @@
                         </span>
                     </td>
                     <td v-if="userOwnsObject(mapObject)" class="text-right" style="">
-                        <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
+                        <button title="Edit waypoints." v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
                         <i class="fas fa-plus"></i> </button>
-                        <button v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary  ml-1" @click="quickBuildCarrier(mapObject)"><i class="fas fa-rocket"></i></button>
-                        <button v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="garrisonAllShips(mapObject)"><i class="fas fa-chevron-up"></i></button>
-                        <button v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
+                        <button title="Create a carrier." v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary  ml-1" @click="quickBuildCarrier(mapObject)"><i class="fas fa-rocket"></i></button>
+                        <button title="Transfer all ships to the star." v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="garrisonAllShips(mapObject)"><i class="fas fa-chevron-up"></i></button>
+                        <button title="Transfer ships." v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
             </tbody>
