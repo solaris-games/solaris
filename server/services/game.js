@@ -82,6 +82,20 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async getByIdConversations(id) {
+        return await this.getById(id, {
+            conversations: 1,
+            'galaxy.players': 1
+        });
+    }
+
+    async getByIdConversationsLean(id) {
+        return await this.getByIdLean(id, {
+            conversations: 1,
+            'galaxy.players': 1
+        });
+    }
+
     async join(game, userId, playerId, alias, avatar, password) {
         // Only allow join if the game hasn't started.
         if (game.state.startDate) {

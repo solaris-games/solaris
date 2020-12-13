@@ -37,6 +37,7 @@ const HistoryService = require('../services/history');
 const LedgerService = require('../services/ledger');
 const SpecialistService = require('../services/specialist');
 const AchievementService = require('../services/achievement');
+const ConversationService = require('../services/conversation');
 
 const CircularMapService = require('../services/maps/circular');
 const SpiralMapService = require('../services/maps/spiral');
@@ -85,6 +86,7 @@ module.exports = (io) => {
     const messageService = new MessageService(GameModel);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
+    const conversationService = new ConversationService(GameModel);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService);
@@ -122,5 +124,6 @@ module.exports = (io) => {
         ledgerService,
         specialistService,
         achievementService,
+        conversationService,
     };
 };

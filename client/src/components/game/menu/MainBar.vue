@@ -60,7 +60,8 @@
         @onConversationOpenRequested="onConversationOpenRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenInboxRequested="onOpenInboxRequested"/>
@@ -91,6 +92,8 @@
       <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
         @onCloseRequested="onCloseRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
+        @onCloseRequested="onCloseRequested"/>
+      <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         @onCloseRequested="onCloseRequested"/>
     </div>
   </div>
@@ -125,6 +128,7 @@ import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 import GameNotesVue from '../notes/GameNotes.vue'
 import OptionsVue from './Options.vue'
+import CreateConversationVue from '../inbox/conversations/ConversationCreate.vue'
 
 export default {
   components: {
@@ -152,7 +156,8 @@ export default {
     'hire-specialist-carrier': HireSpecialistCarrierVue,
     'hire-specialist-star': HireSpecialistStarVue,
     'game-notes': GameNotesVue,
-    'options': OptionsVue
+    'options': OptionsVue,
+    'create-conversation': CreateConversationVue
   },
   props: {
     menuState: String,
@@ -214,6 +219,9 @@ export default {
     },
     onBuildCarrierRequested (e) {
       this.changeMenuState(MENU_STATES.BUILD_CARRIER, e)
+    },
+    onCreateNewConversationRequested (e) {
+      this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
     }
   },
   computed: {

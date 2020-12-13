@@ -84,6 +84,22 @@ module.exports = (container) => {
             return next();
         },
 
+        async loadGameConversations(req, res, next) {
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdConversations(req.params.gameId);
+            }
+
+            return next();
+        },
+
+        async loadGameConversationsLean(req, res, next) {
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdConversationsLean(req.params.gameId);
+            }
+
+            return next();
+        },
+
         async loadGamePlayers(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdLean(req.params.gameId, {

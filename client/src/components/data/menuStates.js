@@ -31,5 +31,6 @@ export default {
   LEDGER: 'ledger',
   HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier',
   HIRE_SPECIALIST_STAR: 'hireSpecialistStar',
-  GAME_NOTES: 'gameNotes'
+  GAME_NOTES: 'gameNotes',
+  CREATE_CONVERSATION: 'createConversation'
 }

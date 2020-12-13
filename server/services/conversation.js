@@ -1,5 +1,6 @@
 const moment = require('moment');
 const ValidationError = require('../errors/validation');
+const mongoose = require('mongoose');
 
 module.exports = class ConversationService {
 
@@ -8,7 +9,7 @@ module.exports = class ConversationService {
     }
 
     async create(game, playerId, name, participantIds) {
-        if (name == null || name.length > 100) {
+        if (name == null || !name.length || name.length > 100) {
             throw new ValidationError(`Name is required and must not exceed 100 characters.`);
         }
 
@@ -19,18 +20,29 @@ module.exports = class ConversationService {
             participantIds.push(playerId.toString());
         }
 
+        if (participantIds.length < 2) {
+            throw new ValidationError(`There must be at least 2 participants including yourself.`);
+        }
+
+        let convoId = new mongoose.Types.ObjectId();
+
+        let newConvo = {
+            _id: convoId,
+            name,
+            createdBy: playerId,
+            participants: participantIds
+        };
+
         // Create the convo.
         await this.gameModel.updateOne({
             _id: game._id
         }, {
             $push: {
-                conversations: {
-                    name,
-                    createdBy: playerId,
-                    participants: participantIds
-                }
+                conversations: newConvo
             }
         });
+
+        return newConvo;
     }
 
     async list(game, playerId) {
@@ -41,7 +53,7 @@ module.exports = class ConversationService {
 
         convos.forEach(c => {
             // Only return the last message
-            c.messages = c.messages.slice(-1);
+            c.lastMessage = c.messages.slice(-1)[0];
 
             // Calculate how many messages in this conversation the player has NOT read.
             c.unreadCount = c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
@@ -84,12 +96,28 @@ module.exports = class ConversationService {
         });
     }
 
-    async markMessageAsRead(game, playerId, conversationId, messageId) {
-        // TODO: How to update an array in an array?
+    async markConversationAsRead(game, playerId, conversationId) {
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'conversations._id': conversationId
+        },
+        {
+            $addToSet: {
+                'conversations.$.messages.readBy': playerId
+            }
+        });
     }
 
-    async markConversationAsRead(game, playerId, conversationId) {
-        // TODO: How to update an array in an array?
+    async markMessageAsRead(game, playerId, conversationId, messageId) {
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'conversations.messages._id': messageId
+        },
+        {
+            $addToSet: {
+                'conversations.messages.$.readBy': playerId
+            }
+        });
     }
 
 }
