@@ -5,10 +5,7 @@
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#diplomacy">Private</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#conversations">Groups</a>
+                <a class="nav-link active" data-toggle="tab" href="#diplomacy">Diplomacy</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#events">Events</a>
@@ -18,11 +15,8 @@
 
     <div class="tab-content pt-2">
         <div class="tab-pane fade show active" id="diplomacy">
-            <diplomacy-list @onConversationOpenRequested="onConversationOpenRequested"/>
-        </div>
-        <div class="tab-pane fade show" id="conversations">
             <conversation-list 
-              @onConversationOpenRequested="onConversationOpenRequested"
+              @onOpenConversationRequested="onOpenConversationRequested"
               @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
         </div>
         <div class="tab-pane fade" id="events">
@@ -37,14 +31,12 @@
 
 <script>
 import MenuTitle from '../MenuTitle'
-import DiplomacyListVue from './DiplomacyList'
 import ConversationListVue from './conversations/ConversationList'
 import EventsListVue from './EventsList'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'diplomacy-list': DiplomacyListVue,
     'conversation-list': ConversationListVue,
     'events-list': EventsListVue
   },
@@ -52,8 +44,11 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onConversationOpenRequested (e) {
-      this.$emit('onConversationOpenRequested', e)
+    onOpenConversationRequested (e) {
+      this.$emit('onOpenConversationRequested', e)
+    },
+    onOpenConversationRequested (e) {
+      this.$emit('onOpenConversationRequested', e)
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)

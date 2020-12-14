@@ -8,7 +8,7 @@
         <button class="btn btn-sm btn-primary" @click="onRefreshClicked">Refresh <i class="fas fa-sync"></i></button>
       </div>
       <div class="col-auto">
-        <button class="btn btn-sm btn-primary" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button>
+        <!-- <button class="btn btn-sm btn-primary" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button> -->
         <button class="btn btn-sm btn-info ml-1" @click="onCreateNewConversationRequested">
           <i class="fas fa-edit"></i>
           Create...
@@ -17,7 +17,7 @@
     </div>
 
     <div class="text-center pt-2" v-if="!conversations.length">
-        No Conversations
+        No Conversations.
     </div>
 
     <div class="pt-2">
@@ -27,7 +27,7 @@
           :conversation="conversation"
           :isTruncated="true"
           :isFullWidth="true"
-          @onConversationOpenRequested="onConversationOpenRequested"
+          @onOpenConversationRequested="onOpenConversationRequested"
           class="mb-2"/>
     </div>
   </div>
@@ -71,12 +71,12 @@ export default {
   mounted () {
     this.refreshList()
   },
-//   created () {
-//     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
-//   },
-//   destroyed () {
-//     this.sockets.unsubscribe('gameMessageSent')
-//   },
+  created () {
+    this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+  },
+  destroyed () {
+    this.sockets.unsubscribe('gameMessageSent')
+  },
   methods: {
     getPlayer (playerId) {
       return gameHelper.getPlayerById(this.$store.state.game, playerId)
@@ -117,8 +117,8 @@ export default {
     //     console.error(e)
     //   }
     // },
-    onConversationOpenRequested (e) {
-      this.$emit('onConversationOpenRequested', e)
+    onOpenConversationRequested (e) {
+      this.$emit('onOpenConversationRequested', e)
     },
     onCreateNewConversationRequested (e) {
       this.$emit('onCreateNewConversationRequested', e)
@@ -128,7 +128,7 @@ export default {
     },
     onMessageReceived (e) {
       // Find the conversation that this message is for and replace the last message.
-      let convo = this.conversations.find(c => c.playerId === e.fromPlayerId)
+      let convo = this.conversations.find(c => c._id === e.conversationId)
 
       convo.lastMessage = e
     }

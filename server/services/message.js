@@ -13,6 +13,8 @@ function filterForConversation(game, fromPlayerId, toPlayerId) {
         .sort((a, b) => a.sentDate - b.sentDate);
 }
 
+// TODO: Remove all this, it has been refactored into conversation.js
+
 module.exports = class MessageService {
     
     constructor(gameModel) {

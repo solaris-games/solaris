@@ -16,13 +16,13 @@
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
-        @onViewConversationRequested="onConversationOpenRequested"
+        @onViewConversationRequested="onOpenConversationRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onViewConversationRequested="onConversationOpenRequested"
+        @onViewConversationRequested="onOpenConversationRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -34,7 +34,7 @@
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
-        @onViewConversationRequested="onConversationOpenRequested"
+        @onViewConversationRequested="onOpenConversationRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -57,14 +57,11 @@
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX"
         @onCloseRequested="onCloseRequested"
-        @onConversationOpenRequested="onConversationOpenRequested"
+        @onOpenConversationRequested="onOpenConversationRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
-      <conversation v-if="menuState == MENU_STATES.CONVERSATION" @onCloseRequested="onCloseRequested" :fromPlayerId="menuArguments"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onOpenInboxRequested="onOpenInboxRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
         @onCloseRequested="onCloseRequested"
@@ -94,7 +91,13 @@
       <options v-if="menuState == MENU_STATES.OPTIONS"
         @onCloseRequested="onCloseRequested"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
-        @onCloseRequested="onCloseRequested"/>
+        @onCloseRequested="onCloseRequested"
+        @onOpenInboxRequested="onOpenInboxRequested"
+        @onOpenConversationRequested="onOpenConversationRequested"/>
+      <conversation v-if="menuState == MENU_STATES.CONVERSATION"
+        :conversationId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenInboxRequested="onOpenInboxRequested"/>
     </div>
   </div>
 </div>
@@ -114,7 +117,6 @@ import CarrierWaypointVue from '../carrier/CarrierWaypoint.vue'
 import ShipTransferVue from '../carrier/ShipTransfer.vue'
 import BuildCarrierVue from '../carrier/BuildCarrier.vue'
 import InboxVue from '../inbox/Inbox.vue'
-import ConversationVue from '../inbox/Conversation.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
 import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
@@ -128,7 +130,8 @@ import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 import GameNotesVue from '../notes/GameNotes.vue'
 import OptionsVue from './Options.vue'
-import CreateConversationVue from '../inbox/conversations/ConversationCreate.vue'
+import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
+import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 
 export default {
   components: {
@@ -146,7 +149,6 @@ export default {
     'ship-transfer': ShipTransferVue,
     'build-carrier': BuildCarrierVue,
     'inbox': InboxVue,
-    'conversation': ConversationVue,
     'intel': IntelVue,
     'galaxy': GalaxyVue,
     'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
@@ -157,7 +159,8 @@ export default {
     'hire-specialist-star': HireSpecialistStarVue,
     'game-notes': GameNotesVue,
     'options': OptionsVue,
-    'create-conversation': CreateConversationVue
+    'create-conversation': ConversationCreateVue,
+    'conversation': ConversationDetailVue
   },
   props: {
     menuState: String,
@@ -181,8 +184,11 @@ export default {
     onCloseRequested (e) {
       this.changeMenuState(null, null)
     },
-    onConversationOpenRequested (e) {
-      this.changeMenuState('conversation', e)
+    onOpenConversationRequested (e) {
+      // TODO: What if this is called via the player screen? Should we
+      // open the first available convo between the two players? Or should
+      // we just open the inbox?
+      this.changeMenuState(MENU_STATES.CONVERSATION, e)
     },
     onViewCompareIntelRequested (e) {
       this.changeMenuState(MENU_STATES.INTEL, e)

@@ -22,7 +22,7 @@ class ConversationService extends BaseApiService {
   }
 
   send (gameId, conversationId, message) {
-    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId, {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/send', {
       message
     },
     { withCredentials: true })

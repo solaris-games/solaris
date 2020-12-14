@@ -1,5 +1,7 @@
 const ValidationError = require('../../errors/validation');
 
+// TODO: Remove all this and everything it references.
+
 module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);

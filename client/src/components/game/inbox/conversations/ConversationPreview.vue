@@ -1,24 +1,25 @@
 <template>
-<!-- :style="{'background-image': 'linear-gradient(to left, ' + colour + ', #375a7f 100%)'}" -->
-<!-- :style="{'background-color': colour}" -->
 <div class="container bg-primary pt-1"
     @click="openConversation">
     <div class="row pb-1">
         <div class="col">
           <span>
-              <strong>{{conversation.name}}</strong>
+              {{conversation.name}}
           </span>
         </div>
-        <div class="col-auto" v-if="hasReadLastMessage">
-            <i class="fas fa-envelope mr-2" v-if="!hasReadLastMessage"></i>
-            <small>{{getDateString(conversation.lastMessage.sentDate)}}</small>
+        <div class="col-auto" v-if="!hasReadLastMessage">
+            <!-- <small>{{getDateString(conversation.lastMessage.sentDate)}}</small> -->
+            <small v-if="conversation.unreadCount">
+              <i class="fas fa-envelope"></i>
+              {{conversation.unreadCount}}
+            </small>
         </div>
     </div>
     <!-- <div class="row mt-1" :style="{'background-color': colour}" style="height:6px;"></div> -->
     <div class="row bg-secondary mt-0">
         <div class="col">
             <p class="mt-2 mb-2" v-if="hasLastMessage" :class="{'truncate':isTruncated}">
-              <i class="fas" :class="{'fa-circle': lastMessageSender.shape === 'circle','fa-square': lastMessageSender.shape === 'square'}" :style="{'color': getFriendlyColour(lastMessageSender.colour)}"></i>
+              <player-icon :player="lastMessageSender"/>
               {{conversation.lastMessage.message}}
             </p>
             <p class="mt-2 mb-2" v-if="!hasLastMessage">No messages.</p>
@@ -30,9 +31,11 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import moment from 'moment'
+import PlayerIconVue from '../../player/PlayerIcon.vue'
 
 export default {
   components: {
+    'player-icon': PlayerIconVue
   },
   props: {
     conversation: Object,
@@ -50,7 +53,7 @@ export default {
       return GameHelper.getFriendlyColour(colour)
     },
     openConversation () {
-      this.$emit('onConversationOpenRequested', this.conversation._id)
+      this.$emit('onOpenConversationRequested', this.conversation._id)
     }
   },
   computed: {

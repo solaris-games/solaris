@@ -32,5 +32,6 @@ export default {
   HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier',
   HIRE_SPECIALIST_STAR: 'hireSpecialistStar',
   GAME_NOTES: 'gameNotes',
-  CREATE_CONVERSATION: 'createConversation'
+  CREATE_CONVERSATION: 'createConversation',
+  CONVERSATION: 'conversation'
 }

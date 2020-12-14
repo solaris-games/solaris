@@ -1,7 +1,9 @@
 <template>
 <div class="menu-page">
   <div class="container">
-    <menu-title title="New Conversation" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="New Conversation" @onCloseRequested="onCloseRequested">
+      <button class="btn btn-primary" @click="onOpenInboxRequested"><i class="fas fa-inbox"></i></button>
+    </menu-title>
 
     <div class="row">
       <form class="col-12 pb-2" @submit="createConversation">
@@ -24,7 +26,7 @@
 
         <button type="submit" class="btn btn-primary float-right" :disabled="isLoading">
           <i class="fas fa-comments"></i>
-          Create
+          Create Conversation
         </button>
       </form>
     </div>
@@ -63,6 +65,9 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
+    onOpenInboxRequested (e) {
+      this.$emit('onOpenInboxRequested', e)
+    },
     async createConversation (e) {
       this.errors = []
 
@@ -84,7 +89,7 @@ export default {
         let response = await ConversationApiService.create(this.$store.state.game._id, this.name, this.participants)
 
         if (response.status === 200) {
-          console.log(response.data)
+          this.$emit('onOpenConversationRequested', response.data._id)
         }
       } catch (err) {
         console.error(err)

@@ -86,7 +86,7 @@ module.exports = (io) => {
     const messageService = new MessageService(GameModel);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
-    const conversationService = new ConversationService(GameModel);
+    const conversationService = new ConversationService(GameModel, EventModel);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService);

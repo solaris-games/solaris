@@ -100,7 +100,7 @@ import ServerConnectionStatusVue from './ServerConnectionStatus'
 import ResearchProgressVue from './ResearchProgress'
 import * as moment from 'moment'
 import AudioService from '../../../game/audio'
-import MessageApiService from '../../../services/api/message'
+import ConversationApiService from '../../../services/api/conversation'
 import GameApiService from '../../../services/api/game'
 
 export default {

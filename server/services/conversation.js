@@ -4,8 +4,9 @@ const mongoose = require('mongoose');
 
 module.exports = class ConversationService {
 
-    constructor(gameModel) {
+    constructor(gameModel, eventModel) {
         this.gameModel = gameModel;
+        this.eventModel = eventModel;
     }
 
     async create(game, playerId, name, participantIds) {
@@ -17,7 +18,7 @@ module.exports = class ConversationService {
 
         // Append the current player ID to the participants if it isn't there already.
         if (!participantIds.find(x => x.toString() === playerId.toString())) {
-            participantIds.push(playerId.toString());
+            participantIds.unshift(playerId.toString());
         }
 
         if (participantIds.length < 2) {
@@ -53,16 +54,18 @@ module.exports = class ConversationService {
 
         convos.forEach(c => {
             // Only return the last message
-            c.lastMessage = c.messages.slice(-1)[0];
+            c.lastMessage = c.messages.slice(-1)[0] || null;
 
             // Calculate how many messages in this conversation the player has NOT read.
             c.unreadCount = c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
+
+            delete c.messages;
         });
 
         return convos;
     }
 
-    detail(game, playerId, conversationId) {
+    async detail(game, playerId, conversationId) {
         // Get the conversation that the player has requested in full.
         let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
 
@@ -73,6 +76,21 @@ module.exports = class ConversationService {
         if (convo.participants.find(p => p.equals(playerId) == null)) {
             throw new ValidationError(`You are not participating in this conversation.`);
         }
+
+        convo.messages.forEach(m => {
+            m.type = 'message'; // Append the type of message as we may add trade events.
+        });
+
+        // If there are only two participants, then include any trade events that occurred
+        // between the players.
+        if (convo.participants.length === 2) {
+            let events = await this._getTradeEventsBetweenParticipants(game, playerId, convo.participants);
+
+            convo.messages = convo.messages.concat(events);
+        }
+
+        // Sort by sent date ascending.
+        convo.messages = convo.messages.sort((a, b) => a.sentDate - b.sentDate);
         
         return convo;
     }
@@ -103,7 +121,7 @@ module.exports = class ConversationService {
         },
         {
             $addToSet: {
-                'conversations.$.messages.readBy': playerId
+                'conversations.$.messages.$[].readBy': playerId
             }
         });
     }
@@ -116,6 +134,34 @@ module.exports = class ConversationService {
         {
             $addToSet: {
                 'conversations.messages.$.readBy': playerId
+            }
+        });
+    }
+
+    async _getTradeEventsBetweenParticipants(game, playerId, participants) {
+        let events = await this.eventModel.find({
+            gameId: game._id,
+            playerId: playerId,
+            type: {
+                $in: [
+                    'playerCreditsReceived',
+                    'playerRenownReceived',
+                    'playerTechnologyReceived',
+                    'playerCreditsSent',
+                    'playerRenownSent',
+                    'playerTechnologySent'
+                ]
+            }
+        })
+        .lean({ defaults: true })
+        .exec();
+
+        return events.map(e => {
+            return {
+                playerId: e.playerId,
+                type: e.type,
+                data: e.data,
+                sentDate: moment(e._id.getTimestamp())
             }
         });
     }
