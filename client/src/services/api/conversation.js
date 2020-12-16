@@ -38,6 +38,11 @@ class ConversationService extends BaseApiService {
     { withCredentials: true })
   }
 
+  getUnreadCount (gameId) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/conversations/unread',
+      { withCredentials: true })
+  }
+
 }
 
 export default new ConversationService()

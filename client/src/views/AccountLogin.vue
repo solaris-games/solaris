@@ -15,10 +15,16 @@
     <div class="form-group">
       <div class="row">
         <div class="col-6">
-          <input type="submit" class="btn btn-success btn-block" value="Login" :disabled="isLoading"/>
+          <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">
+            Login
+            <i class="fas fa-sign-in-alt"></i>
+          </button>
         </div>
         <div class="col-6">
-          <router-link to="/account/create" tag="button" class="btn btn-primary btn-block" :disabled="isLoading">Register</router-link>
+          <router-link to="/account/create" tag="button" class="btn btn-primary btn-block" :disabled="isLoading">
+            Register
+            <i class="fas fa-arrow-right"></i>
+          </router-link>
         </div>
       </div>
     </div>

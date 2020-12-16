@@ -127,7 +127,10 @@ export default {
     }
 
     try {
-      let response = await GameApiService.getGameHistory(this.$store.state.game._id)
+      // 10 cycles ago.
+      let startTick = Math.max(0, this.$store.state.game.state.tick - (this.$store.state.game.settings.galaxy.productionTicks * 10))
+
+      let response = await GameApiService.getGameHistory(this.$store.state.game._id, startTick)
 
       if (response.status === 200) {
         this.history = response.data

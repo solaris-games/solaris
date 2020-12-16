@@ -7,10 +7,10 @@
       <div class="col">
         <button class="btn btn-sm btn-primary" @click="onRefreshClicked">Refresh <i class="fas fa-sync"></i></button>
       </div>
-      <div class="col-auto">
+      <div class="col-auto" v-if="!isOneVsOne">
         <!-- <button class="btn btn-sm btn-primary" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button> -->
         <button class="btn btn-sm btn-info ml-1" @click="onCreateNewConversationRequested">
-          <i class="fas fa-edit"></i>
+          <i class="fas fa-comments"></i>
           Create...
         </button>
       </div>
@@ -66,6 +66,9 @@ export default {
           return b.lastMessage.sentDate.localeCompare(a.lastMessage.sentDate)
         }
       });
+    },
+    isOneVsOne: function () {
+      return this.$store.state.game.settings.general.playerLimit === 2
     }
   },
   mounted () {
@@ -131,6 +134,7 @@ export default {
       let convo = this.conversations.find(c => c._id === e.conversationId)
 
       convo.lastMessage = e
+      convo.unreadCount++
     }
   }
 }

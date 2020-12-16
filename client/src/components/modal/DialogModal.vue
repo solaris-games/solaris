@@ -12,8 +12,12 @@
                     <slot></slot>
                 </div>
                 <div class="modal-footer">
-                    <button @click="onCancel" type="button" class="btn btn-danger pl-3 pr-3" data-dismiss="modal" v-if="!hideCancelButton">{{cancelText || 'Cancel'}}</button>
-                    <button @click="onConfirm" type="button" class="btn btn-success pl-3 pr-3" data-dismiss="modal">{{ confirmText || 'Confirm' }}</button>
+                    <button @click="onCancel" type="button" class="btn btn-danger pl-3 pr-3" data-dismiss="modal" v-if="!hideCancelButton">
+                      <i class="fas fa-times"></i> {{cancelText || 'Cancel'}}
+                    </button>
+                    <button @click="onConfirm" type="button" class="btn btn-success pl-3 pr-3" data-dismiss="modal">
+                      <i class="fas fa-check"></i> {{ confirmText || 'Confirm' }}
+                    </button>
                 </div>
             </div>
         </div>

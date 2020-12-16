@@ -131,8 +131,7 @@ export default {
 
     this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('gameMessagesAllRead', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('gameMessagesRead', this.checkForUnreadMessages.bind(this))
+    this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
 
     this.sockets.subscribe('playerCreditsReceived', (data) => {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -228,7 +227,7 @@ export default {
       }
 
       try {
-        let response = await MessageApiService.getUnreadCount(this.$store.state.game._id)
+        let response = await ConversationApiService.getUnreadCount(this.$store.state.game._id)
 
         if (response.status === 200) {
           this.unreadMessages = response.data.unread
@@ -305,11 +304,17 @@ export default {
           case 78: // N
             this.setMenuState(MENU_STATES.GAME_NOTES)
             break
+          case 75: // K
+            this.setMenuState(MENU_STATES.LEDGER)
+            break
         }
       }
 
       // Handle keyboard shortcuts for any user type.
       switch (keyCode) {
+        case 27: // Esc
+          this.setMenuState(null, null)
+          break
         case 187: // +
           GameContainer.zoomIn()
           break

@@ -17,7 +17,7 @@
     </div>
 
     <div class="pt-0 mb-2 mt-2" v-if="!conversation.messages.length">
-        <p class="mb-0">No messages.</p>
+        <p class="mb-0 text-center">No messages.</p>
     </div>
 
     <compose-conversation-message :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent"/>
@@ -55,12 +55,14 @@ export default {
   },
   created () {
     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+    this.sockets.subscribe('gameConversationRead', this.onConversationRead)
     this.sockets.subscribe('playerCreditsReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
   },
   destroyed () {
     this.sockets.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('gameConversationRead')
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerRenownReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
@@ -87,6 +89,17 @@ export default {
         this.conversation.messages.push(e)
 
         this.scrollToEnd()
+      }
+    },
+    onConversationRead (e) {
+      if (e.conversationId === this.conversation._id) {
+        let messages = this.conversation.messages.filter(m => m.type === 'message')
+
+        for (let message of messages) {
+          if (message.readBy.indexOf(e.readByPlayerId) < 0) {
+            message.readBy.push(e.readByPlayerId)
+          }
+        }
       }
     },
     onTradeEventReceived (e) {

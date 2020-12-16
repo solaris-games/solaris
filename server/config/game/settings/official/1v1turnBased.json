@@ -3,41 +3,41 @@
     "name": "[[[RANDOM]]]",
     "description": "1 vs. 1 - Turn Based",
     "password": null,
-    "starVictoryPercentage": 75,
+    "starVictoryPercentage": 66,
     "playerLimit": 2,
     "playerType": "all",
     "anonymity": "normal"
   },
   "galaxy": {
     "galaxyType": "circular",
-    "starsPerPlayer": 10,
-    "productionTicks": 24
+    "starsPerPlayer": 30,
+    "productionTicks": 20
   },
   "specialGalaxy": {
     "carrierCost": "standard",
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
-    "darkGalaxy": "disabled",
+    "darkGalaxy": "start",
     "giftCarriers": "disabled",
-    "defenderBonus": "disabled",
+    "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular"
   },
   "player": {
-    "startingStars": 3,
-    "startingCredits": 500,
-    "startingShips": 10,
+    "startingStars": 6,
+    "startingCredits": 2000,
+    "startingShips": 100,
     "startingInfrastructure": {
-      "economy": 5,
-      "industry": 5,
-      "science": 1
+      "economy": 20,
+      "industry": 20,
+      "science": 4
     },
     "developmentCost": {
       "economy": "standard",
       "industry": "standard",
-      "science": "standard"
+      "science": "cheap"
     },
     "tradeCost": 15,
     "tradeScanning": "all"
@@ -50,16 +50,16 @@
       "hyperspace": 1,
       "manufacturing": 1,
       "banking": 1,
-      "weapons": 1
+      "weapons": 3
     },
     "researchCosts": {
       "terraforming": "standard",
-      "experimentation": "standard",
+      "experimentation": "none",
       "scanning": "standard",
       "hyperspace": "standard",
       "manufacturing": "standard",
-      "banking": "standard",
-      "weapons": "standard"
+      "banking": "cheap",
+      "weapons": "expensive"
     }
   },
   "gameTime": {

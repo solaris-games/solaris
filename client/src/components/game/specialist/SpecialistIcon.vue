@@ -14,23 +14,21 @@ export default {
       type: String,
       specialist: Object
   },
-  data () {
-    return {
-        source: null
-    }
-  },
   mounted () {
-    this.loadIcon()
+
   },
   methods: {
-    loadIcon () {
-        if (!this.specialist) {
-            return
-        }
 
+  },
+  computed: {
+    source: function () {
+        if (!this.specialist) {
+            return null
+        }
+        
         let name = gameHelper.getSpecialistName(this.type, this.specialist.id)
 
-        this.source = require(`../../../assets/specialists/${name}.svg`)
+        return require(`../../../assets/specialists/${name}.svg`)
     }
   }
 }

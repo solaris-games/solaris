@@ -1,5 +1,6 @@
 <template>
-<div class="container bg-primary pt-1"
+<div class="container bg-primary pt-1" 
+  :class="{'bg-light': isAllPlayersConversation, 'bg-warning':conversation.unreadCount}"
     @click="openConversation">
     <div class="row pb-1">
         <div class="col">
@@ -7,22 +8,30 @@
               {{conversation.name}}
           </span>
         </div>
-        <div class="col-auto" v-if="!hasReadLastMessage">
-            <!-- <small>{{getDateString(conversation.lastMessage.sentDate)}}</small> -->
-            <small v-if="conversation.unreadCount">
+        <div class="col-auto">
+            <small v-if="!hasReadLastMessage && conversation.unreadCount">
               <i class="fas fa-envelope"></i>
               {{conversation.unreadCount}}
+            </small>
+            <small>
+              <i class="fas fa-user"></i>
+              {{conversation.participants.length}}
             </small>
         </div>
     </div>
     <!-- <div class="row mt-1" :style="{'background-color': colour}" style="height:6px;"></div> -->
     <div class="row bg-secondary mt-0">
-        <div class="col">
-            <p class="mt-2 mb-2" v-if="hasLastMessage" :class="{'truncate':isTruncated}">
+        <div class="col-12" v-if="hasLastMessage">
+            <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
               <player-icon :player="lastMessageSender"/>
               {{conversation.lastMessage.message}}
             </p>
-            <p class="mt-2 mb-2" v-if="!hasLastMessage">No messages.</p>
+        </div>
+        <div class="col-12" v-if="hasLastMessage">
+            <small class="float-right mb-2"><i>{{getDateString(conversation.lastMessage.sentDate)}}</i></small>
+        </div>
+        <div class="col-12" v-if="!hasLastMessage">
+            <p class="mt-2 mb-2">No messages.</p>
         </div>
     </div>
 </div>
@@ -65,6 +74,9 @@ export default {
     },
     lastMessageSender: function () {
       return GameHelper.getPlayerById(this.$store.state.game, this.conversation.lastMessage.fromPlayerId)
+    },
+    isAllPlayersConversation: function () {
+      return this.conversation.participants.length === this.$store.state.game.settings.general.playerLimit
     }
   }
 }

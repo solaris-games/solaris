@@ -182,6 +182,8 @@ export default {
       this.sockets.subscribe('gameStarCarrierShipTransferred', (data) => this.$store.commit('gameStarCarrierShipTransferred', data))
       this.sockets.subscribe('gameStarAbandoned', (data) => this.$store.commit('gameStarAbandoned', data))
       this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
+      this.sockets.subscribe('starSpecialistHired', (data) => this.$store.commit('starSpecialistHired', data))
+      this.sockets.subscribe('carrierSpecialistHired', (data) => this.$store.commit('carrierSpecialistHired', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
     },
     unsubscribeToSockets () {
@@ -197,21 +199,19 @@ export default {
       this.sockets.unsubscribe('gameStarCarrierShipTransferred')
       this.sockets.unsubscribe('gameStarAbandoned')
       this.sockets.unsubscribe('playerDebtSettled')
+      this.sockets.unsubscribe('starSpecialistHired')
+      this.sockets.unsubscribe('carrierSpecialistHired')
       this.sockets.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
-      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
+      let conversationId = e.conversationId
 
       // Show a toast only if the user isn't already in the conversation.
-      // if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === e.fromPlayerId) {
-      //   return
-      // }
-
-      // TODO: If the player is in a conversation and the message was from another player, then allow
-      // then to open the other conversation.
-      if (this.menuState === MENU_STATES.CONVERSATION) {
+      if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === conversationId) {
         return
       }
+
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
 
       this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
         duration: null,
@@ -228,7 +228,7 @@ export default {
             onClick: (e, toastObject) => {
               this.onMenuStateChanged({
                 state: MENU_STATES.CONVERSATION,
-                args: fromPlayer._id
+                args: conversationId
               })
 
               toastObject.goAway(0)

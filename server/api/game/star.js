@@ -126,7 +126,7 @@ module.exports = (router, io, container) => {
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
-            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateBuilt(req.game, req.body.starId));
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateBuilt(req.game, p._id, req.body.starId));
         } catch (err) {
             return next(err);
         }
@@ -144,7 +144,7 @@ module.exports = (router, io, container) => {
             // Broadcast the event to the current player and also all other players within scanning range.
             let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
 
-            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateDestroyed(req.game, req.body.starId));
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateDestroyed(req.game, p._id, req.body.starId));
         } catch (err) {
             return next(err);
         }

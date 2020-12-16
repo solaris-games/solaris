@@ -7,9 +7,10 @@ module.exports = class HistoryService {
         this.playerService = playerService;
     }
 
-    async listByGameId(gameId) {
+    async listByGameId(gameId, startTick = 0) {
         return await this.historyModel.find({
-            gameId
+            gameId,
+            tick: { $gte: startTick }
         })
         .lean({ defaults: true })
         .exec();

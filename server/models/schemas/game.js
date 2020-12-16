@@ -5,7 +5,6 @@ const Types = Schema.Types;
 const playerSchema = require('./player');
 const starSchema = require('./star');
 const carrierSchema = require('./carrier');
-const messageSchema = require('./message');
 const conversationSchema = require('./conversation');
 
 const schema = new Schema({
@@ -16,7 +15,7 @@ const schema = new Schema({
             description: { type: Types.String, required: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
-			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 75, 90, 100], default: 50 },
+			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' }
@@ -88,7 +87,6 @@ const schema = new Schema({
 		stars: [starSchema],
 		carriers: [carrierSchema]
 	},
-	messages: [messageSchema],
 	conversations: [conversationSchema],
 	state: {
 		tick: { type: Types.Number, required: true, default: 0 },

@@ -11,7 +11,7 @@
   "galaxy": {
     "galaxyType": "circular",
     "starsPerPlayer": 20,
-    "productionTicks": 24
+    "productionTicks": 20
   },
   "specialGalaxy": {
     "carrierCost": "standard",
@@ -20,7 +20,7 @@
     "randomGates": "none",
     "darkGalaxy": "disabled",
     "giftCarriers": "enabled",
-    "defenderBonus": "disabled",
+    "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular"

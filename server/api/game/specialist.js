@@ -57,7 +57,10 @@ module.exports = (router, io, container) => {
                 result.specialist
             );
 
-            // TODO: Implement a socket to broadcast to other players.
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, result.carrier.orbiting.toString());
+
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameCarrierSpecialistHired(req.game, p._id, result.carrier, result.specialist));
 
             return res.sendStatus(200);
         } catch (err) {
@@ -86,7 +89,10 @@ module.exports = (router, io, container) => {
                 result.specialist
             );
 
-            // TODO: Implement a socket to broadcast to other players.
+            // Broadcast the event to the current player and also all other players within scanning range.
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.params.starId);
+
+            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarSpecialistHired(req.game, p._id, result.star, result.specialist));
 
             return res.sendStatus(200);
         } catch (err) {

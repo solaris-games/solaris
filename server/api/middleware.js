@@ -113,7 +113,9 @@ module.exports = (container) => {
 
         async loadGameHistory(req, res, next) {
             if (req.params.gameId) {
-                req.history = await container.historyService.listByGameId(req.params.gameId);
+                let startTick = +req.query.startTick || 0;
+
+                req.history = await container.historyService.listByGameId(req.params.gameId, startTick);
             }
 
             return next();

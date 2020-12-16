@@ -1,11 +1,14 @@
 <template>
 <div class="participant-container">
-  <p>
+  <p v-if="isPartialPlayers">
     <span v-for="participant in conversation.participants" :key="participant" class="mr-2">
       <player-icon :player="getPlayer(participant)"/>
 
       {{getPlayer(participant).alias}}
     </span>
+  </p>
+  <p v-if="!isPartialPlayers && !isOneVsOne" class="text-info">
+    <i>This conversation is for <strong>all</strong> players.</i>
   </p>
   <!-- {{getPlayersString()}} -->
   <!-- <div v-for="participant in conversation.participants" :key="participant">
@@ -31,6 +34,14 @@ export default {
     },
     getPlayersString () {
       return this.conversation.participants.map(p => this.getPlayer(p).alias).join(', ')
+    }
+  },
+  computed: {
+    isPartialPlayers: function () {
+      return this.conversation.participants.length !== this.$store.state.game.galaxy.players.length
+    },
+    isOneVsOne: function () {
+      return this.$store.state.game.settings.general.playerLimit === 2
     }
   }
 }

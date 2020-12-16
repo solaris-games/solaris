@@ -10,8 +10,12 @@
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
-                  <button class="btn btn-success" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button>
-                  <button class="btn btn-info ml-1" :disabled="!gameHasStarted || player.userId" @click="onViewCompareIntelRequested"><i class="fas fa-chart-line"></i></button>
+                <!-- TODO: Figure out how to open the conversation with the player -->
+                <!-- <button class="btn btn-success" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button> -->
+                <button class="btn btn-info ml-1" :disabled="!gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
+                  <i class="fas fa-chart-line"></i>
+                  Intel
+                </button>
               </div>
           </div>
       </div>

@@ -24,7 +24,7 @@
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary float-right" :disabled="isLoading">
+        <button type="submit" class="btn btn-success float-right" :disabled="isLoading">
           <i class="fas fa-comments"></i>
           Create Conversation
         </button>
@@ -93,6 +93,10 @@ export default {
         }
       } catch (err) {
         console.error(err)
+
+        if (err.response.data.errors) {
+          this.errors = err.response.data.errors
+        }
       }
 
       this.isLoading = false
@@ -105,5 +109,7 @@ export default {
 </script>
 
 <style scoped>
-
+select {
+  min-height: 200px;
+}
 </style>

@@ -4,13 +4,14 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService) {
         this.gameModel = gameModel;
         this.gameListService = gameListService;
         this.nameService = nameService;
         this.mapService = mapService;
         this.playerService = playerService;
         this.passwordService = passwordService;
+        this.conversationService = conversationService;
     }
 
     async create(settings) {
@@ -65,6 +66,8 @@ module.exports = class GameCreateService {
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
         game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+
+        this.conversationService.createConversationAllPlayers(game);
 
         return await game.save();
     }

@@ -30,7 +30,6 @@ const StarUpgradeService = require('../services/starUpgrade');
 const TechnologyService = require('../services/technology');
 const TradeService = require('../services/trade');
 const WaypointService = require('../services/waypoint');
-const MessageService = require('../services/message');
 const ShipTransferService = require('../services/shipTransfer');
 const UserService = require('../services/user');
 const HistoryService = require('../services/history');
@@ -78,15 +77,14 @@ module.exports = (io) => {
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, userService, technologyService);
     const tradeService = new TradeService(userService, playerService, ledgerService);
     const waypointService = new WaypointService(GameModel, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
-    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService);
+    const conversationService = new ConversationService(GameModel, EventModel);
+    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService);
     const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService);
     const gameGalaxyService = new GameGalaxyService(gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService);
     const historyService = new HistoryService(HistoryModel, playerService);
     const gameTickService = new GameTickService(broadcastService, distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService);
-    const messageService = new MessageService(GameModel);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
-    const conversationService = new ConversationService(GameModel, EventModel);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService);
@@ -119,7 +117,6 @@ module.exports = (io) => {
         userService,
         waypointService,
         shipTransferService,
-        messageService,
         historyService,
         ledgerService,
         specialistService,

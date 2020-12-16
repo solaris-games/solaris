@@ -48,7 +48,8 @@ export default {
             fromPlayerId: userPlayerId,
             message: this.message,
             sentDate: moment().utc(),
-            readBy: [userPlayerId]
+            readBy: [userPlayerId],
+            type: 'message'
           })
 
           this.message = ''

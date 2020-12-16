@@ -16,6 +16,20 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/:gameId/conversations/unread', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let result = container.conversationService.getUnreadCount(
+                req.game,
+                req.player._id);
+
+            return res.status(200).json({
+                unread: result
+            });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/conversations/:conversationId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
         try {
             let result = await container.conversationService.detail(
@@ -71,13 +85,13 @@ module.exports = (router, io, container) => {
                 throw new ValidationError(errors);
             }
             
-            await container.conversationService.send(
+            let message = await container.conversationService.send(
                 req.game,
                 req.player._id,
                 req.params.conversationId,
                 req.body.message);
 
-            // container.broadcastService.gameConversationMessageSent(req.game, req.player._id, req.params.conversationId, message);
+            container.broadcastService.gameMessageSent(req.game, message);
 
             return res.sendStatus(200);
         } catch (err) {
@@ -87,12 +101,12 @@ module.exports = (router, io, container) => {
 
     router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
         try {
-            await container.conversationService.markConversationAsRead(
+            let convo = await container.conversationService.markConversationAsRead(
                 req.game,
                 req.player._id,
                 req.params.conversationId);
 
-            // TODO: Broadcast convo read.
+            container.broadcastService.gameConversationRead(req.game, convo, req.player._id);
 
             return res.sendStatus(200);
         } catch (err) {
@@ -100,6 +114,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    // TODO: Do we need this?
     router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
         try {
             await container.conversationService.markMessageAsRead(

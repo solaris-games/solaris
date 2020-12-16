@@ -21,8 +21,8 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  getGameHistory (id) {
-    return axios.get(this.BASE_URL + 'game/' + id + '/history',
+  getGameHistory (id, startTick = 0) {
+    return axios.get(this.BASE_URL + 'game/' + id + '/history?startTick=' + startTick.toString(),
       { withCredentials: true })
   }
 

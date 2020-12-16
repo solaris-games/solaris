@@ -77,14 +77,14 @@ module.exports = class BroadcastService {
         this.io.to(playerId.toString()).emit('gameStarBulkUpgraded', summary);
     }
 
-    gameStarWarpGateBuilt(game, starId) {
-        this.io.to(game.id).emit('gameStarWarpGateBuilt', {
+    gameStarWarpGateBuilt(game, playerId, starId) {
+        this.io.to(playerId.toString()).emit('gameStarWarpGateBuilt', {
             starId
         });
     }
 
-    gameStarWarpGateDestroyed(game, starId) {
-        this.io.to(game.id).emit('gameStarWarpGateDestroyed', {
+    gameStarWarpGateDestroyed(game, playerId, starId) {
+        this.io.to(playerId.toString()).emit('gameStarWarpGateDestroyed', {
             starId
         });
     }
@@ -108,17 +108,20 @@ module.exports = class BroadcastService {
         });
     }
 
-    gameMessageSent(game, message, toPlayerId) {
-        this.io.to(toPlayerId).emit('gameMessageSent', message);
+    gameMessageSent(game, message) {
+        message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
     }
 
-    gameMessagesRead(game, playerId, messageIds) {
-        this.io.to(playerId).emit('gameMessagesRead', messageIds);
+    gameConversationRead(game, conversation, readByPlayerId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationRead', {
+            conversationId: conversation._id,
+            readByPlayerId
+        }));
     }
 
-    gameMessagesAllRead(game, playerId) {
-        this.io.to(playerId).emit('gameMessagesAllRead');
-    }
+    // gameMessagesAllRead(game, playerId) {
+    //     this.io.to(playerId).emit('gameMessagesAllRead');
+    // }
 
     gamePlayerCreditsReceived(game, fromPlayerId, toPlayerId, credits, date) {
         this.io.to(toPlayerId).emit('playerCreditsReceived', {
@@ -195,5 +198,33 @@ module.exports = class BroadcastService {
     // userRenownReceived(game, toUserId, renown) {
     //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?
     // }
+
+    gameStarSpecialistHired(game, playerId, star, specialist) {
+        let data = {
+            starId: star._id,
+            specialist: {
+                id: specialist.id,
+                name: specialist.name,
+                description: specialist.description,
+                modifiers: specialist.modifiers
+            }
+        };
+
+        this.io.to(playerId.toString()).emit('starSpecialistHired', data);
+    }
+
+    gameCarrierSpecialistHired(game, playerId, carrier, specialist) {
+        let data = {
+            carrierId: carrier._id,
+            specialist: {
+                id: specialist.id,
+                name: specialist.name,
+                description: specialist.description,
+                modifiers: specialist.modifiers
+            }
+        };
+
+        this.io.to(playerId.toString()).emit('carrierSpecialistHired', data);
+    }
 
 };

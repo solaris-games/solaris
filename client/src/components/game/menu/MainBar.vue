@@ -96,6 +96,7 @@
         @onOpenConversationRequested="onOpenConversationRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION"
         :conversationId="menuArguments"
+        :key="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenInboxRequested="onOpenInboxRequested"/>
     </div>

@@ -32,7 +32,7 @@
 <script>
 import MenuTitle from '../MenuTitle'
 import ConversationListVue from './conversations/ConversationList'
-import EventsListVue from './EventsList'
+import EventsListVue from './events/EventsList'
 
 export default {
   components: {

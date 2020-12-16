@@ -114,17 +114,22 @@ class Star extends EventEmitter {
     if (!this.hasSpecialist()) {
       return
     }
+
+    if (this.specialistSprite) {
+      this.container.removeChild(this.specialistSprite)
+      this.specialistSprite = null
+    }
     
     //FIXME potential resource leak, should not create a new sprite every time
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
-    let specialistSprite = new PIXI.Sprite(specialistTexture)
+    this.specialistSprite = new PIXI.Sprite(specialistTexture)
 
-    specialistSprite.width = 10
-    specialistSprite.height = 10
-    specialistSprite.x = -5
-    specialistSprite.y = -5
+    this.specialistSprite.width = 10
+    this.specialistSprite.height = 10
+    this.specialistSprite.x = -5
+    this.specialistSprite.y = -5
     
-    this.container.addChild(specialistSprite)
+    this.container.addChild(this.specialistSprite)
   }
 
   hasSpecialist () {
@@ -165,12 +170,12 @@ class Star extends EventEmitter {
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = 0.1
-          orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
+        orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
         this.container_planets.addChild(orbitGraphics)
 
         let planetGraphics = new PIXI.Graphics()
         planetGraphics.beginFill(playerColour)
-        planetGraphics.drawCircle(0, 0, planetSize)
+        planetGraphics.drawCircle(planetSize / 2, 0, planetSize)
         planetGraphics.endFill()
 
         if (!this._isInScanningRange()) {

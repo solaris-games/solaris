@@ -322,6 +322,22 @@ export default new Vuex.Store({
       if (data.creditorPlayerId === player._id) {
         player.credits += data.amount
       }
+    },
+    starSpecialistHired (state, data) {
+      let star = GameHelper.getStarById(state.game, data.starId)
+
+      star.specialistId = data.specialist.id
+      star.specialist = data.specialist
+
+      GameContainer.reloadStar(star)
+    },
+    carrierSpecialistHired (state, data) {
+      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
+
+      carrier.specialistId = data.specialist.id
+      carrier.specialist = data.specialist
+
+      GameContainer.reloadCarrier(carrier)
     }
   },
   actions: {

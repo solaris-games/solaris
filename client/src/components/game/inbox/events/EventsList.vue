@@ -20,18 +20,22 @@
   <!-- <button class="btn btn-primary float-right">Mark All Read</button>
   <span class="ml-2">Click on an event to mark is as read.</span> -->
 
-  <div class="mt-2 events-container container" v-if="filteredEvents">
+  <div class="mt-2 events-container container" v-if="filteredEvents && filteredEvents.length">
       <events-list-item v-for="event in filteredEvents" :key="event._id" :event="event"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
   </div>
+
+  <div class="text-center pt-3 pb-3" v-if="filteredEvents && !filteredEvents.length">
+      No Events.
+  </div>
 </div>
 </template>
 
 <script>
-import GameApiService from '../../../services/api/game'
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
+import GameApiService from '../../../../services/api/game'
+import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
 import EventsListItemVue from './EventsListItem'
 
 export default {
