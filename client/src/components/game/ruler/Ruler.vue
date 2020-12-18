@@ -75,7 +75,7 @@ export default {
       points: [],
       etaTicks: 0,
       rangeLightYears: 0,
-      hyperspaceRange: 1,
+      hyperspaceRange: 0,
       totalEta: '',
       totalEtaWarp: ''
     }
@@ -88,10 +88,6 @@ export default {
     GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
 
     let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
-    if (userPlayer) {
-      this.hyperspaceRange = userPlayer.research.hyperspace.effective
-    }
   },
   destroyed () {
     // Set map to galaxy mode
@@ -110,16 +106,19 @@ export default {
       this.points.push(e)
 
       this.recalculateETAs()
+      this.recalculateHyperspaceRange()
     },
     onRulerPointRemoved (e) {
       this.points.splice(this.points.indexOf(e), 1)
 
       this.recalculateETAs()
+      this.recalculateHyperspaceRange()
     },
     onRulerPointsCleared (e) {
       this.points = []
 
       this.recalculateETAs()
+      this.recalculateHyperspaceRange()
     },
     recalculateETAs () {
       let game = this.$store.state.game
@@ -132,6 +131,33 @@ export default {
 
       this.totalEta = totalTimeString
       this.totalEtaWarp = totalTimeWarpString
+    },
+    recalculateHyperspaceRange () {
+      if (this.points.length < 2) {
+        this.hyperspaceRange = 0
+        return
+      }
+
+      let game = this.$store.state.game
+
+      // Get the waypoint that has the largest distance between the source and destination.
+      let distances = []
+
+      for (let i = 0; i < this.points.length - 1; i++) {
+        const point = this.points[i]
+        const nextPoint = this.points[i + 1]
+
+        if (!nextPoint) {
+          continue
+        }
+
+        distances.push(GameHelper.getDistanceBetweenLocations(point, nextPoint))
+      }
+      
+      let longestWaypoint = Math.max(...distances)
+
+      // Calculate the hyperspace range required for it.
+      this.hyperspaceRange = GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint)
     }
   }
 }

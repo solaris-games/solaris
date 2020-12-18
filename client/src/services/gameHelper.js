@@ -71,6 +71,12 @@ class GameHelper {
     return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
   }
 
+  getHyperspaceLevelByDistance (game, distance) {
+    let distancePerLevel = Math.ceil(distance / game.constants.distances.lightYear - 1.5)
+
+    return distancePerLevel || 1
+  }
+
   getDistanceBetweenLocations (loc1, loc2) {
     let xs = loc2.x - loc1.x
     let ys = loc2.y - loc1.y

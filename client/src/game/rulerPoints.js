@@ -97,6 +97,8 @@ class RulerPoints extends EventEmitter {
       return
     }
 
+    desiredLocation.distance = 
+
     this.rulerPoints.push(desiredLocation)
 
     this.draw()
