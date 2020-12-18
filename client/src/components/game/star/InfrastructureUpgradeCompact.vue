@@ -6,29 +6,29 @@
               :disabled="isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"
               title="Upgrade Economy">
-        <i class="fas fa-money-bill-wave"></i> ${{economy}}
+        <i class="fas fa-money-bill-wave mr-1"></i>${{economy}}
       </button>
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= industry, 'btn-primary': availableCredits < industry}"
               :disabled="isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"
               title="Upgrade Industry">
-        <i class="fas fa-tools"></i> ${{industry}}
+        <i class="fas fa-tools mr-1"></i>${{industry}}
       </button>
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
               :disabled="isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
               title="Upgrade Science">
-        <i class="fas fa-flask"></i> ${{science}}
+        <i class="fas fa-flask mr-1"></i>${{science}}
       </button>
       <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info mr-1" @click="onBuildCarrierRequested">
-        <i class="fas fa-rocket"></i> ${{star.upgradeCosts.carriers}}
+        <i class="fas fa-rocket mr-1"></i>${{star.upgradeCosts.carriers}}
       </button>
     </div>
     <div class="col-auto" v-if="userPlayer">
       <button v-if="canBuildWarpGates && !star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
-        <i class="fas fa-dungeon"></i> ${{star.upgradeCosts.warpGate}}
+        <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
       <button v-if="canBuildWarpGates && star.warpGate" :disabled="isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy Warp Gate">
         <i class="fas fa-trash"></i> <i class="fas fa-dungeon ml-1"></i>

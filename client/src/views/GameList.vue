@@ -27,7 +27,12 @@
                 <td>{{game.settings.general.description}}</td>
                 <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                      <span class="d-none d-md-block">View</span>
+                      <span class="d-xs-block d-sm-block d-md-none">
+                        {{game.state.players}}/{{game.settings.general.playerLimit}}
+                      </span>
+                    </router-link>
                 </td>
             </tr>
         </tbody>
@@ -60,14 +65,20 @@
                 <td>{{game.settings.general.name}}</td>
                 <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                      <span class="d-none d-md-block">View</span>
+                      <span class="d-xs-block d-sm-block d-md-none">
+                        {{game.state.players}}/{{game.settings.general.playerLimit}}
+                      </span>
+                    </router-link>
                 </td>
             </tr>
         </tbody>
     </table>
 
     <div class="text-right" v-if="!isLoadingUserGames">
-      <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+      <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
+      <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
     </div>
   </view-container>
 </template>

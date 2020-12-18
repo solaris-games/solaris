@@ -70,7 +70,7 @@ class Territories {
     this.voronoiContainer = new PIXI.Container()
     this.voronoiContainer.alpha = 0.3
 
-    const maxDistance = 100
+    const maxDistance = 200
 
     let voronoi = new Voronoi()
 

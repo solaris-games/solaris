@@ -208,6 +208,9 @@ class Map extends EventEmitter {
 
     this.territories.setup(game)
     this.territories.draw()
+
+    this.background.setup(game, userSettings)
+    this.background.draw(game, userSettings)
   }
 
 

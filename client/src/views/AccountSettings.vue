@@ -80,7 +80,8 @@ export default {
   data () {
     return {
       info: null,
-      isChangingEmailNotifications: false
+      isChangingEmailNotifications: false,
+      isClosingAccount: false
     }
   },
   async mounted () {

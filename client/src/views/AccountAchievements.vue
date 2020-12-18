@@ -655,17 +655,6 @@ export default {
           },
           {
             data: [
-              this.user.achievements.trade.giftsSent,
-              this.user.achievements.trade.giftsReceived
-            ],
-            backgroundColor: [
-              '#00bc8c',
-              '#3498DB'
-            ],
-            label: 'Gifts'
-          },
-          {
-            data: [
               this.user.achievements.trade.renownSent,
               this.user.achievements.renown
             ],
@@ -674,6 +663,17 @@ export default {
               '#3498DB'
             ],
             label: 'Renown'
+          },
+          {
+            data: [
+              this.user.achievements.trade.giftsSent,
+              this.user.achievements.trade.giftsReceived
+            ],
+            backgroundColor: [
+              '#00bc8c',
+              '#3498DB'
+            ],
+            label: 'Gifts'
           }
         ]
       }

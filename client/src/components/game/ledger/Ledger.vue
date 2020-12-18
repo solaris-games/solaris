@@ -16,12 +16,11 @@
                   <tr v-for="ledger in ledgers" :key="ledger.playerId">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(ledger.playerId)}"></td>
                       <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
-                          <img v-if="getAvatarImage(ledger)" :src="getAvatarImage(ledger)">
-                          <i v-if="!getAvatarImage(ledger)" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:40px;"></i>
+                        <player-avatar :player="getPlayer(ledger.playerId)"/>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
-                          <h5>{{getPlayerAlias(ledger.playerId)}}</h5>
+                          <h5 class="alias-title">{{getPlayerAlias(ledger.playerId)}}</h5>
                       </td>
                       <td class="fit pt-3 pr-4">
                           <h5 :class="{'text-success':ledger.debt>0,'text-danger':ledger.debt<0}">${{ledger.debt}}</h5>
@@ -48,13 +47,15 @@
 <script>
 import MenuTitle from '../MenuTitle'
 import LoadingSpinner from '../../LoadingSpinner'
+import PlayerAvatarVue from '../menu/PlayerAvatar'
 import LedgerApiService from '../../../services/api/ledger'
 import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'player-avatar': PlayerAvatarVue
   },
   data () {
     return {
@@ -79,8 +80,11 @@ export default {
     this.sockets.unsubscribe('playerDebtSettled')
   },
   methods: {
+    getPlayer (playerId) {
+      return gameHelper.getPlayerById(this.$store.state.game, playerId)
+    },
     getPlayerAlias (playerId) {
-      return gameHelper.getPlayerById(this.$store.state.game, playerId).alias
+      return this.getPlayer(playerId).alias
     },
     getFriendlyColour (playerId) {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
@@ -176,13 +180,19 @@ export default {
 </script>
 
 <style scoped>
-img {
-    height: 55px;
+.col-avatar {
+  position:absolute;
+  width: 59px;
+  height: 59px;
+  cursor: pointer;
 }
 
-.col-avatar {
-    width: 55px;
-    cursor: pointer;
+.alias-title {
+  padding-left: 59px;
+}
+
+table tr {
+  height: 59px;
 }
 
 .table-sm td {

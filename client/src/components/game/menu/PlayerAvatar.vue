@@ -2,7 +2,7 @@
     <div class="player-icon text-center">
         <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
         <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:44px;"></i>
-        <i v-if="canShowShapeIcon"
+        <i v-if="canShowShapeIcon()"
             class="shapeIcon far"
             :class="{'fa-circle': player.shape === 'circle','fa-square': player.shape === 'square'}"
             :style="{'color': getFriendlyColour(player.colour.value)}"></i>

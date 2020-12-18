@@ -257,6 +257,8 @@ module.exports = class PlayerService extends EventEmitter {
     _setDefaultResearchTechnology(game, player) {
         let enabledTechs = this.technologyService.getEnabledTechnologies(game);
 
+        // TODO: Should we select a random enabled technology instead of the first enabled one?
+
         player.researchingNow = enabledTechs[0] || 'weapons';
         player.researchingNext = player.researchingNow;
     }

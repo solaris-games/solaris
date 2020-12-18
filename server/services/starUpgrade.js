@@ -377,6 +377,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
             upgradeSummary
         });
 
+        // TODO: Append the new infrastructure costs to all stars that were upgraded.
+        // See setUpgradeCosts below.
+
         return upgradeSummary;
     }
 

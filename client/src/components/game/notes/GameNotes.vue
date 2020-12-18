@@ -6,7 +6,7 @@
 
     <div class="row" v-if="!isLoadingNotes">
         <div class="col-12">
-            <textarea v-model="notes" class="form-control" rows="15"></textarea>
+            <textarea v-model="notes" class="form-control" rows="15" placeholder="Write your notes here..."></textarea>
         </div>
 
         <div class="col"></div>

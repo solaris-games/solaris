@@ -287,10 +287,6 @@ export default {
 </script>
 
 <style scoped>
-img {
-    height: 55px;
-}
-
 .col-avatar {
   position:absolute;
   width: 59px;

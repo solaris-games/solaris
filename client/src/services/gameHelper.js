@@ -478,7 +478,7 @@ class GameHelper {
   }
 
   getGamePlayerShapesCount (game) {
-    return new Set([...game.galaxy.players.map(p => p.shape)]).length > 1
+    return new Set([...game.galaxy.players.map(p => p.shape)]).size
   }
 }
 
