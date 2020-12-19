@@ -99,7 +99,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversations, middleware.loadPlayer, async (req, res, next) => {
         try {
             let convo = await container.conversationService.markConversationAsRead(
                 req.game,

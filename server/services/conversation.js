@@ -104,7 +104,7 @@ module.exports = class ConversationService {
         return convos;
     }
 
-    async detail(game, playerId, conversationId) {
+    async detail(game, playerId, conversationId, includeEvents = true) {
         // Get the conversation that the player has requested in full.
         let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
 
@@ -122,7 +122,7 @@ module.exports = class ConversationService {
 
         // If there are only two participants, then include any trade events that occurred
         // between the players.
-        if (convo.participants.length === 2) {
+        if (includeEvents && convo.participants.length === 2) {
             let events = await this._getTradeEventsBetweenParticipants(game, playerId, convo.participants);
 
             convo.messages = convo.messages.concat(events);
@@ -135,7 +135,7 @@ module.exports = class ConversationService {
     }
 
     async send(game, playerId, conversationId, message) {
-        let convo = await this.detail(game, playerId, conversationId); // Call this for the validation.
+        let convo = await this.detail(game, playerId, conversationId, false); // Call this for the validation.
 
         let newMessage = {
             fromPlayerId: playerId,
@@ -162,39 +162,35 @@ module.exports = class ConversationService {
     }
 
     async markConversationAsRead(game, playerId, conversationId) {
-        let convo = await this.detail(game, playerId, conversationId);
+        let convo = await this.detail(game, playerId, conversationId, false);
 
-        // await this.gameModel.updateOne({
-        //     _id: game._id,
-        //     'conversations._id': conversationId,
-        //     'conversations.messages.readBy': {
-        //         $nin: [playerId]
-        //     }
-        // },
-        // {
-        //     $addToSet: {
-        //         'conversations.$.messages.$[].readBy': playerId
-        //     }
-        // });
-
+        // Note: This is the best way as it may save a DB call
+        // if there are no unread messages.
         let unreadMessages = convo.messages
             .filter(m => m.type === 'message')
-            .filter(m => m.readBy.find(r => r.equals(playerId)) == null)
-            .map(m => m._id);
+            .filter(m => m.readBy.find(r => r.equals(playerId)) == null);
+            //.map(m => m._id);
 
         if (unreadMessages.length) {
-            await this.gameModel.updateOne({
-                _id: game._id,
-                'conversations._id': conversationId,
-                'conversations.messages._id': {
-                    $in: unreadMessages
-                }
-            },
-            {
-                $addToSet: {
-                    'conversations.$.messages.$[].readBy': playerId
-                }
-            });
+            // TODO: Fix this to use the straight DB method asap.
+            unreadMessages.forEach(u => u.readBy.push(playerId));
+
+            await game.save();
+
+            // TODO: This doesn't work in prod because prod is running an older
+            // version of MongoDB that doesn't support $[]
+            // await this.gameModel.updateOne({
+            //     _id: game._id,
+            //     'conversations._id': conversationId,
+            //     'conversations.messages._id': {
+            //         $in: unreadMessages
+            //     }
+            // },
+            // {
+            //     $addToSet: {
+            //         'conversations.$.messages.$[].readBy': playerId
+            //     }
+            // });
         }
 
         return convo;
