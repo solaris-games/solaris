@@ -164,18 +164,38 @@ module.exports = class ConversationService {
     async markConversationAsRead(game, playerId, conversationId) {
         let convo = await this.detail(game, playerId, conversationId);
 
-        await this.gameModel.updateOne({
-            _id: game._id,
-            'conversations._id': conversationId,
-            'conversations.messages.readBy': {
-                $nin: [playerId]
-            }
-        },
-        {
-            $addToSet: {
-                'conversations.$.messages.$[].readBy': playerId
-            }
-        });
+        // await this.gameModel.updateOne({
+        //     _id: game._id,
+        //     'conversations._id': conversationId,
+        //     'conversations.messages.readBy': {
+        //         $nin: [playerId]
+        //     }
+        // },
+        // {
+        //     $addToSet: {
+        //         'conversations.$.messages.$[].readBy': playerId
+        //     }
+        // });
+
+        let unreadMessages = convo.messages
+            .filter(m => m.type === 'message')
+            .filter(m => m.readBy.find(r => r.equals(playerId)) == null)
+            .map(m => m._id);
+
+        if (unreadMessages.length) {
+            await this.gameModel.updateOne({
+                _id: game._id,
+                'conversations._id': conversationId,
+                'conversations.messages._id': {
+                    $in: unreadMessages
+                }
+            },
+            {
+                $addToSet: {
+                    'conversations.$.messages.$[].readBy': playerId
+                }
+            });
+        }
 
         return convo;
     }
