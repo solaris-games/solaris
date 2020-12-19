@@ -167,7 +167,7 @@ module.exports = class ConversationService {
         await this.gameModel.updateOne({
             _id: game._id,
             'conversations._id': conversationId,
-            'converstions.messages.readBy': {
+            'conversations.messages.readBy': {
                 $nin: [playerId]
             }
         },
