@@ -33,11 +33,6 @@ class ConversationService extends BaseApiService {
     { withCredentials: true })
   }
 
-  markMessageAsRead (gameId, conversationId, messageId) {
-    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/markAsRead/' + messageId, { },
-    { withCredentials: true })
-  }
-
   getUnreadCount (gameId) {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/conversations/unread',
       { withCredentials: true })

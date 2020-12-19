@@ -166,7 +166,10 @@ module.exports = class ConversationService {
 
         await this.gameModel.updateOne({
             _id: game._id,
-            'conversations._id': conversationId
+            'conversations._id': conversationId,
+            'converstions.messages.readBy': {
+                $nin: [playerId]
+            }
         },
         {
             $addToSet: {
@@ -175,18 +178,6 @@ module.exports = class ConversationService {
         });
 
         return convo;
-    }
-
-    async markMessageAsRead(game, playerId, conversationId, messageId) {
-        await this.gameModel.updateOne({
-            _id: game._id,
-            'conversations.messages._id': messageId
-        },
-        {
-            $addToSet: {
-                'conversations.messages.$.readBy': playerId
-            }
-        });
     }
 
     async _getTradeEventsBetweenParticipants(game, playerId, participants) {

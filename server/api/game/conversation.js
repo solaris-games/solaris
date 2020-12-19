@@ -114,23 +114,6 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    // TODO: Do we need this?
-    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
-        try {
-            await container.conversationService.markMessageAsRead(
-                req.game,
-                req.player._id,
-                req.params.conversationId,
-                req.params.messageId);
-
-            // TODO: Broadcast message read.
-
-            return res.sendStatus(200);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
     return router;
 
 };
