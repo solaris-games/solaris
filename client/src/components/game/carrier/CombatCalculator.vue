@@ -20,8 +20,16 @@
                     </div>
                 </div>
                 <div class="form-group row" v-if="hasDefenderBonus">
-                    <label class="col-8 col-form-label">Defender Bonus</label>
-                    <label class="col-4 col-form-label text-right text-success">+1 Weapons</label>
+                  <div class="col-8">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" v-model="includeDefenderBonus" id="chkDefenderBonus">
+                      <label class="form-check-label" for="chkDefenderBonus">
+                        Defender Bonus
+                      </label>
+                    </div>
+                  </div>
+
+                  <label class="col-4 col-form-label text-right text-success pt-0 pb-0" v-if="includeDefenderBonus">+1 Weapons</label>
                 </div>
 
                 <hr/>
@@ -78,6 +86,7 @@ export default {
       isLoading: false,
       errors: [],
       hasDefenderBonus: false,
+      includeDefenderBonus: true,
       defender: {
         ships: 0,
         weaponsLevel: 1
@@ -129,7 +138,8 @@ export default {
         }, {
           weaponsLevel: +this.attacker.weaponsLevel,
           ships: +this.attacker.ships
-        })
+        },
+        this.includeDefenderBonus)
 
         if (response.status === 200) {
           this.result = response.data
@@ -145,5 +155,7 @@ export default {
 </script>
 
 <style scoped>
-
+.form-check-input, .form-check-label {
+  cursor: pointer;
+}
 </style>

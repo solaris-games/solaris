@@ -156,6 +156,10 @@ module.exports = (router, io, container) => {
             errors.push('attacker.weaponsLevel must be greater than 0.');
         }
 
+        if (req.body.includeDefenderBonus == null) {
+            req.body.includeDefenderBonus = true;
+        }
+
         if (errors.length) {
             throw new ValidationError(errors);
         }
@@ -164,7 +168,8 @@ module.exports = (router, io, container) => {
             let result = container.combatService.calculate(
                 req.game,
                 req.body.defender,
-                req.body.attacker);
+                req.body.attacker,
+                req.body.includeDefenderBonus);
 
             return res.status(200).json(result);
         } catch (err) {
