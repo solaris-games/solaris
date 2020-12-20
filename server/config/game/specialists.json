@@ -192,7 +192,7 @@
             "id": 6,
             "name": "World Builder",
             "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
-            "tier": 4,
+            "tier": 5,
             "modifiers": {
                 "special": {
                     "addNaturalResourcesOnTick": 1
