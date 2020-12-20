@@ -209,12 +209,17 @@ module.exports = class ConversationService {
                     'playerRenownSent',
                     'playerTechnologySent'
                 ]
-            }
+            },
+            $or: [
+                { 'data.fromPlayerId': { $in: participants } },
+                { 'data.toPlayerId': { $in: participants } }
+            ]
         })
         .lean({ defaults: true })
         .exec();
 
-        return events.map(e => {
+        return events
+        .map(e => {
             return {
                 playerId: e.playerId,
                 type: e.type,
