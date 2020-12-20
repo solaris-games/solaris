@@ -43,14 +43,14 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="pl-2">
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy"><i class="fas fa-compass"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()"><i class="fas fa-search-plus"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()"><i class="fas fa-search-minus"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)"><i class="fas fa-calculator"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy" title="Hotkey: 0"><i class="fas fa-compass"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()" title="Hotkey: +"><i class="fas fa-search-plus"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()" title="Hotkey: -"><i class="fas fa-search-minus"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Hotkey: C"><i class="fas fa-calculator"></i></button>
                     <div v-if="userPlayer">
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()"><i class="fas fa-home"></i></button>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)"><i class="fas fa-ruler"></i></button>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" v-if="!userPlayer.defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)"><i class="fas fa-money-bill"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Hotkey: H"><i class="fas fa-home"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Hotkey: V"><i class="fas fa-ruler"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" v-if="!userPlayer.defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Hotkey: B"><i class="fas fa-money-bill"></i></button>
                     </div>
                 </div>
                 <div class="dropdown-divider"></div>
@@ -58,14 +58,14 @@
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake mr-2"></i>Welcome</a>
                 </div>
                 <div v-if="userPlayer">
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)"><i class="fas fa-flask mr-2"></i>Research</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)"><i class="fas fa-star mr-2"></i>Galaxy</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)"><i class="fas fa-book-open mr-2"></i>Notes</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Hotkey: L"><i class="fas fa-users mr-2"></i>Leaderboard</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Hotkey: R"><i class="fas fa-flask mr-2"></i>Research</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Hotkey: S"><i class="fas fa-star mr-2"></i>Galaxy</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Hotkey: K"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Hotkey: G"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Hotkey: N"><i class="fas fa-book-open mr-2"></i>Notes</a>
                 </div>
-                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)"><i class="fas fa-cog mr-2"></i>Options</a>
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Hotkey: O"><i class="fas fa-cog mr-2"></i>Options</a>
                 <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
                 <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
             </div>
@@ -78,7 +78,7 @@
                 <i class="fas fa-cog"></i>
             </button> -->
 
-            <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)">
+            <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Hotkey: I">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
@@ -277,12 +277,6 @@ export default {
       // who are players.
       if (isInGame) {
         switch (keyCode) {
-          case 187: // +
-            GameContainer.zoomIn()
-            break
-          case 189: // -
-            GameContainer.zoomOut()
-            break
           case 82: // R
             this.setMenuState(MENU_STATES.RESEARCH)
             break
@@ -307,6 +301,12 @@ export default {
           case 75: // K
             this.setMenuState(MENU_STATES.LEDGER)
             break
+          case 66: // B
+            this.setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
+            break
+          case 72: // H
+            this.panToHomeStar()
+            break
         }
       }
 
@@ -320,6 +320,9 @@ export default {
           break
         case 189: // -
           GameContainer.zoomOut()
+          break
+        case 48: // -
+          this.fitGalaxy()
           break
         case 76: // L
           this.setMenuState(MENU_STATES.LEADERBOARD)
