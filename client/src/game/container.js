@@ -135,6 +135,10 @@ class GameContainer {
     this.map.reloadGame(game, userSettings)
   }
 
+  reloadTerritories () {
+    this.map.drawTerritories()
+  }
+
   reloadStar (star) {
     let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)

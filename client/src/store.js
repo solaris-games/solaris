@@ -197,6 +197,8 @@ export default new Vuex.Store({
             report.playerGalacticCycleReport.experimentTechnologyLevel
         }
       }
+
+      GameContainer.reloadTerritories()
     },
     gameStarEconomyUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)

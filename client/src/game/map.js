@@ -206,8 +206,7 @@ class Map extends EventEmitter {
       existing.draw()
     }
 
-    this.territories.setup(game)
-    this.territories.draw()
+    this.drawTerritories()
 
     this.background.setup(game, userSettings)
     this.background.draw(game, userSettings)
@@ -299,6 +298,11 @@ class Map extends EventEmitter {
 
   clearRulerPoints () {
     this.rulerPoints.setup(this.game)
+  }
+
+  drawTerritories () {
+    this.territories.setup(this.game)
+    this.territories.draw()
   }
 
   panToPlayer (game, player) {
