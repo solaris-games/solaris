@@ -145,6 +145,7 @@ export default {
 
     this.sockets.unsubscribe('gameStarted')
     this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('gameConversationRead')
   },
   methods: {
     gameStarted () {

@@ -84,6 +84,7 @@ module.exports = class GameService extends EventEmitter {
 
     async getByIdConversations(id) {
         return await this.getById(id, {
+            state: 1,
             conversations: 1,
             'galaxy.players': 1
         });
@@ -91,6 +92,7 @@ module.exports = class GameService extends EventEmitter {
 
     async getByIdConversationsLean(id) {
         return await this.getByIdLean(id, {
+            state: 1,
             conversations: 1,
             'galaxy.players': 1
         });

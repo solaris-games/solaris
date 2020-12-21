@@ -4,7 +4,8 @@
 
   <div class="container" v-if="conversation">
     <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-primary" @click="onOpenInboxRequested"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
     <conversation-participants :conversation="conversation"/>
@@ -56,6 +57,7 @@ export default {
   created () {
     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
     this.sockets.subscribe('gameConversationRead', this.onConversationRead)
+    this.sockets.subscribe('gameConversationLeft', this.onConversationLeft)
     this.sockets.subscribe('playerCreditsReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
@@ -63,6 +65,7 @@ export default {
   destroyed () {
     this.sockets.unsubscribe('gameMessageSent')
     this.sockets.unsubscribe('gameConversationRead')
+    this.sockets.unsubscribe('gameConversationLeft')
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerRenownReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
@@ -100,6 +103,12 @@ export default {
             message.readBy.push(e.readByPlayerId)
           }
         }
+      }
+    },
+    onConversationLeft (e) {
+      debugger
+      if (e.conversationId === this.conversation._id) {
+        this.conversation.participants.splice(this.conversation.participants.indexOf(e.playerId), 1)
       }
     },
     onTradeEventReceived (e) {
@@ -152,6 +161,17 @@ export default {
         await ConversationApiService.markAsRead(this.$store.state.game._id, this.conversation._id)
       } catch (err) {
         console.error(err)
+      }
+    },
+    async leaveConversation () {
+      if (confirm(`Are you sure you want to leave this conversation?`)) {
+        try {
+          this.onOpenInboxRequested()
+
+          await ConversationApiService.leave(this.$store.state.game._id, this.conversation._id)
+        } catch (err) {
+          console.error(err)
+        }
       }
     }
   },

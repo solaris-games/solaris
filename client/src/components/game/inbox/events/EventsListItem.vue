@@ -57,6 +57,9 @@
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         <player-carrier-specialist-hired :event="event" v-if="event.type === 'playerCarrierSpecialistHired'"
             @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
+        <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
+        <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
     </div>
 </div>
 </template>
@@ -89,6 +92,9 @@ import PlayerDebtForgivenVue from './PlayerDebtForgiven'
 import PlayerDebtSettledVue from './PlayerDebtSettled'
 import PlayerStarSpecialistHiredVue from './PlayerStarSpecialistHired'
 import PlayerCarrierSpecialistHiredVue from './PlayerCarrierSpecialistHired'
+import PlayerConversationCreatedVue from './PlayerConversationCreated'
+import PlayerConversationInvitedVue from './PlayerConversationInvited'
+import PlayerConversationLeftVue from './PlayerConversationLeft'
 
 export default {
   components: {
@@ -118,7 +124,10 @@ export default {
     'player-debt-forgiven': PlayerDebtForgivenVue,
     'player-debt-settled': PlayerDebtSettledVue,
     'player-star-specialist-hired': PlayerStarSpecialistHiredVue,
-    'player-carrier-specialist-hired': PlayerCarrierSpecialistHiredVue
+    'player-carrier-specialist-hired': PlayerCarrierSpecialistHiredVue,
+    'player-conversation-created': PlayerConversationCreatedVue,
+    'player-conversation-invited': PlayerConversationInvitedVue,
+    'player-conversation-left': PlayerConversationLeftVue
   },
   props: {
     event: Object

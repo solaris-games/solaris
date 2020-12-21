@@ -31,11 +31,14 @@ module.exports = class EventService {
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
         PLAYER_STAR_SPECIALIST_HIRED: 'playerStarSpecialistHired',
         PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
+        PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
+        PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
+        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft'
     }
 
     constructor(eventModel, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService) {
+        ledgerService, conversationService) {
         this.eventModel = eventModel;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
@@ -45,6 +48,7 @@ module.exports = class EventService {
         this.starUpgradeService = starUpgradeService;
         this.tradeService = tradeService;
         this.ledgerService = ledgerService;
+        this.conversationService = conversationService;
 
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.game, args.player));
         this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.game));
@@ -83,6 +87,10 @@ module.exports = class EventService {
         this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.game, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.game, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.game, args.debtor, args.creditor, args.amount));
+
+        this.conversationService.on('onConversationCreated', (args) => this.createPlayerConversationCreated(args.game, args.convo));
+        this.conversationService.on('onConversationInvited', (args) => this.createPlayerConversationInvited(args.game, args.convo, args.playerId));
+        this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.game, args.convo, args.playerId));
     }
 
     async createGameEvent(game, type, data) {
@@ -432,6 +440,37 @@ module.exports = class EventService {
         }
 
         await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data);
+    }
+
+    async createPlayerConversationCreated(game, convo) {
+        let data = {
+            conversationId: convo._id,
+            createdBy: convo.createdBy,
+            name: convo.name,
+            participants: convo.participants
+        };
+
+        await this.createPlayerEvent(game, convo.createdBy, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data);
+    }
+
+    async createPlayerConversationInvited(game, convo, playerId) {
+        let data = {
+            conversationId: convo._id,
+            name: convo.name,
+            playerId
+        };
+
+        await this.createPlayerEvent(game, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_INVITED, data);
+    }
+
+    async createPlayerConversationLeft(game, convo, playerId) {
+        let data = {
+            conversationId: convo._id,
+            name: convo.name,
+            playerId
+        };
+
+        await this.createPlayerEvent(game, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data);
     }
 
 };

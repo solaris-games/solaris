@@ -119,6 +119,13 @@ module.exports = class BroadcastService {
         }));
     }
 
+    gameConversationLeft(game, conversation, playerId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationLeft', {
+            conversationId: conversation._id,
+            playerId
+        }));
+    }
+
     // gameMessagesAllRead(game, playerId) {
     //     this.io.to(playerId).emit('gameMessagesAllRead');
     // }

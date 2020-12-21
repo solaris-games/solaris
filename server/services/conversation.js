@@ -1,6 +1,7 @@
 const moment = require('moment');
 const ValidationError = require('../errors/validation');
 const mongoose = require('mongoose');
+const EventEmitter = require('events');
 
 function arrayIsEqual(a, b) {
     if (a.length !== b.length) return false;
@@ -54,9 +55,11 @@ function getNewConversation(game, playerId, name, participantIds) {
     return newConvo;
 }
 
-module.exports = class ConversationService {
+module.exports = class ConversationService extends EventEmitter {
 
     constructor(gameModel, eventModel) {
+        super();
+
         this.gameModel = gameModel;
         this.eventModel = eventModel;
     }
@@ -72,6 +75,20 @@ module.exports = class ConversationService {
                 conversations: newConvo
             }
         });
+
+        this.emit('onConversationCreated', {
+            game,
+            convo: newConvo,
+            playerId
+        });
+
+        for (let i = 1; i < newConvo.participants.length; i++) {
+            this.emit('onConversationInvited', {
+                game,
+                convo: newConvo,
+                playerId: newConvo.participants[i]
+            });
+        }
 
         return newConvo;
     }
@@ -192,6 +209,33 @@ module.exports = class ConversationService {
             //     }
             // });
         }
+
+        return convo;
+    }
+
+    async leave(game, playerId, conversationId) {
+        let convo = await this.detail(game, playerId, conversationId, false);
+
+        if (convo.createdBy == null) {
+            throw new ValidationError(`Cannot leave this conversation.`);
+        }
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'conversations._id': conversationId
+        }, {
+            $pull: {
+                'conversations.$.participants': playerId
+            }
+        });
+
+        // TODO: Delete the conversation if no longer any participants?
+
+        this.emit('onConversationLeft', {
+            game,
+            convo,
+            playerId
+        });
 
         return convo;
     }

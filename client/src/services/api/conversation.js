@@ -33,6 +33,11 @@ class ConversationService extends BaseApiService {
     { withCredentials: true })
   }
 
+  leave (gameId, conversationId) {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/leave', { },
+    { withCredentials: true })
+  }
+
   getUnreadCount (gameId) {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/conversations/unread',
       { withCredentials: true })

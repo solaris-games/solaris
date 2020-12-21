@@ -114,6 +114,21 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversations, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let convo = await container.conversationService.leave(
+                req.game,
+                req.player._id,
+                req.params.conversationId);
+
+            container.broadcastService.gameConversationLeft(req.game, convo, req.player._id);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

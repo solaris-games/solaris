@@ -2,7 +2,7 @@
 <div class="menu-page">
   <div class="container">
     <menu-title title="New Conversation" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-primary" @click="onOpenInboxRequested"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
     </menu-title>
 
     <div class="row">
