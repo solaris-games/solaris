@@ -1,7 +1,13 @@
 <template>
 <div class="menu-page bg-secondary pb-2">
   <div class="container">
-    <menu-title title="Intel" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Intel" @onCloseRequested="onCloseRequested">
+      <button class="btn btn-primary" @click="toggleAllHistory">
+        <i class="fas fa-history mr-1"></i>
+        <span v-if="showAllHistory">All</span>
+        <span v-if="!showAllHistory">Fixed</span>
+      </button>
+    </menu-title>
 
     <loading-spinner :loading="!history"/>
   </div>
@@ -81,6 +87,7 @@ export default {
     return {
       intelType: 'totalStars',
       history: null,
+      showAllHistory: false,
       datacollection: null,
       dataoptions: {
         bezierCurve: false,
@@ -126,23 +133,37 @@ export default {
       })
     }
 
-    try {
-      // 10 cycles ago.
-      let startTick = Math.max(0, this.$store.state.game.state.tick - (this.$store.state.game.settings.galaxy.productionTicks * 10))
-
-      let response = await GameApiService.getGameHistory(this.$store.state.game._id, startTick)
-
-      if (response.status === 200) {
-        this.history = response.data
-        this.fillData()
-      }
-    } catch (err) {
-      console.error(err)
-    }
+    this.reloadData()
   },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    async reloadData () {
+      this.history = null
+
+      try {
+        let startTick = 0
+
+        if (!this.showAllHistory) {
+          // 10 cycles ago.
+          startTick = Math.max(0, this.$store.state.game.state.tick - (this.$store.state.game.settings.galaxy.productionTicks * 10))
+        }
+
+        let response = await GameApiService.getGameHistory(this.$store.state.game._id, startTick)
+
+        if (response.status === 200) {
+          this.history = response.data
+          this.fillData()
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    toggleAllHistory () {
+      this.showAllHistory = !this.showAllHistory
+
+      this.reloadData()
     },
     getPlayerColour (player) {
       return GameHelper.getPlayerColour(this.$store.state.game, player._id)
