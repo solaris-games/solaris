@@ -432,9 +432,27 @@ module.exports = class GameTickService extends EventEmitter {
         let attackersKilled = combatResult.lost.attacker;
         let attackerCarrierIndex = 0;
 
-        while (attackersKilled--) {
+        while (attackersKilled-- && attackerCarriers.length) {
             let attackerCarrier = attackerCarriers[attackerCarrierIndex];
             let combatCarrier = combatResult.carriers.find(c => c._id.equals(attackerCarrier._id));
+
+            // Check for Coward spec, instead of removing it from the game, re-route it to the
+            // nearest friendly star.
+            if (star && attackerCarrier.ships === 1) {
+                let hasRerouted = this._tryRerouteCowardCarrier(game, attackerCarrier);
+
+                // If rerouted, we need to exit out of the current loop early.
+                if (hasRerouted) {
+                    // Remove it from the attackers array
+                    attackerCarriers.splice(attackerCarrierIndex, 1);
+                    attackerCarrierIndex = this._loopIncrementIndex(attackerCarrierIndex, attackerCarriers, -1);
+
+                    // No ships were killed so add back onto the while loop iterator
+                    attackersKilled++;
+
+                    continue;
+                }
+            }
 
             attackerCarrier.ships--;
             combatCarrier.after--;
@@ -466,11 +484,7 @@ module.exports = class GameTickService extends EventEmitter {
                 }
             }
 
-            attackerCarrierIndex++;
-
-            if (attackerCarrierIndex > attackerCarriers.length - 1) {
-                attackerCarrierIndex = 0;
-            }
+            attackerCarrierIndex = this._loopIncrementIndex(attackerCarrierIndex, attackerCarriers, 1);
         }
 
         // Now do the same for the defender.
@@ -586,8 +600,14 @@ module.exports = class GameTickService extends EventEmitter {
             // Capture the star.
             let newStarPlayer = attackers.find(p => p._id.equals(closestPlayerId));
             let newStarUser = attackerUsers.find(u => u._id.toString() === newStarPlayer.userId.toString());
+            let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId.equals(newStarPlayer._id));
 
             let captureReward = star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
+
+            // Check to see whether to double the capture reward.
+            let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
+
+            captureReward *= captureRewardMultiplier;
 
             star.ownedByPlayerId = newStarPlayer._id;
             newStarPlayer.credits += captureReward;
@@ -641,6 +661,32 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this._performCombat(game, player, star, attackerCarriers, report);
         }
+    }
+
+    _loopIncrementIndex(currentIndex, arr, amount = 1) {
+        currentIndex += amount;
+
+        if (currentIndex > arr.length - 1) {
+            currentIndex = 0;
+        }
+
+        currentIndex = Math.max(currentIndex, 0);
+
+        return currentIndex;
+    }
+
+    _tryRerouteCowardCarrier(game, carrier) {
+        let isCoward = this.specialistService.getStarCombatAttackingRedirectIfDefeated(carrier);
+                
+        if (isCoward) {
+            let redirectStar = this.waypointService.rerouteToNearestFriendlyStarFromStar(game, carrier);
+
+            if (redirectStar) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _endOfGalacticCycleCheck(game, report) {

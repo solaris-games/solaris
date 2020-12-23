@@ -249,5 +249,59 @@ module.exports = class SpecialistService {
             cost
         };
     }
+
+    _getCarrierSpecialValue(carrier, name, defaultValue) {
+        if (!carrier.specialistId) {
+            return defaultValue;
+        }
+
+        let specialist = this.getByIdCarrier(carrier.specialistId);
+
+        if (!specialist.modifiers.special) {
+            return defaultValue;
+        }
+
+        let val = specialist.modifiers.special[name];
+
+        return val == null ? defaultValue : val;
+    }
+
+    _getStarSpecialValue(star, name, defaultValue) {
+        if (!star.specialistId) {
+            return defaultValue;
+        }
+
+        let specialist = this.getByIdStar(star.specialistId);
+
+        if (!specialist.modifiers.special) {
+            return defaultValue;
+        }
+
+        let val = specialist.modifiers.special[name];
+
+        return val == null ? defaultValue : val;
+    }
+
+    getStarCaptureRewardMultiplier(carrier) {
+        return this._getCarrierSpecialValue(carrier, 'starCaptureRewardMultiplier', 1);
+    }
+
+    hasAwardDoubleCaptureRewardSpecialist(carriers) {
+        return carriers
+            .map(c => this.getStarCaptureRewardMultiplier(c))
+            .sort((a, b) => b - a)[0];
+    }
+
+    getEconomyInfrastructureMultiplier(star) {
+        return this._getStarSpecialValue(star, 'economyInfrastructureMultiplier', 1);
+    }
+
+    getScienceInfrastructureMultiplier(star) {
+        return this._getStarSpecialValue(star, 'scienceInfrastructureMultiplier', 1);
+    }
+
+    getStarCombatAttackingRedirectIfDefeated(carrier) {
+        return this._getCarrierSpecialValue(carrier, 'starCombatAttackingRedirectIfDefeated', false);
+    }
     
 };

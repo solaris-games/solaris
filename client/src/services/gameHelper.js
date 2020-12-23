@@ -431,6 +431,10 @@ class GameHelper {
           return 'energise'
         case 10:
           return 'afterburn'
+        case 11:
+          return 'strafe'
+        case 12:
+          return 'alien-stare'
       }
     } else {
       switch (specialistId) {
@@ -452,6 +456,10 @@ class GameHelper {
           return 'power-generator'
         case 9:
           return 'space-suit'
+        case 10:
+          return 'ringed-planet'
+        case 11:
+          return 'observatory'
       }
     }
   }

@@ -391,4 +391,40 @@ module.exports = class WaypointService {
         }
     }
 
+    rerouteToNearestFriendlyStarFromStar(game, carrier) {
+        if (!carrier.orbiting) {
+            throw new ValidationError(`Star must be in orbit for it to be rerouted from a star.`);
+        }
+
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
+
+        // Find the nearest friendly star, if there is none then we cannot reroute.
+        let nearestStar = this.starDistanceService.getClosestPlayerOwnedStarsFromLocationWithinDistance(
+            carrier.location,
+            game.galaxy.stars,
+            carrier.ownedByPlayerId,
+            hyperspaceDistance
+        )[0];
+
+        if (!nearestStar) {
+            return null;
+        }
+
+        carrier.waypoints = [{
+            source: carrier.orbiting,
+            destination: nearestStar._id,
+            action: 'nothing',
+            actionShips: 0,
+            delayTicks: 0
+        }];
+
+        carrier.waypointsLooped = false;
+        carrier.inTransitFrom = carrier.orbiting;
+        carrier.inTransitTo = nearestStar._id;
+        carrier.orbiting = false;
+
+        return nearestStar;
+    }
+
 };

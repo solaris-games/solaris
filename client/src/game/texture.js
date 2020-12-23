@@ -38,6 +38,10 @@ class TextureService {
       this._loadSpecialistTexture('techno-heart')
       this._loadSpecialistTexture('missile-pod')
       this._loadSpecialistTexture('space-suit')
+      this._loadSpecialistTexture('strafe')
+      this._loadSpecialistTexture('ringed-planet')
+      this._loadSpecialistTexture('observatory')
+      this._loadSpecialistTexture('alien-stare')
     }
 
     _loadSpecialistTexture(name) {
