@@ -14,6 +14,7 @@ class Background {
   constructor () {
     this.container = new PIXI.Container()
     this.container.alpha = 0.5
+    this.zoomPercent = 0
   }
 
   setup (game, userSettings) {
@@ -64,6 +65,14 @@ class Background {
       sprite.originY = sprite.y
 
       this.container.addChild(sprite)
+    }
+  }
+
+  refreshZoom (zoomPercent) {
+    this.zoomPercent = zoomPercent
+
+    if (this.container) {
+      this.container.visible = zoomPercent > 100
     }
   }
 
