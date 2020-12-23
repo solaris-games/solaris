@@ -97,12 +97,22 @@ export default {
     userOwnsObject (mapObject) {
       let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
 
+      let owningPlayer
+
       switch (mapObject.type) {
         case 'star':
-          return gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
+          owningPlayer = gameHelper.getStarOwningPlayer(this.$store.state.game, mapObject.data)
+          break
         case 'carrier':
-          return gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)._id === userPlayer._id
+          owningPlayer = gameHelper.getCarrierOwningPlayer(this.$store.state.game, mapObject.data)
+          break
       }
+
+      if (!owningPlayer) {
+        return false
+      }
+
+      return owningPlayer._id === userPlayer._id
     },
     isGameFinished () {
       return gameHelper.isGameFinished(this.$store.state.game)
