@@ -422,7 +422,7 @@ module.exports = class WaypointService {
         carrier.waypointsLooped = false;
         carrier.inTransitFrom = carrier.orbiting;
         carrier.inTransitTo = nearestStar._id;
-        carrier.orbiting = false;
+        carrier.orbiting = null;
 
         return nearestStar;
     }
