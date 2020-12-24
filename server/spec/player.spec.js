@@ -47,6 +47,9 @@ const game = {
                 banking: 'standard',
                 weapons: 'standard'
             }
+        },
+        specialGalaxy: {
+            playerDistribution: 'circular'
         }
     },
     constants: {
