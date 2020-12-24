@@ -313,8 +313,8 @@ module.exports = class GameTickService extends EventEmitter {
             await this._performCombat(game, starOwningPlayer, combatStar, carriersAtStar, report);
         }
 
-        // There may be carriers in the waypoint list that do not have any remaining ships, filter them out.
-        actionWaypoints = actionWaypoints.filter(x => x.carrier.ships > 0);
+        // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
+        actionWaypoints = actionWaypoints.filter(x => x.carrier.orbiting && x.carrier.ships > 0);
 
         // 4a. Now that combat is done, perform any carrier waypoint actions.
         // Do the drops first
