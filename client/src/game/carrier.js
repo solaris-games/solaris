@@ -14,6 +14,14 @@ class Carrier extends EventEmitter {
     this.container.interactive = true
     this.container.buttonMode = true
 
+    this.graphics_colour = new PIXI.Graphics()
+    this.graphics_ship = new PIXI.Graphics()
+    this.graphics_waypoints = new PIXI.Graphics()
+
+    this.container.addChild(this.graphics_colour)
+    this.container.addChild(this.graphics_ship)
+    this.fixedContainer.addChild(this.graphics_waypoints)
+
     // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
@@ -56,11 +64,6 @@ class Carrier extends EventEmitter {
   }
 
   drawColour () {
-    if (!this.graphics_colour) {
-      this.graphics_colour = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour)
-    }
-
     this.graphics_colour.clear()
 
     if (!this.data.orbiting) {
@@ -70,11 +73,6 @@ class Carrier extends EventEmitter {
   }
 
   drawShip () {
-    if (!this.graphics_ship) {
-      this.graphics_ship = new PIXI.Graphics()
-      this.container.addChild(this.graphics_ship)
-    }
-
     this.graphics_ship.clear()
 
     // this.graphics_ship.lineStyle(0.3, 0x000000)
@@ -162,11 +160,6 @@ class Carrier extends EventEmitter {
   }
 
   drawCarrierWaypoints () {
-    if (!this.graphics_waypoints) {
-      this.graphics_waypoints = new PIXI.Graphics()
-      this.fixedContainer.addChild(this.graphics_waypoints)
-    }
-
     this.graphics_waypoints.clear()
 
     let lineWidth = this.data.waypointsLooped ? 1 : 2
