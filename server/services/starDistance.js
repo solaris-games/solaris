@@ -60,6 +60,40 @@ module.exports = class StarDistanceService {
             .filter(s => s.ownedByPlayerId.equals(player._id));
     }
 
+    getClosestPlayerOwnedStarsFromLocation(location, stars, ownedByPlayerId) {
+        let sorted = stars
+            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(ownedByPlayerId))
+            .sort((a, b) => {
+                let star = {
+                    location
+                };
+
+                return this.getDistanceBetweenStars(star, a)
+                    - this.getDistanceBetweenStars(star, b);
+            });
+
+        return sorted;
+    }
+
+    getClosestPlayerOwnedStarsFromLocationWithinDistance(location, stars, ownedByPlayerId, maxDistance) {
+        let sorted = stars
+            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(ownedByPlayerId))
+            .filter(s => {
+                let locationStar = { location };
+
+                let distance = this.getDistanceBetweenStars(locationStar, s);
+                
+                return maxDistance >= distance;
+            })
+            .sort((a, b) => {
+                let locationStar = { location };
+
+                return this.getDistanceBetweenStars(locationStar, a) - this.getDistanceBetweenStars(locationStar, b);
+            });
+
+        return sorted;
+    }
+
     getClosestUnownedStarsFromLocation(location, stars, amount) {
         let sorted = stars
             .filter(s => !s.ownedByPlayerId)

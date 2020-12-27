@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 
 module.exports = class PlayerService extends EventEmitter {
     
-    constructor(gameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService) {
+    constructor(gameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService) {
         super();
         
         this.gameModel = gameModel;
@@ -14,6 +14,7 @@ module.exports = class PlayerService extends EventEmitter {
         this.carrierService = carrierService;
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
+        this.specialistService = specialistService;
     }
 
     getByObjectId(game, playerId) {
@@ -336,7 +337,11 @@ module.exports = class PlayerService extends EventEmitter {
     calculateTotalEconomy(player, stars) {
         let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
-        let totalEconomy = playerStars.reduce((sum, s) => sum + s.infrastructure.economy, 0);
+        let totalEconomy = playerStars.reduce((sum, s) => {
+            let multiplier = this.specialistService.getEconomyInfrastructureMultiplier(s);
+
+            return sum + (s.infrastructure.economy * multiplier)
+        }, 0);
 
         return totalEconomy;
     }
@@ -352,7 +357,11 @@ module.exports = class PlayerService extends EventEmitter {
     calculateTotalScience(player, stars) {
         let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
-        let totalScience = playerStars.reduce((sum, s) => sum + s.infrastructure.science, 0);
+        let totalScience = playerStars.reduce((sum, s) => {
+            let multiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
+
+            return sum + (s.infrastructure.science * multiplier)
+        }, 0);
 
         return totalScience;
     }

@@ -76,46 +76,46 @@ module.exports = class AchievementService {
         .exec();
     }
 
-    async incrementInfrastructureBuilt(type, userId) {
+    async incrementInfrastructureBuilt(type, userId, amount = 1) {
         switch (type) {
             case 'economy':
-                await this.incrementEconomyBuilt(userId);
+                await this.incrementEconomyBuilt(userId, amount);
                 break;
             case 'industry':
-                await this.incrementIndustryBuilt(userId);
+                await this.incrementIndustryBuilt(userId, amount);
                 break;
             case 'science':
-                await this.incrementScienceBuilt(userId);
+                await this.incrementScienceBuilt(userId, amount);
                 break;
         }
     }
 
-    async incrementEconomyBuilt(userId) {
+    async incrementEconomyBuilt(userId, amount = 1) {
         await this.userModel.updateOne({
             _id: userId
         },
         {
-            $inc: { 'achievements.infrastructure.economy': 1 }
+            $inc: { 'achievements.infrastructure.economy': amount }
         })
         .exec();
     }
 
-    async incrementIndustryBuilt(userId) {
+    async incrementIndustryBuilt(userId, amount = 1) {
         await this.userModel.updateOne({
             _id: userId
         },
         {
-            $inc: { 'achievements.infrastructure.industry': 1 }
+            $inc: { 'achievements.infrastructure.industry': amount }
         })
         .exec();
     }
 
-    async incrementScienceBuilt(userId) {
+    async incrementScienceBuilt(userId, amount = 1) {
         await this.userModel.updateOne({
             _id: userId
         },
         {
-            $inc: { 'achievements.infrastructure.science': 1 }
+            $inc: { 'achievements.infrastructure.science': amount }
         })
         .exec();
     }

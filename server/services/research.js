@@ -91,13 +91,7 @@ module.exports = class ResearchService extends EventEmitter {
                 technology: {name:techKey,level:tech.level}
             });
 
-            if (player.researchingNext === 'random') {
-                let randomTech = this._getRandomTechnology(game, player);
-
-                player.researchingNow = randomTech.key;
-            } else {
-                player.researchingNow = player.researchingNext;
-            }
+            this._setNextResearch(game, player);
 
             levelUp = true
         }
@@ -175,6 +169,12 @@ module.exports = class ResearchService extends EventEmitter {
             levelUp = true;
         }
 
+        // If the technology leveled up, we need to change the research
+        // to the next desired research technology.
+        if (levelUp) {
+            this._setNextResearch(game, player);
+        }
+
         // The current research may have been the one experimented on, so make sure we get the ETA of it.
         let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
 
@@ -187,6 +187,20 @@ module.exports = class ResearchService extends EventEmitter {
             levelUp,
             currentResearchTicksEta
         };
+    }
+
+    _setNextResearch(game, player) {
+        if (player.researchingNext === player.researchingNow) {
+            return;
+        }
+
+        if (player.researchingNext === 'random') {
+            let randomTech = this._getRandomTechnology(game, player);
+
+            player.researchingNow = randomTech.key;
+        } else {
+            player.researchingNow = player.researchingNext;
+        }
     }
 
     _getRandomTechnology(game, player) {

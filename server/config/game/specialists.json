@@ -54,12 +54,12 @@
         {
             "id": 5,
             "name": "Smuggler",
-            "description": "Grants x2 Speed, -3 Hyperspace Range to the Carrier.",
-            "tier": 5,
+            "description": "Grants x2 Speed, -1 Hyperspace Range to the Carrier.",
+            "tier": 4,
             "modifiers": {
                 "local": {
                     "speed": 2,
-                    "hyperspace": -3
+                    "hyperspace": -1
                 }
             }
         },
@@ -121,6 +121,32 @@
             "modifiers": {
                 "special": {
                     "unlockWarpGates": true
+                }
+            }
+        },
+        {
+            "id": 11,
+            "name": "Raider",
+            "description": "Carrier travels at x2 Speed, -2 Weapons. The carrier is awarded x2 star capture rewards for destroying infrastructure.",
+            "tier": 4,
+            "modifiers": {
+                "local": {
+                    "speed": 2,
+                    "weapons": -1
+                },
+                "special": {
+                    "starCaptureRewardMultiplier": 2
+                }
+            }
+        },
+        {
+            "id": 12,
+            "name": "Coward",
+            "description": "When attacking a Star, if the Carrier loses in combat it is redirected to the nearest friendly Star within its Hyperspace Range.",
+            "tier": 1,
+            "modifiers": {
+                "special": {
+                    "starCombatAttackingRedirectIfDefeated": true
                 }
             }
         }
@@ -240,6 +266,28 @@
             "modifiers": {
                 "special": {
                     "destroyInfrastructureOnLoss": true
+                }
+            }
+        },
+        {
+            "id": 10,
+            "name": "Trade Port",
+            "description": "The Star's Economy infrastructure contributes x2 to economy production.",
+            "tier": 4,
+            "modifiers": {
+                "special": {
+                    "economyInfrastructureMultiplier": 2
+                }
+            }
+        },
+        {
+            "id": 11,
+            "name": "Research Station",
+            "description": "The Star's Science infrastructure contributes x2 to research.",
+            "tier": 5,
+            "modifiers": {
+                "special": {
+                    "scienceInfrastructureMultiplier": 2
                 }
             }
         }

@@ -12,6 +12,7 @@ module.exports = class HistoryService {
             gameId,
             tick: { $gte: startTick }
         })
+        .sort({ tick: 1 })
         .lean({ defaults: true })
         .exec();
     }

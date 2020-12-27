@@ -169,14 +169,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         };
     }
 
-    async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback) {
-        // Get the star.
-        let star = this.starService.getById(game, starId);
-
-        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
-            throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
-        }
-
+    _calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback) {
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         // Calculate how much the upgrade will cost.
@@ -184,14 +177,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
         const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
-        if (player.credits < cost) {
-            throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
-        }
+        return cost;
+    }
 
-        // Upgrade infrastructure.
-        star.infrastructure[economyType]++;
-        player.credits -= cost;
-
+    async _upgradeInfrastructureUpdateDB(game, player, star, cost, economyType) {
         let dbWrites = [
             this._getDeductPlayerCreditsDBWrite(game, player, cost)
         ];
@@ -248,8 +237,31 @@ module.exports = class StarUpgradeService extends EventEmitter {
         await this.gameModel.bulkWrite(dbWrites);
 
         await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
+    }
 
-        let nextCost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
+    async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback, writeToDB = true) {
+        // Get the star.
+        let star = this.starService.getById(game, starId);
+
+        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
+            throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
+        }
+
+        let cost = this._calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback);
+
+        if (player.credits < cost) {
+            throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
+        }
+
+        // Upgrade infrastructure.
+        star.infrastructure[economyType]++;
+        player.credits -= cost;
+
+        if (writeToDB) {
+            await this._upgradeInfrastructureUpdateDB(game, player, star, cost, economyType);
+        }
+
+        let nextCost = this._calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback);
 
         // Return a report of what just went down.
         return {
@@ -261,12 +273,12 @@ module.exports = class StarUpgradeService extends EventEmitter {
         };
     }
 
-    async upgradeEconomy(game, player, starId) {
-        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this));
+    async upgradeEconomy(game, player, starId, writeToDB = true) {
+        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this), writeToDB);
     }
 
-    async upgradeIndustry(game, player, starId) {
-        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this));
+    async upgradeIndustry(game, player, starId, writeToDB = true) {
+        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this), writeToDB);
 
         // Append the new manufacturing speed to the report.
         let star = this.starService.getById(game, starId);
@@ -277,8 +289,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return report;
     }
 
-    async upgradeScience(game, player, starId) {
-        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this));
+    async upgradeScience(game, player, starId, writeToDB = true) {
+        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this), writeToDB);
 
         report.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(game, player);
 
@@ -344,16 +356,16 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            let upgradedCost = await upgradeFunction(game, player, upgradeStar.star._id);
+            let upgradeReport = await upgradeFunction(game, player, upgradeStar.star._id, false);
 
-            amount -= upgradedCost.cost;
+            amount -= upgradeReport.cost;
 
             upgradeSummary.upgraded++;
-            upgradeSummary.cost += upgradedCost.cost;
+            upgradeSummary.cost += upgradeReport.cost;
 
             // Update the stars next infrastructure cost so next time
             // we loop we will have the most up to date info.
-            upgradeStar.infrastructureCost = upgradedCost.nextCost;
+            upgradeStar.infrastructureCost = upgradeReport.nextCost;
 
             // Add the star that we upgraded to the summary result.
             let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
@@ -369,7 +381,66 @@ module.exports = class StarUpgradeService extends EventEmitter {
             summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
         }
 
-        await game.save();
+        // Generate the DB writes for all the stars to upgrade, including deducting the credits
+        // for the player and also updating the player's achievement statistics.
+        let dbWrites = [
+            this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
+        ];
+
+        for (let star of upgradeSummary.stars) {
+            switch (infrastructureType) {
+                case 'economy':
+                    dbWrites.push({
+                        updateOne: {
+                            filter: {
+                                _id: game._id,
+                                'galaxy.stars._id': star.starId
+                            },
+                            update: {
+                                $set: {
+                                    'galaxy.stars.$.infrastructure.economy': star.infrastructure
+                                }
+                            }
+                        }
+                    });
+                    break;
+                case 'industry':
+                    dbWrites.push({
+                        updateOne: {
+                            filter: {
+                                _id: game._id,
+                                'galaxy.stars._id': star.starId
+                            },
+                            update: {
+                                $set: {
+                                    'galaxy.stars.$.infrastructure.industry': star.infrastructure
+                                }
+                            }
+                        }
+                    });
+                    break;
+                case 'science':
+                    dbWrites.push({
+                        updateOne: {
+                            filter: {
+                                _id: game._id,
+                                'galaxy.stars._id': star.starId
+                            },
+                            update: {
+                                $set: {
+                                    'galaxy.stars.$.infrastructure.science': star.infrastructure
+                                }
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
+
+        // Update the DB.
+        await this.gameModel.bulkWrite(dbWrites);
+
+        await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
 
         this.emit('onPlayerInfrastructureBulkUpgraded', {
             game,

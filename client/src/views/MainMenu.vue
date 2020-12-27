@@ -1,8 +1,22 @@
 <template>
 <div>
+  <div class="container col-xs-12 col-sm-10 col-md-10 col-lg-6 pr-1 pl-1">
+    <div class="row no-gutters pb-0 pt-1" v-if="user">
+      <div class="col">
+        <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{user.username}}</router-link>
+      </div>
+      <div class="col-auto">
+        <router-link v-if="user" :to="{ name: 'account-achievements', params: { userId: user._id }}"><i class="fas fa-medal mr-1"></i>Achievements</router-link>
+        <router-link to="/codex" class="ml-3"><i class="fas fa-question mr-1"></i>Help</router-link>
+        <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
+      </div>
+    </div>
+  </div>
+
   <view-container>
     <view-title title="Main Menu" :hideHomeButton="true"></view-title>
-    <div class="row">
+
+    <div class="row pb-0">
       <div class="col-sm-12 col-md-6 col-lg-5">
         <p>A space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
@@ -13,35 +27,39 @@
         <loading-spinner :loading="!achievements"></loading-spinner>
       </div>
     </div>
-    <div class="row">
-      <div class="d-none d-md-block col-md-8">
-        <h4>Leaderboard</h4>
+
+    <div class="row pb-0">
+      <div class="col-sm-12 col-md-4 col-lg-4">
+        <div class="card bg-dark text-white" @click="routeToPath('/game/active-games')">
+          <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
+          <div class="card-img-overlay">
+            <h5 class="card-title">My Games</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-4 col-lg-4" @click="routeToPath('/game/list')">
+        <div class="card bg-dark text-white">
+          <img class="card-img" :src="require('../assets/screenshots/home-2.png')" alt="Join a game">
+          <div class="card-img-overlay">
+            <h5 class="card-title">Join Game</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-4 col-lg-4">
+        <div class="card bg-dark text-white" @click="routeToPath('/leaderboard')">
+          <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
+          <div class="card-img-overlay">
+            <h5 class="card-title">Leaderboard</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row pb-0">
+      <div class="col d-none d-md-block">
+        <h4>Top 10 Players</h4>
         <leaderboard-table if="leaderboard" :leaderboard="leaderboard"></leaderboard-table>
         <loading-spinner :loading="!leaderboard"></loading-spinner>
-      </div>
-      <div class="col-sm-12 col-md-4">
-        <div>
-          <router-link to="/game/active-games" tag="button" class="btn btn-block btn-success">My Games</router-link>
-          <router-link to="/game/list" tag="button" class="btn btn-block btn-success">Join Game</router-link>
-          <router-link to="/leaderboard" tag="button" class="btn btn-block btn-info">Leaderboard</router-link>
-          <router-link to="/game/create" tag="button" class="btn btn-block btn-primary">Create Game</router-link>
-        </div>
-
-        <div class="mt-3">
-          <router-link v-if="user" :to="{ name: 'account-achievements', params: { userId: user._id }}" tag="button" class="btn btn-block btn-primary">Achievements</router-link>
-          <router-link to="/account/settings" tag="button" class="btn btn-block btn-primary">Account Settings</router-link>
-          <router-link to="/codex" tag="button" class="btn btn-block btn-info">Help</router-link>
-        </div>
-
-<!--
-        <div class="mt-3">
-          <router-link to="/premium-store" tag="button" class="btn btn-block btn-danger">Premium Store</router-link>
-        </div>
-        -->
-
-        <div class="mt-3">
-          <button @click="logout" class="btn btn-block btn-danger" :disabled="isLoggingOut">Logout</button>
-        </div>
       </div>
     </div>
   </view-container>
@@ -102,12 +120,15 @@ export default {
     },
     async loadLeaderboard () {
       try {
-        let response = await userService.getLeaderboard(6)
+        let response = await userService.getLeaderboard(10)
 
         this.leaderboard = response.data
       } catch (err) {
         console.error(err)
       }
+    },
+    routeToPath(path) {
+      router.push(path)
     }
   }
 }
@@ -120,5 +141,27 @@ button {
 
 .row {
   padding-bottom: 15px;
+}
+
+.card {
+  max-height: 150px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.card-img {
+  object-fit: cover;
+  max-height: 150px;
+}
+
+.card-img-overlay {
+  padding: 0.5rem;
+}
+
+.card-title {
+  background-color: #375a7f;
+  padding: 0.25rem;
+  display: inline-block;
+  border-radius: 3px;
 }
 </style>
