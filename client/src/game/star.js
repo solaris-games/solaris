@@ -15,6 +15,33 @@ class Star extends EventEmitter {
     this.container.interactive = true
     this.container.buttonMode = true
 
+    this.graphics_colour_arc = new PIXI.Graphics()
+    this.graphics_colour_cir = new PIXI.Graphics()
+    this.graphics_colour_square = new PIXI.Graphics()
+    this.graphics_colour_square_partial = new PIXI.Graphics()
+    this.graphics_colour_warp_arc = new PIXI.Graphics()
+    this.graphics_colour_warp_cir = new PIXI.Graphics()
+    this.graphics_colour_warp_square = new PIXI.Graphics()
+    this.graphics_colour_warp_square_partial = new PIXI.Graphics()
+    this.graphics_hyperspaceRange = new PIXI.Graphics()
+    this.graphics_natural_resources_ring = new PIXI.Graphics()
+    this.graphics_scanningRange = new PIXI.Graphics()
+    this.graphics_star = new PIXI.Graphics()
+
+    this.container.addChild(this.graphics_star)
+    this.container.addChild(this.graphics_natural_resources_ring)
+    this.container.addChild(this.graphics_colour_arc)
+    this.container.addChild(this.graphics_colour_cir)
+    this.container.addChild(this.graphics_colour_warp_arc)
+    this.container.addChild(this.graphics_colour_warp_cir)
+    this.container.addChild(this.graphics_colour_square_partial)
+    this.container.addChild(this.graphics_colour_square)
+    this.container.addChild(this.graphics_colour_warp_square_partial)
+    this.container.addChild(this.graphics_colour_warp_square)
+
+    this.fixedContainer.addChild(this.graphics_scanningRange)
+    this.fixedContainer.addChild(this.graphics_hyperspaceRange)
+    
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
@@ -86,11 +113,6 @@ class Star extends EventEmitter {
 
 
   drawStar () {
-    if (!this.graphics_star) {
-      this.graphics_star = new PIXI.Graphics()
-      this.container.addChild(this.graphics_star)
-    }
-
     this.graphics_star.clear()
 
     let isInScanningRange = this._isInScanningRange()
@@ -205,18 +227,10 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
+    this.graphics_natural_resources_ring.clear()
+
     if (this.userSettings.map.naturalResources !== 'single-ring') {
-      if (this.graphics_natural_resources_ring) {
-        this.container.removeChild(this.graphics_natural_resources_ring)
-        this.graphics_natural_resources_ring = null
-      }
-
       return
-    }
-
-    if (!this.graphics_natural_resources_ring) {
-      this.graphics_natural_resources_ring = new PIXI.Graphics()
-      this.container.addChild(this.graphics_natural_resources_ring)
     }
 
     let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
@@ -261,23 +275,6 @@ class Star extends EventEmitter {
   }
 
   _drawColourCircle (player) {
-    if (!this.graphics_colour_arc) {
-      this.graphics_colour_arc = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_arc)
-    }
-    if (!this.graphics_colour_cir) {
-      this.graphics_colour_cir = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_cir)
-    }
-    if (!this.graphics_colour_warp_arc) {
-      this.graphics_colour_warp_arc = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_warp_arc)
-    }
-    if (!this.graphics_colour_warp_cir) {
-      this.graphics_colour_warp_cir = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_warp_cir)
-    }
-
     this.graphics_colour_arc.clear()
     this.graphics_colour_cir.clear()
     this.graphics_colour_warp_arc.clear()
@@ -296,23 +293,6 @@ class Star extends EventEmitter {
   }
 
   _drawColourSquare (player) {
-    if (!this.graphics_colour_square_partial) {
-      this.graphics_colour_square_partial = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_square_partial)
-    }
-    if (!this.graphics_colour_square) {
-      this.graphics_colour_square = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_square)
-    }
-    if (!this.graphics_colour_warp_square_partial) {
-      this.graphics_colour_warp_square_partial = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_warp_square_partial)
-    }
-    if (!this.graphics_colour_warp_square) {
-      this.graphics_colour_warp_square = new PIXI.Graphics()
-      this.container.addChild(this.graphics_colour_warp_square)
-    }
-
     this.graphics_colour_square_partial.clear()
     this.graphics_colour_square.clear()
     this.graphics_colour_warp_square_partial.clear()
@@ -441,11 +421,6 @@ class Star extends EventEmitter {
   }
 
   drawScanningRange () {
-    if (!this.graphics_scanningRange) {
-      this.graphics_scanningRange = new PIXI.Graphics()
-      this.fixedContainer.addChild(this.graphics_scanningRange)
-    }
-
     this.graphics_scanningRange.clear()
 
     // Get the player who owns the star.
@@ -476,12 +451,6 @@ class Star extends EventEmitter {
   }
 
   drawHyperspaceRange () {
-
-    if (!this.graphics_hyperspaceRange) {
-      this.graphics_hyperspaceRange = new PIXI.Graphics()
-      this.fixedContainer.addChild(this.graphics_hyperspaceRange)
-    }
-
     this.graphics_hyperspaceRange.clear()
 
     if (!this.isSelected) {
@@ -523,19 +492,20 @@ class Star extends EventEmitter {
      //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
      // maybe put them on their own container, since this piece of code should remain as small as possible
      this.graphics_star.visible = false
+     this.graphics_colour_arc.visible = false
+     this.graphics_colour_cir.visible = false
+     this.graphics_colour_warp_arc.visible = false
+     this.graphics_colour_warp_cir.visible = false
+     this.graphics_colour_square_partial.visible = false
+     this.graphics_colour_square.visible = false
+     this.graphics_colour_warp_square_partial.visible = false
+     this.graphics_colour_warp_square.visible = false
+     this.graphics_natural_resources_ring.visible = false
+
      if (this.text_name) this.text_name.visible = false
-     if (this.graphics_colour_arc) this.graphics_colour_arc.visible = false
-     if (this.graphics_colour_cir) this.graphics_colour_cir.visible = false
-     if (this.graphics_colour_warp_arc) this.graphics_colour_warp_arc.visible = false
-     if (this.graphics_colour_warp_cir) this.graphics_colour_warp_cir.visible = false
-     if (this.graphics_colour_square_partial) this.graphics_colour_square_partial.visible = false
-     if (this.graphics_colour_square) this.graphics_colour_square.visible = false
-     if (this.graphics_colour_warp_square_partial) this.graphics_colour_warp_square_partial.visible = false
-     if (this.graphics_colour_warp_square) this.graphics_colour_warp_square.visible = false
-     if (this.graphics_natural_resources_ring) this.graphics_natural_resources_ring.visible = false
      if (this.container_planets) this.container_planets.visible = false
-     if (this.text_infrastructure) { this.text_infrastructure.visible = false }
-     if (this.text_garrison) { this.text_garrison.visible = false }
+     if (this.text_infrastructure) this.text_infrastructure.visible = false
+     if (this.text_garrison) this.text_garrison.visible = false
    } 
    else {
      this.updateVisibility()
@@ -582,35 +552,23 @@ class Star extends EventEmitter {
   }
 
   updateVisibility() {
-
     this.graphics_star.visible = !this.hasSpecialist()
-    
-    if (this.graphics_colour_arc) this.graphics_colour_arc.visible = this.zoomPercent > 200
-    if (this.graphics_colour_cir) this.graphics_colour_cir.visible = this.zoomPercent <= 200
-    if (this.graphics_colour_warp_arc) this.graphics_colour_warp_arc.visible = this.zoomPercent > 200 && this.data.warpGate
-    if (this.graphics_colour_warp_cir) this.graphics_colour_warp_cir.visible = this.zoomPercent <= 200 && this.data.warpGate
-    if (this.graphics_colour_square_partial) this.graphics_colour_square_partial.visible = this.zoomPercent > 200
-    if (this.graphics_colour_square) this.graphics_colour_square.visible = this.zoomPercent <= 200
-    if (this.graphics_colour_warp_square_partial) this.graphics_colour_warp_square_partial.visible = this.zoomPercent > 200 && this.data.warpGate
-    if (this.graphics_colour_warp_square) this.graphics_colour_warp_square.visible = this.zoomPercent <= 200 && this.data.warpGate
+    this.graphics_colour_arc.visible = this.zoomPercent > 200
+    this.graphics_colour_cir.visible = this.zoomPercent <= 200
+    this.graphics_colour_warp_arc.visible = this.zoomPercent > 200 && this.data.warpGate
+    this.graphics_colour_warp_cir.visible = this.zoomPercent <= 200 && this.data.warpGate
+    this.graphics_colour_square_partial.visible = this.zoomPercent > 200
+    this.graphics_colour_square.visible = this.zoomPercent <= 200
+    this.graphics_colour_warp_square_partial.visible = this.zoomPercent > 200 && this.data.warpGate
+    this.graphics_colour_warp_square.visible = this.zoomPercent <= 200 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.text_name.visible = this.isSelected || this.zoomPercent > 200
+    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200
 
-    if (this.graphics_natural_resources_ring) {
-      this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200
-    }
-    
-    if (this.container_planets) {
-      this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > 200
-    }
-
-    if (this.text_infrastructure) { // may not exist for stars out of range
-      this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 200
-    }
-    if (this.text_garrison) {
-      this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 200)
-    }
+    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent > 200
+    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > 200
+    if (this.text_infrastructure) this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 200
+    if (this.text_garrison) this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 200)
   }
 
   deselectAllText () {
