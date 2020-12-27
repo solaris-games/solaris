@@ -9,7 +9,7 @@
     "anonymity": "normal"
   },
   "galaxy": {
-    "galaxyType": "circular",
+    "galaxyType": "circular-balanced",
     "starsPerPlayer": 30,
     "productionTicks": 20
   },
@@ -18,7 +18,7 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
-    "darkGalaxy": "start",
+    "darkGalaxy": "disabled",
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",

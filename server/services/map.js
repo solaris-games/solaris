@@ -3,7 +3,7 @@ const ValidationError = require("../errors/validation");
 module.exports = class MapService {
 
     constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService, spiralMapService, doughnutMapService) {
+        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
@@ -11,10 +11,11 @@ module.exports = class MapService {
         this.circularMapService = circularMapService;
         this.spiralMapService = spiralMapService;
         this.doughnutMapService = doughnutMapService;
+        this.circularBalancedMapService = circularBalancedMapService;
     }
 
     generateStars(game, starCount, playerLimit, warpGatesSetting) {
-        const stars = [];
+        let stars = [];
 
         // Get an array of random star names for however many stars we want.
         const starNames = this.nameService.getRandomStarNames(starCount);
@@ -32,29 +33,49 @@ module.exports = class MapService {
             case 'doughnut': 
                 starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
+            case 'circular-balanced':
+                starLocations = this.circularBalancedMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
+                break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
 
         // Iterate over all star locations
-        for (let i = 0; i < starLocations.length; i++) {
-            let starLocation = starLocations[i];
+        let starNamesIndex = 0;
+
+        let unlinkedStars = starLocations.filter(l => !l.linked);
+
+        for (let i = 0; i < unlinkedStars.length; i++) {
+            let starLocation = unlinkedStars[i];
 
             let loc = {
                 x: starLocation.x,
                 y: starLocation.y
             };
-
-            const star = this.starService.generateUnownedStar(game, starNames[i], loc, starLocation.resources);
-
+            
+            let star = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], loc, starLocation.resources);
+            
             stars.push(star);
+
+            if (starLocation.isHomeStar) {
+                let linkedStars = [];
+
+                for (let linkedLocation of starLocation.linkedLocations) {
+                  let linkedStar = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
+                  stars.push(linkedStar);
+                  linkedStars.push(linkedStar._id);
+                }
+
+                game.galaxy.homeStars.push(star._id)
+                game.galaxy.linkedStars.push(linkedStars);
+            }
         }
 
         // If warp gates are enabled, assign random stars to start as warp gates.
         if (warpGatesSetting !== 'none') {
             this.generateGates(stars, warpGatesSetting, playerLimit);
         }
-
+        
         return stars;
     }
 

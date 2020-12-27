@@ -21,7 +21,7 @@ const schema = new Schema({
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' }
         },
         galaxy: {
-			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut'], default: 'circular' },
+			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30], default: 20 },
 			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },

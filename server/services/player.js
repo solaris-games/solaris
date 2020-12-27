@@ -96,19 +96,6 @@ module.exports = class PlayerService extends EventEmitter {
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
-        // Divide the galaxy into equal chunks, each player will spawned
-        // at near equal distance from the center of the galaxy.
-        const starLocations = game.galaxy.stars.map(s => s.location);
-
-        // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
-
-        // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
-
-        let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
-
-        // Create each player starting at angle 0 at a distance of half the galaxy radius
         for(let i = 0; i < game.settings.general.playerLimit; i++) {
             // Get a random colour to assign to the player.
             if (!colours.length) {
@@ -122,36 +109,89 @@ module.exports = class PlayerService extends EventEmitter {
             let player = this.createEmptyPlayer(game, colour, shape);
 
             this._setDefaultResearchTechnology(game, player);
+            players.push(player);
+        }
 
+        if (game.galaxy.homeStars) {
+            this._distributePlayerLinkedHomeStars(game, players);
+        } else {
+            this._distributePlayerHomeStars(game, players);
+        }
+
+        if (game.galaxy.linkedStars) {
+            this._distributePlayerLinkedStartingStars(game, players);
+        }
+        else {
+            this._distributePlayerStartingStars(game, players);
+        }
+
+        return players;
+    }
+
+    _distributePlayerLinkedHomeStars(game, players) {
+        for(let player of players) {
+            let homeStarId = game.galaxy.homeStars.pop();
+
+            // Set up the home star
+            let homeStar = this.starService.getByObjectId(game, homeStarId);
+
+            this.starService.setupHomeStar(game, homeStar, player, game.settings);
+        }
+    }
+
+    _distributePlayerHomeStars(game, players) {
+        // Divide the galaxy into equal chunks, each player will spawned
+        // at near equal distance from the center of the galaxy.
+        const starLocations = game.galaxy.stars.map(s => s.location);
+
+        // Calculate the center point of the galaxy as we need to add it onto the starting location.
+        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
+
+        // The desired distance from the center is half way from the galaxy center and the edge.
+        const distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
+
+        let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
+
+        // Create each player starting at angle 0 at a distance of half the galaxy radius
+
+        for(let player of players) {
             let homeStar = this._getNewPlayerHomeStar(game, starLocations, galaxyCenter, distanceFromCenter, radians);
 
             // Set up the home star
             this.starService.setupHomeStar(game, homeStar, player, game.settings);
-
-            players.push(player);
         }
+    }
 
-        // Now that all players have a home star, the fairest way to distribute stars to players is to
+    _distributePlayerLinkedStartingStars(game, players) {
+        for (let player of players) {
+            let linkedStars = game.galaxy.linkedStars.pop();
+
+            for (let starId of linkedStars) {
+                let star = this.starService.getByObjectId(game, starId);
+
+                this.setupStarForGameStart(game, star, player); 
+            }
+        }
+    }
+
+    _distributePlayerStartingStars(game, players) {
+        // The fairest way to distribute stars to players is to
         // iterate over each player and give them 1 star at a time, this is arguably the fairest way
         // otherwise we'll end up with the last player potentially having a really bad position as their
         // stars could be miles away from their home star.
         let starsToDistribute = game.settings.player.startingStars - 1;
 
         while (starsToDistribute--) {
-            for (let playerIndex = 0; playerIndex < players.length; playerIndex++) {
-                let player = players[playerIndex];
-                let homeStar = game.galaxy.stars.find(s => player.homeStarId.equals(s._id));
+            for (let player of players) {
+                let homeStar = this.starService.getByObjectId(game, player.homeStarId);
 
-                // Get X closest stars to the home star and also give those to
-                // the player.
+                // Get X closest stars to the home star and also give those to the player.
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
                 this.setupStarForGameStart(game, s, player);
             }
         }
-
-        return players;
     }
 
     setupStarForGameStart(game, star, player) {

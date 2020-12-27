@@ -53,11 +53,14 @@ module.exports = class GameCreateService {
         }
 
         // Create all of the stars required.
+        game.galaxy.homeStars = [];
+        game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
             game,
             desiredStarCount,
             game.settings.general.playerLimit,
             game.settings.specialGalaxy.randomGates);
+
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
