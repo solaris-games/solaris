@@ -63,17 +63,22 @@ module.exports = class CircularBalancedMapService {
                 let candidateLocations = [];
                 let baseLocation = this._generateStarPositionInSector(currentRadius, rng, playerCount);
                 let locationRejected = false;
+
                 for (let sectorIndex = 0; sectorIndex<playerCount; sectorIndex++) {
                   let location = this._getRotatedLocation(baseLocation, sectorIndex*sectorAngle);
+
                   // Stars must not be too close to eachother.
-                  if( (this.isLocationTooCloseToOthers(game, location, locations)) ||
-                  ( this.isLocationTooCloseToOthers(game, location, candidateLocations)) ) {
+                  if ((this.isLocationTooCloseToOthers(game, location, locations)) ||
+                    (this.isLocationTooCloseToOthers(game, location, candidateLocations)) ) {
                       locationRejected = true;
                       break;
                   }
+
                   candidateLocations.push(location);
                 }
+
                 if (locationRejected) { continue; }
+
                 locations.push(...candidateLocations);
                 createdLocations = true;
                 break;
@@ -98,8 +103,7 @@ module.exports = class CircularBalancedMapService {
             let locationIndex = (firstHomeLocationIndex+i);
             locations[locationIndex].isHomeStar = true;
         }
-        game.galaxy.provideHomeStars = true;
-
+        
         let homeLocations = locations.filter( (location) => { return location.isHomeStar; } );
         let initialHyperRange = game.settings.technology.startingTechnologyLevel.hyperspace;
         let startingStarsCount = game.settings.player.startingStars-1;
@@ -107,7 +111,9 @@ module.exports = class CircularBalancedMapService {
         for(let homeLocation of homeLocations) {
             homeLocation.linkedLocations = [];
         }
+
         let unlinkedLocations = locations.filter( (loc) => { return !loc.isHomeStar;} );
+
         while(startingStarsCount--) {
             for(let homeLocation of homeLocations) {
                 let closestUnlinkedLocation = this.distanceService.getClosestLocation(homeLocation, unlinkedLocations);
@@ -116,18 +122,20 @@ module.exports = class CircularBalancedMapService {
                 unlinkedLocations = unlinkedLocations.filter( (loc) => { return loc !== closestUnlinkedLocation; } );
             }
         }
-        game.galaxy.provideInitialStars = true;
 
-        
         // pull the closest stars that will be linked so they are in hyper range
         let minimumClaimDistance = this.distanceService.getHyperspaceDistance(game, initialHyperRange)-2;//-2 to avoid floating point imprecisions
+
         for(let homeLocation of homeLocations) {
             let reachableLocations = [];
             let unreachebleLocations = [];
+
             reachableLocations.push(homeLocation);
+            
             for(let location of homeLocation.linkedLocations) {
                 unreachebleLocations.push(location);
             }
+
             while( unreachebleLocations.length > 0) {
                 //find the unreachable location that is closer to any of the reachable locations
                 for(let unreachebleLocation of unreachebleLocations) {
@@ -137,26 +145,33 @@ module.exports = class CircularBalancedMapService {
                     
                     for(let reachableLocation of reachableLocations) {
                         let distance = this.distanceService.getDistanceBetweenLocations(unreachebleLocation, reachableLocation);
+                        
                         if (distance < smallestDistance ) { 
                             smallestDistance = distance;
                             distanceToClosestReachable = distance;
                             closestReachableLocation = reachableLocation;
                         }
                     }
+
                     unreachebleLocation.distanceToClosestReachable = distanceToClosestReachable;
                     unreachebleLocation.closestReachable = closestReachableLocation;
                 }
+
                 let closestUnreachable = unreachebleLocations[0];
-                for(let unreachebleLocation of unreachebleLocations) {
-                    if( unreachebleLocation.distanceToClosestReachable < closestUnreachable.distanceToClosestReachable) {
+
+                for (let unreachebleLocation of unreachebleLocations) {
+                    if (unreachebleLocation.distanceToClosestReachable < closestUnreachable.distanceToClosestReachable) {
                         closestUnreachable = unreachebleLocation;
                     }
                 }
+
                 this._moveLocationTowards(closestUnreachable, closestUnreachable.closestReachable, minimumClaimDistance);
+                
                 // after moving closer we can change the location from the unreachable to the reachable array
                 unreachebleLocations.splice(unreachebleLocations.indexOf(closestUnreachable), 1);
                 reachableLocations.push(closestUnreachable);
             }
+
             //now all linked stars should be reachable
         }
 
@@ -184,6 +199,7 @@ module.exports = class CircularBalancedMapService {
 
         for (let i = 0; i<locations.length; ) {
             let naturalResources = Math.floor(this.randomService.getRandomNumberBetween(RMIN, RMAX));
+
             for(let j = 0; j<playerCount; j++) {
                 let location = locations[i];
                 i++;
@@ -193,7 +209,6 @@ module.exports = class CircularBalancedMapService {
     }
 
     setResourcesWeightedCenter(game, locations, playerCount, rng) {
-
         // The closer to the center of the galaxy, the more likely to find stars with higher resources.
         let galaxyRadius = this._getGalaxyDiameter(locations).x/2;//this is fine since the galaxy is a circle, and not an ellipse
         
