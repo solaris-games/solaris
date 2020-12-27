@@ -31,12 +31,12 @@
                           {{mapObject.data.waypoints.length}}
                         </span>
                     </td>
-                    <td v-if="userOwnsObject(mapObject)" class="text-right" style="">
-                        <button title="Edit waypoints" v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
+                    <td v-if="userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !isGameFinished()" class="text-right" style="">
+                        <button title="Edit waypoints" v-if="mapObject.type === 'carrier' && !mapObject.data.isGift" type="button" class="btn btn-primary  ml-1" @click="onEditWaypointsRequested(mapObject.data._id)">
                         <i class="fas fa-plus"></i> </button>
                         <button title="Build a carrier" v-if="mapObject.type === 'star' && mapObject.data.garrison && hasEnoughCredits(mapObject)" type="button" class="btn btn-primary ml-1" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>
-                        <button title="Transfer all ships to the star" v-if="mapObject.type === 'star' " type="button" class="btn btn-primary  ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
-                        <button title="Transfer ships" v-if="mapObject.type === 'carrier' && !getObjectOwningPlayer(mapObject).defeated && !mapObject.data.isGift && !isGameFinished()" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
+                        <button title="Transfer all ships to the star" v-if="mapObject.type === 'star' && hasCarriersInOrbit(mapObject)" type="button" class="btn btn-primary  ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
+                        <button title="Transfer ships" v-if="mapObject.type === 'carrier' && !mapObject.data.isGift && mapObject.data.orbiting" type="button" class="btn btn-primary  ml-1 " @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
                     </td>
                 </tr>
             </tbody>
@@ -113,6 +113,11 @@ export default {
       }
 
       return owningPlayer._id === userPlayer._id
+    },
+    hasCarriersInOrbit (mapObject) {
+      let star = gameHelper.getStarById(this.$store.state.game, mapObject.data._id)
+
+      return gameHelper.getCarriersOrbitingStar(this.$store.state.game, star).length > 0
     },
     isGameFinished () {
       return gameHelper.isGameFinished(this.$store.state.game)
