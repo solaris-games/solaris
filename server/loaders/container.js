@@ -39,6 +39,7 @@ const AchievementService = require('../services/achievement');
 const ConversationService = require('../services/conversation');
 
 const CircularMapService = require('../services/maps/circular');
+const CircularBalancedMapService = require('../services/maps/circularBalanced');
 const SpiralMapService = require('../services/maps/spiral');
 const DoughnutMapService = require('../services/maps/doughnut');
 
@@ -67,9 +68,10 @@ module.exports = (io) => {
     const carrierService = new CarrierService(achievementService, distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService, specialistService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
+    const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService);
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService);
     const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService);
-    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService);
+    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService);
     const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     const ledgerService = new LedgerService(playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService);

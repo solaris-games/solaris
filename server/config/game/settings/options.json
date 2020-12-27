@@ -190,6 +190,10 @@
             {
             "value": "doughnut",
             "text": "Doughnut"
+            },
+            {
+            "value": "circular-balanced",
+            "text": "Circular Balanced"
             }
         ],
         "starsPerPlayer": [
