@@ -6,7 +6,7 @@
       <div class="col mt-1">
         <span>
           <player-icon :player="fromPlayer"/>
-          <strong class="ml-1">{{fromPlayer.alias}}</strong>
+          <strong class="ml-2">{{fromPlayer.alias}}</strong>
         </span>
       </div>
       <div class="col-auto">

@@ -22,6 +22,11 @@ module.exports = class GameCreateService {
             if (openGames.length) {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
+
+            // Validate that the player cannot create large games.
+            if (settings.general.playerLimit > 16) {
+                throw new ValidationError(`Games larger than 16 players are reserved for official games only.`);
+            }
         }
         
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {

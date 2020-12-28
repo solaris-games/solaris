@@ -92,7 +92,7 @@ module.exports = class PlayerService extends EventEmitter {
     createEmptyPlayers(game) {
         let players = [];
 
-        let shapes = ['circle', 'square'];
+        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
@@ -112,13 +112,13 @@ module.exports = class PlayerService extends EventEmitter {
             players.push(player);
         }
 
-        if (game.galaxy.homeStars) {
+        if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
             this._distributePlayerLinkedHomeStars(game, players);
         } else {
             this._distributePlayerHomeStars(game, players);
         }
 
-        if (game.galaxy.linkedStars) {
+        if (game.galaxy.linkedStars && game.galaxy.linkedStars.length) {
             this._distributePlayerLinkedStartingStars(game, players);
         }
         else {

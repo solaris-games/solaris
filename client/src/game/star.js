@@ -15,14 +15,10 @@ class Star extends EventEmitter {
     this.container.interactive = true
     this.container.buttonMode = true
 
-    this.graphics_colour_arc = new PIXI.Graphics()
-    this.graphics_colour_cir = new PIXI.Graphics()
-    this.graphics_colour_square = new PIXI.Graphics()
-    this.graphics_colour_square_partial = new PIXI.Graphics()
-    this.graphics_colour_warp_arc = new PIXI.Graphics()
-    this.graphics_colour_warp_cir = new PIXI.Graphics()
-    this.graphics_colour_warp_square = new PIXI.Graphics()
-    this.graphics_colour_warp_square_partial = new PIXI.Graphics()
+    this.graphics_shape_part = new PIXI.Graphics()
+    this.graphics_shape_full = new PIXI.Graphics()
+    this.graphics_shape_part_warp = new PIXI.Graphics()
+    this.graphics_shape_full_warp = new PIXI.Graphics()
     this.graphics_hyperspaceRange = new PIXI.Graphics()
     this.graphics_natural_resources_ring = new PIXI.Graphics()
     this.graphics_scanningRange = new PIXI.Graphics()
@@ -30,14 +26,10 @@ class Star extends EventEmitter {
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_natural_resources_ring)
-    this.container.addChild(this.graphics_colour_arc)
-    this.container.addChild(this.graphics_colour_cir)
-    this.container.addChild(this.graphics_colour_warp_arc)
-    this.container.addChild(this.graphics_colour_warp_cir)
-    this.container.addChild(this.graphics_colour_square_partial)
-    this.container.addChild(this.graphics_colour_square)
-    this.container.addChild(this.graphics_colour_warp_square_partial)
-    this.container.addChild(this.graphics_colour_warp_square)
+    this.container.addChild(this.graphics_shape_part)
+    this.container.addChild(this.graphics_shape_full)
+    this.container.addChild(this.graphics_shape_part_warp)
+    this.container.addChild(this.graphics_shape_full_warp)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -264,58 +256,109 @@ class Star extends EventEmitter {
       return
     }
 
+    this.graphics_shape_part.clear()
+    this.graphics_shape_full.clear()
+    this.graphics_shape_part_warp.clear()
+    this.graphics_shape_full_warp.clear()
+
+    this.graphics_shape_part.lineStyle(3, player.colour.value)
+    this.graphics_shape_full.lineStyle(3, player.colour.value)
+    this.graphics_shape_part_warp.lineStyle(2, player.colour.value)
+    this.graphics_shape_full_warp.lineStyle(2, player.colour.value)
+
     switch (player.shape) {
       case 'circle': 
-        this._drawColourCircle(player)
+        this._drawColourCircle()
         break
       case 'square': 
-        this._drawColourSquare(player)
+        this._drawColourSquare()
         break
+      case 'diamond':
+        this._drawColourDiamond()
+        break;
+      case 'hexagon':
+        this._drawColourHexagon()
+        break;
     }
   }
 
-  _drawColourCircle (player) {
-    this.graphics_colour_arc.clear()
-    this.graphics_colour_cir.clear()
-    this.graphics_colour_warp_arc.clear()
-    this.graphics_colour_warp_cir.clear()
-
-    this.graphics_colour_arc.lineStyle(3, player.colour.value)
-    this.graphics_colour_cir.lineStyle(3, player.colour.value)
-    this.graphics_colour_warp_arc.lineStyle(2, player.colour.value)
-    this.graphics_colour_warp_cir.lineStyle(2, player.colour.value)
-
-    this.graphics_colour_arc.arc(0, 0, 7, 0.785398, -0.785398)
-    this.graphics_colour_cir.drawCircle(0, 0, 7)
+  _drawColourCircle () {
+    this.graphics_shape_part.arc(0, 0, 7, 0.785398, -0.785398)
+    this.graphics_shape_full.drawCircle(0, 0, 7)
     
-    this.graphics_colour_warp_arc.arc(0, 0, 10, 0.785398, -0.785398)
-    this.graphics_colour_warp_cir.drawCircle(0, 0, 10)
+    this.graphics_shape_part_warp.arc(0, 0, 10, 0.785398, -0.785398)
+    this.graphics_shape_full_warp.drawCircle(0, 0, 10)
   }
 
-  _drawColourSquare (player) {
-    this.graphics_colour_square_partial.clear()
-    this.graphics_colour_square.clear()
-    this.graphics_colour_warp_square_partial.clear()
-    this.graphics_colour_warp_square.clear()
-
-    this.graphics_colour_square_partial.lineStyle(3, player.colour.value)
-    this.graphics_colour_square.lineStyle(3, player.colour.value)
-    this.graphics_colour_warp_square_partial.lineStyle(2, player.colour.value)
-    this.graphics_colour_warp_square.lineStyle(2, player.colour.value)
-
-    this.graphics_colour_square_partial.moveTo(7, -7)
-    this.graphics_colour_square_partial.lineTo(-7, -7)
-    this.graphics_colour_square_partial.lineTo(-7, 7)
-    this.graphics_colour_square_partial.lineTo(7, 7)
+  _drawColourSquare () {
+    this.graphics_shape_part.moveTo(7, -7)
+    this.graphics_shape_part.lineTo(-7, -7)
+    this.graphics_shape_part.lineTo(-7, 7)
+    this.graphics_shape_part.lineTo(7, 7)
     
-    this.graphics_colour_square.drawRect(-7, -7, 14, 14)
+    this.graphics_shape_full.drawRect(-7, -7, 14, 14)
 
-    this.graphics_colour_warp_square_partial.moveTo(7, -10)
-    this.graphics_colour_warp_square_partial.lineTo(-10, -10)
-    this.graphics_colour_warp_square_partial.lineTo(-10, 10)
-    this.graphics_colour_warp_square_partial.lineTo(7, 10)
+    this.graphics_shape_part_warp.moveTo(7, -10)
+    this.graphics_shape_part_warp.lineTo(-10, -10)
+    this.graphics_shape_part_warp.lineTo(-10, 10)
+    this.graphics_shape_part_warp.lineTo(7, 10)
 
-    this.graphics_colour_warp_square.drawRect(-10, -10, 20, 20)
+    this.graphics_shape_full_warp.drawRect(-10, -10, 20, 20)
+  }
+
+  _drawColourDiamond () {
+    let s = 9;
+    let w = 14;
+
+    this.graphics_shape_part.moveTo(0, -s)
+    this.graphics_shape_part.lineTo(-s, 0)
+    this.graphics_shape_part.lineTo(0, s)
+
+    this.graphics_shape_full.moveTo(0, -s)
+    this.graphics_shape_full.lineTo(-s, 0)
+    this.graphics_shape_full.lineTo(0, s)
+    this.graphics_shape_full.lineTo(s, 0)
+    this.graphics_shape_full.closePath()
+    
+    this.graphics_shape_part_warp.moveTo(0, -w)
+    this.graphics_shape_part_warp.lineTo(-w, 0)
+    this.graphics_shape_part_warp.lineTo(0, w)
+
+    this.graphics_shape_full_warp.moveTo(0, -w)
+    this.graphics_shape_full_warp.lineTo(-w, 0)
+    this.graphics_shape_full_warp.lineTo(0, w)
+    this.graphics_shape_full_warp.lineTo(w, 0)
+    this.graphics_shape_full_warp.closePath()
+  }
+
+  _drawColourHexagon () {
+    this.graphics_shape_part.moveTo(4, -7)
+    this.graphics_shape_part.lineTo(-4, -7)
+    this.graphics_shape_part.lineTo(-8, 0)
+    this.graphics_shape_part.lineTo(-4, 7)
+    this.graphics_shape_part.lineTo(4, 7)
+
+    this.graphics_shape_full.moveTo(4, -7)
+    this.graphics_shape_full.lineTo(-4, -7)
+    this.graphics_shape_full.lineTo(-8, 0)
+    this.graphics_shape_full.lineTo(-4, 7)
+    this.graphics_shape_full.lineTo(4, 7)
+    this.graphics_shape_full.lineTo(8, 0)
+    this.graphics_shape_full.closePath()
+
+    this.graphics_shape_part_warp.moveTo(6.5, -10.5)
+    this.graphics_shape_part_warp.lineTo(-6.5, -10.5)
+    this.graphics_shape_part_warp.lineTo(-12, 0)
+    this.graphics_shape_part_warp.lineTo(-6.5, 10.5)
+    this.graphics_shape_part_warp.lineTo(6.5, 10.5)
+
+    this.graphics_shape_full_warp.moveTo(6.5, -10.5)
+    this.graphics_shape_full_warp.lineTo(-6.5, -10.5)
+    this.graphics_shape_full_warp.lineTo(-12, 0)
+    this.graphics_shape_full_warp.lineTo(-6.5, 10.5)
+    this.graphics_shape_full_warp.lineTo(6.5, 10.5)
+    this.graphics_shape_full_warp.lineTo(12, 0)
+    this.graphics_shape_full_warp.closePath()
   }
 
   _hasUnknownShips() {
@@ -492,14 +535,10 @@ class Star extends EventEmitter {
      //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
      // maybe put them on their own container, since this piece of code should remain as small as possible
      this.graphics_star.visible = false
-     this.graphics_colour_arc.visible = false
-     this.graphics_colour_cir.visible = false
-     this.graphics_colour_warp_arc.visible = false
-     this.graphics_colour_warp_cir.visible = false
-     this.graphics_colour_square_partial.visible = false
-     this.graphics_colour_square.visible = false
-     this.graphics_colour_warp_square_partial.visible = false
-     this.graphics_colour_warp_square.visible = false
+     this.graphics_shape_part.visible = false
+     this.graphics_shape_full.visible = false
+     this.graphics_shape_part_warp.visible = false
+     this.graphics_shape_full_warp.visible = false
      this.graphics_natural_resources_ring.visible = false
 
      if (this.text_name) this.text_name.visible = false
@@ -553,14 +592,10 @@ class Star extends EventEmitter {
 
   updateVisibility() {
     this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_colour_arc.visible = this.zoomPercent > 200
-    this.graphics_colour_cir.visible = this.zoomPercent <= 200
-    this.graphics_colour_warp_arc.visible = this.zoomPercent > 200 && this.data.warpGate
-    this.graphics_colour_warp_cir.visible = this.zoomPercent <= 200 && this.data.warpGate
-    this.graphics_colour_square_partial.visible = this.zoomPercent > 200
-    this.graphics_colour_square.visible = this.zoomPercent <= 200
-    this.graphics_colour_warp_square_partial.visible = this.zoomPercent > 200 && this.data.warpGate
-    this.graphics_colour_warp_square.visible = this.zoomPercent <= 200 && this.data.warpGate
+    this.graphics_shape_part.visible = this.zoomPercent > 200
+    this.graphics_shape_full.visible = this.zoomPercent <= 200
+    this.graphics_shape_part_warp.visible = this.zoomPercent > 200 && this.data.warpGate
+    this.graphics_shape_full_warp.visible = this.zoomPercent <= 200 && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200

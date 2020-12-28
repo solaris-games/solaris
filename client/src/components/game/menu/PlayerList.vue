@@ -1,7 +1,7 @@
 <template>
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item grow" v-for="p in players" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
-          :title="p.colour.alias + ' - ' + p.alias">
+          :title="p.colour.alias + ' ' + p.shape + ' - ' + p.alias">
           <player-avatar :player="p"/>
 
           <div class="colour-bar" v-bind:style="{'background-color':getFriendlyColour(p.colour.value)}">

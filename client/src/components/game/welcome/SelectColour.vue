@@ -12,12 +12,11 @@
             <tbody>
                 <tr v-for="player in players" v-bind:key="player._id">
                     <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                    <td class="col-avatar" :title="player.colour.alias" @click="onOpenPlayerDetailRequested(player)">
-                        <img v-if="player.avatar" :src="getAvatarImage(player)">
-                        <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:40px;"></i>
+                    <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape" @click="onOpenPlayerDetailRequested(player)">
+                        <player-avatar :player="player"/>
                     </td>
                     <td class="pl-2 pt-3 pb-2">
-                        <h5 style="vertical-align: middle;">{{player.alias}}</h5>
+                        <h5 class="alias-title" style="vertical-align: middle;">{{player.alias}}</h5>
                     </td>
                     <td class="fit pl-2 pt-2 pb-2 pr-2">
                         <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -34,8 +33,12 @@
 <script>
 import gameContainer from '../../../game/container'
 import gameHelper from '../../../services/gameHelper'
+import PlayerAvatarVue from '../menu/PlayerAvatar'
 
 export default {
+  components: {
+    'player-avatar': PlayerAvatarVue
+  },
   data () {
     return {
       players: []
@@ -91,8 +94,17 @@ img {
 }
 
 .col-avatar {
-    width: 55px;
-    cursor: pointer;
+  position:absolute;
+  width: 59px;
+  cursor: pointer;
+}
+
+.alias-title {
+  padding-left: 59px;
+}
+
+table tr {
+  height: 59px;
 }
 
 .table-sm td {

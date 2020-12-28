@@ -12,7 +12,7 @@ const schema = new Schema({
         alias: { type: Types.String, required: true },
         value: { type: Types.String, required: true }
     },
-    shape: { type: Types.String, required: true, enum: ['circle', 'square'], default: 'circle' },
+    shape: { type: Types.String, required: true, enum: ['circle', 'square', 'diamond', 'hexagon'], default: 'circle' },
     lastSeen: { type: Types.Date, required: false },
     lastSeenIP: { type: Types.String, required: false },
     researchingNow: { type: Types.String, required: true, default: 'weapons' },

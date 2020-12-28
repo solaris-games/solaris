@@ -56,9 +56,7 @@
                 class="btn mr-1 mb-1"
                 :class="{'btn-primary': playerFilter.enabled}"
                 @click="togglePlayerFilter(playerFilter)">
-                <i class="fas" 
-                  :class="{'fa-circle': playerFilter.shape === 'circle','fa-square': playerFilter.shape === 'square'}"
-                  :style="{'color': playerFilter.colour}"></i>
+                <player-icon :player="playerFilter" style="margin-top:0px;margin-right:0px;"/>
               </button>
             </div>
         </div>
@@ -71,6 +69,7 @@
 import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MenuTitle from '../MenuTitle'
 import LineChart from './LineChart.js'
+import PlayerIconVue from '../player/PlayerIcon'
 import GameHelper from '../../../services/gameHelper'
 import GameApiService from '../../../services/api/game'
 
@@ -78,7 +77,8 @@ export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'menu-title': MenuTitle,
-    'line-chart': LineChart
+    'line-chart': LineChart,
+    'player-icon': PlayerIconVue
   },
   props: {
     compareWithPlayerId: String
@@ -120,7 +120,7 @@ export default {
         enabled: true,
         playerId: p._id,
         shape: p.shape,
-        colour: GameHelper.getPlayerColour(this.$store.state.game, p._id)
+        colour: p.colour // GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
     })
 

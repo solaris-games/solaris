@@ -1,9 +1,9 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "Standard 32 Player",
+    "description": "32 Players",
     "password": null,
-    "starVictoryPercentage": 50,
+    "starVictoryPercentage": 33,
     "playerLimit": 32,
     "playerType": "all"
   },
@@ -17,7 +17,7 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
-    "darkGalaxy": "start",
+    "darkGalaxy": "enabled",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
