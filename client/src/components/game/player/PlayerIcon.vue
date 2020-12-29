@@ -10,7 +10,9 @@ import moment from 'moment'
 
 export default {
   props: {
-    playerId: String
+    playerId: String,
+    hideOnlineStatus: Boolean,
+    solidGlyphOnly: Boolean
   },
   data () {
     return {
@@ -22,14 +24,16 @@ export default {
   mounted () {
     this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
-    this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
+    if (!this.hideOnlineStatus) {
+      this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
+    }
   },
   destroyed () {
     clearInterval(this.intervalFunction)
   },
   methods: {
     getFriendlyColour () {
-        return GameHelper.getFriendlyColour(this.player.colour.value)
+      return GameHelper.getFriendlyColour(this.player.colour.value)
     },
     recalculateOnlineStatus () {
       if (this.player.isOnline) {
@@ -44,13 +48,13 @@ export default {
     glyph () {
       switch (this.player.shape) {
           case 'circle': 
-            return this.player.isOnline ? '●' : '○'
+            return this.solidGlyphOnly || this.player.isOnline ? '●' : '○'
           case 'square':
-            return this.player.isOnline ? '■' : '□'
+            return this.solidGlyphOnly || this.player.isOnline ? '■' : '□'
           case 'diamond':
-            return this.player.isOnline ? '♦' : '◇'
+            return this.solidGlyphOnly || this.player.isOnline ? '♦' : '◇'
           case 'hexagon':
-            return this.player.isOnline ? '⬢' : '⬡'
+            return this.solidGlyphOnly || this.player.isOnline ? '⬢' : '⬡'
         }
     }
   }

@@ -1,19 +1,15 @@
 <template>
 <div class="menu-page bg-secondary pb-2">
   <div class="container">
-    <menu-title title="Intel" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-primary" @click="toggleAllHistory">
-        <i class="fas fa-history mr-1"></i>
-        <span v-if="showAllHistory">All</span>
-        <span v-if="!showAllHistory">Fixed</span>
-      </button>
-    </menu-title>
+    <menu-title title="Intel" @onCloseRequested="onCloseRequested"></menu-title>
 
     <loading-spinner :loading="!history"/>
   </div>
 
   <div v-if="history">
     <div class="container">
+      <div class="row no-gutters">
+        <div class="col">
         <select class="form-control input-sm" id="intelType" v-model="intelType" v-on:change="fillData" :disabled="history == null">
           <option key="totalStars" value="totalStars">Total Stars</option>
           <option key="totalEconomy" value="totalEconomy">Total Economy</option>
@@ -32,6 +28,15 @@
           <option key="experimentation" value="experimentation">Experimentation</option>
           <option key="terraforming" value="terraforming">Terraforming</option>
         </select>
+        </div>
+        <div class="col-auto ml-1">
+          <select class="form-control input-sm" v-model="startTick" v-on:change="reloadData" :disabled="history == null">
+            <option v-for="option in startTickOptions" :key="option.text" :value="option.value">
+              {{option.text}}
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="mb-2 mt-2 ml-1 mr-1" v-if="datacollection != null">
@@ -55,8 +60,9 @@
               <button v-for="playerFilter in playerFilters" :key="playerFilter._id"
                 class="btn mr-1 mb-1"
                 :class="{'btn-primary': playerFilter.enabled}"
-                @click="togglePlayerFilter(playerFilter)">
-                <player-icon :playerId="playerFilter._id" style="margin-top:0px;margin-right:0px;"/>
+                @click="togglePlayerFilter(playerFilter)"
+                :title="playerFilter.alias">
+                <player-icon :playerId="playerFilter.playerId" :hideOnlineStatus="true" :solidGlyphOnly="true" style="margin-top:0px;margin-right:0px;"/>
               </button>
             </div>
         </div>
@@ -87,7 +93,8 @@ export default {
     return {
       intelType: 'totalStars',
       history: null,
-      showAllHistory: false,
+      startTick: null,
+      startTickOptions: [],
       datacollection: null,
       dataoptions: {
         bezierCurve: false,
@@ -119,6 +126,7 @@ export default {
       return {
         enabled: true,
         playerId: p._id,
+        alias: p.alias,
         shape: p.shape,
         colour: p.colour // GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
@@ -133,24 +141,41 @@ export default {
       })
     }
 
+    this.calculateStartTicks()
     this.reloadData()
   },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
+    calculateStartTicks () {
+      let currentTick = this.$store.state.game.state.tick
+      let prodTicks = this.$store.state.game.settings.galaxy.productionTicks
+
+      this.startTickOptions.push({
+        text: `Last Cycle`,
+        value: Math.max(0, currentTick - prodTicks)
+      })
+
+      for (let i = 2; i < 11; i++) {
+        this.startTickOptions.push({
+          text: `${i} Cycles`,
+          value: Math.max(0, currentTick - (prodTicks * i))
+        })
+      }
+
+      this.startTickOptions.push({
+        text: 'All',
+        value: 0
+      })
+      
+      this.startTick = this.startTickOptions[this.startTickOptions.length - 2].value
+    },
     async reloadData () {
       this.history = null
 
       try {
-        let startTick = 0
-
-        if (!this.showAllHistory) {
-          // 10 cycles ago.
-          startTick = Math.max(0, this.$store.state.game.state.tick - (this.$store.state.game.settings.galaxy.productionTicks * 10))
-        }
-
-        let response = await GameApiService.getGameHistory(this.$store.state.game._id, startTick)
+        let response = await GameApiService.getGameHistory(this.$store.state.game._id, this.startTick)
 
         if (response.status === 200) {
           this.history = response.data
@@ -159,11 +184,6 @@ export default {
       } catch (err) {
         console.error(err)
       }
-    },
-    toggleAllHistory () {
-      this.showAllHistory = !this.showAllHistory
-
-      this.reloadData()
     },
     getPlayerColour (player) {
       return GameHelper.getPlayerColour(this.$store.state.game, player._id)
