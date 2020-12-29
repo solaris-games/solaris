@@ -91,22 +91,24 @@ module.exports = (router, io, container) => {
                 // Don't send out potentially sensitive info like costs to all players, only
                 // the stuff that the UI needs.
                 req.game.galaxy.players.forEach(p => {
-                    let broadcastSummary = {
-                        playerId: req.player._id,
-                        stars: summary.stars,
-                        infrastructureType: summary.infrastructureType,
-                        upgraded: summary.upgraded
-                    };
-    
-                    // If it isn't the player who performed the bulk upgrade then strip out
-                    // the stars that are outside of scanning range.
-                    if (!p._id.equals(req.player._id)) {
-                        let starsInScanningRange = container.starService.filterStarsByScanningRange(req.game, p);
-    
-                        broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
+                    if (container.broadcastService.roomExists(p._id)) { // Check for active socket here before filtering stars.
+                        let broadcastSummary = {
+                            playerId: req.player._id,
+                            stars: summary.stars,
+                            infrastructureType: summary.infrastructureType,
+                            upgraded: summary.upgraded
+                        };
+        
+                        // If it isn't the player who performed the bulk upgrade then strip out
+                        // the stars that are outside of scanning range.
+                        if (!p._id.equals(req.player._id)) {
+                            let starsInScanningRange = container.starService.filterStarsByScanningRange(req.game, p);
+        
+                            broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
+                        }
+        
+                        container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);
                     }
-    
-                    container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);
                 });
             }
         } catch (err) {
