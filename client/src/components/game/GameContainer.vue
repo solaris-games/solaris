@@ -14,7 +14,8 @@ export default {
       onStarRightClickedHandler: null,
       onCarrierClickedHandler: null,
       onWaypointCreatedHandler: null,
-      onObjectsClickedHandler: null
+      onObjectsClickedHandler: null,
+      polling: null
     }
   },
 
@@ -49,7 +50,7 @@ export default {
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
 
-    setInterval(this.touchPlayer, 60000)
+    this.polling = setInterval(this.touchPlayer, 60000)
 
     this.touchPlayer()
   },
@@ -65,6 +66,8 @@ export default {
 
   beforeDestroy () {
     window.removeEventListener('resize', this.handleResize)
+
+    clearInterval(this.polling)
   },
 
   methods: {

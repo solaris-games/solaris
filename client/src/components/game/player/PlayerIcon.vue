@@ -1,32 +1,58 @@
 <template>
   <!-- Note: We can't use Font Awesome because diamond and hexagon are premium icons -->
-  <span class="span-container" :style="{'color': getFriendlyColour()}">
-    {{getGlyph()}}
+  <span v-if="player" class="span-container" :style="{'color': getFriendlyColour()}" :title="onlineStatus">
+    {{glyph}}
   </span>
 </template>
 <script>
 import GameHelper from '../../../services/gameHelper'
+import moment from 'moment'
 
 export default {
   props: {
-    player: Object
+    playerId: String
+  },
+  data () {
+    return {
+      player: null,
+      onlineStatus: '',
+      intervalFunction: null
+    }
+  },
+  mounted () {
+    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+
+    this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
+  },
+  destroyed () {
+    clearInterval(this.intervalFunction)
   },
   methods: {
-      getFriendlyColour () {
-          return GameHelper.getFriendlyColour(this.player.colour.value)
-      },
-      getGlyph () {
-        switch (this.player.shape) {
-          case 'circle': 
-            return '●'
-          case 'square':
-            return '■'
-          case 'diamond':
-            return '♦'
-          case 'hexagon':
-            return '⬢'
-        }
+    getFriendlyColour () {
+        return GameHelper.getFriendlyColour(this.player.colour.value)
+    },
+    recalculateOnlineStatus () {
+      if (this.player.isOnline) {
+        this.onlineStatus = 'Online Now'
       }
+      else {
+        this.onlineStatus = moment(this.player.lastSeen).utc().fromNow()
+      }
+    }
+  },
+  computed: {
+    glyph () {
+      switch (this.player.shape) {
+          case 'circle': 
+            return this.player.isOnline ? '●' : '○'
+          case 'square':
+            return this.player.isOnline ? '■' : '□'
+          case 'diamond':
+            return this.player.isOnline ? '♦' : '◇'
+          case 'hexagon':
+            return this.player.isOnline ? '⬢' : '⬡'
+        }
+    }
   }
 }
 </script>

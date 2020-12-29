@@ -2,7 +2,7 @@
   <div v-if="player" class="row" :style="{'background-image': 'linear-gradient(to left, ' + colour + ', #375a7f 100%)'}">
       <div class="col">
           <h4 class="pt-2">
-            <player-icon :player="player"/>
+            <player-icon :playerId="player._id"/>
             {{player.alias}} 
             <!-- <span v-if="player.userId">(You)</span> -->
             <span v-if="player.defeated">({{getPlayerStatus()}})</span>

@@ -18,6 +18,10 @@ module.exports = class BroadcastService {
         return this.io.sockets.adapter.rooms[player._id.toString()] != null;
     }
 
+    getOnlinePlayers(game) {
+        return game.galaxy.players.filter(p => this.playerRoomExists(p));
+    }
+
     gameTick(game, playerId, report) {
         this.io.to(playerId.toString()).emit('gameTicked', {
             report

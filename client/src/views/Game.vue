@@ -31,6 +31,7 @@ import gameService from '../services/api/game'
 import UserApiService from '../services/api/user'
 import GameHelper from '../services/gameHelper'
 import AudioService from '../game/audio'
+import moment from 'moment'
 
 export default {
   components: {
@@ -78,7 +79,18 @@ export default {
   destroyed () {
     this.unsubscribeToSockets()
     
-    this.$socket.emit('gameRoomLeft')
+    let socketData = {
+      gameId: this.$store.state.game._id,
+      userId: this.$store.state.userId
+    }
+
+    let player = GameHelper.getUserPlayer(this.$store.state.game)
+
+    if (player) {
+      socketData.playerId = player._id
+    }
+    
+    this.$socket.emit('gameRoomLeft', socketData)
 
     document.title = 'Solaris'
   },
@@ -172,6 +184,8 @@ export default {
       // TODO: Move all component subscriptions into the components' socket object.
       this.sockets.subscribe('gameTicked', (data) => this.$store.commit('gameTicked', data))
       this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
+      this.sockets.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
+      this.sockets.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
       this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
       this.sockets.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
@@ -262,6 +276,18 @@ export default {
           }
         ]
       })
+    },
+    onGamePlayerRoomJoined (data) {
+      let player = GameHelper.getPlayerById(this.$store.state.game, data.playerId)
+
+      player.lastSeen = moment().utc()
+      player.isOnline = true
+    },
+    onGamePlayerRoomLeft (data) {
+      let player = GameHelper.getPlayerById(this.$store.state.game, data.playerId)
+
+      player.lastSeen = moment().utc()
+      player.isOnline = false
     }
   },
   computed: {

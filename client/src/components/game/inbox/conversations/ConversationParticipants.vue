@@ -2,7 +2,7 @@
 <div class="participant-container">
   <p v-if="isPartialPlayers">
     <span v-for="participant in conversation.participants" :key="participant" class="mr-2">
-      <player-icon :player="getPlayer(participant)"/>
+      <player-icon :playerId="getPlayer(participant)._id"/>
 
       {{getPlayer(participant).alias}}
     </span>

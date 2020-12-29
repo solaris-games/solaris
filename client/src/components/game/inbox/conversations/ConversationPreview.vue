@@ -23,7 +23,7 @@
     <div class="row bg-secondary mt-0">
         <div class="col-12" v-if="hasLastMessage">
             <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
-              <player-icon :player="lastMessageSender"/>
+              <player-icon :playerId="lastMessageSender._id"/>
               {{conversation.lastMessage.message}}
             </p>
         </div>

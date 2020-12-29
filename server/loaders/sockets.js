@@ -14,11 +14,26 @@ module.exports = (server) => {
 
             if (data.playerId) {
                 socket.join(data.playerId);
+
+                // Broadcast to all other players that the player joined the room.
+                socket.to(data.gameId).emit('gamePlayerRoomJoined', {
+                    playerId: data.playerId
+                });
             }
         });
 
-        socket.on('gameRoomLeft', () => {
-            socket.leaveAll()
+        socket.on('gameRoomLeft', (data) => {
+            socket.leave(data.gameId)
+            socket.leave(data.userId)
+
+            if (data.playerId) {
+                socket.leave(data.playerId)
+
+                // Broadcast to all other players that the player left the room.
+                socket.to(data.gameId).emit('gamePlayerRoomLeft', {
+                    playerId: data.playerId
+                });
+            }
         });
     });
 

@@ -2,9 +2,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(gameService, mapService, playerService, starService, distanceService, 
+    constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService) {
+        this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
@@ -217,9 +218,14 @@ module.exports = class GameGalaxyService {
             playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, player);
         }
 
+        let onlinePlayers = this.broadcastService.getOnlinePlayers(doc);
+
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
+            // Work out whether the player is online.
+            p.isOnline = onlinePlayers.find(op => op._id.equals(p._id)) != null;
+
             let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
 
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
@@ -240,6 +246,9 @@ module.exports = class GameGalaxyService {
 
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
+
+                // The user is making the request so they must be online.
+                p.isOnline = true;
 
                 return p;
             }
@@ -287,7 +296,9 @@ module.exports = class GameGalaxyService {
                 alias: p.alias,
                 avatar: p.avatar,
                 homeStarId: p.homeStarId,
-                stats: p.stats
+                stats: p.stats,
+                lastSeen: p.lastSeen,
+                isOnline: p.isOnline
             };
         });
     }

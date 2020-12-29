@@ -56,7 +56,7 @@
                 class="btn mr-1 mb-1"
                 :class="{'btn-primary': playerFilter.enabled}"
                 @click="togglePlayerFilter(playerFilter)">
-                <player-icon :player="playerFilter" style="margin-top:0px;margin-right:0px;"/>
+                <player-icon :playerId="playerFilter._id" style="margin-top:0px;margin-right:0px;"/>
               </button>
             </div>
         </div>

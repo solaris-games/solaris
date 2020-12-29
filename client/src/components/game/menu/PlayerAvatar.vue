@@ -3,7 +3,7 @@
         <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
         <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:44px;"></i>
         <span v-if="canShowShapeIcon()" class="shapeIcon">
-          <player-icon :player="player"/>
+          <player-icon :playerId="player._id"/>
         </span>
         <i v-if="player.userId" class="userIcon fas fa-user"></i>
         <i v-if="showMedals && isFirstPlace()" class="medalIcon gold fas fa-medal"></i>

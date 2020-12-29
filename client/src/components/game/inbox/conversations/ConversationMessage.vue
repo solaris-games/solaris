@@ -5,7 +5,7 @@
     <div class="row mt-0 bg-secondary" v-if="message">
       <div class="col mt-1">
         <span>
-          <player-icon :player="fromPlayer"/>
+          <player-icon :playerId="fromPlayer._id"/>
           <strong class="ml-2">{{fromPlayer.alias}}</strong>
         </span>
       </div>
