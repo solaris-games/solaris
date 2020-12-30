@@ -138,8 +138,8 @@ class Map extends EventEmitter {
       existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
-      this.carrierContainer.removeChild(existing.container)
       this.carrierContainer.removeChild(existing.fixedContainer)
+      this.carrierContainer.removeChild(existing.container)
 
       this.carriers.splice(this.carriers.indexOf(existing), 1)
     }
@@ -151,8 +151,8 @@ class Map extends EventEmitter {
 
     this.carriers.push(carrier)
 
-    this.carrierContainer.addChild(carrier.container)
     this.carrierContainer.addChild(carrier.fixedContainer)
+    this.carrierContainer.addChild(carrier.container)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
