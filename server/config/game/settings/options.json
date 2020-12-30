@@ -222,6 +222,10 @@
             {
             "value": 30,
             "text": "30 Stars (Large)"
+            },
+            {
+            "value": 50,
+            "text": "50 Stars (Huge)"
             }
         ],
         "productionTicks": [
