@@ -253,7 +253,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             // If we are currently in orbit then this is the first movement, we
             // need to set the transit fields
-            if (carrier.orbiting) {
+            // Also double check that the waypoint isn't travelling to the current star
+            // that the carrier is in orbit of.
+            if (carrier.orbiting && !carrier.orbiting.equals(waypoint.destination)) {
                 carrier.inTransitFrom = carrier.orbiting;
                 carrier.inTransitTo = waypoint.destination;
                 carrier.orbiting = null; // We are just about to move now so this needs to be null.
