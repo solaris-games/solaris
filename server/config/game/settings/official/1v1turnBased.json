@@ -6,7 +6,8 @@
     "starVictoryPercentage": 66,
     "playerLimit": 2,
     "playerType": "all",
-    "anonymity": "normal"
+    "anonymity": "normal",
+    "playerOnlineStatus": "visible"
   },
   "galaxy": {
     "galaxyType": "circular-balanced",

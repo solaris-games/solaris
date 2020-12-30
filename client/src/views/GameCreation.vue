@@ -57,6 +57,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="playerOnlineStatus" class="col-form-label">Player Online Status</label>
+        <select class="form-control" id="playerOnlineStatus" v-model="settings.general.playerOnlineStatus" :disabled="isCreatingGame">
+          <option v-for="opt in options.general.playerOnlineStatus" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <form-error-list v-bind:errors="errors"/>
 
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>

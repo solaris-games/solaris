@@ -218,14 +218,11 @@ module.exports = class GameGalaxyService {
             playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, player);
         }
 
-        let onlinePlayers = this.broadcastService.getOnlinePlayers(doc);
-
+        let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
+        
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
-            // Work out whether the player is online.
-            p.isOnline = onlinePlayers.find(op => op._id.equals(p._id)) != null;
-
             let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
 
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
@@ -247,10 +244,18 @@ module.exports = class GameGalaxyService {
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
 
-                // The user is making the request so they must be online.
-                p.isOnline = true;
-
                 return p;
+            }
+
+            if (!displayOnlineStatus) {
+                p.lastSeen = null;
+                p.isOnline = null;
+            } else {
+                // Work out whether the player is online.
+                let onlinePlayers = this.broadcastService.getOnlinePlayers(doc);
+                
+                p.isOnline = (player && p._id == player._id) 
+                    || onlinePlayers.find(op => op._id.equals(p._id)) != null;
             }
 
             // Return a subset of the user, key info only.

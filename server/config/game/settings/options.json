@@ -45,6 +45,16 @@
             "value": "extra",
             "text": "Extra"
             }
+        ],
+        "playerOnlineStatus": [
+            {
+            "value": "hidden",
+            "text": "Hidden"
+            },
+            {
+            "value": "visible",
+            "text": "Visible"
+            }
         ]
         },
         "specialGalaxy": {

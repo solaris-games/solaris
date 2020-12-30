@@ -53,10 +53,10 @@ export default {
 
     this.$store.commit('clearGame')
 
-    this.subscribeToSockets()
-
     await this.reloadGame()
     await this.reloadSettings()
+
+    this.subscribeToSockets()
 
     // AudioService.download()
 
@@ -184,8 +184,6 @@ export default {
       // TODO: Move all component subscriptions into the components' socket object.
       this.sockets.subscribe('gameTicked', (data) => this.$store.commit('gameTicked', data))
       this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
-      this.sockets.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
-      this.sockets.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
       this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
       this.sockets.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
@@ -199,6 +197,11 @@ export default {
       this.sockets.subscribe('starSpecialistHired', (data) => this.$store.commit('starSpecialistHired', data))
       this.sockets.subscribe('carrierSpecialistHired', (data) => this.$store.commit('carrierSpecialistHired', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
+
+      if (!GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)) {
+        this.sockets.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
+        this.sockets.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
+      }
     },
     unsubscribeToSockets () {
       this.sockets.unsubscribe('gameTicked')

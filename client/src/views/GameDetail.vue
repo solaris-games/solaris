@@ -34,6 +34,10 @@
               <td>Anonymity</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
             </tr>
+            <tr>
+              <td>Player Online Status</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.general.playerOnlineStatus) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -340,7 +344,9 @@ export default {
         'spiral': 'Spiral',
         'doughnut': 'Doughnut',
         'normal': 'Normal',
-        'extra': 'Extra'
+        'extra': 'Extra',
+        'hidden': 'Hidden',
+        'visible': 'Visible'
       }[option]
 
       return text || option

@@ -24,7 +24,9 @@ export default {
   mounted () {
     this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
-    if (!this.hideOnlineStatus) {
+    let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
+
+    if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
       this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
     }
   },
@@ -36,7 +38,10 @@ export default {
       return GameHelper.getFriendlyColour(this.player.colour.value)
     },
     recalculateOnlineStatus () {
-      if (this.player.isOnline) {
+      if (this.player.isOnline == null) {
+        this.onlineStatus = ''
+      }
+      else if (this.player.isOnline) {
         this.onlineStatus = 'Online Now'
       }
       else {
@@ -46,15 +51,17 @@ export default {
   },
   computed: {
     glyph () {
+      let unknownStatus = this.player.isOnline == null
+
       switch (this.player.shape) {
           case 'circle': 
-            return this.solidGlyphOnly || this.player.isOnline ? '●' : '○'
+            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '●' : '○'
           case 'square':
-            return this.solidGlyphOnly || this.player.isOnline ? '■' : '□'
+            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '■' : '□'
           case 'diamond':
-            return this.solidGlyphOnly || this.player.isOnline ? '♦' : '◇'
+            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '♦' : '◇'
           case 'hexagon':
-            return this.solidGlyphOnly || this.player.isOnline ? '⬢' : '⬡'
+            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '⬢' : '⬡'
         }
     }
   }

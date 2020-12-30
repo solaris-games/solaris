@@ -372,6 +372,10 @@ class GameHelper {
     return game.settings.general.anonymity === 'normal'
   }
 
+  isHiddenPlayerOnlineStatus (game) {
+    return game.settings.general.playerOnlineStatus === 'hidden'
+  }
+
   calculateGalaxyCenterX (game) {
     let starFieldLeft = this.calculateMinStarX(game)
     let starFieldRight = this.calculateMaxStarX(game)
