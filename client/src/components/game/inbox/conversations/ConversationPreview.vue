@@ -8,15 +8,20 @@
               {{conversation.name}}
           </span>
         </div>
+        <div class="col-auto player-icons" v-if="!isAllPlayersConversation">
+          <small v-for="participant in conversation.participants" :key="participant">
+            <player-icon :playerId="participant"/>
+          </small>
+        </div>
         <div class="col-auto">
-            <small v-if="!hasReadLastMessage && conversation.unreadCount">
-              <i class="fas fa-envelope"></i>
-              {{conversation.unreadCount}}
-            </small>
-            <small>
-              <i class="fas fa-user"></i>
-              {{conversation.participants.length}}
-            </small>
+          <small v-if="!hasReadLastMessage && conversation.unreadCount">
+            <i class="fas fa-envelope"></i>
+            {{conversation.unreadCount}}
+          </small>
+          <small>
+            <i class="fas fa-user"></i>
+            {{conversation.participants.length}}
+          </small>
         </div>
     </div>
     <!-- <div class="row mt-1" :style="{'background-color': colour}" style="height:6px;"></div> -->
@@ -85,6 +90,11 @@ export default {
 <style scoped>
 .container {
     cursor: pointer;
+}
+
+.player-icons {
+  margin-top: 3px;
+  margin-bottom: -3px;
 }
 
 .truncate {
