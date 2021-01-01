@@ -249,17 +249,17 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
+    this.graphics_shape_part.clear()
+    this.graphics_shape_full.clear()
+    this.graphics_shape_part_warp.clear()
+    this.graphics_shape_full_warp.clear()
+
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
     if (!player) {
       return
     }
-
-    this.graphics_shape_part.clear()
-    this.graphics_shape_full.clear()
-    this.graphics_shape_part_warp.clear()
-    this.graphics_shape_full_warp.clear()
 
     this.graphics_shape_part.lineStyle(3, player.colour.value)
     this.graphics_shape_full.lineStyle(3, player.colour.value)

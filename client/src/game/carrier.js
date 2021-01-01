@@ -104,8 +104,13 @@ class Carrier extends EventEmitter {
     }
 
     if (!this.text_garrison) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
+      let style = new PIXI.TextStyle({
+        fontFamily: `'Space Mono', monospace`,
+        fill: 0xFFFFFF,
+        padding: 3,
+        fontSize: 4,
+        fontWeight: 'bold'
+      })
 
       let totalGarrison = this.data.ships == null ? '???' : this.data.ships
       
