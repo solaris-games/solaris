@@ -583,8 +583,8 @@ class Map extends EventEmitter {
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
 
-    this.territories.refreshZoom(zoomPercent)
-    this.background.refreshZoom(zoomPercent)
+    if (this.territories) this.territories.refreshZoom(zoomPercent)
+    if (this.background) this.background.refreshZoom(zoomPercent)
   }
 }
 
