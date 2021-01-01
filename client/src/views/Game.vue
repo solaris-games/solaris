@@ -53,8 +53,8 @@ export default {
 
     this.$store.commit('clearGame')
 
-    await this.reloadGame()
     await this.reloadSettings()
+    await this.reloadGame()
 
     this.subscribeToSockets()
 
