@@ -178,6 +178,20 @@ class GameContainer {
     this.map.resetMode()
   }
 
+  resize () {
+    this.app.renderer.resize(
+      window.innerWidth,
+      window.innerHeight
+    )
+
+    this.viewport.resize(
+      window.innerWidth,
+      window.innerHeight,
+      Number.MAX_VALUE,
+      Number.MAX_VALUE
+    )
+  }
+
 }
 
 export default new GameContainer()

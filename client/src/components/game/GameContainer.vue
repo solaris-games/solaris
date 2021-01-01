@@ -93,10 +93,7 @@ export default {
       }
     },
     handleResize (e) {
-      this.gameContainer.app.renderer.resize(
-        window.innerWidth,
-        window.innerHeight
-      )
+      this.gameContainer.resize()
     },
     onStarClicked (e) {
       this.$emit('onStarClicked', e._id)
