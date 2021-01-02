@@ -104,7 +104,14 @@ module.exports = (router, io, container) => {
                         if (!p._id.equals(req.player._id)) {
                             let starsInScanningRange = container.starService.filterStarsByScanningRange(req.game, p);
         
-                            broadcastSummary.stars = broadcastSummary.stars.filter(s => starsInScanningRange.find(sr => sr._id.equals(s._id)) != null);
+                            broadcastSummary.stars = broadcastSummary.stars
+                                .filter(s => starsInScanningRange.find(sr => sr._id.equals(s.starId)) != null)
+                                .map(s => {
+                                    return {
+                                        starId: s.starId,
+                                        infrastructure: s.infrastructure
+                                    }
+                                });
                         }
         
                         container.broadcastService.gameStarBulkUpgraded(req.game, p._id, broadcastSummary);

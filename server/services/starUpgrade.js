@@ -372,7 +372,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
             if (!summaryStar) {
                 summaryStar = {
-                    starId: upgradeStar.star._id
+                    starId: upgradeStar.star._id,
+                    naturalResources: upgradeStar.star.naturalResources
                 }
 
                 upgradeSummary.stars.push(summaryStar);
@@ -449,7 +450,12 @@ module.exports = class StarUpgradeService extends EventEmitter {
         });
 
         // TODO: Append the new infrastructure costs to all stars that were upgraded.
-        // See setUpgradeCosts below.
+        // See setUpgradeCosts below. 
+        for (let star of upgradeSummary.stars) {
+            let terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level)
+
+            star.upgradeCost = calculateCostFunction(game, expenseConfig, star.infrastructure, terraformedResources)
+        }
 
         return upgradeSummary;
     }
