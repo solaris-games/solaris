@@ -147,8 +147,7 @@ module.exports = class PlayerService extends EventEmitter {
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
         let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
 
-        // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
+        const distanceFromCenter = this._getPlayerDistanceFromCenter(game, starLocations);
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
@@ -160,6 +159,22 @@ module.exports = class PlayerService extends EventEmitter {
             // Set up the home star
             this.starService.setupHomeStar(game, homeStar, player, game.settings);
         }
+    }
+
+    _getPlayerDistanceFromCenter(game, starLocations) {
+        let distanceFromCenter;
+
+        // doughnut galaxies the distance from the center needs to be slightly more than others
+        if (game.settings.galaxy.galaxyType === 'doughnut') {
+            distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 1.5;
+        }
+        else {
+            // The desired distance from the center is half way from the galaxy center and the edge
+            // for all galaxies other than doughnut.
+            distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
+        }
+
+        return distanceFromCenter;
     }
 
     _distributePlayerLinkedStartingStars(game, players) {

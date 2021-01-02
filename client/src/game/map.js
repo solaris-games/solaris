@@ -163,12 +163,11 @@ class Map extends EventEmitter {
   }
 
   draw () {
-    this.drawStars()
-    this.drawCarriers()
-
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
     } else {
+      this.drawStars()
+      this.drawCarriers()
       this.clearWaypoints()
     }
 
@@ -214,34 +213,49 @@ class Map extends EventEmitter {
 
 
   _disableCarriersInteractivity() {
-    this.carriers.forEach( c => c.disableInteractivity() )
+    for (let i = 0; i < this.carriers.length; i++) {
+      let c = this.carriers[i]
+
+      c.disableInteractivity()
+    }
   }
 
   _enableCarriersInteractivity() {
-    this.carriers.forEach( c => c.enableInteractivity() )
+    for (let i = 0; i < this.carriers.length; i++) {
+      let c = this.carriers[i]
+
+      c.enableInteractivity()
+    }
   }
 
 
   setMode (mode, args) {
+    let wasWaypoints = this.mode === 'waypoints'
+
     this.mode = mode
     this.modeArgs = args
 
-    if (this.mode !== 'galaxy') {
-      this.unselectAllCarriers()
-      this.unselectAllStars()
-    }
-    if (this.mode == 'waypoints') {
+    this.unselectAllCarriers()
+    this.unselectAllStars()
+    this.clearWaypoints()
+    this.clearRulerPoints()
+
+    if (this.mode === 'waypoints') {
       this._disableCarriersInteractivity()
+      this.drawWaypoints()
     }
-    else {
+
+    if (wasWaypoints) {
       this._enableCarriersInteractivity()
     }
 
-    this.draw()
+    if (this.mode === 'ruler') {
+      this.drawRulerPoints()
+    }
   }
 
   resetMode () {
-    this.setMode( 'galaxy', this.modeArgs )
+    this.setMode('galaxy', this.modeArgs)
   }
 
   drawStars () {
@@ -286,6 +300,12 @@ class Map extends EventEmitter {
 
   drawWaypoints () {
     this.waypoints.draw(this.modeArgs)
+
+    for (let i = 0; i < this.carriers.length; i++) {
+      let c = this.carriers[i]
+
+      c.drawCarrierWaypoints()
+    }
   }
 
   clearWaypoints () {
@@ -357,19 +377,21 @@ class Map extends EventEmitter {
   }
 
   unselectAllStars () {
-    this.stars
-      .forEach(s => {
-        s.isSelected = false
-        s.updateVisibility() // Should be fine to pass in false for force
-      })
+    for (let i = 0; i < this.stars.length; i++) {
+      let s = this.stars[i]
+
+      s.isSelected = false
+      s.updateVisibility() // Should be fine to pass in false for force
+    }
   }
 
   unselectAllCarriers () {
-    this.carriers
-      .forEach(c => {
-        c.isSelected = false
-        c.updateVisibility()
-      })
+    for (let i = 0; i < this.carriers.length; i++) {
+      let c = this.carriers[i]
+
+      c.isSelected = false
+      c.updateVisibility()
+    }
   }
 
   unselectAllStarsExcept (star) {

@@ -106,7 +106,6 @@ export default {
       }
     },
     onConversationLeft (e) {
-      debugger
       if (e.conversationId === this.conversation._id) {
         this.conversation.participants.splice(this.conversation.participants.indexOf(e.playerId), 1)
       }

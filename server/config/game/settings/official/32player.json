@@ -22,7 +22,7 @@
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
-    "playerDistribution": "random"
+    "playerDistribution": "circular"
   },
   "player": {
     "startingStars": 6,

@@ -118,7 +118,7 @@ export default {
       if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
         this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
 
-        GameContainer.draw()
+        GameContainer.drawWaypoints()
       }
 
       if (!this.carrier.waypoints.length) {

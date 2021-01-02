@@ -46,14 +46,14 @@ class Waypoints extends EventEmitter {
     // Calculate which stars are in reach and draw highlights around them
     const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
 
-    let stars = this.game.galaxy.stars.filter(s => {
+    for (let i = 0; i < this.game.galaxy.stars.length; i++) {
+      let s = this.game.galaxy.stars[i]
+
       let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
 
-      return distance <= hyperspaceDistance
-    })
-
-    for (let i = 0; i < stars.length; i++) {
-      this._highlightLocation(stars[i].location, 0.3)
+      if (distance <= hyperspaceDistance) {
+        this._highlightLocation(s.location, 0.3)
+      }
     }
   }
 

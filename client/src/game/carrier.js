@@ -194,8 +194,8 @@ class Carrier extends EventEmitter {
   }
 
   disableInteractivity() {
-   this.container.interactive = false
-   this.container.buttonMode = false
+    this.container.interactive = false
+    this.container.buttonMode = false
   }
 
   onTick( deltaTime, zoomPercent, viewportData) {

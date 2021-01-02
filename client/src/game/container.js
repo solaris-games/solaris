@@ -129,6 +129,10 @@ class GameContainer {
     this.map.draw()
   }
 
+  drawWaypoints () {
+    this.map.drawWaypoints()
+  }
+
   reloadGame (game, userSettings) {
     this.game = game
     this.userSettings = userSettings
