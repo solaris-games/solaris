@@ -181,7 +181,11 @@ export default new Vuex.Store({
           player.research[reportExperiment.technology].progress = reportExperiment.progress
         }
 
-        // Update the current research ETA
+        // Update the current research and ETA
+        if (reportExperiment.currentResearchTechnology != null) {
+          player.researchingNow = reportExperiment.currentResearchTechnology
+        }
+
         if (reportExperiment.currentResearchTicksEta != null) {
           player.currentResearchTicksEta = reportExperiment.currentResearchTicksEta
         }

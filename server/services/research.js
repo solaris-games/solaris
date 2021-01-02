@@ -185,7 +185,8 @@ module.exports = class ResearchService extends EventEmitter {
             progress: tech.technology.progress,
             amount: researchAmount,
             levelUp,
-            currentResearchTicksEta
+            currentResearchTicksEta,
+            currentResearchTechnology: player.researchingNow
         };
     }
 
@@ -201,6 +202,8 @@ module.exports = class ResearchService extends EventEmitter {
         } else {
             player.researchingNow = player.researchingNext;
         }
+
+        return player.researchingNow;
     }
 
     _getRandomTechnology(game, player) {

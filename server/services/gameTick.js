@@ -1030,6 +1030,7 @@ module.exports = class GameTickService extends EventEmitter {
                     delete r.progress; // Remove the new research progress if it isn't the current player.
                     delete r.amount; // Remove the experiment amount if it isn't the current player.
                     delete r.currentResearchTicksEta;
+                    delete r.currentResearchTechnology;
                 }
                 
                 return r;
