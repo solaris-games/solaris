@@ -5,6 +5,7 @@ module.exports = async (container) => {
 
     const gameTickJob = require('../jobs/gameTick')(container);
     const officialGamesCheckJob = require('../jobs/officialGamesCheck')(container);
+    const cleanupOldGamesJob = require('../jobs/cleanupOldGames')(container);
     
     // Set up the agenda instance.
     const agendajs = new Agenda()
@@ -28,6 +29,12 @@ module.exports = async (container) => {
         priority: 'high', concurrency: 1
     },
     officialGamesCheckJob.handler);
+
+    // Cleanup old games
+    // agendajs.define('cleanup-old-games', {
+    //     priority: 'high', concurrency: 1
+    // },
+    // cleanupOldGamesJob.handler);
 
     // ...
 

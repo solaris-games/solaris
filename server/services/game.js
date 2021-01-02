@@ -264,23 +264,26 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    async delete(game, userId) {
-        if (game.state.startDate) {
+    async delete(game, deletedByUserId) {
+        // If being deleted by a legit user then do some validation.
+        if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
         }
 
-        if (!game.settings.general.createdByUserId.equals(userId)) {
+        if (deletedByUserId && !game.settings.general.createdByUserId.equals(deletedByUserId)) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 
-        // Deduct "joined" count for all players who already joined the game.
-        for (let player of game.galaxy.players) {
-            if (player.userId) {
-                let user = await this.userService.getById(player.userId);
-
-                user.achievements.joined--;
-
-                await user.save();
+        if (deletedByUserId) {
+            // Deduct "joined" count for all players who already joined the game.
+            for (let player of game.galaxy.players) {
+                if (player.userId) {
+                    let user = await this.userService.getById(player.userId);
+    
+                    user.achievements.joined--;
+    
+                    await user.save();
+                }
             }
         }
 

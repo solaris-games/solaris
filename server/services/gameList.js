@@ -85,6 +85,15 @@ module.exports = class GameListService {
         .exec();
     }
 
+    async listOldCompletedGames() {
+        let date = moment().subtract(3, 'month');
+
+        return await this.gameModel.find({
+            'state.endDate': { $lt: date }
+        })
+        .exec();
+    }
+
     async listInProgressGames() {
         return await this.gameModel.find({
             'state.startDate': { $lte: moment().utc().toDate() },
