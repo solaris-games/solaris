@@ -85,6 +85,8 @@
         Click on the star to view it in detail.
       </p>
 
+      <img :src="require('../assets/screenshots/codex/star1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="A star displayed on the map"/>
+
       <p>If star has a warp gate then it will be displayed with an additional halo.</p>
 
       <p>
@@ -92,11 +94,15 @@
         circular spikey ring around the star and the Scanning Range is displayed as a solid circle around the star.
       </p>
 
+      <img :src="require('../assets/screenshots/codex/star2.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="A star's scanning and hyperspace range"/>
+
       <h5>Carriers</h5>
       <p>
         Carriers are displayed as small ship icons with a circular coloured halo, much like stars. The number of ships that a carrier
         has will be displayed when zoomed in. Click on the carrier to view it in detail.
       </p>
+
+      <img :src="require('../assets/screenshots/codex/carrier1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="Carriers on the map"/>
 
       <p>
         Carriers that have waypoints will have a line drawn to their destination. If those waypoints are looped then the line will be
@@ -108,6 +114,12 @@
         If a star or carrier has a specialist, the specialist icon will be displayed instead of the standard star/carrier icon. To view
         the specialist in detail, click on the star/carrier and scroll to the "Specialist" section.
       </p>
+
+      <h5>Galaxy Territories</h5>
+      <p>If you zoom far out the territories held by players will be visible. This gives you a good indication of where empires are located,
+        and you will be able to identify strong areas and weak points.</p>
+
+      <img :src="require('../assets/screenshots/codex/map1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="Galaxy territories"/>
     </div>
 
     <div ref="stars">
@@ -128,6 +140,8 @@
         Click on a star to view the star detail, this screen displays all information related to a star.
         For example who owns the star, how many resources it has, its infrastructure and what carriers are in orbit.
       </p>
+
+      <img :src="require('../assets/screenshots/codex/star3.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The star detail screen (compact mode)"/>
 
       <p>
         A star's natural resources determines how many credits it will cost to build infrastructure. The higher
@@ -153,6 +167,8 @@
         to receive the speed boost.
       </p>
 
+      <img :src="require('../assets/screenshots/codex/star4.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="A star with a warp gate"/>
+
       <p>
         You may choose to <strong>abandon a star</strong>, in which case all Carriers and Ships at the star will be destroyed
         and all infrastructure will remain intact, including a warp gate if present. The warp gate will be inactive so it will
@@ -172,6 +188,8 @@
         <li><strong>Industry</strong> - Increases ship production rate.</li>
         <li><strong>Science</strong> - Increases research speed. Each point of Science will generate one research point per tick for the chosen current technology that is being researched.</li>
       </ul>
+
+      <img :src="require('../assets/screenshots/codex/star5.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="Star upgrade infrastructure"/>
     </div>
 
     <div ref="carriers">
@@ -191,6 +209,8 @@
         <li>Upgrade Carriers with Specialists to grant special abilities.</li>
       </ul>
 
+      <img :src="require('../assets/screenshots/codex/carrier2.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The carrier detail screen (compact mode)"/>
+
       <p>
         By default a Carrier will transfer <strong>all</strong> garrisoned Ships at the Star it was built at,
         this can be configured in the menu settings.
@@ -209,6 +229,8 @@
         Combat occurs when a Carrier arrives at an enemy Star or when a Carrier intercepts an enemy Carrier in hyperspace.
         The combat summary can be viewed in the event log.
       </p>
+
+      <img :src="require('../assets/screenshots/codex/eventlog1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="A combat event"/>
 
       <p>
         When 2 opposing Carriers arrive at a Star on the same tick, the Carrier that travelled the <strong>least</strong>
@@ -245,6 +267,8 @@
         Open the <strong>Research</strong> screen to view the current research and set the next research. The types
         of technologies are as follows:
       </p>
+
+      <img :src="require('../assets/screenshots/codex/research1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The research screen"/>
 
       <ul>
         <li><strong>Scanning</strong> - Improves the visibile range a star can see.</li>
@@ -317,4 +341,25 @@ export default {
 </script>
 
 <style scoped>
+img {
+  height:auto;
+}
+
+.img-sm {
+  max-width: 50%;
+}
+
+.img-md {
+  max-width: 75%;
+}
+
+.img-lg {
+  max-width: 100%;
+}
+
+@media(max-width: 576px) {
+  .img-sm, .img-md, .img-lg {
+    max-width: 100% !important;
+  }
+}
 </style>
