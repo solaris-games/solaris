@@ -48,6 +48,9 @@ const game = {
                 weapons: 'standard'
             }
         },
+        galaxy: {
+            galaxyType: 'circular'
+        },
         specialGalaxy: {
             playerDistribution: 'circular'
         }
