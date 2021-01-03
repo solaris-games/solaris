@@ -17,7 +17,7 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
-    "darkGalaxy": "enabled",
+    "darkGalaxy": "start",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",

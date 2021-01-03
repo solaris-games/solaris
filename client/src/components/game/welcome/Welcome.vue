@@ -10,7 +10,7 @@
 
     <loading-spinner :loading="isJoiningGame"/>
 
-    <select-colour v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+    <select-colour v-if="!isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <share-link/>
 </div>
