@@ -4,7 +4,7 @@
     <div class="row mt-0" :style="{'background-color': getFriendlyColour(fromPlayer.colour.value)}" style="height:6px;"></div>
     <div class="row mt-0 bg-secondary" v-if="message">
       <div class="col mt-1">
-        <span>
+        <span class="pointer" @click="onOpenPlayerDetailRequested(fromPlayer)">
           <player-icon :playerId="fromPlayer._id"/>
           <strong class="ml-2">{{fromPlayer.alias}}</strong>
         </span>
@@ -45,6 +45,9 @@ export default {
     },
     getFriendlyColour (colour) {
       return GameHelper.getFriendlyColour(colour)
+    },
+    onOpenPlayerDetailRequested (player) {
+      this.$emit('onOpenPlayerDetailRequested', player._id)
     }
   },
   computed: {
@@ -70,5 +73,9 @@ export default {
 .right-message {
   width: 85%;
   margin-right:0;
+}
+
+.pointer {
+  cursor: pointer;
 }
 </style>

@@ -141,6 +141,7 @@ export default {
     },
     panToPlayer (player) {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
+      this.onOpenPlayerDetailRequested(player)
     },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)

@@ -88,6 +88,9 @@ export default {
     this.currentWaypoint = this.waypoints.find(x => x._id === this.waypoint._id)
     this.panToWaypoint()
   },
+  destroyed () {
+    GameContainer.map.clearHighlightedLocations()
+  },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
@@ -157,9 +160,12 @@ export default {
       this.panToWaypoint()
     },
     panToWaypoint () {
+      GameContainer.map.clearHighlightedLocations()
+      
       let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
 
       GameContainer.map.panToStar(star)
+      GameContainer.map.highlightLocation(star.location)
     },
     toggleLooped () {
       this.carrier.waypointsLooped = !this.carrier.waypointsLooped

@@ -11,10 +11,13 @@
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
                 <!-- TODO: Figure out how to open the conversation with the player -->
-                <!-- <button class="btn btn-success" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"><i class="fas fa-envelope"></i></button> -->
-                <button class="btn btn-info ml-1" :disabled="!gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
+                <button class="btn btn-success mr-1" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"
+                  :class="{'btn-warning': conversation && conversation.unreadCount}">
+                  <i class="fas fa-envelope"></i>
+                  <span v-if="conversation && conversation.unreadCount" class="ml-1">{{conversation.unreadCount}}</span>
+                </button>
+                <button class="btn btn-info" :disabled="!gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
                   <i class="fas fa-chart-line"></i>
-                  Intel
                 </button>
               </div>
           </div>
@@ -30,6 +33,7 @@
 import Statistics from './Statistics'
 import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
+import ConversationApiService from '../../../services/api/conversation'
 
 export default {
   components: {
@@ -41,24 +45,53 @@ export default {
   },
   data () {
     return {
+      userPlayer: null,
       player: null,
-      gameHasStarted: null
+      gameHasStarted: null,
+      conversation: null
     }
   },
-  mounted () {
+  async mounted () {
+    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
     this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
     this.gameHasStarted = this.$store.state.game.state.startDate != null
+
+    await this.loadConversation()
   },
   methods: {
     onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', this.player._id)
+      if (this.conversation) {
+        this.$emit('onViewConversationRequested', {
+          conversationId: this.conversation._id
+        })
+      } else {
+        this.$emit('onViewConversationRequested', {
+          participantIds: [
+            this.userPlayer._id,
+            this.player._id
+          ]
+        })
+      }
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', this.player._id)
     },
     getAvatarImage () {
       return require(`../../../assets/avatars/${this.player.avatar}.png`)
+    },
+    async loadConversation () {
+      if (this.userPlayer && this.userPlayer._id !== this.player._id) {
+        try {
+          let response = await ConversationApiService.privateChatSummary(this.$store.state.game._id, this.player._id)
+
+          if (response.status === 200) {
+            this.conversation = response.data
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      }
     }
   }
 }

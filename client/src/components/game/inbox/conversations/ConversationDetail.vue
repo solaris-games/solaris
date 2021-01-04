@@ -12,7 +12,7 @@
 
     <div class="pt-0 mb-2 mt-2 messages-container" v-if="conversation.messages.length">
       <div v-for="message in conversation.messages" v-bind:key="message._id" class="mb-1">
-        <conversation-message v-if="message.type === 'message'" :message="message"/>
+        <conversation-message v-if="message.type === 'message'" :message="message" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <conversation-trade-event v-if="message.type !== 'message'" :event="message"/>
       </div>
     </div>
@@ -81,6 +81,9 @@ export default {
     },
     onOpenInboxRequested (e) {
       this.$emit('onOpenInboxRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     onConversationMessageSent (e) {
       this.conversation.messages.push(e)

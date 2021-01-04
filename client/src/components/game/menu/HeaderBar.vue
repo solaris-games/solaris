@@ -192,6 +192,10 @@ export default {
     },
     panToHomeStar () {
       GameContainer.map.panToUser(this.$store.state.game)
+
+      if (this.userPlayer) {
+        this.$emit('onOpenPlayerDetailRequested', this.userPlayer._id)
+      }
     },
     recalculateTimeRemaining () {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {

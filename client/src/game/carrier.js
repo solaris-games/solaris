@@ -252,8 +252,10 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
+    let displayTextZoom = 150
+
     this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > 200 || (this.isSelected && this.zoomPercent > 200 ) || (this.isMouseOver && this.zoomPercent >200))
+    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > displayTextZoom || (this.isSelected && this.zoomPercent > displayTextZoom ) || (this.isMouseOver && this.zoomPercent > displayTextZoom))
   }
 
   deselectAllText () {

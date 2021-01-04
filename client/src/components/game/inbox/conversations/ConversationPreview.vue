@@ -67,7 +67,9 @@ export default {
       return GameHelper.getFriendlyColour(colour)
     },
     openConversation () {
-      this.$emit('onOpenConversationRequested', this.conversation._id)
+      this.$emit('onViewConversationRequested', {
+        conversationId: this.conversation._id
+      })
     }
   },
   computed: {

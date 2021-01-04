@@ -47,6 +47,9 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'form-error-list': FormErrorList
   },
+  props: {
+    participantIds: Array
+  },
   data () {
     return {
       isLoading: false,
@@ -60,6 +63,11 @@ export default {
     let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.possibleParticipants = this.$store.state.game.galaxy.players.filter(p => p._id !== userPlayer._id)
+
+    // Pre-select any participants passed into the props.
+    if (this.participantIds && this.participantIds.length) {
+      this.participants = this.participantIds
+    }
   },
   methods: {
     onCloseRequested (e) {
@@ -89,7 +97,9 @@ export default {
         let response = await ConversationApiService.create(this.$store.state.game._id, this.name, this.participants)
 
         if (response.status === 200) {
-          this.$emit('onOpenConversationRequested', response.data._id)
+          this.$emit('onViewConversationRequested', {
+            conversationId: response.data._id
+          })
         }
       } catch (err) {
         console.error(err)

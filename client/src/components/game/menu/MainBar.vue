@@ -1,6 +1,8 @@
 <template>
 <div>
-  <header-bar class="header-bar" @onMenuStateChanged="onMenuStateChanged"/>
+  <header-bar class="header-bar" 
+    @onMenuStateChanged="onMenuStateChanged"
+    @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
   <div class="menu">
     <div class="header-buffer"></div>
@@ -16,13 +18,13 @@
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
-        @onViewConversationRequested="onOpenConversationRequested"
+        @onViewConversationRequested="onViewConversationRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onViewConversationRequested="onOpenConversationRequested"
+        @onViewConversationRequested="onViewConversationRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -34,7 +36,7 @@
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
-        @onViewConversationRequested="onOpenConversationRequested"
+        @onViewConversationRequested="onViewConversationRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -57,7 +59,7 @@
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX"
         @onCloseRequested="onCloseRequested"
-        @onOpenConversationRequested="onOpenConversationRequested"
+        @onViewConversationRequested="onViewConversationRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
@@ -91,14 +93,16 @@
       <options v-if="menuState == MENU_STATES.OPTIONS"
         @onCloseRequested="onCloseRequested"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
+        :participantIds="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenInboxRequested="onOpenInboxRequested"
-        @onOpenConversationRequested="onOpenConversationRequested"/>
+        @onViewConversationRequested="onViewConversationRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION"
         :conversationId="menuArguments"
         :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onOpenInboxRequested="onOpenInboxRequested"/>
+        @onOpenInboxRequested="onOpenInboxRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
   </div>
 </div>
@@ -185,11 +189,12 @@ export default {
     onCloseRequested (e) {
       this.changeMenuState(null, null)
     },
-    onOpenConversationRequested (e) {
-      // TODO: What if this is called via the player screen? Should we
-      // open the first available convo between the two players? Or should
-      // we just open the inbox?
-      this.changeMenuState(MENU_STATES.CONVERSATION, e)
+    onViewConversationRequested (e) {
+      if (e.conversationId) {
+        this.changeMenuState(MENU_STATES.CONVERSATION, e.conversationId)
+      } else if (e.participantIds) {
+        this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
+      }
     },
     onViewCompareIntelRequested (e) {
       this.changeMenuState(MENU_STATES.INTEL, e)

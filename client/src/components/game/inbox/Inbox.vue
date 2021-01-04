@@ -16,7 +16,7 @@
     <div class="tab-content pt-2">
         <div class="tab-pane fade show active" id="diplomacy">
             <conversation-list 
-              @onOpenConversationRequested="onOpenConversationRequested"
+              @onViewConversationRequested="onViewConversationRequested"
               @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
         </div>
         <div class="tab-pane fade" id="events">
@@ -44,11 +44,11 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onOpenConversationRequested (e) {
-      this.$emit('onOpenConversationRequested', e)
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', e)
     },
-    onOpenConversationRequested (e) {
-      this.$emit('onOpenConversationRequested', e)
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', e)
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)

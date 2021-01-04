@@ -8,6 +8,11 @@ class ConversationService extends BaseApiService {
       { withCredentials: true })
   }
 
+  privateChatSummary (gameId, withPlayerId) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/conversations/private/' + withPlayerId,
+      { withCredentials: true })
+  }
+
   detail (gameId, conversationId) {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId,
       { withCredentials: true })

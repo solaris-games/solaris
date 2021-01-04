@@ -121,6 +121,21 @@ module.exports = class ConversationService extends EventEmitter {
         return convos;
     }
 
+    // Gets the summary of a single chat (if exists) between two players
+    async privateChatSummary(game, playerIdA, playerIdB) {
+        let convos = await this.list(game, playerIdA)
+
+        // Find the chat with the other participant
+        let convo = convos
+            .filter(c => c.participants.length === 2)
+            .find(c => {
+                return c.participants.find(a => a.toString() === playerIdA.toString())
+                    && c.participants.find(b => b.toString() === playerIdB.toString())
+            });
+
+        return convo || null;
+    }
+
     async detail(game, playerId, conversationId, includeEvents = true) {
         // Get the conversation that the player has requested in full.
         let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
@@ -152,6 +167,12 @@ module.exports = class ConversationService extends EventEmitter {
     }
 
     async send(game, playerId, conversationId, message) {
+        message = message.trim()
+
+        if (message === '') {
+            throw new ValidationError(`Message must not be empty.`);
+        }
+
         let convo = await this.detail(game, playerId, conversationId, false); // Call this for the validation.
 
         let newMessage = {

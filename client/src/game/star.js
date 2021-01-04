@@ -586,24 +586,29 @@ class Star extends EventEmitter {
       
       if (this._getStarPlayer()) {
         this.updateVisibility()
+        // this.setScale()
       }
     }
   }
 
   updateVisibility() {
+    const displayTextZoom = 150
+
     this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_shape_part.visible = this.zoomPercent > 200
-    this.graphics_shape_full.visible = this.zoomPercent <= 200
-    this.graphics_shape_part_warp.visible = this.zoomPercent > 200 && this.data.warpGate
-    this.graphics_shape_full_warp.visible = this.zoomPercent <= 200 && this.data.warpGate
+    this.graphics_shape_part.visible = this.zoomPercent > displayTextZoom
+    this.graphics_shape_full.visible = this.zoomPercent <= displayTextZoom
+    this.graphics_shape_part_warp.visible = this.zoomPercent > displayTextZoom && this.data.warpGate
+    this.graphics_shape_full_warp.visible = this.zoomPercent <= displayTextZoom && this.data.warpGate
     this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
     this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > 200
+    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
 
-    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent > 200
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > 200
-    if (this.text_infrastructure) this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > 200
-    if (this.text_garrison) this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > 200)
+    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent > displayTextZoom
+    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
+    if (this.text_infrastructure) this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > displayTextZoom
+    if (this.text_garrison) this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > displayTextZoom)
+
+    // this.baseScale = this.isSelected ? 1.5 : 1
   }
 
   deselectAllText () {

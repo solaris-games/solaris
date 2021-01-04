@@ -27,7 +27,7 @@
           :conversation="conversation"
           :isTruncated="true"
           :isFullWidth="true"
-          @onOpenConversationRequested="onOpenConversationRequested"
+          @onViewConversationRequested="onViewConversationRequested"
           class="mb-2"/>
     </div>
   </div>
@@ -120,8 +120,8 @@ export default {
     //     console.error(e)
     //   }
     // },
-    onOpenConversationRequested (e) {
-      this.$emit('onOpenConversationRequested', e)
+    onViewConversationRequested (e) {
+      this.$emit('onViewConversationRequested', e)
     },
     onCreateNewConversationRequested (e) {
       this.$emit('onCreateNewConversationRequested', e)

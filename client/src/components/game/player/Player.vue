@@ -104,6 +104,8 @@ export default {
   },
   async mounted () {
     this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+    this.playerIndex = this.$store.state.game.galaxy.players.indexOf(this.player)
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
@@ -120,9 +122,6 @@ export default {
     if (this.user == null) {
       this.user = {}
     }
-
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.playerIndex = this.$store.state.game.galaxy.players.indexOf(this.player)
   },
   methods: {
     onCloseRequested (e) {

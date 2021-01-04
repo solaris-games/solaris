@@ -16,6 +16,19 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/:gameId/conversations/private/:withPlayerId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let result = await container.conversationService.privateChatSummary(
+                req.game,
+                req.player._id,
+                req.params.withPlayerId);
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/conversations/unread', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
         try {
             let result = container.conversationService.getUnreadCount(

@@ -167,10 +167,6 @@
 
       <gift-carrier v-if="canGiftCarrier" :carrierId="carrier._id"/>
     </div>
-<!-- 
-    <playerOverview v-if="carrierOwningPlayer" :playerId="carrierOwningPlayer._id"
-      @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/> -->
 </div>
 </template>
 
@@ -178,7 +174,6 @@
 import GameHelper from '../../../services/gameHelper'
 import CarrierApiService from '../../../services/api/carrier'
 import MenuTitle from '../MenuTitle'
-import PlayerOverview from '../player/Overview'
 import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
 import CarrierSpecialistVue from './CarrierSpecialist'
@@ -187,7 +182,6 @@ import GiftCarrierVue from './GiftCarrier'
 export default {
   components: {
     'menu-title': MenuTitle,
-    'playerOverview': PlayerOverview,
     'waypointTable': WaypointTable,
     'carrier-specialist': CarrierSpecialistVue,
     'gift-carrier': GiftCarrierVue

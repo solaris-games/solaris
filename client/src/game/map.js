@@ -35,6 +35,7 @@ class Map extends EventEmitter {
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
+    this.highlightLocationsContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
@@ -42,6 +43,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
+    this.container.addChild(this.highlightLocationsContainer)
   }
 
   setup (game, userSettings) {
@@ -607,6 +609,20 @@ class Map extends EventEmitter {
 
     if (this.territories) this.territories.refreshZoom(zoomPercent)
     if (this.background) this.background.refreshZoom(zoomPercent)
+  }
+
+  highlightLocation (location, opacity = 1) {
+    let graphics = new PIXI.Graphics()
+    let radius = 12
+
+    graphics.lineStyle(1, 0xFFFFFF, opacity)
+    graphics.drawStar(location.x, location.y, radius, radius, radius - 3)
+
+    this.highlightLocationsContainer.addChild(graphics)
+  }
+
+  clearHighlightedLocations () {
+    this.highlightLocationsContainer.removeChildren()
   }
 }
 

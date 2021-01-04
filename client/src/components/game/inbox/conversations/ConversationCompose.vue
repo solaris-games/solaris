@@ -33,6 +33,12 @@ export default {
   },
   methods: {
     async send () {
+      this.message = this.message.trim()
+
+      if (this.message === '') {
+        return
+      }
+
       try {
         this.isSendingMessage = true
 
