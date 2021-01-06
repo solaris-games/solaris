@@ -62,7 +62,12 @@
                 :class="{'btn-primary': playerFilter.enabled}"
                 @click="togglePlayerFilter(playerFilter)"
                 :title="playerFilter.alias">
-                <player-icon :playerId="playerFilter.playerId" :hideOnlineStatus="true" :solidGlyphOnly="true" style="margin-top:0px;margin-right:0px;"/>
+                <player-icon 
+                  :playerId="playerFilter.playerId" 
+                  :hideOnlineStatus="true" 
+                  :solidGlyphOnly="true"
+                  :colour="playerFilter.colour"
+                  style="margin-top:0px;margin-right:0px;"/>
               </button>
             </div>
         </div>
@@ -91,6 +96,7 @@ export default {
   },
   data () {
     return {
+      userPlayer: null,
       intelType: 'totalStars',
       history: null,
       startTick: null,
@@ -122,22 +128,24 @@ export default {
     }
   },
   async mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+
     this.playerFilters = this.$store.state.game.galaxy.players.map(p => {
+      let isCurrentPlayer = this.userPlayer._id === p._id
+
       return {
         enabled: true,
         playerId: p._id,
         alias: p.alias,
         shape: p.shape,
-        colour: p.colour // GameHelper.getPlayerColour(this.$store.state.game, p._id)
+        colour: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(p.colour.value) //p.colour // GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
     })
 
     if (this.compareWithPlayerId) {
-      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
       this.playerFilters.forEach(f => {
         f.enabled = f.playerId === this.compareWithPlayerId ||
-            f.playerId === userPlayer._id
+            f.playerId === this.userPlayer._id
       })
     }
 
@@ -199,9 +207,7 @@ export default {
       this.fillData()
     },
     showNone () {
-      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
-      this.playerFilters.forEach(f => f.enabled = (f.playerId === userPlayer._id))
+      this.playerFilters.forEach(f => f.enabled = (f.playerId === this.userPlayer._id))
 
       this.fillData()
     },
@@ -227,9 +233,11 @@ export default {
           continue
         }
 
+        let isCurrentPlayer = this.userPlayer._id === player._id
+
         let dataset = {
           label: player.alias,
-          borderColor: GameHelper.getFriendlyColour(player.colour.value),
+          borderColor: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(player.colour.value),
           fill: false,
           pointRadius: 0,
           borderWidth: 3,

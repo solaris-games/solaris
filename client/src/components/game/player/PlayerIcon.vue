@@ -1,6 +1,6 @@
 <template>
   <!-- Note: We can't use Font Awesome because diamond and hexagon are premium icons -->
-  <span v-if="player" class="span-container" :style="{'color': getFriendlyColour()}" :title="onlineStatus">
+  <span v-if="player" class="span-container" :style="{'color': iconColour}" :title="onlineStatus">
     {{glyph}}
   </span>
 </template>
@@ -12,17 +12,21 @@ export default {
   props: {
     playerId: String,
     hideOnlineStatus: Boolean,
-    solidGlyphOnly: Boolean
+    solidGlyphOnly: Boolean,
+    colour: String
   },
   data () {
     return {
       player: null,
       onlineStatus: '',
+      iconColour: '',
       intervalFunction: null
     }
   },
   mounted () {
     this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+
+    this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
 
     let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
@@ -34,9 +38,6 @@ export default {
     clearInterval(this.intervalFunction)
   },
   methods: {
-    getFriendlyColour () {
-      return GameHelper.getFriendlyColour(this.player.colour.value)
-    },
     recalculateOnlineStatus () {
       if (this.player.isOnline == null) {
         this.onlineStatus = ''

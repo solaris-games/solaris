@@ -349,7 +349,7 @@ class GameHelper {
 
   getSortedLeaderboardPlayerList (game) {
     // Sort by total number of stars, then by total ships, then by total carriers.
-    return game.galaxy.players
+    return [...game.galaxy.players]
       .sort((a, b) => {
         // Sort by total stars descending
         if (a.stats.totalStars > b.stats.totalStars) return -1
