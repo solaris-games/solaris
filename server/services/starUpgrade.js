@@ -297,30 +297,23 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return report;
     }
 
-    async upgradeBulk(game, player, infrastructureType, amount) {
-        let upgradeSummary = {
-            stars: [],
-            cost: 0,
-            upgraded: 0,
-            infrastructureType
-        };
-
+    _getStarsWithNextUpgradeCost(game, player, infrastructureType) {
         let expenseConfig;
         let calculateCostFunction;
         let upgradeFunction;
 
         switch (infrastructureType) {
-            case 'economy': 
+            case 'economy':
                 calculateCostFunction = this.calculateEconomyCost.bind(this);
                 upgradeFunction = this.upgradeEconomy.bind(this);
                 expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
                 break;
-            case 'industry': 
+            case 'industry':
                 calculateCostFunction = this.calculateIndustryCost.bind(this);
                 upgradeFunction = this.upgradeIndustry.bind(this);
                 expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
                 break;
-            case 'science': 
+            case 'science':
                 calculateCostFunction = this.calculateScienceCost.bind(this);
                 upgradeFunction = this.upgradeScience.bind(this);
                 expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
@@ -328,11 +321,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         if (!calculateCostFunction) {
-            throw new ValidationError(`Unknown infrastructure type ${infrastructure}`)
+            throw new ValidationError(`Unknown infrastructure type ${infrastructureType}`)
         }
 
         // Get all of the player stars and what the next upgrade cost will be.
-        let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
+        return this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
             .map(s => {
                 // NOTE: Do not need to do calculations for effective tech level here as it is unnecessary because
                 // the resources will scale in the same way for all stars.
@@ -341,9 +334,22 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 return {
                     star: s,
                     terraformedResources,
-                    infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedResources)
+                    infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedResources),
+                    upgradeFunction: upgradeFunction(game, player, s._id, false),
+                    calculateCostFunction: calculateCostFunction(game, expenseConfig, s.infrastructure, terraformedResources)
                 }
-            });
+            })
+    }
+
+    async upgradeBulk(game, player, infrastructureType, amount) {
+        let upgradeSummary = {
+            stars: [],
+            cost: 0,
+            upgraded: 0,
+            infrastructureType
+        };
+
+        let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType);
 
         while (amount) {
             // Get the next star that can be upgraded, cheapest first.
@@ -356,7 +362,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            let upgradeReport = await upgradeFunction(game, player, upgradeStar.star._id, false);
+            let upgradeReport = await upgradeStar.upgradeFunction;
 
             amount -= upgradeReport.cost;
 
@@ -452,12 +458,46 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // TODO: Append the new infrastructure costs to all stars that were upgraded.
         // See setUpgradeCosts below. 
         for (let star of upgradeSummary.stars) {
-            let terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, player.research.terraforming.level)
-
-            star.upgradeCost = calculateCostFunction(game, expenseConfig, star.infrastructure, terraformedResources)
+            star.upgradeCost = star.calculateCostFunction
         }
 
         return upgradeSummary;
+    }
+
+    async checkBulkUpgradedAmount(game, player, infrastructureType, amount) {
+        let checkSummary = {
+            canUpgrade: 0,
+            cost: 0,
+            infrastructureType
+        };
+
+        // Get all of the player stars and what the next upgrade cost will be.
+        let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType);
+
+        while (amount) {
+            // Get the next star that can be upgraded, cheapest first.
+            let upgradeStar = stars
+                .filter(s => s.infrastructureCost <= amount)
+                .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
+
+            // If no stars can be upgraded then break out here.
+            if (!upgradeStar) {
+                break;
+            }
+
+            let upgradeReport = await upgradeStar.upgradeFunction;
+
+            amount -= upgradeReport.cost;
+
+            checkSummary.canUpgrade++;
+            checkSummary.cost += upgradeReport.cost;
+
+            // Update the stars next infrastructure cost so next time
+            // we loop we will have the most up to date info.
+            upgradeStar.infrastructureCost = upgradeReport.nextCost;
+        }
+
+        return checkSummary;
     }
 
     calculateWarpGateCost(game, expenseConfig, terraformedResources) {
