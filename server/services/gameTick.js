@@ -952,7 +952,9 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _broadcastReportToPlayer(game, report, player) {
-        let playerReport = JSON.parse(JSON.stringify(report)); // Clone the original report.
+        let playerReport = Object.assign({}, report); // Clone the original report.
+
+        // let playerReport = JSON.parse(JSON.stringify(report)); // Is this too slow?
 
         // Get the end of galactic cycle report for the player if there is one.
         playerReport.playerGalacticCycleReport = report.playerGalacticCycleReport.find(r => r.playerId.equals(player._id)) || null;
