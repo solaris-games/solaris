@@ -29,7 +29,7 @@
         </select>
       </div>
       <div class="form-group col-4 pl-1">
-        <button class="btn btn-success btn-block" v-on="doAction"
+        <button class="btn btn-success btn-block" v-on:click="doAction"
                 :disabled="isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
       </div>
     </form>
