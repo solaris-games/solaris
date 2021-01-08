@@ -15,18 +15,19 @@
               title="Upgrade Industry">
         <i class="fas fa-tools mr-1"></i>${{industry}}
       </button>
-      <button class="btn btn-sm mr-1"
+      <button class="btn btn-sm"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
               :disabled="isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
               title="Upgrade Science">
         <i class="fas fa-flask mr-1"></i>${{science}}
       </button>
-      <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info mr-1" @click="onBuildCarrierRequested">
-        <i class="fas fa-rocket mr-1"></i>${{star.upgradeCosts.carriers}}
-      </button>
     </div>
     <div class="col-auto" v-if="userPlayer">
+      <button class="btn btn-sm btn-danger mr-1" v-if="!isGameFinished" @click="confirmAbandonStar" title="Abandon Star">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+
       <button v-if="canBuildWarpGates && !star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
@@ -34,8 +35,8 @@
         <i class="fas fa-trash"></i> <i class="fas fa-dungeon ml-1"></i>
       </button>
 
-      <button class="btn btn-sm btn-danger" v-if="!isGameFinished" @click="confirmAbandonStar" title="Abandon Star">
-        <i class="fas fa-sign-out-alt"></i>
+      <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
+        <i class="fas fa-rocket mr-1"></i>${{star.upgradeCosts.carriers}}
       </button>
     </div>
   </div>
