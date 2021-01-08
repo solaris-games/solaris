@@ -103,6 +103,11 @@ module.exports = class StarService extends EventEmitter {
                     starIdsToCheck.splice(starIdsToCheck.indexOf(starId), 1);
                 }
             }
+
+            // If we've checked all stars then no need to continue.
+            if (!starIdsToCheck.length) {
+                break;
+            }
         }
 
         return starIdsInRange.map(s => this.getByObjectId(game, s));

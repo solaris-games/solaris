@@ -65,40 +65,51 @@ module.exports = class CarrierService {
         return name;
     }
 
-    getCarriersWithinScanningRangeOfStar(game, star) {
+    getCarriersWithinScanningRangeOfStarByCarrierIds(game, star, carrierIds) {
+        // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
             return [];
         }
 
+        // Calculate the scanning distance of the given star.
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
 
-        // Go through all stars and find each star that is in scanning range.
-        let carriersInRange = game.galaxy.carriers.filter(c => {
+        let carriers = carrierIds.map(s => this.getByObjectId(game, s));
+
+        // Go through all carriers and the ones that are within the star's scanning range.
+        let carriersInRange = carriers.filter(c => {
             return c.ownedByPlayerId.equals(star.ownedByPlayerId) ||
                 this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
         });
 
-        return carriersInRange;
+        return carriersInRange.map(c => c._id);
     }
 
     filterCarriersByScanningRange(game, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let inRange = [];
+        let carrierIdsInRange = [];
+        let carrierIdsToCheck = game.galaxy.carriers.map(c => c._id);
 
         for (let star of playerStars) {
-            let carriers = this.getCarriersWithinScanningRangeOfStar(game, star);
+            let carrierIds = this.getCarriersWithinScanningRangeOfStarByCarrierIds(game, star, carrierIdsToCheck);
 
-            for (let c of carriers) {
-                if (inRange.indexOf(c) === -1) {
-                    inRange.push(c);
+            for (let carrierId of carrierIds) {
+                if (carrierIdsInRange.indexOf(carrierId) === -1) {
+                    carrierIdsInRange.push(carrierId);
+                    carrierIdsToCheck.splice(carrierIdsToCheck.indexOf(carrierId), 1);
                 }
+            }
+
+            // If we've checked all carriers then no need to continue.
+            if (!carrierIdsToCheck.length) {
+                break;
             }
         }
 
-        return inRange;
+        return carrierIdsInRange.map(c => this.getByObjectId(game, c));
     }
 
     sanitizeCarriersByPlayer(game, player) {
