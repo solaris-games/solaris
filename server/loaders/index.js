@@ -4,10 +4,12 @@ const agendaLoader = require('./agenda');
 const socketLoader = require('./sockets');
 const containerLoader = require('./container');
 
+let mongo;
+
 module.exports = {
   
   async init(expressApp, expressServer) {
-    await mongooseLoader();
+    mongo = await mongooseLoader();
     console.log('MongoDB Intialized');
     
     const io = socketLoader(expressServer);
@@ -21,6 +23,12 @@ module.exports = {
 
     await agendaLoader(container);
     console.log('Agenda Initialized');
+  },
+
+  async cleanup() {
+    console.log('Disconnecting from MongoDB...');
+    await mongo.disconnect();
+    console.log('MongoDB disconnected.');
   }
 
 };

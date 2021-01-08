@@ -19,4 +19,14 @@ async function startServer() {
   });
 }
 
+process.on('SIGINT', async () => {
+  console.log('Shutting down...');
+
+  await loaders.cleanup();
+
+  console.log('Shutdown complete.');
+  
+  process.exit();
+});
+
 startServer();
