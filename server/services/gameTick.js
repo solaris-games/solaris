@@ -106,7 +106,8 @@ module.exports = class GameTickService extends EventEmitter {
         await game.save();
         logTime('Save game');
 
-        this._broadcastReport(game, report);       
+        // this._broadcastReport(game, report);   
+        console.log('Broadcast report has been DISABLED - PLEASE FIX ASAP');
         logTime('Broadcast report');
 
         let endTime = process.hrtime(startTime);
