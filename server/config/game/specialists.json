@@ -54,12 +54,13 @@
         {
             "id": 5,
             "name": "Smuggler",
-            "description": "Grants x2 Speed, -1 Hyperspace Range to the Carrier.",
+            "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the Carrier.",
             "tier": 4,
             "modifiers": {
                 "local": {
                     "speed": 2,
-                    "hyperspace": -1
+                    "hyperspace": -1,
+                    "weapons": -1
                 }
             }
         },
