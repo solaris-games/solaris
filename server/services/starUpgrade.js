@@ -335,8 +335,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
                     star: s,
                     terraformedResources,
                     infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedResources),
-                    upgradeFunction: upgradeFunction(game, player, s._id, false),
-                    calculateCostFunction: calculateCostFunction(game, expenseConfig, s.infrastructure, terraformedResources)
+                    upgrade: upgradeFunction(game, player, s._id, false),
+                    nextInfrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure, terraformedResources)
                 }
             })
     }
@@ -362,7 +362,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            let upgradeReport = await upgradeStar.upgradeFunction;
+            let upgradeReport = await upgradeStar.upgrade;
 
             amount -= upgradeReport.cost;
 
@@ -458,7 +458,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // TODO: Append the new infrastructure costs to all stars that were upgraded.
         // See setUpgradeCosts below. 
         for (let star of upgradeSummary.stars) {
-            star.upgradeCost = star.calculateCostFunction
+            star.upgradeCost = star.nextInfrastructureCost
         }
 
         return upgradeSummary;
@@ -485,7 +485,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            let upgradeReport = await upgradeStar.upgradeFunction;
+            let upgradeReport = await upgradeStar.upgrade;
 
             amount -= upgradeReport.cost;
 

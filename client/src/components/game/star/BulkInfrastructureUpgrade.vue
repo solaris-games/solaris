@@ -11,7 +11,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">$</span>
         </div>
-        <input v-on:input="hasChecked = false"
+        <input v-on:input="resetHasChecked"
           class="form-control"
           id="amount"
           v-model="amount"
@@ -29,7 +29,7 @@
         </select>
       </div>
       <div class="form-group col-4 pl-1">
-        <button class="btn btn-success btn-block" v-on="this.hasChecked ? {click: () => upgrade()} : {click: () => check()}"
+        <button class="btn btn-success btn-block" v-on="doAction"
                 :disabled="isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
       </div>
     </form>
@@ -86,6 +86,12 @@ export default {
     },
     gameIsFinished () {
       return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    resetHasChecked () {
+      this.hasChecked = false
+    },
+    doAction () {
+      this.hasChecked ? this.upgrade() : this.check()
     },
     async check () {
       if (this.amount <= 0) {
