@@ -26,8 +26,11 @@
           </span>
         </div>
         <div class="col-auto">
+          <span title="Weapons">
+            {{carrier.ships == null ? '???' : carrier.effectiveWeapons}} <i class="fas fa-fighter-jet ml-1 mr-3"></i>
+          </span>
           <span title="Ships">
-            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i>
           </span>
         </div>
       </div>
@@ -53,7 +56,7 @@
         </div>
         <div class="col-auto">
           <span title="Waypoints">
-            {{carrier.waypoints.length}} 
+            {{carrier.waypoints.length}}
             <i class="fas fa-map-marker-alt ml-1" v-if="!carrier.waypointsLooped"></i>
             <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i>
           </span>
@@ -66,6 +69,8 @@
         </div>
       </div>
 
+
+
       <div class="row pb-2 pt-2 bg-secondary" v-if="canGiftCarrier || canTransferShips || canEditWaypoints">
         <div class="col">
           <button class="btn btn-sm btn-primary" @click="onShipTransferRequested" v-if="canTransferShips">
@@ -75,6 +80,12 @@
             Gift <i class="fas fa-gift"></i>
           </button>
         </div>
+        <span title="Effective Speed">
+            {{carrier.ships == null ? '???' : carrier.effectiveSpeed.toFixed(1)}}x <i class="fas fa-tachometer-alt pt-2 ml-1 mr-4"></i>
+          </span>
+        <span title="Hyperspace Range">
+            {{carrier.ships == null ? '???' : carrier.effectiveRange}} <i class="fas fa-gas-pump pt-2 ml-1 mr-2"></i>
+        </span>
         <div class="col-auto">
           <button class="btn btn-success btn-sm" v-if="canEditWaypoints && carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
@@ -102,6 +113,30 @@
               {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
           </div>
       </div>
+      <div class="row pt-1 pb-1 bg-secondary">
+        <div class="col">
+          Weapons
+        </div>
+        <div class="col text-right">
+          {{carrier.ships == null ? '???' : carrier.effectiveWeapons}} <i class="fas fa-fighter-jet ml-0"></i>
+        </div>
+      </div>
+      <div class="row pt-1 pb-1 bg-secondary">
+        <div class="col">
+          Effective Speed
+        </div>
+        <div class="col text-right">
+          {{carrier.ships == null ? '???' : carrier.effectiveSpeed.toFixed(1)}}x <i class="fas fa-tachometer-alt ml-0"></i>
+        </div>
+      </div>
+      <div class="row pt-1 pb-1 bg-secondary">
+        <div class="col">
+          Hyperspace Range
+        </div>
+        <div class="col text-right">
+          {{carrier.ships == null ? '???' : carrier.effectiveRange}} <i class="fas fa-gas-pump ml-1"></i>
+        </div>
+      </div>
     </div>
 
     <h4 class="pt-0" v-if="isStandardUIStyle">Navigation</h4>
@@ -123,7 +158,7 @@
       </div>
 
       <div v-if="carrier.waypoints.length && carrierOwningPlayer == userPlayer" class="row pt-0 pb-0 mb-0">
-        <waypointTable :carrier="carrier" 
+        <waypointTable :carrier="carrier"
           @onEditWaypointRequested="onEditWaypointRequested"
           @onEditWaypointsRequested="editWaypoints"
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
@@ -194,6 +229,7 @@ export default {
       carrier: null,
       carrierOwningPlayer: null,
       userPlayer: null,
+      research: null,
       isLoopingWaypoints: false,
       isGiftingCarrier: false,
       timeRemainingEta: null,
@@ -209,8 +245,13 @@ export default {
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+    this.research = GameHelper.getUserPlayer(this.$store.state.game).research
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.carrierOwningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
+
+    this.carrier.effectiveSpeed = this.getEffectiveSpeed()
+    this.carrier.effectiveWeapons = this.getEffectiveWeapons()
+    this.carrier.effectiveRange = this.getEffectiveRange()
 
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
 
@@ -260,6 +301,36 @@ export default {
     },
     viewOnMap (e) {
       GameContainer.map.panToCarrier(this.carrier)
+    },
+    getEffectiveSpeed () {
+      let speed = 1
+
+      if (this.carrier.specialist && this.carrier.specialist.modifiers.local.speed) {
+        speed = this.carrier.specialist.modifiers.local.speed
+      }
+      if (this.isInWarp) {
+        speed *= 3
+      }
+
+      return speed
+    },
+    getEffectiveWeapons () {
+      if (this.carrier.specialist && this.carrier.specialist.modifiers.local.weapons) {
+        let weapons = this.research.weapons.level + this.carrier.specialist.modifiers.local.weapons
+
+        return (weapons >= 1) ? weapons : 1
+      }
+
+      return this.research.weapons.level
+    },
+    getEffectiveRange () {
+      if (this.carrier.specialist && this.carrier.specialist.modifiers.local.hyperspace) {
+        let range = this.research.hyperspace.level + this.carrier.specialist.modifiers.local.hyperspace
+
+        return (range >= 1) ? range : 1
+      }
+
+      return this.research.hyperspace.level
     },
     getFirstWaypointSource () {
       if (!this.carrier.waypoints.length) {
@@ -373,6 +444,12 @@ export default {
     },
     isNotUserPlayerCarrier: function () {
       return this.carrier && !this.userPlayer || this.carrier.ownedByPlayerId != this.userPlayer._id
+    },
+    isInWarp: function () {
+      if (!this.carrier.orbiting) {
+        return this.getFirstWaypointSource().ownedByPlayerId === this.userPlayer._id && this.getFirstWaypointSource().warpGate && this.getFirstWaypointDestination().ownedByPlayerId === this.userPlayer._id && this.getFirstWaypointDestination().warpGate
+      }
+      return false
     },
     canEditWaypoints: function () {
       return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
