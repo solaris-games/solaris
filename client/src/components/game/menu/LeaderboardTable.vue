@@ -13,8 +13,9 @@
                 <td>{{player.position}}</td>
                 <td>
                     <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">{{player.username}}</router-link>
-                    <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.contributor"></i>
-                    <i class="fas fa-code ml-1" title="This player is a developer" v-if="player.developer"></i>
+                    <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.roles.contributor"></i>
+                    <i class="fas fa-code ml-1" title="This player is a developer" v-if="player.roles.developer"></i>
+                    <i class="fas fa-user-friends ml-1" title="This player is a community manager" v-if="player.roles.communityManager"></i>
                 </td>
                 <td align="right">{{player.achievements.rank}}</td>
                 <td align="right">{{player.achievements.victories}}</td>

@@ -2,7 +2,7 @@
   <view-container>
     <view-title :title="user ? user.username : 'Achievements'" />
 
-    <div class="row bg-success mb-2" v-if="user && user.contributor">
+    <div class="row bg-success mb-2" v-if="user && user.roles.contributor">
       <div class="col text-center">
         <p class="mt-1 mb-1">
           This player is a contributor <i class="fas fa-hands-helping"></i>
@@ -10,10 +10,18 @@
       </div>
     </div>
 
-    <div class="row bg-warning mb-2" v-if="user && user.developer">
+    <div class="row bg-warning mb-2" v-if="user && user.roles.developer">
       <div class="col text-center">
         <p class="mt-1 mb-1">
           This player is a developer <i class="fas fa-code"></i>
+        </p>
+      </div>
+    </div>
+
+    <div class="row bg-info mb-2" v-if="user && user.roles.communityManager">
+      <div class="col text-center">
+        <p class="mt-1 mb-1">
+          This player is a community manager <i class="fas fa-user-friends"></i>
         </p>
       </div>
     </div>
