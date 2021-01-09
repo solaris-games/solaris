@@ -123,6 +123,20 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/star/upgrade/bulkCheck', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            let summary = await container.starUpgradeService.checkBulkUpgradedAmount(
+                req.game,
+                req.player,
+                req.body.infrastructure,
+                +req.body.amount);
+
+            res.status(200).json(summary);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.put('/api/game/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.buildWarpGate(

@@ -11,7 +11,7 @@
         <div class="input-group-prepend">
           <span class="input-group-text">$</span>
         </div>
-        <input
+        <input v-on:input="resetHasChecked"
           class="form-control"
           id="amount"
           v-model="amount"
@@ -20,7 +20,7 @@
         />
       </div>
       <div class="form-group col-4">
-        <select class="form-control" id="infrastructureType" v-model="selectedType">
+        <select class="form-control" id="infrastructureType" v-on:change="hasChecked = false" v-model="selectedType">
           <option
             v-for="opt in types"
             v-bind:key="opt.key"
@@ -29,9 +29,15 @@
         </select>
       </div>
       <div class="form-group col-4 pl-1">
-        <button class="btn btn-success btn-block" @click="upgrade" :disabled="isUpgrading || gameIsFinished()"><i class="fas fa-hammer"></i> Upgrade</button>
+        <button class="btn btn-success btn-block" v-on:click="doAction"
+                :disabled="isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
       </div>
     </form>
+    <div v-if="hasChecked" class="row bg-secondary">
+      <div class="col text-center pt-2">
+        <p><b>${{this.amount}}</b> budget: <b>{{this.upgradeAvailable}}</b> upgrades for <b>${{this.cost}}</b></p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,7 +55,11 @@ export default {
     return {
       audio: null,
       isUpgrading: false,
+      isChecking: false,
+      hasChecked: false,
       amount: 0,
+      upgradeAvailable: 0,
+      cost: 0,
       selectedType: 'economy',
       types: [
         {
@@ -77,12 +87,42 @@ export default {
     gameIsFinished () {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
-    async upgrade () {
+    resetHasChecked () {
+      this.hasChecked = false
+    },
+    doAction () {
+      this.hasChecked ? this.upgrade() : this.check()
+    },
+    async check () {
       if (this.amount <= 0) {
         return
       }
+      try {
+        this.upgradeAvailable = 0
+        this.cost = 0
+        this.isChecking = true
+        let response = await starService.checkBulkUpgradedAmount(
+          this.$store.state.game._id,
+          this.selectedType,
+          this.amount
+        )
+        if (response.status === 200) {
+          AudioService.join()
+          this.upgradeAvailable = response.data.canUpgrade
+          this.cost = response.data.cost
+        }
+      } catch (err) {
+        console.error(err)
+      }
+      this.isChecking = false
+      this.hasChecked = true
+    },
+    async upgrade () {
+      if (this.cost <= 0) {
+        return
+      }
 
-      if (!confirm(`Are you sure you want to spend $${this.amount} credits to upgrade ${this.selectedType} across all of your stars?`)) {
+      if (!confirm(`Are you sure you want to spend $${this.cost} credits to upgrade ${this.selectedType} across all of your stars?`)) {
         return
       }
 
@@ -92,7 +132,7 @@ export default {
         let response = await starService.bulkInfrastructureUpgrade(
           this.$store.state.game._id,
           this.selectedType,
-          this.amount
+          this.cost
         )
 
         if (response.status === 200) {
@@ -112,6 +152,7 @@ export default {
         console.error(err)
       }
 
+      this.hasChecked = false
       this.isUpgrading = false
     }
   }
