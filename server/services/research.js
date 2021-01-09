@@ -3,13 +3,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ResearchService extends EventEmitter {
 
-    constructor(gameModel, technologyService, randomService, playerService, userService) {
+    constructor(gameModel, technologyService, randomService, playerService, starService, userService) {
         super();
         
         this.gameModel = gameModel;
         this.technologyService = technologyService;
         this.randomService = randomService;
         this.playerService = playerService;
+        this.starService = starService;
         this.userService = userService;
     }
 
@@ -59,21 +60,24 @@ module.exports = class ResearchService extends EventEmitter {
         return await game.save();
     }
 
-    async conductResearch(game, player) {
+    async conductResearch(game, user, player) {
         // TODO: Defeated players do not conduct research or experiments?
         if (player.defeated) {
             return;
         }
         
-        let user = await this.userService.getById(player.userId);
-
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
-        let totalScience = this.playerService.calculateTotalScience(player, game.galaxy.stars);
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        let totalScience = this.playerService.calculateTotalScience(playerStars);
             
         tech.progress += totalScience;
-        user.achievements.research[techKey] += totalScience;
+
+        if (user) {
+            user.achievements.research[techKey] += totalScience;
+        }
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -98,8 +102,6 @@ module.exports = class ResearchService extends EventEmitter {
 
         let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
 
-        await user.save();
-
         let report = {
             name: techKey,
             level: tech.level,
@@ -111,7 +113,7 @@ module.exports = class ResearchService extends EventEmitter {
         return report;
     }
 
-    async conductResearchAll(game, report) {
+    async conductResearchAll(game, gameUsers, report) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -122,7 +124,8 @@ module.exports = class ResearchService extends EventEmitter {
                 continue;
             }
             
-            let researchReport = await this.conductResearch(game, player);
+            let user = gameUsers.find(u => u._id.equals(player.userId));
+            let researchReport = await this.conductResearch(game, user, player);
 
             researchReport.playerId = player._id;
 
@@ -234,7 +237,9 @@ module.exports = class ResearchService extends EventEmitter {
         let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level);
         let remainingPoints = requiredProgress - tech.progress;
 
-        let totalScience = this.playerService.calculateTotalScience(player, game.galaxy.stars);
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        let totalScience = this.playerService.calculateTotalScience(playerStars);
 
         // If there is no science then there cannot be an end date to the research.
         if (totalScience === 0) {
