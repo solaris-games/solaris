@@ -46,9 +46,9 @@
                     <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy" title="Hotkey: 0"><i class="fas fa-compass"></i></button>
                     <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()" title="Hotkey: +"><i class="fas fa-search-plus"></i></button>
                     <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()" title="Hotkey: -"><i class="fas fa-search-minus"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Hotkey: C"><i class="fas fa-calculator"></i></button>
-                    <div v-if="userPlayer">
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Hotkey: H"><i class="fas fa-home"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Hotkey: H"><i class="fas fa-home"></i></button>
+                  <div v-if="userPlayer">
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Hotkey: C"><i class="fas fa-calculator"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Hotkey: V"><i class="fas fa-ruler"></i></button>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" v-if="!userPlayer.defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Hotkey: B"><i class="fas fa-money-bill"></i></button>
                     </div>
@@ -241,7 +241,7 @@ export default {
         console.error(err)
       }
     },
-    async toggleReadyStatus () {      
+    async toggleReadyStatus () {
       try {
         if (this.userPlayer.ready) {
           let response = await GameApiService.unconfirmReady(this.$store.state.game._id)
