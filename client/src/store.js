@@ -224,7 +224,7 @@ export default new Vuex.Store({
 
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
       player.stats.totalIndustry++
-      player.stats.newShips += manufacturingDifference
+      player.stats.newShips = +(player.stats.newShips + manufacturingDifference).toFixed(2)
 
       GameContainer.reloadStar(star)
     },
