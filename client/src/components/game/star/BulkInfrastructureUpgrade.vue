@@ -108,7 +108,7 @@ export default {
         )
         if (response.status === 200) {
           AudioService.join()
-          this.upgradeAvailable = response.data.canUpgrade
+          this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
         }
       } catch (err) {

@@ -243,7 +243,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
-        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player.id) {
+        if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player._id.toString()) {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
@@ -335,59 +335,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
                     star: s,
                     terraformedResources,
                     infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedResources),
-                    upgrade: upgradeFunction,
-                    nextInfrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure, terraformedResources)
+                    upgrade: upgradeFunction
                 }
             });
     }
 
     async upgradeBulk(game, player, infrastructureType, amount) {
-        let upgradeSummary = {
-            stars: [],
-            cost: 0,
-            upgraded: 0,
-            infrastructureType
-        };
-
-        // Get all of the player stars and what the next upgrade cost will be.
-        let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType);
-
-        while (amount) {
-            // Get the next star that can be upgraded, cheapest first.
-            let upgradeStar = stars
-                .filter(s => s.infrastructureCost <= amount)
-                .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
-
-            // If no stars can be upgraded then break out here.
-            if (!upgradeStar) {
-                break;
-            }
-
-            let upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
-
-            amount -= upgradeReport.cost;
-
-            upgradeSummary.upgraded++;
-            upgradeSummary.cost += upgradeReport.cost;
-
-            // Update the stars next infrastructure cost so next time
-            // we loop we will have the most up to date info.
-            upgradeStar.infrastructureCost = upgradeReport.nextCost;
-
-            // Add the star that we upgraded to the summary result.
-            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
-
-            if (!summaryStar) {
-                summaryStar = {
-                    starId: upgradeStar.star._id,
-                    naturalResources: upgradeStar.star.naturalResources
-                }
-
-                upgradeSummary.stars.push(summaryStar);
-            }
-
-            summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
-        }
+        let upgradeSummary = await this.generateUpgradeBulkReport(game, player, infrastructureType, amount);
 
         // Generate the DB writes for all the stars to upgrade, including deducting the credits
         // for the player and also updating the player's achievement statistics.
@@ -456,19 +410,14 @@ module.exports = class StarUpgradeService extends EventEmitter {
             upgradeSummary
         });
 
-        // TODO: Append the new infrastructure costs to all stars that were upgraded.
-        // See setUpgradeCosts below. 
-        for (let star of upgradeSummary.stars) {
-            star.upgradeCost = star.nextInfrastructureCost
-        }
-
         return upgradeSummary;
     }
 
-    async checkBulkUpgradedAmount(game, player, infrastructureType, amount) {
-        let checkSummary = {
-            canUpgrade: 0,
+    async generateUpgradeBulkReport(game, player, infrastructureType, amount) {
+        let upgradeSummary = {
+            stars: [],
             cost: 0,
+            upgraded: 0,
             infrastructureType
         };
 
@@ -490,17 +439,31 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
             amount -= upgradeReport.cost;
 
-            checkSummary.canUpgrade++;
-            checkSummary.cost += upgradeReport.cost;
+            upgradeSummary.upgraded++;
+            upgradeSummary.cost += upgradeReport.cost;
 
             // Update the stars next infrastructure cost so next time
             // we loop we will have the most up to date info.
             upgradeStar.infrastructureCost = upgradeReport.nextCost;
+
+            // Add the star that we upgraded to the summary result.
+            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
+
+            if (!summaryStar) {
+                summaryStar = {
+                    starId: upgradeStar.star._id,
+                    naturalResources: upgradeStar.star.naturalResources
+                }
+
+                upgradeSummary.stars.push(summaryStar);
+            }
+
+            summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
+            summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
         }
 
-        return checkSummary;
+        return upgradeSummary;
     }
-
 
     calculateWarpGateCost(game, expenseConfig, terraformedResources) {
         return this._calculateInfrastructureCost(game.constants.star.infrastructureCostMultipliers.warpGate, expenseConfig, 0, terraformedResources);

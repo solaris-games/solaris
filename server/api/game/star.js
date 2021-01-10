@@ -123,9 +123,9 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/bulkCheck', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/bulkCheck', middleware.authenticate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            let summary = await container.starUpgradeService.checkBulkUpgradedAmount(
+            let summary = await container.starUpgradeService.generateUpgradeBulkReport(
                 req.game,
                 req.player,
                 req.body.infrastructure,

@@ -244,8 +244,8 @@ export default new Vuex.Store({
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
 
-        if (star.upgradeCosts && s.upgradeCost) {
-          star.upgradeCosts[data.infrastructureType] = s.upgradeCost
+        if (star.upgradeCosts && s.infrastructureCost) {
+          star.upgradeCosts[data.infrastructureType] = s.infrastructureCost
         }
 
         GameContainer.reloadStar(star)
