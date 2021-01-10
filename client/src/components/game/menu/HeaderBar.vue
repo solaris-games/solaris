@@ -50,7 +50,7 @@
                     <div>
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Hotkey: C"><i class="fas fa-calculator"></i></button>
                         <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Hotkey: V"><i class="fas fa-ruler"></i></button>
-                        <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" v-if="!userPlayer.defeated" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Hotkey: B"><i class="fas fa-money-bill"></i></button>
+                        <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Hotkey: B"><i class="fas fa-money-bill"></i></button>
                     </div>
                 </div>
                 <div class="dropdown-divider"></div>
