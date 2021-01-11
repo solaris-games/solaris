@@ -3,7 +3,7 @@ const ValidationError = require("../errors/validation");
 module.exports = class MapService {
 
     constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService) {
+        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
@@ -12,6 +12,7 @@ module.exports = class MapService {
         this.spiralMapService = spiralMapService;
         this.doughnutMapService = doughnutMapService;
         this.circularBalancedMapService = circularBalancedMapService;
+        this.irregularMapService = irregularMapService;
     }
 
     generateStars(game, starCount, playerLimit, warpGatesSetting) {
@@ -35,6 +36,9 @@ module.exports = class MapService {
                 break;
             case 'circular-balanced':
                 starLocations = this.circularBalancedMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
+                break;
+            case 'irregular':
+                starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
