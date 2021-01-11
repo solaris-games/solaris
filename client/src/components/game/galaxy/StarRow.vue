@@ -74,6 +74,10 @@ export default {
       this.star.upgradeCosts[infrastructure] = data.nextCost
       this.star.infrastructure[infrastructure] = data.infrastructure
 
+      if (data.manufacturing) {
+        this.star.manufacturing = +data.manufacturing.toFixed(2)
+      }
+
       this.$emit('onInfrastructureUpgraded', {
         infrastructureKey: infrastructure,
         data: data

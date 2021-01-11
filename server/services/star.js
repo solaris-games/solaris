@@ -87,30 +87,35 @@ module.exports = class StarService extends EventEmitter {
     }
 
     filterStarsByScanningRange(game, player) {
-        let starIdsInRange = [];
+        let starsInRange = [];
 
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
         let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let starIdsToCheck = game.galaxy.stars.map(s => s._id);
+        let starsToCheck = game.galaxy.stars.map(s => {
+            return {
+                _id: s._id,
+                location: s.location
+            }
+        });
 
         for (let star of playerStars) {
-            let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star._id, starIdsToCheck);
+            let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
 
             for (let starId of starIds) {
-                if (starIdsInRange.indexOf(starId) === -1) {
-                    starIdsInRange.push(starId);
-                    starIdsToCheck.splice(starIdsToCheck.indexOf(starId), 1);
+                if (starsInRange.indexOf(starId) === -1) {
+                    starsInRange.push(starId);
+                    starsToCheck.splice(starsToCheck.indexOf(starId), 1);
                 }
             }
 
             // If we've checked all stars then no need to continue.
-            if (!starIdsToCheck.length) {
+            if (!starsToCheck.length) {
                 break;
             }
         }
 
-        return starIdsInRange.map(s => this.getByObjectId(game, s));
+        return starsInRange.map(s => this.getByObjectId(game, s._id));
     }
 
     filterStarsByScanningRangeAndWaypointDestinations(game, player) {
@@ -133,9 +138,7 @@ module.exports = class StarService extends EventEmitter {
         return starsInScanningRange;
     }
     
-    getStarsWithinScanningRangeOfStarByStarIds(game, starId, starIds) {
-        let star = this.getByObjectId(game, starId);
-
+    getStarsWithinScanningRangeOfStarByStarIds(game, star, stars) {
         // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
             return [];
@@ -145,14 +148,12 @@ module.exports = class StarService extends EventEmitter {
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
 
-        let stars = starIds.map(s => this.getByObjectId(game, s));
-
         // Go through all stars and find each star that is in scanning range.
         let starsInRange = stars.filter(s => {
             return this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
         });
 
-        return starsInRange.map(s => s._id);
+        return starsInRange;
     }
 
     isStarInScanningRangeOfPlayer(game, star, player) {
@@ -268,7 +269,7 @@ module.exports = class StarService extends EventEmitter {
         return true;
     }
 
-    async claimUnownedStar(game, star, carrier) {
+    async claimUnownedStar(game, gameUsers, star, carrier) {
         if (star.ownedByPlayerId) {
             throw new ValidationError(`Cannot claim an owned star`);
         }
@@ -281,12 +282,10 @@ module.exports = class StarService extends EventEmitter {
         }
 
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+        let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
-        let playerUser = await this.userService.getById(carrierPlayer.userId);
-
-        if (playerUser) {
-            playerUser.achievements.combat.stars.captured++;
-            await playerUser.save();
+        if (carrierUser) {
+            carrierUser.achievements.combat.stars.captured++;
         }
     }
 

@@ -25,26 +25,6 @@ module.exports = class AchievementService {
         .exec();
     }
 
-    async incrementGiftsSent(userId, amount) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.trade.giftsSent': amount }
-        })
-        .exec();
-    }
-
-    async incrementGiftsReceived(userId, amount) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.trade.giftsReceived': amount }
-        })
-        .exec();
-    }
-
     async incrementWarpGatesBuilt(userId) {
         await this.userModel.updateOne({
             _id: userId

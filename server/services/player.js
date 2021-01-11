@@ -352,17 +352,12 @@ module.exports = class PlayerService extends EventEmitter {
         return playerStars.length;
     }
 
-    calculateTotalShips(player, stars, carriers) {
-        let ownedStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-        let ownedCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
-
+    calculateTotalShips(ownedStars, ownedCarriers) {
         return ownedStars.reduce((sum, s) => sum + Math.floor(s.garrisonActual), 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
     }
 
-    calculateTotalEconomy(player, stars) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-
+    calculateTotalEconomy(playerStars) {
         let totalEconomy = playerStars.reduce((sum, s) => {
             let multiplier = this.specialistService.getEconomyInfrastructureMultiplier(s);
 
@@ -372,17 +367,13 @@ module.exports = class PlayerService extends EventEmitter {
         return totalEconomy;
     }
 
-    calculateTotalIndustry(player, stars) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-
+    calculateTotalIndustry(playerStars) {
         let totalIndustry = playerStars.reduce((sum, s) => sum + s.infrastructure.industry, 0);
 
         return totalIndustry;
     }
 
-    calculateTotalScience(player, stars) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-
+    calculateTotalScience(playerStars) {
         let totalScience = playerStars.reduce((sum, s) => {
             let multiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
 
@@ -392,9 +383,7 @@ module.exports = class PlayerService extends EventEmitter {
         return totalScience;
     }
 
-    calculateTotalManufacturing(game, player, stars) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-
+    calculateTotalManufacturing(game, playerStars) {
         // Calculate the manufacturing level for all of the stars the player owns.
         playerStars.forEach(s => {
             let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
@@ -413,30 +402,29 @@ module.exports = class PlayerService extends EventEmitter {
         return playerCarriers.length;
     }
 
-    calculateTotalStarSpecialists(player, stars) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-
+    calculateTotalStarSpecialists(playerStars) {
         return playerStars.filter(s => s.specialistId).length;
     }
 
-    calculateTotalCarrierSpecialists(player, carriers) {
-        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
-
+    calculateTotalCarrierSpecialists(playerCarriers) {
         return playerCarriers.filter(c => c.specialistId).length;
     }
 
     getStats(game, player) {
-        let totalStarSpecialists = this.calculateTotalStarSpecialists(player, game.galaxy.stars);
-        let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(player, game.galaxy.carriers);
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+
+        let totalStarSpecialists = this.calculateTotalStarSpecialists(playerStars);
+        let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
         return {
-            totalStars: this.calculateTotalStars(player, game.galaxy.stars),
-            totalCarriers: this.calculateTotalCarriers(player, game.galaxy.carriers),
-            totalShips: this.calculateTotalShips(player, game.galaxy.stars, game.galaxy.carriers),
-            totalEconomy: this.calculateTotalEconomy(player, game.galaxy.stars),
-            totalIndustry: this.calculateTotalIndustry(player, game.galaxy.stars),
-            totalScience: this.calculateTotalScience(player, game.galaxy.stars),
-            newShips: this.calculateTotalManufacturing(game, player, game.galaxy.stars),
+            totalStars: playerStars.length,
+            totalCarriers: playerCarriers.length,
+            totalShips: this.calculateTotalShips(playerStars, playerCarriers),
+            totalEconomy: this.calculateTotalEconomy(playerStars),
+            totalIndustry: this.calculateTotalIndustry(playerStars),
+            totalScience: this.calculateTotalScience(playerStars),
+            newShips: this.calculateTotalManufacturing(game, playerStars),
             totalStarSpecialists,
             totalCarrierSpecialists,
             totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
@@ -460,8 +448,10 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
         let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
-        let totalEco = this.calculateTotalEconomy(player, game.galaxy.stars);
+        let totalEco = this.calculateTotalEconomy(playerStars);
 
         let creditsFromEconomy = totalEco * 10;
         let creditsFromBanking = effectiveTechs.banking * 75;

@@ -320,7 +320,7 @@ export default {
       this.star.infrastructure[e.infrastructureKey] = e.data.infrastructure
 
       if (e.data.manufacturing) {
-        this.star.manufacturing = e.data.manufacturing
+        this.star.manufacturing = +e.data.manufacturing.toFixed(2)
       }
     },
     onOpenPlayerDetailRequested (e) {

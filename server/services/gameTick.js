@@ -72,6 +72,9 @@ module.exports = class GameTickService extends EventEmitter {
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
+        let gameUsers = await this.userService.getGameUsers(game);
+        logTime('Loaded game users');
+
         let iterations = 1;
 
         // If we are in turn based mode, we need to repeat the tick X number of times.
@@ -81,19 +84,19 @@ module.exports = class GameTickService extends EventEmitter {
 
         while (iterations--) {
             logTime(`Tick ${game.state.tick}`);
-            await this._combatCarriers(game, report);
+            await this._combatCarriers(game, gameUsers, report);
             logTime('Combat carriers');
-            await this._moveCarriers(game, report);
+            await this._moveCarriers(game, gameUsers, report);
             logTime('Move carriers and produce ships');
-            await this.researchService.conductResearchAll(game, report);
+            await this.researchService.conductResearchAll(game, gameUsers, report);
             logTime('Conduct research');
             this._endOfGalacticCycleCheck(game, report);
             logTime('Galactic cycle check');
             this._logHistory(game, report);
             logTime('Log history');
-            await this._gameLoseCheck(game, report);
+            await this._gameLoseCheck(game, gameUsers, report);
             logTime('Game lose check');
-            let hasWinner = await this._gameWinCheck(game, report);
+            let hasWinner = await this._gameWinCheck(game, gameUsers, report);
             logTime('Game win check');
 
             if (hasWinner) {
@@ -106,8 +109,14 @@ module.exports = class GameTickService extends EventEmitter {
         await game.save();
         logTime('Save game');
 
-        // this._broadcastReport(game, report);   
-        console.log('Broadcast report has been DISABLED - PLEASE FIX ASAP');
+        // Save user profile achievements if any have changed.
+        for (let user of gameUsers) {
+            await user.save();
+        }
+
+        logTime('Save users');
+
+        this._broadcastReport(game, report);
         logTime('Broadcast report');
 
         let endTime = process.hrtime(startTime);
@@ -139,7 +148,7 @@ module.exports = class GameTickService extends EventEmitter {
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
-    async _combatCarriers(game, report) {
+    async _combatCarriers(game, gameUsers, report) {
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
         }
@@ -224,11 +233,11 @@ module.exports = class GameTickService extends EventEmitter {
 
             // TODO: Check for specialists that affect pre-combat.
 
-            await this._performCombat(game, friendlyPlayer, null, combatCarriers, report);
+            await this._performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers, report);
         }
     }
 
-    async _moveCarriers(game, report) {
+    async _moveCarriers(game, gameUsers, report) {
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
         // Note, we order by distance ascending for 2 reasons:
@@ -282,7 +291,7 @@ module.exports = class GameTickService extends EventEmitter {
         for (let i = 0; i < carriers.length; i++) {
             let carrier = carriers[i];
         
-            let carrierMovementReport = await this.carrierService.moveCarrier(game, carrier);
+            let carrierMovementReport = await this.carrierService.moveCarrier(game, gameUsers, carrier);
 
             // If the carrier has arrived at the star then
             // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
@@ -313,7 +322,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
 
-            await this._performCombat(game, starOwningPlayer, combatStar, carriersAtStar, report);
+            await this._performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar, report);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -339,7 +348,7 @@ module.exports = class GameTickService extends EventEmitter {
             this.waypointService.sanitiseDarkModeCarrierWaypoints(game, c));
     }
 
-    async _performCombat(game, player, star, carriers, report) {
+    async _performCombat(game, gameUsers, player, star, carriers, report) {
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
         // Get all defender carriers ordered by most carriers present descending.
@@ -369,11 +378,11 @@ module.exports = class GameTickService extends EventEmitter {
         let defender = player;
         let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
 
-        let defenderUser = await this.userService.getById(defender.userId);
+        let defenderUser = gameUsers.find(u => u._id.equals(defender.userId));
         let attackerUsers = [];
         
         for (let attacker of attackers) {
-            let attackerUser = await this.userService.getById(attacker.userId);
+            let attackerUser = gameUsers.find(u => u._id.equals(attacker.userId));
             attackerUsers.push(attackerUser);
         }
 
@@ -423,7 +432,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         // Add combat result stats to defender achievements.
-        if (defenderUser != null) {
+        if (defenderUser) {
             defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
             defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
         }
@@ -644,13 +653,6 @@ module.exports = class GameTickService extends EventEmitter {
             });
         }
 
-        // Save user profile achievements.
-        if (defenderUser) await defenderUser.save();
-
-        for (let attackerUser of attackerUsers) {
-            if (attackerUser) await attackerUser.save();
-        }
-
         // If there are still attackers remaining, recurse.
         attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
 
@@ -662,7 +664,7 @@ module.exports = class GameTickService extends EventEmitter {
                 player = this.playerService.getById(game, attackerPlayerIds[0]);
             }
 
-            await this._performCombat(game, player, star, attackerCarriers, report);
+            await this._performCombat(game, gameUsers, player, star, attackerCarriers, report);
         }
     }
 
@@ -751,15 +753,18 @@ module.exports = class GameTickService extends EventEmitter {
         this.historyService.log(game);
     }
 
-    async _gameLoseCheck(game, report) {
+    async _gameLoseCheck(game, gameUsers, report) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+        let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
+        let isRealTimeGame = this.gameService.isRealTimeGame(game);
+        let afkThresholdDate = moment().utc().subtract(3, 'days');
+        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            if (this.gameService.isTurnBasedGame(game)) {
+            if (isTurnBasedGame) {
                 // Reset whether we have sent the player a turn reminder.
                 player.hasSentTurnReminder = false;
 
@@ -778,9 +783,9 @@ module.exports = class GameTickService extends EventEmitter {
             // OR if in turn based mode, check if the player has reached the maximum missed turn limit.
             let isAfk = false;
 
-            if (this.gameService.isRealTimeGame(game)) {
-                isAfk = moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
-            } else if (this.gameService.isTurnBasedGame(game)) {
+            if (isRealTimeGame) {
+                isAfk = moment(player.lastSeen).utc() < afkThresholdDate;
+            } else if (isTurnBasedGame) {
                 isAfk = player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
             }
 
@@ -792,20 +797,26 @@ module.exports = class GameTickService extends EventEmitter {
             // Check if the player has been defeated by conquest.
             if (!player.defeated) {
                 let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
-    
-                player.defeated = stars.length === 0 && carriers.length === 0;
+
+                // If there are no stars and there are no carriers then the player is defeated.
+                if (stars.length === 0) {
+                    let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
+        
+                    player.defeated = carriers.length === 0;
+                }
             }
 
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.
 
-                let user = await this.userService.getById(player.userId);
+                let user = gameUsers.find(u => u._id.equals(player.userId));
 
                 if (isAfk) {
                     // AFK counts as a defeat as well.
-                    user.achievements.defeated++;
-                    user.achievements.afk++;
+                    if (user) {
+                        user.achievements.defeated++;
+                        user.achievements.afk++;
+                    }
 
                     this.emit('onPlayerAfk', {
                         game, 
@@ -813,20 +824,20 @@ module.exports = class GameTickService extends EventEmitter {
                     });
                 }
                 else {
-                    user.achievements.defeated++;
+                    if (user) {
+                        user.achievements.defeated++;
+                    }
 
                     this.emit('onPlayerDefeated', {
                         game, 
                         player
                     });
                 }
-
-                await user.save();
             }
         }
     }
 
-    async _gameWinCheck(game) {
+    async _gameWinCheck(game, gameUsers) {
         let winner = this.leaderboardService.getGameWinner(game);
 
         if (winner) {
@@ -834,7 +845,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
-            await this.leaderboardService.addGameRankings(game, leaderboard);
+            await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
 
             this.emit('onGameEnded', {
                 game
@@ -954,8 +965,6 @@ module.exports = class GameTickService extends EventEmitter {
 
     _broadcastReportToPlayer(game, report, player) {
         let playerReport = Object.assign({}, report); // Clone the original report.
-
-        // let playerReport = JSON.parse(JSON.stringify(report)); // Is this too slow?
 
         // Get the end of galactic cycle report for the player if there is one.
         playerReport.playerGalacticCycleReport = report.playerGalacticCycleReport.find(r => r.playerId.equals(player._id)) || null;

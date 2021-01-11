@@ -4,7 +4,10 @@
 
     <loading-spinner :loading="!leaderboard"/>
 
-    <leaderboard-table :leaderboard="leaderboard"></leaderboard-table>
+    <div v-if="leaderboard">
+      <h4>Top 100 Players</h4>
+      <leaderboard-table :leaderboard="leaderboard"></leaderboard-table>
+    </div>
   </view-container>
 </template>
 
@@ -31,7 +34,7 @@ export default {
     this.leaderboard = null
 
     try {
-      let response = await UserApiService.getLeaderboard()
+      let response = await UserApiService.getLeaderboard(100)
 
       if (response.status === 200) {
         this.leaderboard = response.data

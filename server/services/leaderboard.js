@@ -60,7 +60,7 @@ module.exports = class LeaderboardService {
         return leaderboard;
     }
 
-    async addGameRankings(game, leaderboard) {
+    async addGameRankings(game, gameUsers, leaderboard) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
 
         // Remove any afk players from the leaderboard, they will not
@@ -70,7 +70,7 @@ module.exports = class LeaderboardService {
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboardPlayers[i];
 
-            let user = await this.userService.getById(player.userId);
+            let user = gameUsers.find(u => u._id.equals(player.userId));
 
             // Double check user isn't deleted.
             if (!user) {
@@ -107,8 +107,6 @@ module.exports = class LeaderboardService {
             if (!player.defeated) {
                 user.achievements.completed++;
             }
-
-            await user.save();
         }
     }
 

@@ -32,6 +32,14 @@ module.exports = class UserService extends EventEmitter {
         return await this.userModel.findById(id);
     }
 
+    async getGameUsers(game) {
+        return await this.userModel.find({
+            _id: {
+                $in: game.galaxy.players.map(p => p.userId)
+            }
+        });
+    }
+
     async getInfoById(id) {
         return await this.userModel.findById(id, {
             // Remove fields we don't want to send back.
