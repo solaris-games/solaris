@@ -150,6 +150,7 @@ class Map extends EventEmitter {
     let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
     carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
+    carrier.refreshZoom(this.zoomPercent)
 
     this.carriers.push(carrier)
 
