@@ -5,8 +5,9 @@
     <loading-spinner :loading="!leaderboard"/>
 
     <div v-if="leaderboard">
-      <h4>Top 100 Players</h4>
-      <leaderboard-table :leaderboard="leaderboard"></leaderboard-table>
+      <h4 class="mb-1">Top 100 Players</h4>
+      <small class="text-warning">Total Players: {{totalPlayers}}</small>
+      <leaderboard-table class="mt-2" :leaderboard="leaderboard"></leaderboard-table>
     </div>
   </view-container>
 </template>
@@ -27,7 +28,8 @@ export default {
   },
   data () {
     return {
-      leaderboard: null
+      leaderboard: null,
+      totalPlayers: 0
     }
   },
   async mounted () {
@@ -37,7 +39,8 @@ export default {
       let response = await UserApiService.getLeaderboard(100)
 
       if (response.status === 200) {
-        this.leaderboard = response.data
+        this.leaderboard = response.data.leaderboard
+        this.totalPlayers = response.data.totalPlayers
       }
     } catch (err) {
       console.error(err)
