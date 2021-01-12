@@ -103,14 +103,14 @@ module.exports = class TechnologyService {
 
             if (specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
-            }
 
-            if (isCarrierToStarCombat === true && specialist.modifiers.local.carrierToStarCombat != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.local.carrierToStarCombat, sanitize);
-            }
-
-            if (isCarrierToStarCombat === false && specialist.modifiers.local.carrierToCarrierCombat != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.local.carrierToCarrierCombat, sanitize);
+                if (isCarrierToStarCombat === true && specialist.modifiers.local.carrierToStarCombat != null) {
+                    this._applyTechModifiers(techs, specialist.modifiers.local.carrierToStarCombat, sanitize);
+                }
+    
+                if (isCarrierToStarCombat === false && specialist.modifiers.local.carrierToCarrierCombat != null) {
+                    this._applyTechModifiers(techs, specialist.modifiers.local.carrierToCarrierCombat, sanitize);
+                }
             }
         }
 
