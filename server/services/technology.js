@@ -93,7 +93,7 @@ module.exports = class TechnologyService {
         return techs;
     }
 
-    getCarrierEffectiveTechnologyLevels(game, carrier, sanitize = true) {
+    getCarrierEffectiveTechnologyLevels(game, carrier, isCarrierToStarCombat, sanitize = true) {
         let player = game.galaxy.players.find(x => x._id.equals(carrier.ownedByPlayerId));
 
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
@@ -104,18 +104,26 @@ module.exports = class TechnologyService {
             if (specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
             }
+
+            if (isCarrierToStarCombat === true && specialist.modifiers.local.carrierToStarCombat != null) {
+                this._applyTechModifiers(techs, specialist.modifiers.local.carrierToStarCombat, sanitize);
+            }
+
+            if (isCarrierToStarCombat === false && specialist.modifiers.local.carrierToCarrierCombat != null) {
+                this._applyTechModifiers(techs, specialist.modifiers.local.carrierToCarrierCombat, sanitize);
+            }
         }
 
         return techs;
     }
 
-    getCarriersEffectiveWeaponsLevel(game, carriers) {
+    getCarriersEffectiveWeaponsLevel(game, carriers, isCarrierToStarCombat) {
         if (!carriers.length) {
             return 1;
         }
 
         // Get the max tech level of all carriers in the array.
-        let techLevels = carriers.map(c => this.getCarrierEffectiveTechnologyLevels(game, c).weapons);
+        let techLevels = carriers.map(c => this.getCarrierEffectiveTechnologyLevels(game, c, isCarrierToStarCombat, true).weapons);
 
         return techLevels.sort((a, b) => b - a)[0];
     }

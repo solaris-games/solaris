@@ -25,7 +25,7 @@ module.exports = class WaypointService {
             throw new ValidationError('Cannot change waypoints of a carrier that is a gift.');
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         // If the carrier is currently in transit then double check that the first waypoint
@@ -138,7 +138,7 @@ module.exports = class WaypointService {
             return false;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
 
         // Check whether the last waypoint is in range of the first waypoint.
         let firstWaypoint = carrier.waypoints[0];
@@ -396,7 +396,7 @@ module.exports = class WaypointService {
             throw new ValidationError(`Star must be in orbit for it to be rerouted from a star.`);
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         // Find the nearest friendly star, if there is none then we cannot reroute.
