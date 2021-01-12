@@ -117,9 +117,12 @@
         {
             "id": 10,
             "name": "Warp Stabilizer",
-            "description": "Warp Scramblers do not affect the carrier.",
+            "description": "Warp Scramblers do not affect the carrier. -1 Weapons.",
             "tier": 4,
             "modifiers": {
+                "local": {
+                    "weapons": -1
+                },
                 "special": {
                     "unlockWarpGates": true
                 }
