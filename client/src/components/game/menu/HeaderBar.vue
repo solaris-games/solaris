@@ -43,14 +43,14 @@
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <div class="pl-2">
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy" title="Hotkey: 0"><i class="fas fa-compass"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()" title="Hotkey: +"><i class="fas fa-search-plus"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()" title="Hotkey: -"><i class="fas fa-search-minus"></i></button>
-                    <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Hotkey: H"><i class="fas fa-home"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy" title="Fit Galaxy (0)"><i class="fas fa-compass"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()" title="Zoom In (+)"><i class="fas fa-search-plus"></i></button>
+                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()" title="Zoom Out (-)"><i class="fas fa-search-minus"></i></button>
+                    <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Home (H)"><i class="fas fa-home"></i></button>
                     <div>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Hotkey: C"><i class="fas fa-calculator"></i></button>
-                        <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Hotkey: V"><i class="fas fa-ruler"></i></button>
-                        <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Hotkey: B"><i class="fas fa-money-bill"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></button>
+                        <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Ruler (V)"><i class="fas fa-ruler"></i></button>
+                        <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></button>
                     </div>
                 </div>
                 <div class="dropdown-divider"></div>
@@ -58,14 +58,14 @@
                     <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake mr-2"></i>Welcome</a>
                 </div>
                 <div v-if="userPlayer">
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Hotkey: L"><i class="fas fa-users mr-2"></i>Leaderboard</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Hotkey: R"><i class="fas fa-flask mr-2"></i>Research</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Hotkey: S"><i class="fas fa-star mr-2"></i>Galaxy</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Hotkey: K"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Hotkey: G"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Hotkey: N"><i class="fas fa-book-open mr-2"></i>Notes</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (L)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask mr-2"></i>Research</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (S)"><i class="fas fa-star mr-2"></i>Galaxy</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (K)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (G)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
                 </div>
-                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Hotkey: O"><i class="fas fa-cog mr-2"></i>Options</a>
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
                 <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
                 <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
             </div>
@@ -78,7 +78,7 @@
                 <i class="fas fa-cog"></i>
             </button> -->
 
-            <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Hotkey: I">
+            <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (I)">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
