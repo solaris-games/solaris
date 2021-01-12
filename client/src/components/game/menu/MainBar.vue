@@ -7,7 +7,7 @@
   <div class="menu">
     <div class="header-buffer"></div>
 
-    <player-list v-bind:players="game.galaxy.players" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+    <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="menu-content bg-dark" v-if="menuState">
       <!-- <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
