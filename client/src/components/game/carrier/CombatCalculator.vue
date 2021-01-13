@@ -100,6 +100,7 @@ export default {
   },
   mounted () {
     this.hasDefenderBonus = this.$store.state.game.settings.specialGalaxy.defenderBonus === 'enabled'
+    this.includeDefenderBonus = this.hasDefenderBonus
   },
   methods: {
     onCloseRequested (e) {

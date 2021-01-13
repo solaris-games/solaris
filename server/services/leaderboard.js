@@ -28,7 +28,12 @@ module.exports = class LeaderboardService {
             leaderboard[i].position = i + 1;
         }
 
-        return leaderboard;
+        let totalPlayers = await this.userModel.countDocuments();
+
+        return {
+            totalPlayers,
+            leaderboard
+        };
     }
 
     getLeaderboardRankings(game) {

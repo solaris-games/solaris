@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group list-group-horizontal">
-        <li class="list-group-item grow" v-for="p in players" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
+        <li class="list-group-item grow" v-for="p in sortedPlayers" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
           :title="p.colour.alias + ' ' + p.shape + ' - ' + p.alias">
           <player-avatar :player="p"/>
 
@@ -18,15 +18,17 @@ export default {
   components: {
     'player-avatar': PlayerAvatarVue
   },
-  props: {
-    players: Array
-  },
   methods: {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
     onOpenPlayerDetailRequested (player) {
       this.$emit('onOpenPlayerDetailRequested', player._id)
+    }
+  },
+  computed: {
+    sortedPlayers: function () {
+      return gameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
     }
   }
 }

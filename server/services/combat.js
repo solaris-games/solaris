@@ -63,12 +63,12 @@ module.exports = class CombatService {
         // Calculate the weapons tech levels based on any specialists present at stars or carriers.
         let defenderWeaponsTechLevel;
         let defenderWeaponsTechLevelStar = this.technologyService.getStarEffectiveTechnologyLevels(game, star).weapons;
-        let defenderWeaponsTechLevelCarriers = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenderCarriers);
+        let defenderWeaponsTechLevelCarriers = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenderCarriers, true);
 
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevelStar, defenderWeaponsTechLevelCarriers);
         
         // Use the highest weapons tech of the attacking players to calculate combat result.
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers, true);
 
         // Check for deductions to weapons.
         let defenderWeaponsDeduction = this.getWeaponsDeduction(attackerCarriers, defenderCarriers);
@@ -95,8 +95,8 @@ module.exports = class CombatService {
         let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
 
         // Calculate the weapons tech levels
-        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenderCarriers);
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers);
+        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenderCarriers, false);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers, false);
         
         // Check for deductions to weapons.
         let defenderWeaponsDeduction = this.getWeaponsDeduction(attackerCarriers, defenderCarriers);

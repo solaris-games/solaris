@@ -48,28 +48,30 @@
     </div>
 
     <div class="container">
-        <div class="row">
-            <div class="col-4">
+        <div class="row mb-2">
+            <div class="col">
               <div class="btn-group">
                 <button class="btn btn-success" @click="showAll">All</button>
-                <button class="btn btn-primary mr-3" @click="showNone">None</button>
+                <button class="btn btn-info" @click="showActive">Active</button>
+                <button class="btn btn-primary" @click="showNone">You</button>
               </div>
             </div>
-
-            <div class="col">
-              <button v-for="playerFilter in playerFilters" :key="playerFilter._id"
-                class="btn mr-1 mb-1"
-                :class="{'btn-primary': playerFilter.enabled}"
-                @click="togglePlayerFilter(playerFilter)"
-                :title="playerFilter.alias">
-                <player-icon 
-                  :playerId="playerFilter.playerId" 
-                  :hideOnlineStatus="true" 
-                  :solidGlyphOnly="true"
-                  :colour="playerFilter.colour"
-                  style="margin-top:0px;margin-right:0px;"/>
-              </button>
-            </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button v-for="playerFilter in playerFilters" :key="playerFilter._id"
+              class="btn mr-1 mb-1"
+              :class="{'btn-primary': playerFilter.enabled}"
+              @click="togglePlayerFilter(playerFilter)"
+              :title="playerFilter.alias">
+              <player-icon 
+                :playerId="playerFilter.playerId" 
+                :hideOnlineStatus="true" 
+                :solidGlyphOnly="true"
+                :colour="playerFilter.colour"
+                style="margin-top:0px;margin-right:0px;"/>
+            </button>
+          </div>
         </div>
     </div>
   </div>
@@ -138,6 +140,7 @@ export default {
         playerId: p._id,
         alias: p.alias,
         shape: p.shape,
+        defeated: p.defeated,
         colour: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(p.colour.value) //p.colour // GameHelper.getPlayerColour(this.$store.state.game, p._id)
       }
     })
@@ -203,6 +206,11 @@ export default {
     },
     showAll () {
       this.playerFilters.forEach(f => f.enabled = true)
+
+      this.fillData()
+    },
+    showActive () {
+      this.playerFilters.forEach(f => f.enabled = !f.defeated)
 
       this.fillData()
     },

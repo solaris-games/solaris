@@ -122,7 +122,7 @@ export default {
       try {
         let response = await userService.getLeaderboard(10)
 
-        this.leaderboard = response.data
+        this.leaderboard = response.data.leaderboard
       } catch (err) {
         console.error(err)
       }

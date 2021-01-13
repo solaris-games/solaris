@@ -217,6 +217,7 @@ module.exports = class PlayerService extends EventEmitter {
             star.garrisonActual = game.settings.player.startingShips;
             star.garrison = star.garrisonActual;
             star.warpGate = false;
+            star.specialistId = null;
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
             star.infrastructure.science = 0;

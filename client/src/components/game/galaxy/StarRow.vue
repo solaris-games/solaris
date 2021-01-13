@@ -3,9 +3,9 @@
     <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
-    <td class="text-right">{{star.infrastructure.economy}}</td>
-    <td class="text-right">{{star.infrastructure.industry}}</td>
-    <td class="text-right">{{star.infrastructure.science}}</td>
+    <td class="text-right"><span v-if="star.infrastructure">{{star.infrastructure.economy}}</span></td>
+    <td class="text-right"><span v-if="star.infrastructure">{{star.infrastructure.industry}}</span></td>
+    <td class="text-right"><span v-if="star.infrastructure">{{star.infrastructure.science}}</span></td>
     <td class="text-right">
       <span v-if="star.upgradeCosts && !canUpgradeEconomy">${{star.upgradeCosts.economy}}</span>
       <a href="javascript:;" v-if="canUpgradeEconomy"
