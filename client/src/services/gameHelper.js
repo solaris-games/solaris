@@ -440,7 +440,7 @@ class GameHelper {
         case 12:
           return 'alien-stare'
         case 13:
-          return 'bubble-field'
+          return 'pirate'
       }
     } else {
       switch (specialistId) {

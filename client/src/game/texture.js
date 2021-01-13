@@ -43,7 +43,7 @@ class TextureService {
       this._loadSpecialistTexture('observatory')
       this._loadSpecialistTexture('alien-stare')
       this._loadSpecialistTexture('afterburn')
-      this._loadSpecialistTexture('bubble-field')
+      this._loadSpecialistTexture('pirate')
     }
 
     _loadSpecialistTexture(name) {
