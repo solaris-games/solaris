@@ -51,6 +51,7 @@
                         <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></button>
                         <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Ruler (V)"><i class="fas fa-ruler"></i></button>
                         <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></button>
+                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="reloadPage" title="Reload Game"><i class="fas fa-sync"></i></button>
                     </div>
                 </div>
                 <div class="dropdown-divider"></div>
@@ -340,6 +341,9 @@ export default {
           this.setMenuState(MENU_STATES.OPTIONS)
           break
       }
+    },
+    reloadPage () {
+      window.location.reload()
     }
   },
   computed: {
