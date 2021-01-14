@@ -15,6 +15,10 @@ module.exports = class WaypointService {
     }
 
     async saveWaypoints(game, player, carrierId, waypoints, looped) {
+        if (looped == null) {
+            looped = false;
+        }
+        
         let carrier = this.carrierService.getById(game, carrierId);
         
         if (!carrier.ownedByPlayerId.equals(player._id)) {
