@@ -169,9 +169,9 @@ module.exports = class StarService extends EventEmitter {
         return (terraforming * 5) + naturalResources;
     }
 
-    calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1) {
+    calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1, productionTicks = 24) {
         // A star produces Y*(X+5) ships every 24 ticks where X is your manufacturing tech level and Y is the amount of industry at a star.
-        return +((industryLevel * (techLevel + 5) / 24) * ticks).toFixed(2);
+        return +((industryLevel * (techLevel + 5) / productionTicks) * ticks).toFixed(2);
     }
 
     async abandonStar(game, player, starId) {
@@ -338,7 +338,7 @@ module.exports = class StarService extends EventEmitter {
                 let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
     
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.garrisonActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry);
+                star.garrisonActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
                 star.garrison = Math.floor(star.garrisonActual);
 
                 // If the star isn't already in the report, add it.

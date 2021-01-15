@@ -284,7 +284,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let star = this.starService.getById(game, starId);
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
-        report.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, report.infrastructure);
+        report.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, report.infrastructure, 1, game.settings.galaxy.productionTicks);
 
         return report;
     }

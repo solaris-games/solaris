@@ -389,7 +389,7 @@ module.exports = class PlayerService extends EventEmitter {
         playerStars.forEach(s => {
             let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
 
-            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, s.infrastructure.industry)
+            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, s.infrastructure.industry, 1, game.settings.galaxy.productionTicks)
         });
 
         let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
