@@ -239,7 +239,7 @@ module.exports = class IrregularMapService {
         const STARS_PER_PLAYER = starCount/playerCount;
         const INITIAL_HYPER_RANGE = game.settings.technology.startingTechnologyLevel.hyperspace;
         const STARTING_STAR_COUNT = game.settings.player.startingStars-1;
-        const MINIMUM_STAR_DISTANCE = game.constants.distances.minDistanceBetweenStars;
+        const MINIMUM_STAR_DISTANCE = game.constants.distances.minDistanceBetweenStars * 0.75; // TODO: This is a bit of a bodge to ensure that stars do not spawn too far away from players.
        
         //the amount of rings must produce about 30% more stars then requested. this way they can be pruned latter with noise to produce nice gap
         const STAR_COUNT_MULTIPLYER = 1.3;
