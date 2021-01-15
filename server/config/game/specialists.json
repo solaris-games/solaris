@@ -305,7 +305,7 @@
             "id": 11,
             "name": "Research Station",
             "description": "The Star's Science infrastructure contributes x2 to research.",
-            "tier": 5,
+            "tier": 4,
             "modifiers": {
                 "special": {
                     "scienceInfrastructureMultiplier": 2
