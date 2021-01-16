@@ -61,7 +61,7 @@ class GameHelper {
 
   getHyperspaceDistance (game, player, carrier) {
     let techLevel = player.research.hyperspace.effective
-    
+
     if (carrier.specialist && carrier.specialist.modifiers.local) {
       techLevel += carrier.specialist.modifiers.local.hyperspace || 0
     }
@@ -69,6 +69,11 @@ class GameHelper {
     techLevel = Math.max(1, techLevel)
 
     return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
+  }
+
+  getScanningLevelByDistance (game, distance) {
+    let distancePerLevel = Math.ceil(distance / game.constants.distances.lightYear - 1)
+    return distancePerLevel || 1
   }
 
   getHyperspaceLevelByDistance (game, distance) {
@@ -88,14 +93,14 @@ class GameHelper {
   }
 
   getAngleBetweenLocations (loc1, loc2) {
-    return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x);
+    return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x)
   }
 
   getPointFromLocation (loc, angle, distance) {
     return {
-        x: loc.x + (Math.cos(angle) * distance),
-        y: loc.y + (Math.sin(angle) * distance)
-    };
+      x: loc.x + (Math.cos(angle) * distance),
+      y: loc.y + (Math.sin(angle) * distance)
+    }
   }
 
   getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
@@ -129,7 +134,7 @@ class GameHelper {
 
     let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
 
-    return ticksToProduction;
+    return ticksToProduction
   }
 
   getCountdownTimeString (game, date) {
@@ -148,9 +153,9 @@ class GameHelper {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 
       let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
-  
+
       let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate)
-  
+
       return timeRemainingEta
     }
 
@@ -305,7 +310,7 @@ class GameHelper {
 
   userPlayerHasHighestTechLevel (game, techKey) {
     let userPlayer = this.getUserPlayer(game)
-    
+
     let levels = [...new Set(game.galaxy.players.map(p => {
       return p.research[techKey].level
     }))]
@@ -322,7 +327,7 @@ class GameHelper {
 
   userPlayerHasLowestTechLevel (game, techKey) {
     let userPlayer = this.getUserPlayer(game)
-    
+
     let levels = [...new Set(game.galaxy.players.map(p => {
       return p.research[techKey].level
     }))]
@@ -379,13 +384,13 @@ class GameHelper {
   calculateGalaxyCenterX (game) {
     let starFieldLeft = this.calculateMinStarX(game)
     let starFieldRight = this.calculateMaxStarX(game)
-    return starFieldLeft + ( (starFieldRight-starFieldLeft)/2.0 )
+    return starFieldLeft + ((starFieldRight - starFieldLeft) / 2.0)
   }
 
   calculateGalaxyCenterY (game) {
     let starFieldTop = this.calculateMinStarY(game)
     let starFieldBottom = this.calculateMaxStarY(game)
-    return starFieldTop + ( (starFieldBottom-starFieldTop)/2.0 )
+    return starFieldTop + ((starFieldBottom - starFieldTop) / 2.0)
   }
 
   calculateMinStarX (game) {
