@@ -13,25 +13,16 @@
         </div>
     </div>
 
-    <!-- <div class="row bg-primary pt-2 pb-2">
-        <div class="col-6">
-            ETA
-        </div>
-        <div class="col-6 text-right">
-            0h
-        </div>
-    </div>
-
-    <div class="row bg-secondary pt-2 pb-2">
+    <div class="row bg-primary pt-2 pb-2">
         <div class="col-6">
             Range
         </div>
         <div class="col-6 text-right">
-            {{rangeLightYears}}ly
+            <i class="fas fa-sun"></i> {{rangeLightYears}} LY
         </div>
-    </div> -->
+    </div>
 
-    <div class="row bg-primary pt-2 pb-2">
+    <div class="row bg-secondary pt-2 pb-2">
         <div class="col-6">
             Hyperspace Range
         </div>
@@ -40,7 +31,7 @@
         </div>
     </div>
 
-    <div class="row bg-secondary pt-2 pb-2">
+    <div class="row bg-primary pt-2 pb-2">
         <div class="col-6">
             ETA Base Speed
         </div>
@@ -49,7 +40,7 @@
         </div>
     </div>
 
-    <div class="row bg-primary pt-2 pb-2">
+    <div class="row bg-secondary pt-2 pb-2">
         <div class="col-6">
             ETA Warp Speed
         </div>
@@ -64,7 +55,6 @@
 import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
-import * as moment from 'moment'
 
 export default {
   components: {
@@ -86,8 +76,6 @@ export default {
     GameContainer.map.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     GameContainer.map.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
     GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
-
-    let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
   },
   destroyed () {
     // Set map to galaxy mode
@@ -107,18 +95,21 @@ export default {
 
       this.recalculateETAs()
       this.recalculateHyperspaceRange()
+      this.recalculateRangeLightYears()
     },
     onRulerPointRemoved (e) {
       this.points.splice(this.points.indexOf(e), 1)
 
       this.recalculateETAs()
       this.recalculateHyperspaceRange()
+      this.recalculateRangeLightYears()
     },
     onRulerPointsCleared (e) {
       this.points = []
 
       this.recalculateETAs()
       this.recalculateHyperspaceRange()
+      this.recalculateRangeLightYears()
     },
     recalculateETAs () {
       let game = this.$store.state.game
@@ -153,11 +144,24 @@ export default {
 
         distances.push(GameHelper.getDistanceBetweenLocations(point, nextPoint))
       }
-      
+
       let longestWaypoint = Math.max(...distances)
 
       // Calculate the hyperspace range required for it.
       this.hyperspaceRange = GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint)
+    },
+    recalculateRangeLightYears () {
+      this.rangeLightYears = 0
+      if (this.points.length < 2) {
+        return
+      }
+
+      let game = this.$store.state.game
+
+      for (let i = 0; i < this.points.length - 1; i++) {
+        this.rangeLightYears += GameHelper.getDistanceBetweenLocations(this.points[i], this.points[i + 1])
+      }
+      this.rangeLightYears = Math.round(this.rangeLightYears / game.constants.distances.lightYear)
     }
   }
 }
