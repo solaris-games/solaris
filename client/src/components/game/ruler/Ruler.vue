@@ -4,58 +4,31 @@
         <button class="btn btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
     </menu-title>
 
-    <div class="row bg-secondary pt-2 pb-2">
-        <div class="col-6">
-            Waypoints
-        </div>
-        <div class="col-6 text-right">
-            <i class="fas fa-map-marker-alt"></i> {{points.length}}
-        </div>
-    </div>
-
     <div class="row bg-primary pt-2 pb-2">
-        <div class="col-6">
-            Range
-        </div>
-        <div class="col-6 text-right">
-            <i class="fas fa-sun"></i> {{rangeLightYears}} LY
-        </div>
+      <div class="col-3 text-center">
+          <i class="fas fa-map-marker-alt"></i> {{points.length}}
+      </div>
+      <div class="col-3 text-center">
+          <i class="fas fa-sun"></i> {{rangeLightYears}} LY
+      </div>
+      <div class="col-3 text-center">
+          <i class="fas fa-binoculars"></i> {{scanningRange}}
+      </div>
+      <div class="col-3 text-center">
+          <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
+      </div>
     </div>
 
     <div class="row bg-secondary pt-2 pb-2">
-        <div class="col-6">
-            Scanning Range
-        </div>
-        <div class="col-6 text-right">
-            <i class="fas fa-binoculars"></i> {{scanningRange}}
-        </div>
-    </div>
-
-    <div class="row bg-primary pt-2 pb-2">
-        <div class="col-6">
-            Hyperspace Range
-        </div>
-        <div class="col-6 text-right">
-            <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
-        </div>
-    </div>
-
-    <div class="row bg-secondary pt-2 pb-2">
-        <div class="col-6">
-            ETA Base Speed
-        </div>
-        <div class="col-6 text-right">
-            {{totalEta || 'N/A'}}
-        </div>
-    </div>
-
-    <div class="row bg-primary pt-2 pb-2">
-        <div class="col-6">
-            ETA Warp Speed
-        </div>
-        <div class="col-6 text-right">
-            {{totalEtaWarp || 'N/A'}}
-        </div>
+      <div class="col-2">
+          ETA
+      </div>
+      <div class="col-5 text-right">
+          Base {{totalEta || 'N/A'}}
+      </div>
+      <div class="col-5 text-right">
+          Warp {{totalEtaWarp || 'N/A'}}
+      </div>
     </div>
 </div>
 </template>
