@@ -116,8 +116,8 @@ module.exports = class GameTickService extends EventEmitter {
 
         logTime('Save users');
 
-        this._broadcastReport(game, report);
-        logTime('Broadcast report');
+        // this._broadcastReport(game, report);
+        // logTime('Broadcast report');
 
         let endTime = process.hrtime(startTime);
 

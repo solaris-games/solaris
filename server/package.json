@@ -2,10 +2,10 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "jasmine",
-    "start": "node index.js"
+    "start-api": "node api/index.js",
+    "start-jobs": "node jobs/index.js"
   },
   "author": "",
   "license": "ISC",
