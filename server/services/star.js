@@ -289,21 +289,17 @@ module.exports = class StarService extends EventEmitter {
         }
     }
 
-    applyStarSpecialistSpecialModifiers(game, report) {
+    applyStarSpecialistSpecialModifiers(game) {
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let star = game.galaxy.stars[i];
 
             if (star.ownedByPlayerId) {
-                let hasModifiedStar = false;
-
                 if (star.specialistId) {
                     let specialist = this.specialistService.getByIdStar(star.specialistId);
 
                     if (specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
                             star.naturalResources += specialist.modifiers.special.addNaturalResourcesOnTick;
-
-                            hasModifiedStar = true;
                         }
 
                         if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
@@ -314,21 +310,14 @@ module.exports = class StarService extends EventEmitter {
                                 star.naturalResources = 0;
                                 star.specialistId = null;
                             }
-
-                            hasModifiedStar = true;
                         }
                     }
-                }
-
-                // If the star isn't already in the report, add it.
-                if (hasModifiedStar && !report.stars.find(s => s.equals(star._id))) {
-                    report.stars.push(star._id);
                 }
             }
         }
     }
 
-    produceShips(game, report) {
+    produceShips(game) {
         let starsToProduce = game.galaxy.stars.filter(s => s.infrastructure.industry > 0);
 
         for (let i = 0; i < starsToProduce.length; i++) {
@@ -340,11 +329,6 @@ module.exports = class StarService extends EventEmitter {
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
                 star.garrisonActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
                 star.garrison = Math.floor(star.garrisonActual);
-
-                // If the star isn't already in the report, add it.
-                if (!report.stars.find(s => s.equals(star._id))) {
-                    report.stars.push(star._id);
-                }
             }
         }
     }

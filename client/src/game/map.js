@@ -182,16 +182,43 @@ class Map extends EventEmitter {
   }
 
   reloadGame (game, userSettings) {
-    // Update all of the stars.
+    // Check for stars that are no longer in scanning range.
+    for (let i = 0; i < this.stars.length; i++) {
+      let star = this.stars[i]
+      let gameStar = GameHelper.getStarById(game, star.data._id)
+
+      if (!gameStar) {
+        this._undrawStar(star)
+        i--
+      }
+    }
+
+    // Check for carriers that are no longer in scanning range or have been destroyed.
+    for (let i = 0; i < this.carriers.length; i++) {
+      let carrier = this.carriers[i]
+      let gameCarrier = GameHelper.getCarrierById(game, carrier.data._id)
+
+      if (!gameCarrier) {
+        this._undrawCarrier(carrier)
+        i--
+      }
+    }
+
+    // Update all of the stars and add any newly discovered ones.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
       let starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
-      existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+      if (existing) {
+        existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+      } else {
+        existing = this.setupStar(game, userSettings, starData)
+      }
+
       existing.draw()
     }
 
-    // Remove any carriers that have been destroyed and add new ones that have been built.
+    // Update all of the carriers and add new ones that have been built.
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
       let carrierData = game.galaxy.carriers[i]
 
@@ -273,6 +300,16 @@ class Map extends EventEmitter {
     star.draw()
   }
 
+  _undrawStar (star) {
+    star.off('onStarClicked', this.onStarClicked.bind(this))
+    star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
+
+    this.starContainer.removeChild(star.container)
+    this.starContainer.removeChild(star.fixedcontainer)
+
+    this.stars.splice(this.stars.indexOf(star), 1)
+  }
+
   drawCarriers () {
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
@@ -285,19 +322,23 @@ class Map extends EventEmitter {
     carrier.draw()
   }
 
+  _undrawCarrier (carrier) {
+    carrier.off('onCarrierClicked', this.onCarrierClicked.bind(this))
+    carrier.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
+    carrier.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+    carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+
+    this.carrierContainer.removeChild(carrier.container)
+    this.carrierContainer.removeChild(carrier.fixedcontainer)
+
+    this.carriers.splice(this.carriers.indexOf(carrier), 1)
+  }
+
   undrawCarrier (carrierData) {
     let existing = this.carriers.find(x => x.data._id === carrierData._id)
 
     if (existing) {
-      existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-      existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-      existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
-
-      this.carrierContainer.removeChild(existing.container)
-      this.carrierContainer.removeChild(existing.fixedcontainer)
-
-      this.carriers.splice(this.carriers.indexOf(existing), 1)
+      this._undrawCarrier(existing)
     }
   }
 

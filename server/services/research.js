@@ -113,7 +113,7 @@ module.exports = class ResearchService extends EventEmitter {
         return report;
     }
 
-    async conductResearchAll(game, gameUsers, report) {
+    async conductResearchAll(game, gameUsers) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -125,11 +125,8 @@ module.exports = class ResearchService extends EventEmitter {
             }
             
             let user = gameUsers.find(u => u._id.equals(player.userId));
-            let researchReport = await this.conductResearch(game, user, player);
-
-            researchReport.playerId = player._id;
-
-            report.playerResearch.push(researchReport);
+            
+            await this.conductResearch(game, user, player);
         }
     }
 

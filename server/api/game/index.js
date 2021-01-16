@@ -31,6 +31,14 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/:gameId/state', middleware.authenticate, middleware.loadGameState, async (req, res, next) => {
+        try {
+            return res.status(200).json(req.game);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
         try {
             return res.status(200).json(req.history);

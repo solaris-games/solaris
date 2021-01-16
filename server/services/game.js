@@ -64,6 +64,14 @@ module.exports = class GameService extends EventEmitter {
         return game;
     }
 
+    async getByIdState(id, userId) {
+        let game = await this.getByIdLean(id, {
+            state: 1
+        });
+
+        return game;
+    }
+
     async getByIdMessages(id) {
         return await this.getById(id, {
             settings: 1,

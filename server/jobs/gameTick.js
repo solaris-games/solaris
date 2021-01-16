@@ -5,8 +5,6 @@ module.exports = (container) => {
         async handler(job, done) {
             let games = await container.gameListService.listInProgressGames();
 
-            console.log(`Games In Progress: ${games.length}`);
-            
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
 

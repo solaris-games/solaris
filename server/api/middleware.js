@@ -68,6 +68,14 @@ module.exports = (container) => {
             return next();
         },
 
+        async loadGameState(req, res, next) {
+            if (req.params.gameId) {
+                req.game = await container.gameService.getByIdState(req.params.gameId, req.session.userId);
+            }
+
+            return next();
+        },
+
         async loadGameMessages(req, res, next) {
             if (req.params.gameId) {
                 req.game = await container.gameService.getByIdMessages(req.params.gameId);

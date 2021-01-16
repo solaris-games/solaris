@@ -22,12 +22,6 @@ module.exports = class BroadcastService {
         return game.galaxy.players.filter(p => this.playerRoomExists(p));
     }
 
-    gameTick(game, playerId, report) {
-        this.io.to(playerId.toString()).emit('gameTicked', {
-            report
-        });
-    }
-
     gameStarted(game) {
         this.io.to(game.id).emit('gameStarted', {
             state: game.state

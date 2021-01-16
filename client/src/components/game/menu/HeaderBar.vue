@@ -33,7 +33,7 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-if="userPlayer && isTurnBasedGame() && !gameIsFinished()" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame() && !gameIsFinished()" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
@@ -80,7 +80,7 @@
                 <i class="fas fa-cog"></i>
             </button> -->
 
-            <button class="btn btn-sm ml-1" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-if="userPlayer" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (I)">
+            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (I)">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
@@ -117,13 +117,10 @@ export default {
       MENU_STATES: MENU_STATES,
       timeRemaining: null,
       intervalFunction: null,
-      userPlayer: null,
       unreadMessages: 0
     }
   },
   mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
     this.setupTimer()
 
     this.checkForUnreadMessages()
@@ -227,8 +224,6 @@ export default {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     },
     async checkForUnreadMessages () {
-      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
       if (!userPlayer) {
         return
       }
@@ -349,6 +344,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
     }
   }
 }

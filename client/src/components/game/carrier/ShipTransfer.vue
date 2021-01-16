@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import GameHelper from '../../../services/gameHelper'
 import CarrierApiService from '../../../services/api/carrier'
 import MenuTitle from '../MenuTitle'
@@ -89,22 +90,17 @@ export default {
     }
   },
   mounted () {
-    this.sockets.subscribe('gameTicked', (data) => this.onGameTicked(data))
-
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
 
     this.starShips = this.star.garrison
     this.carrierShips = this.carrier.ships
   },
-  destroyed () {
-    this.sockets.unsubscribe('gameTicked')
-  },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onGameTicked (data) {
+    onGameReloaded (data) {
       // When the game ticks there may have been ships built at the star.
       // Find the star in the tick report and compare the garrison, then add
       // the difference to the star ships side on the transfer.
@@ -181,6 +177,12 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
       this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
+    }
+  },
+  computed: mapState(['game']),
+  watch: {
+    game (newGame, oldGame) {
+      this.onGameReloaded(newGame)
     }
   }
 }

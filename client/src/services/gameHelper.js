@@ -505,6 +505,44 @@ class GameHelper {
   getGamePlayerShapesCount (game) {
     return new Set([...game.galaxy.players.map(p => p.shape)]).size
   }
+
+  isRealTimeGame(game) {
+    return game.settings.gameTime.gameType === 'realTime';
+  }
+
+  isTurnBasedGame(game) {
+    return game.settings.gameTime.gameType === 'turnBased';
+  }
+
+  isAllUndefeatedPlayersReady(game) {
+    let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+
+    return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+  }
+
+  canTick(game) {
+    let lastTick = moment(game.state.lastTickDate).utc();
+    let nextTick;
+
+    if (this.isRealTimeGame(game)) {
+        // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+    } else if (this.isTurnBasedGame(game)) {
+        // If in turn based mode, then check if all undefeated players are ready.
+        // OR the max time wait limit has been reached.
+        let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
+        
+        if (isAllPlayersReady) {
+            return true;
+        }
+
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+    } else {
+        throw new Error(`Unsupported game type.`);
+    }
+
+    return nextTick.diff(moment().utc(), 'seconds') <= 0;
+}
 }
 
 export default new GameHelper()

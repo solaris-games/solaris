@@ -27,11 +27,12 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
-import gameService from '../services/api/game'
+import GameApiService from '../services/api/game'
 import UserApiService from '../services/api/user'
 import GameHelper from '../services/gameHelper'
 import AudioService from '../game/audio'
 import moment from 'moment'
+import gameHelper from '../services/gameHelper'
 
 export default {
   components: {
@@ -45,7 +46,8 @@ export default {
       audio: null,
       menuState: null,
       menuArguments: null,
-      MENU_STATES: MENU_STATES
+      MENU_STATES: MENU_STATES,
+      polling: null
     }
   },
   async created () {
@@ -75,6 +77,11 @@ export default {
 
     // Check if the user is in this game, if not then show the welcome screen.
     this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
+
+    this.polling = setInterval(this.reloadGameCheck, 10000)
+  },
+  beforeDestroy () {
+    clearInterval(this.polling)
   },
   destroyed () {
     this.unsubscribeToSockets()
@@ -97,7 +104,7 @@ export default {
   methods: {
     async reloadGame () {
       try {
-        let galaxyResponse = await gameService.getGameGalaxy(this.$route.query.id)
+        let galaxyResponse = await GameApiService.getGameGalaxy(this.$route.query.id)
 
         this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
 
@@ -182,7 +189,6 @@ export default {
     // Sockets
     subscribeToSockets () {
       // TODO: Move all component subscriptions into the components' socket object.
-      this.sockets.subscribe('gameTicked', (data) => this.$store.commit('gameTicked', data))
       this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
       this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
@@ -204,7 +210,6 @@ export default {
       }
     },
     unsubscribeToSockets () {
-      this.sockets.unsubscribe('gameTicked')
       this.sockets.unsubscribe('gameStarted')
       this.sockets.unsubscribe('gameStarEconomyUpgraded')
       this.sockets.unsubscribe('gameStarIndustryUpgraded')
@@ -291,6 +296,25 @@ export default {
 
       player.lastSeen = moment().utc()
       player.isOnline = false
+    },
+    async reloadGameCheck () {
+      // Check if the next tick date has passed, if so check if the server has finished the game tick.
+      let canTick = gameHelper.canTick(this.$store.state.game)
+
+      if (true) {
+        try {
+          let response = await GameApiService.getGameState(this.$store.state.game._id)
+          
+          if (response.status === 200) {
+            
+            if (this.$store.state.game.state.tick < response.data.state.tick) {
+              await this.reloadGame()
+            }
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      }
     }
   },
   computed: {

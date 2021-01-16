@@ -3,12 +3,11 @@ const moment = require('moment');
 
 module.exports = class GameTickService extends EventEmitter {
     
-    constructor(broadcastService, distanceService, starService, carrierService, 
+    constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
         specialistService, starUpgradeService) {
         super();
             
-        this.broadcastService = broadcastService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.carrierService = carrierService;
@@ -52,17 +51,6 @@ module.exports = class GameTickService extends EventEmitter {
 
        game.state.lastTickDate = moment().utc();
 
-        let report = {
-            gameState: null,
-            carriers: [],
-            destroyedCarriers: [],
-            stars: [],
-            players: [],
-            playerResearch: [],
-            playerExperiments: [],
-            playerGalacticCycleReport: []
-        };
-
         let taskTime = process.hrtime();
         let taskTimeEnd = null;
 
@@ -84,19 +72,19 @@ module.exports = class GameTickService extends EventEmitter {
 
         while (iterations--) {
             logTime(`Tick ${game.state.tick}`);
-            await this._combatCarriers(game, gameUsers, report);
+            await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
-            await this._moveCarriers(game, gameUsers, report);
+            await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
-            await this.researchService.conductResearchAll(game, gameUsers, report);
+            await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
-            this._endOfGalacticCycleCheck(game, report);
+            this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
-            this._logHistory(game, report);
+            this._logHistory(game);
             logTime('Log history');
-            await this._gameLoseCheck(game, gameUsers, report);
+            await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
-            let hasWinner = await this._gameWinCheck(game, gameUsers, report);
+            let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
 
             if (hasWinner) {
@@ -104,7 +92,7 @@ module.exports = class GameTickService extends EventEmitter {
             }
         }
 
-        this._resetPlayersReadyStatus(game, report);
+        this._resetPlayersReadyStatus(game);
 
         await game.save();
         logTime('Save game');
@@ -115,9 +103,6 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         logTime('Save users');
-
-        // this._broadcastReport(game, report);
-        // logTime('Broadcast report');
 
         let endTime = process.hrtime(startTime);
 
@@ -148,7 +133,7 @@ module.exports = class GameTickService extends EventEmitter {
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
-    async _combatCarriers(game, gameUsers, report) {
+    async _combatCarriers(game, gameUsers) {
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
         }
@@ -233,11 +218,11 @@ module.exports = class GameTickService extends EventEmitter {
 
             // TODO: Check for specialists that affect pre-combat.
 
-            await this._performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers, report);
+            await this._performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
         }
     }
 
-    async _moveCarriers(game, gameUsers, report) {
+    async _moveCarriers(game, gameUsers) {
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
         // Note, we order by distance ascending for 2 reasons:
@@ -307,10 +292,6 @@ module.exports = class GameTickService extends EventEmitter {
             if (carrierMovementReport.combatRequiredStar && combatStars.indexOf(carrierMovementReport.destinationStar) < 0) {
                 combatStars.push(carrierMovementReport.destinationStar);
             }
-            
-            // The star has been affected by the game tick so append it to the report
-            // NOTE: We will get the data for it later at the end of the tick.
-            report.stars.push(carrierMovementReport.destinationStar._id);
         }
 
         // 3. Now that all carriers have finished moving, perform combat.
@@ -322,7 +303,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
 
-            await this._performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar, report);
+            await this._performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -333,8 +314,8 @@ module.exports = class GameTickService extends EventEmitter {
         this.waypointService.performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
-        this.starService.applyStarSpecialistSpecialModifiers(game, report);
-        this.starService.produceShips(game, report);
+        this.starService.applyStarSpecialistSpecialModifiers(game);
+        this.starService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
@@ -348,7 +329,7 @@ module.exports = class GameTickService extends EventEmitter {
             this.waypointService.sanitiseDarkModeCarrierWaypoints(game, c));
     }
 
-    async _performCombat(game, gameUsers, player, star, carriers, report) {
+    async _performCombat(game, gameUsers, player, star, carriers) {
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
         // Get all defender carriers ordered by most carriers present descending.
@@ -479,8 +460,6 @@ module.exports = class GameTickService extends EventEmitter {
             if (!attackerCarrier.ships) {
                 game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(attackerCarrier), 1);
 
-                report.destroyedCarriers.push(attackerCarrier._id);
-                
                 attackerCarriers.splice(attackerCarrierIndex, 1);
                 attackerCarrierIndex--;
 
@@ -530,8 +509,6 @@ module.exports = class GameTickService extends EventEmitter {
                 if (!defenderCarrier.ships) {
                     game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(defenderCarrier), 1);
 
-                    report.destroyedCarriers.push(defenderCarrier._id);
-                    
                     defenderCarriers.splice(defenderCarrierIndex, 1);
                     defenderCarrierIndex--;
 
@@ -664,7 +641,7 @@ module.exports = class GameTickService extends EventEmitter {
                 player = this.playerService.getById(game, attackerPlayerIds[0]);
             }
 
-            await this._performCombat(game, gameUsers, player, star, attackerCarriers, report);
+            await this._performCombat(game, gameUsers, player, star, attackerCarriers);
         }
     }
 
@@ -694,7 +671,7 @@ module.exports = class GameTickService extends EventEmitter {
         return false;
     }
 
-    _endOfGalacticCycleCheck(game, report) {
+    _endOfGalacticCycleCheck(game) {
         game.state.tick++;
 
         // Check if we have reached the production tick.
@@ -713,7 +690,7 @@ module.exports = class GameTickService extends EventEmitter {
                 }
                 
                 let creditsResult = this.playerService.givePlayerMoney(game, player);
-                let experimentResult = this._conductExperiments(game, player, report);
+                let experimentResult = this._conductExperiments(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -724,13 +701,6 @@ module.exports = class GameTickService extends EventEmitter {
                     experimentTechnologyLevel: experimentResult.level,
                     experimentAmount: experimentResult.amount
                 });
-
-                report.playerGalacticCycleReport.push({
-                    playerId: player._id,
-                    credits: creditsResult.creditsTotal,
-                    experimentTechnology: experimentResult.technology,
-                    experimentTechnologyLevel: experimentResult.level
-                });
             }
 
             this.emit('onGameGalacticCycleTicked', {
@@ -739,12 +709,10 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    _conductExperiments(game, player, report) {
+    _conductExperiments(game, player) {
         let experimentReport = this.researchService.conductExperiments(game, player);
 
         experimentReport.playerId = player._id;
-
-        report.playerExperiments.push(experimentReport);
 
         return experimentReport;
     }
@@ -753,7 +721,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.historyService.log(game);
     }
 
-    async _gameLoseCheck(game, gameUsers, report) {
+    async _gameLoseCheck(game, gameUsers) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
         let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
@@ -857,197 +825,9 @@ module.exports = class GameTickService extends EventEmitter {
         return false;
     }
 
-    _resetPlayersReadyStatus(game, report) {
+    _resetPlayersReadyStatus(game) {
         for (let player of game.galaxy.players) {
             player.ready = false;
         }
-    }
-
-    _broadcastReport(game, report) {
-        // Get all players who are connected to the server.
-        let broadcastPlayers = game.galaxy.players.filter(p =>
-            this.broadcastService.playerRoomExists(p));
-
-        // If there are no players to broadcast to, then
-        // there is no point creating the game tick report.
-        if (broadcastPlayers.length) {
-            this._appendReportGameState(game, report);
-            this._appendReportCarriers(game, report);
-            this._appendReportStars(game, report);
-            this._appendReportPlayers(game, report);
-     
-            for (let player of broadcastPlayers) {
-                this._broadcastReportToPlayer(game, report, player);
-            }
-        }
-    }
-
-    _appendReportGameState(game, report) {
-        report.gameState = {
-            lastTickDate: game.state.lastTickDate,
-            paused: game.state.paused,
-            players: game.state.players,
-            productionTick: game.state.productionTick,
-            tick: game.state.tick,
-            endDate: game.state.endDate,
-            winner: game.state.winner
-        };
-    }
-
-    _appendReportCarriers(game, report) {
-        // The report for the carriers will contain all carriers
-        // and fields that could have changed in the tick.
-        report.carriers = game.galaxy.carriers
-        .map(carrier => {
-            return {
-                _id: carrier._id,
-                ownedByPlayerId: carrier.ownedByPlayerId,
-                orbiting: carrier.orbiting,
-                inTransitFrom: carrier.inTransitFrom,
-                inTransitTo: carrier.inTransitTo,
-                ships: carrier.ships,
-                location: carrier.location,
-                waypoints: carrier.waypoints,
-                name: carrier.name, // Include the name because carriers can go in and out of scanning range.
-                isGift: carrier.isGift, // Carriers may have been successfully gifted.
-                specialistId: carrier.specialistId
-            };
-        });
-    }
-
-    _appendReportStars(game, report) {
-        let starsData = [];
-
-        for (let starId of report.stars) {
-            let star = this.starService.getByObjectId(game, starId);
-            let terraformedResources = null;
-            let upgradeCosts = null;
-
-            if (star.ownedByPlayerId) {
-                let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-                terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, owningPlayerEffectiveTechs.terraforming);   
-                
-                star.terraformedResources = terraformedResources; // Need to set this first before calling setUpgradeCosts
-                upgradeCosts = this.starUpgradeService.setUpgradeCosts(game, star);
-            }
-
-            // Add everything that could have changed
-            starsData.push({
-                _id: star._id,
-                ownedByPlayerId: star.ownedByPlayerId,
-                warpGate: star.warpGate,    // The warp gate would not have changed but may go in and out of scanning range.
-                naturalResources: star.naturalResources,
-                terraformedResources,
-                garrison: star.garrison,
-                infrastructure: star.infrastructure,
-                specialistId: star.specialistId, // TODO: Also need to re-get the specialist but only if it has changed.
-                upgradeCosts
-            });
-        }
-
-        report.stars = starsData;
-    }
-
-    _appendReportPlayers(game, report) {
-        for (let player of game.galaxy.players) {
-            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
-            
-            report.players.push({
-                _id: player._id,
-                defeated: player.defeated,
-                afk: player.afk,
-                ready: false,
-                stats: this.playerService.getStats(game, player),
-                effectiveTechs
-            });
-        }
-    }
-
-    _broadcastReportToPlayer(game, report, player) {
-        let playerReport = Object.assign({}, report); // Clone the original report.
-
-        // Get the end of galactic cycle report for the player if there is one.
-        playerReport.playerGalacticCycleReport = report.playerGalacticCycleReport.find(r => r.playerId.equals(player._id)) || null;
-
-        // Calculate which players are in scanning range.
-        let playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(game, player);
-
-        playerReport.players.forEach(p => {
-            p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id) != null;
-        });
-
-        // Perform a filter on the report stars, if the star is out of range
-        // then only return basic info.
-        let starsInRange = this.starService.filterStarsByScanningRange(game, player);
-
-        playerReport.stars = playerReport.stars.map(s => {
-            let isInRange = starsInRange.find(x => x._id.equals(s._id)) != null;
-
-            if (!this.starService.canPlayerSeeStarGarrison(player, s)) {
-                s.garrison = null;
-            }
-
-            if (isInRange) {
-                return s;
-            }
-
-            return {
-                _id: s._id,
-                ownedByPlayerId: s.ownedByPlayerId,
-                warpGate: false // Players cannot see warp gates if they are out of scanning range.
-            }
-        });
-
-        // Filter out any carriers that are out of scanning range.
-        let carriersInRange = this.carrierService.filterCarriersByScanningRange(game, player);
-
-        playerReport.carriers = playerReport.carriers
-        .filter(c => {
-            return carriersInRange.find(x => x._id.equals(c._id)) != null;
-        })
-        .map(c => {
-            // If the carrier does not belong to the player and the carrier has waypoints
-            // then only return the first waypoint.
-            if (c.ownedByPlayerId !== player.id) {
-                c.waypoints = this.carrierService.clearCarrierWaypointsNonTransit(c, true);
-            }
-
-            // The waypoint ETAs may have changed so make sure that they are updated.
-            this.waypointService.populateCarrierWaypointEta(game, c);
-
-            if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
-                c.ships = null;
-            }
-
-            return c;
-        });
-
-        // Filter out other player's research progress.
-        playerReport.playerResearch = playerReport.playerResearch
-            .filter(r => r.playerId === player.id || r.levelUp) // Get the player report or any other reports that have leveled up.
-            .map(r => {
-                if (r.playerId !== player.id) {
-                    delete r.progress; // Remove the progress if it isn't the current player.
-                    delete r.currentResearchTicksEta;
-                }
-                
-                return r;
-            });
-
-        // Filter out other player's experiments
-        playerReport.playerExperiments = playerReport.playerExperiments
-            .filter(r => r.playerId === player.id || r.levelUp) // Get the player report or any other reports that have leveled up.
-            .map(r => {
-                if (r.playerId !== player.id) {
-                    delete r.progress; // Remove the new research progress if it isn't the current player.
-                    delete r.amount; // Remove the experiment amount if it isn't the current player.
-                    delete r.currentResearchTicksEta;
-                    delete r.currentResearchTechnology;
-                }
-                
-                return r;
-            });
-
-        this.broadcastService.gameTick(game, player._id, playerReport);
     }
 }
