@@ -11,18 +11,18 @@
           </span>
       </div>
       <div class="col-3 text-center">
-          <span title="Range">
-            <i class="fas fa-sun"></i> {{rangeLightYears}}
+          <span title="Distance (ly)">
+            <i class="fas fa-sun"></i> {{distanceLightYears}}
           </span>
       </div>
       <div class="col-3 text-center">
-          <span title="Scanning Range">
-            <i class="fas fa-binoculars"></i> {{scanningRange}}
+          <span title="Required Scanning Level">
+            <i class="fas fa-binoculars"></i> {{scanningLevel}}
           </span>
       </div>
       <div class="col-3 text-right">
-          <span title="Hyperspace Range">
-            <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
+          <span title="Required Hyperspace Level">
+            <i class="fas fa-gas-pump"></i> {{hyperspaceLevel}}
           </span>
       </div>
     </div>
@@ -58,33 +58,33 @@
 
       <div class="row bg-primary pt-2 pb-2">
           <div class="col-6">
-              Range
+             Distance (ly)
           </div>
           <div class="col-6 text-right">
-              <span title="Range">
-                <i class="fas fa-sun"></i> {{rangeLightYears}}
+              <span title="Distance (ly)">
+                <i class="fas fa-sun"></i> {{distanceLightYears}}
               </span>
           </div>
       </div>
 
       <div class="row bg-secondary pt-2 pb-2">
-          <div class="col-6">
-              Scanning Range
+          <div class="col-8">
+              Required Scanning Level
           </div>
-          <div class="col-6 text-right">
-              <span title="Scanning Range">
-                <i class="fas fa-binoculars"></i> {{scanningRange}}
+          <div class="col-4 text-right">
+              <span title="Required Scanning Level">
+                <i class="fas fa-binoculars"></i> {{scanningLevel}}
               </span>
           </div>
       </div>
 
       <div class="row bg-primary pt-2 pb-2">
-          <div class="col-6">
-              Hyperspace Range
+          <div class="col-8">
+              Required Hyperspace Level
           </div>
-          <div class="col-6 text-right">
-              <span title="Hyperspace Range">
-                <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
+          <div class="col-4 text-right">
+              <span title="Required Hyperspace Level">
+                <i class="fas fa-gas-pump"></i> {{hyperspaceLevel}}
               </span>
           </div>
       </div>
@@ -127,9 +127,9 @@ export default {
     return {
       points: [],
       etaTicks: 0,
-      rangeLightYears: 0,
-      hyperspaceRange: 0,
-      scanningRange: 0,
+      distanceLightYears: 0,
+      hyperspaceLevel: 0,
+      scanningLevel: 0,
       totalEta: '',
       totalEtaWarp: '',
       isStandardUIStyle: false,
@@ -163,22 +163,22 @@ export default {
       this.points.push(e)
 
       this.recalculateETAs()
-      this.recalculateHyperspaceRange()
-      this.recalculateRangeLightYears()
+      this.recalculateHyperspaceScanningLevel()
+      this.recalculateDistanceLightYears()
     },
     onRulerPointRemoved (e) {
       this.points.splice(this.points.indexOf(e), 1)
 
       this.recalculateETAs()
-      this.recalculateHyperspaceRange()
-      this.recalculateRangeLightYears()
+      this.recalculateHyperspaceScanningLevel()
+      this.recalculateDistanceLightYears()
     },
     onRulerPointsCleared (e) {
       this.points = []
 
       this.recalculateETAs()
-      this.recalculateHyperspaceRange()
-      this.recalculateRangeLightYears()
+      this.recalculateHyperspaceScanningLevel()
+      this.recalculateDistanceLightYears()
     },
     recalculateETAs () {
       let game = this.$store.state.game
@@ -192,10 +192,10 @@ export default {
       this.totalEta = totalTimeString
       this.totalEtaWarp = totalTimeWarpString
     },
-    recalculateHyperspaceRange () {
+    recalculateHyperspaceScanningLevel () {
       if (this.points.length < 2) {
-        this.hyperspaceRange = 0
-        this.scanningRange = 0
+        this.hyperspaceLevel = 0
+        this.scanningLevel = 0
         return
       }
 
@@ -218,11 +218,11 @@ export default {
       let longestWaypoint = Math.max(...distances)
 
       // Calculate the hyperspace range required for it.
-      this.hyperspaceRange = GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint)
-      this.scanningRange = GameHelper.getScanningLevelByDistance(game, longestWaypoint)
+      this.hyperspaceLevel = GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint)
+      this.scanningLevel = GameHelper.getScanningLevelByDistance(game, longestWaypoint)
     },
-    recalculateRangeLightYears () {
-      this.rangeLightYears = 0
+    recalculateDistanceLightYears () {
+      this.distanceLightYears = 0
       if (this.points.length < 2) {
         return
       }
@@ -230,9 +230,9 @@ export default {
       let game = this.$store.state.game
 
       for (let i = 0; i < this.points.length - 1; i++) {
-        this.rangeLightYears += GameHelper.getDistanceBetweenLocations(this.points[i], this.points[i + 1])
+        this.distanceLightYears += GameHelper.getDistanceBetweenLocations(this.points[i], this.points[i + 1])
       }
-      this.rangeLightYears = Math.round(this.rangeLightYears / game.constants.distances.lightYear * 100.0) / 100.0
+      this.distanceLightYears = Math.round(this.distanceLightYears / game.constants.distances.lightYear * 100.0) / 100.0
     }
   }
 }
