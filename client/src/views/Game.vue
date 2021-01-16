@@ -301,7 +301,7 @@ export default {
       // Check if the next tick date has passed, if so check if the server has finished the game tick.
       let canTick = gameHelper.canTick(this.$store.state.game)
 
-      if (true) {
+      if (canTick) {
         try {
           let response = await GameApiService.getGameState(this.$store.state.game._id)
           
