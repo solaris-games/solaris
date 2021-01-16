@@ -3,19 +3,27 @@
     <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
         <button class="btn btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
     </menu-title>
-
+    <div v-if="isCompactUIStyle">
     <div class="row bg-primary pt-2 pb-2">
-      <div class="col-3 text-center">
-          <i class="fas fa-map-marker-alt"></i> {{points.length}}
+      <div class="col-3 text-left">
+          <span title="Waypoints">
+           <i class="fas fa-map-marker-alt"></i> {{points.length}}
+          </span>
       </div>
       <div class="col-3 text-center">
-          <i class="fas fa-sun"></i> {{rangeLightYears}} LY
+          <span title="Range">
+            <i class="fas fa-sun"></i> {{rangeLightYears}}
+          </span>
       </div>
       <div class="col-3 text-center">
-          <i class="fas fa-binoculars"></i> {{scanningRange}}
+          <span title="Scanning Range">
+            <i class="fas fa-binoculars"></i> {{scanningRange}}
+          </span>
       </div>
-      <div class="col-3 text-center">
-          <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
+      <div class="col-3 text-right">
+          <span title="Hyperspace Range">
+            <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
+          </span>
       </div>
     </div>
 
@@ -24,11 +32,84 @@
           ETA
       </div>
       <div class="col-5 text-right">
-          Base {{totalEta || 'N/A'}}
+          <span title="ETA Base Speed">
+            Base {{totalEta || 'N/A'}}
+          </span>
       </div>
       <div class="col-5 text-right">
-          Warp {{totalEtaWarp || 'N/A'}}
+          <span title="ETA Warp Speed">
+            Warp {{totalEtaWarp || 'N/A'}}
+          </span>
       </div>
+    </div>
+    </div>
+
+    <div v-if="isStandardUIStyle">
+      <div class="row bg-secondary pt-2 pb-2">
+          <div class="col-6">
+              Waypoints
+          </div>
+          <div class="col-6 text-right">
+              <span title="Waypoints">
+                <i class="fas fa-map-marker-alt"></i> {{points.length}}
+              </span>
+          </div>
+      </div>
+
+      <div class="row bg-primary pt-2 pb-2">
+          <div class="col-6">
+              Range
+          </div>
+          <div class="col-6 text-right">
+              <span title="Range">
+                <i class="fas fa-sun"></i> {{rangeLightYears}}
+              </span>
+          </div>
+      </div>
+
+      <div class="row bg-secondary pt-2 pb-2">
+          <div class="col-6">
+              Scanning Range
+          </div>
+          <div class="col-6 text-right">
+              <span title="Scanning Range">
+                <i class="fas fa-binoculars"></i> {{scanningRange}}
+              </span>
+          </div>
+      </div>
+
+      <div class="row bg-primary pt-2 pb-2">
+          <div class="col-6">
+              Hyperspace Range
+          </div>
+          <div class="col-6 text-right">
+              <span title="Hyperspace Range">
+                <i class="fas fa-gas-pump"></i> {{hyperspaceRange}}
+              </span>
+          </div>
+      </div>
+
+      <div class="row bg-secondary pt-2 pb-2">
+          <div class="col-6">
+              ETA Base Speed
+          </div>
+          <div class="col-6 text-right">
+              <span title="ETA Base Speed">
+                {{totalEta || 'N/A'}}
+              </span>
+          </div>
+      </div>
+
+      <div class="row bg-primary pt-2 pb-2">
+          <div class="col-6">
+              ETA Warp Speed
+          </div>
+          <div class="col-6 text-right">
+              <span title="ETA Warp Speed">
+                {{totalEtaWarp || 'N/A'}}
+              </span>
+          </div>
+        </div>
     </div>
 </div>
 </template>
@@ -50,10 +131,15 @@ export default {
       hyperspaceRange: 0,
       scanningRange: 0,
       totalEta: '',
-      totalEtaWarp: ''
+      totalEtaWarp: '',
+      isStandardUIStyle: false,
+      isCompactUIStyle: false
     }
   },
   mounted () {
+    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
+    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+
     // Set map to ruler mode
     GameContainer.setMode('ruler')
     GameContainer.map.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
@@ -146,7 +232,7 @@ export default {
       for (let i = 0; i < this.points.length - 1; i++) {
         this.rangeLightYears += GameHelper.getDistanceBetweenLocations(this.points[i], this.points[i + 1])
       }
-      this.rangeLightYears = Math.round(this.rangeLightYears / game.constants.distances.lightYear)
+      this.rangeLightYears = Math.round(this.rangeLightYears / game.constants.distances.lightYear * 100.0) / 100.0
     }
   }
 }
