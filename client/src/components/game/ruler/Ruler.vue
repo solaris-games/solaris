@@ -24,6 +24,15 @@
 
     <div class="row bg-secondary pt-2 pb-2">
         <div class="col-6">
+            Scanning Range
+        </div>
+        <div class="col-6 text-right">
+            <i class="fas fa-binoculars"></i> {{scanningRange}}
+        </div>
+    </div>
+
+    <div class="row bg-primary pt-2 pb-2">
+        <div class="col-6">
             Hyperspace Range
         </div>
         <div class="col-6 text-right">
@@ -31,7 +40,7 @@
         </div>
     </div>
 
-    <div class="row bg-primary pt-2 pb-2">
+    <div class="row bg-secondary pt-2 pb-2">
         <div class="col-6">
             ETA Base Speed
         </div>
@@ -40,7 +49,7 @@
         </div>
     </div>
 
-    <div class="row bg-secondary pt-2 pb-2">
+    <div class="row bg-primary pt-2 pb-2">
         <div class="col-6">
             ETA Warp Speed
         </div>
@@ -66,6 +75,7 @@ export default {
       etaTicks: 0,
       rangeLightYears: 0,
       hyperspaceRange: 0,
+      scanningRange: 0,
       totalEta: '',
       totalEtaWarp: ''
     }
@@ -126,6 +136,7 @@ export default {
     recalculateHyperspaceRange () {
       if (this.points.length < 2) {
         this.hyperspaceRange = 0
+        this.scanningRange = 0
         return
       }
 
@@ -149,6 +160,7 @@ export default {
 
       // Calculate the hyperspace range required for it.
       this.hyperspaceRange = GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint)
+      this.scanningRange = GameHelper.getScanningLevelByDistance(game, longestWaypoint)
     },
     recalculateRangeLightYears () {
       this.rangeLightYears = 0
