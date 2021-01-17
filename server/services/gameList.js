@@ -100,6 +100,9 @@ module.exports = class GameListService {
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
         })
+        .select({
+            _id: 1
+        })
         .exec();
     }
 

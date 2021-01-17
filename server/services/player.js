@@ -29,10 +29,14 @@ module.exports = class PlayerService extends EventEmitter {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
     }
     
-    getPlayersWithinScanningRangeOfStar(game, starId) {
+    getPlayersWithinScanningRangeOfStar(game, starId, players) {
+        if (players == null) {
+            players = game.galaxy.players;
+        }
+
         let star = this.starService.getById(game, starId);
 
-        let playersWithinRange = game.galaxy.players.filter(p => {
+        let playersWithinRange = players.filter(p => {
             return this.starService.isStarInScanningRangeOfPlayer(game, star, p);
         });
 

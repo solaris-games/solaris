@@ -176,10 +176,10 @@ module.exports = class StarService extends EventEmitter {
 
     async abandonStar(game, player, starId) {
         // Get the star.
-        let star = game.galaxy.stars.find(x => x.id === starId);
+        let star = game.galaxy.stars.find(x => x._id.toString() === starId);
 
         // Check whether the star is owned by the player
-        if ((star.ownedByPlayerId || '').toString() !== player.id) {
+        if ((star.ownedByPlayerId || '').toString() !== player._id.toString()) {
             throw new ValidationError(`Cannot abandon a star that is not owned by the player.`);
         }
 
@@ -187,7 +187,7 @@ module.exports = class StarService extends EventEmitter {
         star.garrisonActual = 0;
         star.garrison = star.garrisonActual;
         
-        game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star.id);
+        game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
 
         // TODO: Re-assign home star?
         // // If this was the player's home star, then we need to find a new home star.

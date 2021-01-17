@@ -9,7 +9,7 @@ module.exports = (container) => {
                 let game = games[i];
 
                 try {
-                    await container.gameTickService.tick(game);
+                    await container.gameTickService.tick(game._id);
                 } catch (e) {
                     console.error(e);
                 }

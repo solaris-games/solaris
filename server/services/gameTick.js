@@ -24,7 +24,9 @@ module.exports = class GameTickService extends EventEmitter {
         this.starUpgradeService = starUpgradeService;
     }
 
-    async tick(game) {
+    async tick(gameId) {
+        let game = await this.gameService.getByIdAll(gameId);
+
         /*
             1. Move all carriers
             2. Perform combat at stars that have enemy carriers in orbit

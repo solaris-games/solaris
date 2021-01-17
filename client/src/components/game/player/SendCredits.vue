@@ -12,7 +12,7 @@
                   <input type="number" class="form-control" v-model="amount"/>
                 </div>
                 <div class="col-5">
-                    <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block"><i class="fas fa-paper-plane"></i> Send</modalButton>
+                    <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="isSendingCredits"><i class="fas fa-paper-plane"></i> Send</modalButton>
                 </div>
             </div>
         </form>
@@ -40,11 +40,14 @@ export default {
   },
   data () {
     return {
+      isSendingCredits: false,
       amount: 0
     }
   },
   methods: {
     async confirmSendCredits () {
+      this.isSendingCredits = true
+
       try {
         let response = await tradeService.sendCredits(this.$store.state.game._id, this.player._id, this.amount)
 
@@ -59,6 +62,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isSendingCredits = false
     }
   }
 }

@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-5">
                     <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
-                      :disabled="!availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
+                      :disabled="isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
                 </div>
             </div>
         </form>
@@ -43,6 +43,7 @@ export default {
   },
   data () {
     return {
+      isSendingTech: false,
       player: null,
       userPlayer: null,
       selectedTechnology: null,
@@ -78,6 +79,8 @@ export default {
       }
     },
     async confirmSendTechnology () {
+      this.isSendingTech = true
+
       try {
         let response = await TradeApiService.sendTechnology(this.$store.state.game._id, this.player._id, this.selectedTechnology.name, this.selectedTechnology.level)
 
@@ -96,6 +99,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isSendingTech = false
     }
   }
 }

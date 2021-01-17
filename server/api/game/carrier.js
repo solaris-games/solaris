@@ -80,7 +80,8 @@ module.exports = (router, io, container) => {
             res.sendStatus(200);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => {
                 let canSeeStarGarrison = container.starService.canPlayerSeeStarGarrison(p, report.star);
@@ -110,7 +111,8 @@ module.exports = (router, io, container) => {
 
             // TODO Implement this socket.
             // // Broadcast the event to the current player and also all other players within scanning range.
-            // let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            // let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            // let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             // playersWithinScanningRange.forEach(p => 
             //     container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));

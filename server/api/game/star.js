@@ -18,7 +18,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/api/game/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.upgradeEconomy(
                 req.game,
@@ -28,7 +28,8 @@ module.exports = (router, io, container) => {
             res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => 
                 container.broadcastService.gameStarEconomyUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
@@ -37,7 +38,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.upgradeIndustry(
                 req.game,
@@ -47,7 +48,8 @@ module.exports = (router, io, container) => {
             res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => 
                 container.broadcastService.gameStarIndustryUpgraded(req.game, p._id, req.body.starId, report.infrastructure, report.manufacturing));
@@ -56,7 +58,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.upgradeScience(
                 req.game,
@@ -66,7 +68,8 @@ module.exports = (router, io, container) => {
             res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => 
                 container.broadcastService.gameStarScienceUpgraded(req.game, p._id, req.body.starId, report.infrastructure));
@@ -75,7 +78,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let summary = await container.starUpgradeService.upgradeBulk(
                 req.game,
@@ -137,7 +140,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.buildWarpGate(
                 req.game,
@@ -147,7 +150,8 @@ module.exports = (router, io, container) => {
             res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateBuilt(req.game, p._id, req.body.starId));
         } catch (err) {
@@ -155,7 +159,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.starUpgradeService.destroyWarpGate(
                 req.game,
@@ -165,7 +169,8 @@ module.exports = (router, io, container) => {
             res.sendStatus(200);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => container.broadcastService.gameStarWarpGateDestroyed(req.game, p._id, req.body.starId));
         } catch (err) {
@@ -173,7 +178,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let ships = +req.body.ships || 1;
 
         try {
@@ -186,7 +191,8 @@ module.exports = (router, io, container) => {
             res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => {
                 if (!p._id.equals(req.player._id)) {
@@ -198,7 +204,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/transferall', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/transferall', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.shipTransferService.transferAllToStar(
                 req.game,
@@ -208,7 +214,8 @@ module.exports = (router, io, container) => {
             res.status(200).json(report);
 
             // Broadcast the event to the current player and also all other players within scanning range.
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId);
+            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
+            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
 
             playersWithinScanningRange.forEach(p => {
                 for (let carrier of report.carriersAtStar) {
