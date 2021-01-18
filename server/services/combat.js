@@ -18,17 +18,12 @@ module.exports = class CombatService {
         let defendPower = defender.weaponsLevel + (defenderBonus ? 1 : 0),
             attackPower = attacker.weaponsLevel;
             
-        // Keep fighting until either carrier has no ships remaining.
-        while (defenderShipsRemaining > 0 && attackerShipsRemaining > 0) {
-            // Friendly carrier attacks first with defender bonus.
-            attackerShipsRemaining -= defendPower;
-
-            // Enemy carrier attacks next if there are still ships remaining.
-            if (attackerShipsRemaining <= 0) {
-                break;
-            }
-
-            defenderShipsRemaining -= attackPower;
+        if (Math.ceil(attacker.ships/defendPower) <= Math.ceil(defender.ships/attackPower))  {
+            attackerShipsRemaining = 0
+            defenderShipsRemaining = defender.ships - (Math.ceil(attacker.ships/defendPower) -1) * attackPower
+        } else {
+            defenderShipsRemaining = 0
+            attackerShipsRemaining = attacker.ships - Math.ceil(defender.ships/attackPower) * defendPower
         }
 
         attackerShipsRemaining = Math.max(0, attackerShipsRemaining)
