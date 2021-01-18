@@ -166,12 +166,13 @@ module.exports = class ResearchService extends EventEmitter {
         while (tech.technology.progress >= requiredProgress) {
             tech.technology.level++;
             tech.technology.progress -= requiredProgress;
+            requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
             levelUp = true;
         }
 
         // If the technology leveled up, we need to change the research
         // to the next desired research technology.
-        if (levelUp) {
+        if (levelUp && tech.key === player.researchingNow) {
             this._setNextResearch(game, player);
         }
 
