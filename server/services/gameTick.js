@@ -727,7 +727,6 @@ module.exports = class GameTickService extends EventEmitter {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
         let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
-        let isRealTimeGame = this.gameService.isRealTimeGame(game);
         let afkThresholdDate = moment().utc().subtract(3, 'days');
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
@@ -751,13 +750,8 @@ module.exports = class GameTickService extends EventEmitter {
             // Check if the player has been AFK.
             // If in real time mode, check if the player has not been seen for over 48 hours.
             // OR if in turn based mode, check if the player has reached the maximum missed turn limit.
-            let isAfk = false;
-
-            if (isRealTimeGame) {
-                isAfk = moment(player.lastSeen).utc() < afkThresholdDate;
-            } else if (isTurnBasedGame) {
-                isAfk = player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
-            }
+            let isAfk = moment(player.lastSeen).utc() < afkThresholdDate
+                    || player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
 
             if (isAfk) {
                 player.defeated = true;
