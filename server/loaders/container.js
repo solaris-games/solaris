@@ -65,7 +65,7 @@ module.exports = (io) => {
     const achievementService = new AchievementService(UserModel);
     const specialistService = new SpecialistService(GameModel, achievementService);
     const technologyService = new TechnologyService(specialistService);
-    const starService = new StarService(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
+    const starService = new StarService(GameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
     const carrierService = new CarrierService(achievementService, distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService, specialistService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);

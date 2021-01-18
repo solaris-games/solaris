@@ -7,4 +7,6 @@ schema.plugin(mongooseLeanDefaults);
 
 const model = mongoose.model('gameHistory', schema);
 
+model.syncIndexes();
+
 module.exports = model;

@@ -308,6 +308,9 @@ module.exports = class CarrierService {
             } else {
                 report.combatRequiredStar = true;
             }
+        } else {
+            // Make sure the carrier gift is reset if the star is owned by the same player.
+            carrier.isGift = false;
         }
 
         return report;

@@ -1,7 +1,12 @@
 <template>
 <div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
-      <button @click="viewOnMap" class="btn btn-info"><i class="fas fa-eye"></i></button>
+      <button @click="toggleBulkIgnore" class="btn" 
+        title="Toggle Bulk Ignore"
+        :class="{'btn-danger':star.ignoreBulkUpgrade,'btn-success':!star.ignoreBulkUpgrade}">
+        <i class="fas" :class="{'fa-ban':star.ignoreBulkUpgrade,'fa-check-square':!star.ignoreBulkUpgrade}"></i>
+      </button>
+      <button @click="viewOnMap" class="btn btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <div class="row bg-secondary">
@@ -397,6 +402,23 @@ export default {
           })
 
           this.$toasted.show(`All ships transfered to ${this.star.name}.`)
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async toggleBulkIgnore () {
+      try {
+        let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id)
+        
+        if (response.status === 200) {
+          this.star.ignoreBulkUpgrade = !this.star.ignoreBulkUpgrade
+
+          if (this.star.ignoreBulkUpgrade) {
+            this.$toasted.show(`${this.star.name} is included in Bulk Upgrade.`)
+          } else {
+            this.$toasted.show(`${this.star.name} is now ignored by Bulk Upgrade.`)
+          }
         }
       } catch (err) {
         console.log(err)

@@ -7,4 +7,6 @@ schema.plugin(mongooseLeanDefaults);
 
 const model = mongoose.model('user', schema);
 
+model.syncIndexes();
+
 module.exports = model;

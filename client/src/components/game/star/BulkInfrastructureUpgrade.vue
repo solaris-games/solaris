@@ -35,7 +35,8 @@
     </form>
     <div v-if="hasChecked" class="row bg-secondary">
       <div class="col text-center pt-2">
-        <p><b>${{this.amount}}</b> budget: <b>{{this.upgradeAvailable}}</b> upgrades for <b>${{this.cost}}</b></p>
+        <p><b class="text-warning">${{this.amount}}</b> budget: <b class="text-success">{{this.upgradeAvailable}}</b> upgrades for <b class="text-danger">${{this.cost}}</b></p>
+        <p v-if="this.ignoredCount"><small>{{this.ignoredCount}} stars have been ignored by the bulk upgrade.</small></p>
       </div>
     </div>
   </div>
@@ -60,6 +61,7 @@ export default {
       amount: 0,
       upgradeAvailable: 0,
       cost: 0,
+      ignoredCount: 0,
       selectedType: 'economy',
       types: [
         {
@@ -110,6 +112,7 @@ export default {
           AudioService.join()
           this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
+          this.ignoredCount = response.data.ignoredCount
         }
       } catch (err) {
         console.error(err)

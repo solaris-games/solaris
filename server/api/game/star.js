@@ -251,6 +251,19 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/star/toggleignorebulkupgrade', middleware.authenticate, validate, middleware.loadGameLean, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.starService.toggleIgnoreBulkUpgrade(
+                req.game,
+                req.player,
+                req.body.starId);
+
+            res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };
