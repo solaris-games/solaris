@@ -156,6 +156,16 @@ module.exports = class LeaderboardService {
             return undefeatedPlayers[0];
         }
 
+        // If all players have been defeated somehow then pick the player
+        // who is currently in first place.
+        let defeatedPlayers = game.galaxy.players.filter(p => p.defeated);
+
+        if (defeatedPlayers.length === game.settings.general.playerLimit) {
+            let leaderboard = this.getLeaderboardRankings(game);
+
+            return leaderboard[0].player;
+        }
+
         return null;
     }
 
