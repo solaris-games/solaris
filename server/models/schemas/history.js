@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
 const schema = new Schema({
-    gameId: { type: Types.ObjectId, required: true, index: true },
+    gameId: { type: Types.ObjectId, required: true },
     tick: { type: Types.Number, required: true },
     players: [
         {
@@ -29,5 +29,7 @@ const schema = new Schema({
         }
     ]
 });
+
+schema.index({gameId: 1, tick: 1}, {unique: true});
 
 module.exports = schema;
