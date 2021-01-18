@@ -106,9 +106,13 @@ export default {
       try {
         let galaxyResponse = await GameApiService.getGameGalaxy(this.$route.query.id)
 
-        this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
+        // Make sure the player is still in the current game, they may have quickly
+        // switched to another game.
+        if (this.$route.query.id === galaxyResponse.data._id) {
+          this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
 
-        document.title = galaxyResponse.data.settings.general.name + ' - Solaris'
+          document.title = galaxyResponse.data.settings.general.name + ' - Solaris'
+        }
       } catch (err) {
         console.error(err)
       }
