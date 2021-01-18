@@ -603,6 +603,7 @@ module.exports = class GameTickService extends EventEmitter {
             star.ownedByPlayerId = newStarPlayer._id;
             newStarPlayer.credits += captureReward;
             star.infrastructure.economy = 0;
+            star.ignoreBulkUpgrade = false; // Reset this as it has been captured by a new player.
 
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.

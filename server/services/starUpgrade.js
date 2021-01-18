@@ -297,7 +297,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return report;
     }
 
-    _getStarsWithNextUpgradeCost(game, player, infrastructureType) {
+    _getStarsWithNextUpgradeCost(game, player, infrastructureType, includeIgnored = true) {
         let expenseConfig;
         let calculateCostFunction;
         let upgradeFunction;
@@ -326,6 +326,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Get all of the player stars and what the next upgrade cost will be.
         return this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
+            .filter(s => {
+                if (includeIgnored) {
+                    return true;
+                }
+
+                return !s.ignoreBulkUpgrade;
+            })
             .map(s => {
                 // NOTE: Do not need to do calculations for effective tech level here as it is unnecessary because
                 // the resources will scale in the same way for all stars.
@@ -414,15 +421,17 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async generateUpgradeBulkReport(game, player, infrastructureType, amount) {
+        // Get all of the player stars and what the next upgrade cost will be.
+        let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
+        let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
+
         let upgradeSummary = {
             stars: [],
             cost: 0,
             upgraded: 0,
-            infrastructureType
+            infrastructureType,
+            ignoredCount
         };
-
-        // Get all of the player stars and what the next upgrade cost will be.
-        let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType);
 
         while (amount) {
             // Get the next star that can be upgraded, cheapest first.

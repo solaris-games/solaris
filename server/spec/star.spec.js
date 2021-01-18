@@ -50,7 +50,7 @@ describe('star', () => {
     let starService;
 
     beforeEach(() => {
-        starService = new StarService(fakeRandomService, fakeStarNameService, fakeDistanceService, fakeStarDistanceService);
+        starService = new StarService({}, fakeRandomService, fakeStarNameService, fakeDistanceService, fakeStarDistanceService);
     });
 
     it('should generate an unowned star', () => {

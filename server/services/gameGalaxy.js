@@ -153,7 +153,12 @@ module.exports = class GameGalaxyService {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
 
+                s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || false; // TODO: For some reason this isn't being set in the mongoose defaults?
+
                 return s;
+            } else {
+                // Remove fields that the user player shouldn't see.
+                delete s.ignoreBulkUpgrade;
             }
 
             // Get the closest player star to this star.

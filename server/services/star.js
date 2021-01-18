@@ -4,9 +4,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
+    constructor(gameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
         super();
         
+        this.gameModel = gameModel;
         this.randomService = randomService;
         this.nameService = nameService;
         this.distanceService = distanceService;
@@ -50,6 +51,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.garrison = homeStar.garrisonActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.warpGate = false;
+        homeStar.ignoreBulkUpgrade = false;
         
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
@@ -63,6 +65,11 @@ module.exports = class StarService extends EventEmitter {
 
     listStarsOwnedByPlayer(stars, playerId) {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
+    }
+
+    listStarsOwnedByPlayerBulkIgnored(stars, playerId) {
+        return this.listStarsOwnedByPlayer(stars, playerId)
+            .filter(s => s.ignoreBulkUpgrade);
     }
 
     isStarWithinScanningRangeOfStars(game, star, stars) {
@@ -186,6 +193,7 @@ module.exports = class StarService extends EventEmitter {
         star.ownedByPlayerId = null;
         star.garrisonActual = 0;
         star.garrison = star.garrisonActual;
+        star.ignoreBulkUpgrade = false;
         
         game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
 
@@ -275,6 +283,7 @@ module.exports = class StarService extends EventEmitter {
         }
 
         star.ownedByPlayerId = carrier.ownedByPlayerId;
+        star.ignoreBulkUpgrade = false;
 
         // Weird scenario, but could happen.
         if (carrier.isGift) {
@@ -331,6 +340,23 @@ module.exports = class StarService extends EventEmitter {
                 star.garrison = Math.floor(star.garrisonActual);
             }
         }
+    }
+
+    async toggleIgnoreBulkUpgrade(game, player, starId) {
+        let star = this.getById(game, starId);
+
+        if (!star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
+            throw new ValidationError(`You do not own this star.`);
+        }
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.stars._id': starId
+        }, {
+            $set: {
+                'galaxy.stars.$.ignoreBulkUpgrade': star.ignoreBulkUpgrade ? false : true
+            }
+        });
     }
 
 }
