@@ -415,9 +415,9 @@ export default {
           this.star.ignoreBulkUpgrade = !this.star.ignoreBulkUpgrade
 
           if (this.star.ignoreBulkUpgrade) {
-            this.$toasted.show(`${this.star.name} is included in Bulk Upgrade.`)
-          } else {
             this.$toasted.show(`${this.star.name} is now ignored by Bulk Upgrade.`)
+          } else {
+            this.$toasted.show(`${this.star.name} is included in Bulk Upgrade.`)
           }
         }
       } catch (err) {
