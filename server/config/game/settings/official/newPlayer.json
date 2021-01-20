@@ -4,14 +4,14 @@
     "description": "New Players",
     "password": null,
     "starVictoryPercentage": 50,
-    "playerLimit": 8,
+    "playerLimit": 4,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden"
   },
   "galaxy": {
     "galaxyType": "circular",
-    "starsPerPlayer": 20,
+    "starsPerPlayer": 10,
     "productionTicks": 20
   },
   "specialGalaxy": {
@@ -27,7 +27,7 @@
     "playerDistribution": "circular"
   },
   "player": {
-    "startingStars": 6,
+    "startingStars": 3,
     "startingCredits": 500,
     "startingShips": 10,
     "startingInfrastructure": {

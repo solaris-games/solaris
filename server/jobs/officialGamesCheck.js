@@ -1,11 +1,11 @@
 const officialGameSettings = [
     require('../config/game/settings/official/newPlayer'),
     require('../config/game/settings/official/standard'),
-    require('../config/game/settings/official/32player'), // 32 player games are reserved only for official games.
+    // require('../config/game/settings/official/32player'), // 32 player games are reserved only for official games.
     require('../config/game/settings/official/dark'),
-    require('../config/game/settings/official/turnBased'),
+    // require('../config/game/settings/official/turnBased'),
     require('../config/game/settings/official/1v1'),
-    require('../config/game/settings/official/1v1turnBased'),
+    // require('../config/game/settings/official/1v1turnBased'),
 ];
 
 module.exports = (container) => {

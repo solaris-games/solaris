@@ -10,7 +10,7 @@
     "playerOnlineStatus": "visible"
   },
   "galaxy": {
-    "galaxyType": "circular",
+    "galaxyType": "irregular",
     "starsPerPlayer": 20,
     "productionTicks": 20
   },
