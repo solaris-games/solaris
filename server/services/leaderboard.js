@@ -93,17 +93,21 @@ module.exports = class LeaderboardService {
             // TODO: Maybe a better ranking system would be to simply award players
             // rank equal to the number of stars they have at the end of the game?
         
+            let isOfficialGame = game.settings.general.createdByUserId == null;
+
             if (i == 0) {
-                user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 user.achievements.victories++; // Increase the winner's victory count
 
                 // Give the winner a galactic credit for official games.
-                if (game.settings.general.createdByUserId == null) {
+                if (isOfficialGame) {
                     user.credits++;
+                    user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 }
             } else {
-                user.achievements.rank += leaderboard.length / 2 - i;
-                user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
+                if (isOfficialGame) {
+                    user.achievements.rank += leaderboard.length / 2 - i;
+                    user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
+                }
             }
 
             user.achievements.rank = Math.round(user.achievements.rank);
