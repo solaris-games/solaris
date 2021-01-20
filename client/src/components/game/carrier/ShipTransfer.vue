@@ -4,16 +4,16 @@
 
     <div class="row bg-secondary mb-2">
       <div class="col text-center pt-3">
-        <p>While in orbit of a star you may move ships to and from a fleet Carrier. It's free to transfer ships.</p>
+        <p>While in orbit of a star you may move ships to and from a fleet Carrier.</p>
       </div>
     </div>
 
     <div class="row">
         <div class="col" v-if="star">
-            <p class="mb-0">{{star.name}}</p>
+            <p class="mb-0"><i class="fas fa-star mr-1"></i>{{star.name}}</p>
         </div>
         <div class="col" v-if="carrier">
-            <p class="mb-0">{{carrier.name}}</p>
+            <p class="mb-0"><i class="fas fa-rocket mr-1"></i>{{carrier.name}}</p>
         </div>
     </div>
 

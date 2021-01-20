@@ -26,6 +26,8 @@
 
     <span v-if="isCompactUIStyle">{{waypointAsList}}</span>
 
+    <form-error-list v-bind:errors="errors" class="mt-2"/>
+
 		<div class="row bg-secondary pt-2 pb-2 mt-2">
 			<div class="col-12">
 				<p class="mb-1" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
@@ -45,6 +47,7 @@
 
 <script>
 import MenuTitle from '../MenuTitle'
+import FormErrorList from '../../FormErrorList'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
 import CarrierApiService from '../../../services/api/carrier'
@@ -52,7 +55,8 @@ import AudioService from '../../../game/audio'
 
 export default {
   components: {
-    	'menu-title': MenuTitle
+    'menu-title': MenuTitle,
+    'form-error-list': FormErrorList
   },
   props: {
     carrierId: String
@@ -67,7 +71,8 @@ export default {
       totalEtaTimeString: null,
       waypointCreatedHandler: null,
       isStandardUIStyle: false,
-      isCompactUIStyle: false
+      isCompactUIStyle: false,
+      errors: []
     }
   },
   mounted () {
@@ -168,6 +173,8 @@ export default {
       this.carrier.waypointsLooped = !this.carrier.waypointsLooped
     },
     async saveWaypoints (saveAndEdit = false) {
+      this.errors = []
+
       // Push the waypoints to the API.
       try {
         this.isSavingWaypoints = true
@@ -200,8 +207,8 @@ export default {
             this.onCloseRequested()
           }
         }
-      } catch (e) {
-        console.error(e)
+      } catch (err) {
+        this.errors = err.response.data.errors || []
       }
 
       this.isSavingWaypoints = false
