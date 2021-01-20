@@ -115,13 +115,11 @@ export default {
     return {
       audio: null,
       players: [],
-      sortedPlayers: [],
       timeRemaining: null
     }
   },
   mounted () {
     this.players = this.$store.state.game.galaxy.players
-    this.sortedPlayers = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
 
     this.recalculateTimeRemaining()
 
@@ -282,6 +280,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    sortedPlayers () {
+      return GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
     }
   }
 }

@@ -224,7 +224,7 @@ export default {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     },
     async checkForUnreadMessages () {
-      if (!userPlayer) {
+      if (!this.userPlayer) {
         return
       }
 
