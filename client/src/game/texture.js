@@ -44,6 +44,7 @@ class TextureService {
       this._loadSpecialistTexture('alien-stare')
       this._loadSpecialistTexture('afterburn')
       this._loadSpecialistTexture('pirate')
+      this._loadSpecialistTexture('spoutnik')
     }
 
     _loadSpecialistTexture(name) {

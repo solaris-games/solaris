@@ -170,6 +170,17 @@
                     }
                 }
             }
+        },
+        {
+            "id": 14,
+            "name": "Pathfinder",
+            "description": "Grants +1 Hyperspace Range to the Carrier.",
+            "tier": 1,
+            "modifiers": {
+                "local": {
+                    "hyperspace": 1
+                }
+            }
         }
     ],
     "star": [

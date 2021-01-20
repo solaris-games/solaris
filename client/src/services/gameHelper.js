@@ -446,6 +446,8 @@ class GameHelper {
           return 'alien-stare'
         case 13:
           return 'pirate'
+        case 14:
+          return 'spoutnik'
       }
     } else {
       switch (specialistId) {
