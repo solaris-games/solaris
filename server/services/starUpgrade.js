@@ -249,15 +249,16 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         let cost = this._calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback);
 
-        if (player.credits < cost) {
+        if (writeToDB && player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
         }
 
         // Upgrade infrastructure.
         star.infrastructure[economyType]++;
-        player.credits -= cost;
 
         if (writeToDB) {
+            player.credits -= cost;
+            
             await this._upgradeInfrastructureUpdateDB(game, player, star, cost, economyType);
         }
 
