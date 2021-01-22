@@ -282,7 +282,9 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 
-        if (deletedByUserId) {
+        // If the game hasn't started yet, re-adjust user achievements of players
+        // who joined the game.
+        if (game.state.startDate == null) {
             // Deduct "joined" count for all players who already joined the game.
             for (let player of game.galaxy.players) {
                 if (player.userId) {
@@ -295,7 +297,7 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
-        await game.remove();
+        await this.gameModel.deleteOne({ _id: game._id });
     }
 
     async getPlayerUser(game, playerId) {

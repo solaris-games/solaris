@@ -54,6 +54,10 @@ module.exports = class EmailService {
         YOUR_TURN_REMINDER: {
             fileName: 'yourTurnReminder.html',
             subject: 'Solaris - It\'s your turn to play!'
+        },
+        CUSTOM_GAME_REMOVED: {
+            fileName: 'customGameRemoved.html',
+            subject: 'Solaris - Your game did not start'
         }
     };
 
@@ -264,6 +268,26 @@ module.exports = class EmailService {
                     await this.sendTemplate(user.email, this.TEMPLATES.YOUR_TURN_REMINDER, [
                         gameName,
                         gameUrl
+                    ]);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    async sendCustomGameRemovedEmail(game) {
+        let gameName = game.settings.general.name;
+
+        for (let player of game.galaxy.players) {
+            let user = await this.userService.getEmailById(player.userId);
+            
+            if (user && user.emailEnabled) {
+                try {
+                    await sleep(2500); // This might work I dunno.
+                    
+                    await this.sendTemplate(user.email, this.TEMPLATES.CUSTOM_GAME_REMOVED, [
+                        gameName
                     ]);
                 } catch (err) {
                     console.error(err);

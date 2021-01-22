@@ -24,16 +24,18 @@ module.exports = class GameListService {
         .exec();
     }
 
-    async listUserGames() {
+    async listUserGames(select) {
+        select = select || {
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        };
+
         return await this.gameModel.find({
             'settings.general.createdByUserId': { $ne: null },
             'state.startDate': { $eq: null }
         })
-        .select({
-            'settings.general.name': 1,
-            'settings.general.playerLimit': 1,
-            state: 1
-        })
+        .select(select)
         .lean({ defaults: true })
         .exec();
     }
@@ -92,6 +94,19 @@ module.exports = class GameListService {
             'state.endDate': { $lt: date }
         })
         .exec();
+    }
+
+    async listCustomGamesTimedOut() {
+        let date = moment().subtract(7, 'day');
+
+        let userGames = await this.listUserGames({
+            'galaxy.stars': 0,
+            'galaxy.carriers': 0
+        });
+
+        return userGames.filter(g => {
+            return moment(g._id.getTimestamp()) <= date;
+        });
     }
 
     async listInProgressGames() {
