@@ -425,12 +425,15 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    async generateUpgradeBulkReport(game, player, infrastructureType, amount) {
+    async generateUpgradeBulkReport(game, player, infrastructureType, budget) {
         // Get all of the player stars and what the next upgrade cost will be.
         let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
         let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
+        budget = Math.min(budget, player.credits * 10); // Prevent players from generating reports for stupid amounts of credits
+
         let upgradeSummary = {
+            budget,
             stars: [],
             cost: 0,
             upgraded: 0,
@@ -438,10 +441,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             ignoredCount
         };
 
-        while (amount) {
+        while (budget) {
             // Get the next star that can be upgraded, cheapest first.
             let upgradeStar = stars
-                .filter(s => s.infrastructureCost <= amount)
+                .filter(s => s.infrastructureCost <= budget)
                 .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
 
             // If no stars can be upgraded then break out here.
@@ -451,7 +454,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
             let upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
 
-            amount -= upgradeReport.cost;
+            budget -= upgradeReport.cost;
 
             upgradeSummary.upgraded++;
             upgradeSummary.cost += upgradeReport.cost;

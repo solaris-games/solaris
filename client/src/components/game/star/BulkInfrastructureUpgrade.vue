@@ -6,6 +6,8 @@
       <p class="col-12">Select an amount of money to spend and the kind of infrastructure you would like to buy. The cheapest infrastructure will be purchased throughout your empire.</p>
     </div>
 
+    <form-error-list v-bind:errors="errors"/>
+
     <form class="row no-gutters" @submit.prevent>
       <div class="form-group input-group col-4 pr-1">
         <div class="input-group-prepend">
@@ -44,16 +46,19 @@
 
 <script>
 import MenuTitle from '../MenuTitle'
+import FormErrorList from '../../FormErrorList'
 import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
 
 export default {
   components: {
-    'menu-title': MenuTitle
+    'menu-title': MenuTitle,
+    'form-error-list': FormErrorList
   },
   data () {
     return {
+      errors: [],
       audio: null,
       isUpgrading: false,
       isChecking: false,
@@ -96,9 +101,12 @@ export default {
       this.hasChecked ? this.upgrade() : this.check()
     },
     async check () {
+      this.errors = []
+
       if (this.amount <= 0) {
         return
       }
+
       try {
         this.upgradeAvailable = 0
         this.cost = 0
@@ -113,14 +121,17 @@ export default {
           this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
           this.ignoredCount = response.data.ignoredCount
+          this.amount = response.data.budget
         }
       } catch (err) {
-        console.error(err)
+        this.errors = err.response.data.errors || []
       }
       this.isChecking = false
       this.hasChecked = true
     },
     async upgrade () {
+      this.errors = []
+
       if (this.cost <= 0) {
         return
       }
@@ -152,7 +163,7 @@ export default {
           this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
         }
       } catch (err) {
-        console.error(err)
+        this.errors = err.response.data.errors || []
       }
 
       this.hasChecked = false
