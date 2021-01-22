@@ -349,6 +349,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async upgradeBulk(game, player, infrastructureType, amount) {
+        // Check that the amount the player wants to spend isn't more than the amount he has
+        if(player.credits < amount) {
+            throw new ValidationError(`The player does not own enough credits to afford to bulk upgrade.`);
+        }
         let upgradeSummary = await this.generateUpgradeBulkReport(game, player, infrastructureType, amount);
 
         // Generate the DB writes for all the stars to upgrade, including deducting the credits
