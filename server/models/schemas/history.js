@@ -24,7 +24,8 @@ const schema = new Schema({
                 hyperspace: { type: Types.Number, required: true, default: 0 },
                 scanning: { type: Types.Number, required: true, default: 0 },
                 experimentation: { type: Types.Number, required: true, default: 0 },
-                terraforming: { type: Types.Number, required: true, default: 0 }
+                terraforming: { type: Types.Number, required: true, default: 0 },
+                warpgates: { type: Types.Number, required: true, default: 0 }
             }
         }
     ]
