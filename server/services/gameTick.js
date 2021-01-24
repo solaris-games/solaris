@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService) {
+        specialistService, starUpgradeService, reputationService) {
         super();
             
         this.distanceService = distanceService;
@@ -22,6 +22,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.technologyService = technologyService;
         this.specialistService = specialistService;
         this.starUpgradeService = starUpgradeService;
+        this.reputationService = reputationService;
     }
 
     async tick(gameId) {
@@ -383,6 +384,8 @@ module.exports = class GameTickService extends EventEmitter {
         } else {
             combatResult = this.combatService.calculateCarrier(game, defenderCarriers, attackerCarriers);
         }
+
+        await this._decreaseReputationForCombat(game, defender, attackers);
         
         // Add all of the carriers to the combat result with a snapshot of
         // how many ships they had before combat occurs.
@@ -658,6 +661,14 @@ module.exports = class GameTickService extends EventEmitter {
         currentIndex = Math.max(currentIndex, 0);
 
         return currentIndex;
+    }
+
+    async _decreaseReputationForCombat(game, defender, attackers) {
+        // Deduct reputation for all attackers that the defender is fighting and vice versa.
+        for (let attacker of attackers) {
+            await this.reputationService.decreaseReputation(game, defender, attacker, false);
+            await this.reputationService.decreaseReputation(game, attacker, defender, false);
+        }
     }
 
     _tryRerouteCowardCarrier(game, carrier) {

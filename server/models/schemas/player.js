@@ -59,7 +59,13 @@ const schema = new Schema({
     ledger: [
         {
             playerId: { type: Types.ObjectId, required: true },
-            debt: { type: Types.Number, required: true  }
+            debt: { type: Types.Number, required: true, default: 0  }
+        }
+    ],
+    reputations: [
+        {
+            playerId: { type: Types.ObjectId, required: true },
+            score: { type: Types.Number, required: true, default: 0  }
         }
     ]
 });
