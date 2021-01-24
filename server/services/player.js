@@ -402,6 +402,10 @@ module.exports = class PlayerService extends EventEmitter {
         return Math.round((totalManufacturing + Number.EPSILON) * 100) / 100
     }
 
+    calculateWarpgates(playerStars) {
+        return playerStars.reduce((sum, s) => s.warpGate ? sum + 1 : sum, 0);
+    }
+
     calculateTotalCarriers(player, carriers) {
         let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
 
@@ -431,6 +435,7 @@ module.exports = class PlayerService extends EventEmitter {
             totalIndustry: this.calculateTotalIndustry(playerStars),
             totalScience: this.calculateTotalScience(playerStars),
             newShips: this.calculateTotalManufacturing(game, playerStars),
+            warpgates: this.calculateWarpgates(playerStars),
             totalStarSpecialists,
             totalCarrierSpecialists,
             totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
