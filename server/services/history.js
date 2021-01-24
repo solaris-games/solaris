@@ -41,13 +41,14 @@ module.exports = class HistoryService {
                     totalSpecialists: stats.totalSpecialists,
                     totalStarSpecialists: stats.totalStarSpecialists,
                     totalCarrierSpecialists: stats.totalCarrierSpecialists,
+                    warpgates: stats.warpgates,
                     weapons: player.research.weapons.level,
                     banking: player.research.banking.level,
                     manufacturing: player.research.manufacturing.level,
                     hyperspace: player.research.hyperspace.level,
                     scanning: player.research.scanning.level,
                     experimentation: player.research.experimentation.level,
-                    terraforming: player.research.terraforming.level
+                    terraforming: player.research.terraforming.level,
                 }
             })
         }
