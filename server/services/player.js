@@ -509,4 +509,22 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
+    setPlayerAsDefeated(game, player) {
+        player.defeated = true;
+        player.researchingNext = 'random'; // Set up the AI for random research.
+
+        // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+
+        for (let star of playerStars) {
+            star.ignoreBulkUpgrade = false;
+        }
+    }
+
+    setPlayerAsAfk(game, player) {
+        this.setPlayerAsDefeated(game, player);
+
+        player.afk = true;
+    }
+
 }

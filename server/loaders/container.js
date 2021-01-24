@@ -38,6 +38,7 @@ const SpecialistService = require('../services/specialist');
 const AchievementService = require('../services/achievement');
 const ConversationService = require('../services/conversation');
 const ReputationService = require('../services/reputation');
+const AIService = require('../services/ai');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -86,9 +87,10 @@ module.exports = (io) => {
     const conversationService = new ConversationService(GameModel, EventModel);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService);
     const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService);
+    const aiService = new AIService(starUpgradeService);
     const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService);
     const historyService = new HistoryService(HistoryModel, playerService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     
@@ -129,5 +131,6 @@ module.exports = (io) => {
         achievementService,
         conversationService,
         reputationService,
+        aiService,
     };
 };

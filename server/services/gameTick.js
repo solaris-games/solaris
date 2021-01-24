@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService) {
+        specialistService, starUpgradeService, reputationService, aiService) {
         super();
             
         this.distanceService = distanceService;
@@ -23,6 +23,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.specialistService = specialistService;
         this.starUpgradeService = starUpgradeService;
         this.reputationService = reputationService;
+        this.aiService = aiService;
     }
 
     async tick(gameId) {
@@ -89,6 +90,8 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Game lose check');
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
+            this._playAI(game);
+            logTime('AI controlled players turn');
 
             if (hasWinner) {
                 break;
@@ -753,8 +756,7 @@ module.exports = class GameTickService extends EventEmitter {
                     || player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
 
             if (isAfk) {
-                player.defeated = true;
-                player.afk = true;
+                this.playerService.setPlayerAsAfk(game, player);
             }
 
             // Check if the player has been defeated by conquest.
@@ -765,7 +767,9 @@ module.exports = class GameTickService extends EventEmitter {
                 if (stars.length === 0) {
                     let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
         
-                    player.defeated = carriers.length === 0;
+                    if (carriers.length === 0) {
+                        this.playerService.setPlayerAsDefeated(game, player);
+                    }
                 }
             }
 
@@ -818,6 +822,14 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         return false;
+    }
+
+    async _playAI(game) {
+        for (let player of game.galaxy.players) {
+            if (player.defeated) {
+                await this.aiService.play(game, player);
+            }
+        }
     }
 
     _resetPlayersReadyStatus(game) {

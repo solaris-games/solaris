@@ -348,73 +348,81 @@ module.exports = class StarUpgradeService extends EventEmitter {
             });
     }
 
-    async upgradeBulk(game, player, infrastructureType, amount) {
+    async upgradeBulk(game, player, infrastructureType, amount, writeToDB = true) {
         // Check that the amount the player wants to spend isn't more than the amount he has
-        if(player.credits < amount) {
+        if (player.credits < amount) {
             throw new ValidationError(`The player does not own enough credits to afford to bulk upgrade.`);
         }
+
         let upgradeSummary = await this.generateUpgradeBulkReport(game, player, infrastructureType, amount);
 
-        // Generate the DB writes for all the stars to upgrade, including deducting the credits
-        // for the player and also updating the player's achievement statistics.
-        let dbWrites = [
-            this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
-        ];
+        if (writeToDB) {
+            // Generate the DB writes for all the stars to upgrade, including deducting the credits
+            // for the player and also updating the player's achievement statistics.
+            let dbWrites = [
+                this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
+            ];
 
-        for (let star of upgradeSummary.stars) {
-            switch (infrastructureType) {
-                case 'economy':
-                    dbWrites.push({
-                        updateOne: {
-                            filter: {
-                                _id: game._id,
-                                'galaxy.stars._id': star.starId
-                            },
-                            update: {
-                                $set: {
-                                    'galaxy.stars.$.infrastructure.economy': star.infrastructure
+            for (let star of upgradeSummary.stars) {
+                switch (infrastructureType) {
+                    case 'economy':
+                        dbWrites.push({
+                            updateOne: {
+                                filter: {
+                                    _id: game._id,
+                                    'galaxy.stars._id': star.starId
+                                },
+                                update: {
+                                    $set: {
+                                        'galaxy.stars.$.infrastructure.economy': star.infrastructure
+                                    }
                                 }
                             }
-                        }
-                    });
-                    break;
-                case 'industry':
-                    dbWrites.push({
-                        updateOne: {
-                            filter: {
-                                _id: game._id,
-                                'galaxy.stars._id': star.starId
-                            },
-                            update: {
-                                $set: {
-                                    'galaxy.stars.$.infrastructure.industry': star.infrastructure
+                        });
+                        break;
+                    case 'industry':
+                        dbWrites.push({
+                            updateOne: {
+                                filter: {
+                                    _id: game._id,
+                                    'galaxy.stars._id': star.starId
+                                },
+                                update: {
+                                    $set: {
+                                        'galaxy.stars.$.infrastructure.industry': star.infrastructure
+                                    }
                                 }
                             }
-                        }
-                    });
-                    break;
-                case 'science':
-                    dbWrites.push({
-                        updateOne: {
-                            filter: {
-                                _id: game._id,
-                                'galaxy.stars._id': star.starId
-                            },
-                            update: {
-                                $set: {
-                                    'galaxy.stars.$.infrastructure.science': star.infrastructure
+                        });
+                        break;
+                    case 'science':
+                        dbWrites.push({
+                            updateOne: {
+                                filter: {
+                                    _id: game._id,
+                                    'galaxy.stars._id': star.starId
+                                },
+                                update: {
+                                    $set: {
+                                        'galaxy.stars.$.infrastructure.science': star.infrastructure
+                                    }
                                 }
                             }
-                        }
-                    });
-                    break;
+                        });
+                        break;
+                }
             }
+
+            // Update the DB.
+            await this.gameModel.bulkWrite(dbWrites);
         }
 
-        // Update the DB.
-        await this.gameModel.bulkWrite(dbWrites);
+        // Check for AI control.
+        if (!player.defeated) {
+            await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
+        }
 
-        await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
+        player.credits -= upgradeSummary.cost;
 
         this.emit('onPlayerInfrastructureBulkUpgraded', {
             game,

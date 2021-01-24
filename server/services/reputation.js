@@ -1,10 +1,14 @@
+const EventEmitter = require('events');
+
 const MAX_REPUTATION = 10;
 const MIN_REPUTATION = -10;
 const REPUTATION_INCREMENT = 1;
 
-module.exports = class ReputationService {
+module.exports = class ReputationService extends EventEmitter {
 
     constructor(gameModel, tradeService, playerService) {
+        super();
+        
         this.gameModel = gameModel;
         this.tradeService = tradeService;
         this.playerService = playerService;
@@ -30,13 +34,24 @@ module.exports = class ReputationService {
 
     async increaseReputation(game, player, forPlayer, updateDatabase = true) {
         let reputation = this.getReputation(game, player, forPlayer);
+        let increased = false;
 
         if (reputation.score < MAX_REPUTATION) {
             reputation.score += REPUTATION_INCREMENT;
+            increased = true;
         }
 
         if (updateDatabase) {
             await this._updateReputation(game, player, forPlayer, reputation);
+        }
+
+        if (increased) {
+            this.emit('onReputationIncreased', {
+                game,
+                player,
+                forPlayer,
+                amount: REPUTATION_INCREMENT
+            });
         }
     }
 

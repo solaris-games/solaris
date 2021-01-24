@@ -70,7 +70,8 @@ module.exports = class ResearchService extends EventEmitter {
             
         tech.progress += totalScience;
 
-        if (user) {
+        // If the player isn't being controlled by AI then increment achievements.
+        if (user && !player.defeated) {
             user.achievements.research[techKey] += totalScience;
         }
 
