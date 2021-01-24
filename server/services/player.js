@@ -460,7 +460,7 @@ module.exports = class PlayerService extends EventEmitter {
         let totalEco = this.calculateTotalEconomy(playerStars);
 
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = effectiveTechs.banking * 75;
+        let creditsFromBanking = playerStars.length ? effectiveTechs.banking * 75 : 0; // Players must have stars in order to get credits from banking.
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;

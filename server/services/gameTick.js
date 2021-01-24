@@ -698,13 +698,8 @@ module.exports = class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                // Defeated players do not conduct research or experiments?
-                if (player.defeated) {
-                    continue;
-                }
-                
                 let creditsResult = this.playerService.givePlayerMoney(game, player);
-                let experimentResult = this._conductExperiments(game, player);
+                let experimentResult = this.researchService.conductExperiments(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -721,14 +716,6 @@ module.exports = class GameTickService extends EventEmitter {
                 game
             });
         }
-    }
-
-    _conductExperiments(game, player) {
-        let experimentReport = this.researchService.conductExperiments(game, player);
-
-        experimentReport.playerId = player._id;
-
-        return experimentReport;
     }
 
     _logHistory(game) {

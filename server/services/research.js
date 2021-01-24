@@ -61,11 +61,6 @@ module.exports = class ResearchService extends EventEmitter {
     }
 
     async conductResearch(game, user, player) {
-        // TODO: Defeated players do not conduct research or experiments?
-        if (player.defeated) {
-            return;
-        }
-        
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
@@ -119,11 +114,6 @@ module.exports = class ResearchService extends EventEmitter {
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
 
-            // TODO: Defeated players do not conduct research or experiments?
-            if (player.defeated) {
-                continue;
-            }
-            
             let user = gameUsers.find(u => u._id.equals(player.userId));
             
             await this.conductResearch(game, user, player);
@@ -140,10 +130,15 @@ module.exports = class ResearchService extends EventEmitter {
 
     conductExperiments(game, player) {
         // NOTE: Experiments do not count towards player research achievements.
+        // NOTE: Players must own stars in order to have experiments.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        // TODO: Defeated players do not conduct research or experiments?
-        if (player.defeated) {
-            return;
+        if (!playerStars.length) {
+            return {
+                technology: null,
+                level: null,
+                amount: null
+            };
         }
 
         let tech = this._getRandomTechnology(game, player);
@@ -176,18 +171,10 @@ module.exports = class ResearchService extends EventEmitter {
             this._setNextResearch(game, player);
         }
 
-        // The current research may have been the one experimented on, so make sure we get the ETA of it.
-        let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
-
         return {
             technology: tech.key,
             level: tech.technology.level,
-            // TODO: Return effective tech level
-            progress: tech.technology.progress,
-            amount: researchAmount,
-            levelUp,
-            currentResearchTicksEta,
-            currentResearchTechnology: player.researchingNow
+            amount: researchAmount
         };
     }
 
