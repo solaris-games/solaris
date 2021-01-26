@@ -39,6 +39,7 @@ const AchievementService = require('../services/achievement');
 const ConversationService = require('../services/conversation');
 const ReputationService = require('../services/reputation');
 const AIService = require('../services/ai');
+const AITradeService = require('../services/aiTrade');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -93,6 +94,7 @@ module.exports = (io) => {
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
+    const aiTradeService = new AITradeService(reputationService, randomService, tradeService);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService);
@@ -132,5 +134,6 @@ module.exports = (io) => {
         conversationService,
         reputationService,
         aiService,
+        aiTradeService,
     };
 };

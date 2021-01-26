@@ -151,6 +151,8 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`There is no user associated with this player.`);
         }
 
+        let levelDifference = tradeTech.level - toPlayerTech.level;
+
         toPlayerTech.level = tradeTech.level;
         toPlayerTech.progress = 0;
         toUser.achievements.trade.technologyReceived++;
@@ -170,7 +172,8 @@ module.exports = class TradeService extends EventEmitter {
             toPlayer,
             technology: {
                 name: tradeTech.name,
-                level: tradeTech.level
+                level: tradeTech.level,
+                difference: levelDifference
             },
             date: moment().utc()
         };

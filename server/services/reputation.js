@@ -32,12 +32,13 @@ module.exports = class ReputationService extends EventEmitter {
         return player.reputations.find(r => r.playerId.equals(forPlayer._id));
     }
 
-    async increaseReputation(game, player, forPlayer, updateDatabase = true) {
+    async increaseReputation(game, player, forPlayer, amount = 1, updateDatabase = true) {
         let reputation = this.getReputation(game, player, forPlayer);
         let increased = false;
 
         if (reputation.score < MAX_REPUTATION) {
-            reputation.score += REPUTATION_INCREMENT;
+            reputation.score += amount;
+            reputation.score = Math.min(MAX_REPUTATION, reputation.score);
             increased = true;
         }
 
@@ -50,7 +51,7 @@ module.exports = class ReputationService extends EventEmitter {
                 game,
                 player,
                 forPlayer,
-                amount: REPUTATION_INCREMENT
+                score: reputation.score
             });
         }
     }
@@ -68,9 +69,7 @@ module.exports = class ReputationService extends EventEmitter {
     }
 
     async _updateReputation(game, player, forPlayer, reputation) {
-        let isNew = reputation._id == null;
-
-        if (isNew) {
+        if (reputation.isNew) {
             return await this.gameModel.updateOne({
                 _id: game._id,
                 'galaxy.players._id': player._id
@@ -106,12 +105,12 @@ module.exports = class ReputationService extends EventEmitter {
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
 
         if (amount >= creditsRequired) {
-            await this.increaseReputation(game, toPlayer, fromPlayer);
+            await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
         }
     }
 
     async onPlayerTechnologyReceived(game, fromPlayer, toPlayer, technology) {
-        await this.increaseReputation(game, toPlayer, fromPlayer);
+        await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
     }
 
 };
