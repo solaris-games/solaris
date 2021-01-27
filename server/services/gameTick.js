@@ -373,8 +373,12 @@ module.exports = class GameTickService extends EventEmitter {
             attackerUsers.push(attackerUser);
         }
 
+        const getCarrierPlayer = (carrier, players) => {
+            return players.find(p => carrier.ownedByPlayerId.equals(p._id));
+        };
+
         const getCarrierUser = (carrier, players, users) => {
-            let player = players.find(p => carrier.ownedByPlayerId.equals(p._id));
+            let player = getCarrierPlayer(carrier, players);
 
             return users.find(u => u._id.toString() === player.userId.toString());
         };
@@ -421,7 +425,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         // Add combat result stats to defender achievements.
-        if (defenderUser) {
+        if (defenderUser && !defender.defeated) {
             defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
             defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
         }
@@ -460,9 +464,10 @@ module.exports = class GameTickService extends EventEmitter {
             combatCarrier.lost++;
 
             // Deduct ships lost from attacker.
+            let attacker = getCarrierPlayer(attackerCarrier, attackers);
             let attackerUser = getCarrierUser(attackerCarrier, attackers, attackerUsers);
 
-            if (attackerUser) attackerUser.achievements.combat.losses.ships++;
+            if (attackerUser && !attacker.defeated) attackerUser.achievements.combat.losses.ships++;
 
             // If the carrier has been destroyed, remove it from the game.
             if (!attackerCarrier.ships) {
@@ -471,12 +476,13 @@ module.exports = class GameTickService extends EventEmitter {
                 attackerCarriers.splice(attackerCarrierIndex, 1);
                 attackerCarrierIndex--;
 
-                if (attackerUser) {
+                if (attackerUser && !attacker.defeated) {
                     attackerUser.achievements.combat.losses.carriers++;
 
                     if (attackerCarrier.specialistId) attackerUser.achievements.combat.losses.specialists++;
                 }
-                if (defenderUser) {
+
+                if (defenderUser && !defender.defeated) {
                     defenderUser.achievements.combat.kills.carriers++;
 
                     if (attackerCarrier.specialistId) defenderUser.achievements.combat.kills.specialists++;
@@ -520,14 +526,16 @@ module.exports = class GameTickService extends EventEmitter {
                     defenderCarriers.splice(defenderCarrierIndex, 1);
                     defenderCarrierIndex--;
 
-                    if (defenderUser) {
+                    if (defenderUser && !defender.defeated) {
                         defenderUser.achievements.combat.losses.carriers++;
 
                         if (defenderCarrier.specialistId) defenderUser.achievements.combat.losses.specialists++;
                     }
 
                     // Add carriers killed to attackers.
-                    for (let attackerUser of attackerUsers) {
+                    for (let attacker of attackers.filter(a => !a.defeated)) {
+                        let attackerUser = attackerUsers.find(u => u._id.toString() === attacker.userId.toString());
+
                         if (attackerUser) {
                             attackerUser.achievements.combat.kills.carriers++;
 
@@ -541,7 +549,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             if (defenderShipKilled) {
                 // Add ships killed to attackers.
-                for (let attackerUser of attackerUsers) {
+                for (let attacker of attackers.filter(a => !a.defeated)) {
+                    let attackerUser = attackerUsers.find(u => u._id.toString() === attacker.userId.toString());
+
                     if (attackerUser) attackerUser.achievements.combat.kills.ships++;
                 }
             }
@@ -614,11 +624,11 @@ module.exports = class GameTickService extends EventEmitter {
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
-            if (defenderUser) {
+            if (defenderUser && !defender.defeated) {
                 defenderUser.achievements.combat.stars.lost++;
             }
             
-            if (newStarUser) {
+            if (newStarUser && !newStarPlayer.defeated) {
                 newStarUser.achievements.combat.stars.captured++;
             }
 

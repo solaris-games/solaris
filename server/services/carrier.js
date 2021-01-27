@@ -238,14 +238,14 @@ module.exports = class CarrierService {
         let starPlayer = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
         let starUser = gameUsers.find(u => u._id.equals(starPlayer.userId));
 
-        if (starUser) {
+        if (starUser && !starPlayer.defeated) {
             starUser.achievements.trade.giftsReceived += carrier.ships;
         }
 
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
-        if (carrierUser) {
+        if (carrierUser && !carrierPlayer.defeated) {
             carrierUser.achievements.trade.giftsSent += carrier.ships;
         }
 

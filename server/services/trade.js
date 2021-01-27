@@ -39,10 +39,16 @@ module.exports = class TradeService extends EventEmitter {
         }
 
         fromPlayer.credits -= amount;
-        fromPlayerUser.achievements.trade.creditsSent += amount;
+
+        if (!fromPlayer.defeated) {
+            fromPlayerUser.achievements.trade.creditsSent += amount;
+        }
 
         toPlayer.credits += amount;
-        toPlayerUser.achievements.trade.creditsReceived += amount;
+
+        if (!toPlayer.defeated) {
+            toPlayerUser.achievements.trade.creditsReceived += amount;
+        }
 
         this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
 
@@ -93,6 +99,8 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`There is no user associated with this player.`);
         }
 
+        // Note: AI will never ever send renown so no need to check
+        // if players are AI controlled here.
         fromPlayer.renownToGive -= amount;
 
         fromUser.achievements.trade.renownSent += amount;
@@ -155,10 +163,17 @@ module.exports = class TradeService extends EventEmitter {
 
         toPlayerTech.level = tradeTech.level;
         toPlayerTech.progress = 0;
-        toUser.achievements.trade.technologyReceived++;
+
+        // Need to assert that the trading players aren't controlled by AI.
+        if (!toPlayer.defeated) {
+            toUser.achievements.trade.technologyReceived++;
+        }
 
         fromPlayer.credits -= tradeTech.cost;
-        fromUser.achievements.trade.technologySent++;
+
+        if (!fromPlayer.defeated) {
+            fromUser.achievements.trade.technologySent++;
+        }
 
         this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
 

@@ -50,7 +50,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
             this._getSetStarWarpGateDBWrite(game, star, true)
         ]);
 
-        await this.achievementService.incrementWarpGatesBuilt(player.userId);
+        if (!player.defeated) {
+            await this.achievementService.incrementWarpGatesBuilt(player.userId);
+        }
 
         this.emit('onPlayerWarpGateBuilt', {
             game,
@@ -82,7 +84,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
             this._getSetStarWarpGateDBWrite(game, star, false)
         ]);
 
-        await this.achievementService.incrementWarpGatesDestroyed(player.userId);
+        if (!player.defeated) {
+            await this.achievementService.incrementWarpGatesDestroyed(player.userId);
+        }
 
         this.emit('onPlayerWarpGateDestroyed', {
             game,
@@ -154,7 +158,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
         ]);
 
-        await this.achievementService.incrementCarriersBuilt(player.userId);
+        if (!player.defeated) {
+            await this.achievementService.incrementCarriersBuilt(player.userId);
+        }
 
         this.emit('onPlayerCarrierBuilt', {
             game,
@@ -236,7 +242,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // Update the DB.
         await this.gameModel.bulkWrite(dbWrites);
 
-        await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
+        if (!player.defeated) {
+            await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
+        }
     }
 
     async _upgradeInfrastructure(game, player, starId, expenseConfigKey, economyType, calculateCostCallback, writeToDB = true) {
