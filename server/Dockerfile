@@ -14,6 +14,4 @@ RUN npm ci --only=production
 # Bundle app source
 COPY . .
 
-EXPOSE 3000
-RUN npm run start-jobs
 CMD [ "npm", "run", "start-api" ]
