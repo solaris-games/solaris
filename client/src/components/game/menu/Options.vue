@@ -41,6 +41,23 @@
       <h4 class="pt-2">Map</h4>
 
       <div class="row bg-secondary pt-1 pb-1">
+        <label for="territory-style" class="col col-form-label">Territory Style</label>
+        <div class="col">
+          <select class="form-control" id="territory-style" v-model="settings.map.territoryStyle" :disabled="isSavingSettings">
+            <option value="marching-square">Marching Square</option>
+            <option value="voronoi">Voronoi</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="grid-size" class="col col-form-label">Grid Size</label>
+        <div class="col">
+          <input type="number" class="form-control" id="grid-size" v-model="settings.map.marchingSquareGridSize" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1">
         <label for="objects-scaling" class="col col-form-label">Objects Scaling</label>
         <div class="col">
           <select class="form-control" id="objects-scaling" v-model="settings.map.objectsScaling" :disabled="isSavingSettings">
