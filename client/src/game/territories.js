@@ -74,7 +74,7 @@ class Territories {
 
   _drawTerritoriesMarchingCube (gridSize) {
     const CELL_SIZE = 5*gridSize
-    const METABALL_RADIUS = CELL_SIZE*3
+    const METABALL_RADIUS = 120 //TODO get from userSetting
     const LINE_PROPORTION = 1/5
     const LINE_WIDTH = CELL_SIZE*LINE_PROPORTION
     const LINE_OFFSET = LINE_PROPORTION/2
