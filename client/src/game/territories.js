@@ -357,8 +357,8 @@ class Territories {
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
 
-    if (this.voronoiContainer) {
-      this.voronoiContainer.visible = zoomPercent <= 100
+    if (this.territoryContainer) {
+      this.territoryContainer.visible = zoomPercent <= 100
     }
 
     if (this.playerNamesContainer) {
