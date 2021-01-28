@@ -75,7 +75,7 @@ class Territories {
   _drawTerritoriesMarchingCube (gridSize) {
     const CELL_SIZE = 5*gridSize
     const METABALL_RADIUS = 120 //TODO get from userSetting
-    const LINE_PROPORTION = 1/5
+    const LINE_PROPORTION = 1/8
     const LINE_WIDTH = CELL_SIZE*LINE_PROPORTION
     const LINE_OFFSET = LINE_PROPORTION/2
 
@@ -210,7 +210,7 @@ class Territories {
       let territoryLines = new PIXI.Graphics()
       this.territoryContainer.addChild(territoryPolygons)
       this.territoryContainer.addChild(territoryLines)
-      territoryLines.lineStyle(4, color, 1)
+      territoryLines.lineStyle(LINE_WIDTH, color, 1)
       territoryLines._lineStyle.cap = PIXI.LINE_CAP.ROUND
       territoryPolygons.alpha = 0.333
 
