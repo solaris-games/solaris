@@ -96,6 +96,8 @@ const schema = new Schema({
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
             territoryStyle: { type: Types.String, required: false, enum: ['marching-square', 'voronoi'], default: 'marching-square' },
             marchingSquareGridSize: { type: Types.Number, required: false, default: 6 },
+            marchingSquareTerritorySize:{ type: Types.Number, required: false, default: 5 },
+            marchingSquareBorderWidth: { type: Types.Number, required: false, default: 4 },
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16 },

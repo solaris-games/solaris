@@ -51,9 +51,23 @@
       </div>
 
       <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="territory-size" class="col col-form-label">Territory Size</label>
+        <div class="col">
+          <input type="number" class="form-control" id="territory-size" v-model="settings.map.marchingSquareTerritorySize" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="grid-size" class="col col-form-label">Grid Size</label>
         <div class="col">
           <input type="number" class="form-control" id="grid-size" v-model="settings.map.marchingSquareGridSize" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="border-width" class="col col-form-label">Border Width</label>
+        <div class="col">
+          <input type="number" class="form-control" id="border-width" v-model="settings.map.marchingSquareBorderWidth" :disabled="isSavingSettings">
         </div>
       </div>
 

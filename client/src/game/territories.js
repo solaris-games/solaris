@@ -64,7 +64,7 @@ class Territories {
   drawTerritories (userSettings) {
     switch(userSettings.map.territoryStyle) {
       case 'marching-square':
-        this._drawTerritoriesMarchingCube(userSettings.map.marchingSquareGridSize)
+        this._drawTerritoriesMarchingCube(userSettings)
         break;
       case 'voronoi':
         this._drawTerritoriesVoronoi()
@@ -72,10 +72,11 @@ class Territories {
     }
   }
 
-  _drawTerritoriesMarchingCube (gridSize) {
-    const CELL_SIZE = 5*gridSize
-    const METABALL_RADIUS = 120 //TODO get from userSetting
-    const LINE_PROPORTION = 1/8
+  _drawTerritoriesMarchingCube (userSettings) {
+    console.log(userSettings.map)
+    const CELL_SIZE = 5*userSettings.map.marchingSquareGridSize
+    const METABALL_RADIUS = 20*userSettings.map.marchingSquareTerritorySize
+    const LINE_PROPORTION = (1/16)*userSettings.map.marchingSquareBorderWidth
     const LINE_WIDTH = CELL_SIZE*LINE_PROPORTION
     const LINE_OFFSET = LINE_PROPORTION/2
 
