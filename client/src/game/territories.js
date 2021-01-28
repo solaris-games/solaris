@@ -62,6 +62,13 @@ class Territories {
   }
 
   drawTerritories (userSettings) {
+    if (this.territoryContainer) {
+      this.container.removeChild(this.territoryContainer)
+      this.territoryContainer = null
+    }
+
+    this.territoryContainer = new PIXI.Container()
+
     switch(userSettings.map.territoryStyle) {
       case 'marching-square':
         this._drawTerritoriesMarchingCube(userSettings)
@@ -73,7 +80,6 @@ class Territories {
   }
 
   _drawTerritoriesMarchingCube (userSettings) {
-    console.log(userSettings.map)
     const CELL_SIZE = 5*userSettings.map.marchingSquareGridSize
     const METABALL_RADIUS = 20*userSettings.map.marchingSquareTerritorySize
     const LINE_PROPORTION = (1/16)*userSettings.map.marchingSquareBorderWidth
@@ -139,13 +145,6 @@ class Territories {
         [{x: 0, y: 0},{x: 1, y: 0},{x: 1, y: 1},{x: 0, y: 1}]
       ],
     ]
-    if (this.territoryContainer) {
-      this.container.removeChild(this.territoryContainer)
-      this.territoryContainer = null
-    }
-
-    this.territoryContainer = new PIXI.Container()
-    //this.territoryContainer.alpha = 0.3
 
     let minX = gameHelper.calculateMinStarX(this.game)
     let minY = gameHelper.calculateMinStarY(this.game)
@@ -273,12 +272,6 @@ class Territories {
   }
 
   _drawTerritoriesVoronoi () {
-    if (this.territoryContainer) {
-      this.container.removeChild(this.territoryContainer)
-      this.territoryContainer = null
-    }
-
-    this.territoryContainer = new PIXI.Container()
     this.territoryContainer.alpha = 0.3
 
     const maxDistance = 200
