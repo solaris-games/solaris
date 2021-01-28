@@ -140,7 +140,7 @@ class GameContainer {
   }
 
   reloadTerritories () {
-    this.map.drawTerritories()
+    this.map.drawTerritories(this.userSettings)
   }
 
   reloadStar (star) {

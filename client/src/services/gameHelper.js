@@ -91,6 +91,19 @@ class GameHelper {
 
     return Math.sqrt(xs + ys)
   }
+  
+  getClosestStar (stars, point) {
+    let closestStar = stars[0]
+    let smallerDistance = Number.MAX_VALUE
+    for( let star of stars ) {
+      let distance = this.getDistanceBetweenLocations(star.location, point)
+      if( distance<smallerDistance ) {
+        smallerDistance = distance
+        closestStar = star
+      }
+    }
+    return closestStar
+  }
 
   getAngleBetweenLocations (loc1, loc2) {
     return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x)
