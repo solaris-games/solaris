@@ -167,10 +167,8 @@ class Territories {
     let gridHeight = (maxY-minY)/CELL_SIZE
 
     let samplePoints = new Array(gridWidth+1)
-    let colors = []
-    for( let player of this.game.galaxy.players ) {
-      colors.push(player.colour.value)
-    }
+
+    let noPlayer = {}
     
     for( let ix = 0; ix<samplePoints.length; ix++ ) {
       samplePoints[ix] = new Array(gridHeight+1)
@@ -179,19 +177,12 @@ class Territories {
         let pointLocation = {x: ix*CELL_SIZE+minX, y: iy*CELL_SIZE+minY}
         let closestStar = gameHelper.getClosestStar(this.game.galaxy.stars, pointLocation)
         let owner = this.game.galaxy.players.find( p => p._id === closestStar.ownedByPlayerId )
-        let color = 0xFFFFFF
-        if( owner ){
-          color = owner.colour.value
-        }
         // TODO get the intensity of the metaball composed of all stars of the owner
         // the owner stars shouold be cached outside this loop
 
         let distance = gameHelper.getDistanceBetweenLocations(pointLocation, closestStar.location)
         if( distance<METABALL_RADIUS ) {
-           samplePoints[ix][iy] = color
-        }
-        else {
-           samplePoints[ix][iy] = 0xFFFFFF
+          samplePoints[ix][iy] = owner
         }
         if(false)
         {
@@ -205,7 +196,8 @@ class Territories {
         
       }
     }
-    for( let color of colors ) {
+    for( let player of this.game.galaxy.players ) {
+      let color = player.colour.value
       let territoryPolygons = new PIXI.Graphics()
       let territoryLines = new PIXI.Graphics()
       this.territoryContainer.addChild(territoryPolygons)
@@ -218,10 +210,10 @@ class Territories {
       for( let ix = 0; ix<samplePoints.length-1; ix++ ) {
         for( let iy = 0; iy<samplePoints[ix].length-1; iy++ ) {
           let lookUpIndex = 0
-          lookUpIndex += (samplePoints[ix][iy]==color)*8
-          lookUpIndex += (samplePoints[ix+1][iy]==color)*4
-          lookUpIndex += (samplePoints[ix][iy+1]==color)*1
-          lookUpIndex += (samplePoints[ix+1][iy+1]==color)*2
+          lookUpIndex += (player==samplePoints[ix][iy])*8
+          lookUpIndex += (player==samplePoints[ix+1][iy])*4
+          lookUpIndex += (player==samplePoints[ix][iy+1])*1
+          lookUpIndex += (player==samplePoints[ix+1][iy+1])*2
           if( VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != ACTION_SKIP ){
             let cellOrigin = {x: ix*CELL_SIZE+minX, y: iy*CELL_SIZE+minY}
             if( VERTEX_TABLE[lookUpIndex][LINES_INDEX].length>1 ) {
