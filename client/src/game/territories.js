@@ -167,8 +167,6 @@ class Territories {
     let gridHeight = (maxY-minY)/CELL_SIZE
 
     let samplePoints = new Array(gridWidth+1)
-
-    let noPlayer = {}
     
     for( let ix = 0; ix<samplePoints.length; ix++ ) {
       samplePoints[ix] = new Array(gridHeight+1)
