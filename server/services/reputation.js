@@ -18,7 +18,11 @@ module.exports = class ReputationService extends EventEmitter {
     }
 
     getReputation(game, player, forPlayer) {
-        let reputation = player.reputations.find(r => r.playerId.equals(forPlayer._id));
+        let reputation = null;
+
+        if (player.reputations) {
+            reputation = player.reputations.find(r => r.playerId.equals(forPlayer._id));
+        }
 
         if (!reputation) {
             reputation = {
@@ -26,6 +30,10 @@ module.exports = class ReputationService extends EventEmitter {
                 score: 0
             };
 
+            if (!player.reputations) {
+                player.reputations = [];
+            }
+            
             player.reputations.push(reputation);
         }
 
