@@ -249,6 +249,7 @@ export default {
 
       player.isEmptySlot = false
       player.alias = data.alias
+      player.avatar = data.avatar
     })
 
     this.sockets.subscribe('gamePlayerQuit', (data) => {
@@ -256,6 +257,7 @@ export default {
 
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
+      player.avatar = null
     })
 
     this.sockets.subscribe('gamePlayerReady', (data) => {
