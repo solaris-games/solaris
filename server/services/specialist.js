@@ -166,7 +166,9 @@ module.exports = class SpecialistService {
             }
         ]);
 
-        await this.achievementService.incrementSpecialistsHired(player.userId);
+        if (!player.defeated) {
+            await this.achievementService.incrementSpecialistsHired(player.userId);
+        }
 
         // TODO: The carrier may have its waypoint ETAs changed based on the specialist so need to 
         // return the new data.
@@ -238,7 +240,9 @@ module.exports = class SpecialistService {
             }
         ]);
 
-        await this.achievementService.incrementSpecialistsHired(player.userId);
+        if (!player.defeated) {
+            await this.achievementService.incrementSpecialistsHired(player.userId);
+        }
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.
         // TODO: Need to consider local and global effects and update the UI accordingly.

@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService) {
+        specialistService, starUpgradeService, reputationService, aiService) {
         super();
             
         this.distanceService = distanceService;
@@ -22,6 +22,8 @@ module.exports = class GameTickService extends EventEmitter {
         this.technologyService = technologyService;
         this.specialistService = specialistService;
         this.starUpgradeService = starUpgradeService;
+        this.reputationService = reputationService;
+        this.aiService = aiService;
     }
 
     async tick(gameId) {
@@ -88,6 +90,8 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Game lose check');
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
+            this._playAI(game);
+            logTime('AI controlled players turn');
 
             if (hasWinner) {
                 break;
@@ -369,8 +373,12 @@ module.exports = class GameTickService extends EventEmitter {
             attackerUsers.push(attackerUser);
         }
 
+        const getCarrierPlayer = (carrier, players) => {
+            return players.find(p => carrier.ownedByPlayerId.equals(p._id));
+        };
+
         const getCarrierUser = (carrier, players, users) => {
-            let player = players.find(p => carrier.ownedByPlayerId.equals(p._id));
+            let player = getCarrierPlayer(carrier, players);
 
             return users.find(u => u._id.toString() === player.userId.toString());
         };
@@ -383,6 +391,8 @@ module.exports = class GameTickService extends EventEmitter {
         } else {
             combatResult = this.combatService.calculateCarrier(game, defenderCarriers, attackerCarriers);
         }
+
+        await this._decreaseReputationForCombat(game, defender, attackers);
         
         // Add all of the carriers to the combat result with a snapshot of
         // how many ships they had before combat occurs.
@@ -415,7 +425,7 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         // Add combat result stats to defender achievements.
-        if (defenderUser) {
+        if (defenderUser && !defender.defeated) {
             defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
             defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
         }
@@ -454,9 +464,10 @@ module.exports = class GameTickService extends EventEmitter {
             combatCarrier.lost++;
 
             // Deduct ships lost from attacker.
+            let attacker = getCarrierPlayer(attackerCarrier, attackers);
             let attackerUser = getCarrierUser(attackerCarrier, attackers, attackerUsers);
 
-            if (attackerUser) attackerUser.achievements.combat.losses.ships++;
+            if (attackerUser && !attacker.defeated) attackerUser.achievements.combat.losses.ships++;
 
             // If the carrier has been destroyed, remove it from the game.
             if (!attackerCarrier.ships) {
@@ -465,12 +476,13 @@ module.exports = class GameTickService extends EventEmitter {
                 attackerCarriers.splice(attackerCarrierIndex, 1);
                 attackerCarrierIndex--;
 
-                if (attackerUser) {
+                if (attackerUser && !attacker.defeated) {
                     attackerUser.achievements.combat.losses.carriers++;
 
                     if (attackerCarrier.specialistId) attackerUser.achievements.combat.losses.specialists++;
                 }
-                if (defenderUser) {
+
+                if (defenderUser && !defender.defeated) {
                     defenderUser.achievements.combat.kills.carriers++;
 
                     if (attackerCarrier.specialistId) defenderUser.achievements.combat.kills.specialists++;
@@ -514,14 +526,16 @@ module.exports = class GameTickService extends EventEmitter {
                     defenderCarriers.splice(defenderCarrierIndex, 1);
                     defenderCarrierIndex--;
 
-                    if (defenderUser) {
+                    if (defenderUser && !defender.defeated) {
                         defenderUser.achievements.combat.losses.carriers++;
 
                         if (defenderCarrier.specialistId) defenderUser.achievements.combat.losses.specialists++;
                     }
 
                     // Add carriers killed to attackers.
-                    for (let attackerUser of attackerUsers) {
+                    for (let attacker of attackers.filter(a => !a.defeated)) {
+                        let attackerUser = attackerUsers.find(u => u._id.toString() === attacker.userId.toString());
+
                         if (attackerUser) {
                             attackerUser.achievements.combat.kills.carriers++;
 
@@ -535,7 +549,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             if (defenderShipKilled) {
                 // Add ships killed to attackers.
-                for (let attackerUser of attackerUsers) {
+                for (let attacker of attackers.filter(a => !a.defeated)) {
+                    let attackerUser = attackerUsers.find(u => u._id.toString() === attacker.userId.toString());
+
                     if (attackerUser) attackerUser.achievements.combat.kills.ships++;
                 }
             }
@@ -608,11 +624,11 @@ module.exports = class GameTickService extends EventEmitter {
             // TODO: If the home star is captured, find a new one?
             // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
-            if (defenderUser) {
+            if (defenderUser && !defender.defeated) {
                 defenderUser.achievements.combat.stars.lost++;
             }
             
-            if (newStarUser) {
+            if (newStarUser && !newStarPlayer.defeated) {
                 newStarUser.achievements.combat.stars.captured++;
             }
 
@@ -660,6 +676,14 @@ module.exports = class GameTickService extends EventEmitter {
         return currentIndex;
     }
 
+    async _decreaseReputationForCombat(game, defender, attackers) {
+        // Deduct reputation for all attackers that the defender is fighting and vice versa.
+        for (let attacker of attackers) {
+            await this.reputationService.decreaseReputation(game, defender, attacker, false);
+            await this.reputationService.decreaseReputation(game, attacker, defender, false);
+        }
+    }
+
     _tryRerouteCowardCarrier(game, carrier) {
         let isCoward = this.specialistService.getStarCombatAttackingRedirectIfDefeated(carrier);
                 
@@ -687,13 +711,8 @@ module.exports = class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                // Defeated players do not conduct research or experiments?
-                if (player.defeated) {
-                    continue;
-                }
-                
                 let creditsResult = this.playerService.givePlayerMoney(game, player);
-                let experimentResult = this._conductExperiments(game, player);
+                let experimentResult = this.researchService.conductExperiments(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -710,14 +729,6 @@ module.exports = class GameTickService extends EventEmitter {
                 game
             });
         }
-    }
-
-    _conductExperiments(game, player) {
-        let experimentReport = this.researchService.conductExperiments(game, player);
-
-        experimentReport.playerId = player._id;
-
-        return experimentReport;
     }
 
     _logHistory(game) {
@@ -755,8 +766,7 @@ module.exports = class GameTickService extends EventEmitter {
                     || player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
 
             if (isAfk) {
-                player.defeated = true;
-                player.afk = true;
+                this.playerService.setPlayerAsAfk(game, player);
             }
 
             // Check if the player has been defeated by conquest.
@@ -767,7 +777,9 @@ module.exports = class GameTickService extends EventEmitter {
                 if (stars.length === 0) {
                     let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
         
-                    player.defeated = carriers.length === 0;
+                    if (carriers.length === 0) {
+                        this.playerService.setPlayerAsDefeated(game, player);
+                    }
                 }
             }
 
@@ -820,6 +832,14 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         return false;
+    }
+
+    async _playAI(game) {
+        for (let player of game.galaxy.players) {
+            if (player.defeated) {
+                await this.aiService.play(game, player);
+            }
+        }
     }
 
     _resetPlayersReadyStatus(game) {

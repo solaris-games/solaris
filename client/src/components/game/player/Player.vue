@@ -2,7 +2,7 @@
 <div class="menu-page container">
     <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested">
-      <span class="mr-2" v-if="user">
+      <span class="mr-2" v-if="user.roles">
         <i class="fas fa-hands-helping" v-if="user.roles.contributor" title="This player is a contributor"></i>
         <i class="fas fa-code ml-1" v-if="user.roles.developer" title="This player is a developer"></i>
         <i class="fas fa-user-friends ml-1" v-if="user.roles.communityManager" title="This player is a community manager"></i>

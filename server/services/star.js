@@ -293,7 +293,7 @@ module.exports = class StarService extends EventEmitter {
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
-        if (carrierUser) {
+        if (carrierUser && !carrierPlayer.defeated) {
             carrierUser.achievements.combat.stars.captured++;
         }
     }
