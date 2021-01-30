@@ -66,7 +66,7 @@
               <span class="text-success">{{previewStar.infrastructure}}</span>
             </td>
             <td class="text-right">
-              {{previewStar.infrastructureCost}}
+              {{previewStar.infrastructureCostTotal}}
             </td>
           </tr>
         </tbody>

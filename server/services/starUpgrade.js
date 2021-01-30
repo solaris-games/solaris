@@ -459,7 +459,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 summaryStar = {
                     starId: upgradeStar.star._id,
                     naturalResources: upgradeStar.star.naturalResources,
-                    infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType]
+                    infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
+                    infrastructureCostTotal: 0
                 }
 
                 upgradeSummary.stars.push(summaryStar);
@@ -471,6 +472,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
             upgradeSummary.upgraded++;
             upgradeSummary.cost += upgradeReport.cost;
+            summaryStar.infrastructureCostTotal += upgradeReport.cost;
 
             // Update the stars next infrastructure cost so next time
             // we loop we will have the most up to date info.
