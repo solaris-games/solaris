@@ -305,7 +305,7 @@ class Map extends EventEmitter {
     star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
 
     this.starContainer.removeChild(star.container)
-    this.starContainer.removeChild(star.fixedcontainer)
+    this.starContainer.removeChild(star.fixedContainer)
 
     this.stars.splice(this.stars.indexOf(star), 1)
   }
@@ -329,7 +329,7 @@ class Map extends EventEmitter {
     carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
     this.carrierContainer.removeChild(carrier.container)
-    this.carrierContainer.removeChild(carrier.fixedcontainer)
+    this.carrierContainer.removeChild(carrier.fixedContainer)
 
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
   }
