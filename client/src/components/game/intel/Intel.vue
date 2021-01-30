@@ -137,7 +137,7 @@ export default {
       let isCurrentPlayer = this.userPlayer._id === p._id
 
       return {
-        enabled: true,
+        enabled: !p.defeated, // Default to Active filter
         playerId: p._id,
         alias: p.alias,
         shape: p.shape,
