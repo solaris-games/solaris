@@ -140,6 +140,10 @@ module.exports = class ResearchService extends EventEmitter {
 
     conductExperiments(game, player) {
         // NOTE: Experiments do not count towards player research achievements.
+        // Check if experimentation is enabled.
+        if (!this.technologyService.isTechnologyEnabled(game, 'experimentation')) {
+            return;
+        }
 
         // TODO: Defeated players do not conduct research or experiments?
         if (player.defeated) {

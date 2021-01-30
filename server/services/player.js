@@ -459,13 +459,15 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
+        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
+
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.calculateTotalEconomy(playerStars);
 
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = effectiveTechs.banking * 75;
+        let creditsFromBanking = (isBankingEnabled ? effectiveTechs.banking : 0) * 75;
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
