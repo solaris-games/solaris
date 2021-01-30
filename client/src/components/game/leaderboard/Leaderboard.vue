@@ -48,7 +48,7 @@
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame()">
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
                         <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
@@ -146,9 +146,6 @@ export default {
     },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
-    },
-    isTurnBasedGame () {
-      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     },
     isUserPlayer (player) {
       let userPlayer = this.getUserPlayer()
@@ -285,6 +282,9 @@ export default {
     },
     sortedPlayers () {
       return GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
+    },
+    isTurnBasedGame () {
+      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     }
   }
 }

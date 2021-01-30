@@ -4,7 +4,7 @@ module.exports = class GameGalaxyService {
 
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService, specialistService, technologyService) {
+        waypointService, researchService, specialistService, technologyService, reputationService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -18,6 +18,7 @@ module.exports = class GameGalaxyService {
         this.researchService = researchService;
         this.specialistService = specialistService;
         this.technologyService = technologyService;
+        this.reputationService = reputationService;
     }
 
     async getGalaxy(game, userId) {
@@ -249,6 +250,12 @@ module.exports = class GameGalaxyService {
                     || onlinePlayers.find(op => op._id.equals(p._id)) != null;
             }
 
+            let reputation = null;
+
+            if (player) {
+                reputation = this.reputationService.getReputation(doc, p, player);
+            }
+
             // Return a subset of the user, key info only.
             return {
                 colour: p.colour,
@@ -293,6 +300,7 @@ module.exports = class GameGalaxyService {
                 avatar: p.avatar,
                 homeStarId: p.homeStarId,
                 stats: p.stats,
+                reputation,
                 lastSeen: p.lastSeen,
                 isOnline: p.isOnline
             };

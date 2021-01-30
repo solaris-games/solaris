@@ -7,9 +7,9 @@
             {{game.settings.general.name}}
         </div>
         <div class="col">
-            <span class="pointer" v-if="gameIsPaused()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText()}}</span>
-            <span class="pointer" v-if="gameIsInProgress()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
-            <span class="pointer" v-if="gameIsPendingStart()" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText}}</span>
+            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
         </div>
         <div class="col-auto text-right" v-if="userPlayer">
             <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
@@ -33,7 +33,7 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame() && !gameIsFinished()" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
@@ -205,24 +205,6 @@ export default {
         this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }
     },
-    gameIsPaused () {
-      return GameHelper.isGamePaused(this.$store.state.game)
-    },
-    gameIsInProgress () {
-      return GameHelper.isGameInProgress(this.$store.state.game)
-    },
-    gameIsPendingStart () {
-      return GameHelper.isGamePendingStart(this.$store.state.game)
-    },
-    gameIsFinished () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    getGameStatusText (game) {
-      return GameHelper.getGameStatusText(this.$store.state.game)
-    },
-    isTurnBasedGame () {
-      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
-    },
     async checkForUnreadMessages () {
       if (!this.userPlayer) {
         return
@@ -347,6 +329,24 @@ export default {
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    gameIsPaused () {
+      return GameHelper.isGamePaused(this.$store.state.game)
+    },
+    gameIsInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    gameIsPendingStart () {
+      return GameHelper.isGamePendingStart(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    getGameStatusText (game) {
+      return GameHelper.getGameStatusText(this.$store.state.game)
+    },
+    isTurnBasedGame () {
+      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     }
   }
 }

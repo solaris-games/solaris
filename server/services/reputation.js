@@ -56,13 +56,18 @@ module.exports = class ReputationService extends EventEmitter {
         }
     }
 
-    async decreaseReputation(game, player, forPlayer, updateDatabase = true) {
+    async decreaseReputation(game, player, forPlayer, resetReputationAboveZero = false, updateDatabase = true) {
         let reputation = this.getReputation(game, player, forPlayer);
         let decreased = false;
 
         if (reputation.score > MIN_REPUTATION) {
-            reputation.score -= REPUTATION_INCREMENT;
-            reputation.score = Math.max(MIN_REPUTATION, reputation.score);
+            if (resetReputationAboveZero && reputation.score > 0) {
+                reputation.score = 0;
+            } else {
+                reputation.score -= REPUTATION_INCREMENT;
+                reputation.score = Math.max(MIN_REPUTATION, reputation.score);
+            }
+
             decreased = true;
         }
 

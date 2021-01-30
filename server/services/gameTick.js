@@ -679,8 +679,8 @@ module.exports = class GameTickService extends EventEmitter {
     async _decreaseReputationForCombat(game, defender, attackers) {
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
         for (let attacker of attackers) {
-            await this.reputationService.decreaseReputation(game, defender, attacker, false);
-            await this.reputationService.decreaseReputation(game, attacker, defender, false);
+            await this.reputationService.decreaseReputation(game, defender, attacker, true, false);
+            await this.reputationService.decreaseReputation(game, attacker, defender, true, false);
         }
     }
 
