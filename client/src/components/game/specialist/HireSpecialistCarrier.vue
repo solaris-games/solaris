@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Hire Specialist" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Hire Specialist" @onCloseRequested="onCloseRequested">
+      <button @click="onOpenCarrierDetailRequested(carrier)" class="btn btn-primary" title="Back to Carrier"><i class="fas fa-arrow-left"></i></button>
+    </menu-title>
 
     <div class="row bg-primary">
         <div class="col">
