@@ -835,10 +835,8 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     async _playAI(game) {
-        for (let player of game.galaxy.players) {
-            if (player.defeated) {
-                await this.aiService.play(game, player);
-            }
+        for (let player of game.galaxy.players.filter(p => p.defeated)) {
+            await this.aiService.play(game, player);
         }
     }
 

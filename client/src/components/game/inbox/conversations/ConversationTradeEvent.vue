@@ -17,7 +17,7 @@
       </div>
       <div class="col-auto">
         <p class="mt-0 mb-0">
-          <small><em>{{getDateString(event.date)}}</em></small>
+          <small><em>{{getDateString(event.sentDate)}}</em></small>
         </p>
       </div>
     </div>
