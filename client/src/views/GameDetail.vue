@@ -102,6 +102,14 @@
               <td>Resource Distribution</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.resourceDistribution) }}</td>
             </tr>
+            <tr>
+              <td>Player Distribution</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.playerDistribution) }}</td>
+            </tr>
+            <tr>
+              <td>Carrier Speed</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierSpeed) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>

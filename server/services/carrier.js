@@ -191,7 +191,7 @@ module.exports = class CarrierService {
             }
         }
 
-        return game.constants.distances.shipSpeed * distanceModifier;
+        return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
     }
 
     async convertToGift(game, player, carrierId) {

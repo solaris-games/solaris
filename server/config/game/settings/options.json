@@ -185,6 +185,20 @@
             "value": "random",
             "text": "Random"
             }
+        ],
+        "carrierSpeed": [
+            {
+            "value": 2.5,
+            "text": "Slow"
+            },
+            {
+            "value": 5,
+            "text": "Standard"
+            },
+            {
+            "value": 10,
+            "text": "Fast"
+            }
         ]
         },
         "galaxy": {

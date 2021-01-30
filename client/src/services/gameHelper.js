@@ -118,7 +118,7 @@ class GameHelper {
 
   getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
     let totalTicks = 0
-    let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
+    let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
     // TODO: Global speed modifiers.
