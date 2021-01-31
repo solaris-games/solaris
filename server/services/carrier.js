@@ -89,19 +89,22 @@ module.exports = class CarrierService {
         // each star to check what is within its scanning range.
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        // If the player has no stars remaining then they can only see their own carriers.
-        if (!playerStars.length) {
-            return game.galaxy.carriers.filter(c => c.ownedByPlayerId.equals(player._id));
-        }
-        
-        let carriersInRange = [];
-        let carriersToCheck = game.galaxy.carriers.map(c => {
-            return {
-                _id: c._id,
-                ownedByPlayerId: c.ownedByPlayerId,
-                location: c.location
-            };
-        });
+        // Start with all of the carriers that the player owns as
+        // the player can always see those carriers.
+        let carriersInRange = game.galaxy.carriers
+            .filter(c => c.ownedByPlayerId.equals(player._id))
+            .map(c => c._id);
+
+        // We need to check all carriers NOT owned by the player.
+        let carriersToCheck = game.galaxy.carriers
+            .filter(c => !c.ownedByPlayerId.equals(player._id))
+            .map(c => {
+                return {
+                    _id: c._id,
+                    ownedByPlayerId: c.ownedByPlayerId,
+                    location: c.location
+                };
+            });
 
         for (let star of playerStars) {
             let carrierIds = this.getCarriersWithinScanningRangeOfStarByCarrierIds(game, star, carriersToCheck);
