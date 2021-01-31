@@ -632,6 +632,7 @@ class Map extends EventEmitter {
 
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
+      .sort((a, b) => b.type.localeCompare(a.type))
       .sort((a, b) => a.distance - b.distance)
 
     if (closeObjects.length > 1) {
