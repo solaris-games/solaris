@@ -35,6 +35,7 @@ const UserService = require('../services/user');
 const HistoryService = require('../services/history');
 const LedgerService = require('../services/ledger');
 const SpecialistService = require('../services/specialist');
+const SpecialistHireService = require('../services/specialistHire');
 const AchievementService = require('../services/achievement');
 const ConversationService = require('../services/conversation');
 const ReputationService = require('../services/reputation');
@@ -66,7 +67,7 @@ module.exports = (io) => {
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const achievementService = new AchievementService(UserModel);
-    const specialistService = new SpecialistService(GameModel, achievementService);
+    const specialistService = new SpecialistService();
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(GameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
     const carrierService = new CarrierService(achievementService, distanceService, starService, technologyService, specialistService);
@@ -85,6 +86,7 @@ module.exports = (io) => {
     const tradeService = new TradeService(userService, playerService, ledgerService);
     const reputationService = new ReputationService(GameModel, tradeService, playerService);
     const waypointService = new WaypointService(GameModel, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
+    const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService);
     const conversationService = new ConversationService(GameModel, EventModel);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService);
     const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService);
@@ -130,6 +132,7 @@ module.exports = (io) => {
         historyService,
         ledgerService,
         specialistService,
+        specialistHireService,
         achievementService,
         conversationService,
         reputationService,

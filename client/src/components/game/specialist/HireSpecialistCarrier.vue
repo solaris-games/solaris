@@ -107,6 +107,11 @@ export default {
                 this.carrier.specialist = specialist
                 this.userPlayer.credits -= specialist.cost
 
+                if (response.data.waypoints) {
+                    this.carrier.waypoints = response.data.waypoints.waypoints
+                    this.carrier.waypointsLooped = response.data.waypoints.waypointsLooped
+                }
+
                 GameContainer.reloadCarrier(this.carrier)
             }
         } catch (err) {
