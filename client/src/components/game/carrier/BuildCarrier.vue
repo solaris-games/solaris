@@ -76,6 +76,7 @@ import starService from '../../../services/api/star'
 import AudioService from '../../../game/audio'
 import GameHelper from '../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -146,10 +147,13 @@ export default {
 
                 this.$store.state.game.galaxy.carriers.push(response.data.carrier)
 
-                let star = GameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting).garrison = response.data.starGarrison
+                let star = GameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting)
+                star.garrison = response.data.starGarrison
 
                 this.$emit('onEditWaypointsRequested', response.data.carrier._id)
                 GameHelper.getUserPlayer(this.$store.state.game).credits -= this.star.upgradeCosts.carriers
+
+                GameContainer.reloadStar(star)
 
                 AudioService.join()
             }
