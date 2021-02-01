@@ -4,7 +4,7 @@ module.exports = class GameGalaxyService {
 
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService, specialistService, technologyService) {
+        waypointService, researchService, specialistService, technologyService, reputationService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -18,18 +18,13 @@ module.exports = class GameGalaxyService {
         this.researchService = researchService;
         this.specialistService = specialistService;
         this.technologyService = technologyService;
+        this.reputationService = reputationService;
     }
 
     async getGalaxy(game, userId) {
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
         
-        // If the game has started and the user is not in this game
-        // then they cannot view info about this game.
-        if (game.state.startDate && !player) {
-            throw new ValidationError('Cannot view information about this game, you are not playing.');
-        }
-
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
@@ -37,7 +32,7 @@ module.exports = class GameGalaxyService {
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
-        // if the user isn't playing this game yet, then only return
+        // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like garrisons.
         if (!player) {
             this._setStarInfoBasic(game);
@@ -94,20 +89,12 @@ module.exports = class GameGalaxyService {
 
         doc.galaxy.stars = doc.galaxy.stars
         .map(s => {
-            if (s.specialistId) {
-                s.specialist = this.specialistService.getByIdStar(s.specialistId);
-            }
-
             return {
                 _id: s._id,
                 name: s.name,
                 ownedByPlayerId: s.ownedByPlayerId,
                 location: s.location,
-                warpGate: s.warpGate,
-                stats: s.stats,
-                manufacturing: s.manufacturing,
-                specialistId: s.specialistId,
-                specialist: s.specialist
+                warpGate: false
             }
         });
     }
@@ -263,6 +250,12 @@ module.exports = class GameGalaxyService {
                     || onlinePlayers.find(op => op._id.equals(p._id)) != null;
             }
 
+            let reputation = null;
+
+            if (player) {
+                reputation = this.reputationService.getReputation(doc, p, player);
+            }
+
             // Return a subset of the user, key info only.
             return {
                 colour: p.colour,
@@ -307,6 +300,7 @@ module.exports = class GameGalaxyService {
                 avatar: p.avatar,
                 homeStarId: p.homeStarId,
                 stats: p.stats,
+                reputation,
                 lastSeen: p.lastSeen,
                 isOnline: p.isOnline
             };

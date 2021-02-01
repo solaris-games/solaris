@@ -29,9 +29,6 @@ module.exports = class WaypointService {
             throw new ValidationError('Cannot change waypoints of a carrier that is a gift.');
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
         if (!carrier.orbiting) {
@@ -65,9 +62,7 @@ module.exports = class WaypointService {
                 throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} delay cannot be a decimal.`);
             }
 
-            let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
-
-            if (distanceBetweenStars > hyperspaceDistance) {
+            if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
                 throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} exceeds hyperspace range.`);
             }
         }
@@ -103,6 +98,61 @@ module.exports = class WaypointService {
             ticksEtaTotal: reportCarrier.ticksEtaTotal,
             waypoints: reportCarrier.waypoints
         };
+    }
+
+    _waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint) {
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
+
+        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
+        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
+
+        return distanceBetweenStars <= hyperspaceDistance;
+    }
+
+    async cullWaypointsByHyperspaceRange(game, carrier) {
+        let player = this.playerService.getById(game, carrier.ownedByPlayerId);
+
+        // Iterate through all waypoints the carrier has one by one and
+        // if any of them are not valid then remove it and all subsequent waypoints.
+        let waypointsCulled = false;
+
+        for (let i = 0; i < carrier.waypoints.length; i++) {
+            let waypoint = carrier.waypoints[i];
+
+            if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
+                waypointsCulled = true;
+
+                carrier.waypoints.splice(i);
+
+                if (carrier.waypointsLooped) {
+                    carrier.waypointsLooped = this.canLoop(game, player, carrier);
+                }
+
+                break;
+            }
+        }
+
+        if (waypointsCulled) {
+            await this.gameModel.updateOne({
+                _id: game._id,
+                'galaxy.carriers._id': carrier._id
+            }, {
+                $set: {
+                    'galaxy.carriers.$.waypoints': carrier.waypoints,
+                    'galaxy.carriers.$.waypointsLooped': carrier.waypointsLooped,
+                }
+            });
+
+            return {
+                waypoints: carrier.waypoints,
+                waypointsLooped: carrier.waypointsLooped
+            };
+        }
+
+        return null;
     }
 
     async loopWaypoints(game, player, carrierId, loop) {

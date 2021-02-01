@@ -101,7 +101,7 @@ class Map extends EventEmitter {
     this.territories.setup(game)
 
     this.territoryContainer.addChild(this.territories.container)
-    this.territories.draw()
+    this.territories.draw(userSettings)
 
     // -----------
     // Setup Background
@@ -235,7 +235,7 @@ class Map extends EventEmitter {
       existing.draw()
     }
 
-    this.drawTerritories()
+    this.drawTerritories(userSettings)
 
     this.background.setup(game, userSettings)
     this.background.draw(game, userSettings)
@@ -305,7 +305,7 @@ class Map extends EventEmitter {
     star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
 
     this.starContainer.removeChild(star.container)
-    this.starContainer.removeChild(star.fixedcontainer)
+    this.starContainer.removeChild(star.fixedContainer)
 
     this.stars.splice(this.stars.indexOf(star), 1)
   }
@@ -329,7 +329,7 @@ class Map extends EventEmitter {
     carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
     this.carrierContainer.removeChild(carrier.container)
-    this.carrierContainer.removeChild(carrier.fixedcontainer)
+    this.carrierContainer.removeChild(carrier.fixedContainer)
 
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
   }
@@ -364,9 +364,9 @@ class Map extends EventEmitter {
     this.rulerPoints.setup(this.game)
   }
 
-  drawTerritories () {
+  drawTerritories (userSettings) {
     this.territories.setup(this.game)
-    this.territories.draw()
+    this.territories.draw(userSettings)
   }
 
   panToPlayer (game, player) {
@@ -632,6 +632,7 @@ class Map extends EventEmitter {
 
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
+      .sort((a, b) => b.type.localeCompare(a.type))
       .sort((a, b) => a.distance - b.distance)
 
     if (closeObjects.length > 1) {

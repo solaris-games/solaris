@@ -459,13 +459,17 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
+        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
+
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.calculateTotalEconomy(playerStars);
 
+        let bankingMultiplier = isBankingEnabled ? effectiveTechs.banking : 0;
+
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = effectiveTechs.banking * 75;
+        let creditsFromBanking = playerStars.length ? bankingMultiplier * 75 : 0; // Players must have stars in order to get credits from banking.
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
@@ -512,6 +516,24 @@ module.exports = class PlayerService extends EventEmitter {
                 'galaxy.players.$.notes': notes
             }
         });
+    }
+
+    setPlayerAsDefeated(game, player) {
+        player.defeated = true;
+        player.researchingNext = 'random'; // Set up the AI for random research.
+
+        // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        for (let star of playerStars) {
+            star.ignoreBulkUpgrade = false;
+        }
+    }
+
+    setPlayerAsAfk(game, player) {
+        this.setPlayerAsDefeated(game, player);
+
+        player.afk = true;
     }
 
 }

@@ -3,7 +3,8 @@
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
       <button @click="toggleBulkIgnore" class="btn" 
         title="Toggle Bulk Ignore"
-        :class="{'btn-danger':star.ignoreBulkUpgrade,'btn-success':!star.ignoreBulkUpgrade}">
+        :class="{'btn-danger':star.ignoreBulkUpgrade,'btn-success':!star.ignoreBulkUpgrade}"
+        v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">
         <i class="fas" :class="{'fa-ban':star.ignoreBulkUpgrade,'fa-check-square':!star.ignoreBulkUpgrade}"></i>
       </button>
       <button @click="viewOnMap" class="btn btn-info ml-1"><i class="fas fa-eye"></i></button>
@@ -46,7 +47,7 @@
           </span>
         </div>
         <div class="col-auto">
-          <span title="Total Known Garrison" v-if="star.ownedByPlayerId">
+          <span title="Total Known Garrison" v-if="star.ownedByPlayerId && star.infrastructure">
             {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
           </span>
         </div>
@@ -99,7 +100,7 @@
     </div>
 
     <div v-if="isStandardUIStyle">
-      <div v-if="star.ownedByPlayerId" class="row mb-0 pt-3 pb-3 bg-primary">
+      <div v-if="star.ownedByPlayerId && star.infrastructure" class="row mb-0 pt-3 pb-3 bg-primary">
           <div class="col">
               Ships
           </div>
@@ -108,7 +109,7 @@
           </div>
       </div>
 
-      <div class="row pt-1 pb-1 bg-secondary">
+      <div class="row pt-1 pb-1 bg-secondary" v-if="star.infrastructure">
           <div class="col">
               Natural Resources
           </div>
@@ -117,7 +118,7 @@
           </div>
       </div>
 
-      <div v-if="star.ownedByPlayerId" class="row mb-2 pt-1 pb-1 bg-secondary">
+      <div v-if="star.ownedByPlayerId && star.infrastructure" class="row mb-2 pt-1 pb-1 bg-secondary">
           <div class="col">
               Terraformed Resources
           </div>

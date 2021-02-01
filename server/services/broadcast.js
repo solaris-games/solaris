@@ -28,10 +28,11 @@ module.exports = class BroadcastService {
         });
     }
 
-    gamePlayerJoined(game, playerId, alias) {
+    gamePlayerJoined(game, playerId, alias, avatar) {
         this.io.to(game.id).emit('gamePlayerJoined', {
             playerId,
-            alias
+            alias,
+            avatar
         });
     }
 

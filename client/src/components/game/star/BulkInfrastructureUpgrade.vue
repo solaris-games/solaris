@@ -22,7 +22,7 @@
         />
       </div>
       <div class="form-group col-4">
-        <select class="form-control" id="infrastructureType" v-on:change="hasChecked = false" v-model="selectedType">
+        <select class="form-control" id="infrastructureType" v-on:change="onInfrastructureSelectionChanged" v-model="selectedType">
           <option
             v-for="opt in types"
             v-bind:key="opt.key"
@@ -36,10 +36,41 @@
       </div>
     </form>
     <div v-if="hasChecked" class="row bg-secondary">
-      <div class="col text-center pt-2">
+      <div class="col text-center pt-3">
         <p><b class="text-warning">${{this.amount}}</b> budget: <b class="text-success">{{this.upgradeAvailable}}</b> upgrades for <b class="text-danger">${{this.cost}}</b></p>
-        <p v-if="this.ignoredCount"><small>{{this.ignoredCount}} stars have been ignored by the bulk upgrade.</small></p>
+        <p v-if="this.ignoredCount"><small>{{this.ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
       </div>
+    </div>
+    <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
+      <!-- TODO: This should be a component -->
+      <table class="table table-striped table-hover mb-1">
+        <thead>
+            <tr class="bg-primary">
+                <td>Star</td>
+                <td class="text-right">Upgrade</td>
+                <td class="text-right"><i class="fas fa-dollar-sign"></i></td>
+            </tr>
+        </thead>
+        <tbody>
+          <!-- TODO: This should be a component -->
+          <tr v-for="previewStar in upgradePreview.stars" :key="previewStar.starId">
+            <td>
+              <a href="javascript:void;" @click="panToStar(previewStar.starId)">
+                <i class="fas fa-eye"></i>
+                {{getStar(previewStar.starId).name}}
+              </a>
+            </td>
+            <td class="text-right">
+              <span class="text-danger">{{previewStar.infrastructureCurrent}}</span>
+              <i class="fas fa-arrow-right ml-2 mr-2"></i>
+              <span class="text-success">{{previewStar.infrastructure}}</span>
+            </td>
+            <td class="text-right">
+              {{previewStar.infrastructureCostTotal}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -50,6 +81,7 @@ import FormErrorList from '../../FormErrorList'
 import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -63,6 +95,7 @@ export default {
       isUpgrading: false,
       isChecking: false,
       hasChecked: false,
+      upgradePreview: null,
       amount: 0,
       upgradeAvailable: 0,
       cost: 0,
@@ -91,6 +124,15 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
+    onInfrastructureSelectionChanged (e) {
+      this.hasChecked = false
+      this.upgradePreview = null
+    },
+    panToStar (starId) {
+      let star = this.getStar(starId)
+
+      GameContainer.map.panToStar(star)
+    },
     gameIsFinished () {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
@@ -102,6 +144,7 @@ export default {
     },
     async check () {
       this.errors = []
+      this.upgradePreview = null
 
       if (this.amount <= 0) {
         return
@@ -118,6 +161,7 @@ export default {
         )
         if (response.status === 200) {
           AudioService.join()
+          this.upgradePreview = response.data
           this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
           this.ignoredCount = response.data.ignoredCount
@@ -168,6 +212,9 @@ export default {
 
       this.hasChecked = false
       this.isUpgrading = false
+    },
+    getStar(starId) {
+      return GameHelper.getStarById(this.$store.state.game, starId)
     }
   }
 }

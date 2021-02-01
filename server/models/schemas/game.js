@@ -37,6 +37,7 @@ const schema = new Schema({
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
+			carrierSpeed: { type: Types.Number, required: true, enum: [2.5, 5, 10], default: 5 },
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
@@ -106,7 +107,6 @@ const schema = new Schema({
 			lightYear: { type: Types.Number, required: true, default: 50 },
 			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
 			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
-			shipSpeed: { type: Types.Number, required: true, default: 5 },
 			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 }
 		},
 		research: {

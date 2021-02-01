@@ -95,22 +95,18 @@ module.exports = class LeaderboardService {
         
             let isOfficialGame = game.settings.general.createdByUserId == null;
 
-            if (i == 0) {
-                user.achievements.victories++; // Increase the winner's victory count
-
-                // Give the winner a galactic credit for official games.
-                if (isOfficialGame) {
-                    user.credits++;
+            if (isOfficialGame) {
+                if (i == 0) {
+                    user.achievements.victories++; // Increase the winner's victory count
+                    user.credits++; // Give the winner a galactic credit.
                     user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
-                }
-            } else {
-                if (isOfficialGame) {
+                } else {
                     user.achievements.rank += leaderboard.length / 2 - i;
                     user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
                 }
-            }
 
-            user.achievements.rank = Math.round(user.achievements.rank);
+                user.achievements.rank = Math.round(user.achievements.rank);    
+            }
 
             // If the player hasn't been defeated then add completed stats.
             if (!player.defeated) {

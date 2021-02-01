@@ -88,14 +88,23 @@ module.exports = class CarrierService {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let carriersInRange = [];
-        let carriersToCheck = game.galaxy.carriers.map(c => {
-            return {
-                _id: c._id,
-                ownedByPlayerId: c.ownedByPlayerId,
-                location: c.location
-            };
-        });
+
+        // Start with all of the carriers that the player owns as
+        // the player can always see those carriers.
+        let carriersInRange = game.galaxy.carriers
+            .filter(c => c.ownedByPlayerId.equals(player._id))
+            .map(c => c._id);
+
+        // We need to check all carriers NOT owned by the player.
+        let carriersToCheck = game.galaxy.carriers
+            .filter(c => !c.ownedByPlayerId.equals(player._id))
+            .map(c => {
+                return {
+                    _id: c._id,
+                    ownedByPlayerId: c.ownedByPlayerId,
+                    location: c.location
+                };
+            });
 
         for (let star of playerStars) {
             let carrierIds = this.getCarriersWithinScanningRangeOfStarByCarrierIds(game, star, carriersToCheck);
@@ -191,7 +200,7 @@ module.exports = class CarrierService {
             }
         }
 
-        return game.constants.distances.shipSpeed * distanceModifier;
+        return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
     }
 
     async convertToGift(game, player, carrierId) {
@@ -238,14 +247,14 @@ module.exports = class CarrierService {
         let starPlayer = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
         let starUser = gameUsers.find(u => u._id.equals(starPlayer.userId));
 
-        if (starUser) {
+        if (starUser && !starPlayer.defeated) {
             starUser.achievements.trade.giftsReceived += carrier.ships;
         }
 
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
-        if (carrierUser) {
+        if (carrierUser && !carrierPlayer.defeated) {
             carrierUser.achievements.trade.giftsSent += carrier.ships;
         }
 
