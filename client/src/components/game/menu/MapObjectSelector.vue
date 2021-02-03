@@ -10,10 +10,10 @@
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
                     <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
                     <td v-if="mapObject.type === 'star'" class="col-auto text-center col-percent-12-5" @click="onViewObjectRequested(mapObject)">
-                        <specialist-icon :type="'star'" :specialist="mapObject.data.specialist" />
+                        <specialist-icon :type="'star'" :defaultIcon="'star'" :specialist="mapObject.data.specialist" />
                     </td>
                     <td v-if="mapObject.type === 'carrier'" class="col-auto text-center col-percent-12-5" @click="onViewObjectRequested(mapObject)">
-                        <specialist-icon :type="'carrier'" :specialist="mapObject.data.specialist" />
+                        <specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="mapObject.data.specialist" />
                     </td>
                     <td v-if="mapObject.type === 'star'" class="bg-secondary text-center col-percent-12-5">
                         <span>{{mapObject.data.garrison == null ? '???' : mapObject.data.garrison}}</span>

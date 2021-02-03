@@ -2,28 +2,31 @@
 <div class="container">
   <div class="mb-2">
       <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
-        <span v-if="!showAll">Show All Ships</span>
-        <span v-if="showAll">Show Your Ships</span>
+        <span v-if="!showAll">Show All</span>
+        <span v-if="showAll">Show Yours</span>
       </button>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr class="bg-primary">
-                <td><i class="fas fa-user"></i></td>
-                <td><a href="javascript:;" @click="sort('name')">Name</a></td>
-                <td></td>
-                <td></td>
-                <td class="text-right"><a href="javascript:;" @click="sort('ships')"><i class="fas fa-rocket"></i></a></td>
-            </tr>
-        </thead>
-        <tbody>
-            <ship-row v-for="ship in sortedTableData" v-bind:key="ship._id" :ship="ship"
-              @onOpenStarDetailRequested="onOpenStarDetailRequested"
-              @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-        </tbody>
-    </table>
+  <div class="row">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+          <thead>
+              <tr class="bg-primary">
+                  <td><i class="fas fa-user"></i></td>
+                  <td><a href="javascript:;" @click="sort('name')">Name</a></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right"><a href="javascript:;" @click="sort('ships')"><i class="fas fa-rocket"></i></a></td>
+              </tr>
+          </thead>
+          <tbody>
+              <ship-row v-for="ship in sortedTableData" v-bind:key="ship._id" :ship="ship"
+                @onOpenStarDetailRequested="onOpenStarDetailRequested"
+                @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+          </tbody>
+      </table>
+    </div>
   </div>
 
   <p v-if="!tableData.length" class="text-center">You have no ships.</p>
@@ -70,7 +73,8 @@ export default {
             name: s.name,
             ships: s.garrison,
             type: 0,
-            location: s.location
+            location: s.location,
+            specialist: s.specialist
           }
         })
 
@@ -83,7 +87,8 @@ export default {
             name: c.name,
             ships: c.ships,
             type: 1,
-            location: c.location
+            location: c.location,
+            specialist: c.specialist
           }
         })
 

@@ -35,14 +35,14 @@
       <div class="row pb-2">
         <div class="col">
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
-            <i class="fas fa-user-astronaut mr-1"></i>
+            <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
             <a href="javascript:;" @click="onViewHireCarrierSpecialistRequested">
-              <span class="ml-2" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
-              <span class="ml-2" v-if="!carrier.specialistId">No Specialist</span>
+              <span class="ml-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
+              <span v-if="!carrier.specialistId">No Specialist</span>
             </a>
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
-            <i class="fas fa-user-astronaut"></i>
+            <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
             <span v-if="carrier.specialist">
               {{carrier.specialist.name}}
             </span>
@@ -178,13 +178,15 @@ import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
 import CarrierSpecialistVue from './CarrierSpecialist'
 import GiftCarrierVue from './GiftCarrier'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'waypointTable': WaypointTable,
     'carrier-specialist': CarrierSpecialistVue,
-    'gift-carrier': GiftCarrierVue
+    'gift-carrier': GiftCarrierVue,
+    'specialist-icon': SpecialistIconVue
   },
   props: {
     carrierId: String

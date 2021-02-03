@@ -3,6 +3,7 @@
     <td><i class="fas fa-circle" v-if="carrier.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
     <td><a href="javascript:;" @click="clickCarrier">{{carrier.name}}</a></td>
     <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
+    <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
     <td class="text-right">{{carrier.ships == null ? '???' : carrier.ships}}</td>
     <td class="text-right">{{carrier.waypoints.length}}</td>
     <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td>
@@ -14,9 +15,11 @@
 <script>
 import gameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
+import SpecialistIcon from '../specialist/SpecialistIcon'
 
 export default {
   components: {
+    'specialist-icon': SpecialistIcon
   },
   props: {
     carrier: Object

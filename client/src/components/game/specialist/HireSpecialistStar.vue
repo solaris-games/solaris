@@ -24,7 +24,10 @@
     <div v-if="!isLoadingSpecialists && specialists.length">
         <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 bg-secondary">
             <div class="col mt-2">
-                <h5 class="pt-1 text-warning">{{specialist.name}}</h5>
+                <h5 class="pt-1 text-warning">
+                    <specialist-icon :type="'star'" :defaultIcon="'star'" :specialist="specialist"/>
+                    <span class="ml-1">{{specialist.name}}</span>
+                </h5>
             </div>
             <div class="col-auto mt-2">
                 <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
@@ -44,11 +47,13 @@ import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
 import SpecialistApiService from '../../../services/api/specialist'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinner,
-    'menu-title': MenuTitleVue
+    'menu-title': MenuTitleVue,
+    'specialist-icon': SpecialistIconVue
   },
   props: {
       starId: String

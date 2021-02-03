@@ -56,14 +56,14 @@
       <div class="row pb-2" v-if="canShowSpecialist || (star.ownedByPlayerId && star.manufacturing != null)">
         <div class="col">
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
-            <i class="fas fa-user-astronaut mr-1"></i>
+            <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
             <a href="javascript:;" @click="onViewHireStarSpecialistRequested">
-              <span class="ml-2" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
-              <span class="ml-2" v-if="!star.specialistId">No Specialist</span>
+              <span class="ml-1" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
+              <span v-if="!star.specialistId">No Specialist</span>
             </a>
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
-            <i class="fas fa-user-astronaut"></i>
+            <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
             <span v-if="star.specialist">
               {{star.specialist.name}}
             </span>
@@ -140,7 +140,7 @@
 
       <div v-for="carrier in getCarriersInOrbit()" :key="carrier._id" class="row mb-1 pt-1 pb-0 bg-secondary">
         <div class="col-auto pr-0">
-          <specialist-icon :type="'carrier'" :specialist="carrier.specialist"/>
+          <specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist"/>
         </div>
         <div class="col pl-1">
           <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>

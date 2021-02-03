@@ -1,7 +1,6 @@
 <template>
     <span>
-        <i class="fas fa-star" v-if="type === 'star' && !source"></i>
-        <i class="fas fa-rocket" v-if="type === 'carrier' && !source"></i>
+        <i class="fas" :class="'fa-' + defaultIcon" v-if="!hideDefaultIcon && !source"></i>
 
         <img :src="source" width="24" height="24" v-if="source" :title="specialist.name">
     </span>
@@ -12,7 +11,9 @@ import gameHelper from '../../../services/gameHelper'
 export default {
   props: {
       type: String,
-      specialist: Object
+      defaultIcon: String,
+      hideDefaultIcon: Boolean,
+      specialist: Object,
   },
   mounted () {
 
@@ -38,7 +39,7 @@ export default {
 i {
     width: 24px;
     height: 24px;
-    text-align: center;
+    text-align: left;
     font-size: 16px;
 }
 </style>

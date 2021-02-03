@@ -2,30 +2,33 @@
 <div class="container">
   <div class="mb-2">
       <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
-        <span v-if="!showAll">Show All Carriers</span>
-        <span v-if="showAll">Show Your Carriers</span>
+        <span v-if="!showAll">Show All</span>
+        <span v-if="showAll">Show Yours</span>
       </button>
   </div>
 
-  <div class="table-responsive">
-      <table class="table table-striped table-hover">
-          <thead>
-              <tr class="bg-primary">
-                  <td><i class="fas fa-user"></i></td>
-                  <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
-                  <td></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['ships'])"><i class="fas fa-rocket"></i></a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['waypoints', 'length'])"><i class="fas fa-map-marker-alt"></i></a></td>
-                  <td></td>
-                  <td><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
-                  <!-- <td>Total ETA</td> -->
-              </tr>
-          </thead>
-          <tbody>
-              <carrier-row v-for="carrier in sortedTableData" v-bind:key="carrier._id" :carrier="carrier"
-                @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-          </tbody>
-      </table>
+  <div class="row">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr class="bg-primary">
+                    <td><i class="fas fa-user"></i></td>
+                    <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right"><a href="javascript:;" @click="sort(['ships'])"><i class="fas fa-rocket"></i></a></td>
+                    <td class="text-right"><a href="javascript:;" @click="sort(['waypoints', 'length'])"><i class="fas fa-map-marker-alt"></i></a></td>
+                    <td></td>
+                    <td><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
+                    <!-- <td>Total ETA</td> -->
+                </tr>
+            </thead>
+            <tbody>
+                <carrier-row v-for="carrier in sortedTableData" v-bind:key="carrier._id" :carrier="carrier"
+                  @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+            </tbody>
+        </table>
+    </div>
   </div>
 
   <p v-if="!tableData.length" class="text-center">You have no carriers.</p>
