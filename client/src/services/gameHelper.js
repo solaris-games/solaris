@@ -271,6 +271,9 @@ class GameHelper {
     if (carrier.waypoints.length < 2) {
       return false
     }
+    
+    // TODO: Calculate effective techs for the carrier. Need to find a way to share this
+    // logic with the server.
 
     // Check whether the last waypoint is in range of the first waypoint.
     let firstWaypoint = carrier.waypoints[0]

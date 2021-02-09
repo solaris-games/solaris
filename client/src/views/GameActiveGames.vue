@@ -119,6 +119,10 @@ export default {
       return GameHelper.getGameStatusText(game)
     },
     getEndDateFromNow (game) {
+      if (!game.state.endDate) {
+        return 'In Progress'
+      }
+
       return moment(game.state.endDate).fromNow()
     }
   }

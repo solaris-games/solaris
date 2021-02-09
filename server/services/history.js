@@ -41,6 +41,7 @@ module.exports = class HistoryService {
                     totalSpecialists: stats.totalSpecialists,
                     totalStarSpecialists: stats.totalStarSpecialists,
                     totalCarrierSpecialists: stats.totalCarrierSpecialists,
+                    newShips: stats.newShips,
                     warpgates: stats.warpgates,
                     weapons: player.research.weapons.level,
                     banking: player.research.banking.level,
