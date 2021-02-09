@@ -136,7 +136,7 @@
             "modifiers": {
                 "local": {
                     "speed": 2,
-                    "weapons": -1
+                    "weapons": -2
                 },
                 "special": {
                     "starCaptureRewardMultiplier": 2
