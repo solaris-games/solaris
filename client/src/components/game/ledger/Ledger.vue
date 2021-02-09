@@ -16,7 +16,7 @@
                   <tr v-for="ledger in ledgers" :key="ledger.playerId">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(ledger.playerId)}"></td>
                       <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
-                        <player-avatar :player="getPlayer(ledger.playerId)"/>
+                        <player-avatar @onClick="onPlayerDetailRequested(ledger.playerId)" :player="getPlayer(ledger.playerId)"/>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
@@ -88,6 +88,9 @@ export default {
     },
     getFriendlyColour (playerId) {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+    },
+    onPlayerDetailRequested(playerId) {
+      this.$emit('onOpenPlayerDetailRequested', playerId)
     },
     async forgiveDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)

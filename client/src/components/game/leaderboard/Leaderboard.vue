@@ -35,8 +35,8 @@
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
                   <tr v-for="player in sortedPlayers" :key="player._id">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                      <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape" @click="onOpenPlayerDetailRequested(player)">
-                          <player-avatar :player="player"/>
+                      <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
+                          <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->

@@ -1,5 +1,5 @@
 <template>
-    <div class="player-icon text-center">
+    <div @click="onClick" class="player-icon text-center">
         <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
         <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:44px;"></i>
         <span v-if="canShowShapeIcon()" class="shapeIcon">
@@ -55,6 +55,9 @@ export default {
     canShowShapeIcon () {
       // return gameHelper.getGamePlayerShapesCount(this.$store.state.game) > 1
       return true
+    },
+    onClick () {
+      this.$emit('onClick')
     }
   }
 }
