@@ -30,7 +30,10 @@
 
 		<div class="row bg-secondary pt-2 pb-2 mt-2">
 			<div class="col-12">
-				<p class="mb-1" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
+        <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
+        <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
+        <!-- Seriously, what is wrong with you, Safari? -->
+				<p class="mb-1" :key="new Date().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
 			</div>
 			<div class="col">
 				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-undo"></i> Last</button>
