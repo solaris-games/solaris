@@ -71,6 +71,7 @@ export default {
       carrier: null,
       isSavingWaypoints: false,
       oldWaypoints: [],
+      oldWaypointsLooped: false,
       totalEtaTimeString: null,
       waypointCreatedHandler: null,
       isStandardUIStyle: false,
@@ -91,6 +92,7 @@ export default {
     	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
 
     this.oldWaypoints = this.carrier.waypoints.slice(0)
+    this.oldWaypointsLooped = this.carrier.waypointsLooped
 
     this.recalculateTotalEta()
   },
@@ -102,6 +104,7 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.carrier.waypoints = this.oldWaypoints
+      this.carrier.waypointsLooped = this.oldWaypointsLooped
 
       this.$emit('onCloseRequested', e)
     },
@@ -192,6 +195,7 @@ export default {
           this.carrier.waypoints = response.data.waypoints
 
           this.oldWaypoints = this.carrier.waypoints
+          this.oldWaypointsLooped = this.carrier.waypointsLooped
 
           this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 
