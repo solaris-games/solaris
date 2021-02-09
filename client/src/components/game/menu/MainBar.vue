@@ -79,7 +79,7 @@
         @onShipTransferRequested="onShipTransferRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
-      <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested"/>
+      <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"
