@@ -305,7 +305,7 @@
             "id": 10,
             "name": "Trade Port",
             "description": "The Star's Economy infrastructure contributes x2 to economy production.",
-            "tier": 4,
+            "tier": 5,
             "modifiers": {
                 "special": {
                     "economyInfrastructureMultiplier": 2
