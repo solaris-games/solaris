@@ -164,21 +164,21 @@ class Carrier extends EventEmitter {
   }
   
   _drawShapeDiamond() {  
-    this.graphics_colour.moveTo(2, 0)
-    this.graphics_colour.lineTo(4, 2)
-    this.graphics_colour.lineTo(4, 4)
-    this.graphics_colour.lineTo(0, 2)
+    this.graphics_colour.moveTo(0, -4)
+    this.graphics_colour.lineTo(4, 0)
+    this.graphics_colour.lineTo(0, 4)
+    this.graphics_colour.lineTo(-4, 0)
     this.graphics_colour.closePath()
   }
 
   _drawShapeHexagon() {
-    this.graphics_colour.moveTo(1, 0);
-    this.graphics_colour.lineTo(3, 0);
-    this.graphics_colour.lineTo(4, 2);
-    this.graphics_colour.lineTo(3, 4);
-    this.graphics_colour.lineTo(1, 4);
-    this.graphics_colour.lineTo(0, 2);
-    this.graphics_colour.closePath();
+    this.graphics_colour.moveTo(2, -3.5)
+    this.graphics_colour.lineTo(-2, -3.5)
+    this.graphics_colour.lineTo(-4, 0)
+    this.graphics_colour.lineTo(-2, 3.5)
+    this.graphics_colour.lineTo(2, 3.5)
+    this.graphics_colour.lineTo(4, 0)
+    this.graphics_colour.closePath()
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {
