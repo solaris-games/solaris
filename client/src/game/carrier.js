@@ -68,13 +68,15 @@ class Carrier extends EventEmitter {
     switch(this.player.shape) {
       case 'circle':
         this.graphics_colour.drawCircle(0, 0, 4)
+        return
       case 'square':
-        this.graphics_colour.drawRect(-4, -4, 8, 8);
+        this.graphics_colour.drawRect(-4, -4, 8, 8)
+        return
       case 'hexagon':
-        this._drawShapeHexagon();
+        this._drawShapeHexagon()
+        return
       case 'diamond':
-        this._drawShapeDiamond();
-      default:
+        this._drawShapeDiamond()
         return
     }
   }
