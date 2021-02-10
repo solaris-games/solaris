@@ -63,12 +63,28 @@ class Carrier extends EventEmitter {
     this.drawGarrison()
   }
 
+  drawShape() {
+    this._rotateCarrierTowardsWaypoint(this.graphics_colour);
+    switch(this.player.shape) {
+      case 'circle':
+        this.graphics_colour.drawCircle(0, 0, 4)
+      case 'square':
+        this.graphics_colour.drawRect(0, 0, 4, 4);
+      case 'hexagon':
+        this._drawShapeHexagon();
+      case 'diamond':
+        this._drawShapeDiamond();
+      default:
+        return
+    }
+  }
+
   drawColour () {
     this.graphics_colour.clear()
 
     if (!this.data.orbiting) {
       this.graphics_colour.lineStyle(1, this.colour)
-      this.graphics_colour.drawCircle(0, 0, 4)
+      drawShape();
     }
   }
 
@@ -143,6 +159,24 @@ class Carrier extends EventEmitter {
 
   hasSpecialist () {
     return this.data.specialistId && this.data.specialistId > 0
+  }
+  
+  _drawShapeDiamond() {  
+    this.graphics_colour.moveTo(2, 0)
+    this.graphics_colour.lineTo(4, 2)
+    this.graphics_colour.lineTo(4, 4)
+    this.graphics_colour.lineTo(0, 2)
+    this.graphics_colour.closePath()
+  }
+
+  _drawShapeHexagon() {
+    this.graphics_colour.moveTo(1, 0);
+    this.graphics_colour.lineTo(3, 0);
+    this.graphics_colour.lineTo(4, 2);
+    this.graphics_colour.lineTo(3, 4);
+    this.graphics_colour.lineTo(1, 4);
+    this.graphics_colour.lineTo(0, 2);
+    this.graphics_colour.closePath();
   }
 
   _rotateCarrierTowardsWaypoint (graphics) {
