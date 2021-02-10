@@ -69,7 +69,7 @@ class Carrier extends EventEmitter {
       case 'circle':
         this.graphics_colour.drawCircle(0, 0, 4)
       case 'square':
-        this.graphics_colour.drawRect(0, 0, 4, 4);
+        this.graphics_colour.drawRect(-4, -4, 8, 8);
       case 'hexagon':
         this._drawShapeHexagon();
       case 'diamond':
@@ -84,7 +84,7 @@ class Carrier extends EventEmitter {
 
     if (!this.data.orbiting) {
       this.graphics_colour.lineStyle(1, this.colour)
-      drawShape();
+      this.drawShape();
     }
   }
 
