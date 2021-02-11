@@ -64,13 +64,12 @@ class Carrier extends EventEmitter {
   }
 
   drawShape() {
-    this._rotateCarrierTowardsWaypoint(this.graphics_colour);
     switch(this.player.shape) {
       case 'circle':
-        this.graphics_colour.drawCircle(0, 0, 4)
+        this._drawShapeCircle()
         return
       case 'square':
-        this.graphics_colour.drawRect(-4, -4, 8, 8)
+        this._drawShapeSquare()
         return
       case 'hexagon':
         this._drawShapeHexagon()
@@ -79,6 +78,8 @@ class Carrier extends EventEmitter {
         this._drawShapeDiamond()
         return
     }
+
+    this._rotateCarrierTowardsWaypoint(this.graphics_colour)
   }
 
   drawColour () {
@@ -164,14 +165,22 @@ class Carrier extends EventEmitter {
   }
   
   _drawShapeDiamond() {  
-    this.graphics_colour.moveTo(0, -4)
-    this.graphics_colour.lineTo(4, 0)
-    this.graphics_colour.lineTo(0, 4)
-    this.graphics_colour.lineTo(-4, 0)
+    this.graphics_colour.moveTo(0, -5)
+    this.graphics_colour.lineTo(5, 0)
+    this.graphics_colour.lineTo(0, 5)
+    this.graphics_colour.lineTo(-5, 0)
     this.graphics_colour.closePath()
   }
 
-  _drawShapeHexagon() {
+  _drawShapeCircle () {
+    this.graphics_colour.drawCircle(0, 0, 4)
+  }
+
+  _drawShapeSquare () {
+    this.graphics_colour.drawRect(-3.5, -3.5, 7, 7)
+  }
+
+  _drawShapeHexagon () {
     this.graphics_colour.moveTo(2, -3.5)
     this.graphics_colour.lineTo(-2, -3.5)
     this.graphics_colour.lineTo(-4, 0)
