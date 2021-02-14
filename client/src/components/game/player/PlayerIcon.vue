@@ -68,8 +68,8 @@ export default {
 <style scoped>
 .span-container {
   display: inline-block;
-  height: 25px;
-  width: 25px;
+  height: 18px;
+  width: 18px;
   margin-top: -12px;
   margin-right: -6px;
 }
