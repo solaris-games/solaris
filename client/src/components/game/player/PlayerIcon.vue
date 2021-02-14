@@ -58,7 +58,8 @@ export default {
       }
     },
     getIconStyle () {
-      if (this.isOnline || this.solidGlyphOnly) {
+      const unknownStatus = this.player.isOnline == null;
+      if (unknownStatus || this.isOnline || this.solidGlyphOnly) {
         return { 'fill': this.iconColour, 'stroke': 'none' }
       } else {
         return {'stroke-width':64, 'fill': 'none', 'stroke': this.iconColour}
