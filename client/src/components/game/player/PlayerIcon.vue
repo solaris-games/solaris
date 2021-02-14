@@ -1,7 +1,9 @@
 <template>
   <!-- Note: We can't use Font Awesome because diamond and hexagon are premium icons -->
-  <span v-if="player" class="span-container" :style="{'color': iconColour}" :title="onlineStatus">
-    {{glyph}}
+  <span v-if="player" class="span-container" :title="onlineStatus">
+    <svg viewBox="0 0 512 512">
+      <ellipse :style="{'stroke-width':64, 'fill': 'none', 'stroke': iconColour}" cx="256" cy="256" rx="224" ry="224" />
+    </svg>
   </span>
 </template>
 <script>
@@ -48,22 +50,9 @@ export default {
       else {
         this.onlineStatus = moment(this.player.lastSeen).utc().fromNow()
       }
-    }
-  },
-  computed: {
-    glyph () {
-      let unknownStatus = this.player.isOnline == null
-
-      switch (this.player.shape) {
-          case 'circle': 
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '●' : '○'
-          case 'square':
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '■' : '□'
-          case 'diamond':
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '♦' : '◇'
-          case 'hexagon':
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '⬢' : '⬡'
-        }
+    },
+    getIconSource () {
+      return require(`../../../assets/icons/${this.player.shape}.svg`)
     }
   }
 }
@@ -72,7 +61,8 @@ export default {
 <style scoped>
 .span-container {
   display: inline-block;
-  font-size: 25px;
+  height: 25px;
+  width: 25px;
   margin-top: -12px;
   margin-right: -6px;
 }
