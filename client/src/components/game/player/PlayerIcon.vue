@@ -1,8 +1,7 @@
 <template>
-  <!-- Note: We can't use Font Awesome because diamond and hexagon are premium icons -->
   <span v-if="player" class="span-container" :title="onlineStatus">
     <svg viewBox="0 0 512 512">
-      <ellipse :style="{'stroke-width':64, 'fill': 'none', 'stroke': iconColour}" cx="256" cy="256" rx="224" ry="224" />
+      <ellipse :style="getIconStyle()" cx="256" cy="256" rx="224" ry="224" />
     </svg>
   </span>
 </template>
@@ -21,6 +20,7 @@ export default {
     return {
       player: null,
       onlineStatus: '',
+      isOnline: false,
       iconColour: '',
       intervalFunction: null
     }
@@ -43,16 +43,23 @@ export default {
     recalculateOnlineStatus () {
       if (this.player.isOnline == null) {
         this.onlineStatus = ''
+        this.isOnline = false;
       }
       else if (this.player.isOnline) {
         this.onlineStatus = 'Online Now'
+        this.isOnline = true;
       }
       else {
         this.onlineStatus = moment(this.player.lastSeen).utc().fromNow()
+        this.isOnline = false;
       }
     },
-    getIconSource () {
-      return require(`../../../assets/icons/${this.player.shape}.svg`)
+    getIconStyle () {
+      if (this.isOnline) {
+        return { 'fill': this.iconColour, 'stroke': 'none' }
+      } else {
+        return {'stroke-width':64, 'fill': 'none', 'stroke': this.iconColour}
+      }
     }
   }
 }
