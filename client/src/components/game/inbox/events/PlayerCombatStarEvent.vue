@@ -119,8 +119,14 @@ export default {
 </script>
 
 <style scoped>
+.name-and-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
 .name-and-icon svg {
   width: 12px;
   height: 12px;
+  margin-right: 10px;
 }
 </style>
