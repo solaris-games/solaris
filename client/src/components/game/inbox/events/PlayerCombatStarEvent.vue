@@ -77,7 +77,6 @@ import PlayerIconShape from '../../player/PlayerIconShape.vue'
 export default {
   components: {
     PlayerIconShape
-
   },
   props: {
     event: Object
