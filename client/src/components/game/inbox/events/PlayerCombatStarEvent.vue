@@ -22,7 +22,10 @@
                     <tr>
                         <td>
                             <i class="fas fa-star mr-2"></i>
-                            <span :style="{ 'color': getStarColour() }" v-if="star">{{star.name}}</span>
+                            <span :style="{ 'color': getStarColour() }" v-if="star" class="name-and-icon">
+                              <player-icon-shape :filled="true" :shape="getStarShape()" :iconColour="getStarColour()" />
+                              {{star.name}}
+                            </span>
                             <span v-if="star.specialist" :title="star.specialist.description"> ({{star.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.star.before}}</td>
@@ -32,7 +35,10 @@
                     <tr v-for="carrier of defenderCarriers" :key="carrier._id">
                         <td>
                             <i class="fas fa-rocket mr-2"></i>
-                            <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
+                            <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
+                              <player-icon-shape :filled="true" :shape="getCarrierShape(carrier)" :iconColour="getCarrierColour(carrier)" />
+                              {{carrier.name}}
+                            </span>
                             <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
@@ -48,7 +54,10 @@
                     <tr v-for="carrier of attackerCarriers" :key="carrier._id">
                         <td>
                             <i class="fas fa-rocket mr-2"></i>
-                            <span :style="{ 'color': getCarrierColour(carrier._id) }">{{carrier.name}}</span>
+                            <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
+                              <player-icon-shape :filled="true" :iconColour="getCarrierColour(carrier)" :shape="getCarrierShape(carrier)" />
+                              {{carrier.name}}
+                            </span>
                             <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{carrier.before}}</td>
@@ -63,9 +72,11 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
+import PlayerIconShape from '../../player/PlayerIconShape.vue'
 
 export default {
   components: {
+    PlayerIconShape
 
   },
   props: {
@@ -92,20 +103,25 @@ export default {
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
-    getCarrierColour (carrierId) {
-      let carrier = this.event.data.combatResult.carriers.find(c => c._id === carrierId)
-      let playerColour = GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)
-
-      return playerColour
+    getCarrierColour (carrier) {
+      return GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)
+    },
+    getCarrierShape (carrier) {
+      return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
     },
     getStarColour (starId) {
-      let playerColour = GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdDefender)
-
-      return playerColour
+      return GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdDefender)
+    },
+    getStarShape () {
+      return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender).shape;
     }
   }
 }
 </script>
 
 <style scoped>
+.name-and-icon svg {
+  width: 12px;
+  height: 12px;
+}
 </style>
