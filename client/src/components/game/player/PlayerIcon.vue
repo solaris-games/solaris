@@ -58,11 +58,7 @@ export default {
   computed: {
     iconFilled () {
       const unknownStatus = this.player.isOnline == null;
-      if (unknownStatus || this.isOnline || this.solidGlyphOnly) {
-        return { 'fill': this.iconColour, 'stroke': 'none' }
-      } else {
-        return {'stroke-width':64, 'fill': 'none', 'stroke': this.iconColour}
-      }
+      return unknownStatus || this.isOnline || this.solidGlyphOnly;
     }
   }
 }
