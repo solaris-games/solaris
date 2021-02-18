@@ -42,7 +42,7 @@ class Territories {
       if (empireCenter == null) {
         continue
       }
-      
+
       let style = new PIXI.TextStyle({
         fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
