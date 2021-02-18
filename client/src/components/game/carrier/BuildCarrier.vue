@@ -154,6 +154,7 @@ export default {
                 GameHelper.getUserPlayer(this.$store.state.game).credits -= this.star.upgradeCosts.carriers
 
                 GameContainer.reloadStar(star)
+                GameContainer.reloadCarrier(response.data.carrier)
 
                 AudioService.join()
             }
