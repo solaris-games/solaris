@@ -532,6 +532,9 @@ module.exports = class PlayerService extends EventEmitter {
         for (let star of playerStars) {
             star.ignoreBulkUpgrade = false;
         }
+
+        // Clear out any carriers that have looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
     }
 
     setPlayerAsAfk(game, player) {
