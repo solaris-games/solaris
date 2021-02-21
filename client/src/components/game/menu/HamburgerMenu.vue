@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="dropdown-divider"></div>
-            <div v-if="!userPlayer">
+            <div v-if="!userPlayer && gameIsJoinable">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake mr-2"></i>Welcome</a>
             </div>
             <div v-if="userPlayer">
@@ -90,6 +90,15 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    gameIsInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    gameIsJoinable () {
+      return !this.gameIsInProgress && !this.gameIsFinished
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)

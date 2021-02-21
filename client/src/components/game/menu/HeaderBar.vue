@@ -30,7 +30,7 @@
             </span>
         </div>
         <div class="col-auto ml-1">
-            <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
+            <button class="btn btn-sm btn-success" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
             <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
@@ -303,6 +303,9 @@ export default {
     },
     gameIsFinished () {
       return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    gameIsJoinable () {
+      return !this.gameIsInProgress && !this.gameIsFinished
     },
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)

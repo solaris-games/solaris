@@ -1,22 +1,30 @@
 <template>
 <div class="container-fluid bg-dark pt-2 pb-2 footer-bar">
     <div class="row no-gutters">
-        <div class="col">
+        <div class="col" v-if="!userPlayer && gameIsJoinable">
+          <button class="btn" v-on:click="setMenuState(MENU_STATES.WELCOME)">
+            <i class="fas fa-handshake"></i>
+          </button>
+        </div>
+        <!-- <div class="col" v-if="!userPlayer">
+          <router-link to="/codex" class="btn"><i class="fas fa-question"></i></router-link>
+        </div> -->
+        <div class="col" v-if="userPlayer">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <i class="fas fa-users"></i>
           </button>
         </div>
-        <div class="col">
+        <div class="col" v-if="userPlayer">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.RESEARCH)">
             <i class="fas fa-flask"></i>
           </button>
         </div>
-        <div class="col">
+        <div class="col" v-if="userPlayer">
           <button class="btn" @click="panToHomeStar()">
             <i class="fas fa-home"></i>
           </button>
         </div>
-        <div class="col">
+        <div class="col" v-if="userPlayer">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.GALAXY)">
             <i class="fas fa-sun"></i>
           </button>
@@ -66,6 +74,18 @@ export default {
     }
   },
   computed: {
+    game () {
+      return this.$store.state.game
+    },
+    gameIsInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    gameIsJoinable () {
+      return !this.gameIsInProgress && !this.gameIsFinished
+    },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     }
