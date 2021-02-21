@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
-        <button class="btn btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
+        <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
     </menu-title>
     <div v-if="isCompactUIStyle">
     <div class="row bg-primary pt-2 pb-2">

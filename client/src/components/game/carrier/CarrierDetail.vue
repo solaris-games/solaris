@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button @click="viewOnMap" class="btn btn-info"><i class="fas fa-eye"></i></button>
+      <button @click="viewOnMap" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <div class="row bg-secondary">
