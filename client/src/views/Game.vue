@@ -139,8 +139,17 @@ export default {
       this.menuState = null
     },
     onMenuStateChanged (e) {
-      this.menuArguments = e.args || null
-      this.menuState = e.state || null
+      e.args = e.args || null
+      e.state = e.state || null
+
+      // Toggle menu if its already open.
+      if (e.state === this.menuState && e.args === this.menuArguments) {
+        this.menuArguments = null
+        this.menuState = null
+      } else {
+        this.menuArguments = e.args
+        this.menuState = e.state
+      }
 
       this.$emit('onMenuStateChanged', e)
     },
