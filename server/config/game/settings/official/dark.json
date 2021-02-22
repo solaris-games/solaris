@@ -25,7 +25,7 @@
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 5
+    "carrierSpeed": 10
   },
   "player": {
     "startingStars": 6,

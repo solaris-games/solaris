@@ -194,7 +194,7 @@
       </div>
 
       <div class="form-group">
-        <label for="carrierSpeed" class="col-form-label">Player Distribution</label>
+        <label for="carrierSpeed" class="col-form-label">Carrier Speed</label>
         <select class="form-control" id="carrierSpeed" v-model="settings.specialGalaxy.carrierSpeed" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.carrierSpeed" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}

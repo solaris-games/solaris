@@ -37,7 +37,7 @@ const schema = new Schema({
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
-			carrierSpeed: { type: Types.Number, required: true, enum: [2.5, 5, 10], default: 5 },
+			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
@@ -53,7 +53,7 @@ const schema = new Schema({
 				industry: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
 				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
 			},
-			tradeCost: { type: Types.Number, required: true, enum: [5, 15, 25, 50], default: 15 },
+			tradeCost: { type: Types.Number, required: true, enum: [5, 15, 25, 50, 100], default: 15 },
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
         },
         technology: {
@@ -78,7 +78,7 @@ const schema = new Schema({
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			speed: { type: Types.Number, required: true, enum: [10, 30, 60], default: 30 },
+			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 30 },
 			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 }
