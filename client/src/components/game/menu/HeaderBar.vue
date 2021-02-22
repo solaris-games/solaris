@@ -42,7 +42,7 @@
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
-            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'"/>
+            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
             
             <button class="btn btn-sm btn-info ml-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
@@ -127,6 +127,9 @@ export default {
         state,
         args
       })
+    },
+    onMenuStateChanged (e) {
+      this.$emit('onMenuStateChanged', e)
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })
