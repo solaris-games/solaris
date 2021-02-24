@@ -207,4 +207,19 @@ table tr {
     white-space: nowrap;
     width: 1%;
 }
+
+@media screen and (max-width: 576px) {
+  table tr {
+    height: 45px;
+  }
+
+  .alias-title {
+    padding-left: 45px;
+  }
+
+  .col-avatar {
+    width: 45px;
+    padding-top: 0.25rem !important;
+  }
+}
 </style>

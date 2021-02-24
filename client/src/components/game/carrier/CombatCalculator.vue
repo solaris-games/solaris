@@ -48,8 +48,7 @@
                 </div>
 
                 <div class="form-group row">
-                    <div class="col-8"></div>
-                    <div class="col-4">
+                    <div class="col-12 col-sm-4 offset-sm-8">
                         <button type="submit" class="btn btn-success btn-block" :disabled="isLoading"><i class="fas fa-fist-raised"></i> Fight</button>
                     </div>
                 </div>

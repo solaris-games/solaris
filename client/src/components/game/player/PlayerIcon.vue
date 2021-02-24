@@ -72,4 +72,13 @@ export default {
   margin-top: -12px;
   margin-right: -6px;
 }
+
+@media screen and (max-width: 576px) { 
+  .span-container {
+    height: 10px;
+    width: 10px;
+    margin-top: -12px;
+    margin-right: -6px;
+  }
+}
 </style>

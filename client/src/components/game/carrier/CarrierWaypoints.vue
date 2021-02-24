@@ -36,13 +36,27 @@
 				<p class="mb-1" :key="new Date().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
 			</div>
 			<div class="col">
-				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-undo"></i> Last</button>
-				<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-trash"></i> All</button>
-				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints"><i class="fas fa-sync"></i></button>
+				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
+          <i class="fas fa-undo"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Last</span>
+        </button>
+				<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-trash"></i>
+          <span class="ml-1 d-none d-sm-inline-block">All</span>
+        </button>
+				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints">
+          <i class="fas fa-sync"></i>
+        </button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-save"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Save</span>
+        </button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+          <i class="fas fa-edit"></i> 
+          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+        </button>
 			</div>
 		</div>
 	</div>

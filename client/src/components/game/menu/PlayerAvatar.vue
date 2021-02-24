@@ -1,7 +1,7 @@
 <template>
     <div @click="onClick" class="player-icon text-center">
         <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
-        <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2" style="font-size:44px;"></i>
+        <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2"></i>
         <span v-if="canShowShapeIcon()" class="shapeIcon">
           <player-icon :playerId="player._id"/>
         </span>
@@ -88,6 +88,42 @@ export default {
   left: 40px;
   top: 40px;
   font-size:16px;
+}
+
+.fa-user {
+  font-size: 44px;
+}
+
+@media screen and (max-width: 576px) { 
+  .player-icon, img {
+      height: 45px;
+      width: 45px;
+  }
+
+  .player-icon .userIcon {
+    position: absolute;
+    left: 3px;
+    top: 32px;
+    font-size:10px;
+  }
+
+  .player-icon .shapeIcon {
+    position: absolute;
+    left: 32px;
+    top: 3px;
+    font-size:10px;
+  }
+
+  .player-icon .medalIcon {
+    position: absolute;
+    left: 32px;
+    top: 32px;
+    font-size:10px;
+  }
+
+  .fa-user {
+    font-size: 30px;
+  }
 }
 
 .gold {

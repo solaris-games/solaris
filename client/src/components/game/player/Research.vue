@@ -2,7 +2,7 @@
 <div class="row bg-primary" v-if="userPlayer && player">
     <div class="col">
         <div class="table-responsive mb-0">
-            <table class="table table-sm">
+            <table class="table table-sm mb-0">
                 <thead>
                     <tr v-if="userPlayer && player != userPlayer">
                         <th></th>

@@ -65,13 +65,13 @@
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
       <div class="col">
-        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
+        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
       </div>
         <div class="col text-right pr-2">
-            <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">
+            <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-sm btn-danger">
               <i class="fas fa-sign-out-alt"></i> Quit Game
             </modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger">
+            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
               <i class="fas fa-skull-crossbones"></i> Concede Defeat
             </modalButton>
         </div>
@@ -317,5 +317,20 @@ table tr {
 
 .fa-check {
   cursor: pointer;
+}
+
+@media screen and (max-width: 576px) {
+  table tr {
+    height: 45px;
+  }
+
+  .alias-title {
+    padding-left: 45px;
+  }
+
+  .col-avatar {
+    width: 45px;
+    padding-top: 0.25rem !important;
+  }
 }
 </style>

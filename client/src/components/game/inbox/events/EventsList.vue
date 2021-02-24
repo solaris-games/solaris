@@ -5,10 +5,10 @@
   <div class="container" v-if="events">
     <div class="row">
       <div class="col">
-        <button class="btn btn-primary" @click="loadEvents">Refresh <i class="fas fa-sync"></i></button>
+        <button class="btn btn-sm btn-primary" @click="loadEvents">Refresh <i class="fas fa-sync"></i></button>
       </div>
       <div class="col">
-        <select class="form-control" v-model="selectedFilter" @change="onSelectedFilterChanged">
+        <select class="form-control form-control-sm" v-model="selectedFilter" @change="onSelectedFilterChanged">
           <option value="all">All Events</option>
           <option value="trade">Trade</option>
           <option value="combat">Combat</option>

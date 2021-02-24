@@ -8,7 +8,7 @@
 
     <loading-spinner :loading="isLoadingServerGames"/>
 
-    <p v-if="!isLoadingServerGames && !serverGames.length" class="text-danger">
+    <p v-if="!isLoadingServerGames && !serverGames.length" class="text-danger mb-2">
       There are no official games available.
     </p>
 
@@ -48,7 +48,7 @@
 
     <loading-spinner :loading="isLoadingUserGames"/>
 
-    <div v-if="!isLoadingUserGames && !userGames.length">
+    <div v-if="!isLoadingUserGames && !userGames.length" class="text-warning mb-2">
       There are no user created games available.
     </div>
 

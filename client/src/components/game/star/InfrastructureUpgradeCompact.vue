@@ -1,6 +1,6 @@
 <template>
   <div class="row bg-secondary pt-2 pb-2" v-if="userPlayer">
-    <div class="col">
+    <div class="col pr-0">
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"
               :disabled="isUpgradingEconomy || availableCredits < economy || isGameFinished"
@@ -23,11 +23,7 @@
         <i class="fas fa-flask mr-1"></i>${{science}}
       </button>
     </div>
-    <div class="col-auto" v-if="userPlayer">
-      <button class="btn btn-sm btn-danger mr-1" v-if="!isGameFinished" @click="confirmAbandonStar" title="Abandon Star">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
-
+    <div class="col-auto pl-0" v-if="userPlayer">
       <button v-if="canBuildWarpGates && !star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
@@ -168,23 +164,6 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
-
-          AudioService.leave()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async confirmAbandonStar (e) {
-      if (!confirm(`Are you sure you want to abandon ${this.star.name}? It's Economy, Industry and Science will remain, but all ships at this star will be destroyed.`)) {
-        return
-      }
-
-      try {
-        let response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          this.$toasted.show(`${this.star.name} has been abandoned.`)
 
           AudioService.leave()
         }

@@ -1,24 +1,24 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-block mr-5 pointer" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
+        <div class="col-auto d-none d-md-block mr-5 pointer pt-1" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
 
             {{game.settings.general.name}}
         </div>
-        <div class="col">
+        <div class="col pt-1">
             <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText}}</span>
-            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
-            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto text-right" v-if="userPlayer">
+        <div class="col-auto text-right pt-1" v-if="userPlayer">
             <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
             </span>
 
             <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
-        <div class="col-auto text-right pointer" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
+        <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
             <span class="d-none d-sm-inline-block ml-4">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
