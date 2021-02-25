@@ -12,7 +12,7 @@
   "galaxy": {
     "galaxyType": "circular-balanced",
     "starsPerPlayer": 30,
-    "productionTicks": 20
+    "productionTicks": 24
   },
   "specialGalaxy": {
     "carrierCost": "standard",
