@@ -4,6 +4,7 @@ const GameModel = require('../models/Game');
 const UserModel = require('../models/User');
 const HistoryModel = require('../models/History');
 const EventModel = require('../models/Event');
+const GuildModel = require('../models/Guild');
 
 const PasswordService = require('../services/password');
 const AuthService = require('../services/auth');
@@ -41,6 +42,7 @@ const ConversationService = require('../services/conversation');
 const ReputationService = require('../services/reputation');
 const AIService = require('../services/ai');
 const AITradeService = require('../services/aiTrade');
+const GuildService = require('../services/guild');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -97,6 +99,7 @@ module.exports = (io) => {
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService);
+    const guildService = new GuildService(GuildModel, UserModel);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService);
@@ -116,6 +119,7 @@ module.exports = (io) => {
         gameGalaxyService,
         gameListService,
         gameTickService,
+        guildService,
         mapService,
         playerService,
         randomService,
