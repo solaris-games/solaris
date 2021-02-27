@@ -1,15 +1,16 @@
-const EventEmitter = require('events');
+const mongoose = require('mongoose');
 const ValidationError = require('../errors/validation');
 
 function toProperCase(string) {
     return string.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
-module.exports = class UserService extends EventEmitter {
+module.exports = class GuildService {
+
+    MAX_MEMBER_COUNT = 100
+    MAX_INVITE_COUNT = 100
     
     constructor(guildModel, userModel) {
-        super();
-
         this.userModel = userModel;
         this.guildModel = guildModel;
     }
@@ -27,7 +28,7 @@ module.exports = class UserService extends EventEmitter {
             name: 1,
             tag: 1
         })
-        .lean({ defaults: true })
+        .lean()
         .exec();
 
         for (let guild in guilds) {
@@ -40,26 +41,26 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async detail(guildId, withUserInfo = false) {
-        let guild = await this.guildModel.find({
+        let guild = await this.guildModel.findOne({
             _id: guildId
         })
         .lean({ defaults: true })
         .exec();
 
         if (withUserInfo) {
-            let users = await this.userModel.find({ 
-                guildId
-            }, {
+            let users = await this.userModel.find({}, {
                 username: 1,
-                'achievements.rank': 1
+                'achievements.rank': 1,
+                'achievements.victories': 1,
+                'achievements.renown': 1
             })
             .lean()
             .exec();
     
             guild.leader = users.find(x => x._id.equals(guild.leader));
-            guild.officers = users.filter(x => this._isOfficer(guild, x));
-            guild.members = users.filter(x => this._isMember(guild, x));
-            guild.invitees = users.filter(x => this._isInvitee(guild, x));
+            guild.officers = users.filter(x => this._isOfficer(guild, x._id));
+            guild.members = users.filter(x => this._isMember(guild, x._id));
+            guild.invitees = users.filter(x => this._isInvitee(guild, x._id));
 
             guild.totalRank = users.reduce((sum, i) => sum + i.achievements.rank, 0);
         }
@@ -75,11 +76,12 @@ module.exports = class UserService extends EventEmitter {
         }
 
         name = toProperCase(name.trim());
-        tag = tag.trim();
+        tag = tag.trim().replace(/\s/g, '');
 
         let existing = await this.guildModel.count({
             name
-        }).exec();
+        })
+        .exec();
 
         if (existing) {
             throw new ValidationError(`A guild with the same name already exists.`);
@@ -92,6 +94,17 @@ module.exports = class UserService extends EventEmitter {
         guild.tag = tag;
 
         await guild.save();
+
+        await this.userModel.updateOne({
+            _id: userId
+        }, {
+            $set: {
+                guildId: guild._id
+            }
+        })
+        .exec();
+
+        return guild;
     }
 
     async delete(userId, guildId) {
@@ -113,7 +126,22 @@ module.exports = class UserService extends EventEmitter {
         await this.guildModel.deleteOne({ _id: guildId }).exec();
     }
 
-    async invite(userId, guildId, invitedByUserId) {
+    async invite(username, guildId, invitedByUserId) {
+        let user = await this.userModel.findOne({ 
+            username 
+        }, {
+             username: 1,
+             'achievements.rank': 1,
+             'achievements.victories': 1,
+             'achievements.renown': 1
+        }).lean().exec();
+        
+        if (!user) {
+            throw new ValidationError(`A player with the username does not exist.`);
+        }
+
+        let userId = user._id;
+
         let isUserInAGuild = await this._isUserInAGuild(userId);
 
         if (isUserInAGuild) {
@@ -122,7 +150,9 @@ module.exports = class UserService extends EventEmitter {
 
         let guild = await this.detail(guildId);
 
-        if (!this._isLeader(guild, invitedByUserId) || !this._isOfficer(guild, invitedByUserId)) {
+        let hasPermission = this._isLeader(guild, invitedByUserId) || this._isOfficer(guild, invitedByUserId);
+
+        if (!hasPermission) {
             throw new ValidationError(`You do not have the authority to invite new members to the guild.`);
         }
 
@@ -130,8 +160,8 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError(`The user has already been invited to the guild.`);
         }
 
-        if (guild.invitees.length >= 100) {
-            throw new ValidationError(`There is a maximum of 100 invitees at one time.`);
+        if (guild.invitees.length >= this.MAX_INVITE_COUNT) {
+            throw new ValidationError(`There is a maximum of ${this.MAX_INVITE_COUNT} invitees at one time.`);
         }
 
         await this.guildModel.updateOne({
@@ -142,34 +172,21 @@ module.exports = class UserService extends EventEmitter {
             }
         })
         .exec();
+
+        return user;
     }
 
     async uninvite(userId, guildId, uninvitedByUserId) {
         let guild = await this.detail(guildId);
 
-        if (!this._isLeader(guild, uninvitedByUserId) || !this._isOfficer(guild, uninvitedByUserId)) {
+        let hasPermission = this._isLeader(guild, uninvitedByUserId) || this._isOfficer(guild, uninvitedByUserId);
+
+        if (!hasPermission) {
             throw new ValidationError(`You do not have the authority to uninvite users from the guild.`);
         }
 
         if (!this._isInvitee(guild, userId)) {
             throw new ValidationError(`The user has not been invited to the guild.`);
-        }
-
-        await this.guildModel.updateOne({
-            _id: guildId
-        }, {
-            $pull: {
-                invitees: userId
-            }
-        })
-        .exec();
-    }
-
-    async declineInvite(userId, guildId) {
-        let guild = await this.detail(guildId);
-
-        if (!this._isInvitee(guild, userId)) {
-            throw new ValidationError(`The user is not an invitee of this guild.`);
         }
 
         await this.guildModel.updateOne({
@@ -223,8 +240,8 @@ module.exports = class UserService extends EventEmitter {
 
         guild.members.push(userId);
 
-        // If maximum members reached (100), clear pending invites.
-        if (this._totalMemberCount(guild) >= 100) {
+        // If maximum members reached, clear pending invites.
+        if (this._totalMemberCount(guild) >= this.MAX_MEMBER_COUNT) {
             await this.guildModel.updateOne({
                 _id: guildId
             }, {
@@ -234,6 +251,23 @@ module.exports = class UserService extends EventEmitter {
             })
             .exec();
         }
+    }
+
+    async declineInvite(userId, guildId) {
+        let guild = await this.detail(guildId);
+
+        if (!this._isInvitee(guild, userId)) {
+            throw new ValidationError(`The user is not an invitee of this guild.`);
+        }
+
+        await this.guildModel.updateOne({
+            _id: guildId
+        }, {
+            $pull: {
+                invitees: userId
+            }
+        })
+        .exec();
     }
 
     async leave(userId, guildId) {
@@ -291,15 +325,15 @@ module.exports = class UserService extends EventEmitter {
         .exec();
     }
 
-    async kick(userId, guildId) {
+    async kick(userId, guildId, kickedByUserId) {
         let guild = await this.detail(guildId);
 
         if (this._isLeader(guild, userId)) {
             throw new ValidationError(`Cannot kick the guild leader.`);
         }
 
-        let hasPermission = this._isLeader(guild, promotedByUserId)
-            || (this._isOfficer(guild, promotedByUserId) && this._isMember(guild, userId));
+        let hasPermission = this._isLeader(guild, kickedByUserId)
+            || (this._isOfficer(guild, kickedByUserId) && this._isMember(guild, userId));
 
         if (!hasPermission) {
             throw new ValidationError(`You do not have the authority to kick this member.`);

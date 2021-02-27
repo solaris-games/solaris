@@ -29,7 +29,7 @@
     </div>
 
     <div class="row pb-0">
-      <div class="col-sm-12 col-md-4 col-lg-4">
+      <div class="col-sm-12 col-md-8 col-lg-8">
         <div class="card bg-dark text-white" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
           <div class="card-img-overlay">
@@ -45,11 +45,19 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-4 col-lg-4">
+      <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white" @click="routeToPath('/leaderboard')">
           <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
           <div class="card-img-overlay">
             <h5 class="card-title">Leaderboard</h5>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="card bg-dark text-white" @click="routeToPath('/guild/' + user.guildId)">
+          <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
+          <div class="card-img-overlay">
+            <h5 class="card-title">Guild</h5>
           </div>
         </div>
       </div>
