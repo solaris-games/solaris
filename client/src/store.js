@@ -60,8 +60,10 @@ export default new Vuex.Store({
 
       star.infrastructure.economy = data.infrastructure
 
+      let additionalEconomy = GameHelper.getEconomyUpgradeForStar(star, state.starSpecialists)
+
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalEconomy++
+      player.stats.totalEconomy += additionalEconomy;
 
       GameContainer.reloadStar(star)
     },
@@ -73,8 +75,10 @@ export default new Vuex.Store({
       star.infrastructure.industry = data.infrastructure
       star.manufacturing = data.manufacturing
 
+      let additionalIndustry = GameHelper.getIndustryUpgradeForStar(star, state.starSpecialists)
+
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalIndustry++
+      player.stats.totalIndustry += additionalIndustry;
       player.stats.newShips = +(player.stats.newShips + manufacturingDifference).toFixed(2)
 
       GameContainer.reloadStar(star)
@@ -84,8 +88,10 @@ export default new Vuex.Store({
 
       star.infrastructure.science = data.infrastructure
 
+      let additionalScience = GameHelper.getScienceUpgradeForStar(star, state.starSpecialists);
+
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalScience++
+      player.stats.totalScience += additionalScience;
 
       GameContainer.reloadStar(star)
     },

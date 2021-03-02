@@ -430,6 +430,33 @@ class GameHelper {
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
+  getSpecialistModifierValue(starSpecialists, specialistId, modifierType, modifierName) {
+    const specialist = starSpecialists.find(x => x.id === specialistId)
+    if (specialist && specialist.modifiers && specialist.modifiers[modifierType]) {
+      return specialist.modifiers[modifierType][modifierName] || 1;
+    }
+    return 1;
+  }
+
+  getEconomyUpgradeForStar (star, starSpecialists) {
+    if (star.specialistId && star.specialistId > 0) {
+      return this.getSpecialistModifierValue(starSpecialists, star.specialistId, 'special', 'economyInfrastructureMultiplier');
+    }
+    return 1;
+  }
+
+  getIndustryUpgradeForStar (star, starSpecialists) {
+    //We have no industry-infrastructure boosting specialists right now
+    return 1
+  }
+
+  getScienceUpgradeForStar(star, starSpecialists) {
+    if (star.specialistId && star.specialistId > 0) {
+      return this.getSpecialistModifierValue(starSpecialists, star.specialistId, 'special', 'scienceInfrastructureMultiplier');
+    }
+    return 1;
+  }
+
   getSpecialistName (type, specialistId) {
     if (type === 'carrier') {
       switch (specialistId) {
