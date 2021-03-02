@@ -17,7 +17,8 @@ module.exports = class ResearchService extends EventEmitter {
     async updateResearchNow(game, player, preference) {
         preference = preference.toLowerCase().trim();
 
-        if (!this.technologyService.isTechnologyEnabled(game, preference)) {
+        if (!this.technologyService.isTechnologyEnabled(game, preference)
+            || !this.technologyService.isTechnologyResearchable(game, preference)) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -42,7 +43,9 @@ module.exports = class ResearchService extends EventEmitter {
     async updateResearchNext(game, player, preference) {
         preference = preference.toLowerCase().trim();
 
-        if (preference !== 'random' && !this.technologyService.isTechnologyEnabled(game, preference)) {
+        if (preference !== 'random' &&
+            (!this.technologyService.isTechnologyEnabled(game, preference) ||
+            !this.technologyService.isTechnologyResearchable(game, preference))) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -203,7 +206,8 @@ module.exports = class ResearchService extends EventEmitter {
             return k.match(/^[^_\$]/) != null;
         });
 
-        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t));
+        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t)
+                                && this.technologyService.isTechnologyResearchable(game, t));
 
         if (!techs.length) {
             return null;

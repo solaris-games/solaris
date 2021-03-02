@@ -97,7 +97,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGameAll, async (req, res, next) => {
+    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGameAll, middleware.validateGameLocked, async (req, res, next) => {
         try {
             let gameIsFull = await container.gameService.join(
                 req.game,
@@ -119,7 +119,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGameAll, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGameAll, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let player = await container.gameService.quit(
                 req.game,
@@ -133,7 +133,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.gameService.concedeDefeat(
                 req.game,
@@ -145,7 +145,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.playerService.declareReady(
                 req.game,
@@ -159,7 +159,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.playerService.undeclareReady(
                 req.game,
@@ -185,7 +185,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             await container.playerService.updateGameNotes(
                 req.game,
@@ -198,7 +198,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, async (req, res, next) => {
+    router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, async (req, res, next) => {
         try {
             await container.gameService.delete(
                 req.game,

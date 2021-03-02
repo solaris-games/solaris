@@ -116,7 +116,10 @@ module.exports = class GameListService {
             'state.paused': { $eq: false }
         })
         .select({
-            _id: 1
+            _id: 1,
+            state: 1,
+            settings: 1,
+            'galaxy.players': 1
         })
         .exec();
     }

@@ -223,7 +223,7 @@
             "id": 4,
             "name": "Orbital Cannon",
             "description": "Grants +2 Weapons, -1 Scanning, -1 Terraforming to the Star.",
-            "tier": 2,
+            "tier": 3,
             "modifiers": {
                 "local": {
                     "weapons": 2,
