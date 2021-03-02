@@ -56,7 +56,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/conversations', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.post('/api/game/:gameId/conversations', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             let errors = [];
 
@@ -86,7 +86,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/send', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/send', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             let errors = [];
 
@@ -112,7 +112,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversations, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             let convo = await container.conversationService.markConversationAsRead(
                 req.game,
@@ -127,7 +127,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversations, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             let convo = await container.conversationService.leave(
                 req.game,

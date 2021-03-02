@@ -38,18 +38,6 @@ module.exports = class GameTickService extends EventEmitter {
             6. Check to see if anyone has won the game.
         */
 
-       if (game.state.paused) {
-           throw new Error('Cannot perform a game tick on a paused game');
-       }
-
-       if (moment(game.state.startDate).utc().diff(moment().utc()) > 0) {
-            throw new Error('Cannot perform a game tick as this game has not yet started.');
-       }
-
-       if (!this._canTick(game)) {
-           return;
-       }
-
        let startTime = process.hrtime();
        console.info(`[${game.settings.general.name}] - Game tick started.`);
 
@@ -115,10 +103,20 @@ module.exports = class GameTickService extends EventEmitter {
         console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
-    _canTick(game) {
+    canTick(game) {
+        // Cannot perform a game tick on a paused game
+        if (game.state.paused) {
+            return false;
+        }
+
+        // Cannot perform a game tick as this game has not yet started.
+        if (moment(game.state.startDate).utc().diff(moment().utc()) > 0) {
+            return false;
+        }
+
         let lastTick = moment(game.state.lastTickDate).utc();
         let nextTick;
-
+        
         if (this.gameService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
             nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');

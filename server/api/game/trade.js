@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/api/game/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -44,7 +44,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.validateGameStarted, middleware.loadPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameStarted, middleware.loadPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {
@@ -83,7 +83,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.toPlayerId) {

@@ -22,7 +22,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/ledger/forgive/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/ledger/forgive/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -41,7 +41,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/ledger/settle/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/ledger/settle/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {

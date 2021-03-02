@@ -147,6 +147,14 @@ module.exports = (container) => {
             return next();
         },
 
+        validateGameLocked(req, res, next) {
+            if (container.gameService.isLocked(req.game)) {
+                throw new ValidationError('You cannot perform this action, the game is locked by the system. Please try again.');
+            }
+
+            return next();
+        },
+
         validateUndefeatedPlayer(req, res, next) {
             if (req.player.defeated) {
                 throw new ValidationError('You cannot participate in this game, you have been defeated.');

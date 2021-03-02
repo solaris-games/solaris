@@ -320,6 +320,21 @@ module.exports = class GameService extends EventEmitter {
         return await this.userService.getInfoByIdLean(player.userId);
     }
 
+    isLocked(game) {
+        return game.state.locked;
+    }
+
+    async lock(gameId, locked = true) {
+        await this.gameModel.updateOne({
+            _id: gameId
+        }, {
+            $set: {
+                'state.locked': locked
+            }
+        })
+        .exec();
+    }
+
     // TODO: All of below needs a rework. A game is started if the start date is less than now and the game hasn't finished
     // and the game is not paused
     

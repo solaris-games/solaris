@@ -92,6 +92,7 @@ const schema = new Schema({
 	},
 	conversations: [conversationSchema],
 	state: {
+		locked: { type: Types.Boolean, required: false, default: false },
 		tick: { type: Types.Number, required: true, default: 0 },
 		paused: { type: Types.Boolean, required: true, default: true },
 		productionTick: { type: Types.Number, required: true, default: 0 },
