@@ -207,7 +207,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    loadSpecialistData ({ commit }, gameId) {
+    async loadSpecialistData ({ commit }, gameId) {
       carrierSpecialists = await SpecialistService.getCarrierSpecialists(gameId)
       starSpecialists = await SpecialistService.getStarSpecialists(gameId)
       commit('setCarrierSpecialists', carrierSpecialists)
