@@ -183,6 +183,14 @@ module.exports = class CarrierService {
             carrier.waypoints = this.clearCarrierWaypointsNonTransit(carrier);
         }
     }
+    
+    clearPlayerCarrierWaypointsLooped(game, player) {
+        let carriers = this.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+
+        for (let carrier of carriers) {
+            carrier.waypointsLooped = false;
+        }
+    }
 
     clearPlayerCarriers(game, player) {
         game.galaxy.carriers = game.galaxy.carriers.filter(c => !c.ownedByPlayerId

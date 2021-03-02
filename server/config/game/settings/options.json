@@ -188,16 +188,32 @@
         ],
         "carrierSpeed": [
             {
+            "value": 1,
+            "text": "Crazy Slow"
+            },
+            {
             "value": 2.5,
-            "text": "Slow"
+            "text": "Very Slow"
             },
             {
             "value": 5,
-            "text": "Standard"
+            "text": "Slow"
             },
             {
             "value": 10,
+            "text": "Standard"
+            },
+            {
+            "value": 15,
             "text": "Fast"
+            },
+            {
+            "value": 20,
+            "text": "Very Fast"
+            },
+            {
+            "value": 25,
+            "text": "Crazy Fast"
             }
         ]
         },
@@ -342,6 +358,10 @@
             {
             "value": 50,
             "text": "Very Expensive"
+            },
+            {
+            "value": 100,
+            "text": "Crazy Expensive"
             }
         ],
         "tradeScanning": [
@@ -413,6 +433,14 @@
             }
         ],
         "speed": [
+            {
+                "value": 1,
+                "text": "Crazy Fast (1 tick = 1 minute)"
+            },
+            {
+                "value": 5,
+                "text": "Very Fast (1 tick = 5 minutes)"
+            },
             {
                 "value": 10,
                 "text": "Fast (1 tick = 10 minutes)"

@@ -5,69 +5,16 @@ import gameHelper from '../services/gameHelper'
 class Territories {
   constructor () {
     this.container = new PIXI.Container()
+
     this.zoomPercent = 0
   }
 
   setup (game) {
     this.game = game
-
-    this.clear()
-  }
-
-  clear () {
-    this.container.removeChildren()
   }
 
   draw (userSettings) {
-    this.clear()
-
-    this.drawTerritories(userSettings)
-    this.drawPlayerNames()
-
-    this.refreshZoom(this.zoomPercent || 0)
-  }
-
-  drawPlayerNames () {
-    if (this.playerNamesContainer) {
-      this.container.removeChild(this.playerNamesContainer)
-      this.playerNamesContainer = null
-    }
-
-    this.playerNamesContainer = new PIXI.Container()
-    this.playerNamesContainer.alpha = 0.8
-
-    for (let player of this.game.galaxy.players) {
-      let empireCenter = gameHelper.getPlayerEmpireCenter(this.game, player)
-
-      if (empireCenter == null) {
-        continue
-      }
-      
-      let style = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
-        fill: 0xFFFFFF,
-        padding: 3,
-        fontSize: 50
-      })
-
-      let text_name = new PIXI.Text(player.alias, style)
-      text_name.x = empireCenter.x - (text_name.width / 2)
-      text_name.y = empireCenter.y - (text_name.height / 2)
-      text_name.resolution = 10
-
-      this.playerNamesContainer.addChild(text_name)
-    }
-
-    this.container.addChild(this.playerNamesContainer)
-  }
-
-  drawTerritories (userSettings) {
-    if (this.territoryContainer) {
-      this.container.removeChild(this.territoryContainer)
-      this.territoryContainer = null
-    }
-
-    this.territoryContainer = new PIXI.Container()
+    this.container.removeChildren()
 
     switch(userSettings.map.territoryStyle) {
       case 'marching-square':
@@ -77,9 +24,13 @@ class Territories {
         this._drawTerritoriesVoronoi()
         break;
     }
+
+    this.refreshZoom(this.zoomPercent || 0)
   }
 
   _drawTerritoriesMarchingCube (userSettings) {
+    this.container.alpha = 1
+
     const CELL_SIZE = 5*userSettings.map.marchingSquareGridSize
     const METABALL_RADIUS = 20*userSettings.map.marchingSquareTerritorySize
     const LINE_PROPORTION = (1/16)*userSettings.map.marchingSquareBorderWidth
@@ -189,7 +140,7 @@ class Territories {
         pointGraphics.drawStar(0, 0, 5, 5, 5 - 2)
         pointGraphics.position.x = pointLocation.x
         pointGraphics.position.y = pointLocation.y
-        this.territoryContainer.addChild(pointGraphics)
+        this.container.addChild(pointGraphics)
         }
         
       }
@@ -198,8 +149,8 @@ class Territories {
       let color = player.colour.value
       let territoryPolygons = new PIXI.Graphics()
       let territoryLines = new PIXI.Graphics()
-      this.territoryContainer.addChild(territoryPolygons)
-      this.territoryContainer.addChild(territoryLines)
+      this.container.addChild(territoryPolygons)
+      this.container.addChild(territoryLines)
       territoryLines.lineStyle(LINE_WIDTH, color, 1)
       territoryLines._lineStyle.cap = PIXI.LINE_CAP.ROUND
       territoryPolygons.alpha = 0.333
@@ -257,12 +208,10 @@ class Territories {
         }
       }
     }
-    
-    this.container.addChild(this.territoryContainer)
   }
 
   _drawTerritoriesVoronoi () {
-    this.territoryContainer.alpha = 0.3
+    this.container.alpha = 0.3
 
     const maxDistance = 200
 
@@ -332,21 +281,15 @@ class Territories {
 
       territoryGraphic.endFill()
 
-      this.territoryContainer.addChild(territoryGraphic)
+      this.container.addChild(territoryGraphic)
     }
-
-    this.container.addChild(this.territoryContainer)
   }
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
 
-    if (this.territoryContainer) {
-      this.territoryContainer.visible = zoomPercent <= 100
-    }
-
-    if (this.playerNamesContainer) {
-      this.playerNamesContainer.visible = zoomPercent <= 90
+    if (this.container) {
+      this.container.visible = zoomPercent <= 100
     }
   }
 

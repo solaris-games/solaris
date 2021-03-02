@@ -50,6 +50,18 @@ export default {
     min-height: 8px;
 }
 
+@media screen and (max-width: 576px) { 
+  .list-group-item {
+      height: 49px;
+      width: 45px;
+      min-width: 45px;
+  }
+
+  .colour-bar {
+      min-height: 4px;
+  }
+}
+
 ul {
   overflow: visible;
   white-space: nowrap;

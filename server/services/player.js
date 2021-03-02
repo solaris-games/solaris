@@ -53,10 +53,15 @@ module.exports = class PlayerService extends EventEmitter {
 
             let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
 
-            let isInRange = playerStars.find(s => {
-                return this.starService.isStarInScanningRangeOfPlayer(game, s, player);       
-            });
+            let isInRange = false;
 
+            for (let s of playerStars) {
+                if (this.starService.isStarInScanningRangeOfPlayer(game, s, player)) {
+                    isInRange = true;
+                    break;
+                }
+            }
+            
             if (isInRange) {
                 inRange.push(p);
             }
@@ -66,7 +71,6 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
-        // TODO: Make this more efficient.
         return this.getPlayersWithinScanningRangeOfPlayer(game, sourcePlayer)
             .find(p => p._id.equals(targetPlayer._id)) != null;
     }
@@ -528,6 +532,9 @@ module.exports = class PlayerService extends EventEmitter {
         for (let star of playerStars) {
             star.ignoreBulkUpgrade = false;
         }
+
+        // Clear out any carriers that have looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
     }
 
     setPlayerAsAfk(game, player) {

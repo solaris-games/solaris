@@ -9,7 +9,7 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form class="row no-gutters" @submit.prevent>
-      <div class="form-group input-group col-4 pr-1">
+      <div class="form-group input-group col-6 col-sm-4">
         <div class="input-group-prepend">
           <span class="input-group-text">$</span>
         </div>
@@ -21,7 +21,7 @@
           required="required"
         />
       </div>
-      <div class="form-group col-4">
+      <div class="form-group col-6 col-sm-4 pl-1 pr-1">
         <select class="form-control" id="infrastructureType" v-on:change="onInfrastructureSelectionChanged" v-model="selectedType">
           <option
             v-for="opt in types"
@@ -30,7 +30,7 @@
           >{{ opt.name }}</option>
         </select>
       </div>
-      <div class="form-group col-4 pl-1">
+      <div class="form-group col-12 col-sm-4">
         <button class="btn btn-success btn-block" v-on:click="doAction"
                 :disabled="isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
       </div>

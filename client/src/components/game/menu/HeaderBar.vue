@@ -1,24 +1,24 @@
 <template>
 <div class="container-fluid bg-primary header-bar">
     <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-block mr-5 pointer" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
+        <div class="col-auto d-none d-md-block mr-5 pointer pt-1" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
 
             {{game.settings.general.name}}
         </div>
-        <div class="col">
+        <div class="col pt-1">
             <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText}}</span>
-            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Production: {{timeRemaining}}</span>
-            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">Starts In: {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto text-right" v-if="userPlayer">
+        <div class="col-auto text-right pt-1" v-if="userPlayer">
             <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
             </span>
 
             <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
-        <div class="col-auto text-right pointer" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
+        <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
             <span class="d-none d-sm-inline-block ml-4">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
@@ -29,8 +29,8 @@
                 <i class="fas fa-flask text-info"></i> {{userPlayer.stats.totalScience}}
             </span>
         </div>
-        <div class="col-auto dropleft ml-1">
-            <button class="btn btn-sm btn-success" v-if="!userPlayer && !game.state.startDate" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
+        <div class="col-auto ml-1">
+            <button class="btn btn-sm btn-success" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
             <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
@@ -38,53 +38,13 @@
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm btn-info ml-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <div class="pl-2">
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="fitGalaxy" title="Fit Galaxy (0)"><i class="fas fa-compass"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomIn()" title="Zoom In (+)"><i class="fas fa-search-plus"></i></button>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()" title="Zoom Out (-)"><i class="fas fa-search-minus"></i></button>
-                    <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Home (H)"><i class="fas fa-home"></i></button>
-                    <div>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></button>
-                        <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Ruler (V)"><i class="fas fa-ruler"></i></button>
-                        <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></button>
-                        <button class="btn btn-primary btn-sm mr-1 mb-1" @click="reloadPage" title="Reload Game"><i class="fas fa-sync"></i></button>
-                    </div>
-                </div>
-                <div class="dropdown-divider"></div>
-                <div v-if="!userPlayer">
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake mr-2"></i>Welcome</a>
-                </div>
-                <div v-if="userPlayer">
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (L)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask mr-2"></i>Research</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (S)"><i class="fas fa-star mr-2"></i>Galaxy</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (K)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (G)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-                    <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
-                </div>
-                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
-                <router-link to="/codex" class="dropdown-item"><i class="fas fa-question mr-2"></i>Help</router-link>
-                <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
-                <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
-            </div>
-
-            <!-- <button class="btn btn-sm btn-info ml-1" type="button">
-                <i class="fas fa-sync-alt"></i>
-            </button>
-
-            <button class="btn btn-sm btn-info ml-1" type="button">
-                <i class="fas fa-cog"></i>
-            </button> -->
-
             <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (I)">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
-            <button class="btn btn-sm btn-info ml-1" type="button" @click="goToMyGames()">
+            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
+            
+            <button class="btn btn-sm btn-info ml-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
@@ -104,11 +64,13 @@ import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import ConversationApiService from '../../../services/api/conversation'
 import GameApiService from '../../../services/api/game'
+import HamburgerMenuVue from './HamburgerMenu'
 
 export default {
   components: {
     'server-connection-status': ServerConnectionStatusVue,
-    'research-progress': ResearchProgressVue
+    'research-progress': ResearchProgressVue,
+    'hamburger-menu': HamburgerMenuVue
   },
   data () {
     return {
@@ -165,6 +127,9 @@ export default {
         state,
         args
       })
+    },
+    onMenuStateChanged (e) {
+      this.$emit('onMenuStateChanged', e)
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })
@@ -342,6 +307,9 @@ export default {
     gameIsFinished () {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
+    gameIsJoinable () {
+      return !this.gameIsInProgress && !this.gameIsFinished
+    },
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)
     },
@@ -353,11 +321,6 @@ export default {
 </script>
 
 <style scoped>
-/* .header-bar {
-  position:absolute;
-    overflow: auto;
-    overflow-x: hidden;
-} */
 .pointer {
   cursor:pointer;
 }

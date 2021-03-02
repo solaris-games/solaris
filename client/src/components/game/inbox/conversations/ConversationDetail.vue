@@ -4,8 +4,8 @@
 
   <div class="container" v-if="conversation">
     <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
-      <button class="btn btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
+      <button class="btn btn-sm btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
     <conversation-participants :conversation="conversation"/>

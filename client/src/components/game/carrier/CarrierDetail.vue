@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button @click="viewOnMap" class="btn btn-info"><i class="fas fa-eye"></i></button>
+      <button @click="viewOnMap" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <div class="row bg-secondary">
@@ -108,11 +108,13 @@
 
     <div>
       <div v-if="carrier.orbiting && isStandardUIStyle" class="row bg-secondary pt-2 pb-0 mb-0">
-        <div class="col-7">
+        <div class="col">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
-        <div class="col-5">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">Ship Transfer</button>
+        <div class="col-auto">
+          <button class="btn btn-sm btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
+            <i class="fas fa-exchange-alt"></i> Ship Transfer
+          </button>
         </div>
       </div>
 
@@ -148,7 +150,7 @@
           <!-- <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p> -->
         </div>
         <div class="col-auto">
-          <button class="btn btn-success" @click="editWaypoints()">
+          <button class="btn btn-sm btn-success" @click="editWaypoints()">
             Edit Waypoints
             <i class="fas fa-pencil-alt"></i>
           </button>

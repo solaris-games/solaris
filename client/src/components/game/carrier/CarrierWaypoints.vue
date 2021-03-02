@@ -30,16 +30,33 @@
 
 		<div class="row bg-secondary pt-2 pb-2 mt-2">
 			<div class="col-12">
-				<p class="mb-1" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
+        <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
+        <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
+        <!-- Seriously, what is wrong with you, Safari? -->
+				<p class="mb-1" :key="new Date().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
 			</div>
 			<div class="col">
-				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints"><i class="fas fa-undo"></i> Last</button>
-				<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-trash"></i> All</button>
-				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints"><i class="fas fa-sync"></i></button>
+				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
+          <i class="fas fa-undo"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Last</span>
+        </button>
+				<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-trash"></i>
+          <span class="ml-1 d-none d-sm-inline-block">All</span>
+        </button>
+				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints">
+          <i class="fas fa-sync"></i>
+        </button>
 			</div>
 			<div class="col-auto">
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints"><i class="fas fa-save"></i> Save</button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints"><i class="fas fa-edit"></i> Save &amp; Edit</button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-save"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Save</span>
+        </button>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+          <i class="fas fa-edit"></i> 
+          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+        </button>
 			</div>
 		</div>
 	</div>
@@ -68,6 +85,7 @@ export default {
       carrier: null,
       isSavingWaypoints: false,
       oldWaypoints: [],
+      oldWaypointsLooped: false,
       totalEtaTimeString: null,
       waypointCreatedHandler: null,
       isStandardUIStyle: false,
@@ -88,6 +106,7 @@ export default {
     	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
 
     this.oldWaypoints = this.carrier.waypoints.slice(0)
+    this.oldWaypointsLooped = this.carrier.waypointsLooped
 
     this.recalculateTotalEta()
   },
@@ -99,6 +118,7 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.carrier.waypoints = this.oldWaypoints
+      this.carrier.waypointsLooped = this.oldWaypointsLooped
 
       this.$emit('onCloseRequested', e)
     },
@@ -189,6 +209,7 @@ export default {
           this.carrier.waypoints = response.data.waypoints
 
           this.oldWaypoints = this.carrier.waypoints
+          this.oldWaypointsLooped = this.carrier.waypointsLooped
 
           this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 

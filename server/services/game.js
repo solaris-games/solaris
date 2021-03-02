@@ -261,6 +261,8 @@ module.exports = class GameService extends EventEmitter {
         // TODO: We may want to do this in future when the AI becomes clevererer.
         // // Remove all carrier waypoints (unless in transit)
         // this.carrierService.clearPlayerCarrierWaypointsNonTransit(game, player);
+        // TODO: Instead of above, just clear the player's looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
 
         let userPlayer = await this.getPlayerUser(game, player._id);
         userPlayer.achievements.defeated++;

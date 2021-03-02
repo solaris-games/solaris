@@ -7,9 +7,9 @@
         <i class="fas fa-code ml-1" v-if="user.roles.developer" title="This player is a developer"></i>
         <i class="fas fa-user-friends ml-1" v-if="user.roles.communityManager" title="This player is a community manager"></i>
       </span>
-      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-info"><i class="fas fa-chevron-left"></i></button>
-      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
-      <button @click="panToPlayer" class="btn btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-sm btn-info"><i class="fas fa-chevron-left"></i></button>
+      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-sm btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
+      <button @click="panToPlayer" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <overview v-if="player" :playerId="player._id"

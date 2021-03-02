@@ -1,0 +1,47 @@
+version: '3.4'
+services:
+  mongo:
+    image: mongo:3.6
+    volumes:
+      - dbdata:/data/db
+    expose:
+      - "27017"
+  server:
+    build:
+      context: server
+    ports:
+      - "3000:3000"
+    environment: 
+      - PORT=3000
+      - SESSION_SECRET=top_secret
+      - SESSION_SECURE_COOKIES=false
+      - CONNECTION_STRING=mongodb://mongo:27017/solaris
+      - CLIENT_URL=http://localhost:8080
+      - SMTP_ENABLED=false
+      - SMTP_HOST=localhost
+      - SMTP_PORT=25
+      - SMTP_FROM=noreply@example.com
+    depends_on:
+      - mongo
+  jobs:
+    build:
+      context: server
+    depends_on:
+      - mongo
+    command: ["npm", "run", "start-jobs"]
+    environment: 
+      - CONNECTION_STRING=mongodb://mongo:27017/solaris
+  client:
+    build:
+      context: client
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - server
+    environment: 
+      - VUE_APP_API_HOST=http://localhost:3000
+      - VUE_APP_SOCKETS_HOST=localhost:3000
+      - VUE_APP_GOOGLE_ANALYTICS_TRACKING_CODE=ABC-123-1
+volumes:
+  dbdata:

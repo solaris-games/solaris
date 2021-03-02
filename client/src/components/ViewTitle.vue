@@ -1,7 +1,7 @@
 <template>
 <div class="row bg-primary pt-3 pb-3 mb-2">
     <div class="col">
-        <h2>{{ title }}</h2>
+        <h3 class="mb-0">{{ title }}</h3>
     </div>
     <div class="col-1" v-if="!hideHomeButton">
         <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>

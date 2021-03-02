@@ -24,8 +24,8 @@ module.exports = async (app, io, container) => {
     // Use sessions for tracking logins
     app.use(session({
         secret: config.sessionSecret,
-        resave: true,
-        saveUninitialized: true,
+        resave: false,
+        saveUninitialized: false,
         cookie: { 
             secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year

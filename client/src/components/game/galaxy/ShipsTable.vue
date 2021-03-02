@@ -9,7 +9,7 @@
 
   <div class="row">
     <div class="table-responsive">
-      <table class="table table-striped table-hover">
+      <table class="table table-striped table-hover mb-0">
           <thead>
               <tr class="bg-primary">
                   <td><i class="fas fa-user"></i></td>

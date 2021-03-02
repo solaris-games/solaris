@@ -1,13 +1,16 @@
 <template>
 <div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
-      <button @click="toggleBulkIgnore" class="btn" 
+      <modalButton modalName="abandonStarModal" v-if="isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-secondary">
+        <i class="fas fa-sign-out-alt"></i>
+      </modalButton>
+      <button @click="toggleBulkIgnore" class="btn btn-sm ml-1" 
         title="Toggle Bulk Ignore"
         :class="{'btn-danger':star.ignoreBulkUpgrade,'btn-success':!star.ignoreBulkUpgrade}"
         v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">
         <i class="fas" :class="{'fa-ban':star.ignoreBulkUpgrade,'fa-check-square':!star.ignoreBulkUpgrade}"></i>
       </button>
-      <button @click="viewOnMap" class="btn btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <div class="row bg-secondary">
