@@ -80,8 +80,10 @@ export default {
         { text: 'Manufacturing', value: 'manufacturing' }
       ]
 
-      this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value))
-      this.optionsNext = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value))
+      this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value) 
+                                          && TechnologyHelper.isTechnologyResearchable(this.$store.state.game, o.value))
+      this.optionsNext = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value)
+                                          && TechnologyHelper.isTechnologyResearchable(this.$store.state.game, o.value))
 
       this.optionsNext.push({ text: 'Random', value: 'random' })
     },

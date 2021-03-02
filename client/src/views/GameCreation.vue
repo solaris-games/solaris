@@ -297,8 +297,9 @@
           </option>
         </select>
         <select class="form-control" id="startingTechLevelExperimentation" v-model="settings.technology.startingTechnologyLevel.experimentation" :disabled="isCreatingGame">
-          <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
-            Level {{ opt }} Experimentation
+          <option v-for="opt in options.technology.startingTechnologyLevelWithDisabled" v-bind:key="opt" v-bind:value="opt">
+            <span v-if="opt > 0">Level {{ opt }} Experimentation</span>
+            <span v-if="opt === 0">Experimentation Disabled</span>
           </option>
         </select>
         <select class="form-control" id="startingTechLevelScanning" v-model="settings.technology.startingTechnologyLevel.scanning" :disabled="isCreatingGame">
@@ -317,8 +318,9 @@
           </option>
         </select>
         <select class="form-control" id="startingTechLevelBanking" v-model="settings.technology.startingTechnologyLevel.banking" :disabled="isCreatingGame">
-          <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
-            Level {{ opt }} Banking
+          <option v-for="opt in options.technology.startingTechnologyLevelWithDisabled" v-bind:key="opt" v-bind:value="opt">
+            <span v-if="opt > 0">Level {{ opt }} Banking</span>
+            <span v-if="opt === 0">Banking Disabled</span>
           </option>
         </select>
         <select class="form-control" id="startingTechLevelWeapons" v-model="settings.technology.startingTechnologyLevel.weapons" :disabled="isCreatingGame">

@@ -59,11 +59,11 @@ const schema = new Schema({
         technology: {
 			startingTechnologyLevel: {
 				terraforming: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				experimentation: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
+				experimentation: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				scanning: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				hyperspace: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				manufacturing: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				banking: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
+				banking: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
 			},
 			researchCosts: {

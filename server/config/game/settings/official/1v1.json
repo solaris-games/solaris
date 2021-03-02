@@ -47,7 +47,7 @@
   "technology": {
     "startingTechnologyLevel": {
       "terraforming": 1,
-      "experimentation": 1,
+      "experimentation": 0,
       "scanning": 1,
       "hyperspace": 1,
       "manufacturing": 1,
