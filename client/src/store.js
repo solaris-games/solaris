@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
+import SpecialistService from './services/api/specialist';
 
 Vue.use(Vuex)
 
@@ -14,9 +15,18 @@ const vuexPersist = new VuexPersist({
 export default new Vuex.Store({
   state: {
     userId: null,
-    game: null
+    game: null,
+    starSpecialists: null,
+    carrierSpecialists: null
   },
   mutations: {
+    setCarrierSpecialists (state, carrierSpecialists) {
+      state.carrierSpecialists = carrierSpecialists;
+    },
+    setStarSpecialists (state, starSpecialists) {
+      state.starSpecialists = starSpecialists;
+    },
+
     setUserId (state, userId) {
       state.userId = userId
     },
@@ -192,7 +202,12 @@ export default new Vuex.Store({
     }
   },
   actions: {
-
+    loadSpecialistData ({ commit }, gameId) {
+      carrierSpecialists = await SpecialistService.getCarrierSpecialists(gameId)
+      starSpecialists = await SpecialistService.getStarSpecialists(gameId)
+      commit('setCarrierSpecialists', carrierSpecialists)
+      commit('setStarSpecialists', starSpecialists)
+    }
   },
   plugins: [vuexPersist.plugin]
 })
