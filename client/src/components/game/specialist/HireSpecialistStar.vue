@@ -10,9 +10,7 @@
         </div>
     </div>
 
-    <loading-spinner :loading="isLoadingSpecialists"/>
-
-    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="!isLoadingSpecialists && star">
+    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="star">
         <div class="col">
             <a href="javascript:;" @click="onOpenStarDetailRequested(star)">{{star.name}}</a>
         </div>
@@ -21,7 +19,7 @@
         </div>
     </div>
 
-    <div v-if="!isLoadingSpecialists && specialists.length">
+    <div v-if="specialists && specialists.length">
         <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 bg-secondary">
             <div class="col mt-2">
                 <h5 class="pt-1 text-warning">
@@ -42,7 +40,6 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../LoadingSpinner'
 import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
@@ -51,7 +48,6 @@ import SpecialistIconVue from '../specialist/SpecialistIcon'
 
 export default {
   components: {
-    'loading-spinner': LoadingSpinner,
     'menu-title': MenuTitleVue,
     'specialist-icon': SpecialistIconVue
   },
@@ -63,7 +59,6 @@ export default {
       userPlayer: null,
       star: null,
       specialists: [],
-      isLoadingSpecialists: false,
       isHiringSpecialist: false
     }
   },
@@ -71,7 +66,7 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
-    this.loadSpecialists()
+    this.specialists = this.$store.state.starSpecialists;
   },
   methods: {
     onCloseRequested (e) {
@@ -79,21 +74,6 @@ export default {
     },
     onOpenStarDetailRequested (star) {
       this.$emit('onOpenStarDetailRequested', star._id)
-    },
-    async loadSpecialists () {
-        this.isLoadingSpecialists = true
-
-        try {
-            let response = await SpecialistApiService.getStarSpecialists(this.$store.state.game._id)
-
-            if (response.status === 200) {
-                this.specialists = response.data
-            }
-        } catch (err) {
-            console.error(err)
-        }
-
-        this.isLoadingSpecialists = false
     },
     async hireSpecialist (specialist) {
         this.isHiringSpecialist = true
