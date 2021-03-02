@@ -208,11 +208,12 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    async loadSpecialistData ({ commit }, gameId) {
-      carrierSpecialists = await SpecialistService.getCarrierSpecialists(gameId)
-      starSpecialists = await SpecialistService.getStarSpecialists(gameId)
-      commit('setCarrierSpecialists', carrierSpecialists)
-      commit('setStarSpecialists', starSpecialists)
+    async loadSpecialistData ({ commit, state }) {
+      const gameId = state.game._id;
+      const carrierSpecialistsResponse = await SpecialistService.getCarrierSpecialists(gameId)
+      const starSpecialistsResponse = await SpecialistService.getStarSpecialists(gameId)
+      commit('setCarrierSpecialists', carrierSpecialistsResponse.data)
+      commit('setStarSpecialists', starSpecialistsResponse.data)
     }
   },
   plugins: [vuexPersist.plugin]
