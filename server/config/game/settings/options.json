@@ -531,6 +531,28 @@
                 "value": 48,
                 "text": "48 Hours"
             }
+        ],
+        "missedTurnLimit": [
+            {
+                "value": 1,
+                "text": "1 Missed Turn"
+            },
+            {
+                "value": 2,
+                "text": "2 Missed Turns"
+            },
+            {
+                "value": 3,
+                "text": "3 Missed Turns"
+            },
+            {
+                "value": 4,
+                "text": "4 Missed Turns"
+            },
+            {
+                "value": 5,
+                "text": "5 Missed Turns"
+            }
         ]
     }
 }

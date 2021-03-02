@@ -81,7 +81,8 @@ const schema = new Schema({
 			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 30 },
 			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 }
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 },
+			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5], default: 3 }
 		}
     },
     galaxy: {
@@ -131,9 +132,6 @@ const schema = new Schema({
 				veryExpensive: { type: Types.Number, required: true, default: 8 },
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
 			}
-		},
-		turnBased: {
-			playerMissedTurnLimit: { type: Types.Number, required: true, default: 3 },
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }]

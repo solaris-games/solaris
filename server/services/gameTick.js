@@ -763,7 +763,7 @@ module.exports = class GameTickService extends EventEmitter {
             // If in real time mode, check if the player has not been seen for over 48 hours.
             // OR if in turn based mode, check if the player has reached the maximum missed turn limit.
             let isAfk = moment(player.lastSeen).utc() < afkThresholdDate
-                    || player.missedTurns >= game.constants.turnBased.playerMissedTurnLimit;
+                    || player.missedTurns >= game.settings.gameTime.missedTurnLimit;
 
             if (isAfk) {
                 this.playerService.setPlayerAsAfk(game, player);

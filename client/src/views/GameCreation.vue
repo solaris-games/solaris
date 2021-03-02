@@ -414,6 +414,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
+        <label for="missedTurnLimit" class="col-form-label">Missed Turn Limit</label>
+        <select class="form-control" id="missedTurnLimit" v-model="settings.gameTime.missedTurnLimit" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.missedTurnLimit" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
     </form>
   </view-container>
 </template>
