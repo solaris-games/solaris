@@ -90,6 +90,8 @@ export default {
     }
 
     this.polling = setInterval(this.reloadGameCheck, 10000)
+
+    this.$store.dispatch('loadSpecialistData');
   },
   beforeDestroy () {
     clearInterval(this.polling)
