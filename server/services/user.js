@@ -22,7 +22,8 @@ module.exports = class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
-            premiumEndDate: 0
+            premiumEndDate: 0,
+            banned: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -46,6 +47,7 @@ module.exports = class UserService extends EventEmitter {
             password: 0,
             resetPasswordToken: 0,
             premiumEndDate: 0,
+            banned: 0,
             credits: 0,
             email: 0,
             emailEnabled: 0,
@@ -60,6 +62,7 @@ module.exports = class UserService extends EventEmitter {
             password: 0,
             resetPasswordToken: 0,
             premiumEndDate: 0,
+            banned: 0,
             credits: 0,
             email: 0,
             emailEnabled: 0,
@@ -90,6 +93,18 @@ module.exports = class UserService extends EventEmitter {
         }
 
         return user.username;
+    }
+
+    async getUserIsBanned(userId) {
+        let user = await this.userModel.findOne({
+            _id: userId
+        }, {
+            banned: 1
+        })
+        .lean({defaults: true})
+        .exec();
+
+        return user.banned;
     }
 
     async create(user) {

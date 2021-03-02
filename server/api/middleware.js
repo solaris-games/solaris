@@ -3,9 +3,15 @@ const ValidationError = require('../errors/validation');
 module.exports = (container) => {
 
     return {
-        authenticate(req, res, next) {
+        async authenticate(req, res, next) {
             if (!req.session.userId) {
                 return res.sendStatus(401);
+            }
+
+            let isBanned = await container.userService.getUserIsBanned(req.session.userId);
+
+            if (isBanned) {
+                throw new ValidationError(`The account is banned.`, 401);
             }
 
             next();
