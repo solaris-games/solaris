@@ -1,10 +1,14 @@
 <template>
   <view-container>
-    <view-title :title="guild ? guildFullName : 'Guild'" />
+    <view-title :title="guild ? guildFullName : 'Guilds'" />
 
-    <loading-spinner :loading="!guild"/>
+    <loading-spinner :loading="isLoading"/>
 
-    <div v-if="guild">
+    <div v-if="!isLoading && guild">
+      <p class="float-right">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
+
+      <h5>Guild Roster</h5>
+
       <div class="table-responsive">
           <table class="table table-striped table-hover">
               <thead>
@@ -16,23 +20,59 @@
                   <th></th>
               </thead>
               <tbody> 
-                <guild-member :guild="guild" :player="guild.leader" role="Leader"/>
+                <guild-member :guild="guild" :player="guild.leader" role="Leader"
+                  @onPlayerPromoted="onPlayerPromoted"
+                  @onPlayerKicked="onPlayerKicked"
+                  @onPlayerUninvited="onPlayerUninvited"/>
 
                 <guild-member :guild="guild" :player="officer" role="Officer"
-                  v-for="officer in guild.officers" :key="officer._id"/>
+                  v-for="officer in guild.officers" :key="officer._id"
+                  @onPlayerPromoted="onPlayerPromoted"
+                  @onPlayerDemoted="onPlayerDemoted"
+                  @onPlayerKicked="onPlayerKicked"
+                  @onPlayerUninvited="onPlayerUninvited"/>
 
                 <guild-member :guild="guild" :player="member" role="Member"
-                  v-for="member in guild.members" :key="member._id"/>
+                  v-for="member in guild.members" :key="member._id"
+                  @onPlayerPromoted="onPlayerPromoted"
+                  @onPlayerKicked="onPlayerKicked"
+                  @onPlayerUninvited="onPlayerUninvited"/>
 
                 <guild-member :guild="guild" :player="invitee" role="Invitee"
-                  v-for="invitee in guild.invitees" :key="invitee._id"/>
+                  v-for="invitee in guild.invitees" :key="invitee._id"
+                  @onPlayerPromoted="onPlayerPromoted"
+                  @onPlayerKicked="onPlayerKicked"
+                  @onPlayerUninvited="onPlayerUninvited"/>
               </tbody>
           </table>
       </div>
 
-      <guild-invite v-if="isLeader || isOfficer"
+      <guild-new-invite v-if="isLeader || isOfficer"
         :guildId="this.guild._id"
         @onUserInvited="onUserInvited"/>
+    </div>
+
+    <div v-if="!isLoading && !guild">
+      <p>You are not a member of a guild. Accept an invitation to join a guild or found a new one.</p>
+
+      <router-link to="/guild/create" class="btn btn-info">
+        <i class="fas fa-users"></i> Create a Guild
+      </router-link>
+
+      <h4 class="mt-3">Guild Invites</h4>
+
+      <p v-if="!invites.length" class="text-warning">You have no guild invitations.</p>
+
+      <div class="table-responsive" v-if="invites.length">
+          <table class="table table-striped table-hover">
+              <tbody> 
+                <guild-invite v-for="invite in invites" :key="invite.guildId"
+                  :invite="invite"
+                  @onInvitationAccepted="onInvitationAccepted"
+                  @onInvitationDeclined="onInvitationDeclined"/>
+              </tbody>
+          </table>
+      </div>
     </div>
   </view-container>
 </template>
@@ -42,6 +82,7 @@ import ViewContainer from '../../components/ViewContainer'
 import ViewTitle from '../../components/ViewTitle'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import GuildApiService from '../../services/api/guild'
+import GuildNewInvite from './GuildNewInvite'
 import GuildInvite from './GuildInvite'
 import GuildMember from './GuildMember'
 
@@ -50,45 +91,71 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'loading-spinner': LoadingSpinner,
+    'guild-new-invite': GuildNewInvite,
     'guild-invite': GuildInvite,
     'guild-member': GuildMember
   },
   data () {
     return {
-      guild: null
+      isLoading: false,
+      guild: null,
+      invites: []
     }
   },
   async mounted () {
-    this.guild = null
-
-    try {
-      let response = await GuildApiService.detail(this.$route.params.guildId)
-
-      if (response.status === 200) {
-        this.guild = response.data
-      }
-    } catch (err) {
-      console.error(err)
-    }
+    await this.loadGuild()
   },
   methods: {
+    async loadGuild () {
+      this.isLoading = true
+      this.guild = null
+
+      try {
+        let response = await GuildApiService.detailMyGuild()
+
+        if (response.status === 200) {
+          this.guild = response.data
+        }
+        
+        if (!this.guild) {
+          response = await GuildApiService.listInvitations()
+
+          if (response.status === 200) {
+            this.invites = response.data
+          }
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
     onUserInvited (e) {
       this.guild.invitees.push(e)
     },
+    onInvitationAccepted (e) {
+      this.invites = []
+
+      this.loadGuild()
+    },
+    // Fuck it.
+    onInvitationDeclined (e) {
+      this.loadGuild()
+    },
+    onPlayerPromoted (e) {
+      this.loadGuild()
+    },
+    onPlayerDemoted (e) {
+      this.loadGuild()
+    },
+    onPlayerKicked (e) {
+      this.loadGuild()
+    },
+    onPlayerUninvited (e) {
+      this.loadGuild()
+    },
     isCurrentUser (userId) {
       return userId === this.$store.state.userId
-    },
-    async kick (userId) {
-
-    },
-    async uninvite (userId) {
-
-    },
-    async leave () {
-
-    },
-    async disband () {
-
     }
   },
   computed: {

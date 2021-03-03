@@ -6,8 +6,12 @@ class GuildService extends BaseApiService {
     return axios.get(this.BASE_URL + 'guild', { withCredentials: true })
   }
 
-  detail (guildId) {
-    return axios.get(this.BASE_URL + 'guild/' + guildId, { withCredentials: true })
+  listInvitations () {
+    return axios.get(this.BASE_URL + 'guild/invites', { withCredentials: true })
+  }
+
+  detailMyGuild () {
+    return axios.get(this.BASE_URL + 'guild/mine', { withCredentials: true })
   }
 
   create (name, tag) {
@@ -55,6 +59,12 @@ class GuildService extends BaseApiService {
 
   promote (guildId, userId) {
     return axios.patch(this.BASE_URL + 'guild/' + guildId + '/promote/' + userId, 
+      {}, 
+      { withCredentials: true })
+  }
+
+  demote (guildId, userId) {
+    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/demote/' + userId, 
       {}, 
       { withCredentials: true })
   }

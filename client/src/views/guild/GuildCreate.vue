@@ -4,12 +4,20 @@
 
     <loading-spinner :loading="isLoading"/>
 
-    <p>Found a new guild.</p>
+    <h4>Found a new guild</h4>
+    
+    <ul>
+      <li>Become the leader of a prestigeous guild.</li>
+      <li>Invite your friends and allies to join you.</li>
+      <li>Show off your guild tag in games.</li>
+      <li>Assign roles to Members, promote players to Officers.</li>
+      <li>Arrange Guild vs. Guild matches to see which guild is best.</li>
+    </ul>
 
     <form @submit="handleSubmit">
       <div class="form-group">
         <label for="name">Guild Name</label>
-        <input type="text" required="required" class="form-control" minlength="4" maxlength="100" name="name" v-model="name" :disabled="isLoading">
+        <input type="text" required="required" class="form-control" minlength="4" maxlength="31" name="name" v-model="name" :disabled="isLoading">
       </div>
 
       <div class="form-group">
@@ -21,14 +29,17 @@
       
       <div class="form-group">
         <div class="row">
-          <div class="col-6">
-            <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">
+          <div class="col">
+            <router-link to="/guild" tag="button" class="btn btn-danger">
+              <i class="fas fa-arrow-left"></i>
+              Cancel
+            </router-link>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-success" :disabled="isLoading">
               <i class="fas fa-users"></i>
               Found Guild
             </button>
-          </div>
-          <div class="col-6">
-            <router-link to="/" tag="button" class="btn btn-danger btn-block">Cancel</router-link>
           </div>
         </div>
       </div>
@@ -84,7 +95,7 @@ export default {
         if (response.status === 201) {
           this.$toasted.show(`You have founded the guild ${this.name} [${this.tag}]!`, { type: 'success' })
 
-          router.push({ name: 'guild', params: { guildId: response.data._id } })
+          router.push({ name: 'guild' })
         }
       } catch (err) {
         console.log(err)

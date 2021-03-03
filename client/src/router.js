@@ -127,7 +127,7 @@ export default new Router({
       component: GuildCreate
     },
     {
-      path: '/guild/:guildId',
+      path: '/guild',
       name: 'guild',
       component: Guild
     }

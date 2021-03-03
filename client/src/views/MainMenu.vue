@@ -54,10 +54,10 @@
         </div>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-6">
-        <div class="card bg-dark text-white" @click="routeToPath('/guild/' + user.guildId)">
-          <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
+        <div class="card bg-dark text-white" @click="routeToPath('/guild')">
+          <img class="card-img" :src="require('../assets/screenshots/home-4.png')" alt="Guilds">
           <div class="card-img-overlay">
-            <h5 class="card-title">Guild</h5>
+            <h5 class="card-title">Guilds</h5>
           </div>
         </div>
       </div>

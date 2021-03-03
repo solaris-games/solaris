@@ -40,6 +40,34 @@ module.exports = class GuildService {
         return guilds.sort((a, b) => b.totalRank - a.totalRank);
     }
 
+    async listInfoByIds(guildIds) {
+        return await this.guildModel.find({
+            _id: {
+                $in: guildIds
+            }
+        }, {
+            name: 1,
+            tag: 1
+        })
+        .lean()
+        .exec();
+    }
+
+    async listInvitations(userId) {
+        let guilds = await this.guildModel.find({
+            invitees: {
+                $in: [userId]
+            }
+        }, {
+            name: 1,
+            tag: 1
+        })
+        .lean()
+        .exec();
+
+        return guilds;
+    }
+
     async detail(guildId, withUserInfo = false) {
         let guild = await this.guildModel.findOne({
             _id: guildId
@@ -66,6 +94,22 @@ module.exports = class GuildService {
         }
 
         return guild;
+    }
+
+    async detailMyGuild(userId, withUserInfo = false) {
+        let user = await this.userModel.findOne({
+            _id: userId
+        }, {
+            guildId: 1
+        })
+        .lean()
+        .exec();
+
+        if (!user.guildId) {
+            return null;
+        }
+
+        return await this.detail(user.guildId, withUserInfo);
     }
 
     async create(userId, name, tag) {
@@ -114,11 +158,11 @@ module.exports = class GuildService {
             throw new ValidationError(`You do not have the authority to disband the guild.`);
         }
 
-        await this.userModel.update({
+        await this.userModel.updateMany({
             guildId
         }, {
-            $set: {
-                guildId: null
+            $unset: {
+                guildId: undefined
             }
         })
         .exec();
@@ -290,31 +334,59 @@ module.exports = class GuildService {
             throw new ValidationError(`You do not have the authority to promote this member.`);
         }
 
-        let updateObject = null;
-
         if (this._isOfficer(guild, userId)) {
             // Officer to leader
-            updateObject = {
-                $push: {
-                    officers: promotedByUserId
-                },
-                $pull: {
-                    officers: userId
-                },
+            await this.guildModel.updateOne({
+                _id: guildId,
+                'officers': userId
+            }, {
                 $set: {
-                    leader: userId
+                    leader: userId,
+                    'officers.$': promotedByUserId
                 }
-            };
+            })
+            .exec();
         } else if (this._isMember(guild, userId)) {
             // Member to officer
-            updateObject = {
+            await this.guildModel.updateOne({
+                _id: guildId
+            }, {
                 $pull: {
                     members: userId
                 },
                 $push: {
                     officers: userId
                 }
+            })
+            .exec();
+        } else {
+            throw new ValidationError(`The user is not a member of this guild.`);
+        }
+    }
+
+    async demote(userId, guildId, demotedByUserId) {
+        let guild = await this.detail(guildId);
+
+        let hasPermission = this._isLeader(guild, demotedByUserId);
+
+        if (!hasPermission) {
+            throw new ValidationError(`You do not have the authority to demote this member.`);
+        }
+
+        let updateObject = null;
+
+        if (this._isOfficer(guild, userId)) {
+            // Officer to member
+            updateObject = {
+                $pull: {
+                    officers: userId
+                },
+                $push: {
+                    members: userId
+                }
             };
+        } else if (this._isMember(guild, userId)) {
+            throw new ValidationError(`Members cannot be demoted.`);
         } else {
             throw new ValidationError(`The user is not a member of this guild.`);
         }
@@ -362,7 +434,7 @@ module.exports = class GuildService {
         }
 
         await this.guildModel.updateOne({
-            _id: guildId
+            _id: guild._id
         }, updateObject)
         .exec();
 

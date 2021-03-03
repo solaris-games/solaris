@@ -1,78 +1,71 @@
 <template>
-  <div>
-    <loading-spinner :loading="isLoading"/>
-
-    <h5>Invite Player</h5>
-
-    <form-error-list :errors="errors"/>
-      
-    <form @submit="handleSubmit">
-        <div class="row no-gutters">
-            <div class="col">
-                <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading" placeholder="Enter Player Name...">
-            </div>
-            <div class="col-auto ml-2">
-                <button type="submit" class="btn btn-success" :disabled="isLoading">
-                    <i class="fas fa-user-plus"></i>
-                    Invite Player
-                </button>
-            </div>
-        </div>
-    </form>
-  </div>
+  <tr>
+    <td>{{invite.name}}[{{invite.tag}}]</td>
+    <td class="text-right">
+      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" title="Accept Invitation">
+        <i class="fas fa-check"></i>
+      </button>
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" title="Reject Invitation">
+        <i class="fas fa-trash"></i>
+      </button>
+    </td>
+  </tr>
 </template>
 
 <script>
-import FormErrorList from '../../components/FormErrorList'
-import LoadingSpinner from '../../components/LoadingSpinner'
 import GuildApiService from '../../services/api/guild'
 
 export default {
-  components: {
-    'form-error-list': FormErrorList,
-    'loading-spinner': LoadingSpinner
-  },
   props: {
-      guildId: String
+    invite: Object
   },
   data () {
     return {
-      isLoading: false,
-      errors: [],
-      username: ''
+      isLoading: false
     }
   },
   methods: {
-    async handleSubmit (e) {
-      this.errors = []
-
-      if (!this.username) {
-        this.errors.push('Username is required.')
+    async accept () {
+      if (!confirm(`Are you sure you want to accept the invitation from ${this.invite.name}[${this.invite.tag}]?`)) {
+        return
       }
 
-      e.preventDefault()
-
-      if (this.errors.length) return
+      this.isLoading = true
 
       try {
-        this.isLoading = true
-
-        let response = await GuildApiService.invite(this.guildId, this.username)
+        let response = await GuildApiService.acceptInvite(this.invite._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`ou invited ${this.username} to the guild.`, { type: 'success' })
-
-          this.$emit('onUserInvited', response.data)
-
-          this.username = ''
+          this.$emit('onInvitationAccepted', this.invite._id)
         }
       } catch (err) {
-        console.log(err)
-        this.errors = err.response.data.errors || []
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
+    async reject () {
+      if (!confirm(`Are you sure you want to decline the invitation from ${this.invite.name}[${this.invite.tag}]?`)) {
+        return
+      }
+
+      this.isLoading = true
+
+      try {
+        let response = await GuildApiService.declineInvite(this.invite._id)
+
+        if (response.status === 200) {
+          this.$emit('onInvitationDeclined', this.invite._id)
+        }
+      } catch (err) {
+        console.error(err)
       }
 
       this.isLoading = false
     }
+  },
+  computed: {
+
   }
 }
 </script>
