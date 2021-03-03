@@ -20,6 +20,10 @@ module.exports = class AuthService {
             throw new ValidationError('The email address or password is incorrect.');
         }
 
+        if (user.banned) {
+            throw new ValidationError('The account has been banned.');
+        }
+
         // Compare the passwords and if they match then the user is authenticated.
         let result = await this.passwordService.compare(password, user.password);
 

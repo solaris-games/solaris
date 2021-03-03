@@ -18,7 +18,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/api/game/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.upgradeEconomy(
                 req.game,
@@ -38,7 +38,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/industry', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.upgradeIndustry(
                 req.game,
@@ -58,7 +58,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/science', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.upgradeScience(
                 req.game,
@@ -78,7 +78,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/bulk', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let summary = await container.starUpgradeService.upgradeBulk(
                 req.game,
@@ -126,7 +126,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/upgrade/bulkCheck', middleware.authenticate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/upgrade/bulkCheck', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let summary = await container.starUpgradeService.generateUpgradeBulkReport(
                 req.game,
@@ -140,7 +140,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/build/warpgate', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.starUpgradeService.buildWarpGate(
                 req.game,
@@ -159,7 +159,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/destroy/warpgate', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.starUpgradeService.destroyWarpGate(
                 req.game,
@@ -178,7 +178,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/build/carrier', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let ships = +req.body.ships || 1;
 
         try {
@@ -204,7 +204,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/transferall', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/transferall', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let report = await container.shipTransferService.transferAllToStar(
                 req.game,
@@ -234,7 +234,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/abandon', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/abandon', middleware.authenticate, validate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.starService.abandonStar(
                 req.game,
@@ -251,7 +251,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/toggleignorebulkupgrade', middleware.authenticate, validate, middleware.loadGameLean, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/toggleignorebulkupgrade', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.starService.toggleIgnoreBulkUpgrade(
                 req.game,

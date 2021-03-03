@@ -10,6 +10,7 @@ const schema = new Schema({
     resetPasswordToken: { type: Types.String, required: false },
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
+    banned: { type: Types.Boolean, default: false },
     roles: {
         contributor: { type: Types.Boolean, default: false },
         developer: { type: Types.Boolean, default: false },

@@ -394,6 +394,25 @@
             15,
             16
         ],
+        "startingTechnologyLevelWithDisabled": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+        ],
         "researchCosts": [
             {
             "value": "none",
@@ -530,6 +549,28 @@
             {
                 "value": 48,
                 "text": "48 Hours"
+            }
+        ],
+        "missedTurnLimit": [
+            {
+                "value": 1,
+                "text": "1 Missed Turn"
+            },
+            {
+                "value": 2,
+                "text": "2 Missed Turns"
+            },
+            {
+                "value": 3,
+                "text": "3 Missed Turns"
+            },
+            {
+                "value": 4,
+                "text": "4 Missed Turns"
+            },
+            {
+                "value": 5,
+                "text": "5 Missed Turns"
             }
         ]
     }

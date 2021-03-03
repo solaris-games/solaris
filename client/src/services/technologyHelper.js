@@ -14,6 +14,10 @@ class TechnologyHelper {
     }
 
     isTechnologyEnabled (game, technologyKey) {
+      return game.settings.technology.startingTechnologyLevel[technologyKey] > 0
+    }
+
+    isTechnologyResearchable (game, technologyKey) {
       return game.settings.technology.researchCosts[technologyKey] !== 'none'
     }
 

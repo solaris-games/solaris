@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -25,7 +25,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (req.body.loop == null) {
@@ -49,7 +49,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (req.body.carrierShips == null) {
@@ -96,7 +96,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -123,7 +123,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, (req, res, next) => {
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, (req, res, next) => {
         let errors = [];
 
         if (req.body.defender.ships == null) {
