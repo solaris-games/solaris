@@ -201,7 +201,7 @@ export default new Vuex.Store({
   },
   getters: {
     getConversationMessage: (state) => (conversationId) => {
-      return state.cachedConversationComposeMessages[conversationId]
+      return state.cachedConversationComposeMessages[conversationId] || ''
     }
   },
   plugins: [vuexPersist.plugin]
