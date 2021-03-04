@@ -78,20 +78,25 @@ export default {
     await this.loadConversation()
   },
   methods: {
-    onMessageChange (e) {
-      this.currentConversationMessage = e;
-    },
-    onCloseRequested (e) {
+    cacheComposedMessage () {
       this.$store.commit('storeConversationMessage', {
         conversationId: this.conversationId,
         message: this.currentConversationMessage
       })
+    },
+    onMessageChange (e) {
+      this.currentConversationMessage = e;
+    },
+    onCloseRequested (e) {
+      this.cacheComposedMessage()
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
+      this.cacheComposedMessage()
       this.$emit('onOpenInboxRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
+      this.cacheComposedMessage()
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     onConversationMessageSent (e) {
