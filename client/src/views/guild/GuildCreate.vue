@@ -7,17 +7,18 @@
     <h4>Found a new guild</h4>
     
     <ul>
-      <li>Become the leader of a prestigeous guild.</li>
+      <li>Become the <strong>leader</strong> of a prestigeous guild.</li>
       <li>Invite your friends and allies to join you.</li>
       <li>Show off your guild tag in games.</li>
-      <li>Assign roles to Members, promote players to Officers.</li>
-      <li>Arrange Guild vs. Guild matches to see which guild is best.</li>
+      <li>Assign roles to <strong>Members</strong>, promote players to <strong class="text-info">Officers</strong>.</li>
+      <li>Arrange <strong class="text-warning">Guild vs. Guild</strong> matches to see which guild is best.</li>
     </ul>
 
     <form @submit="handleSubmit">
       <div class="form-group">
         <label for="name">Guild Name</label>
-        <input type="text" required="required" class="form-control" minlength="4" maxlength="31" name="name" v-model="name" :disabled="isLoading">
+        <input type="text" required="required" class="form-control" minlength="4" maxlength="31" name="name" v-model="name" :disabled="isLoading"
+          @change="onGuildNameChanged">
       </div>
 
       <div class="form-group">
@@ -27,7 +28,7 @@
 
       <form-error-list :errors="errors"/>
 
-      <p>Founding a guild costs <strong class="text-warning">3 galactic credits</strong>. Earn credits by winning official games.</p>
+      <p><span class="text-warning">Warning</span>: Founding a guild costs <strong class="text-danger">3 galactic credits</strong>, earn credits by winning official games.</p>
       
       <div class="form-group">
         <div class="row">
@@ -39,7 +40,7 @@
           </div>
           <div class="col-auto">
             <button type="submit" class="btn btn-success" :disabled="isLoading">
-              <i class="fas fa-users"></i>
+              <i class="fas fa-shield-alt"></i>
               Found Guild
             </button>
           </div>
@@ -109,6 +110,9 @@ export default {
       }
 
       this.isLoading = false
+    },
+    onGuildNameChanged (e) {
+      this.name = this.name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
     }
   }
 }

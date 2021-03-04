@@ -4,7 +4,7 @@
 
     <loading-spinner :loading="isLoading"/>
 
-    <div v-if="!isLoading && guild">
+    <div v-if="!isLoading && guild" class="mb-4">
       <p class="float-right">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5>Guild Roster</h5>
@@ -52,14 +52,16 @@
         @onUserInvited="onUserInvited"/>
     </div>
 
-    <div v-if="!isLoading && !guild">
+    <div v-if="!isLoading && !guild" class="mb-4">
       <p>You are not a member of a guild. Accept an invitation to join a guild or found a new one.</p>
 
-      <router-link to="/guild/create" class="btn btn-info">
-        <i class="fas fa-users"></i> Create a Guild
-      </router-link>
+      <div class="text-center">
+        <router-link to="/guild/create" class="btn btn-lg btn-success">
+          <i class="fas fa-shield-alt"></i> Create a Guild
+        </router-link>
+      </div>
 
-      <h4 class="mt-3">Guild Invites</h4>
+      <h4 class="mt-4">Guild Invites</h4>
 
       <p v-if="!invites.length" class="text-warning">You have no guild invitations.</p>
 

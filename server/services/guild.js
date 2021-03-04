@@ -135,13 +135,16 @@ module.exports = class GuildService {
         name = toProperCase(name.trim());
         tag = tag.trim().replace(/\s/g, '');
 
-        let existing = await this.guildModel.count({
-            name
+        let existing = await this.guildModel.findOne({
+            $or: [
+                { name },
+                { tag }
+            ]
         })
         .exec();
 
         if (existing) {
-            throw new ValidationError(`A guild with the same name already exists.`);
+            throw new ValidationError(`A guild with the same name or tag already exists.`);
         }
 
         let guild = new this.guildModel();

@@ -33,7 +33,10 @@
         <div class="card bg-dark text-white" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
           <div class="card-img-overlay">
-            <h5 class="card-title">My Games</h5>
+            <h5 class="card-title">
+              <i class="fas fa-user"></i> 
+              <span class="ml-2">My Games</span>
+            </h5>
           </div>
         </div>
       </div>
@@ -41,7 +44,10 @@
         <div class="card bg-dark text-white">
           <img class="card-img" :src="require('../assets/screenshots/home-2.png')" alt="Join a game">
           <div class="card-img-overlay">
-            <h5 class="card-title">Join Game</h5>
+            <h5 class="card-title">
+              <i class="fas fa-gamepad"></i>
+              <span class="ml-2">Join Game</span>
+            </h5>
           </div>
         </div>
       </div>
@@ -49,7 +55,10 @@
         <div class="card bg-dark text-white" @click="routeToPath('/leaderboard')">
           <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
           <div class="card-img-overlay">
-            <h5 class="card-title">Leaderboard</h5>
+            <h5 class="card-title">
+              <i class="fas fa-list-ol"></i>
+              <span class="ml-2">Leaderboard</span>
+            </h5>
           </div>
         </div>
       </div>
@@ -57,7 +66,10 @@
         <div class="card bg-dark text-white" @click="routeToPath('/guild')">
           <img class="card-img" :src="require('../assets/screenshots/home-4.png')" alt="Guilds">
           <div class="card-img-overlay">
-            <h5 class="card-title">Guilds</h5>
+            <h5 class="card-title">
+              <i class="fas fa-shield-alt"></i>
+              <span class="ml-2">{{user.guildId ? 'My Guild' : 'Guilds'}}</span>
+            </h5>
           </div>
         </div>
       </div>
