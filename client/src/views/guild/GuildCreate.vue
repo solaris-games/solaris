@@ -26,6 +26,8 @@
       </div>
 
       <form-error-list :errors="errors"/>
+
+      <p>Founding a guild costs <strong class="text-warning">3 galactic credits</strong>. Earn credits by winning official games.</p>
       
       <div class="form-group">
         <div class="row">
@@ -85,6 +87,10 @@ export default {
       e.preventDefault()
 
       if (this.errors.length) return
+
+      if (!confirm(`Are you sure you want to found a guild? It will cost 3 galactic credits.`)) {
+        return
+      }
 
       try {
         this.isLoading = true

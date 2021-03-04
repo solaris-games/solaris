@@ -9,6 +9,7 @@ module.exports = class GuildService {
 
     MAX_MEMBER_COUNT = 100
     MAX_INVITE_COUNT = 100
+    CREATE_GUILD_CREDITS_COST = 3
     
     constructor(guildModel, userModel) {
         this.userModel = userModel;
@@ -119,6 +120,18 @@ module.exports = class GuildService {
             throw new ValidationError(`Cannot create a guild if you are already a member in another guild.`);
         }
 
+        let userCredits = await this.userModel.findOne({
+            _id: userId
+        }, {
+            credits: 1
+        })
+        .lean()
+        .exec();
+
+        if (userCredits.credits < this.CREATE_GUILD_CREDITS_COST) {
+            throw new ValidationError(`You do not have enough credits to found a guild. The cost is ${this.CREATE_GUILD_CREDITS_COST} credits, you have ${userCredits.credits}.`);
+        }
+
         name = toProperCase(name.trim());
         tag = tag.trim().replace(/\s/g, '');
 
@@ -144,6 +157,9 @@ module.exports = class GuildService {
         }, {
             $set: {
                 guildId: guild._id
+            },
+            $inc: {
+                credits: -this.CREATE_GUILD_CREDITS_COST
             }
         })
         .exec();
