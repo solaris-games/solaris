@@ -14,7 +14,8 @@ const vuexPersist = new VuexPersist({
 export default new Vuex.Store({
   state: {
     userId: null,
-    game: null
+    game: null,
+    cachedConversationComposeMessages: {}
   },
   mutations: {
     setUserId (state, userId) {
@@ -29,6 +30,7 @@ export default new Vuex.Store({
     },
     clearGame (state) {
       state.game = null
+      state.cachedConversationComposeMessages = {}
     },
 
     setSettings (state, settings) {
@@ -36,6 +38,9 @@ export default new Vuex.Store({
     },
     clearSettings (state) {
       state.settings = null
+    },
+    storeConversationMessage (state, data) {
+      state.cachedConversationComposeMessages[data.conversationId] = data.message;
     },
 
     // ----------------
@@ -193,6 +198,11 @@ export default new Vuex.Store({
   },
   actions: {
 
+  },
+  getters: {
+    getConversationMessage: (state) => (conversationId) => {
+      return state.cachedConversationComposeMessages[conversationId] || ''
+    }
   },
   plugins: [vuexPersist.plugin]
 })

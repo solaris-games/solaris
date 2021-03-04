@@ -21,7 +21,7 @@
         <p class="mb-0 text-center">No messages.</p>
     </div>
 
-    <compose-conversation-message :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent"/>
+    <compose-conversation-message :conversationId="conversationId" :conversationMessage="currentConversationMessage" @onConversationMessageSent="onConversationMessageSent" @onMessageChange="onMessageChange"/>
   </div>
 </div>
 </template>
@@ -46,12 +46,13 @@ export default {
     'conversation-trade-event': ConversationTradeEventVue
   },
   props: {
-    conversationId: String
+    conversationId: String,
   },
   data () {
     return {
       conversation: null,
-      userPlayer: null
+      userPlayer: null,
+      currentConversationMessage: null
     }
   },
   created () {
@@ -72,11 +73,19 @@ export default {
   },
   async mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)._id
+    this.currentConversationMessage = this.$store.getters.getConversationMessage(this.conversationId)
 
     await this.loadConversation()
   },
   methods: {
+    onMessageChange (e) {
+      this.currentConversationMessage = e;
+    },
     onCloseRequested (e) {
+      this.$store.commit('storeConversationMessage', {
+        conversationId: this.conversationId,
+        message: this.currentConversationMessage
+      })
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
