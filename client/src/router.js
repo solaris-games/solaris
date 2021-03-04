@@ -19,6 +19,8 @@ import Home from './views/Home.vue'
 import MainMenu from './views/MainMenu.vue'
 import PremiumStore from './views/PremiumStore.vue'
 import Leaderboard from './views/Leaderboard.vue'
+import Guild from './views/guild/Guild.vue'
+import GuildCreate from './views/guild/GuildCreate.vue'
 
 Vue.use(Router)
 
@@ -118,6 +120,16 @@ export default new Router({
       path: '/leaderboard',
       name: 'leaderboard',
       component: Leaderboard
+    },
+    {
+      path: '/guild/create',
+      name: 'guild-create',
+      component: GuildCreate
+    },
+    {
+      path: '/guild',
+      name: 'guild',
+      component: Guild
     }
   ]
 })

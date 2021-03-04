@@ -4,6 +4,7 @@ const Types = Schema.Types;
 
 const schema = new Schema({
     username: { type: Types.String, required: true },
+    guildId: { type: Types.ObjectId, default: null },
     email: { type: Types.String, required: true },
     emailEnabled: { type: Types.Boolean, default: true },
     password: { type: Types.String, required: true },
