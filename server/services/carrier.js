@@ -258,6 +258,10 @@ module.exports = class CarrierService {
             throw new ValidationError('Name was not passed');
         }
 
+        if (name.length > 30) {
+            throw new ValidationError('Name was too long')
+        }
+
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }
