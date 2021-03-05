@@ -123,7 +123,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/rename', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.post('/api/game/:gameId/carrier/:carrierId/rename', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.carrierService.renameCarrier(
                 req.game,
