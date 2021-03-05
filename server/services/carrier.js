@@ -250,6 +250,14 @@ module.exports = class CarrierService {
     async rename(game, player, carrierId, name) {
         let carrier = this.getById(game, carrierId);
 
+        if (!carrier) {
+            throw new ValidationError('Carrier does not exist');
+        }
+
+        if (!name) {
+            throw new ValidationError('Name was not passed');
+        }
+
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }

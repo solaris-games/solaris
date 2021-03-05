@@ -129,7 +129,7 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.player,
                 req.params.carrierId,
-                 req.query.name);
+                req.body.name);
 
             return res.sendStatus(200);
         } catch (err) {
