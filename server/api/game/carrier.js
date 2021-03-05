@@ -125,7 +125,7 @@ module.exports = (router, io, container) => {
 
     router.post('/api/game/:gameId/carrier/:carrierId/rename', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.carrierService.renameCarrier(
+            await container.carrierService.rename(
                 req.game,
                 req.player,
                 req.params.carrierId,

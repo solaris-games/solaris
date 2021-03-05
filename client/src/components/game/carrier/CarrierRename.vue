@@ -1,12 +1,12 @@
 <template>
 <div class="menu-page container" v-if="carrierId">
-  <menu-title :title="originalName" @onCloseRequested="onCloseRequested" />
+  <menu-title :title="originalName" @onCloseRequested="onCloseRequested" :disabled="isSaving" />
   <div class="row bg-secondary pl-2 pt-2 pb-2">
     <strong>Name:</strong>
     <input class="ml-2 mr-2 auto-width" v-model="currentName" type="text" />
   </div>
   <div class="row pt-2 pb-2">
-    <button class="btn btn-sm btn-success ml-1" @click="doRename">
+    <button class="btn btn-sm btn-success ml-1" @click="doRename" :disabled="isSaving">
       <i class="fas fa-save"></i>
       <span class="ml-1 d-none d-sm-inline-block">Save</span>
     </button>
@@ -16,10 +16,11 @@
 
 <script>
 import MenuTitle from '../MenuTitle'
+import CarrierApiService from '../../../services/api/carrier'
 
 export default {
   components: {
-    'menu-title': MenuTitle,
+    'menu-title': MenuTitle
   },
   props: {
     carrierId: String,
@@ -27,6 +28,7 @@ export default {
   },
   data () {
     return {
+      isSaving: false,
       currentName: this.originalName
     }
   },
@@ -34,8 +36,15 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    doRename (e) {
-
+    async doRename (e) {
+      this.isSaving = true
+      try {
+        await CarrierApiService.renameCarrier(this.$store.state.game._id, this.carrierId, this.currentName)
+        this.onCloseRequested(e)
+      } catch (err) {
+        console.error(err)
+      }
+      this.isSaving = false
     }
   }
 }
