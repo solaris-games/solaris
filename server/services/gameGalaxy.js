@@ -4,7 +4,8 @@ module.exports = class GameGalaxyService {
 
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
-        waypointService, researchService, specialistService, technologyService) {
+        waypointService, researchService, specialistService, technologyService, reputationService,
+        guildUserService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -18,6 +19,8 @@ module.exports = class GameGalaxyService {
         this.researchService = researchService;
         this.specialistService = specialistService;
         this.technologyService = technologyService;
+        this.reputationService = reputationService;
+        this.guildUserService = guildUserService;
     }
 
     async getGalaxy(game, userId) {
@@ -40,13 +43,13 @@ module.exports = class GameGalaxyService {
             this._clearPlayerCarriers(game);
 
             // We still need to filter the player data so that it's basic info.
-            this._setPlayerInfoBasic(game, null);
+            await this._setPlayerInfoBasic(game, null);
         } else {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
             this._setCarrierInfoDetailed(game, player);
             this._setStarInfoDetailed(game, player);
-            this._setPlayerInfoBasic(game, player);
+            await this._setPlayerInfoBasic(game, player);
         }
         
         return game;
@@ -201,7 +204,15 @@ module.exports = class GameGalaxyService {
             });
     }
 
-    _setPlayerInfoBasic(doc, player) {
+    async _setPlayerInfoBasic(doc, player) {
+        // Get the list of all guilds associated to players, we'll need this later.
+        let guildUsers = [];
+
+        if (doc.settings.general.anonymity === 'normal') {
+            let userIds = doc.galaxy.players.filter(x => x.userId).map(x => x.userId);
+            guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds)
+        }
+
         // Calculate which players are in scanning range.
         let playersInRange = [];
         
@@ -214,6 +225,21 @@ module.exports = class GameGalaxyService {
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
+            // Append the guild tag to the player alias.
+            let playerGuild = null;
+
+            if (p.userId) {
+                let guildUser = guildUsers.find(u => u._id.toString() === p.userId.toString());
+
+                if (guildUser) {
+                    playerGuild = guildUser.guild;
+    
+                    if (playerGuild) {
+                        p.alias += `[${playerGuild.tag}]`;
+                    }
+                }
+            }
+
             let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
 
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
@@ -247,6 +273,12 @@ module.exports = class GameGalaxyService {
                 
                 p.isOnline = (player && p._id == player._id) 
                     || onlinePlayers.find(op => op._id.equals(p._id)) != null;
+            }
+
+            let reputation = null;
+
+            if (player) {
+                reputation = this.reputationService.getReputation(doc, p, player);
             }
 
             // Return a subset of the user, key info only.
@@ -293,8 +325,10 @@ module.exports = class GameGalaxyService {
                 avatar: p.avatar,
                 homeStarId: p.homeStarId,
                 stats: p.stats,
+                reputation,
                 lastSeen: p.lastSeen,
-                isOnline: p.isOnline
+                isOnline: p.isOnline,
+                guild: playerGuild
             };
         });
     }

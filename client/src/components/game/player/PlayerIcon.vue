@@ -1,14 +1,15 @@
 <template>
-  <!-- Note: We can't use Font Awesome because diamond and hexagon are premium icons -->
-  <span v-if="player" class="span-container" :style="{'color': iconColour}" :title="onlineStatus">
-    {{glyph}}
+  <span v-if="player" class="span-container" :title="onlineStatus">
+    <player-icon-shape :filled="iconFilled" :iconColour="iconColour" :shape="player.shape" />
   </span>
 </template>
 <script>
 import GameHelper from '../../../services/gameHelper'
 import moment from 'moment'
+import PlayerIconShape from './PlayerIconShape.vue'
 
 export default {
+  components: { PlayerIconShape },
   props: {
     playerId: String,
     hideOnlineStatus: Boolean,
@@ -19,6 +20,7 @@ export default {
     return {
       player: null,
       onlineStatus: '',
+      isOnline: false,
       iconColour: '',
       intervalFunction: null
     }
@@ -41,29 +43,22 @@ export default {
     recalculateOnlineStatus () {
       if (this.player.isOnline == null) {
         this.onlineStatus = ''
+        this.isOnline = false;
       }
       else if (this.player.isOnline) {
         this.onlineStatus = 'Online Now'
+        this.isOnline = true;
       }
       else {
         this.onlineStatus = moment(this.player.lastSeen).utc().fromNow()
+        this.isOnline = false;
       }
     }
   },
   computed: {
-    glyph () {
-      let unknownStatus = this.player.isOnline == null
-
-      switch (this.player.shape) {
-          case 'circle': 
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '●' : '○'
-          case 'square':
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '■' : '□'
-          case 'diamond':
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '♦' : '◇'
-          case 'hexagon':
-            return unknownStatus || this.solidGlyphOnly || this.player.isOnline ? '⬢' : '⬡'
-        }
+    iconFilled () {
+      const unknownStatus = this.player.isOnline == null;
+      return unknownStatus || this.isOnline || this.solidGlyphOnly;
     }
   }
 }
@@ -72,8 +67,18 @@ export default {
 <style scoped>
 .span-container {
   display: inline-block;
-  font-size: 25px;
+  height: 18px;
+  width: 18px;
   margin-top: -12px;
   margin-right: -6px;
+}
+
+@media screen and (max-width: 576px) { 
+  .span-container {
+    height: 10px;
+    width: 10px;
+    margin-top: -12px;
+    margin-right: -6px;
+  }
 }
 </style>

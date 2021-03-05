@@ -8,10 +8,15 @@ module.exports = (container) => {
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
 
-                try {
-                    await container.gameTickService.tick(game._id);
-                } catch (e) {
-                    console.error(e);
+                if (container.gameTickService.canTick(game)) {
+                    try {
+                        await container.gameService.lock(game._id, true);
+                        await container.gameTickService.tick(game._id);
+                    } catch (e) {
+                        console.error(e);
+                    } finally {
+                        await container.gameService.lock(game._id, false);
+                    }
                 }
             }
 

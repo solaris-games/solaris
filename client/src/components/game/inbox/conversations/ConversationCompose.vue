@@ -1,7 +1,7 @@
 <template>
 <form class="pb-1">
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." v-model="message"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." :value="this.conversationMessage" @input="onMessageChange"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -23,26 +23,29 @@ export default {
     
   },
   props: {
-    conversationId: String
+    conversationId: String,
+    conversationMessage: String
   },
   data () {
     return {
-      message: '',
       isSendingMessage: false
     }
   },
   methods: {
+    onMessageChange (e) {
+      this.$emit('onMessageChange', e.target.value)
+    },
     async send () {
-      this.message = this.message.trim()
+      const message = this.conversationMessage.trim()
 
-      if (this.message === '') {
+      if (message === '') {
         return
       }
 
       try {
         this.isSendingMessage = true
 
-        let response = await ConversationApiService.send(this.$store.state.game._id, this.conversationId, this.message)
+        let response = await ConversationApiService.send(this.$store.state.game._id, this.conversationId, message)
 
         if (response.status === 200) {
           AudioService.type()
@@ -52,13 +55,13 @@ export default {
           this.$emit('onConversationMessageSent', {
             conversationId: this.conversationId,
             fromPlayerId: userPlayerId,
-            message: this.message,
+            message: message,
             sentDate: moment().utc(),
             readBy: [userPlayerId],
             type: 'message'
           })
 
-          this.message = ''
+          this.$emit('onMessageChange', '')
         }
       } catch (e) {
         console.error(e)

@@ -13,7 +13,11 @@ module.exports = class TechnologyService {
     }
 
     isTechnologyEnabled(game, techKey) {
-        return game.settings.technology.researchCosts[techKey] !== 'none';
+        return game.settings.technology.startingTechnologyLevel[techKey] > 0;
+    }
+
+    isTechnologyResearchable(game, technologyKey) {
+      return game.settings.technology.researchCosts[technologyKey] !== 'none'
     }
 
     _applyTechModifiers(techs, modifiers, sanitize = true) {

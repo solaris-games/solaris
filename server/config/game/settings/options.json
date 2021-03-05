@@ -185,6 +185,36 @@
             "value": "random",
             "text": "Random"
             }
+        ],
+        "carrierSpeed": [
+            {
+            "value": 1,
+            "text": "Crazy Slow"
+            },
+            {
+            "value": 2.5,
+            "text": "Very Slow"
+            },
+            {
+            "value": 5,
+            "text": "Slow"
+            },
+            {
+            "value": 10,
+            "text": "Standard"
+            },
+            {
+            "value": 15,
+            "text": "Fast"
+            },
+            {
+            "value": 20,
+            "text": "Very Fast"
+            },
+            {
+            "value": 25,
+            "text": "Crazy Fast"
+            }
         ]
         },
         "galaxy": {
@@ -328,6 +358,10 @@
             {
             "value": 50,
             "text": "Very Expensive"
+            },
+            {
+            "value": 100,
+            "text": "Crazy Expensive"
             }
         ],
         "tradeScanning": [
@@ -343,6 +377,25 @@
         },
         "technology": {
         "startingTechnologyLevel": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+        ],
+        "startingTechnologyLevelWithDisabled": [
+            0,
             1,
             2,
             3,
@@ -399,6 +452,14 @@
             }
         ],
         "speed": [
+            {
+                "value": 1,
+                "text": "Crazy Fast (1 tick = 1 minute)"
+            },
+            {
+                "value": 5,
+                "text": "Very Fast (1 tick = 5 minutes)"
+            },
             {
                 "value": 10,
                 "text": "Fast (1 tick = 10 minutes)"
@@ -488,6 +549,28 @@
             {
                 "value": 48,
                 "text": "48 Hours"
+            }
+        ],
+        "missedTurnLimit": [
+            {
+                "value": 1,
+                "text": "1 Missed Turn"
+            },
+            {
+                "value": 2,
+                "text": "2 Missed Turns"
+            },
+            {
+                "value": 3,
+                "text": "3 Missed Turns"
+            },
+            {
+                "value": 4,
+                "text": "4 Missed Turns"
+            },
+            {
+                "value": 5,
+                "text": "5 Missed Turns"
             }
         ]
     }

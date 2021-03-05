@@ -95,13 +95,34 @@ class GameHelper {
   getClosestStar (stars, point) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
-    for( let star of stars ) {
+
+    for(let star of stars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
-      if( distance<smallerDistance ) {
+
+      if (distance < smallerDistance) {
         smallerDistance = distance
         closestStar = star
       }
     }
+
+    return closestStar
+  }
+  
+  getClosestPlayerStar (stars, point, player) {
+    let closestStar = stars[0]
+    let smallerDistance = Number.MAX_VALUE
+
+    let playerStars = this.getStarsOwnedByPlayer(player, stars)
+
+    for(let star of playerStars) {
+      let distance = this.getDistanceBetweenLocations(star.location, point)
+      
+      if (distance < smallerDistance ) {
+        smallerDistance = distance
+        closestStar = star
+      }
+    }
+
     return closestStar
   }
 
@@ -118,7 +139,7 @@ class GameHelper {
 
   getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
     let totalTicks = 0
-    let tickDistance = game.constants.distances.shipSpeed * tickDistanceModifier
+    let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
     // TODO: Global speed modifiers.
@@ -271,6 +292,9 @@ class GameHelper {
     if (carrier.waypoints.length < 2) {
       return false
     }
+    
+    // TODO: Calculate effective techs for the carrier. Need to find a way to share this
+    // logic with the server.
 
     // Check whether the last waypoint is in range of the first waypoint.
     let firstWaypoint = carrier.waypoints[0]
@@ -511,10 +535,9 @@ class GameHelper {
     let centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
     let centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
 
-    return {
-      x: centerX,
-      y: centerY
-    }
+    let closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
+
+    return closestStar.location
   }
 
   getGamePlayerShapesCount (game) {

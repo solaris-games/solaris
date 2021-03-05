@@ -20,6 +20,7 @@
           <option key="totalSpecialists" value="totalSpecialists">Total Specialists</option>
           <option key="totalStarSpecialists" value="totalStarSpecialists">Total Specialists (Stars)</option>
           <option key="totalCarrierSpecialists" value="totalCarrierSpecialists">Total Specialists (Carriers)</option>
+          <option key="newShips" value="newShips">New Ships</option>
           <option key="warpgates" value="warpgates">Warpgates</option>
           <option key="weapons" value="weapons">Weapons</option>
           <option key="banking" value="banking">Banking</option>
@@ -137,7 +138,7 @@ export default {
       let isCurrentPlayer = this.userPlayer._id === p._id
 
       return {
-        enabled: true,
+        enabled: !p.defeated, // Default to Active filter
         playerId: p._id,
         alias: p.alias,
         shape: p.shape,

@@ -36,7 +36,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/hire/:specialistId', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/hire/:specialistId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -44,7 +44,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            let result = await container.specialistService.hireCarrierSpecialist(
+            let result = await container.specialistHireService.hireCarrierSpecialist(
                 req.game,
                 req.player,
                 req.params.carrierId,
@@ -63,13 +63,15 @@ module.exports = (router, io, container) => {
 
             playersWithinScanningRange.forEach(p => container.broadcastService.gameCarrierSpecialistHired(req.game, p._id, result.carrier, result.specialist));
 
-            return res.sendStatus(200);
+            return res.status(200).json({
+                waypoints: result.waypoints
+            });
         } catch (err) {
             return next(err);
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/star/:starId/hire/:specialistId', middleware.authenticate, middleware.loadGame, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/star/:starId/hire/:specialistId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -77,7 +79,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            let result = await container.specialistService.hireStarSpecialist(
+            let result = await container.specialistHireService.hireStarSpecialist(
                 req.game,
                 req.player,
                 req.params.starId,

@@ -1,11 +1,11 @@
 <template>
 <div class="row pt-2">
     <div class="col">
-        <h3>{{ title }}</h3>
+        <h4>{{ title }}</h4>
     </div>
     <div class="col-auto">
         <slot></slot>
-        <button @click="close" class="btn btn-danger ml-1"><i class="fas fa-times"></i></button>
+        <button @click="close" class="btn btn-danger btn-sm ml-1"><i class="fas fa-times"></i></button>
     </div>
 </div>
 </template>

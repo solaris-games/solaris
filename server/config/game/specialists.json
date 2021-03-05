@@ -136,7 +136,7 @@
             "modifiers": {
                 "local": {
                     "speed": 2,
-                    "weapons": -1
+                    "weapons": -2
                 },
                 "special": {
                     "starCaptureRewardMultiplier": 2
@@ -223,7 +223,7 @@
             "id": 4,
             "name": "Orbital Cannon",
             "description": "Grants +2 Weapons, -1 Scanning, -1 Terraforming to the Star.",
-            "tier": 2,
+            "tier": 3,
             "modifiers": {
                 "local": {
                     "weapons": 2,
@@ -304,9 +304,14 @@
         {
             "id": 10,
             "name": "Trade Port",
-            "description": "The Star's Economy infrastructure contributes x2 to economy production.",
-            "tier": 4,
+            "description": "The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning.",
+            "tier": 5,
             "modifiers": {
+                "local": {
+                    "terraforming": -5,
+                    "weapons": -3,
+                    "scanning": 1
+                },
                 "special": {
                     "economyInfrastructureMultiplier": 2
                 }
@@ -315,9 +320,14 @@
         {
             "id": 11,
             "name": "Research Station",
-            "description": "The Star's Science infrastructure contributes x2 to research.",
+            "description": "The Star's Science infrastructure contributes x2 to research. -3 Terraforming, -3 Weapons, +1 Scanning.",
             "tier": 4,
             "modifiers": {
+                "local": {
+                    "terraforming": -3,
+                    "weapons": -3,
+                    "scanning": 1
+                },
                 "special": {
                     "scienceInfrastructureMultiplier": 2
                 }

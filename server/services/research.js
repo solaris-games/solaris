@@ -17,7 +17,8 @@ module.exports = class ResearchService extends EventEmitter {
     async updateResearchNow(game, player, preference) {
         preference = preference.toLowerCase().trim();
 
-        if (!this.technologyService.isTechnologyEnabled(game, preference)) {
+        if (!this.technologyService.isTechnologyEnabled(game, preference)
+            || !this.technologyService.isTechnologyResearchable(game, preference)) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -42,7 +43,9 @@ module.exports = class ResearchService extends EventEmitter {
     async updateResearchNext(game, player, preference) {
         preference = preference.toLowerCase().trim();
 
-        if (preference !== 'random' && !this.technologyService.isTechnologyEnabled(game, preference)) {
+        if (preference !== 'random' &&
+            (!this.technologyService.isTechnologyEnabled(game, preference) ||
+            !this.technologyService.isTechnologyResearchable(game, preference))) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -61,11 +64,6 @@ module.exports = class ResearchService extends EventEmitter {
     }
 
     async conductResearch(game, user, player) {
-        // TODO: Defeated players do not conduct research or experiments?
-        if (player.defeated) {
-            return;
-        }
-        
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
@@ -75,7 +73,8 @@ module.exports = class ResearchService extends EventEmitter {
             
         tech.progress += totalScience;
 
-        if (user) {
+        // If the player isn't being controlled by AI then increment achievements.
+        if (user && !player.defeated) {
             user.achievements.research[techKey] += totalScience;
         }
 
@@ -119,11 +118,6 @@ module.exports = class ResearchService extends EventEmitter {
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
 
-            // TODO: Defeated players do not conduct research or experiments?
-            if (player.defeated) {
-                continue;
-            }
-            
             let user = gameUsers.find(u => u._id.equals(player.userId));
             
             await this.conductResearch(game, user, player);
@@ -140,10 +134,18 @@ module.exports = class ResearchService extends EventEmitter {
 
     conductExperiments(game, player) {
         // NOTE: Experiments do not count towards player research achievements.
+        // Check if experimentation is enabled.
+        let isExperimentationEnabled = this.technologyService.isTechnologyEnabled(game, 'experimentation');
+        
+        // NOTE: Players must own stars in order to have experiments.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        // TODO: Defeated players do not conduct research or experiments?
-        if (player.defeated) {
-            return;
+        if (!isExperimentationEnabled || !playerStars.length) {
+            return {
+                technology: null,
+                level: null,
+                amount: null
+            };
         }
 
         let tech = this._getRandomTechnology(game, player);
@@ -176,18 +178,10 @@ module.exports = class ResearchService extends EventEmitter {
             this._setNextResearch(game, player);
         }
 
-        // The current research may have been the one experimented on, so make sure we get the ETA of it.
-        let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
-
         return {
             technology: tech.key,
             level: tech.technology.level,
-            // TODO: Return effective tech level
-            progress: tech.technology.progress,
-            amount: researchAmount,
-            levelUp,
-            currentResearchTicksEta,
-            currentResearchTechnology: player.researchingNow
+            amount: researchAmount
         };
     }
 
@@ -212,7 +206,8 @@ module.exports = class ResearchService extends EventEmitter {
             return k.match(/^[^_\$]/) != null;
         });
 
-        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t));
+        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t)
+                                && this.technologyService.isTechnologyResearchable(game, t));
 
         if (!techs.length) {
             return null;

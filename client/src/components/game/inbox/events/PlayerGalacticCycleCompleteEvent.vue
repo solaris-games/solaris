@@ -4,7 +4,7 @@
     A galactic cycle is complete. You have received <span class="text-success">${{event.data.creditsEconomy}}</span> from your
     economic infrastructure and <span class="text-success">${{event.data.creditsBanking}}</span> from your banking technology.
   </p>
-  <p>
+  <p v-if="event.data.experimentTechnology">
     Your experimental scientists have stumbled across a new discovery which has unlocked
     <span class="text-warning">{{event.data.experimentAmount}} points</span> of research in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>.
   </p>

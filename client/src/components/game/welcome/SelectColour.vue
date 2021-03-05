@@ -72,6 +72,7 @@ export default {
 
       player.isEmptySlot = false
       player.alias = data.alias
+      player.avatar = data.avatar
     })
 
     this.sockets.subscribe('gamePlayerQuit', (data) => {
@@ -79,6 +80,7 @@ export default {
 
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
+      player.avatar = null
     })
   },
   destroyed () {
@@ -115,5 +117,20 @@ table tr {
 .table th.fit {
     white-space: nowrap;
     width: 1%;
+}
+
+@media screen and (max-width: 576px) {
+  table tr {
+    height: 45px;
+  }
+
+  .alias-title {
+    padding-left: 45px;
+  }
+
+  .col-avatar {
+    width: 45px;
+    padding-top: 0.25rem !important;
+  }
 }
 </style>

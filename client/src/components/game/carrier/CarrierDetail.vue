@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button @click="viewOnMap" class="btn btn-info"><i class="fas fa-eye"></i></button>
+      <button @click="viewOnMap" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <div class="row bg-secondary">
@@ -35,14 +35,14 @@
       <div class="row pb-2">
         <div class="col">
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
-            <i class="fas fa-user-astronaut mr-1"></i>
+            <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
             <a href="javascript:;" @click="onViewHireCarrierSpecialistRequested">
-              <span class="ml-2" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
-              <span class="ml-2" v-if="!carrier.specialistId">No Specialist</span>
+              <span class="ml-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
+              <span v-if="!carrier.specialistId">No Specialist</span>
             </a>
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
-            <i class="fas fa-user-astronaut"></i>
+            <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
             <span v-if="carrier.specialist">
               {{carrier.specialist.name}}
             </span>
@@ -108,11 +108,13 @@
 
     <div>
       <div v-if="carrier.orbiting && isStandardUIStyle" class="row bg-secondary pt-2 pb-0 mb-0">
-        <div class="col-7">
+        <div class="col">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
-        <div class="col-5">
-          <button class="btn btn-block btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">Ship Transfer</button>
+        <div class="col-auto">
+          <button class="btn btn-sm btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
+            <i class="fas fa-exchange-alt"></i> Ship Transfer
+          </button>
         </div>
       </div>
 
@@ -148,7 +150,7 @@
           <!-- <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p> -->
         </div>
         <div class="col-auto">
-          <button class="btn btn-success" @click="editWaypoints()">
+          <button class="btn btn-sm btn-success" @click="editWaypoints()">
             Edit Waypoints
             <i class="fas fa-pencil-alt"></i>
           </button>
@@ -178,13 +180,15 @@ import GameContainer from '../../../game/container'
 import WaypointTable from './WaypointTable'
 import CarrierSpecialistVue from './CarrierSpecialist'
 import GiftCarrierVue from './GiftCarrier'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'waypointTable': WaypointTable,
     'carrier-specialist': CarrierSpecialistVue,
-    'gift-carrier': GiftCarrierVue
+    'gift-carrier': GiftCarrierVue,
+    'specialist-icon': SpecialistIconVue
   },
   props: {
     carrierId: String

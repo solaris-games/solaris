@@ -53,10 +53,15 @@ module.exports = class PlayerService extends EventEmitter {
 
             let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
 
-            let isInRange = playerStars.find(s => {
-                return this.starService.isStarInScanningRangeOfPlayer(game, s, player);       
-            });
+            let isInRange = false;
 
+            for (let s of playerStars) {
+                if (this.starService.isStarInScanningRangeOfPlayer(game, s, player)) {
+                    isInRange = true;
+                    break;
+                }
+            }
+            
             if (isInRange) {
                 inRange.push(p);
             }
@@ -66,7 +71,6 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
-        // TODO: Make this more efficient.
         return this.getPlayersWithinScanningRangeOfPlayer(game, sourcePlayer)
             .find(p => p._id.equals(targetPlayer._id)) != null;
     }
@@ -459,13 +463,17 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
+        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
+
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.calculateTotalEconomy(playerStars);
 
+        let bankingMultiplier = isBankingEnabled ? effectiveTechs.banking : 0;
+
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = effectiveTechs.banking * 75;
+        let creditsFromBanking = playerStars.length ? bankingMultiplier * 75 : 0; // Players must have stars in order to get credits from banking.
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
@@ -512,6 +520,27 @@ module.exports = class PlayerService extends EventEmitter {
                 'galaxy.players.$.notes': notes
             }
         });
+    }
+
+    setPlayerAsDefeated(game, player) {
+        player.defeated = true;
+        player.researchingNext = 'random'; // Set up the AI for random research.
+
+        // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        for (let star of playerStars) {
+            star.ignoreBulkUpgrade = false;
+        }
+
+        // Clear out any carriers that have looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
+    }
+
+    setPlayerAsAfk(game, player) {
+        this.setPlayerAsDefeated(game, player);
+
+        player.afk = true;
     }
 
 }

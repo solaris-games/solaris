@@ -95,8 +95,7 @@ export default {
 }
 
 .player-icons {
-  margin-top: 3px;
-  margin-bottom: -3px;
+  margin-top: -2px;
 }
 
 .truncate {

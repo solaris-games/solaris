@@ -37,6 +37,7 @@ const schema = new Schema({
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
+			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
@@ -52,17 +53,17 @@ const schema = new Schema({
 				industry: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
 				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
 			},
-			tradeCost: { type: Types.Number, required: true, enum: [5, 15, 25, 50], default: 15 },
+			tradeCost: { type: Types.Number, required: true, enum: [5, 15, 25, 50, 100], default: 15 },
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
         },
         technology: {
 			startingTechnologyLevel: {
 				terraforming: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				experimentation: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
+				experimentation: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				scanning: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				hyperspace: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				manufacturing: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				banking: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
+				banking: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
 			},
 			researchCosts: {
@@ -77,10 +78,11 @@ const schema = new Schema({
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			speed: { type: Types.Number, required: true, enum: [10, 30, 60], default: 30 },
+			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 30 },
 			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 }
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 },
+			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5], default: 3 }
 		}
     },
     galaxy: {
@@ -90,6 +92,7 @@ const schema = new Schema({
 	},
 	conversations: [conversationSchema],
 	state: {
+		locked: { type: Types.Boolean, required: false, default: false },
 		tick: { type: Types.Number, required: true, default: 0 },
 		paused: { type: Types.Boolean, required: true, default: true },
 		productionTick: { type: Types.Number, required: true, default: 0 },
@@ -106,7 +109,6 @@ const schema = new Schema({
 			lightYear: { type: Types.Number, required: true, default: 50 },
 			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
 			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
-			shipSpeed: { type: Types.Number, required: true, default: 5 },
 			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 }
 		},
 		research: {
@@ -131,9 +133,6 @@ const schema = new Schema({
 				veryExpensive: { type: Types.Number, required: true, default: 8 },
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
 			}
-		},
-		turnBased: {
-			playerMissedTurnLimit: { type: Types.Number, required: true, default: 3 },
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }]

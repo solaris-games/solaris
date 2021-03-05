@@ -1,9 +1,10 @@
 module.exports = class LeaderboardService {
 
-    constructor(userModel, userService, playerService) {
+    constructor(userModel, userService, playerService, guildUserService) {
         this.userModel = userModel;
         this.userService = userService;
         this.playerService = playerService;
+        this.guildUserService = guildUserService;
     }
 
     async getLeaderboard(limit) {
@@ -16,6 +17,7 @@ module.exports = class LeaderboardService {
         })
         .select({
             username: 1,
+            guildId: 1,
             roles: 1,
             'achievements.victories': 1,
             'achievements.rank': 1,
@@ -24,8 +26,15 @@ module.exports = class LeaderboardService {
         .lean({ defaults: true })
         .exec();
 
+        let userIds = leaderboard.map(x => x._id);
+        let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
+
         for (let i = 0; i < leaderboard.length; i++) {
-            leaderboard[i].position = i + 1;
+            let user = leaderboard[i];
+
+            user.position = i + 1;
+
+            user.guild = guildUsers.find(x => x._id.equals(user._id)).guild;
         }
 
         let totalPlayers = await this.userModel.countDocuments();
@@ -95,22 +104,18 @@ module.exports = class LeaderboardService {
         
             let isOfficialGame = game.settings.general.createdByUserId == null;
 
-            if (i == 0) {
-                user.achievements.victories++; // Increase the winner's victory count
-
-                // Give the winner a galactic credit for official games.
-                if (isOfficialGame) {
-                    user.credits++;
+            if (isOfficialGame) {
+                if (i == 0) {
+                    user.achievements.victories++; // Increase the winner's victory count
+                    user.credits++; // Give the winner a galactic credit.
                     user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
-                }
-            } else {
-                if (isOfficialGame) {
+                } else {
                     user.achievements.rank += leaderboard.length / 2 - i;
                     user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
                 }
-            }
 
-            user.achievements.rank = Math.round(user.achievements.rank);
+                user.achievements.rank = Math.round(user.achievements.rank);    
+            }
 
             // If the player hasn't been defeated then add completed stats.
             if (!player.defeated) {

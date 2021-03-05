@@ -52,7 +52,8 @@ const game = {
             galaxyType: 'circular'
         },
         specialGalaxy: {
-            playerDistribution: 'circular'
+            playerDistribution: 'circular',
+            carrierSpeed: 5
         }
     },
     constants: {

@@ -2,14 +2,14 @@
 <div class="menu-page container">
     <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested">
-      <span class="mr-2" v-if="user">
+      <span class="mr-2" v-if="user && user.roles">
         <i class="fas fa-hands-helping" v-if="user.roles.contributor" title="This player is a contributor"></i>
         <i class="fas fa-code ml-1" v-if="user.roles.developer" title="This player is a developer"></i>
         <i class="fas fa-user-friends ml-1" v-if="user.roles.communityManager" title="This player is a community manager"></i>
       </span>
-      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-info"><i class="fas fa-chevron-left"></i></button>
-      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
-      <button @click="panToPlayer" class="btn btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-sm btn-info"><i class="fas fa-chevron-left"></i></button>
+      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-sm btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
+      <button @click="panToPlayer" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <overview v-if="player" :playerId="player._id"
@@ -36,6 +36,7 @@
       <h4 class="mt-2">Trade</h4>
 
       <div v-if="canTradeWithPlayer">
+        <reputation v-if="player.defeated" :playerId="player._id"/>
         <sendTechnology v-if="player" :playerId="player._id"/>
         <sendCredits :player="player" :userPlayer="userPlayer"/>
       </div>
@@ -74,6 +75,7 @@ import SendCredits from './SendCredits'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import Badges from './Badges'
+import Reputation from './Reputation'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
@@ -90,7 +92,8 @@ export default {
     'sendCredits': SendCredits,
     'achievements': Achievements,
     'sendRenown': SendRenown,
-    'badges': Badges
+    'badges': Badges,
+    'reputation': Reputation
   },
   props: {
     playerId: String

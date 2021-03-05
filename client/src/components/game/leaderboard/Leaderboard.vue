@@ -35,8 +35,8 @@
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
                   <tr v-for="player in sortedPlayers" :key="player._id">
                       <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                      <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape" @click="onOpenPlayerDetailRequested(player)">
-                          <player-avatar :player="player"/>
+                      <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
+                          <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
                       </td>
                       <td class="pl-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
@@ -48,7 +48,7 @@
                       <td class="fit pt-3 pr-2">
                           <span>{{player.stats.totalStars}} Stars</span>
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame()">
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
                         <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
@@ -65,13 +65,13 @@
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
       <div class="col">
-        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
+        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
       </div>
         <div class="col text-right pr-2">
-            <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-danger">
+            <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-sm btn-danger">
               <i class="fas fa-sign-out-alt"></i> Quit Game
             </modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-danger">
+            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
               <i class="fas fa-skull-crossbones"></i> Concede Defeat
             </modalButton>
         </div>
@@ -146,9 +146,6 @@ export default {
     },
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
-    },
-    isTurnBasedGame () {
-      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     },
     isUserPlayer (player) {
       let userPlayer = this.getUserPlayer()
@@ -249,6 +246,7 @@ export default {
 
       player.isEmptySlot = false
       player.alias = data.alias
+      player.avatar = data.avatar
     })
 
     this.sockets.subscribe('gamePlayerQuit', (data) => {
@@ -256,6 +254,7 @@ export default {
 
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
+      player.avatar = null
     })
 
     this.sockets.subscribe('gamePlayerReady', (data) => {
@@ -283,6 +282,9 @@ export default {
     },
     sortedPlayers () {
       return GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
+    },
+    isTurnBasedGame () {
+      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     }
   }
 }
@@ -315,5 +317,20 @@ table tr {
 
 .fa-check {
   cursor: pointer;
+}
+
+@media screen and (max-width: 576px) {
+  table tr {
+    height: 45px;
+  }
+
+  .alias-title {
+    padding-left: 45px;
+  }
+
+  .col-avatar {
+    width: 45px;
+    padding-top: 0.25rem !important;
+  }
 }
 </style>

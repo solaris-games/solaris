@@ -4,8 +4,8 @@
 
   <div class="container" v-if="conversation">
     <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
-      <button class="btn btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
+      <button class="btn btn-sm btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
     <conversation-participants :conversation="conversation"/>
@@ -21,7 +21,7 @@
         <p class="mb-0 text-center">No messages.</p>
     </div>
 
-    <compose-conversation-message :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent"/>
+    <compose-conversation-message :conversationId="conversationId" :conversationMessage="currentConversationMessage" @onConversationMessageSent="onConversationMessageSent" @onMessageChange="onMessageChange"/>
   </div>
 </div>
 </template>
@@ -46,12 +46,13 @@ export default {
     'conversation-trade-event': ConversationTradeEventVue
   },
   props: {
-    conversationId: String
+    conversationId: String,
   },
   data () {
     return {
       conversation: null,
-      userPlayer: null
+      userPlayer: null,
+      currentConversationMessage: null
     }
   },
   created () {
@@ -72,17 +73,30 @@ export default {
   },
   async mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)._id
+    this.currentConversationMessage = this.$store.getters.getConversationMessage(this.conversationId)
 
     await this.loadConversation()
   },
   methods: {
+    cacheComposedMessage () {
+      this.$store.commit('storeConversationMessage', {
+        conversationId: this.conversationId,
+        message: this.currentConversationMessage
+      })
+    },
+    onMessageChange (e) {
+      this.currentConversationMessage = e;
+    },
     onCloseRequested (e) {
+      this.cacheComposedMessage()
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
+      this.cacheComposedMessage()
       this.$emit('onOpenInboxRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
+      this.cacheComposedMessage()
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     onConversationMessageSent (e) {

@@ -102,6 +102,14 @@
               <td>Resource Distribution</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.resourceDistribution) }}</td>
             </tr>
+            <tr>
+              <td>Player Distribution</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.playerDistribution) }}</td>
+            </tr>
+            <tr>
+              <td>Carrier Speed</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierSpeed) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -245,6 +253,10 @@
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Max Turn Wait</td>
               <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
+              <td>Missed Turn Limit</td>
+              <td class="text-right">{{ game.settings.gameTime.missedTurnLimit }} missed turns</td>
             </tr>
           </tbody>
         </table>

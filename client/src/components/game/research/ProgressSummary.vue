@@ -4,47 +4,110 @@
       <div class="table-responsive mb-0">
         <table class="table table-sm mb-1" v-if="research">
             <tbody>
-                <tr>
+                <tr v-if="isTechnologyEnabled('scanning')">
                     <td class="row-icon"><i :class="getIcon('scanning')"></i></td>
                     <td>Scanning</td>
-                    <td>Level {{research.scanning.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('scanning')">{{research.scanning.progress}} of {{getRequiredTotal('scanning')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.scanning.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('scanning')">
+                      {{research.scanning.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('scanning')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('scanning')"></td>
                 </tr>
-                <tr>
+                <tr v-if="isTechnologyEnabled('hyperspace')">
                     <td class="row-icon"><i :class="getIcon('hyperspace')"></i></td>
                     <td>Hyperspace Range</td>
-                    <td>Level {{research.hyperspace.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('hyperspace')">{{research.hyperspace.progress}} of {{getRequiredTotal('hyperspace')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.hyperspace.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('hyperspace')">
+                      {{research.hyperspace.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('hyperspace')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('hyperspace')"></td>
                 </tr>
-                <tr>
+                <tr v-if="isTechnologyEnabled('terraforming')">
                     <td class="row-icon"><i :class="getIcon('terraforming')"></i></td>
                     <td>Terraforming</td>
-                    <td>Level {{research.terraforming.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('terraforming')">{{research.terraforming.progress}} of {{getRequiredTotal('terraforming')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.terraforming.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('terraforming')">
+                      {{research.terraforming.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('terraforming')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('terraforming')"></td>
                 </tr>
-                <tr>
+                <tr v-if="isTechnologyEnabled('experimentation')">
                     <td class="row-icon"><i :class="getIcon('experimentation')"></i></td>
                     <td>Experimentation</td>
-                    <td>Level {{research.experimentation.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('experimentation')">{{research.experimentation.progress}} of {{getRequiredTotal('experimentation')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.experimentation.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('experimentation')">
+                      {{research.experimentation.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('experimentation')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('experimentation')"></td>
                 </tr>
-                <tr>
+                <tr v-if="isTechnologyEnabled('weapons')">
                     <td class="row-icon"><i :class="getIcon('weapons')"></i></td>
                     <td>Weapons</td>
-                    <td>Level {{research.weapons.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('weapons')">{{research.weapons.progress}} of {{getRequiredTotal('weapons')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.weapons.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('weapons')">
+                      {{research.weapons.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('weapons')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('scanning')"></td>
                 </tr>
-                <tr>
+                <tr v-if="isTechnologyEnabled('banking')">
                     <td class="row-icon"><i :class="getIcon('banking')"></i></td>
                     <td>Banking</td>
-                    <td>Level {{research.banking.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('banking')">{{research.banking.progress}} of {{getRequiredTotal('banking')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.banking.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('banking')">
+                      {{research.banking.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('banking')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('banking')"></td>
                 </tr>
-                <tr>
+                <tr v-if="isTechnologyEnabled('manufacturing')">
                     <td class="row-icon"><i :class="getIcon('manufacturing')"></i></td>
                     <td>Manufacturing</td>
-                    <td>Level {{research.manufacturing.level}}</td>
-                    <td class="text-right"><span v-if="isTechnologyEnabled('manufacturing')">{{research.manufacturing.progress}} of {{getRequiredTotal('manufacturing')}}</span></td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.manufacturing.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('manufacturing')">
+                      {{research.manufacturing.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('manufacturing')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('manufacturing')"></td>
                 </tr>
             </tbody>
         </table>
@@ -79,6 +142,9 @@ export default {
     isTechnologyEnabled (technologyKey) {
       return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, technologyKey)
     },
+    isTechnologyResearchable (technologyKey) {
+      return TechnologyHelper.isTechnologyResearchable(this.$store.state.game, technologyKey)
+    },
     getIcon (technologyKey) {
       return 'fas fa-' + TechnologyHelper.getIcon(technologyKey)
     }
@@ -89,5 +155,21 @@ export default {
 <style scoped>
 .row-icon {
     width: 1%;
+}
+
+@media screen and (max-width: 576px) { 
+  .level-label {
+    display: none;
+  }
+
+  .of-label {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 577px) { 
+  .slash-label {
+    display: none;
+  }
 }
 </style>

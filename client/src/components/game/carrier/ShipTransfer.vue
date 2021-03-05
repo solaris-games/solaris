@@ -175,7 +175,9 @@ export default {
 
       this.isTransferringShips = false
     },
-    onOpenCarrierDetailRequested (e) {
+    async onOpenCarrierDetailRequested (e) {
+      await this.saveTransfer(e)
+      
       this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
     }
   },

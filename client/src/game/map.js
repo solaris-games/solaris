@@ -6,6 +6,7 @@ import Carrier from './carrier'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
+import PlayerNames from './playerNames'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 import AnimationService from './animation'
@@ -35,6 +36,7 @@ class Map extends EventEmitter {
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
+    this.playerNamesContainer = new PIXI.Container()
     this.highlightLocationsContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
@@ -43,6 +45,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
+    this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.highlightLocationsContainer)
   }
 
@@ -102,6 +105,14 @@ class Map extends EventEmitter {
 
     this.territoryContainer.addChild(this.territories.container)
     this.territories.draw(userSettings)
+
+    // -----------
+    // Setup Player Names
+    this.playerNames = new PlayerNames()
+    this.playerNames.setup(game)
+
+    this.playerNamesContainer.addChild(this.playerNames.container)
+    this.playerNames.draw()
 
     // -----------
     // Setup Background
@@ -238,6 +249,7 @@ class Map extends EventEmitter {
     }
 
     this.drawTerritories(userSettings)
+    this.drawPlayerNames()
 
     this.background.setup(game, userSettings)
     this.background.draw(game, userSettings)
@@ -307,7 +319,7 @@ class Map extends EventEmitter {
     star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
 
     this.starContainer.removeChild(star.container)
-    this.starContainer.removeChild(star.fixedcontainer)
+    this.starContainer.removeChild(star.fixedContainer)
 
     this.stars.splice(this.stars.indexOf(star), 1)
   }
@@ -331,7 +343,7 @@ class Map extends EventEmitter {
     carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
     this.carrierContainer.removeChild(carrier.container)
-    this.carrierContainer.removeChild(carrier.fixedcontainer)
+    this.carrierContainer.removeChild(carrier.fixedContainer)
 
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
   }
@@ -369,6 +381,11 @@ class Map extends EventEmitter {
   drawTerritories (userSettings) {
     this.territories.setup(this.game)
     this.territories.draw(userSettings)
+  }
+
+  drawPlayerNames () {
+    this.playerNames.setup(this.game)
+    this.playerNames.draw()
   }
 
   panToPlayer (game, player) {
@@ -634,6 +651,7 @@ class Map extends EventEmitter {
 
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
+      .sort((a, b) => b.type.localeCompare(a.type))
       .sort((a, b) => a.distance - b.distance)
 
     if (closeObjects.length > 1) {
@@ -652,6 +670,7 @@ class Map extends EventEmitter {
     this.carriers.forEach(c => c.refreshZoom(zoomPercent))
 
     if (this.territories) this.territories.refreshZoom(zoomPercent)
+    if (this.playerNames) this.playerNames.refreshZoom(zoomPercent)
     if (this.background) this.background.refreshZoom(zoomPercent)
   }
 

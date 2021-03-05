@@ -79,7 +79,7 @@
         @onShipTransferRequested="onShipTransferRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
-      <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested"/>
+      <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"
@@ -105,6 +105,10 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
   </div>
+
+  <footer-bar class="footer-bar d-xs-block d-sm-none" 
+    @onMenuStateChanged="onMenuStateChanged"
+    @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 </div>
 </template>
 
@@ -137,10 +141,12 @@ import GameNotesVue from '../notes/GameNotes.vue'
 import OptionsVue from './Options.vue'
 import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
+import FooterBarVue from './FooterBar.vue'
 
 export default {
   components: {
     'header-bar': HeaderBarVue,
+    'footer-bar': FooterBarVue,
     'welcome': WelcomeVue,
     'player-list': PlayerListVue,
     'leaderboard': LeaderboardVue,
@@ -248,6 +254,13 @@ export default {
 .header-bar {
   position:absolute;
   height: 45px;
+  z-index: 1;
+}
+
+.footer-bar {
+  position:absolute;
+  height: 52px;
+  bottom: 0px;
   z-index: 1;
 }
 

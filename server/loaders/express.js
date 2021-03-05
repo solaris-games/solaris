@@ -24,8 +24,8 @@ module.exports = async (app, io, container) => {
     // Use sessions for tracking logins
     app.use(session({
         secret: config.sessionSecret,
-        resave: true,
-        saveUninitialized: true,
+        resave: false,
+        saveUninitialized: false,
         cookie: { 
             secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
@@ -68,6 +68,7 @@ module.exports = async (app, io, container) => {
     const specialist = require('../api/game/specialist')(router, io, container);
     const auth = require('../api/auth')(router, io, container);
     const user = require('../api/user')(router, io, container);
+    const guild = require('../api/guild')(router, io, container);
 
     app.use(auth);
     app.use(user);
@@ -79,6 +80,7 @@ module.exports = async (app, io, container) => {
     app.use(conversation);
     app.use(ledger);
     app.use(specialist);
+    app.use(guild);
 
     return app;
 };

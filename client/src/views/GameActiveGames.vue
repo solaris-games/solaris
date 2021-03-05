@@ -53,12 +53,14 @@
         <thead>
             <tr class="bg-primary">
                 <td>Name</td>
+                <td class="d-none d-sm-table-cell text-right">Completed</td>
                 <td></td>
             </tr>
         </thead>
         <tbody>
             <tr v-for="game in completedGames" v-bind:key="game._id">
                 <td>{{game.settings.general.name}}</td>
+                <td class="d-none d-sm-table-cell text-right">{{getEndDateFromNow(game)}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
                 </td>
@@ -80,6 +82,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
+import moment from 'moment'
 
 export default {
   components: {
@@ -114,6 +117,13 @@ export default {
   methods: {
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(game)
+    },
+    getEndDateFromNow (game) {
+      if (!game.state.endDate) {
+        return 'In Progress'
+      }
+
+      return moment(game.state.endDate).fromNow()
     }
   }
 }

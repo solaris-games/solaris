@@ -251,14 +251,18 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('Cannot concede defeat in a game that has finished.');
         }
 
-        player.defeated = true;
+        this.playerService.setPlayerAsDefeated(game, player);
+
         game.state.players--; // Deduct number of active players from the game.
 
         // NOTE: The game will check for a winner on each tick so no need to 
         // repeat that here.
         
-        // Remove all carrier waypoints (unless in transit)
-        this.carrierService.clearPlayerCarrierWaypointsNonTransit(game, player);
+        // TODO: We may want to do this in future when the AI becomes clevererer.
+        // // Remove all carrier waypoints (unless in transit)
+        // this.carrierService.clearPlayerCarrierWaypointsNonTransit(game, player);
+        // TODO: Instead of above, just clear the player's looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
 
         let userPlayer = await this.getPlayerUser(game, player._id);
         userPlayer.achievements.defeated++;
@@ -314,6 +318,21 @@ module.exports = class GameService extends EventEmitter {
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
 
         return await this.userService.getInfoByIdLean(player.userId);
+    }
+
+    isLocked(game) {
+        return game.state.locked;
+    }
+
+    async lock(gameId, locked = true) {
+        await this.gameModel.updateOne({
+            _id: gameId
+        }, {
+            $set: {
+                'state.locked': locked
+            }
+        })
+        .exec();
     }
 
     // TODO: All of below needs a rework. A game is started if the start date is less than now and the game hasn't finished

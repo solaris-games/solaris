@@ -12,7 +12,7 @@
   "galaxy": {
     "galaxyType": "circular-balanced",
     "starsPerPlayer": 30,
-    "productionTicks": 20
+    "productionTicks": 24
   },
   "specialGalaxy": {
     "carrierCost": "standard",
@@ -24,7 +24,8 @@
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
-    "playerDistribution": "circular"
+    "playerDistribution": "circular",
+    "carrierSpeed": 10
   },
   "player": {
     "startingStars": 6,
@@ -46,7 +47,7 @@
   "technology": {
     "startingTechnologyLevel": {
       "terraforming": 1,
-      "experimentation": 1,
+      "experimentation": 0,
       "scanning": 1,
       "hyperspace": 1,
       "manufacturing": 1,
@@ -66,6 +67,7 @@
   "gameTime": {
     "gameType": "turnBased",
     "tickJumps": 6,
-    "maxTurnWait": 12
+    "maxTurnWait": 12,
+    "missedTurnLimit": 3
   }
 }

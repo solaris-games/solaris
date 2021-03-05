@@ -18,6 +18,7 @@ const schema = new Schema({
                 totalSpecialists: { type: Types.Number, required: true, default: 0 },
                 totalStarSpecialists: { type: Types.Number, required: true, default: 0 },
                 totalCarrierSpecialists: { type: Types.Number, required: true, default: 0 },
+                newShips: { type: Types.Number, required: true, default: 0 },
                 weapons: { type: Types.Number, required: true, default: 0 },
                 banking: { type: Types.Number, required: true, default: 0 },
                 manufacturing: { type: Types.Number, required: true, default: 0 },

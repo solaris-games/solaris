@@ -4,12 +4,14 @@ const Types = Schema.Types;
 
 const schema = new Schema({
     username: { type: Types.String, required: true },
+    guildId: { type: Types.ObjectId, default: null },
     email: { type: Types.String, required: true },
     emailEnabled: { type: Types.Boolean, default: true },
     password: { type: Types.String, required: true },
     resetPasswordToken: { type: Types.String, required: false },
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
+    banned: { type: Types.Boolean, default: false },
     roles: {
         contributor: { type: Types.Boolean, default: false },
         developer: { type: Types.Boolean, default: false },
