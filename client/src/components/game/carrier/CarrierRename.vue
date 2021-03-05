@@ -1,11 +1,11 @@
 <template>
 <div class="menu-page container" v-if="carrierId">
   <menu-title :title="originalName" @onCloseRequested="onCloseRequested" />
-  <div class="row bg-secondary">
+  <div class="row bg-secondary pl-2 pt-2 pb-2">
     <strong>Name:</strong>
-    <input v-model="currentName" type="text" />
+    <input class="ml-2 mr-2 auto-width" v-model="currentName" type="text" />
   </div>
-  <div class="row">
+  <div class="row pt-2 pb-2">
     <button class="btn btn-sm btn-success ml-1" @click="doRename">
       <i class="fas fa-save"></i>
       <span class="ml-1 d-none d-sm-inline-block">Save</span>
