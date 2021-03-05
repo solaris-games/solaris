@@ -17,6 +17,7 @@
 <script>
 import MenuTitle from '../MenuTitle'
 import CarrierApiService from '../../../services/api/carrier'
+import gameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -46,6 +47,8 @@ export default {
       this.isSaving = true
       try {
         await CarrierApiService.renameCarrier(this.$store.state.game._id, this.carrierId, this.currentName)
+        const carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId);
+        carrier.name = this.currentName;
         this.$toasted.show(`Carrier renamed to ${this.currentName}.`)
         this.onCloseRequested(e)
       } catch (err) {
