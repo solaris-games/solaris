@@ -142,6 +142,7 @@ class Map extends EventEmitter {
 
       this.carrierContainer.removeChild(existing.fixedContainer)
       this.carrierContainer.removeChild(existing.container)
+      this.carrierContainer.removeChild(existing.pathContainer)
 
       this.carriers.splice(this.carriers.indexOf(existing), 1)
     }
@@ -156,6 +157,7 @@ class Map extends EventEmitter {
 
     this.carrierContainer.addChild(carrier.fixedContainer)
     this.carrierContainer.addChild(carrier.container)
+    this.carrierContainer.addChild(carrier.pathContainer)
 
     carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
     carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
