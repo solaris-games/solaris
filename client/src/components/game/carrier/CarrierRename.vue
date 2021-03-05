@@ -40,6 +40,7 @@ export default {
       this.isSaving = true
       try {
         await CarrierApiService.renameCarrier(this.$store.state.game._id, this.carrierId, this.currentName)
+        this.$toasted.show(`Carrier renamed to ${this.currentName}.`)
         this.onCloseRequested(e)
       } catch (err) {
         console.error(err)
