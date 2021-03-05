@@ -17,7 +17,8 @@ export default new Vuex.Store({
     userId: null,
     game: null,
     starSpecialists: null,
-    carrierSpecialists: null
+    carrierSpecialists: null,
+    cachedConversationComposeMessages: {}
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -39,6 +40,7 @@ export default new Vuex.Store({
     },
     clearGame (state) {
       state.game = null
+      state.cachedConversationComposeMessages = {}
     },
 
     setSettings (state, settings) {
@@ -46,6 +48,9 @@ export default new Vuex.Store({
     },
     clearSettings (state) {
       state.settings = null
+    },
+    storeConversationMessage (state, data) {
+      state.cachedConversationComposeMessages[data.conversationId] = data.message;
     },
 
     // ----------------
@@ -214,6 +219,11 @@ export default new Vuex.Store({
       const starSpecialistsResponse = await SpecialistService.getStarSpecialists(gameId)
       commit('setCarrierSpecialists', carrierSpecialistsResponse.data)
       commit('setStarSpecialists', starSpecialistsResponse.data)
+    }
+  },
+  getters: {
+    getConversationMessage: (state) => (conversationId) => {
+      return state.cachedConversationComposeMessages[conversationId] || ''
     }
   },
   plugins: [vuexPersist.plugin]

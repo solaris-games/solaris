@@ -5,17 +5,17 @@
     <loading-spinner :loading="!info"/>
 
     <div v-if="info">
-      <!--
+      
       <div class="row pt-3 pb-3 bg-info">
         <div class="col">
           <p>Galactic Credits</p>
+          <p><small>Earn credits by winning official games.</small></p>
         </div>
         <div class="col">
-          <p class="text-right">{{ info.credits }} Credits</p>
+          <p class="text-right"><strong>{{ info.credits }}</strong> credits</p>
         </div>
       </div>
-      -->
-
+     
       <div class="row pt-3 pb-3 bg-primary">
         <div class="col">
           <p>Username</p>
