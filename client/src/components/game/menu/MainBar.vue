@@ -32,7 +32,8 @@
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"
         @onShipTransferRequested="onShipTransferRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" 
+        @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
@@ -40,7 +41,8 @@
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"/>
+        @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"
+        @onCarrierRenameRequested="onCarrierRenameRequested" />
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
@@ -50,6 +52,10 @@
         :carrierId="menuArguments.carrierId"
         :waypoint="menuArguments.waypoint"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <carrier-rename v-if="menuState == MENU_STATES.CARRIER_RENAME"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuArguments.carrierId"
+        :originalName="menuArguments.originalName" />
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
@@ -123,6 +129,7 @@ import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
 import CarrierWaypointsVue from '../carrier/CarrierWaypoints.vue'
 import CarrierWaypointVue from '../carrier/CarrierWaypoint.vue'
+import CarrierRenameVue from '../carrier/CarrierRename.vue'
 import ShipTransferVue from '../carrier/ShipTransfer.vue'
 import BuildCarrierVue from '../carrier/BuildCarrier.vue'
 import InboxVue from '../inbox/Inbox.vue'
@@ -156,6 +163,7 @@ export default {
     'carrier-detail': CarrierDetailVue,
     'carrier-waypoints': CarrierWaypointsVue,
     'carrier-waypoint': CarrierWaypointVue,
+    'carrier-rename': CarrierRenameVue,
     'combat-calculator': CombatCalculatorVue,
     'ship-transfer': ShipTransferVue,
     'build-carrier': BuildCarrierVue,
@@ -237,6 +245,9 @@ export default {
     },
     onBuildCarrierRequested (e) {
       this.changeMenuState(MENU_STATES.BUILD_CARRIER, e)
+    },
+    onCarrierRenameRequested (e) {
+      this.changeMenuState(MENU_STATES.CARRIER_RENAME, e)
     },
     onCreateNewConversationRequested (e) {
       this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)

@@ -2,6 +2,12 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class CarrierService extends BaseApiService {
+  renameCarrier (gameId, carrierId, name) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/rename', { 
+      name
+    }, { withCredentials: true })
+  }
+
   saveWaypoints (gameId, carrierId, waypoints, looped) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/waypoints', {
       waypoints,
