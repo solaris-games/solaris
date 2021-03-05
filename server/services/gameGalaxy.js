@@ -229,10 +229,14 @@ module.exports = class GameGalaxyService {
             let playerGuild = null;
 
             if (p.userId) {
-                playerGuild = guildUsers.find(u => u._id.equals(p.userId)).guild;
+                let guildUser = guildUsers.find(u => u._id.toString() === p.userId.toString());
 
-                if (playerGuild) {
-                    p.alias += `[${playerGuild.tag}]`;
+                if (guildUser) {
+                    playerGuild = guildUser.guild;
+    
+                    if (playerGuild) {
+                        p.alias += `[${playerGuild.tag}]`;
+                    }
                 }
             }
 
