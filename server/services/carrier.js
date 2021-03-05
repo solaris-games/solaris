@@ -247,6 +247,18 @@ module.exports = class CarrierService {
         await game.save();
     }
 
+    async rename(game, player, carrierId, name) {
+        let carrier = this.getById(game, carrierId);
+
+        if (!carrier.ownedByPlayerId.equals(player._id)) {
+            throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
+        }
+
+        carrier.name = name.trim();
+
+        await game.save();
+    }
+
     async transferGift(game, gameUsers, star, carrier) {
         if (!star.ownedByPlayerId) {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
