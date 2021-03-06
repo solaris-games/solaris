@@ -54,8 +54,8 @@
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <carrier-rename v-if="menuState == MENU_STATES.CARRIER_RENAME"
         @onCloseRequested="onCloseRequested"
-        :carrierId="menuArguments.carrierId"
-        :originalName="menuArguments.originalName" />
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        :carrierId="menuArguments" />
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"

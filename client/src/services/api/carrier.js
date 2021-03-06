@@ -3,7 +3,7 @@ import BaseApiService from './base'
 
 class CarrierService extends BaseApiService {
   renameCarrier (gameId, carrierId, name) {
-    return axios.post(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/rename', { 
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/rename', { 
       name
     }, { withCredentials: true })
   }

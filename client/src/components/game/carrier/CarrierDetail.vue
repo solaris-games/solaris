@@ -243,10 +243,7 @@ export default {
       this.$emit('onViewCompareIntelRequested', e)
     },
     onCarrierRenameRequested (e) {
-      this.$emit('onCarrierRenameRequested', {
-        carrierId: this.carrierId,
-        originalName: this.carrier.name
-      })
+      this.$emit('onCarrierRenameRequested', this.carrier._id)
     },
     onViewHireCarrierSpecialistRequested (e) {
       this.$emit('onViewHireCarrierSpecialistRequested', this.carrier._id)

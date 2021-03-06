@@ -3,7 +3,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(achievementService, distanceService, starService, technologyService, specialistService) {
+    constructor(gameModel, achievementService, distanceService, starService, technologyService, specialistService) {
+        this.gameModel = gameModel;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
@@ -255,20 +256,28 @@ module.exports = class CarrierService {
         }
 
         if (!name) {
-            throw new ValidationError('Name was not passed');
+            throw new ValidationError('Name is required.');
         }
 
-        if (name.length > 30) {
-            throw new ValidationError('Name was too long')
+        if (name.length < 4 || name.length > 30) {
+            throw new ValidationError('Name must be between greater than 3 and less than or equal to 30 characters long.');
         }
 
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }
 
-        carrier.name = name.trim();
-
-        await game.save();
+        let carrierName = name.trim().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.carriers._id': carrierId
+        }, {
+            $set: {
+                'galaxy.carriers.$.name': carrierName
+            }
+        })
+        .exec();
     }
 
     async transferGift(game, gameUsers, star, carrier) {
