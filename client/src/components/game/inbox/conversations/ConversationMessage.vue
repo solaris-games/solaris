@@ -18,7 +18,7 @@
     </div>
     <div class="row bg-secondary mt-0">
         <div class="col">
-            <p class="mt-2 mb-2">{{message.message}}</p>
+            <p class="mt-2 mb-2 linebreaks">{{message.message}}</p>
         </div>
     </div>
   </div>
@@ -77,5 +77,9 @@ export default {
 
 .pointer {
   cursor: pointer;
+}
+
+.linebreaks {
+  white-space: break-spaces;
 }
 </style>
