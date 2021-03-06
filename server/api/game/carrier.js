@@ -123,6 +123,20 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/game/:gameId/carrier/:carrierId/rename', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.carrierService.rename(
+                req.game,
+                req.player,
+                req.params.carrierId,
+                req.body.name);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, (req, res, next) => {
         let errors = [];
 

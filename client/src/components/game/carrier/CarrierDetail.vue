@@ -1,7 +1,8 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button @click="viewOnMap" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></button>
+      <button @click="onCarrierRenameRequested" class="btn btn-sm btn-success"><i class="fas fa-pencil-alt"></i></button>
+      <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <div class="row bg-secondary">
@@ -240,6 +241,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onCarrierRenameRequested (e) {
+      this.$emit('onCarrierRenameRequested', this.carrier._id)
     },
     onViewHireCarrierSpecialistRequested (e) {
       this.$emit('onViewHireCarrierSpecialistRequested', this.carrier._id)
