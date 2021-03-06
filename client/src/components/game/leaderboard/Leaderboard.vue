@@ -42,7 +42,9 @@
                           <!-- Text styling for defeated players? -->
                           <h5 class="alias-title">
                             {{player.alias}}
-                            <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
+                            <span v-if="player.defeated" :title="getPlayerStatus(player)">
+                              <i class="fas fa-skull-crossbones"></i>
+                            </span>
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2">

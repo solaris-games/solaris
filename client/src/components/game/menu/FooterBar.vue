@@ -10,8 +10,8 @@
           <router-link to="/codex" class="btn"><i class="fas fa-question"></i></router-link>
         </div> -->
         <div class="col" v-if="userPlayer">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
-            <i class="fas fa-users"></i>
+          <button class="btn" @click="panToHomeStar()">
+            <i class="fas fa-home"></i>
           </button>
         </div>
         <div class="col" v-if="userPlayer">
@@ -20,13 +20,13 @@
           </button>
         </div>
         <div class="col" v-if="userPlayer">
-          <button class="btn" @click="panToHomeStar()">
-            <i class="fas fa-home"></i>
+          <button class="btn" v-on:click="setMenuState(MENU_STATES.GALAXY)">
+            <i class="fas fa-sun"></i>
           </button>
         </div>
         <div class="col" v-if="userPlayer">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.GALAXY)">
-            <i class="fas fa-sun"></i>
+          <button class="btn" v-on:click="setMenuState(MENU_STATES.INTEL)">
+            <i class="fas fa-chart-line"></i>
           </button>
         </div>
         <div class="col">

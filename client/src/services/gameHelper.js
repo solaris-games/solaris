@@ -381,12 +381,12 @@ class GameHelper {
 
   getPlayerStatus (player) {
     if (player.defeated && !player.afk) {
-      return 'DEFEATED'
+      return 'Defeated'
     } else if (player.defeated && player.afk) {
       return 'AFK'
     }
 
-    return 'UNKNOWN'
+    return 'Unknown'
   }
 
   getSortedLeaderboardPlayerList (game) {

@@ -5,7 +5,9 @@
             <player-icon :playerId="player._id"/>
             {{player.alias}} 
             <!-- <span v-if="player.userId">(You)</span> -->
-            <span v-if="player.defeated">({{getPlayerStatus()}})</span>
+            <span v-if="player.defeated" :title="getPlayerStatus(player)">
+              <i class="fas fa-skull-crossbones"></i>
+            </span>
           </h4>
       </div>
   </div>
