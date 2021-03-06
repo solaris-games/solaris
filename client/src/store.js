@@ -15,7 +15,8 @@ export default new Vuex.Store({
   state: {
     userId: null,
     game: null,
-    cachedConversationComposeMessages: {}
+    cachedConversationComposeMessages: {},
+    currentConversation: null
   },
   mutations: {
     setUserId (state, userId) {
@@ -39,8 +40,21 @@ export default new Vuex.Store({
     clearSettings (state) {
       state.settings = null
     },
-    storeConversationMessage (state, data) {
-      state.cachedConversationComposeMessages[data.conversationId] = data.message;
+    openConversation (state, data) {
+      state.currentConversation = {
+        selection: null,
+        text: state.cachedConversationComposeMessages[data.conversationId]
+      }
+    },
+    closeConversation (state, data) {
+      state.cachedConversationComposeMessages[data.conversationId] = state.currentConversation.text
+      state.currentConversation = null
+    },
+    updateCurrentConversationText (state, data) {
+      state.currentConversation.text = data.text
+    },
+    updateCurrentConversationSelection (state, data) {
+      state.currentConversation.selection = data.selection
     },
 
     // ----------------

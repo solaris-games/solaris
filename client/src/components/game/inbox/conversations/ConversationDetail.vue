@@ -21,7 +21,7 @@
         <p class="mb-0 text-center">No messages.</p>
     </div>
 
-    <compose-conversation-message :conversationId="conversationId" :conversationMessage="currentConversationMessage" @onConversationMessageSent="onConversationMessageSent" @onMessageChange="onMessageChange"/>
+    <compose-conversation-message :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent" />
   </div>
 </div>
 </template>
@@ -52,7 +52,6 @@ export default {
     return {
       conversation: null,
       userPlayer: null,
-      currentConversationMessage: null
     }
   },
   created () {
@@ -73,15 +72,16 @@ export default {
   },
   async mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)._id
-    this.currentConversationMessage = this.$store.getters.getConversationMessage(this.conversationId)
+    this.$store.commit('openConversation', {
+      conversationId: this.conversationId
+    })
 
     await this.loadConversation()
   },
   methods: {
     cacheComposedMessage () {
-      this.$store.commit('storeConversationMessage', {
-        conversationId: this.conversationId,
-        message: this.currentConversationMessage
+      this.$store.commit('closeConversation', {
+        conversationId: this.conversationId
       })
     },
     onMessageChange (e) {

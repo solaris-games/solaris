@@ -1,7 +1,7 @@
 <template>
 <form class="pb-1">
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." :value="this.conversationMessage" @input="onMessageChange"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." :value="this.$store.state.currentConversation.text" @input="onMessageChange" @select="onSelectionChange"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -24,7 +24,6 @@ export default {
   },
   props: {
     conversationId: String,
-    conversationMessage: String
   },
   data () {
     return {
@@ -33,7 +32,22 @@ export default {
   },
   methods: {
     onMessageChange (e) {
-      this.$emit('onMessageChange', e.target.value)
+      this.selectionChanged(e.target)
+      this.$store.commit('updateCurrentConversationText', {
+        text: e.target.value
+      })
+    },
+    onSelectionChange (e) {
+      this.selectionChanged(e.target)
+    },
+    selectionChanged (textarea) {
+      const selection = {
+        from: textarea.selectionStart,
+        to: textarea.selectionEnd
+      }
+      this.$store.commit('updateCurrentConversationSelection', {
+        selection
+      })
     },
     async send () {
       const message = this.conversationMessage.trim()
