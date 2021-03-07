@@ -94,10 +94,8 @@ export default {
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
 
-    this.sockets.subscribe('playerCreditsReceived', (data) => {
-      let player = GameHelper.getUserPlayer(this.$store.state.game)
-      player.credits += data.data.credits
-    })
+    this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
   destroyed () {
     document.removeEventListener('keydown', this.handleKeyDown)
@@ -130,6 +128,19 @@ export default {
     },
     onMenuStateChanged (e) {
       this.$emit('onMenuStateChanged', e)
+    },
+    onCreditsReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.credits += data.data.credits
+
+      this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+    },
+    onTechnologyReceived (data) {
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      this.$toasted.show(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`, { type: 'info' })
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })
