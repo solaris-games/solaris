@@ -4,11 +4,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, carrierService, playerService, passwordService) {
+    constructor(gameModel, userService, starService, carrierService, playerService, passwordService) {
         super();
         
         this.gameModel = gameModel;
         this.userService = userService;
+        this.starService = starService;
         this.carrierService = carrierService;
         this.playerService = playerService;
         this.passwordService = passwordService;
@@ -139,6 +140,12 @@ module.exports = class GameService extends EventEmitter {
 
         if (!player) {
             throw new ValidationError('The player is not participating in this game.');
+        }
+
+        let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        if (!stars.length) {
+            throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
         }
 
         // Only allow if the player isn't already occupied and is afk
