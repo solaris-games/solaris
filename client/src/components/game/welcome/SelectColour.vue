@@ -19,7 +19,8 @@
                         <h5 class="alias-title" style="vertical-align: middle;">
                           {{player.alias}}
                           <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                            <i class="fas fa-skull-crossbones"></i>
+                            <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
+                            <i v-if="player.afk" class="fas fa-user-clock"></i>
                           </span>
                         </h5>
                     </td>

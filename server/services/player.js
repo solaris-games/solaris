@@ -522,6 +522,70 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
+    performDefeatedOrAfkCheck(game, player, isTurnBasedGame) {
+        if (isTurnBasedGame) {
+            // Reset whether we have sent the player a turn reminder.
+            player.hasSentTurnReminder = false;
+
+            // If the player wasn't ready when the game ticked, increase their number of missed turns.
+            if (!player.ready) {
+                player.missedTurns++;
+                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
+            }
+            else {
+                player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
+            }
+        }
+
+        // Check if the player has been AFK.
+        let isAfk = this.isAfk(game, player, isTurnBasedGame);
+
+        if (isAfk) {
+            this.setPlayerAsAfk(game, player);
+        }
+
+        // Check if the player has been defeated by conquest.
+        if (!player.defeated) {
+            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+            // If there are no stars and there are no carriers then the player is defeated.
+            if (stars.length === 0) {
+                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
+    
+                if (carriers.length === 0) {
+                    this.setPlayerAsDefeated(game, player);
+                }
+            }
+        }
+    }
+
+    isAfk(game, player, isTurnBasedGame, afkThresholdDate) {
+        // The player is afk if:
+        // 1. The afk threshold date is less than the last seen date
+        // 2. The number of missed turns is greater or equal to the missed turn liimt
+        // 3. The game is RT and the first cycle has completed and the player has not been seen since the start of the game
+        // 4. The game is TB and the first turn has been missed.
+
+        if (isTurnBasedGame) {
+            // Calculate what turn this is.
+            let isFirstTurn = game.state.tick <= game.settings.gameTime.turnJumps;
+
+            if (isFirstTurn) {
+                return player.missedTurns > 0;
+            } else {
+                return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
+            }
+        } else {
+            let isFirstCycle = game.state.tick <= game.settings.galaxy.productionTicks;
+
+            if (isFirstCycle) {
+                return moment(player.lastSeen).utc() < moment().utc().subtract(1, 'day');
+            } else {
+                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
+            }
+        }
+    }
+
     setPlayerAsDefeated(game, player) {
         player.defeated = true;
         player.researchingNext = 'random'; // Set up the AI for random research.

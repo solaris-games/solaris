@@ -135,7 +135,8 @@ const schema = new Schema({
 			}
 		}
 	},
-	quitters: [{ type: Types.ObjectId, required: false }]
+	quitters: [{ type: Types.ObjectId, required: false }],
+	afkers: [{ type: Types.ObjectId, required: false }]
 });
 
 module.exports = schema;

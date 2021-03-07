@@ -20,6 +20,9 @@
             <div v-if="!userPlayer && gameIsJoinable">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake mr-2"></i>Welcome</a>
             </div>
+            <div v-if="!userPlayer && !gameIsJoinable">
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (L)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
+            </div>
             <div v-if="userPlayer">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (L)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask mr-2"></i>Research</a>

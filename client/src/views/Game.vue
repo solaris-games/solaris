@@ -77,13 +77,15 @@ export default {
 
     // If the user is in the game then display the leaderboard.
     // Otherwise show the welcome screen if there are empty slots.
-    if (this.getUserPlayer()) {
-      this.menuState = 'leaderboard'
+    let userPlayer = this.getUserPlayer()
+    
+    if (userPlayer && !userPlayer.defeated) {
+      this.menuState = MENU_STATES.LEADERBOARD
     } else {
       if (GameHelper.gameHasOpenSlots(this.$store.state.game)) {
-        this.menuState = 'welcome'
+        this.menuState = MENU_STATES.WELCOME
       } else {
-        this.menuState = 'leaderboard' // Assume the user is spectating.
+        this.menuState = MENU_STATES.LEADERBOARD // Assume the user is spectating.
       }
     }
 

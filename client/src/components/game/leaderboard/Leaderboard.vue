@@ -43,7 +43,8 @@
                           <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i class="fas fa-skull-crossbones"></i>
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock"></i>
                             </span>
                           </h5>
                       </td>
@@ -52,7 +53,7 @@
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
-                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>

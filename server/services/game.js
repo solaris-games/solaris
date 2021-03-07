@@ -112,7 +112,9 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('The game has already finished.');
         }
 
-        if (game.quitters.find(x => x.equals(userId))) {
+        // The user cannot rejoin if they quit early or were afk.
+        if (game.quitters.find(x => x.equals(userId))
+            || game.afkers.find(x => x.equals(userId))) {
             throw new ValidationError('You cannot rejoin this game.');
         }
 
@@ -125,10 +127,11 @@ module.exports = class GameService extends EventEmitter {
         }
 
         // Disallow if they are already in the game as another player.
-        let existing = game.galaxy.players.find(x => x.userId === userId);
+        // If the player they are in the game as is afk then that's fine.
+        let existing = game.galaxy.players.find(x => x.userId === userId.toString());
 
         if (existing) {
-            throw new ValidationError('The user is already participating in this game.');
+            throw new ValidationError('You are already participating in this game.');
         }
 
         // Get the player and update it to assign the user to the player.
@@ -189,6 +192,8 @@ module.exports = class GameService extends EventEmitter {
                     this.playerService.updateLastSeen(game, player);
                 }
             }
+        } else {
+            this.playerService.updateLastSeen(game, player);
         }
 
         await game.save();
