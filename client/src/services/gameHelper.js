@@ -558,6 +558,12 @@ class GameHelper {
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
   }
 
+  gameHasOpenSlots (game) {
+    return game.galaxy.players.filter(p => {
+      return p.isEmptySlot || p.afk
+    }).length > 0
+  }
+
   canTick(game) {
     let lastTick = moment(game.state.lastTickDate).utc();
     let nextTick;

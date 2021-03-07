@@ -249,6 +249,8 @@ export default {
       player.isEmptySlot = false
       player.alias = data.alias
       player.avatar = data.avatar
+      player.defeated = false
+      player.afk = false
     })
 
     this.sockets.subscribe('gamePlayerQuit', (data) => {

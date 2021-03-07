@@ -98,7 +98,7 @@ export default {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
     gameIsJoinable () {
-      return !this.gameIsInProgress && !this.gameIsFinished
+      return !this.gameIsFinished && GameHelper.gameHasOpenSlots(this.$store.state.game)
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)

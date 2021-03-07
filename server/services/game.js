@@ -107,11 +107,6 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async join(game, userId, playerId, alias, avatar, password) {
-        // Only allow join if the game hasn't started.
-        if (game.state.startDate) {
-            throw new ValidationError('The game has already started.');
-        }
-
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
             throw new ValidationError('The game has already finished.');
@@ -143,8 +138,9 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('The player is not participating in this game.');
         }
 
-        // Only allow if the player isn't already occupied.
-        if (player && player.userId) {
+        // Only allow if the player isn't already occupied and is afk
+        // We want to allow players to join in-progress games to fill afk slots.
+        if (player && player.userId && !player.afk) {
             throw new ValidationError('This player spot has already been taken by another user.');
         }
 
@@ -161,25 +157,37 @@ module.exports = class GameService extends EventEmitter {
         player.alias = alias;
         player.avatar = avatar;
 
+        // Reset the defeated and afk status as the user may be filling
+        // an afk slot.
+        player.defeated = false;
+        player.afk = false;
+        player.missedTurns = 0;
+        player.hasSentTurnReminder = false;
+
         // If the max player count is reached then start the game.
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
-        let gameIsFull = game.state.players === game.settings.general.playerLimit;
+        let gameIsFull = false;
 
-        if (gameIsFull) {
-            let start = moment().utc();
-
-            if (this.isRealTimeGame(game)) {
-                // Add the start delay to the start date.
-                start.add(game.settings.gameTime.startDelay, 'minute');
-            }
-
-            game.state.paused = false;
-            game.state.startDate = start;
-            game.state.lastTickDate = start;
-
-            for (let player of game.galaxy.players) {
-                this.playerService.updateLastSeen(game, player);
+        // If the game hasn't started yet then check if the game is full
+        if (!game.state.startDate) {
+            gameIsFull = game.state.players === game.settings.general.playerLimit;
+    
+            if (gameIsFull) {
+                let start = moment().utc();
+    
+                if (this.isRealTimeGame(game)) {
+                    // Add the start delay to the start date.
+                    start.add(game.settings.gameTime.startDelay, 'minute');
+                }
+    
+                game.state.paused = false;
+                game.state.startDate = start;
+                game.state.lastTickDate = start;
+    
+                for (let player of game.galaxy.players) {
+                    this.playerService.updateLastSeen(game, player);
+                }
             }
         }
 
