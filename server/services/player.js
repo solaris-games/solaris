@@ -446,8 +446,8 @@ module.exports = class PlayerService extends EventEmitter {
         };
     }
 
-    updateLastSeen(game, player) {
-        player.lastSeen = moment().utc();
+    updateLastSeen(game, player, date) {
+        player.lastSeen = date || moment().utc();
     }
 
     async updateLastSeenLean(gameId, userId, ipAddress) {
@@ -576,10 +576,12 @@ module.exports = class PlayerService extends EventEmitter {
                 return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
             }
         } else {
-            let isFirstCycle = game.state.tick <= game.settings.galaxy.productionTicks;
+            // If we have reached the first production tick then check here to see if
+            // the player has been active during the cycle.
+            let isFirstCycle = game.state.tick === game.settings.galaxy.productionTicks;
 
             if (isFirstCycle) {
-                return moment(player.lastSeen).utc() < moment().utc().subtract(1, 'day');
+                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc();
             } else {
                 return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
             }

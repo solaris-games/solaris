@@ -177,19 +177,19 @@ module.exports = class GameService extends EventEmitter {
             gameIsFull = game.state.players === game.settings.general.playerLimit;
     
             if (gameIsFull) {
-                let start = moment().utc();
+                let startDate = moment().utc();
     
                 if (this.isRealTimeGame(game)) {
                     // Add the start delay to the start date.
-                    start.add(game.settings.gameTime.startDelay, 'minute');
+                    startDate.add(game.settings.gameTime.startDelay, 'minute');
                 }
     
                 game.state.paused = false;
-                game.state.startDate = start;
-                game.state.lastTickDate = start;
+                game.state.startDate = startDate;
+                game.state.lastTickDate = startDate;
     
                 for (let player of game.galaxy.players) {
-                    this.playerService.updateLastSeen(game, player);
+                    this.playerService.updateLastSeen(game, player, startDate);
                 }
             }
         } else {
