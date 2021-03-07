@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button @click="onCarrierRenameRequested" class="btn btn-sm btn-success"><i class="fas fa-pencil-alt"></i></button>
+      <button v-if="isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
