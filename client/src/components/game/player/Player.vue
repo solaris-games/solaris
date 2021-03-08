@@ -32,13 +32,13 @@
 
     <research v-if="player" :playerId="player._id"/>
 
-    <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished">
+    <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
       <h4 class="mt-2">Trade</h4>
-
+      
       <div v-if="canTradeWithPlayer">
         <reputation v-if="player.defeated" :playerId="player._id"/>
-        <sendTechnology v-if="player" :playerId="player._id"/>
-        <sendCredits :player="player" :userPlayer="userPlayer"/>
+        <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
+        <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
       </div>
 
       <p v-if="!canTradeWithPlayer" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
@@ -179,6 +179,12 @@ export default {
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    tradeCreditsIsEnabled () {
+      return this.game.settings.player.tradeCredits
+    },
+    tradeTechnologyIsEnabled () {
+      return this.game.settings.player.tradeCost > 0
     }
   }
 }

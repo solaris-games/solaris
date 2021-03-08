@@ -42,15 +42,23 @@
                           <!-- Text styling for defeated players? -->
                           <h5 class="alias-title">
                             {{player.alias}}
-                            <span v-if="player.defeated">({{getPlayerStatus(player)}})</span>
+                            <span v-if="player.defeated" :title="getPlayerStatus(player)">
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock"></i>
+                            </span>
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2">
-                          <span>{{player.stats.totalStars}} Stars</span>
+                        <span class="d-xs-block d-sm-none">
+                          <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
+                        </span>
+                        <span class="d-none d-sm-block">
+                          {{player.stats.totalStars}} Stars
+                        </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
-                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -247,6 +255,8 @@ export default {
       player.isEmptySlot = false
       player.alias = data.alias
       player.avatar = data.avatar
+      player.defeated = false
+      player.afk = false
     })
 
     this.sockets.subscribe('gamePlayerQuit', (data) => {

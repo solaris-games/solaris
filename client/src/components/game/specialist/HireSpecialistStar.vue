@@ -76,6 +76,10 @@ export default {
       this.$emit('onOpenStarDetailRequested', star._id)
     },
     async hireSpecialist (specialist) {
+        if (!confirm(`Are you sure you want to hire a ${specialist.name} for $${specialist.cost}?`)) {
+            return
+        }
+        
         this.isHiringSpecialist = true
 
         try {

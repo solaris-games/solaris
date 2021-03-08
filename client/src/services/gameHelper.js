@@ -381,12 +381,12 @@ class GameHelper {
 
   getPlayerStatus (player) {
     if (player.defeated && !player.afk) {
-      return 'DEFEATED'
+      return 'Defeated'
     } else if (player.defeated && player.afk) {
       return 'AFK'
     }
 
-    return 'UNKNOWN'
+    return 'Unknown'
   }
 
   getSortedLeaderboardPlayerList (game) {
@@ -583,6 +583,12 @@ class GameHelper {
     let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
 
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+  }
+
+  gameHasOpenSlots (game) {
+    return game.galaxy.players.filter(p => {
+      return p.isEmptySlot || p.afk
+    }).length > 0
   }
 
   canTick(game) {

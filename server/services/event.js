@@ -195,7 +195,8 @@ module.exports = class EventService {
 
     async createPlayerDefeatedEvent(game, player) {
         let data = {
-            playerId: player._id
+            playerId: player._id,
+            alias: player.alias
         };
 
         return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
@@ -203,7 +204,8 @@ module.exports = class EventService {
 
     async createPlayerAfkEvent(game, player) {
         let data = {
-            playerId: player._id
+            playerId: player._id,
+            alias: player.alias
         };
 
         return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_AFK, data);

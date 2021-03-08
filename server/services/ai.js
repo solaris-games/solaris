@@ -21,6 +21,11 @@ module.exports = class AIService {
         } else if (isLastTick) {
             await this._playLastTick(game, player);
         }
+
+        // TODO: Not sure if this is an issue but there was an occassion during debugging
+        // where the player credits amount was less than 0, I assume its the AI spending too much somehow
+        // so adding this here just in case but need to investigate.
+        player.credits = Math.max(0, player.credits);
     }
 
     async _playFirstTick(game, player) {
