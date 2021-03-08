@@ -42,12 +42,14 @@ export default new Vuex.Store({
     },
     openConversation (state, data) {
       state.currentConversation = {
+        id: data.conversationId,
         selection: null,
         text: state.cachedConversationComposeMessages[data.conversationId]
       }
     },
-    closeConversation (state, data) {
-      state.cachedConversationComposeMessages[data.conversationId] = state.currentConversation.text
+    closeConversation (state) {
+      const id = state.currentConversation.id;
+      state.cachedConversationComposeMessages[id] = state.currentConversation.text
       state.currentConversation = null
     },
     updateCurrentConversationText (state, data) {
