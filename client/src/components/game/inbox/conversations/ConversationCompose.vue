@@ -43,7 +43,8 @@ export default {
     selectionChanged (textarea) {
       const selection = {
         from: textarea.selectionStart,
-        to: textarea.selectionEnd
+        to: textarea.selectionEnd,
+        element: textarea
       }
       this.$store.commit('updateCurrentConversationSelection', {
         selection
