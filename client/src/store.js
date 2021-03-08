@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 import GameHelper from './services/gameHelper'
+import MentionHelper from './services/mentionHelper'
 import GameContainer from './game/container'
 
 Vue.use(Vuex)
@@ -60,15 +61,15 @@ export default new Vuex.Store({
       state.currentConversation.selection = data.selection
     },
     playerClicked (state, data) {
-      console.log(state.currentConversation)
       if (state.currentConversation) {
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.name)
       } else {
         data.continuation(data.player)
       }
     },
     starClicked (state, data) {
-      console.log(state.currentConversation)
       if (state.currentConversation) {
+        MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
       } else {
         data.continuation(data.star)
       }
