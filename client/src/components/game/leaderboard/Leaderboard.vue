@@ -49,7 +49,12 @@
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2">
-                          <span>{{player.stats.totalStars}} Stars</span>
+                        <span class="d-xs-block d-sm-none">
+                          <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
+                        </span>
+                        <span class="d-none d-sm-block">
+                          {{player.stats.totalStars}} Stars
+                        </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
