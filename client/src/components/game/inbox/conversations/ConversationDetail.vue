@@ -72,9 +72,6 @@ export default {
   },
   async mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)._id
-    this.$store.commit('openConversation', {
-      conversationId: this.conversationId
-    })
 
     await this.loadConversation()
   },
@@ -154,6 +151,9 @@ export default {
 
         if (response.status === 200) {
           this.conversation = response.data
+          this.$store.commit('openConversation', {
+            conversationId: this.conversationId
+          })
         
           this.scrollToEnd()
         }

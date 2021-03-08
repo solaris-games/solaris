@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group list-group-horizontal">
-        <li class="list-group-item grow" v-for="p in sortedPlayers" v-bind:key="p._id" v-on:click="onOpenPlayerDetailRequested(p)"
+        <li class="list-group-item grow" v-for="p in sortedPlayers" v-bind:key="p._id" v-on:click="onPlayerClicked(p)"
           :title="p.colour.alias + ' ' + p.shape + ' - ' + p.alias">
           <player-avatar :player="p"/>
 
@@ -22,8 +22,12 @@ export default {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
-    onOpenPlayerDetailRequested (player) {
-      this.$emit('onOpenPlayerDetailRequested', player._id)
+    onPlayerClicked (player) {
+      // dispatch click to the store to intercept it when adding the player name to a message
+      this.$store.commit('playerClicked', {
+        player,
+        continuation: () => this.$emit('onOpenPlayerDetailRequested', player._id)
+      })
     }
   },
   computed: {

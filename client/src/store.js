@@ -32,6 +32,7 @@ export default new Vuex.Store({
     clearGame (state) {
       state.game = null
       state.cachedConversationComposeMessages = {}
+      state.currentConversation = null;
     },
 
     setSettings (state, settings) {
@@ -57,6 +58,20 @@ export default new Vuex.Store({
     },
     updateCurrentConversationSelection (state, data) {
       state.currentConversation.selection = data.selection
+    },
+    playerClicked (state, data) {
+      console.log(state.currentConversation)
+      if (state.currentConversation) {
+      } else {
+        data.continuation(data.player)
+      }
+    },
+    starClicked (state, data) {
+      console.log(state.currentConversation)
+      if (state.currentConversation) {
+      } else {
+        data.continuation(data.star)
+      }
     },
 
     // ----------------
