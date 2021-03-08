@@ -50,7 +50,7 @@ export default {
       })
     },
     async send () {
-      const message = this.conversationMessage.trim()
+      const message = this.$store.state.currentConversation.text.trim()
 
       if (message === '') {
         return
