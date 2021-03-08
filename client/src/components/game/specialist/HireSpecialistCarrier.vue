@@ -100,6 +100,10 @@ export default {
         this.isLoadingSpecialists = false
     },
     async hireSpecialist (specialist) {
+        if (!confirm(`Are you sure you want to hire a ${specialist.name} for $${specialist.cost}?`)) {
+            return
+        }
+        
         this.isHiringSpecialist = true
 
         try {
