@@ -246,9 +246,6 @@ export default {
           case 70: // F
             this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
             break
-          case 71: // G
-            this.setMenuState(MENU_STATES.INTEL)
-            break
           case 73: // I
             this.setMenuState(MENU_STATES.INBOX)
             break
@@ -289,6 +286,9 @@ export default {
           break
         case 67: // C
           this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
+          break
+        case 71: // G
+          this.setMenuState(MENU_STATES.INTEL)
           break
         case 79: // O
           this.setMenuState(MENU_STATES.OPTIONS)
