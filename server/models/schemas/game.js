@@ -53,7 +53,8 @@ const schema = new Schema({
 				industry: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
 				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
 			},
-			tradeCost: { type: Types.Number, required: true, enum: [5, 15, 25, 50, 100], default: 15 },
+			tradeCredits: { type: Types.Boolean, required: false, default: true },
+			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 },
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
         },
         technology: {

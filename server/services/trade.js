@@ -12,7 +12,19 @@ module.exports = class TradeService extends EventEmitter {
         this.ledgerService = ledgerService;
     }
 
+    isTradingCreditsDisabled(game) {
+        return game.settings.player.tradeCredits === false;
+    }
+
+    isTradingTechnologyDisabled(game) {
+        return game.settings.player.tradeCost === 0;
+    }
+
     async sendCredits(game, fromPlayer, toPlayerId, amount) {
+        if (this.isTradingCreditsDisabled(game)) {
+            throw new ValidationError(`Trading credits is disabled.`);
+        }
+
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.state.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
@@ -125,6 +137,10 @@ module.exports = class TradeService extends EventEmitter {
     }
 
     async sendTechnology(game, fromPlayer, toPlayerId, technology, techLevel) {
+        if (this.isTradingTechnologyDisabled(game)) {
+            throw new ValidationError(`Trading technology is disabled.`);
+        }
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
@@ -200,6 +216,10 @@ module.exports = class TradeService extends EventEmitter {
     }
 
     getTradeableTechnologies(game, fromPlayer, toPlayerId) {
+        if (this.isTradingTechnologyDisabled(game)) {
+            return [];
+        }
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 

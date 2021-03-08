@@ -345,7 +345,21 @@
             "text": "Expensive"
             }
         ],
+        "tradeCredits": [
+            {
+            "value": false,
+            "text": "Disabled"
+            },
+            {
+            "value": true,
+            "text": "Enabled"
+            }
+        ],
         "tradeCost": [
+            {
+            "value": 0,
+            "text": "Trading Disabled"
+            },
             {
             "value": 5,
             "text": "Cheap"

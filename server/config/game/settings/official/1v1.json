@@ -41,7 +41,8 @@
       "industry": "standard",
       "science": "cheap"
     },
-    "tradeCost": 15,
+    "tradeCredits": false,
+    "tradeCost": 0,
     "tradeScanning": "all"
   },
   "technology": {
