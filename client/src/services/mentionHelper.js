@@ -62,13 +62,10 @@ class MentionHelper {
     for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
       const text = message.substring(lastMentionEnd, match.index)
       if (text) {
-        console.log("TEXT: " + text)
         const node = document.createTextNode(text)
         element.appendChild(node)
       }
       lastMentionEnd = match.index + match[0].length
-      console.log(match)
-      console.log("LINK: " + match[0])
       const linkElement = this.createMentionLinkElement(match[1], match[2], match[3], clickHandlers)
       element.appendChild(linkElement)
     }
@@ -85,7 +82,8 @@ class MentionHelper {
     node.text = name
     const clickHandlerFactory = clickHandlers[type]
     if (clickHandlerFactory) {
-      node.onClick = clickHandlerFactory(id)
+      console.log("ADDING CLICK HANDLER FOR: " + type + " " + name)
+      node.onclick = clickHandlerFactory(id)
     }
     return node
   }
