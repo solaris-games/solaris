@@ -62,7 +62,7 @@ export default new Vuex.Store({
     },
     playerClicked (state, data) {
       if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, 'player', data.player.name)
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
       } else {
         data.continuation(data.player)
       }
