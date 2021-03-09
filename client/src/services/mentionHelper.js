@@ -1,7 +1,7 @@
 import gameHelper from './gameHelper.js';
 
 class MentionHelper {
-  static MENTION_REGEX = /\[\[(.+):(.+)\]\]/
+  static MENTION_REGEX = RegExp(/\[\[(.+):(.+)\]\]/, 'g')
 
   addMention(conversation, type, name) {
     const text = conversation.text || '';
