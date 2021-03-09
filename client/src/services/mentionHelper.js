@@ -57,6 +57,10 @@ class MentionHelper {
     return `[[${type}/${id}/${name}]]`
   }
 
+  replaceMentionsWithNames(message) {
+    return message.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, _type, _id, name) => name)
+  }
+
   renderMessageWithMentions(element, message, clickHandlers) {
     let lastMentionEnd = 0
     for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
@@ -82,7 +86,6 @@ class MentionHelper {
     node.text = name
     const clickHandlerFactory = clickHandlers[type]
     if (clickHandlerFactory) {
-      console.log("ADDING CLICK HANDLER FOR: " + type + " " + name)
       node.onclick = clickHandlerFactory(id)
     }
     return node

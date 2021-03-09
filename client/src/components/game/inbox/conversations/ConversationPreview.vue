@@ -29,7 +29,7 @@
         <div class="col-12" v-if="hasLastMessage">
             <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
               <player-icon :playerId="lastMessageSender._id"/>
-              {{conversation.lastMessage.message}}
+              {{lastMessage}}
             </p>
         </div>
         <div class="col-12" v-if="hasLastMessage">
@@ -46,6 +46,7 @@
 import GameHelper from '../../../../services/gameHelper'
 import moment from 'moment'
 import PlayerIconVue from '../../player/PlayerIcon.vue'
+import mentionHelper from '../../../../services/mentionHelper'
 
 export default {
   components: {
@@ -84,6 +85,9 @@ export default {
     },
     isAllPlayersConversation: function () {
       return this.conversation.participants.length === this.$store.state.game.settings.general.playerLimit
+    },
+    lastMessage () {
+      return mentionHelper.replaceMentionsWithNames(this.conversation.lastMessage.message)
     }
   }
 }
