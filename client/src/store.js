@@ -45,7 +45,7 @@ export default new Vuex.Store({
     openConversation (state, data) {
       state.currentConversation = {
         id: data.conversationId,
-        selection: null,
+        element: null,
         text: state.cachedConversationComposeMessages[data.conversationId]
       }
     },
@@ -57,8 +57,8 @@ export default new Vuex.Store({
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data.text
     },
-    updateCurrentConversationSelection (state, data) {
-      state.currentConversation.selection = data.selection
+    setConversationElement (state, data) {
+      state.currentConversation.element = data.element
     },
     playerClicked (state, data) {
       if (state.currentConversation) {

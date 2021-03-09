@@ -1,7 +1,7 @@
 <template>
 <form class="pb-1">
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." :value="this.$store.state.currentConversation.text" @input="onMessageChange" @select="onSelectionChange"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -30,24 +30,15 @@ export default {
       isSendingMessage: false
     }
   },
+  mounted () {
+    this.$store.commit('setConversationElement', {
+      element: this.$refs.messageElement
+    });
+  },
   methods: {
     onMessageChange (e) {
-      this.selectionChanged(e.target)
       this.$store.commit('updateCurrentConversationText', {
         text: e.target.value
-      })
-    },
-    onSelectionChange (e) {
-      this.selectionChanged(e.target)
-    },
-    selectionChanged (textarea) {
-      const selection = {
-        from: textarea.selectionStart,
-        to: textarea.selectionEnd,
-        element: textarea
-      }
-      this.$store.commit('updateCurrentConversationSelection', {
-        selection
       })
     },
     async send () {
