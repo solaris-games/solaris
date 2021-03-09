@@ -40,7 +40,7 @@ export default {
   },
   mounted () {
     const clickHandlers = {
-      s: (id) => () => GameContainer.map.panToStar(gameHelper.getStarById(this.$store.state.game, id)),
+      s: (id) => () => this.panToStar(id),
       p: (id) => () => this.$emit('onOpenPlayerDetailRequested', id)
     }
     mentionHelper.renderMessageWithMentions(this.$refs.messageElement, this.message.message, clickHandlers)
@@ -57,6 +57,16 @@ export default {
     },
     onOpenPlayerDetailRequested (player) {
       this.$emit('onOpenPlayerDetailRequested', player._id)
+    },
+    panToStar (id) {
+      const star = gameHelper.getStarById(this.$store.state.game, id)
+      if (star) {
+        GameContainer.map.panToStar()
+      } else {
+        this.$toasted.show(`Unknown location`, { 
+          type: 'error'
+         })
+      }
     }
   },
   computed: {
