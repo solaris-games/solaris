@@ -1,4 +1,9 @@
+import gameHelper from './gameHelper.js';
+import GameHelper from './gameHelper.js'
+
 class MentionHelper {
+  static MENTION_REGEX = /\[\[(.+):(.+)\]\]/
+
   addMention(conversation, type, name) {
     const text = conversation.text || '';
     const element = conversation.element
@@ -14,6 +19,42 @@ class MentionHelper {
       element.setSelectionRange(insertionStart, insertionStart + mention.length)
       element.focus()
     }
+  }
+
+  makeMentionsStatic(game, originalText) {
+    return originalText.replace(MentionHelper.MENTION_REGEX, (match, typeGroup, nameGroup) => {
+      if (typeGroup === 'star') {
+        return this.makeStarMentionStatic(game, nameGroup)
+      } else if (typeGroup === 'player') {
+        return this.makePlayerMentionStatic(game, nameGroup)
+      } else {
+        return match
+      }
+    })
+  }
+
+  makePlayerMentionStatic(game, playerName) {
+    const player = gameHelper.getPlayerByAlias(game, playerName)
+
+    if (player) {
+      return this.makeStaticMention('p', player._id, playerName)
+    } else {
+      return playerName
+    }
+  }
+
+  makeStarMentionStatic(game, starName) {
+    const star = gameHelper.getStarByName(game, starName)
+
+    if (star) {
+      return this.makeStaticMention('s', star._id, starName)
+    } else {
+      return starName
+    }
+  }
+
+  makeStaticMention(type, id, name) {
+    return `${type}/${id}/${name}`
   }
 }
 

@@ -15,6 +15,7 @@
 <script>
 import moment from 'moment'
 import GameHelper from '../../../../services/gameHelper'
+import MentionHelper from '../../../../services/mentionHelper';
 import ConversationApiService from '../../../../services/api/conversation'
 import AudioService from '../../../../game/audio'
 
@@ -42,11 +43,13 @@ export default {
       })
     },
     async send () {
-      const message = this.$store.state.currentConversation.text.trim()
+      const messageText = this.$store.state.currentConversation.text
 
-      if (message === '') {
+      if (!messageText) {
         return
       }
+
+      const message = MentionHelper.makeMentionsStatic(this.$store.state.game, messageText)
 
       try {
         this.isSendingMessage = true

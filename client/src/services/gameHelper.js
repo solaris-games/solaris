@@ -6,6 +6,10 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
+  getPlayerByAlias (game, playerName) {
+    return game.galaxy.players.find(p => p.alias === playerName)
+  }
+
   getPlayerById (game, playerId) {
     return game.galaxy.players.find(x => x._id === playerId)
   }
@@ -18,6 +22,10 @@ class GameHelper {
 
   getFriendlyColour (colour) {
     return colour.replace('0x', '#')
+  }
+
+  getStarByName (game, starName) {
+    return game.galaxy.stars.find(s => s.name === starName)
   }
 
   getStarById (game, starId) {
