@@ -67,7 +67,9 @@ export default {
             type: 'message'
           })
 
-          this.$emit('onMessageChange', '')
+          this.$store.commit('updateCurrentConversationText', {
+            text: ''
+          })
         }
       } catch (e) {
         console.error(e)
