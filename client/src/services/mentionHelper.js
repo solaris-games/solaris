@@ -1,8 +1,8 @@
 import gameHelper from './gameHelper.js'
 
 class MentionHelper {
-  static MENTION_REGEX = RegExp(/\[\[(.+):(.+)\]\]/, 'g')
-  static INTERNAL_MENTION_REGEX = RegExp(/\[\[(\w)\/(\w+)\/(.+)\]\]/, 'g')
+  static MENTION_REGEX = /\[\[(.+?):(.+?)\]\]/g
+  static INTERNAL_MENTION_REGEX = /\[\[(\w)\/(\w+?)\/(.+?)\]\]/g
 
   addMention(conversation, type, name) {
     const text = conversation.text || ''
@@ -22,7 +22,10 @@ class MentionHelper {
   }
 
   makeMentionsStatic(game, originalText) {
-    return originalText.replace(MentionHelper.MENTION_REGEX, (match, typeGroup, nameGroup) => {
+    return originalText.replaceAll(MentionHelper.MENTION_REGEX, (match, typeGroup, nameGroup) => {
+      console.log(match)
+      console.log(typeGroup)
+      console.log(nameGroup)
       if (typeGroup === 'star') {
         return this.makeStarMentionStatic(game, nameGroup)
       } else if (typeGroup === 'player') {
