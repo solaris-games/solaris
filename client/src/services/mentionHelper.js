@@ -1,5 +1,4 @@
 import gameHelper from './gameHelper.js';
-import GameHelper from './gameHelper.js'
 
 class MentionHelper {
   static MENTION_REGEX = /\[\[(.+):(.+)\]\]/
@@ -54,7 +53,7 @@ class MentionHelper {
   }
 
   makeStaticMention(type, id, name) {
-    return `${type}/${id}/${name}`
+    return `[[${type}/${id}/${name}]]`
   }
 }
 
