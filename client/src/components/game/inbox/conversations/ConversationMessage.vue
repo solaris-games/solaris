@@ -18,7 +18,7 @@
     </div>
     <div class="row bg-secondary mt-0">
         <div class="col">
-            <p class="mt-2 mb-2 linebreaks">{{message.message}}</p>
+            <p class="mt-2 mb-2 linebreaks" ref="messageElement" />
         </div>
     </div>
   </div>
@@ -26,8 +26,10 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import ConversationApiService from '../../../../services/api/conversation'
+import GameContainer from '../../../../game/container'
 import PlayerIconVue from '../../player/PlayerIcon'
+import mentionHelper from '../../../../services/mentionHelper'
+import gameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
@@ -35,6 +37,13 @@ export default {
   },
   props: {
     message: Object
+  },
+  mounted () {
+    const clickHandlers = {
+      s: (id) => () => GameContainer.map.panToStar(gameHelper.getStarById(this.$store.state.game, id)),
+      p: (id) => () => this.$emit('onOpenPlayerDetailRequested', id)
+    }
+    mentionHelper.renderMessageWithMentions(this.$refs.messageElement, this.message.message, clickHandlers)
   },
   methods: {
     getUserPlayer () {

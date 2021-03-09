@@ -1,10 +1,11 @@
-import gameHelper from './gameHelper.js';
+import gameHelper from './gameHelper.js'
 
 class MentionHelper {
   static MENTION_REGEX = RegExp(/\[\[(.+):(.+)\]\]/, 'g')
+  static INTERNAL_MENTION_REGEX = RegExp(/\[\[(\w)\/(\w+)\/(.+)\]\]/, 'g')
 
   addMention(conversation, type, name) {
-    const text = conversation.text || '';
+    const text = conversation.text || ''
     const element = conversation.element
     //Do not use and for property access here because a selection start of 0 would be false
     const insertionStart = element ? element.selectionStart : (text.length - 1)
@@ -12,7 +13,7 @@ class MentionHelper {
     
     const mention = `[[${type}:${name}]]`
     const newText = text.substring(0, insertionStart) + mention + text.substring(insertionEnd)
-    conversation.text = newText;
+    conversation.text = newText
 
     if (element) {
       element.setSelectionRange(insertionStart, insertionStart + mention.length)
@@ -54,6 +55,39 @@ class MentionHelper {
 
   makeStaticMention(type, id, name) {
     return `[[${type}/${id}/${name}]]`
+  }
+
+  renderMessageWithMentions(element, message, clickHandlers) {
+    let lastMentionEnd = 0
+    for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
+      const text = message.substring(lastMentionEnd, match.index)
+      if (text) {
+        console.log("TEXT: " + text)
+        const node = document.createTextNode(text)
+        element.appendChild(node)
+      }
+      lastMentionEnd = match.index + match[0].length
+      console.log(match)
+      console.log("LINK: " + match[0])
+      const linkElement = this.createMentionLinkElement(match[1], match[2], match[3], clickHandlers)
+      element.appendChild(linkElement)
+    }
+
+    const lastText = message.substring(lastMentionEnd)
+    if (lastText) {
+      const node = document.createTextNode(lastText)
+      element.appendChild(node)
+    }
+  }
+
+  createMentionLinkElement(type, id, name, clickHandlers) {
+    const node = document.createElement("a")
+    node.text = name
+    const clickHandlerFactory = clickHandlers[type]
+    if (clickHandlerFactory) {
+      node.onClick = clickHandlerFactory(id)
+    }
+    return node
   }
 }
 
