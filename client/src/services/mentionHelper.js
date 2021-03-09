@@ -83,6 +83,8 @@ class MentionHelper {
 
   createMentionLinkElement(type, id, name, clickHandlers) {
     const node = document.createElement("a")
+    //Set href attribute so styles are applied properly
+    node.setAttribute("href", "javascript:void(0)")
     node.text = name
     const clickHandlerFactory = clickHandlers[type]
     if (clickHandlerFactory) {
