@@ -61,7 +61,7 @@ export default {
     panToStar (id) {
       const star = gameHelper.getStarById(this.$store.state.game, id)
       if (star) {
-        GameContainer.map.panToStar()
+        GameContainer.map.panToStar(star)
       } else {
         this.$toasted.show(`Unknown location`, { 
           type: 'error'
