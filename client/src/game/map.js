@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js-legacy'
-import gameContainer from './container'
 import Background from './background'
 import Star from './star'
 import Carrier from './carrier'
@@ -17,10 +16,12 @@ class Map extends EventEmitter {
   // waypoints - Displays waypoints overlay for a given carrier
   mode = 'galaxy'
 
-  constructor (app) {
+  constructor (app, store, gameContainer) {
     super()
 
     this.app = app
+    this.store = store
+    this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
 
     this.stars = []
@@ -395,9 +396,9 @@ class Map extends EventEmitter {
       return
     }
 
-    gameContainer.viewport.moveCenter(empireCenter.x, empireCenter.y)
+    this.gameContainer.viewport.moveCenter(empireCenter.x, empireCenter.y)
 
-    let zoomPercent = gameContainer.getViewportZoomPercentage()
+    let zoomPercent = this.gameContainer.getViewportZoomPercentage()
 
     this.refreshZoom(zoomPercent)
   }
@@ -422,7 +423,7 @@ class Map extends EventEmitter {
   }
 
   panToLocation (location) {
-    gameContainer.viewport.moveCenter(location.x, location.y)
+    this.gameContainer.viewport.moveCenter(location.x, location.y)
   }
 
   clickStar (starId) {
@@ -484,15 +485,15 @@ class Map extends EventEmitter {
   }
 
   onTick(deltaTime) {
-    let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
-    let viewportHeight = gameContainer.viewport.bottom - gameContainer.viewport.top
+    let viewportWidth = this.gameContainer.viewport.right - this.gameContainer.viewport.left
+    let viewportHeight = this.gameContainer.viewport.bottom - this.gameContainer.viewport.top
     
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
     
-    let viewportCenter = gameContainer.viewport.center
+    let viewportCenter = this.gameContainer.viewport.center
 
-    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
+    let zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -526,26 +527,32 @@ class Map extends EventEmitter {
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
     
-    // Clicking stars should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
-      let selectedStar = this.stars.find(x => x.data._id === e._id)
-      selectedStar.isSelected = !selectedStar.isSelected
+    // dispatch click event to the store, so it can be intercepted for adding star name to open message
+    this.store.commit('starClicked', {
+      star: dic.starData,
+      permitCallback: () => {
+        // Clicking stars should only raise events to the UI if in galaxy mode.
+        if (this.mode === 'galaxy') {
+          let selectedStar = this.stars.find(x => x.data._id === e._id)
+          selectedStar.isSelected = !selectedStar.isSelected
+        
+          this.unselectAllCarriers()
+          this.unselectAllStarsExcept(selectedStar)
 
-      this.unselectAllCarriers()
-      this.unselectAllStarsExcept(selectedStar)
-      
-      if (!this.tryMultiSelect(e.location)) {
-        this.emit('onStarClicked', e)
-      } else {
-        selectedStar.isSelected = false // If multi-select then do not select the star.
+          if (!this.tryMultiSelect(e.location)) {
+            this.emit('onStarClicked', e)
+          } else {
+            selectedStar.isSelected = false // If multi-select then do not select the star.
+          }
+        } else if (this.mode === 'waypoints') {
+          this.waypoints.onStarClicked(e)
+        } else if (this.mode === 'ruler') {
+          this.rulerPoints.onStarClicked(e)
+        }
+
+        AnimationService.drawSelectedCircle(this.app, this.container, e.location)
       }
-    } else if (this.mode === 'waypoints') {
-      this.waypoints.onStarClicked(e)
-    } else if (this.mode === 'ruler') {
-      this.rulerPoints.onStarClicked(e)
-    }
-
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+    })
   }
 
   onStarRightClicked (e) {

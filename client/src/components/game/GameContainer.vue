@@ -25,7 +25,7 @@ export default {
 
   beforeMount () {
     this.gameContainer = GameContainer
-    this.gameContainer.setupApp()
+    this.gameContainer.setupApp(this.$store)
     this.loadGame(this.$store.state.game)
   },
 

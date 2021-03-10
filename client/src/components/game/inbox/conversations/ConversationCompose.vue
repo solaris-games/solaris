@@ -1,7 +1,7 @@
 <template>
 <form class="pb-1">
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." :value="this.conversationMessage" @input="onMessageChange"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -15,6 +15,7 @@
 <script>
 import moment from 'moment'
 import GameHelper from '../../../../services/gameHelper'
+import MentionHelper from '../../../../services/mentionHelper';
 import ConversationApiService from '../../../../services/api/conversation'
 import AudioService from '../../../../game/audio'
 
@@ -24,23 +25,27 @@ export default {
   },
   props: {
     conversationId: String,
-    conversationMessage: String
   },
   data () {
     return {
       isSendingMessage: false
     }
   },
+  mounted () {
+    this.$store.commit('setConversationElement', this.$refs.messageElement);
+  },
   methods: {
     onMessageChange (e) {
-      this.$emit('onMessageChange', e.target.value)
+      this.$store.commit('updateCurrentConversationText', e.target.value)
     },
     async send () {
-      const message = this.conversationMessage.trim()
+      const messageText = this.$store.state.currentConversation.text
 
-      if (message === '') {
+      if (!messageText) {
         return
       }
+
+      const message = MentionHelper.makeMentionsStatic(this.$store.state.game, messageText)
 
       try {
         this.isSendingMessage = true
@@ -61,7 +66,7 @@ export default {
             type: 'message'
           })
 
-          this.$emit('onMessageChange', '')
+          this.$store.commit('resetCurrentConversationText')
         }
       } catch (e) {
         console.error(e)
