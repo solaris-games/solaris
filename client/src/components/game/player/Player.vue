@@ -29,7 +29,7 @@
                     :science="userPlayer.stats.totalScience"/>
 
     <h4 v-if="userPlayer" class="mt-2">Technology</h4>
-
+{{canSendRenown}}fdsfdsafds
     <research v-if="player" :playerId="player._id"/>
 
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
@@ -46,7 +46,7 @@
 
     <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
 
-    <h4 class="mt-2" v-if="player && !player.isEmptySlot && isValidUser">Achievements</h4>
+    <h4 class="mt-2" v-if="canViewAchievements">Achievements</h4>
 
     <achievements v-if="isValidUser" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
@@ -164,7 +164,9 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', player._id)
     },
     onRenownSent (e) {
-      this.user.achievements.renown += e
+      if (this.user.achievements) {
+        this.user.achievements.renown += e
+      }
     }
   },
   computed: {
@@ -186,8 +188,22 @@ export default {
     tradeTechnologyIsEnabled () {
       return this.game.settings.player.tradeCost > 0
     },
+    isAnonymousGame () {
+      return this.game.settings.general.anonymity === 'extra'
+    },
+    canViewAchievements () {
+      if (this.isAnonymousGame) {
+        return this.player && !this.player.isEmptySlot && this.isGameFinished && this.player != this.userPlayer
+      } else {
+        return this.player && !this.player.isEmptySlot && this.isValidUser
+      }
+    },
     canSendRenown () {
-      return this.isValidUser && this.game.state.startDate && this.userPlayer && this.player != this.userPlayer
+      if (this.isAnonymousGame) {
+        return this.game.state.startDate && this.userPlayer && this.player != this.userPlayer && this.isGameFinished
+      } else {
+        return this.game.state.startDate && this.userPlayer && this.player != this.userPlayer
+      }
     }
   }
 }

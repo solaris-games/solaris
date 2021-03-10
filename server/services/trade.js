@@ -88,6 +88,11 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
         }
 
+        // If its a anonymous game, then do not allow renown to be sent until the game ends.
+        if (game.settings.general.anonymity === 'extra' && !game.state.endDate) {
+            throw new ValidationError(`Renown cannot be sent to players in anonymous games until the game has finished.`);
+        }
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
