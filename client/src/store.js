@@ -209,10 +209,16 @@ export default new Vuex.Store({
   actions: {
     async loadSpecialistData ({ commit, state }) {
       const gameId = state.game._id;
-      const carrierSpecialistsResponse = await SpecialistService.getCarrierSpecialists(gameId)
-      const starSpecialistsResponse = await SpecialistService.getStarSpecialists(gameId)
-      commit('setCarrierSpecialists', carrierSpecialistsResponse.data)
-      commit('setStarSpecialists', starSpecialistsResponse.data)
+
+      let requests = [
+        SpecialistService.getCarrierSpecialists(gameId),
+        SpecialistService.getStarSpecialists(gameId)
+      ]
+
+      const responses = await Promise.all(requests)
+      
+      commit('setCarrierSpecialists', responses[0].data)
+      commit('setStarSpecialists', responses[1].data)
     }
   },
   getters: {
