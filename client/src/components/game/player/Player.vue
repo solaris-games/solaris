@@ -52,7 +52,7 @@
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="isValidUser && game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"
+    <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
     <!--
@@ -185,6 +185,9 @@ export default {
     },
     tradeTechnologyIsEnabled () {
       return this.game.settings.player.tradeCost > 0
+    },
+    canSendRenown () {
+      return this.isValidUser && this.game.state.startDate && this.userPlayer && this.player != this.userPlayer
     }
   }
 }

@@ -218,7 +218,7 @@ export default {
       let longestWaypoint = Math.max(...distances)
 
       // Calculate the hyperspace range required for it.
-      this.hyperspaceLevel = GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint)
+      this.hyperspaceLevel = Math.max(GameHelper.getHyperspaceLevelByDistance(game, longestWaypoint), 1)
       this.scanningLevel = GameHelper.getScanningLevelByDistance(game, longestWaypoint)
     },
     recalculateDistanceLightYears () {
