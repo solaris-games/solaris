@@ -41,6 +41,7 @@
       "industry": "standard",
       "science": "standard"
     },
+    "tradeCredits": true,
     "tradeCost": 15,
     "tradeScanning": "all"
   },

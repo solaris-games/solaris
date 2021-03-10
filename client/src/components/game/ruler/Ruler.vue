@@ -12,7 +12,7 @@
       </div>
       <div class="col-3 text-center">
           <span title="Distance (ly)">
-            <i class="fas fa-sun"></i> {{distanceLightYears}}
+            <i class="fas fa-sun"></i> {{distanceLightYears.toFixed(3)}}
           </span>
       </div>
       <div class="col-3 text-center">

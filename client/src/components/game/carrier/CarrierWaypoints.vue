@@ -51,7 +51,7 @@
 			<div class="col-auto">
 				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Save</span>
+          <span class="ml-1">Save</span>
         </button>
 				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-edit"></i> 

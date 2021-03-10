@@ -194,6 +194,8 @@ class Map extends EventEmitter {
   }
 
   reloadGame (game, userSettings) {
+    this.game = game
+    
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]

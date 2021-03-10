@@ -10,9 +10,7 @@
         </div>
     </div>
 
-    <loading-spinner :loading="isLoadingSpecialists"/>
-
-    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="!isLoadingSpecialists && carrier">
+    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="carrier">
         <div class="col">
             <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
         </div>
@@ -25,7 +23,7 @@
         </div>
     </div>
 
-    <div v-if="!isLoadingSpecialists && specialists.length">
+    <div v-if="specialists && specialists.length">
         <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 bg-secondary">
             <div class="col mt-2">
                 <h5 class="pt-1 text-warning">
@@ -46,7 +44,6 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../LoadingSpinner'
 import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
@@ -55,7 +52,6 @@ import SpecialistIconVue from '../specialist/SpecialistIcon'
 
 export default {
   components: {
-    'loading-spinner': LoadingSpinner,
     'menu-title': MenuTitleVue,
     'specialist-icon': SpecialistIconVue
   },
@@ -67,7 +63,6 @@ export default {
       userPlayer: null,
       carrier: null,
       specialists: [],
-      isLoadingSpecialists: false,
       isHiringSpecialist: false
     }
   },
@@ -75,7 +70,7 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    this.loadSpecialists()
+    this.specialists = this.$store.state.carrierSpecialists;
   },
   methods: {
     onCloseRequested (e) {
@@ -84,22 +79,11 @@ export default {
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
     },
-    async loadSpecialists () {
-        this.isLoadingSpecialists = true
-
-        try {
-            let response = await SpecialistApiService.getCarrierSpecialists(this.$store.state.game._id)
-
-            if (response.status === 200) {
-                this.specialists = response.data
-            }
-        } catch (err) {
-            console.error(err)
-        }
-
-        this.isLoadingSpecialists = false
-    },
     async hireSpecialist (specialist) {
+        if (!confirm(`Are you sure you want to hire a ${specialist.name} for $${specialist.cost}?`)) {
+            return
+        }
+        
         this.isHiringSpecialist = true
 
         try {

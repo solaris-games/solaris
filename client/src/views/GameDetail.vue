@@ -156,9 +156,10 @@
             </tr>
             <tr>
               <td>Trade Cost</td>
-              <td class="text-right">{{ getFriendlyText(game.settings.player.tradeCost) }} credits/level</td>
+              <td class="text-right" v-if="game.settings.player.tradeCost > 0">{{ getFriendlyText(game.settings.player.tradeCost) }} credits/level</td>
+              <td class="text-right" v-if="game.settings.player.tradeCost === 0">Disabled</td>
             </tr>
-            <tr>
+            <tr v-if="game.settings.player.tradeCost > 0">
               <td>Trade Scanning</td>
               <td class="text-right">{{ getFriendlyText(game.settings.player.tradeScanning) }}</td>
             </tr>

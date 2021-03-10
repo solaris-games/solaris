@@ -33,7 +33,7 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
@@ -94,10 +94,8 @@ export default {
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
 
-    this.sockets.subscribe('playerCreditsReceived', (data) => {
-      let player = GameHelper.getUserPlayer(this.$store.state.game)
-      player.credits += data.data.credits
-    })
+    this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
   destroyed () {
     document.removeEventListener('keydown', this.handleKeyDown)
@@ -130,6 +128,19 @@ export default {
     },
     onMenuStateChanged (e) {
       this.$emit('onMenuStateChanged', e)
+    },
+    onCreditsReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.credits += data.data.credits
+
+      this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+    },
+    onTechnologyReceived (data) {
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      this.$toasted.show(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`, { type: 'info' })
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })
@@ -235,9 +246,6 @@ export default {
           case 70: // F
             this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
             break
-          case 71: // G
-            this.setMenuState(MENU_STATES.INTEL)
-            break
           case 73: // I
             this.setMenuState(MENU_STATES.INBOX)
             break
@@ -278,6 +286,9 @@ export default {
           break
         case 67: // C
           this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
+          break
+        case 71: // G
+          this.setMenuState(MENU_STATES.INTEL)
           break
         case 79: // O
           this.setMenuState(MENU_STATES.OPTIONS)

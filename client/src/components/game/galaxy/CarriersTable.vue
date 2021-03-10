@@ -47,7 +47,7 @@ export default {
     return {
       showAll: false,
       tableData: [],
-      sortBy: null,
+      sortBy: ['ticksEta'],
       sortDirection: true
     }
   },

@@ -46,6 +46,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
+  listInProgressGames () {
+    return axios.get(this.BASE_URL + 'game/list/inprogress',
+      { withCredentials: true })
+  }
+
   listActiveGames () {
     return axios.get(this.BASE_URL + 'game/list/active',
       { withCredentials: true })

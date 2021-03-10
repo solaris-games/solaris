@@ -55,7 +55,10 @@
               <div class="btn-group">
                 <button class="btn btn-success" @click="showAll">All</button>
                 <button class="btn btn-info" @click="showActive">Active</button>
-                <button class="btn btn-primary" @click="showNone">You</button>
+                <button class="btn btn-primary" @click="showNone">
+                  <span v-if="userPlayer">You</span>
+                  <span v-if="!userPlayer">None</span>
+                </button>
               </div>
             </div>
         </div>
@@ -135,7 +138,7 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.playerFilters = this.$store.state.game.galaxy.players.map(p => {
-      let isCurrentPlayer = this.userPlayer._id === p._id
+      let isCurrentPlayer = this.userPlayer && this.userPlayer._id === p._id
 
       return {
         enabled: !p.defeated, // Default to Active filter
@@ -150,7 +153,7 @@ export default {
     if (this.compareWithPlayerId) {
       this.playerFilters.forEach(f => {
         f.enabled = f.playerId === this.compareWithPlayerId ||
-            f.playerId === this.userPlayer._id
+            (this.userPlayer && f.playerId === this.userPlayer._id)
       })
     }
 
@@ -217,7 +220,11 @@ export default {
       this.fillData()
     },
     showNone () {
-      this.playerFilters.forEach(f => f.enabled = (f.playerId === this.userPlayer._id))
+      if (!this.userPlayer) {
+        this.playerFilters.forEach(f => f.enabled = false)
+      } else {
+        this.playerFilters.forEach(f => f.enabled = (f.playerId === this.userPlayer._id))
+      }
 
       this.fillData()
     },
@@ -243,7 +250,7 @@ export default {
           continue
         }
 
-        let isCurrentPlayer = this.userPlayer._id === player._id
+        let isCurrentPlayer = this.userPlayer && this.userPlayer._id === player._id
 
         let dataset = {
           label: player.alias,

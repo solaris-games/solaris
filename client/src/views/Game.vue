@@ -75,10 +75,23 @@ export default {
 
     this.$socket.emit('gameRoomJoined', socketData)
 
-    // Check if the user is in this game, if not then show the welcome screen.
-    this.menuState = this.getUserPlayer() ? 'leaderboard' : 'welcome'
+    // If the user is in the game then display the leaderboard.
+    // Otherwise show the welcome screen if there are empty slots.
+    let userPlayer = this.getUserPlayer()
+    
+    if (userPlayer && !userPlayer.defeated) {
+      this.menuState = MENU_STATES.LEADERBOARD
+    } else {
+      if (GameHelper.gameHasOpenSlots(this.$store.state.game)) {
+        this.menuState = MENU_STATES.WELCOME
+      } else {
+        this.menuState = MENU_STATES.LEADERBOARD // Assume the user is spectating.
+      }
+    }
 
     this.polling = setInterval(this.reloadGameCheck, 10000)
+
+    this.$store.dispatch('loadSpecialistData');
   },
   beforeDestroy () {
     clearInterval(this.polling)

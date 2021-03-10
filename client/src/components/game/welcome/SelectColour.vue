@@ -16,11 +16,17 @@
                         <player-avatar :player="player"/>
                     </td>
                     <td class="pl-2 pt-3 pb-2">
-                        <h5 class="alias-title" style="vertical-align: middle;">{{player.alias}}</h5>
+                        <h5 class="alias-title" style="vertical-align: middle;">
+                          {{player.alias}}
+                          <span v-if="player.defeated" :title="getPlayerStatus(player)">
+                            <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
+                            <i v-if="player.afk" class="fas fa-user-clock"></i>
+                          </span>
+                        </h5>
                     </td>
                     <td class="fit pl-2 pt-2 pb-2 pr-2">
                         <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-success ml-1" @click="onJoinRequested(player)" v-if="player.isEmptySlot">Join</button>
+                        <button class="btn btn-success ml-1" @click="onJoinRequested(player)" v-if="player.isEmptySlot || player.afk">Join</button>
                     </td>
                 </tr>
             </tbody>
@@ -63,6 +69,9 @@ export default {
     },
     getAvatarImage (player) {
       return require(`../../../assets/avatars/${player.avatar}.png`)
+    },
+    getPlayerStatus (player) {
+      return gameHelper.getPlayerStatus(player)
     }
   },
 
