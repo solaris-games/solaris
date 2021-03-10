@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
+import SpecialistService from './services/api/specialist';
 
 Vue.use(Vuex)
 
@@ -15,9 +16,18 @@ export default new Vuex.Store({
   state: {
     userId: null,
     game: null,
-    cachedConversationComposeMessages: {}
+    cachedConversationComposeMessages: {},
+    starSpecialists: null,
+    carrierSpecialists: null
   },
   mutations: {
+    setCarrierSpecialists (state, carrierSpecialists) {
+      state.carrierSpecialists = carrierSpecialists;
+    },
+    setStarSpecialists (state, starSpecialists) {
+      state.starSpecialists = starSpecialists;
+    },
+
     setUserId (state, userId) {
       state.userId = userId
     },
@@ -197,7 +207,19 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async loadSpecialistData ({ commit, state }) {
+      const gameId = state.game._id;
 
+      let requests = [
+        SpecialistService.getCarrierSpecialists(gameId),
+        SpecialistService.getStarSpecialists(gameId)
+      ]
+
+      const responses = await Promise.all(requests)
+      
+      commit('setCarrierSpecialists', responses[0].data)
+      commit('setStarSpecialists', responses[1].data)
+    }
   },
   getters: {
     getConversationMessage: (state) => (conversationId) => {
