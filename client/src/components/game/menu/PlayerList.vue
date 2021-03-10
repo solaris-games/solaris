@@ -26,7 +26,7 @@ export default {
       // dispatch click to the store to intercept it when adding the player name to a message
       this.$store.commit('playerClicked', {
         player,
-        continuation: () => this.$emit('onOpenPlayerDetailRequested', player._id)
+        permitCallback: () => this.$emit('onOpenPlayerDetailRequested', player._id)
       })
     }
   },

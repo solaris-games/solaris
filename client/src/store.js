@@ -54,9 +54,9 @@ export default new Vuex.Store({
     },
     openConversation (state, data) {
       state.currentConversation = {
-        id: data.conversationId,
+        id: data,
         element: null,
-        text: state.cachedConversationComposeMessages[data.conversationId]
+        text: state.cachedConversationComposeMessages[data]
       }
     },
     closeConversation (state) {
@@ -65,23 +65,26 @@ export default new Vuex.Store({
       state.currentConversation = null
     },
     updateCurrentConversationText (state, data) {
-      state.currentConversation.text = data.text
+      state.currentConversation.text = data
+    },
+    resetCurrentConversationText (state, data) {
+      state.currentConversation.text = ''
     },
     setConversationElement (state, data) {
-      state.currentConversation.element = data.element
+      state.currentConversation.element = data
     },
     playerClicked (state, data) {
       if (state.currentConversation) {
         MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
       } else {
-        data.continuation(data.player)
+        data.permitCallback(data.player)
       }
     },
     starClicked (state, data) {
       if (state.currentConversation) {
         MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
       } else {
-        data.continuation(data.star)
+        data.permitCallback(data.star)
       }
     },
 

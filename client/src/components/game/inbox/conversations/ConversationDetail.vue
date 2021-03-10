@@ -69,9 +69,11 @@ export default {
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerRenownReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
+
+    this.$store.commit('closeConversation')
   },
   async mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)._id
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     await this.loadConversation()
   },
@@ -120,10 +122,10 @@ export default {
 
       let partnerPlayerId = this.conversation.participants.filter(p => p !== this.userPlayer._id)[0]
 
-      let isTradeEventBetweenPlayers = (t.playerId === this.userPlayer._id && t.data.fromPlayerId === this.partnerPlayerId) ||
-        (t.playerId === this.partnerPlayerId && t.data.fromPlayerId === this.userPlayer._id) ||
-        (t.playerId === this.userPlayer._id && t.data.toPlayerId === this.partnerPlayerId) ||
-        (t.playerId === this.partnerPlayerId && t.data.toPlayerId === this.userPlayer._id)
+      let isTradeEventBetweenPlayers = (e.playerId === this.userPlayer._id && e.data.fromPlayerId === partnerPlayerId) ||
+        (e.playerId === partnerPlayerId && e.data.fromPlayerId === this.userPlayer._id) ||
+        (e.playerId === this.userPlayer._id && e.data.toPlayerId === partnerPlayerId) ||
+        (e.playerId === partnerPlayerId && e.data.toPlayerId === this.userPlayer._id)
 
       if (isTradeEventBetweenPlayers) {
         this.conversation.messages.push(e)
@@ -151,9 +153,7 @@ export default {
 
         if (response.status === 200) {
           this.conversation = response.data
-          this.$store.commit('openConversation', {
-            conversationId: this.conversationId
-          })
+          this.$store.commit('openConversation', this.conversationId)
         
           this.scrollToEnd()
         }

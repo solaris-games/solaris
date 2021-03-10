@@ -39,11 +39,10 @@ export default {
     message: Object
   },
   mounted () {
-    const clickHandlers = {
-      s: (id) => () => this.panToStar(id),
-      p: (id) => () => this.$emit('onOpenPlayerDetailRequested', id)
-    }
-    mentionHelper.renderMessageWithMentions(this.$refs.messageElement, this.message.message, clickHandlers)
+    let onStarClicked = (id) => this.panToStar(id)
+    let onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
+    
+    mentionHelper.renderMessageWithMentions(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
   },
   methods: {
     getUserPlayer () {
@@ -60,12 +59,11 @@ export default {
     },
     panToStar (id) {
       const star = gameHelper.getStarById(this.$store.state.game, id)
+
       if (star) {
         GameContainer.map.panToStar(star)
       } else {
-        this.$toasted.show(`Unknown location`, { 
-          type: 'error'
-         })
+        this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
       }
     }
   },

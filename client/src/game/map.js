@@ -423,7 +423,7 @@ class Map extends EventEmitter {
   }
 
   panToLocation (location) {
-    this.viewport.moveCenter(location.x, location.y)
+    this.gameContainer.viewport.moveCenter(location.x, location.y)
   }
 
   clickStar (starId) {
@@ -530,7 +530,7 @@ class Map extends EventEmitter {
     // dispatch click event to the store, so it can be intercepted for adding star name to open message
     this.store.commit('starClicked', {
       star: dic.starData,
-      continuation: () => {
+      permitCallback: () => {
         // Clicking stars should only raise events to the UI if in galaxy mode.
         if (this.mode === 'galaxy') {
           let selectedStar = this.stars.find(x => x.data._id === e._id)

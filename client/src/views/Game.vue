@@ -155,10 +155,6 @@ export default {
       e.args = e.args || null
       e.state = e.state || null
 
-      if (this.menuState == MENU_STATES.CONVERSATION) {
-        this.$store.commit('closeConversation')
-      }
-
       // Toggle menu if its already open.
       if (e.state === this.menuState && e.args === this.menuArguments) {
         this.menuArguments = null

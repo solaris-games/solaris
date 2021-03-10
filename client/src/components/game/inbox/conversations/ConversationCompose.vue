@@ -32,15 +32,11 @@ export default {
     }
   },
   mounted () {
-    this.$store.commit('setConversationElement', {
-      element: this.$refs.messageElement
-    });
+    this.$store.commit('setConversationElement', this.$refs.messageElement);
   },
   methods: {
     onMessageChange (e) {
-      this.$store.commit('updateCurrentConversationText', {
-        text: e.target.value
-      })
+      this.$store.commit('updateCurrentConversationText', e.target.value)
     },
     async send () {
       const messageText = this.$store.state.currentConversation.text
@@ -70,9 +66,7 @@ export default {
             type: 'message'
           })
 
-          this.$store.commit('updateCurrentConversationText', {
-            text: ''
-          })
+          this.$store.commit('resetCurrentConversationText')
         }
       } catch (e) {
         console.error(e)

@@ -7,12 +7,14 @@ class MentionHelper {
   addMention(conversation, type, name) {
     const text = conversation.text || ''
     const element = conversation.element
+
     //Do not use and for property access here because a selection start of 0 would be false
     const insertionStart = element ? element.selectionStart : (text.length - 1)
     const insertionEnd = element ? element.selectionEnd : text.length
     
     const mention = `[[${type}:${name}]]`
     const newText = text.substring(0, insertionStart) + mention + text.substring(insertionEnd)
+
     conversation.text = newText
 
     if (element) {
@@ -23,9 +25,6 @@ class MentionHelper {
 
   makeMentionsStatic(game, originalText) {
     return originalText.replaceAll(MentionHelper.MENTION_REGEX, (match, typeGroup, nameGroup) => {
-      console.log(match)
-      console.log(typeGroup)
-      console.log(nameGroup)
       if (typeGroup === 'star') {
         return this.makeStarMentionStatic(game, nameGroup)
       } else if (typeGroup === 'player') {
@@ -64,35 +63,54 @@ class MentionHelper {
     return message.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, _type, _id, name) => name)
   }
 
-  renderMessageWithMentions(element, message, clickHandlers) {
+  renderMessageWithMentions(element, message, onStarClickedCallback, onPlayerClickedCallback) {
     let lastMentionEnd = 0
+
     for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
       const text = message.substring(lastMentionEnd, match.index)
+
       if (text) {
         const node = document.createTextNode(text)
+
         element.appendChild(node)
       }
+
       lastMentionEnd = match.index + match[0].length
-      const linkElement = this.createMentionLinkElement(match[1], match[2], match[3], clickHandlers)
+
+      const linkElement = this.createMentionLinkElement(match[1], match[2], match[3], onStarClickedCallback, onPlayerClickedCallback)
+
       element.appendChild(linkElement)
     }
 
     const lastText = message.substring(lastMentionEnd)
+
     if (lastText) {
       const node = document.createTextNode(lastText)
+
       element.appendChild(node)
     }
   }
 
-  createMentionLinkElement(type, id, name, clickHandlers) {
+  createMentionLinkElement(type, id, name, onStarClickedCallback, onPlayerClickedCallback) {
     const node = document.createElement("a")
+
     //Set href attribute so styles are applied properly
     node.setAttribute("href", "javascript:void(0)")
     node.text = name
-    const clickHandlerFactory = clickHandlers[type]
-    if (clickHandlerFactory) {
-      node.onclick = clickHandlerFactory(id)
+
+    switch (type) {
+      case 's':
+        node.onclick = () => {
+          onStarClickedCallback(id) 
+        }
+        break
+      case 'p':
+        node.onclick = () => { 
+          onPlayerClickedCallback(id) 
+        }
+        break
     }
+
     return node
   }
 }
