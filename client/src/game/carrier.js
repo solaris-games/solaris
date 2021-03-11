@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import Map from './map'
 
 class Carrier extends EventEmitter {
 
@@ -12,6 +13,7 @@ class Carrier extends EventEmitter {
     this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
+    this.container.interactiveChildren = false
     this.container.buttonMode = true
 
     this.graphics_colour = new PIXI.Graphics()
@@ -28,7 +30,7 @@ class Carrier extends EventEmitter {
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.isMouseOver = false
-    this.zoomPercent = 0
+    this.zoomPercent = 100
   }
 
   setup (data, userSettings, stars, player, lightYearDistance) {
@@ -49,6 +51,27 @@ class Carrier extends EventEmitter {
     this.baseScale = 1
     this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
+  }
+
+  addContainerToChunk(chunks, firstX, firstY) {
+    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
+
+    chunks[ix][iy].addChild(this.container)
+    chunks[ix][iy].mapObjects.push(this)
+  }
+
+  removeContainerFromChunk(chunks, firstX, firstY) {
+    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
+
+    chunks[ix][iy].removeChild(this.container)
+    let index = chunks[ix][iy].mapObjects.indexOf(this)
+    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
   draw () {
@@ -243,23 +266,10 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = false
   }
 
-  onTick( deltaTime, zoomPercent, viewportData) {
-   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
-   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
-
-   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
-     //cannot set parent container visibility, since waypoints lines stretch away from carrier location
-     // maybe put waypoints on its own container, since this piece of code should remain as small as possible
-     this.graphics_colour.visible = false
-     this.graphics_ship.visible = false
-     if (this.text_garrison) this.text_garrison.visible = false
-   } 
-   else {
-     this.graphics_colour.visible = true
-     if (this.text_garrison) this.text_garrison.visible = true
-     this.updateVisibility()
-     this.setScale(zoomPercent)
-   }
+  onZoomChanging(zoomPercent) {
+   this.zoomPercent = zoomPercent
+   this.setScale(zoomPercent)
+   this.updateVisibility()//TODO see how this behaves on mobile - does it updated when pinching or only when pinching stops?
   }
 
   setScale( zoomPercent ) {
@@ -283,6 +293,13 @@ class Carrier extends EventEmitter {
      }
   }
 
+  updateVisibility() {
+    let displayTextZoom = 150
+
+    this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
+    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > displayTextZoom || (this.isSelected && this.zoomPercent > displayTextZoom ) || (this.isMouseOver && this.zoomPercent > displayTextZoom))
+  }
+
   onClicked (e) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onCarrierRightClicked', this.data)
@@ -294,13 +311,6 @@ class Carrier extends EventEmitter {
       // Need to do this otherwise sometimes text gets highlighted.
       this.deselectAllText()
     }
-  }
-
-  updateVisibility() {
-    let displayTextZoom = 150
-
-    this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > displayTextZoom || (this.isSelected && this.zoomPercent > displayTextZoom ) || (this.isMouseOver && this.zoomPercent > displayTextZoom))
   }
 
   deselectAllText () {

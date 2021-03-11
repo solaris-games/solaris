@@ -20,6 +20,7 @@ class GameContainer {
       let avg = this.dtAccum/(60.0*5.0)
       console.log( 'avg dt: '+avg )
       console.log( 'avg fps: '+1000.0/(1000.0*avg) )
+      console.log( 'zoom%' + this.map.zoomPercent )
       this.frames = 0
       this.dtAccum = 0
     }
@@ -117,6 +118,7 @@ class GameContainer {
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
+    this.viewport.on('mousemove', this.map.onMouseMove.bind(this.map))
   }
 
   setup (game, userSettings) {
@@ -146,11 +148,13 @@ class GameContainer {
   reloadStar (star) {
     let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)
+    starObject.addContainerToChunk(this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
   }
 
   reloadCarrier (carrier) {
     let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
     this.map.drawCarrier(carrierObject)
+    carrierObject.addContainerToChunk(this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
   }
 
   undrawCarrier (carrier) {

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import Map from './map'
 
 class Star extends EventEmitter {
 
@@ -13,6 +14,7 @@ class Star extends EventEmitter {
     this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
+    this.container.interactiveChildren = false
     this.container.buttonMode = true
 
     this.graphics_shape_part = new PIXI.Graphics()
@@ -41,7 +43,7 @@ class Star extends EventEmitter {
     this.isSelected = false
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
-    this.zoomPercent = 0
+    this.zoomPercent = 100
   }
 
   _getStarPlayer () {
@@ -82,6 +84,7 @@ class Star extends EventEmitter {
     //divide these by 4 to allow more control while keeping the UI as int
     this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
+
   }
 
   draw () {
@@ -368,6 +371,27 @@ class Star extends EventEmitter {
       return ( (scramblers || scrambler) && this._isInScanningRange() )
   }
 
+  addContainerToChunk(chunks, firstX, firstY) { //TODO maybe obtain a map instance
+    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
+
+    chunks[ix][iy].addChild(this.container)
+    chunks[ix][iy].mapObjects.push(this)
+  }
+
+  removeContainerFromChunk(chunks, firstX, firstY) {
+    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
+
+    chunks[ix][iy].removeChild(this.container)
+    let index = chunks[ix][iy].mapObjects.indexOf(this)
+    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
+  }
+
   drawName () {
     if (!this.text_name) {
       let style = TextureService.DEFAULT_FONT_STYLE
@@ -527,29 +551,10 @@ class Star extends EventEmitter {
   }
 
 
-  onTick( deltaTime, zoomPercent, viewportData ) {
-   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
-   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
- 
-   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
-     //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
-     // maybe put them on their own container, since this piece of code should remain as small as possible
-     this.graphics_star.visible = false
-     this.graphics_shape_part.visible = false
-     this.graphics_shape_full.visible = false
-     this.graphics_shape_part_warp.visible = false
-     this.graphics_shape_full_warp.visible = false
-     this.graphics_natural_resources_ring.visible = false
-
-     if (this.text_name) this.text_name.visible = false
-     if (this.container_planets) this.container_planets.visible = false
-     if (this.text_infrastructure) this.text_infrastructure.visible = false
-     if (this.text_garrison) this.text_garrison.visible = false
-   } 
-   else {
-     this.updateVisibility()
-     this.setScale(zoomPercent)
-   }
+  onZoomChanging(zoomPercent) {
+    this.zoomPercent = zoomPercent
+    this.setScale(zoomPercent)
+    this.updateVisibility()
   }
 
   setScale( zoomPercent ) {
@@ -573,6 +578,34 @@ class Star extends EventEmitter {
      }
   }
 
+  updateVisibility() {
+    const displayTextZoom = 150
+
+    this.graphics_star.visible = !this.hasSpecialist()
+    this.graphics_shape_part.visible = this.zoomPercent > displayTextZoom
+    this.graphics_shape_full.visible = this.zoomPercent <= displayTextZoom
+    this.graphics_shape_part_warp.visible = this.zoomPercent > displayTextZoom && this.data.warpGate
+    this.graphics_shape_full_warp.visible = this.zoomPercent <= displayTextZoom && this.data.warpGate
+    this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
+    this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
+    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
+
+    if(this.text_name) {
+    this.text_name.visible = (this.isSelected || this.zoomPercent > displayTextZoom)
+    }
+    if(this.container_planets) {
+    this.container_planets.visible =  (this._isInScanningRange() && this.zoomPercent > displayTextZoom)
+    }
+    if( this.text_infrastructure) {
+    this.text_infrastructure.visible = (this.isMouseOver || this.isSelected || this.zoomPercent > displayTextZoom)
+    }
+    if(this.text_garrison) {
+    this.text_garrison.visible = (this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > displayTextZoom))
+    }
+
+    // this.baseScale = this.isSelected ? 1.5 : 1
+  }
+
   onClicked (e) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
       this.emit('onStarRightClicked', this.data)
@@ -589,26 +622,6 @@ class Star extends EventEmitter {
         // this.setScale()
       }
     }
-  }
-
-  updateVisibility() {
-    const displayTextZoom = 150
-
-    this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_shape_part.visible = this.zoomPercent > displayTextZoom
-    this.graphics_shape_full.visible = this.zoomPercent <= displayTextZoom
-    this.graphics_shape_part_warp.visible = this.zoomPercent > displayTextZoom && this.data.warpGate
-    this.graphics_shape_full_warp.visible = this.zoomPercent <= displayTextZoom && this.data.warpGate
-    this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
-
-    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent > displayTextZoom
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
-    if (this.text_infrastructure) this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > displayTextZoom
-    if (this.text_garrison) this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > displayTextZoom)
-
-    // this.baseScale = this.isSelected ? 1.5 : 1
   }
 
   deselectAllText () {
