@@ -1,8 +1,8 @@
 import gameHelper from './gameHelper.js'
 
 class MentionHelper {
-  static MENTION_REGEX = /\[\[(.+?):(.+?)\]\]/g
-  static INTERNAL_MENTION_REGEX = /\[\[(\w)\/(\w+?)\/(.+?)\]\]/g
+  static MENTION_REGEX = /{{(.+?):(.+?)}}/g
+  static INTERNAL_MENTION_REGEX = /{{(\w)\/(\w+?)\/(.+?)}}/g
 
   addMention(conversation, type, name) {
     const text = conversation.text || ''
@@ -12,7 +12,7 @@ class MentionHelper {
     const insertionStart = element ? element.selectionStart : (text.length - 1)
     const insertionEnd = element ? element.selectionEnd : text.length
     
-    const mention = `[[${type}:${name}]]`
+    const mention = `{{${type}:${name}}}`
     const newText = text.substring(0, insertionStart) + mention + text.substring(insertionEnd)
 
     conversation.text = newText
@@ -56,7 +56,7 @@ class MentionHelper {
   }
 
   makeStaticMention(type, id, name) {
-    return `[[${type}/${id}/${name}]]`
+    return `{{${type}/${id}/${name}}}`
   }
 
   replaceMentionsWithNames(message) {
