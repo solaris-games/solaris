@@ -14,6 +14,17 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/guild/leaderboard', middleware.authenticate, async (req, res, next) => {
+        try {
+            let limit = +req.query.limit || null;
+            let result = await container.guildService.getLeaderboard(limit);
+                
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/guild/invites', middleware.authenticate, async (req, res, next) => {
         try {
             let result = await container.guildService.listInvitations(req.session.userId);

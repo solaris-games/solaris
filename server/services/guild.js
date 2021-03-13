@@ -506,4 +506,51 @@ module.exports = class GuildService {
         }).exec() > 0;
     }
 
+    async listUserRanksInGuilds() {
+        return await this.userModel.find({
+            guildId: { $ne: null }
+        }, {
+            guildId: 1,
+            'achievements.rank': 1
+        })
+        .lean()
+        .exec();
+    }
+
+    async getLeaderboard(limit) {
+        limit = limit || 10;
+
+        let guilds = await this.guildModel.find({}, {
+            name: 1,
+            tag: 1,
+            leader: 1,
+            officers: 1,
+            members: 1
+        })
+        .lean()
+        .exec();
+
+        // Calculate the rankings of each guild.
+        let users = await this.listUserRanksInGuilds();
+
+        for (let guild of guilds) {
+            let usersInGuild = users.filter(x => x.guildId.equals(guild._id));
+
+            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+        }
+
+        let leaderboard = guilds
+                        .sort((a, b) => b.totalRank - a.totalRank)
+                        .slice(0, limit);
+
+        for (let i = 0; i < leaderboard.length; i++) {
+            leaderboard[i].position = i + 1;
+        }
+
+        return {
+            leaderboard,
+            totalGuilds: guilds.length
+        };
+    }
+
 };
