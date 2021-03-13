@@ -69,7 +69,7 @@
         "gameType": "realTime",
         "speed": 30,
         "startDelay": 30,
-        "turnJumps": 8,
+        "turnJumps": 6,
         "maxTurnWait": 24,
         "missedTurnLimit": 3
     }

@@ -67,7 +67,7 @@
   },
   "gameTime": {
     "gameType": "turnBased",
-    "tickJumps": 8,
+    "tickJumps": 6,
     "maxTurnWait": 24,
     "missedTurnLimit": 3
   }

@@ -60,15 +60,15 @@
       "experimentation": "none",
       "scanning": "standard",
       "hyperspace": "standard",
-      "manufacturing": "standard",
+      "manufacturing": "expensive",
       "banking": "cheap",
-      "weapons": "expensive"
+      "weapons": "none"
     }
   },
   "gameTime": {
     "gameType": "turnBased",
     "tickJumps": 6,
-    "maxTurnWait": 12,
+    "maxTurnWait": 24,
     "missedTurnLimit": 3
   }
 }
