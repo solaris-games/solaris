@@ -77,21 +77,33 @@ module.exports = class GuildService {
         .exec();
 
         if (withUserInfo) {
-            let users = await this.userModel.find({}, {
+            let userSelectObject = {
                 username: 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1
-            })
+            };
+
+            let usersInGuild = await this.userModel.find({
+                guildId
+            }, userSelectObject)
+            .lean()
+            .exec();
+
+            let usersInvited = await this.userModel.find({
+                _id: {
+                    $in: guild.invitees
+                }
+            }, userSelectObject)
             .lean()
             .exec();
     
-            guild.leader = users.find(x => x._id.equals(guild.leader));
-            guild.officers = users.filter(x => this._isOfficer(guild, x._id));
-            guild.members = users.filter(x => this._isMember(guild, x._id));
-            guild.invitees = users.filter(x => this._isInvitee(guild, x._id));
+            guild.leader = usersInGuild.find(x => x._id.equals(guild.leader));
+            guild.officers = usersInGuild.filter(x => this._isOfficer(guild, x._id));
+            guild.members = usersInGuild.filter(x => this._isMember(guild, x._id));
+            guild.invitees = usersInvited;
 
-            guild.totalRank = users.reduce((sum, i) => sum + i.achievements.rank, 0);
+            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
         }
 
         return guild;
