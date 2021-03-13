@@ -264,6 +264,7 @@ export default {
       this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
         duration: null,
         type: 'info',
+        duration: 10000,
         action: [
           {
             text: 'Dismiss',
