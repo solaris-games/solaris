@@ -655,12 +655,17 @@ class Map extends EventEmitter {
         }
       })
       .filter(s => s.distance <= distance)
-
+    
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
-      .sort((a, b) => b.type.localeCompare(a.type))
-      .sort((a, b) => a.distance - b.distance)
+      .sort((a, b) => {
+        if (a.type.localeCompare(b.type)) { // Sort the star first
+          return 1
+        }
 
+        return a.distance < b.distance // Then distance ascending.
+      })
+    
     if (closeObjects.length > 1) {
       this.emit('onObjectsClicked', closeObjects)
 
