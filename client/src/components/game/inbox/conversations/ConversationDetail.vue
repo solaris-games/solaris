@@ -4,24 +4,31 @@
 
   <div class="container" v-if="conversation">
     <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-sm btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-sm btn-info" @click="toggleConversationWindow" title="Toggle Conversation Display">
+        <i class="fas" :class="{'fa-eye-slash':!toggleDisplay,'fa-eye':toggleDisplay}"></i>
+      </button>
+      <button class="btn btn-sm btn-primary ml-1" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
       <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
-    <conversation-participants :conversation="conversation"/>
+    <p v-if="!toggleDisplay" class="pb-2 text-warning">
+      <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the conversation.</i></small>
+    </p>
 
-    <div class="pt-0 mb-2 mt-2 messages-container" v-if="conversation.messages.length">
+    <conversation-participants v-if="toggleDisplay" :conversation="conversation"/>
+
+    <div class="pt-0 mb-2 mt-2 messages-container" v-if="toggleDisplay && conversation.messages.length">
       <div v-for="message in conversation.messages" v-bind:key="message._id" class="mb-1">
         <conversation-message v-if="message.type === 'message'" :message="message" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <conversation-trade-event v-if="message.type !== 'message'" :event="message"/>
       </div>
     </div>
 
-    <div class="pt-0 mb-2 mt-2" v-if="!conversation.messages.length">
+    <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && !conversation.messages.length">
         <p class="mb-0 text-center">No messages.</p>
     </div>
 
-    <compose-conversation-message :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent" />
+    <compose-conversation-message v-if="toggleDisplay" :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent" />
   </div>
 </div>
 </template>
@@ -52,6 +59,7 @@ export default {
     return {
       conversation: null,
       userPlayer: null,
+      toggleDisplay: true
     }
   },
   created () {
@@ -86,6 +94,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    toggleConversationWindow (e) {
+      this.toggleDisplay = !this.toggleDisplay
     },
     onConversationMessageSent (e) {
       this.conversation.messages.push(e)
