@@ -85,7 +85,7 @@ module.exports = class GameGalaxyService {
         const isDarkMode = this._isDarkMode(doc);
 
         // If its a dark galaxy start then return no stars.
-        if (isDarkStart || isDarkMode) {
+        if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
             doc.galaxy.stars = [];
         }
 
