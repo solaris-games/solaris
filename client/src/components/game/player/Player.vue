@@ -29,7 +29,7 @@
                     :science="userPlayer.stats.totalScience"/>
 
     <h4 v-if="userPlayer" class="mt-2">Technology</h4>
-{{canSendRenown}}fdsfdsafds
+    
     <research v-if="player" :playerId="player._id"/>
 
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
