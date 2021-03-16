@@ -1,64 +1,73 @@
 <template>
 	<div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-			<span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
+      <span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
+    	<button class="btn btn-sm btn-info" @click="toggleCarrierWaypointsDisplay" title="Toggle Waypoints Display">
+        <i class="fas" :class="{'fa-eye-slash':!display,'fa-eye':display}"></i>
+      </button>
     </menu-title>
 
-		<strong>Waypoints</strong>:
-    <span v-if="!carrier.waypoints.length" class="text-warning">None</span>
-		<ul class="pl-4 mt-2" v-if="isStandardUIStyle">
-			<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
-				<!-- <a href="javascript:;" @click="onOpenStarDetailRequested(waypoint.destination)">{{getStarName(waypoint.destination)}}</a> -->
-				<span>{{getStarName(waypoint.destination)}}</span>
+    <p v-if="!display" class="pb-2 text-warning">
+      <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the waypoints.</i></small>
+    </p>
 
-				<i class="ml-2" :class="{
-					'fas fa-angle-double-up text-success': waypoint.action == 'collectAll',
-					'fas fa-angle-double-down text-danger': waypoint.action == 'dropAll',
-					'fas fa-caret-up text-success': waypoint.action == 'collect',
-					'fas fa-caret-down text-danger': waypoint.action == 'drop',
-					'fas fa-angle-up text-success': waypoint.action == 'collectAllBut',
-					'fas fa-angle-down text-danger': waypoint.action == 'dropAllBut',
-					'fas fa-star text-warning': waypoint.action == 'garrison'
-				}"></i>
-				<span v-if="waypoint.actionShips"> {{waypoint.actionShips}}</span>
-			</li>
-		</ul>
+    <template v-if="display">
+      <strong>Waypoints</strong>:
+      <span v-if="!carrier.waypoints.length" class="text-warning">None</span>
+		  <ul class="pl-4 mt-2" v-if="isStandardUIStyle">
+		  	<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
+		  		<!-- <a href="javascript:;" @click="onOpenStarDetailRequested(waypoint.destination)">{{getStarName(waypoint.destination)}}</a> -->
+		  		<span>{{getStarName(waypoint.destination)}}</span>
 
-    <span v-if="isCompactUIStyle">{{waypointAsList}}</span>
+		  		<i class="ml-2" :class="{
+		  			'fas fa-angle-double-up text-success': waypoint.action == 'collectAll',
+		  			'fas fa-angle-double-down text-danger': waypoint.action == 'dropAll',
+		  			'fas fa-caret-up text-success': waypoint.action == 'collect',
+		  			'fas fa-caret-down text-danger': waypoint.action == 'drop',
+		  			'fas fa-angle-up text-success': waypoint.action == 'collectAllBut',
+		  			'fas fa-angle-down text-danger': waypoint.action == 'dropAllBut',
+		  			'fas fa-star text-warning': waypoint.action == 'garrison'
+		  		}"></i>
+		  		<span v-if="waypoint.actionShips"> {{waypoint.actionShips}}</span>
+		  	</li>
+		  </ul>
 
-    <form-error-list v-bind:errors="errors" class="mt-2"/>
+      <span v-if="isCompactUIStyle">{{waypointAsList}}</span>
 
-		<div class="row bg-secondary pt-2 pb-2 mt-2">
-			<div class="col-12">
-        <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
-        <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
-        <!-- Seriously, what is wrong with you, Safari? -->
-				<p class="mb-1" :key="new Date().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
-			</div>
-			<div class="col">
-				<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
-          <i class="fas fa-undo"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Last</span>
-        </button>
-				<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints">
-          <i class="fas fa-trash"></i>
-          <span class="ml-1 d-none d-sm-inline-block">All</span>
-        </button>
-				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints">
-          <i class="fas fa-sync"></i>
-        </button>
-			</div>
-			<div class="col-auto">
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
-          <i class="fas fa-save"></i>
-          <span class="ml-1">Save</span>
-        </button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
-          <i class="fas fa-edit"></i> 
-          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
-        </button>
-			</div>
-		</div>
+      <form-error-list v-bind:errors="errors" class="mt-2"/>
+
+		  <div class="row bg-secondary pt-2 pb-2 mt-2">
+		  	<div class="col-12">
+          <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
+          <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
+          <!-- Seriously, what is wrong with you, Safari? -->
+		  		<p class="mb-1" :key="new Date().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
+		  	</div>
+		  	<div class="col">
+		  		<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
+            <i class="fas fa-undo"></i>
+            <span class="ml-1 d-none d-sm-inline-block">Last</span>
+          </button>
+		  		<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints">
+            <i class="fas fa-trash"></i>
+            <span class="ml-1 d-none d-sm-inline-block">All</span>
+          </button>
+		  		<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints">
+            <i class="fas fa-sync"></i>
+          </button>
+		  	</div>
+		  	<div class="col-auto">
+		  		<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+            <i class="fas fa-save"></i>
+            <span class="ml-1">Save</span>
+          </button>
+		  		<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+            <i class="fas fa-edit"></i> 
+            <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+          </button>
+		  	</div>
+		  </div>
+    </template>
 	</div>
 </template>
 
@@ -90,7 +99,8 @@ export default {
       waypointCreatedHandler: null,
       isStandardUIStyle: false,
       isCompactUIStyle: false,
-      errors: []
+      errors: [],
+      display: true
     }
   },
   mounted () {
@@ -116,6 +126,9 @@ export default {
     GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
   },
   methods: {
+    toggleCarrierWaypointsDisplay () {
+      this.display = !this.display
+    },
     onCloseRequested (e) {
       this.carrier.waypoints = this.oldWaypoints
       this.carrier.waypointsLooped = this.oldWaypointsLooped
