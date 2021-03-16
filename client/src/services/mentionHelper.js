@@ -153,12 +153,14 @@ class MentionHelper {
   }
 
   updateMention (conversation, suggestionsEnabled) {
-    const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
-    const lastCharacter = newMentionText[newMentionText.length - 1]
-    if (lastCharacter && !lastCharacter.trim()) {
-      this.endMention(conversation)
-    } else {
-      conversation.currentMention.text = newMentionText
+    if (conversation.currentMention) {
+      const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
+      const lastCharacter = newMentionText[newMentionText.length - 1]
+      if (lastCharacter && !lastCharacter.trim()) {
+        this.endMention(conversation)
+      } else {
+        conversation.currentMention.text = newMentionText
+      }
     }
   }
 
