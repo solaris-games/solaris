@@ -1,6 +1,6 @@
 <template>
-<form class="pb-1">
-    <div class="mention-overlay" v-if="focused">
+<form class="pb-1 conversation">
+    <div class="mention-overlay bg-secondary" v-if="focused">
       <ul>
         <li v-for="suggestion in currentSuggestions" :key="suggestion">{{suggestion}}</li>
       </ul>
@@ -95,5 +95,18 @@ export default {
 </script>
 
 <style scoped>
+.conversation {
+  position: relative;
+}
 
+.mention-overlay {
+  position: absolute;
+  z-index: 10;
+  bottom: 100%;
+  width: 100%;
+}
+
+.mention-overlay li {
+  list-style-type: none;
+}
 </style>
