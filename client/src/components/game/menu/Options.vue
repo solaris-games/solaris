@@ -29,6 +29,16 @@
       </div>
 
       <div class="row bg-secondary pt-1 pb-1">
+        <label for="audio" class="col-12 col-sm-6 col-form-label">Suggestions for player and star names</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="suggestMentions" v-model="settings.interface.suggestMentions" :disabled="isSavingSettings">
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1">
         <label for="galaxyScreenUpgrades" class="col-12 col-sm-6 col-form-label">Galaxy Screen</label>
         <div class="col-12 col-sm-6">
           <select class="form-control" id="galaxyScreenUpgrades" v-model="settings.interface.galaxyScreenUpgrades" :disabled="isSavingSettings">

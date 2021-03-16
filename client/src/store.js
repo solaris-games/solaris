@@ -20,7 +20,8 @@ export default new Vuex.Store({
     cachedConversationComposeMessages: {},
     currentConversation: null,
     starSpecialists: null,
-    carrierSpecialists: null
+    carrierSpecialists: null,
+    settings: null
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {

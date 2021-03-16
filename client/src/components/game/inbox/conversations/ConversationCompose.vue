@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-secondary" v-if="focused">
+    <div class="mention-overlay bg-secondary" v-if="suggestMentions && focused">
       <ul>
         <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion">{{suggestion}}</li>
       </ul>
@@ -35,14 +35,12 @@ export default {
     return {
       isSendingMessage: false,
       focused: false,
-      currentSuggestions: [
-        "Test",
-        "Test2"
-      ]
+      suggestMentions: false
     }
   },
   mounted () {
-    this.$store.commit('setConversationElement', this.$refs.messageElement);
+    this.$store.commit('setConversationElement', this.$refs.messageElement)
+    this.suggestMentions = this.$store.state.settings.interface.suggestMentions
   },
   methods: {
     onFocus (e) {
