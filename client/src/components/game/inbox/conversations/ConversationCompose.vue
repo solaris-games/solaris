@@ -6,7 +6,7 @@
       </ul>
     </div>
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @focus="onFocus" @blur="onBlur"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @focus="onFocus" @blur="onBlur" @keydown="onKeyDown"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -48,6 +48,11 @@ export default {
     },
     onBlur (e) {
       this.focused = false
+    },
+    onKeyDown (e) {
+      if (this.suggestMentions) {
+        this.$store.commit('updateConversationSuggestions', e.key)
+      }
     },
     onMessageChange (e) {
       this.$store.commit('updateCurrentConversationText', e.target.value)

@@ -58,8 +58,12 @@ export default new Vuex.Store({
         id: data,
         element: null,
         text: state.cachedConversationComposeMessages[data],
-        suggestions: [ "Test", "Test2" ]
+        suggestions: [ "Test", "Test2" ],
+        currentMention: null
       }
+    },
+    updateConversationSuggestions (state, key) {
+      MentionHelper.processSuggestions(state.currentConversation, key)
     },
     closeConversation (state) {
       const id = state.currentConversation.id;
@@ -68,6 +72,7 @@ export default new Vuex.Store({
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data
+      MentionHelper.updateSuggestions(state.currentConversation)
     },
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''

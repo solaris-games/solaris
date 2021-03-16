@@ -11,14 +11,21 @@ class MentionHelper {
     //Do not use and for property access here because a selection start of 0 would be false
     const insertionStart = element ? element.selectionStart : (text.length - 1)
     const insertionEnd = element ? element.selectionEnd : text.length
-    
+
+    this.addMentionFromTo(conversation, type, name, insertionStart, insertionEnd)
+  }
+
+  addMentionFromTo (conversation, type, name, start, end) {
+    const text = conversation.text || ''
+    const element = conversation.element
+
     const mention = `{{${type}:${name}}}`
-    const newText = text.substring(0, insertionStart) + mention + text.substring(insertionEnd)
+    const newText = text.substring(0, start) + mention + text.substring(end)
 
     conversation.text = newText
 
     if (element) {
-      element.setSelectionRange(insertionStart, insertionStart + mention.length)
+      element.setSelectionRange(start, start + mention.length)
       element.focus()
     }
   }
@@ -112,6 +119,59 @@ class MentionHelper {
     }
 
     return node
+  }
+
+  processSuggestions (conversation, key) {
+    if (!conversation.currentMention) {
+      this.beginSuggestion(conversation, key)
+    }
+  }
+
+  beginSuggestion (conversation, key) {
+    const suggestionType = this.getSuggestionType(key)
+    if (suggestionType) {
+      conversation.currentMention = {
+        suggestionType,
+        mentionStart: conversation.element.selectionStart,
+        text: ''
+      }
+    }
+  }
+
+  endSuggestion (conversation) {
+    const { suggestionType, text, mentionStart } = conversation.currentMention
+    //Offset of 1 for * or @
+    console.log("END SUGGESTION: " + text)
+    this.addMentionFromTo(conversation, suggestionType, text, mentionStart, mentionStart + text.length + 1)
+    conversation.currentMention = null
+  }
+
+  getSuggestionType (character) {
+    if (character === '*') {
+      return 'star'
+    } else if (character === '@') {
+      return 'player'
+    } else {
+      return null
+    }
+  }
+
+  updateSuggestions (conversation) {
+    const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
+    console.log(newMentionText)
+    const lastCharacter = newMentionText[newMentionText.length - 1]
+    if (lastCharacter && !lastCharacter.trim()) {
+      this.endSuggestion(conversation)
+    } else {
+      conversation.currentMention.text = newMentionText
+    }
+  }
+
+  getToCursor (conversation, from) {
+    const element = conversation.element
+    const text = conversation.text || ''
+    const cursorPos = element ? element.selectionEnd : text.length
+    return text.substring(from, cursorPos + 2)
   }
 }
 
