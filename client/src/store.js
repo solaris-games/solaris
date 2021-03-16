@@ -56,7 +56,8 @@ export default new Vuex.Store({
       state.currentConversation = {
         id: data,
         element: null,
-        text: state.cachedConversationComposeMessages[data]
+        text: state.cachedConversationComposeMessages[data],
+        suggestions: [ "Test", "Test2" ]
       }
     },
     closeConversation (state) {

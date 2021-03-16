@@ -2,7 +2,7 @@
 <form class="pb-1 conversation">
     <div class="mention-overlay bg-secondary" v-if="focused">
       <ul>
-        <li v-for="suggestion in currentSuggestions" :key="suggestion">{{suggestion}}</li>
+        <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion">{{suggestion}}</li>
       </ul>
     </div>
     <div class="form-group mb-2">
