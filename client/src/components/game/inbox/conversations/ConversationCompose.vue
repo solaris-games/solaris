@@ -1,7 +1,12 @@
 <template>
 <form class="pb-1">
+    <div class="mention-overlay" v-if="focused">
+      <ul>
+        <li v-for="suggestion in currentSuggestions" :key="suggestion">{{suggestion}}</li>
+      </ul>
+    </div>
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @focus="onFocus" @blur="onBlur"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -28,13 +33,24 @@ export default {
   },
   data () {
     return {
-      isSendingMessage: false
+      isSendingMessage: false,
+      focused: false,
+      currentSuggestions: [
+        "Test",
+        "Test2"
+      ]
     }
   },
   mounted () {
     this.$store.commit('setConversationElement', this.$refs.messageElement);
   },
   methods: {
+    onFocus (e) {
+      this.focused = true
+    },
+    onBlur (e) {
+      this.focused = false
+    },
     onMessageChange (e) {
       this.$store.commit('updateCurrentConversationText', e.target.value)
     },
