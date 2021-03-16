@@ -62,8 +62,8 @@ export default new Vuex.Store({
         currentMention: null
       }
     },
-    updateConversationSuggestions (state, key) {
-      MentionHelper.processSuggestions(state.currentConversation, key)
+    updateCurrentMention (state, key) {
+      MentionHelper.tryBeginMention(state.currentConversation, key, state.settings.interface.suggestMentions)
     },
     closeConversation (state) {
       const id = state.currentConversation.id;
@@ -72,7 +72,7 @@ export default new Vuex.Store({
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data
-      MentionHelper.updateSuggestions(state.currentConversation)
+      MentionHelper.updateMention(state.currentConversation, state.settings.interface.suggestMentions)
     },
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''

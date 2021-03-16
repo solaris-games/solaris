@@ -50,9 +50,7 @@ export default {
       this.focused = false
     },
     onKeyDown (e) {
-      if (this.suggestMentions) {
-        this.$store.commit('updateConversationSuggestions', e.key)
-      }
+      this.$store.commit('updateCurrentMention', e.key)
     },
     onMessageChange (e) {
       this.$store.commit('updateCurrentConversationText', e.target.value)

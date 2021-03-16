@@ -121,24 +121,20 @@ class MentionHelper {
     return node
   }
 
-  processSuggestions (conversation, key) {
+  tryBeginMention (conversation, key, suggestionsEnabled) {
     if (!conversation.currentMention) {
-      this.beginSuggestion(conversation, key)
-    }
-  }
-
-  beginSuggestion (conversation, key) {
-    const suggestionType = this.getSuggestionType(key)
-    if (suggestionType) {
-      conversation.currentMention = {
-        suggestionType,
-        mentionStart: conversation.element.selectionStart,
-        text: ''
+      const suggestionType = this.getMentionType(key)
+      if (suggestionType) {
+        conversation.currentMention = {
+          suggestionType,
+          mentionStart: conversation.element.selectionStart,
+          text: ''
+        }
       }
     }
   }
 
-  endSuggestion (conversation) {
+  endMention (conversation) {
     const { suggestionType, text, mentionStart } = conversation.currentMention
     //Offset of 1 for * or @
     console.log("END SUGGESTION: " + text)
@@ -146,7 +142,7 @@ class MentionHelper {
     conversation.currentMention = null
   }
 
-  getSuggestionType (character) {
+  getMentionType (character) {
     if (character === '*') {
       return 'star'
     } else if (character === '@') {
@@ -156,12 +152,11 @@ class MentionHelper {
     }
   }
 
-  updateSuggestions (conversation) {
+  updateMention (conversation, suggestionsEnabled) {
     const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
-    console.log(newMentionText)
     const lastCharacter = newMentionText[newMentionText.length - 1]
     if (lastCharacter && !lastCharacter.trim()) {
-      this.endSuggestion(conversation)
+      this.endMention(conversation)
     } else {
       conversation.currentMention.text = newMentionText
     }
