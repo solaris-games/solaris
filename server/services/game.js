@@ -160,6 +160,13 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
         }
 
+        // Disallow if they have the same alias as a user.
+        let aliasCheckUser = await this.userService.otherUsernameExists(alias, userId);
+
+        if (aliasCheckUser) {
+            throw new ValidationError(`The alias '${alias}' is the username of another player.`);
+        }
+
         // TODO: Factor in player type setting. i.e premium players only.
 
         // Assign the user to the player.
