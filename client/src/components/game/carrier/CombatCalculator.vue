@@ -48,9 +48,12 @@
                 </div>
 
                 <div class="form-group row">
-                    <div class="col-12 col-sm-4 offset-sm-8">
-                        <button type="submit" class="btn btn-success btn-block" :disabled="isLoading"><i class="fas fa-fist-raised"></i> Fight</button>
-                    </div>
+                  <div class="col-auto col-sm-8">
+                    <button type="button" class="btn btn-info" :disabled="isLoading" title="Swap Defender/Attacker Values" @click="swapValues"><i class="fas fa-exchange-alt"></i></button>
+                  </div>
+                  <div class="col col-sm-4">
+                      <button type="submit" class="btn btn-success btn-block" :disabled="isLoading" title="Calculate Combat Result"><i class="fas fa-fist-raised"></i> Fight</button>
+                  </div>
                 </div>
             </form>
         </div>
@@ -104,6 +107,17 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    swapValues () {
+      let dS = this.defender.ships,
+          dW = this.defender.weaponsLevel,
+          aS = this.attacker.ships,
+          aW = this.attacker.weaponsLevel
+
+      this.defender.ships = aS
+      this.defender.weaponsLevel = aW
+      this.attacker.ships = dS
+      this.attacker.weaponsLevel = dW
     },
     async calculate (e) {
       this.errors = []
