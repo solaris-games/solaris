@@ -67,6 +67,12 @@ class GameHelper {
         carrier.inTransitTo === waypoint.destination
   }
 
+  getStarTotalKnownGarrison (game, star) {
+    let carriers = this.getCarriersOrbitingStar(game, star)
+
+    return (star.garrison || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
+  }
+
   getHyperspaceDistance (game, player, carrier) {
     let techLevel = player.research.hyperspace.effective
 

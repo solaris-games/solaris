@@ -8,13 +8,19 @@
             </div>
             <form class="col-12" @submit="calculate">
                 <div class="form-group row">
-                    <label for="defenderWeaponTech" class="col-8 col-form-label"><i class="fas fa-fighter-jet"></i> <span class="text-success ml-2">Defender</span> Weapons</label>
+                    <label for="defenderWeaponTech" class="col-8 col-form-label">
+                      <i class="fas" :class="{'fa-fighter-jet':!defender.player,'fa-user':defender.player}"></i> 
+                      <span class="text-success ml-2">{{defender.player ? defender.player.alias : 'Defender'}}</span> Weapons
+                    </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderWeaponTech" placeholder="Tech Level" v-model="defender.weaponsLevel" required="required">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="defenderShips" class="col-8 col-form-label"><i class="fas fa-rocket"></i> <span class="text-success ml-2">Defender</span> Ships</label>
+                    <label for="defenderShips" class="col-8 col-form-label">
+                      <i class="fas" :class="{'fa-rocket':!defender.star,'fa-star':defender.star}"></i> 
+                      <span class="text-success ml-2">{{defender.star ? defender.star.name : 'Defender'}}</span> Ships
+                    </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
                     </div>
@@ -35,13 +41,19 @@
                 <hr/>
 
                 <div class="form-group row">
-                    <label for="attackerWeaponTech" class="col-8 col-form-label"><i class="fas fa-fighter-jet"></i> <span class="text-danger ml-2">Attacker</span> Weapons</label>
+                    <label for="attackerWeaponTech" class="col-8 col-form-label">
+                      <i class="fas" :class="{'fa-fighter-jet':!attacker.player,'fa-user':attacker.player}"></i> 
+                      <span class="text-danger ml-2">{{attacker.player ? attacker.player.alias : 'Attacker'}}</span> Weapons
+                    </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerWeaponTech" placeholder="Tech Level" v-model="attacker.weaponsLevel" required="required">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="attackerShips" class="col-8 col-form-label"><i class="fas fa-rocket"></i> <span class="text-danger ml-2">Attacker</span> Ships</label>
+                    <label for="attackerShips" class="col-8 col-form-label">
+                      <i class="fas fa-rocket"></i> 
+                      <span class="text-danger ml-2">{{attacker.carrier ? attacker.carrier.name : 'Attacker'}}</span> Ships
+                    </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerShips" placeholder="Ships" v-model="attacker.ships" required="required">
                     </div>
@@ -60,9 +72,9 @@
 
         <loading-spinner :loading="isLoading"/>
 
-        <div class="row" v-if="result">
-            <p class="col text-right" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
-            <p class="col text-right" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
+        <div class="row bg-secondary pt-2 pb-2" v-if="result">
+            <p class="col text-right mb-0" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
+            <p class="col text-right mb-0" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
         </div>
     </div>
 </template>
@@ -81,7 +93,7 @@ export default {
     'form-error-list': FormErrorList
   },
   props: {
-
+    carrierId: String
   },
   data () {
     return {
@@ -91,18 +103,26 @@ export default {
       includeDefenderBonus: true,
       defender: {
         ships: 0,
-        weaponsLevel: 1
+        weaponsLevel: 1,
+        player: null,
+        star: null
       },
       attacker: {
         ships: 0,
-        weaponsLevel: 1
+        weaponsLevel: 1,
+        player: null,
+        carrier: null
       },
       result: null
     }
   },
-  mounted () {
+  async mounted () {
     this.hasDefenderBonus = this.$store.state.game.settings.specialGalaxy.defenderBonus === 'enabled'
     this.includeDefenderBonus = this.hasDefenderBonus
+
+    if (this.carrierId) {
+      await this.tryAutoCalculate()
+    }
   },
   methods: {
     onCloseRequested (e) {
@@ -118,6 +138,34 @@ export default {
       this.defender.weaponsLevel = aW
       this.attacker.ships = dS
       this.attacker.weaponsLevel = dW
+    },
+    async tryAutoCalculate () {
+      let game = this.$store.state.game
+      
+      if (this.carrierId) {
+        // Work out where the carrier is travelling to and add the ships and weapons level
+        // of the destination star.
+        this.attacker.carrier = GameHelper.getCarrierById(game, this.carrierId)
+        this.attacker.player = GameHelper.getCarrierOwningPlayer(game, this.attacker.carrier)
+
+        if (this.attacker.carrier.waypoints && this.attacker.carrier.waypoints.length) {
+          this.defender.star = GameHelper.getStarById(game, this.attacker.carrier.waypoints[0].destination)
+          
+          this.attacker.ships = this.attacker.carrier.ships
+          this.attacker.weaponsLevel = this.attacker.player.research.weapons.level
+
+          if (this.defender.star) { // May be out of scanning range.
+            this.defender.player = GameHelper.getStarOwningPlayer(game, this.defender.star)
+            let defenderShips = GameHelper.getStarTotalKnownGarrison(game, this.defender.star)
+
+            this.defender.ships = defenderShips
+
+            if (this.defender.player) {
+              this.defender.weaponsLevel = this.defender.player.research.weapons.level
+            }
+          }
+        }
+      }
     },
     async calculate (e) {
       this.errors = []
@@ -138,7 +186,9 @@ export default {
         this.errors.push('Attacker ships must be greater than 0.')
       }
 
-      e.preventDefault()
+      if (e) {
+        e.preventDefault()
+      }
 
       if (this.errors.length) return
 
