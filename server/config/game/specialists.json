@@ -117,12 +117,9 @@
         {
             "id": 10,
             "name": "Warp Stabilizer",
-            "description": "Warp Scramblers do not affect the carrier. -1 Weapons.",
+            "description": "Warp Scramblers do not affect the carrier.",
             "tier": 4,
             "modifiers": {
-                "local": {
-                    "weapons": -1
-                },
                 "special": {
                     "unlockWarpGates": true
                 }
@@ -157,13 +154,13 @@
         {
             "id": 13,
             "name": "Pirate",
-            "description": "Grants +2 Weapons in Carrier-to-Carrier combat, -2 Weapons in Carrier-to-Star combat and x1.5 Speed.",
+            "description": "Grants +3 Weapons in Carrier-to-Carrier combat, -2 Weapons in Carrier-to-Star combat and x1.5 Speed.",
             "tier": 4,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
                     "carrierToCarrierCombat": {
-                        "weapons": 2
+                        "weapons": 3
                     },
                     "carrierToStarCombat": {
                         "weapons": -2
@@ -188,7 +185,7 @@
             "id": 1,
             "name": "Orbital Array",
             "description": "Grants +1 Scanning Range to the Star.",
-            "tier": 2,
+            "tier": 1,
             "modifiers": {
                 "local": {
                     "scanning": 1
