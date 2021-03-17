@@ -577,10 +577,10 @@ module.exports = class PlayerService extends EventEmitter {
             }
         } else {
             // If we have reached the first production tick then check here to see if
-            // the player has been active during the cycle.
-            let isFirstCycle = game.state.tick === game.settings.galaxy.productionTicks;
+            // the player has been active during the first 2 cycles, this is normally 24h.
+            let isWithinCycle = game.state.tick === (game.settings.galaxy.productionTicks * 2);
 
-            if (isFirstCycle) {
+            if (isWithinCycle) {
                 return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc();
             } else {
                 return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
