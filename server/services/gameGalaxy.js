@@ -31,6 +31,29 @@ module.exports = class GameGalaxyService {
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
 
+        /*
+            TODO: Implement masking of galaxy data here, prevent players from seeing what other
+            players are doing until the tick has finished.
+
+            This will be a combination of the current state of the galaxy for the player and
+            the previous tick's galaxy data for other players.
+
+            I think the following should do it:
+            1. Apply previous tick's data to all STARS the player does not own.
+                - Garrison, specialist, warp gate and infrastructure needs to be reset.
+            2. Apply previous tick's data to all CARRIERS the player does not own.
+                - Remove any carriers that exist in the current tick but not in the previous tick.
+                - Ships, specialist and gift status needs to be reset.
+            3. Continue to run through current logic as we do today.
+
+            Note: I don't think we need to reset other player data for the previous tick.
+        
+            Things to consider:
+            - We first off need to actually log the state of the galaxy every time the game ticks.
+            - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
+            - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
+        */
+
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
