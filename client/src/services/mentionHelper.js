@@ -123,26 +123,26 @@ class MentionHelper {
 
   tryBeginMention (conversation, key, suggestionsEnabled) {
     if (!conversation.currentMention) {
-      const suggestionType = this.getMentionType(key)
-      if (suggestionType) {
+      const mentionType = this.getMentionType(key)
+      if (mentionType) {
         conversation.currentMention = {
-          suggestionType,
+          mentionType,
           mentionStart: conversation.element.selectionStart,
           text: ''
         }
+        conversation.suggestions = this.findSuggestions(mentionType, '')
       }
     }
   }
 
   endMention (conversation) {
-    if (!conversation || !conversation.currentMention) {
     if (!conversation || !conversation.currentMention || !conversation.currentMention.text) {
       return
     }
 
-    const { suggestionType, text, mentionStart } = conversation.currentMention
+    const { mentionType, text, mentionStart } = conversation.currentMention
     //Offset of 1 for * or @
-    this.addMentionFromTo(conversation, suggestionType, text, mentionStart, mentionStart + text.length + 1)
+    this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + text.length + 1)
     conversation.currentMention = null
   }
 
@@ -164,6 +164,7 @@ class MentionHelper {
         this.endMention(conversation)
       } else {
         conversation.currentMention.text = newMentionText
+        conversation.suggestions = this.findSuggestions(mentionType, newMentionText)
       }
     }
   }
@@ -173,6 +174,10 @@ class MentionHelper {
     const text = conversation.text || ''
     const cursorPos = element ? element.selectionEnd : text.length
     return text.substring(from, cursorPos)
+  }
+  
+  findSuggestions (mentionType, mentionText) {
+    return []
   }
 }
 
