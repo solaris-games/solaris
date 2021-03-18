@@ -95,6 +95,36 @@ export default new Vuex.Store({
       state.game.state = data.state
     },
 
+    gamePlayerJoined (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.isEmptySlot = false
+      player.alias = data.alias
+      player.avatar = data.avatar
+      player.defeated = false
+      player.afk = false
+    },
+
+    gamePlayerQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      
+      player.isEmptySlot = true
+      player.alias = 'Empty Slot'
+      player.avatar = null
+    },
+
+    gamePlayerReady (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = true
+    },
+
+    gamePlayerNotReady (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = false
+    },
+
     gameStarEconomyUpgraded (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 

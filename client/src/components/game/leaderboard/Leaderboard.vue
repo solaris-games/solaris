@@ -248,44 +248,6 @@ export default {
     }
   },
 
-  created () {
-    this.sockets.subscribe('gamePlayerJoined', (data) => {
-      let player = this.players.find(p => p._id === data.playerId)
-
-      player.isEmptySlot = false
-      player.alias = data.alias
-      player.avatar = data.avatar
-      player.defeated = false
-      player.afk = false
-    })
-
-    this.sockets.subscribe('gamePlayerQuit', (data) => {
-      let player = this.players.find(p => p._id === data.playerId)
-
-      player.isEmptySlot = true
-      player.alias = 'Empty Slot'
-      player.avatar = null
-    })
-
-    this.sockets.subscribe('gamePlayerReady', (data) => {
-      let player = this.players.find(p => p._id === data.playerId)
-
-      player.ready = true
-    })
-
-    this.sockets.subscribe('gamePlayerNotReady', (data) => {
-      let player = this.players.find(p => p._id === data.playerId)
-
-      player.ready = false
-    })
-  },
-  destroyed () {
-    this.sockets.unsubscribe('gamePlayerJoined')
-    this.sockets.unsubscribe('gamePlayerQuit')
-    this.sockets.unsubscribe('gamePlayerReady')
-    this.sockets.unsubscribe('gamePlayerNotReady')
-  },
-
   computed: {
     game () {
       return this.$store.state.game

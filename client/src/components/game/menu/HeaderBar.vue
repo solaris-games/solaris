@@ -130,6 +130,8 @@ export default {
       this.$emit('onMenuStateChanged', e)
     },
     onCreditsReceived (data) {
+      // TODO: This logic should be in the store like the other subscriptions.
+      // However the current component could still subscribe to it to display the toast.
       let player = GameHelper.getUserPlayer(this.$store.state.game)
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
 

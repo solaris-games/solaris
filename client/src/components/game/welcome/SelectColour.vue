@@ -73,28 +73,6 @@ export default {
     getPlayerStatus (player) {
       return gameHelper.getPlayerStatus(player)
     }
-  },
-
-  created () {
-    this.sockets.subscribe('gamePlayerJoined', (data) => {
-      let player = gameHelper.getPlayerById(this.$store.state.game, data.playerId)
-
-      player.isEmptySlot = false
-      player.alias = data.alias
-      player.avatar = data.avatar
-    })
-
-    this.sockets.subscribe('gamePlayerQuit', (data) => {
-      let player = this.players.find(p => p._id === data.playerId)
-
-      player.isEmptySlot = true
-      player.alias = 'Empty Slot'
-      player.avatar = null
-    })
-  },
-  destroyed () {
-    this.sockets.unsubscribe('gamePlayerJoined')
-    this.sockets.unsubscribe('gamePlayerQuit')
   }
 }
 </script>

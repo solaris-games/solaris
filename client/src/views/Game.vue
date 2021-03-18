@@ -216,6 +216,10 @@ export default {
     subscribeToSockets () {
       // TODO: Move all component subscriptions into the components' socket object.
       this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
+      this.sockets.subscribe('gamePlayerJoined', (data) => this.$store.commit('gamePlayerJoined', data))
+      this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
+      this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
+      this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
       this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
       this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
       this.sockets.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
@@ -237,6 +241,10 @@ export default {
     },
     unsubscribeToSockets () {
       this.sockets.unsubscribe('gameStarted')
+      this.sockets.unsubscribe('gamePlayerJoined')
+      this.sockets.unsubscribe('gamePlayerQuit')
+      this.sockets.unsubscribe('gamePlayerReady')
+      this.sockets.unsubscribe('gamePlayerNotReady')
       this.sockets.unsubscribe('gameStarEconomyUpgraded')
       this.sockets.unsubscribe('gameStarIndustryUpgraded')
       this.sockets.unsubscribe('gameStarScienceUpgraded')
