@@ -136,12 +136,12 @@ class MentionHelper {
 
   endMention (conversation) {
     if (!conversation || !conversation.currentMention) {
+    if (!conversation || !conversation.currentMention || !conversation.currentMention.text) {
       return
     }
 
     const { suggestionType, text, mentionStart } = conversation.currentMention
     //Offset of 1 for * or @
-    console.log("END SUGGESTION: " + text)
     this.addMentionFromTo(conversation, suggestionType, text, mentionStart, mentionStart + text.length + 1)
     conversation.currentMention = null
   }
