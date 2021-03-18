@@ -22,9 +22,9 @@
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
           <span title="In Transit" v-if="!carrier.orbiting">
-            <a title="Source Star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSource().name}}</a>
+            <a title="Source Star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
-            <a title="Destination Star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestination().name}}</a>
+            <a title="Destination Star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
           </span>
         </div>
         <div class="col-auto">
@@ -280,12 +280,22 @@ export default {
 
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].source)
     },
+    getFirstWaypointSourceName () {
+      let source = this.getFirstWaypointSource()
+
+      return source ? source.name : 'Unknown'
+    },
     getFirstWaypointDestination () {
       if (!this.carrier.waypoints.length) {
         return null
       }
 
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].destination)
+    },
+    getFirstWaypointDestinationName () {
+      let destination = this.getFirstWaypointDestination()
+
+      return destination ? destination.name : 'Unknown'
     },
     async toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
@@ -361,10 +371,18 @@ export default {
       this.onOpenStarDetailRequested(this.getCarrierOrbitingStar()._id)
     },
     onOpenSourceStarDetailRequested (e) {
-      this.onOpenStarDetailRequested(this.carrier.waypoints[0].source)
+      let star = this.getFirstWaypointSource()
+
+      if (star) {
+        this.onOpenStarDetailRequested(this.carrier.waypoints[0].source)
+      }
     },
     onOpenDestinationStarDetailRequested (e) {
-      this.onOpenStarDetailRequested(this.carrier.waypoints[0].destination)
+      let star = this.getFirstWaypointDestination()
+
+      if (star) {
+        this.onOpenStarDetailRequested(this.carrier.waypoints[0].destination)
+      }
     },
     recalculateTimeRemaining () {
       if (this.carrier.ticksEta) {
