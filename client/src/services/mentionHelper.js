@@ -172,7 +172,7 @@ class MentionHelper {
     const element = conversation.element
     const text = conversation.text || ''
     const cursorPos = element ? element.selectionEnd : text.length
-    return text.substring(from, cursorPos + 2)
+    return text.substring(from, cursorPos)
   }
 }
 
