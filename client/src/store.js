@@ -65,6 +65,9 @@ export default new Vuex.Store({
     updateCurrentMention (state, key) {
       MentionHelper.tryBeginMention(state.currentConversation, key, state.settings.interface.suggestMentions)
     },
+    unfocusConversation (state, data) {
+      MentionHelper.endMention(state.currentConversation)
+    },
     closeConversation (state) {
       const id = state.currentConversation.id;
       state.cachedConversationComposeMessages[id] = state.currentConversation.text

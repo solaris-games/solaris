@@ -135,6 +135,10 @@ class MentionHelper {
   }
 
   endMention (conversation) {
+    if (!conversation || !conversation.currentMention) {
+      return
+    }
+
     const { suggestionType, text, mentionStart } = conversation.currentMention
     //Offset of 1 for * or @
     console.log("END SUGGESTION: " + text)

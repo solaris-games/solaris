@@ -47,6 +47,7 @@ export default {
       this.focused = true
     },
     onBlur (e) {
+      this.$store.commit('unfocusConversation', e)
       this.focused = false
     },
     onKeyDown (e) {
