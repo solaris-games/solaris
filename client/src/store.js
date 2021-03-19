@@ -58,12 +58,12 @@ export default new Vuex.Store({
         id: data,
         element: null,
         text: state.cachedConversationComposeMessages[data],
-        suggestions: [ "Test", "Test2" ],
+        suggestions: [],
         currentMention: null
       }
     },
     updateCurrentMention (state, key) {
-      MentionHelper.tryBeginMention(state.currentConversation, key, state.settings.interface.suggestMentions)
+      MentionHelper.tryBeginMention(state.game, state.currentConversation, key, state.settings.interface.suggestMentions)
     },
     unfocusConversation (state, data) {
       MentionHelper.endMention(state.currentConversation)
@@ -75,7 +75,7 @@ export default new Vuex.Store({
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data
-      MentionHelper.updateMention(state.currentConversation, state.settings.interface.suggestMentions)
+      MentionHelper.updateMention(state.game, state.currentConversation, state.settings.interface.suggestMentions)
     },
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''

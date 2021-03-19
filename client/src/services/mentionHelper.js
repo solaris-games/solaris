@@ -121,7 +121,7 @@ class MentionHelper {
     return node
   }
 
-  tryBeginMention (conversation, key, suggestionsEnabled) {
+  tryBeginMention (game, conversation, key, suggestionsEnabled) {
     if (!conversation.currentMention) {
       const mentionType = this.getMentionType(key)
       if (mentionType) {
@@ -130,7 +130,7 @@ class MentionHelper {
           mentionStart: conversation.element.selectionStart,
           text: ''
         }
-        conversation.suggestions = this.findSuggestions(mentionType, '')
+        conversation.suggestions = this.findSuggestions(game, mentionType, '')
       }
     }
   }
@@ -144,6 +144,7 @@ class MentionHelper {
     //Offset of 1 for * or @
     this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + text.length + 1)
     conversation.currentMention = null
+    conversation.suggestions = []
   }
 
   getMentionType (character) {
@@ -156,7 +157,7 @@ class MentionHelper {
     }
   }
 
-  updateMention (conversation, suggestionsEnabled) {
+  updateMention (game, conversation, suggestionsEnabled) {
     if (conversation.currentMention) {
       const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
       const lastCharacter = newMentionText[newMentionText.length - 1]
@@ -164,7 +165,7 @@ class MentionHelper {
         this.endMention(conversation)
       } else {
         conversation.currentMention.text = newMentionText
-        conversation.suggestions = this.findSuggestions(mentionType, newMentionText)
+        conversation.suggestions = this.findSuggestions(game, conversation.currentMention.mentionType, newMentionText)
       }
     }
   }
@@ -176,8 +177,15 @@ class MentionHelper {
     return text.substring(from, cursorPos)
   }
   
-  findSuggestions (mentionType, mentionText) {
-    return []
+  findSuggestions (game, mentionType, mentionText) {
+    let suggestionNames = []
+    const mentionStart = mentionText.toLowerCase()
+    if (mentionType === 'star') {
+      suggestionNames = game.galaxy.stars.map(star => star.name).filter(starName => starName.toLowerCase().startsWith(mentionStart))
+    } else if (mentionType === 'player') {
+      suggestionNames = game.galaxy.players.map(player => player.alias).filter(playerName => playerName.toLowerCase().startsWith(mentionStart))
+    }
+    return suggestionNames.sort().slice(0, 3)
   }
 }
 
