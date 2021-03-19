@@ -143,7 +143,22 @@ module.exports = class UserService extends EventEmitter {
 
         let user = await this.userModel.findOne({
             username
-        });
+        }, { _id: 1 })
+        .lean()
+        .exec();
+
+        return user != null;
+    }
+
+    async otherUsernameExists(username, ignoreUserId) {
+        username = username.trim();
+
+        let user = await this.userModel.findOne({
+            _id: { $ne: ignoreUserId },
+            username
+        }, { _id: 1 })
+        .lean()
+        .exec();
 
         return user != null;
     }

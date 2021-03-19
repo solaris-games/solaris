@@ -41,7 +41,8 @@
       "industry": "standard",
       "science": "cheap"
     },
-    "tradeCost": 15,
+    "tradeCredits": false,
+    "tradeCost": 0,
     "tradeScanning": "all"
   },
   "technology": {
@@ -59,9 +60,9 @@
       "experimentation": "none",
       "scanning": "standard",
       "hyperspace": "standard",
-      "manufacturing": "standard",
+      "manufacturing": "expensive",
       "banking": "cheap",
-      "weapons": "expensive"
+      "weapons": "none"
     }
   },
   "gameTime": {

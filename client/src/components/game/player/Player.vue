@@ -29,16 +29,16 @@
                     :science="userPlayer.stats.totalScience"/>
 
     <h4 v-if="userPlayer" class="mt-2">Technology</h4>
-
+    
     <research v-if="player" :playerId="player._id"/>
 
-    <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished">
+    <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
       <h4 class="mt-2">Trade</h4>
-
+      
       <div v-if="canTradeWithPlayer">
         <reputation v-if="player.defeated" :playerId="player._id"/>
-        <sendTechnology v-if="player" :playerId="player._id"/>
-        <sendCredits :player="player" :userPlayer="userPlayer"/>
+        <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
+        <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
       </div>
 
       <p v-if="!canTradeWithPlayer" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
@@ -46,13 +46,13 @@
 
     <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
 
-    <h4 class="mt-2" v-if="player && !player.isEmptySlot && isValidUser">Achievements</h4>
+    <h4 class="mt-2" v-if="canViewAchievements">Achievements</h4>
 
     <achievements v-if="isValidUser" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
-    <sendRenown v-if="isValidUser && game.state.startDate && userPlayer && player != userPlayer" :player="player" :userPlayer="userPlayer"
+    <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
     <!--
@@ -164,7 +164,9 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', player._id)
     },
     onRenownSent (e) {
-      this.user.achievements.renown += e
+      if (this.user.achievements) {
+        this.user.achievements.renown += e
+      }
     }
   },
   computed: {
@@ -179,6 +181,29 @@ export default {
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    tradeCreditsIsEnabled () {
+      return this.game.settings.player.tradeCredits
+    },
+    tradeTechnologyIsEnabled () {
+      return this.game.settings.player.tradeCost > 0
+    },
+    isAnonymousGame () {
+      return this.game.settings.general.anonymity === 'extra'
+    },
+    canViewAchievements () {
+      if (this.isAnonymousGame) {
+        return this.player && !this.player.isEmptySlot && this.isGameFinished && this.player != this.userPlayer
+      } else {
+        return this.player && !this.player.isEmptySlot && this.isValidUser
+      }
+    },
+    canSendRenown () {
+      if (this.isAnonymousGame) {
+        return this.game.state.startDate && this.userPlayer && this.player != this.userPlayer && this.isGameFinished
+      } else {
+        return this.game.state.startDate && this.userPlayer && this.player != this.userPlayer
+      }
     }
   }
 }

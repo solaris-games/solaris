@@ -24,7 +24,7 @@ const schema = new Schema({
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30, 50], default: 20 },
-			productionTicks: { type: Types.Number, required: true, enum: [16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
+			productionTicks: { type: Types.Number, required: true, enum: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -41,7 +41,7 @@ const schema = new Schema({
         },
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
-			startingCredits: { type: Types.Number, required: true, enum: [50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
+			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
 			startingShips: { type: Types.Number, required: true, enum: [0, 10, 50, 100], default: 10 },
 			startingInfrastructure: {
 				economy: { type: Types.Number, required: true, enum: [0, 5, 10, 20, 30], default: 5 },
@@ -53,7 +53,8 @@ const schema = new Schema({
 				industry: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
 				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
 			},
-			tradeCost: { type: Types.Number, required: true, enum: [5, 15, 25, 50, 100], default: 15 },
+			tradeCredits: { type: Types.Boolean, required: false, default: true },
+			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 },
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
         },
         technology: {
@@ -135,7 +136,8 @@ const schema = new Schema({
 			}
 		}
 	},
-	quitters: [{ type: Types.ObjectId, required: false }]
+	quitters: [{ type: Types.ObjectId, required: false }],
+	afkers: [{ type: Types.ObjectId, required: false }]
 });
 
 module.exports = schema;

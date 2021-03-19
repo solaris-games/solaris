@@ -2,7 +2,7 @@
 <div>
     <div class="row text-center bg-primary">
         <div class="col">
-            <p class="mb-0 mt-2 mb-2">Select a name for your commander in chief.</p>
+            <p class="mb-0 mt-2 mb-2">Select a race and an alias for your commander.</p>
         </div>
     </div>
 
@@ -14,10 +14,13 @@
                     <select-avatar v-on:onAvatarChanged="onAvatarChanged"/>
                   </div>
                   <div class="col pt-3">
-                    <p>Every great story needs both heroes and villians. Which will you be?</p>
+                    <p v-if="!race">Every great story needs both heroes and villians. Which will you be?</p>
+
+                    <h5 v-if="race">{{race.name}}</h5>
+                    <p v-if="race"><small class="linebreaks">{{race.description}}</small></p>
 
                     <div class="form-group">
-                        <input class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
+                      <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
                     </div>
 
                     <!-- <div class="form-group text-center small">
@@ -34,6 +37,7 @@
 <script>
 import UserService from '../../../services/api/user'
 import SelectAvatarVue from './SelectAvatar.vue'
+import RaceHelper from '../../../services/raceHelper'
 
 export default {
   components: {
@@ -41,7 +45,9 @@ export default {
   },
   data () {
     return {
-      alias: null
+      alias: null,
+      avatar: null,
+      race: null
     }
   },
   async mounted () {
@@ -61,6 +67,10 @@ export default {
       this.$emit('onAliasChanged', this.alias)
     },
     onAvatarChanged (e) {
+      this.avatar = e
+
+      this.race = RaceHelper.getRace(parseInt(e))
+
       this.$emit('onAvatarChanged', e)
     }
   }
@@ -68,4 +78,7 @@ export default {
 </script>
 
 <style scoped>
+.linebreaks {
+  white-space: break-spaces;
+}
 </style>

@@ -68,7 +68,7 @@
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-shield-alt"></i>
-              <span class="ml-2">{{user.guildId ? 'My Guild' : 'Guilds'}}</span>
+              <span class="ml-2">{{user && user.guildId ? 'My Guild' : 'Guilds'}}</span>
             </h5>
           </div>
         </div>
@@ -78,7 +78,7 @@
     <div class="row pb-0">
       <div class="col d-none d-md-block">
         <h4>Top 10 Players</h4>
-        <leaderboard-table if="leaderboard" :leaderboard="leaderboard"></leaderboard-table>
+        <leaderboard-user-table if="leaderboard" :leaderboard="leaderboard"></leaderboard-user-table>
         <loading-spinner :loading="!leaderboard"></loading-spinner>
       </div>
     </div>
@@ -94,7 +94,7 @@ import userService from '../services/api/user'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
-import LeaderboardTable from '../components/game/menu/LeaderboardTable'
+import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
 
 export default {
   components: {
@@ -102,7 +102,7 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'leaderboard-table': LeaderboardTable
+    'leaderboard-user-table': LeaderboardUserTable
   },
   data () {
     return {

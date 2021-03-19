@@ -76,7 +76,7 @@ module.exports = (io) => {
     const specialistService = new SpecialistService();
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(GameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
-    const carrierService = new CarrierService(achievementService, distanceService, starService, technologyService, specialistService);
+    const carrierService = new CarrierService(GameModel, achievementService, distanceService, starService, technologyService, specialistService);
     const combatService = new CombatService(technologyService, specialistService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService);
@@ -87,7 +87,7 @@ module.exports = (io) => {
     const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
     const ledgerService = new LedgerService(playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService);
-    const gameService = new GameService(GameModel, userService, carrierService, playerService, passwordService);
+    const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService);
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, starService, userService);
     const tradeService = new TradeService(userService, playerService, ledgerService);
     const reputationService = new ReputationService(GameModel, tradeService, playerService);

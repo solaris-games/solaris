@@ -3,7 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "New Players",
     "password": null,
-    "starVictoryPercentage": 50,
+    "starVictoryPercentage": 66,
     "playerLimit": 4,
     "playerType": "all",
     "anonymity": "normal",
@@ -41,6 +41,7 @@
       "industry": "standard",
       "science": "standard"
     },
+    "tradeCredits": true,
     "tradeCost": 15,
     "tradeScanning": "all"
   },

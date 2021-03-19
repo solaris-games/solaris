@@ -263,6 +263,9 @@
             }
         ],
         "productionTicks": [
+            10,
+            12,
+            14,
             16,
             18,
             20,
@@ -290,12 +293,14 @@
             10
         ],
         "startingCredits": [
-            25,
-            500,
-            1000,
-            1500,
-            2000,
-            2500,
+            25, 
+            50, 
+            100, 
+            500, 
+            1000, 
+            1500, 
+            2000, 
+            2500, 
             3000
         ],
         "startingShips": [
@@ -342,7 +347,21 @@
             "text": "Expensive"
             }
         ],
+        "tradeCredits": [
+            {
+            "value": false,
+            "text": "Disabled"
+            },
+            {
+            "value": true,
+            "text": "Enabled"
+            }
+        ],
         "tradeCost": [
+            {
+            "value": 0,
+            "text": "Trading Disabled"
+            },
             {
             "value": 5,
             "text": "Cheap"

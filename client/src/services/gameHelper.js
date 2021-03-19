@@ -6,6 +6,10 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
+  getPlayerByAlias (game, playerName) {
+    return game.galaxy.players.find(p => p.alias === playerName)
+  }
+
   getPlayerById (game, playerId) {
     return game.galaxy.players.find(x => x._id === playerId)
   }
@@ -18,6 +22,10 @@ class GameHelper {
 
   getFriendlyColour (colour) {
     return colour.replace('0x', '#')
+  }
+
+  getStarByName (game, starName) {
+    return game.galaxy.stars.find(s => s.name === starName)
   }
 
   getStarById (game, starId) {
@@ -57,6 +65,12 @@ class GameHelper {
         this.isCarrierInTransit(carrier) &&
         carrier.inTransitFrom === waypoint.source &&
         carrier.inTransitTo === waypoint.destination
+  }
+
+  getStarTotalKnownGarrison (game, star) {
+    let carriers = this.getCarriersOrbitingStar(game, star)
+
+    return (star.garrison || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
   getHyperspaceDistance (game, player, carrier) {
@@ -381,12 +395,12 @@ class GameHelper {
 
   getPlayerStatus (player) {
     if (player.defeated && !player.afk) {
-      return 'DEFEATED'
+      return 'Defeated'
     } else if (player.defeated && player.afk) {
       return 'AFK'
     }
 
-    return 'UNKNOWN'
+    return 'Unknown'
   }
 
   getSortedLeaderboardPlayerList (game) {
@@ -556,6 +570,12 @@ class GameHelper {
     let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
 
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+  }
+
+  gameHasOpenSlots (game) {
+    return game.galaxy.players.filter(p => {
+      return p.isEmptySlot || p.afk
+    }).length > 0
   }
 
   canTick(game) {

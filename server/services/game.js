@@ -4,11 +4,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, carrierService, playerService, passwordService) {
+    constructor(gameModel, userService, starService, carrierService, playerService, passwordService) {
         super();
         
         this.gameModel = gameModel;
         this.userService = userService;
+        this.starService = starService;
         this.carrierService = carrierService;
         this.playerService = playerService;
         this.passwordService = passwordService;
@@ -107,17 +108,14 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async join(game, userId, playerId, alias, avatar, password) {
-        // Only allow join if the game hasn't started.
-        if (game.state.startDate) {
-            throw new ValidationError('The game has already started.');
-        }
-
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
             throw new ValidationError('The game has already finished.');
         }
 
-        if (game.quitters.find(x => x.equals(userId))) {
+        // The user cannot rejoin if they quit early or were afk.
+        if (game.quitters.find(x => x.equals(userId))
+            || game.afkers.find(x => x.equals(userId))) {
             throw new ValidationError('You cannot rejoin this game.');
         }
 
@@ -130,10 +128,11 @@ module.exports = class GameService extends EventEmitter {
         }
 
         // Disallow if they are already in the game as another player.
-        let existing = game.galaxy.players.find(x => x.userId === userId);
+        // If the player they are in the game as is afk then that's fine.
+        let existing = game.galaxy.players.find(x => x.userId === userId.toString());
 
         if (existing) {
-            throw new ValidationError('The user is already participating in this game.');
+            throw new ValidationError('You are already participating in this game.');
         }
 
         // Get the player and update it to assign the user to the player.
@@ -143,8 +142,15 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('The player is not participating in this game.');
         }
 
-        // Only allow if the player isn't already occupied.
-        if (player && player.userId) {
+        let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        if (!stars.length) {
+            throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
+        }
+
+        // Only allow if the player isn't already occupied and is afk
+        // We want to allow players to join in-progress games to fill afk slots.
+        if (player && player.userId && !player.afk) {
             throw new ValidationError('This player spot has already been taken by another user.');
         }
 
@@ -154,6 +160,13 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
         }
 
+        // Disallow if they have the same alias as a user.
+        let aliasCheckUser = await this.userService.otherUsernameExists(alias, userId);
+
+        if (aliasCheckUser) {
+            throw new ValidationError(`The alias '${alias}' is the username of another player.`);
+        }
+
         // TODO: Factor in player type setting. i.e premium players only.
 
         // Assign the user to the player.
@@ -161,26 +174,40 @@ module.exports = class GameService extends EventEmitter {
         player.alias = alias;
         player.avatar = avatar;
 
+        // Reset the defeated and afk status as the user may be filling
+        // an afk slot.
+        player.defeated = false;
+        player.afk = false;
+        player.missedTurns = 0;
+        player.hasSentTurnReminder = false;
+
         // If the max player count is reached then start the game.
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
-        let gameIsFull = game.state.players === game.settings.general.playerLimit;
+        let gameIsFull = false;
 
-        if (gameIsFull) {
-            let start = moment().utc();
-
-            if (this.isRealTimeGame(game)) {
-                // Add the start delay to the start date.
-                start.add(game.settings.gameTime.startDelay, 'minute');
+        // If the game hasn't started yet then check if the game is full
+        if (!game.state.startDate) {
+            gameIsFull = game.state.players === game.settings.general.playerLimit;
+    
+            if (gameIsFull) {
+                let startDate = moment().utc();
+    
+                if (this.isRealTimeGame(game)) {
+                    // Add the start delay to the start date.
+                    startDate.add(game.settings.gameTime.startDelay, 'minute');
+                }
+    
+                game.state.paused = false;
+                game.state.startDate = startDate;
+                game.state.lastTickDate = startDate;
+    
+                for (let player of game.galaxy.players) {
+                    this.playerService.updateLastSeen(game, player, startDate);
+                }
             }
-
-            game.state.paused = false;
-            game.state.startDate = start;
-            game.state.lastTickDate = start;
-
-            for (let player of game.galaxy.players) {
-                this.playerService.updateLastSeen(game, player);
-            }
+        } else {
+            this.playerService.updateLastSeen(game, player);
         }
 
         await game.save();
