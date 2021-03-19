@@ -142,9 +142,18 @@ class MentionHelper {
       return
     }
 
-    const { mentionType, text, mentionStart } = conversation.currentMention
+    this.endMentionWithText(conversation, conversation.currentMention.text)
+  }
+
+  endMentionWithText (conversation, text) {
+    if (!conversation || !conversation.currentMention) {
+      return
+    }
+
+    const { mentionType, mentionStart, text: mentionText } = conversation.currentMention
+
     //Offset of 1 for * or @
-    this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + text.length + 1)
+    this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + mentionText.length + 1)
     conversation.currentMention = null
     conversation.suggestions = []
   }

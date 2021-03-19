@@ -1,12 +1,12 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-secondary" v-if="suggestMentions && focused">
+    <div class="mention-overlay bg-secondary" v-if="suggestMentions">
       <ul>
-        <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion">{{suggestion}}</li>
+        <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
     </div>
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @focus="onFocus" @blur="onBlur" @keydown="onKeyDown"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -43,12 +43,8 @@ export default {
     this.suggestMentions = this.$store.state.settings.interface.suggestMentions
   },
   methods: {
-    onFocus (e) {
-      this.focused = true
-    },
-    onBlur (e) {
-      this.$store.commit('unfocusConversation', e)
-      this.focused = false
+    useSuggestion (suggestion) {
+      this.$store.commit('useSuggestion', suggestion)
     },
     onKeyDown (e) {
       this.$store.commit('updateCurrentMention', e.key)
@@ -57,6 +53,7 @@ export default {
       this.$store.commit('updateCurrentConversationText', e.target.value)
     },
     async send () {
+      this.$store.commit('finishMention')
       const messageText = this.$store.state.currentConversation.text
 
       if (!messageText) {
