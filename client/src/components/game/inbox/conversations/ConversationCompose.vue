@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-secondary" v-if="suggestMentions && this.$store.state.currentConversation.suggestions">
+    <div class="mention-overlay bg-secondary" v-if="suggestMentions && suggestionsPresent">
       <ul>
         <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
@@ -41,6 +41,11 @@ export default {
   mounted () {
     this.$store.commit('setConversationElement', this.$refs.messageElement)
     this.suggestMentions = this.$store.state.settings.interface.suggestMentions
+  },
+  computed: {
+    suggestionsPresent () {
+      return this.$store.state.currentConversation.suggestions && this.$store.state.currentConversation.suggestions.length
+    }
   },
   methods: {
     useSuggestion (suggestion) {
