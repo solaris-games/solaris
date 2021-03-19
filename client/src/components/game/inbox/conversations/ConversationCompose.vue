@@ -107,5 +107,6 @@ export default {
 
 .mention-overlay li {
   list-style-type: none;
+  cursor: pointer;
 }
 </style>
