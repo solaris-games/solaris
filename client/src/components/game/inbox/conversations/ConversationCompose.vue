@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-secondary" v-if="suggestMentions && suggestionsPresent">
+    <div class="mention-overlay bg-primary" v-if="suggestMentions && suggestionsPresent">
       <ul>
         <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
@@ -111,6 +111,12 @@ export default {
   z-index: 10;
   bottom: 100%;
   width: 100%;
+  border-radius: 4px;
+}
+
+.mention-overlay ul {
+  padding: 4px 8px;
+  margin-bottom: 0;
 }
 
 .mention-overlay li {
