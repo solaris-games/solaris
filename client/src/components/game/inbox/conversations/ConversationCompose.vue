@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-secondary" v-if="suggestMentions">
+    <div class="mention-overlay bg-secondary" v-if="suggestMentions && this.$store.state.currentConversation.suggestions">
       <ul>
         <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>

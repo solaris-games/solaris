@@ -66,7 +66,6 @@ export default new Vuex.Store({
       MentionHelper.tryBeginMention(state.game, state.currentConversation, key, state.settings.interface.suggestMentions)
     },
     useSuggestion (state, suggestion) {
-      console.warn(suggestion)
       MentionHelper.endMentionWithText(state.currentConversation, suggestion)
     },
     finishMention (state) {
