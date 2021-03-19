@@ -463,17 +463,12 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
-        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
-
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.calculateTotalEconomy(playerStars);
 
-        let bankingMultiplier = isBankingEnabled ? effectiveTechs.banking : 0;
-
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = playerStars.length ? bankingMultiplier * 75 : 0; // Players must have stars in order to get credits from banking.
+        let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
@@ -483,6 +478,25 @@ module.exports = class PlayerService extends EventEmitter {
             creditsFromBanking,
             creditsTotal
         };
+    }
+
+    _getBankingReward(game, player, playerStars, totalEco) {
+        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
+
+        if (!isBankingEnabled || !playerStars.length) { // Players must have stars in order to get credits from banking.
+            return 0;
+        }
+
+        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+
+        switch (game.settings.technology.bankingReward) {
+            case 'standard':
+                return effectiveTechs.banking * 75;
+            case 'experimental':
+                return Math.round((effectiveTechs.banking * 75) + (0.15 * effectiveTechs.banking * totalEco));
+        }
+
+        throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
     }
 
     async declareReady(game, player) {

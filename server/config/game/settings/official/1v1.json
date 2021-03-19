@@ -63,7 +63,8 @@
       "manufacturing": "expensive",
       "banking": "cheap",
       "weapons": "none"
-    }
+    },
+    "bankingReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",

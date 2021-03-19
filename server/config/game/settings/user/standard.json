@@ -63,7 +63,8 @@
         "manufacturing": "standard",
         "banking": "standard",
         "weapons": "standard"
-        }
+        },
+        "bankingReward": "standard"
     },
     "gameTime": {
         "gameType": "realTime",

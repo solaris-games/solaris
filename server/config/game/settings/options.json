@@ -395,69 +395,79 @@
         ]
         },
         "technology": {
-        "startingTechnologyLevel": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16
-        ],
-        "startingTechnologyLevelWithDisabled": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16
-        ],
-        "researchCosts": [
-            {
-            "value": "none",
-            "text": "No"
-            },
-            {
-            "value": "cheap",
-            "text": "Cheap"
-            },
-            {
-            "value": "standard",
-            "text": "Standard"
-            },
-            {
-            "value": "expensive",
-            "text": "Expensive"
-            },
-            {
-            "value": "veryExpensive",
-            "text": "Very Expensive"
-            },
-            {
-            "value": "crazyExpensive",
-            "text": "Crazy Expensive"
-            }
-        ]
+            "startingTechnologyLevel": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+            ],
+            "startingTechnologyLevelWithDisabled": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+            ],
+            "researchCosts": [
+                {
+                    "value": "none",
+                    "text": "No"
+                },
+                {
+                    "value": "cheap",
+                    "text": "Cheap"
+                },
+                {
+                    "value": "standard",
+                    "text": "Standard"
+                },
+                {
+                    "value": "expensive",
+                    "text": "Expensive"
+                },
+                {
+                    "value": "veryExpensive",
+                    "text": "Very Expensive"
+                },
+                {
+                    "value": "crazyExpensive",
+                    "text": "Crazy Expensive"
+                }
+            ],
+            "bankingReward": [
+                {
+                    "value": "standard",
+                    "text": "Standard"
+                },
+                {
+                    "value": "experimental",
+                    "text": "Experimental"
+                }
+            ]
         },
         "gameTime": {
         "gameType": [

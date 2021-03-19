@@ -379,6 +379,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="bankingReward" class="col-form-label">Banking Reward</label>
+        <select class="form-control" id="bankingReward" v-model="settings.technology.bankingReward" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.bankingReward" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <view-subtitle title="Game Time Settings"/>
 
       <div class="form-group">

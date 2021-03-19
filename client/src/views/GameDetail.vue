@@ -234,6 +234,10 @@
               <td>Weapons Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.weapons) }}</td>
             </tr>
+            <tr>
+              <td>Banking Reward</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.bankingReward) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -366,7 +370,8 @@ export default {
         'normal': 'Normal',
         'extra': 'Extra',
         'hidden': 'Hidden',
-        'visible': 'Visible'
+        'visible': 'Visible',
+        'experimental': 'Experimental'
       }[option]
 
       return text || option
