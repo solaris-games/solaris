@@ -370,9 +370,7 @@ class Map extends EventEmitter {
 
   drawStar (star) {
     star.draw()
-    let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
-    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
-    star.onZoomChanging(zoomPercent)
+    star.onZoomChanging(this.zoomPercent)
   }
 
   _undrawStar (star) {
@@ -394,9 +392,7 @@ class Map extends EventEmitter {
 
   drawCarrier (carrier) {
     carrier.draw()
-    let viewportWidth = gameContainer.viewport.right - gameContainer.viewport.left
-    let zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
-    carrier.onZoomChanging(zoomPercent)
+    carrier.onZoomChanging(this.zoomPercent)
   }
 
   _undrawCarrier (carrier) {
@@ -547,7 +543,7 @@ class Map extends EventEmitter {
   }
 
   onMouseMove(eventData) {
-    let world_mousePosition = gameContainer.viewport.toWorld(eventData.data.global)
+    let world_mousePosition = this.gameContainer.viewport.toWorld(eventData.data.global)
     this.mouseChunkX = Math.floor(world_mousePosition.x/Map.chunkSize)
     this.mouseChunkY = Math.floor(world_mousePosition.y/Map.chunkSize)
     this.minMouseChunkX = this.mouseChunkX-1
@@ -580,7 +576,6 @@ class Map extends EventEmitter {
     
     let viewportCenter = this.gameContainer.viewport.center
 
-    this.zoomPercent = (gameContainer.viewport.screenWidth/viewportWidth) * 100
     this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
 
     let viewportData = {
@@ -591,11 +586,11 @@ class Map extends EventEmitter {
 
     //chunk culling
 
-    let firstX = Math.floor(gameContainer.viewport.left/Map.chunkSize)
-    let firstY = Math.floor(gameContainer.viewport.top/Map.chunkSize)
+    let firstX = Math.floor(this.gameContainer.viewport.left/Map.chunkSize)
+    let firstY = Math.floor(this.gameContainer.viewport.top/Map.chunkSize)
 
-    let lastX = Math.floor(gameContainer.viewport.right/Map.chunkSize)
-    let lastY = Math.floor(gameContainer.viewport.bottom/Map.chunkSize)
+    let lastX = Math.floor(this.gameContainer.viewport.right/Map.chunkSize)
+    let lastY = Math.floor(this.gameContainer.viewport.bottom/Map.chunkSize)
 
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
