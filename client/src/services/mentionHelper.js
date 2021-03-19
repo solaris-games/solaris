@@ -130,7 +130,9 @@ class MentionHelper {
           mentionStart: conversation.element.selectionStart,
           text: ''
         }
-        conversation.suggestions = this.findSuggestions(game, mentionType, '')
+        if (suggestionsEnabled) {
+          conversation.suggestions = this.findSuggestions(game, mentionType, '')
+        }
       }
     }
   }
@@ -165,7 +167,9 @@ class MentionHelper {
         this.endMention(conversation)
       } else {
         conversation.currentMention.text = newMentionText
-        conversation.suggestions = this.findSuggestions(game, conversation.currentMention.mentionType, newMentionText)
+        if (suggestionsEnabled) {
+          conversation.suggestions = this.findSuggestions(game, conversation.currentMention.mentionType, newMentionText)
+        }
       }
     }
   }
