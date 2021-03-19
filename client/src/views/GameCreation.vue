@@ -113,6 +113,15 @@
       </div>
 
       <div class="form-group">
+        <label for="carrierUpkeepCost" class="col-form-label">Carrier Upkeep Cost</label>
+        <select class="form-control" id="carrierUpkeepCost" v-model="settings.specialGalaxy.carrierUpkeepCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.carrierUpkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="warpgateCost" class="col-form-label">Warpgate Cost</label>
         <select class="form-control" id="warpgateCost" v-model="settings.specialGalaxy.warpgateCost" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.warpgateCost" v-bind:key="opt.value" v-bind:value="opt.value">

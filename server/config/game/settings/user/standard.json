@@ -16,6 +16,7 @@
     },
     "specialGalaxy": {
         "carrierCost": "standard",
+        "carrierUpkeepCost": "none",
         "warpgateCost": "standard",
         "specialistCost": "standard",
         "randomGates": "none",

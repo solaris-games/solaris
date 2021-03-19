@@ -71,6 +71,10 @@
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierCost) }}</td>
             </tr>
             <tr>
+              <td>Carrier Upkeep Cost</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierUpkeepCost) }}</td>
+            </tr>
+            <tr>
               <td>Warpgate Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.warpgateCost) }}</td>
             </tr>

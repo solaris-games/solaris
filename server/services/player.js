@@ -499,6 +499,31 @@ module.exports = class PlayerService extends EventEmitter {
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
     }
 
+    deductCarrierUpkeepCost(game, player) {
+        const upkeepCosts = {
+            'none': 0,
+            'cheap': 1,
+            'standard': 3,
+            'expensive': 6
+        };
+
+        let costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+
+        if (!costPerCarrier) {
+            return null;
+        }
+
+        let carrierCount = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).length;
+        let totalCost = carrierCount * costPerCarrier;
+
+        player.credits -= totalCost; // Note: Don't care if this goes into negative figures.
+
+        return {
+            carrierCount,
+            totalCost
+        };
+    }
+
     async declareReady(game, player) {
         player.ready = true;
 

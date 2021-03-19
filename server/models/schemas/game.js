@@ -28,6 +28,7 @@ const schema = new Schema({
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
+			carrierUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
