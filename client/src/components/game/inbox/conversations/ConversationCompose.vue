@@ -46,8 +46,11 @@ export default {
     useSuggestion (suggestion) {
       this.$store.commit('useSuggestion', suggestion)
     },
-    onKeyDown (e) {
+    async onKeyDown (e) {
       this.$store.commit('updateCurrentMention', e.key)
+      if (e.ctrlKey && e.key === "Enter") {
+        await this.send()
+      }
     },
     onMessageChange (e) {
       this.$store.commit('updateCurrentConversationText', e.target.value)
