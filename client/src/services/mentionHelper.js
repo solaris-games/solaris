@@ -154,8 +154,7 @@ class MentionHelper {
 
     //Offset of 1 for * or @
     this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + mentionText.length + 1)
-    conversation.currentMention = null
-    conversation.suggestions = []
+    this.deleteMention(conversation)
   }
 
   getMentionType (character) {
@@ -170,6 +169,9 @@ class MentionHelper {
 
   updateMention (game, conversation, suggestionsEnabled) {
     if (conversation.currentMention) {
+      if (conversation.element.selectionEnd <= conversation.currentMention.mentionStart) {
+        this.deleteMention(conversation)
+      }
       const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
       const lastCharacter = newMentionText[newMentionText.length - 1]
       if (lastCharacter && !lastCharacter.trim()) {
@@ -181,6 +183,11 @@ class MentionHelper {
         }
       }
     }
+  }
+
+  deleteMention (conversation) {
+    conversation.currentMention = null
+    conversation.suggestions = []
   }
 
   getToCursor (conversation, from) {
