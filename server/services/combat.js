@@ -81,13 +81,13 @@ module.exports = class CombatService {
         return combatResult;
     }
 
-    calculateCarrier(game, defenderCarriers, attackerCarriers) {
+    calculateCarrier(game, defender, attackers, defenderCarriers, attackerCarriers) {
         let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
         let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
 
         // Calculate the weapons tech levels
-        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenderCarriers, false);
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackerCarriers, false);
+        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, [defender], defenderCarriers, false);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, false);
         
         // Check for deductions to weapons.
         let defenderWeaponsDeduction = this.getWeaponsDeduction(attackerCarriers, defenderCarriers);

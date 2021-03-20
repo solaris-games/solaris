@@ -387,7 +387,7 @@ module.exports = class GameTickService extends EventEmitter {
         if (star) {
             combatResult = this.combatService.calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers);
         } else {
-            combatResult = this.combatService.calculateCarrier(game, defenderCarriers, attackerCarriers);
+            combatResult = this.combatService.calculateCarrier(game, defender, attackers, defenderCarriers, attackerCarriers);
         }
 
         await this._decreaseReputationForCombat(game, defender, attackers);
