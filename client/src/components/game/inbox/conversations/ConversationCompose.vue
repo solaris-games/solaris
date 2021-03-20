@@ -1,8 +1,8 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-primary" v-if="suggestMentions && suggestionsPresent">
+    <div class="mention-overlay bg-primary" v-if="suggestMentions && suggestions && suggestions.length">
       <ul>
-        <li v-for="suggestion in this.$store.state.currentConversation.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
+        <li v-for="suggestion in suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
     </div>
     <div class="form-group mb-2">
@@ -35,24 +35,19 @@ export default {
     return {
       isSendingMessage: false,
       focused: false,
-      suggestMentions: false
+      suggestMentions: false,
+      suggestions: ["Test"]
     }
   },
   mounted () {
     this.$store.commit('setConversationElement', this.$refs.messageElement)
     this.suggestMentions = this.$store.state.settings.interface.suggestMentions
   },
-  computed: {
-    suggestionsPresent () {
-      return this.$store.state.currentConversation.suggestions && this.$store.state.currentConversation.suggestions.length
-    }
-  },
   methods: {
     useSuggestion (suggestion) {
-      this.$store.commit('useSuggestion', suggestion)
+      
     },
     async onKeyDown (e) {
-      this.$store.commit('updateCurrentMention', e.key)
       if (e.ctrlKey && e.key === "Enter") {
         await this.send()
       }
@@ -61,7 +56,6 @@ export default {
       this.$store.commit('updateCurrentConversationText', e.target.value)
     },
     async send () {
-      this.$store.commit('finishMention')
       const messageText = this.$store.state.currentConversation.text
 
       if (!messageText) {
