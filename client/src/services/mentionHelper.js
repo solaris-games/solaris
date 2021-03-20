@@ -122,7 +122,9 @@ class MentionHelper {
   }
 
   tryBeginMention (game, conversation, key, suggestionsEnabled) {
-    if (!conversation.currentMention) {
+    if (conversation.currentMention) {
+      this.updateMention(game, conversation, suggestionsEnabled)
+    } else {
       const mentionType = this.getMentionType(key)
       if (mentionType) {
         conversation.currentMention = {

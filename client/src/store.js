@@ -78,7 +78,6 @@ export default new Vuex.Store({
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data
-      MentionHelper.updateMention(state.game, state.currentConversation, state.settings.interface.suggestMentions)
     },
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''
