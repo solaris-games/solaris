@@ -58,20 +58,20 @@ export default {
       this.selectedSuggestion = newSelected % this.currentMention.suggestions.length
     },
     async onKeyDown (e) {
-      if (e.key === "Enter") {
-        if (e.ctrlKey) {
+      if (e.key === "Enter" && e.ctrlKey) {
           e.preventDefault()
           await this.send()
-        } else if (this.suggestMentions && this.currentMention && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
+      } else if (this.suggestMentions && this.currentMention) {
+        if (e.key === "Enter" && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
           e.preventDefault()
           this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault()
+          this.setSelectedSuggestion(this.selectedSuggestion + 1)
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault()
+          this.setSelectedSuggestion(this.selectedSuggestion - 1)
         }
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault()
-        this.setSelectedSuggestion(this.selectedSuggestion + 1)
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault()
-        this.setSelectedSuggestion(this.selectedSuggestion - 1)
       }
     },
     updateSuggestions () {
@@ -84,8 +84,8 @@ export default {
           this.selectedSuggestion = 0 //Mention was started
         }
 
-        //When the number of new suggestions is smaller, the selection might not get displayed otherwise
-        if (this.selectedSuggestion != null) {
+        if (this.currentMention && this.selectedSuggestion != null) {
+          //When the number of new suggestions is smaller, the selection might not get displayed otherwise
           this.setSelectedSuggestion(this.selectedSuggestion)
         }
       }
