@@ -42,7 +42,8 @@ export default {
   },
   mounted () {
     this.$store.commit('setConversationElement', this.$refs.messageElement)
-    this.suggestMentions = this.$store.state.settings.interface.suggestMentions
+    this.suggestMentions = this.$store.state.settings.interface.suggestMentions === 'enabled'
+    console.warn(this.suggestMentions)
   },
   methods: {
     useSuggestion (suggestion) {
