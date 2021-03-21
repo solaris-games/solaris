@@ -79,9 +79,14 @@ export default {
         const oldMention = Boolean(this.currentMention)
         this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
         if (oldMention && !this.currentMention) {
-          this.selectedSuggestion = null
+          this.selectedSuggestion = null //Mention was left
         } else if (!oldMention && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
-          this.selectedSuggestion = 0
+          this.selectedSuggestion = 0 //Mention was started
+        }
+
+        //When the number of new suggestions is smaller, the selection might not get displayed otherwise
+        if (this.selectedSuggestion != null) {
+          this.setSelectedSuggestion(this.selectedSuggestion)
         }
       }
     },
