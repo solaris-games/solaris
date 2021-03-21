@@ -1,8 +1,10 @@
 import gameHelper from './gameHelper.js'
 
 class MentionHelper {
-  static MENTION_REGEX = /(\*|@)(\w+)/g
+  static MENTION_REGEX = /(#|@)(\w+)/g
   static INTERNAL_MENTION_REGEX = /{{(\w)\/(\w+?)\/(.+?)}}/g
+  static STAR_MENTION_CHARACTER = '#'
+  static PLAYER_MENTION_CHARACTER = '@'
 
   addMention(conversation, type, name) {
     const text = conversation.text || ''
@@ -156,15 +158,15 @@ class MentionHelper {
 
     const { mentionType, mentionStart, text: mentionText } = conversation.currentMention
 
-    //Offset of 1 for * or @
+    //Offset of 1 for # or @
     this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + mentionText.length + 1)
     this.deleteMention(conversation)
   }
 
   getMentionType (character) {
-    if (character === '*') {
+    if (character === MentionHelper.STAR_MENTION_CHARACTER) {
       return 'star'
-    } else if (character === '@') {
+    } else if (character === MentionHelper.PLAYER_MENTION_CHARACTER) {
       return 'player'
     } else {
       return null
@@ -173,9 +175,9 @@ class MentionHelper {
 
   getMentionCharacter (type) {
     if (type === 'star') {
-      return '*'
+      return MentionHelper.STAR_MENTION_CHARACTER
     } else if (type === 'player') {
-      return '@'
+      return MentionHelper.PLAYER_MENTION_CHARACTER
     } else {
       return null
     }
