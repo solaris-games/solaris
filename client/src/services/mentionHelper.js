@@ -125,44 +125,6 @@ class MentionHelper {
     return node
   }
 
-  tryBeginMention (game, conversation, key, suggestionsEnabled) {
-    if (conversation.currentMention) {
-      this.updateMention(game, conversation, suggestionsEnabled)
-    } else {
-      const mentionType = this.getMentionType(key)
-      if (mentionType) {
-        conversation.currentMention = {
-          mentionType,
-          mentionStart: conversation.element.selectionStart,
-          text: ''
-        }
-        if (suggestionsEnabled) {
-          conversation.suggestions = this.findSuggestions(game, mentionType, '')
-        }
-      }
-    }
-  }
-
-  endMention (conversation) {
-    if (!conversation || !conversation.currentMention || !conversation.currentMention.text) {
-      return
-    }
-
-    this.endMentionWithText(conversation, conversation.currentMention.text)
-  }
-
-  endMentionWithText (conversation, text) {
-    if (!conversation || !conversation.currentMention) {
-      return
-    }
-
-    const { mentionType, mentionStart, text: mentionText } = conversation.currentMention
-
-    //Offset of 1 for # or @
-    this.addMentionFromTo(conversation, mentionType, text, mentionStart, mentionStart + mentionText.length + 1)
-    this.deleteMention(conversation)
-  }
-
   getMentionType (character) {
     if (character === MentionHelper.STAR_MENTION_CHARACTER) {
       return 'star'
@@ -181,29 +143,6 @@ class MentionHelper {
     } else {
       return null
     }
-  }
-
-  updateMention (game, conversation, suggestionsEnabled) {
-    if (conversation.currentMention) {
-      if (conversation.element.selectionEnd <= conversation.currentMention.mentionStart) {
-        this.deleteMention(conversation)
-      }
-      const newMentionText = this.getToCursor(conversation, conversation.currentMention.mentionStart + 1)
-      const lastCharacter = newMentionText[newMentionText.length - 1]
-      if (lastCharacter && !lastCharacter.trim()) {
-        this.endMention(conversation)
-      } else {
-        conversation.currentMention.text = newMentionText
-        if (suggestionsEnabled) {
-          conversation.suggestions = this.findSuggestions(game, conversation.currentMention.mentionType, newMentionText)
-        }
-      }
-    }
-  }
-
-  deleteMention (conversation) {
-    conversation.currentMention = null
-    conversation.suggestions = []
   }
 
   getToCursor (conversation, from) {
