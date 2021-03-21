@@ -2,7 +2,7 @@
 <form class="pb-1 conversation">
     <div class="mention-overlay bg-primary" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
       <ul>
-        <li v-for="suggestion in currentMention.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
+        <li v-for="(suggestion, index) in currentMention.suggestions" :class="{ selected: index === selectedSuggestion }" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
     </div>
     <div class="form-group mb-2">
@@ -36,7 +36,8 @@ export default {
       isSendingMessage: false,
       focused: false,
       suggestMentions: false,
-      currentMention: null
+      currentMention: null,
+      selectedSuggestion: 0
     }
   },
   mounted () {
@@ -52,9 +53,23 @@ export default {
         })
       }
     },
+    setSelectedSuggestion (newSelected) {
+      this.selectedSuggestion = newSelected % this.currentMention.suggestions.length
+    },
     async onKeyDown (e) {
-      if (e.ctrlKey && e.key === "Enter") {
-        await this.send()
+      if (e.key === "Enter") {
+        e.preventDefault()
+        if (e.ctrlKey) {
+          await this.send()
+        } else if (this.suggestMentions && this.currentMention && this.selectedSuggestion !== null) {
+          this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
+        }
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault()
+        this.setSelectedSuggestion(this.selectedSuggestion + 1)
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault()
+        this.setSelectedSuggestion(this.selectedSuggestion - 1)
       }
     },
     updateSuggestions () {
@@ -127,5 +142,9 @@ export default {
 .mention-overlay li {
   list-style-type: none;
   cursor: pointer;
+}
+
+.mention-overlay .selected {
+  font-weight: bold;
 }
 </style>
