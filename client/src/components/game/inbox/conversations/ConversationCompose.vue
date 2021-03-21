@@ -45,7 +45,12 @@ export default {
   },
   methods: {
     useSuggestion (suggestion) {
-      
+      if (this.suggestMentions && this.currentMention) {
+        this.$store.commit('replaceInConversationText', {
+          mention: this.currentMention.mention,
+          text: suggestion
+        })
+      }
     },
     async onKeyDown (e) {
       if (e.ctrlKey && e.key === "Enter") {

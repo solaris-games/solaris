@@ -148,17 +148,13 @@ class MentionHelper {
   getCurrentMention (game, element) {
     const text = element.value
     const cursor = element.selectionEnd
-    const allMentions = this.findAllMentions(text)
-    console.log(cursor)
-    console.log(allMentions)
-    const currentMention = allMentions.find(mention => mention.from <= cursor && mention.to >= cursor)
-    console.log(currentMention)
+    const currentMention = this.findAllMentions(text).find(mention => mention.from <= cursor && mention.to >= cursor)
     if (!currentMention) {
       return null
     } else {
       return {
         mention: currentMention,
-        suggestions: this.findSuggestions(game, this.getMentionType(currentMention.character), currentMention.name)
+        suggestions: this.findSuggestions(game, currentMention.type, currentMention.name)
       }
     }
   }
@@ -169,7 +165,7 @@ class MentionHelper {
       return {
         from: match.index,
         to: match.index + match[0].length,
-        character: match[1],
+        type: this.getMentionType(match[1]),
         name: match[2]
       }
     })
@@ -191,6 +187,14 @@ class MentionHelper {
       suggestionNames = game.galaxy.players.map(player => player.alias).filter(playerName => playerName.toLowerCase().startsWith(mentionStart))
     }
     return suggestionNames.sort().slice(0, 3)
+  }
+
+  useSuggestion (conversation, data) {
+    if (!conversation || !data) {
+      return
+    }
+    const { mention, text } = data
+    this.addMentionFromTo(conversation, mention.type, text, mention.from, mention.to)
   }
 }
 

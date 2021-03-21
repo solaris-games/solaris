@@ -88,6 +88,9 @@ export default new Vuex.Store({
         data.permitCallback(data.star)
       }
     },
+    replaceInConversationText (state, data) {
+      MentionHelper.useSuggestion(state.currentConversation, data)
+    },
 
     // ----------------
     // Sockets
