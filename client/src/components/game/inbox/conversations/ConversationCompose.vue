@@ -1,12 +1,12 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-primary" v-if="suggestMentions && suggestions && suggestions.length">
+    <div class="mention-overlay bg-primary" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
       <ul>
-        <li v-for="suggestion in suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
+        <li v-for="suggestion in currentMention.suggestions" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
     </div>
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="onKeyUp"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -36,7 +36,7 @@ export default {
       isSendingMessage: false,
       focused: false,
       suggestMentions: false,
-      suggestions: ["Test"]
+      currentMention: null
     }
   },
   mounted () {
@@ -50,6 +50,11 @@ export default {
     async onKeyDown (e) {
       if (e.ctrlKey && e.key === "Enter") {
         await this.send()
+      }
+    },
+    onKeyUp (e) {
+      if (this.suggestMentions) {
+        this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
       }
     },
     onMessageChange (e) {

@@ -145,6 +145,36 @@ class MentionHelper {
     }
   }
 
+  getCurrentMention (game, element) {
+    const text = element.value
+    const cursor = element.selectionEnd
+    const allMentions = this.findAllMentions(text)
+    console.log(cursor)
+    console.log(allMentions)
+    const currentMention = allMentions.find(mention => mention.from <= cursor && mention.to >= cursor)
+    console.log(currentMention)
+    if (!currentMention) {
+      return null
+    } else {
+      return {
+        mention: currentMention,
+        suggestions: this.findSuggestions(game, this.getMentionType(currentMention.character), currentMention.name)
+      }
+    }
+  }
+
+  findAllMentions (message) {
+    const mentions = [...message.matchAll(MentionHelper.MENTION_REGEX)]
+    return mentions.map(match => {
+      return {
+        from: match.index,
+        to: match.index + match[0].length,
+        character: match[1],
+        name: match[2]
+      }
+    })
+  }
+
   getToCursor (conversation, from) {
     const element = conversation.element
     const text = conversation.text || ''
