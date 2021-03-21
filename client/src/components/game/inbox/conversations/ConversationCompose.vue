@@ -47,6 +47,7 @@ export default {
   methods: {
     useSuggestion (suggestion) {
       if (this.suggestMentions && this.currentMention) {
+        this.selectedSuggestion = null
         this.$store.commit('replaceInConversationText', {
           mention: this.currentMention.mention,
           text: suggestion
@@ -58,10 +59,11 @@ export default {
     },
     async onKeyDown (e) {
       if (e.key === "Enter") {
-        e.preventDefault()
         if (e.ctrlKey) {
+          e.preventDefault()
           await this.send()
-        } else if (this.suggestMentions && this.currentMention && this.selectedSuggestion !== null) {
+        } else if (this.suggestMentions && this.currentMention && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
+          e.preventDefault()
           this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
         }
       } else if (e.key === "ArrowDown") {
@@ -74,7 +76,13 @@ export default {
     },
     updateSuggestions () {
       if (this.suggestMentions) {
+        const oldMention = Boolean(this.currentMention)
         this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
+        if (oldMention && !this.currentMention) {
+          this.selectedSuggestion = null
+        } else if (!oldMention && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
+          this.selectedSuggestion = 0
+        }
       }
     },
     onMessageChange (e) {
