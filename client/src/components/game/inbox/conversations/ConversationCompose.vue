@@ -6,7 +6,7 @@
       </ul>
     </div>
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="onKeyUp"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="updateSuggestions"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -52,7 +52,7 @@ export default {
         await this.send()
       }
     },
-    onKeyUp (e) {
+    updateSuggestions () {
       if (this.suggestMentions) {
         this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
       }
@@ -89,6 +89,7 @@ export default {
           })
 
           this.$store.commit('resetCurrentConversationText')
+          this.currentMention = null
         }
       } catch (e) {
         console.error(e)
