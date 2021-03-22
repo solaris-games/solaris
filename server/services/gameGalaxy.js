@@ -244,6 +244,8 @@ module.exports = class GameGalaxyService {
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
+
+        this._populatePlayerHasDuplicateIPs(doc);
         
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
@@ -351,9 +353,16 @@ module.exports = class GameGalaxyService {
                 reputation,
                 lastSeen: p.lastSeen,
                 isOnline: p.isOnline,
-                guild: playerGuild
+                guild: playerGuild,
+                hasDuplicateIP: p.hasDuplicateIP
             };
         });
+    }
+
+    _populatePlayerHasDuplicateIPs(game) {
+        for (let player of game.galaxy.players) {
+            player.hasDuplicateIP = this.playerService.hasDuplicateLastSeenIP(game, player);
+        }
     }
 
     _hasGameStarted(doc) {

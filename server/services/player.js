@@ -598,7 +598,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
-    isAfk(game, player, isTurnBasedGame, afkThresholdDate) {
+    isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
         // 1. The afk threshold date is less than the last seen date
         // 2. The number of missed turns is greater or equal to the missed turn liimt
@@ -610,9 +610,10 @@ module.exports = class PlayerService extends EventEmitter {
             let isFirstTurn = game.state.tick <= game.settings.gameTime.turnJumps;
 
             if (isFirstTurn) {
-                return player.missedTurns > 0;
+                return player.missedTurns > 0; // Missed the first turn
             } else {
-                return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
+                return player.missedTurns >= game.settings.gameTime.missedTurnLimit
+                    || moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached turn limit or 72 hours
             }
         } else {
             // If we have reached the first production tick then check here to see if
@@ -620,9 +621,9 @@ module.exports = class PlayerService extends EventEmitter {
             let isWithinCycle = game.state.tick === (game.settings.galaxy.productionTicks * 2);
 
             if (isWithinCycle) {
-                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc();
+                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc(); // Not seen for 2 cycles
             } else {
-                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
+                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached 72 hours
             }
         }
     }
@@ -646,6 +647,16 @@ module.exports = class PlayerService extends EventEmitter {
         this.setPlayerAsDefeated(game, player);
 
         player.afk = true;
+    }
+
+    hasDuplicateLastSeenIP(game, player) {
+        if (!player.lastSeenIP) {
+            return false;
+        }
+
+        return game.galaxy.players.find(p => p.lastSeenIP 
+            && !p._id.equals(player._id) 
+            && p.lastSeenIP === player.lastSeenIP) != null;
     }
 
 }
