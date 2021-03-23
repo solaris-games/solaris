@@ -107,6 +107,18 @@ module.exports = class UserService extends EventEmitter {
         return user.banned;
     }
 
+    async getUserIsAdmin(userId) {
+        let user = await this.userModel.findOne({
+            _id: userId
+        }, {
+            'roles.administrator': 1
+        })
+        .lean({defaults: true})
+        .exec();
+
+        return user.roles.administrator;
+    }
+
     async create(user) {
         user.username = user.username.trim();
         user.email = user.email.trim();

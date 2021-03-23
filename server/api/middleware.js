@@ -17,6 +17,20 @@ module.exports = (container) => {
             next();
         },
 
+        async authenticateAdmin(req, res, next) {
+            if (!req.session.userId) {
+                return res.sendStatus(401);
+            }
+
+            let isAdmin = await container.userService.getUserIsAdmin(req.session.userId);
+
+            if (!isAdmin) {
+                throw new ValidationError(`The account is not an administrator.`, 401);
+            }
+
+            next();
+        },
+
         handleError(err, req, res, next) {
             // If there is an error in the pipleline
             // then test to see what type of error it is. If its a validation
