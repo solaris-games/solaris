@@ -16,9 +16,9 @@
       @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
 
-    <h4 v-if="userPlayer" class="mt-2">Infrastructure</h4>
+    <h4 v-if="player" class="mt-2">Infrastructure</h4>
 
-    <infrastructure v-if="userPlayer"
+    <infrastructure v-if="player"
                     :economy="player.stats.totalEconomy"
                     :industry="player.stats.totalIndustry"
                     :science="player.stats.totalScience"/>
