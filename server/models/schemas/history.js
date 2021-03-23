@@ -29,6 +29,37 @@ const schema = new Schema({
                 warpgates: { type: Types.Number, required: true, default: 0 }
             }
         }
+    ],
+    stars: [
+        {
+            starId: { type: Types.ObjectId, required: true },
+            ownedByPlayerId: { type: Types.ObjectId, required: false, default: null},
+            naturalResources: { type: Types.Number, required: true },
+            garrison: { type: Types.Number, required: true },
+            specialistId: { type: Types.Number, required: false, default: null },
+            warpGate: { type: Types.Boolean, required: true },
+            infrastructure: {
+                economy: { type: Types.Number, required: true },
+                industry: { type: Types.Number, required: true },
+                science: { type: Types.Number, required: true }
+            }
+        }
+    ],
+    carriers: [
+        {
+            carrierId: { type: Types.ObjectId, required: true },
+            ownedByPlayerId: { type: Types.ObjectId, required: true },
+            orbiting: { type: Types.ObjectId, required: false, default: null },
+            inTransitFrom: { type: Types.ObjectId, required: false, default: null },
+            inTransitTo: { type: Types.ObjectId, required: false },
+            ships: { type: Types.Number, required: true },
+            specialistId: { type: Types.Number, required: false, default: null },
+            isGift: { type: Types.Boolean, required: true },
+            location: {
+                x: { type: Types.Number, required: true },
+                y: { type: Types.Number, required: true }
+            }
+        }
     ]
 });
 

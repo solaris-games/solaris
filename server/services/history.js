@@ -51,10 +51,45 @@ module.exports = class HistoryService {
                     experimentation: player.research.experimentation.level,
                     terraforming: player.research.terraforming.level,
                 }
-            })
+            });
         }
 
+        history.stars = game.galaxy.stars.map(s => {
+            return {
+                starId: s._id,
+                ownedByPlayerId: s.ownedByPlayerId,
+                naturalResources: s.naturalResources,
+                garrison: s.garrison,
+                specialistId: s.specialistId,
+                warpGate: s.warpGate,
+                infrastructure: s.infrastructure
+            };
+        });
+
+        history.carriers = game.galaxy.carriers.map(c => {
+            return {
+                carrierId: c._id,
+                ownedByPlayerId: c.ownedByPlayerId,
+                orbiting: c.orbiting,
+                inTransitFrom: c.inTransitFrom,
+                inTransitTo: c.inTransitTo,
+                ships: c.ships,
+                specialistId: c.specialistId,
+                isGift: c.isGift,
+                location: c.location
+            };
+        });
+
         await history.save();
+    }
+
+    async getHistoryByTick(gameId, tick) {
+        return await this.historyModel.findOne({
+            gameId,
+            tick
+        })
+        .lean({defaults: true})
+        .exec();
     }
 
 };

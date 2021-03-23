@@ -72,14 +72,14 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Conduct research');
             this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
-            this._logHistory(game);
-            logTime('Log history');
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
             this._playAI(game);
             logTime('AI controlled players turn');
+            this._logHistory(game);
+            logTime('Log history');
 
             if (hasWinner) {
                 break;

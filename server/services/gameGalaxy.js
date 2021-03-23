@@ -1,11 +1,9 @@
-const ValidationError = require('../errors/validation');
-
 module.exports = class GameGalaxyService {
 
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService) {
+        guildUserService, historyService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -21,6 +19,7 @@ module.exports = class GameGalaxyService {
         this.technologyService = technologyService;
         this.reputationService = reputationService;
         this.guildUserService = guildUserService;
+        this.historyService = historyService;
     }
 
     async getGalaxy(game, userId) {
@@ -31,28 +30,7 @@ module.exports = class GameGalaxyService {
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
 
-        /*
-            TODO: Implement masking of galaxy data here, prevent players from seeing what other
-            players are doing until the tick has finished.
-
-            This will be a combination of the current state of the galaxy for the player and
-            the previous tick's galaxy data for other players.
-
-            I think the following should do it:
-            1. Apply previous tick's data to all STARS the player does not own.
-                - Garrison, specialist, warp gate and infrastructure needs to be reset.
-            2. Apply previous tick's data to all CARRIERS the player does not own.
-                - Remove any carriers that exist in the current tick but not in the previous tick.
-                - Ships, specialist and gift status needs to be reset.
-            3. Continue to run through current logic as we do today.
-
-            Note: I don't think we need to reset other player data for the previous tick.
-        
-            Things to consider:
-            - We first off need to actually log the state of the galaxy every time the game ticks.
-            - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
-            - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
-        */
+        await this._maskGalaxy(game, player);
 
         // Append the player stats to each player.
         this._setPlayerStats(game);
@@ -371,6 +349,85 @@ module.exports = class GameGalaxyService {
 
     _clearPlayerCarriers(doc) {
         doc.galaxy.carriers = [];
+    }
+
+    async _maskGalaxy(game, player) {
+        /*
+            Masking of galaxy data occurs here, it prevent players from seeing what other
+            players are doing until the tick has finished.
+
+            This will be a combination of the current state of the galaxy for the player and
+            the previous tick's galaxy data for other players.
+
+            The following logic will be applied to the galaxy:
+            1. Apply previous tick's data to all STARS the player does not own.
+                - Garrison, specialist, warp gate and infrastructure needs to be reset.
+            2. Apply previous tick's data to all CARRIERS the player does not own.
+                - Remove any carriers that exist in the current tick but not in the previous tick.
+                - Ships, specialist and gift status needs to be reset.
+            3. Continue to run through current logic as we do today.
+
+            Note: We do not reset other player data for the previous tick.
+        
+            Things to consider:
+            - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
+            - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
+        */
+
+        if (!this.gameService.isStarted(game) || game.state.tick === 0) {
+            return;
+        }
+
+        let history = await this.historyService.getHistoryByTick(game._id, game.state.tick);
+
+        if (!history) {
+            return;
+        }
+        
+        // Apply previous tick's data to all STARS the player does not own.
+        for (let i = 0; i < game.galaxy.stars.length; i++) {
+            let gameStar = game.galaxy.stars[i];
+            
+            if (player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.equals(player._id)) {
+                continue;
+            }
+            
+            let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
+
+            gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
+            gameStar.naturalResources = historyStar.naturalResources;
+            gameStar.garrison = historyStar.garrison;
+            gameStar.specialistId = historyStar.specialistId;
+            gameStar.warpGate = historyStar.warpGate;
+            gameStar.infrastructure = historyStar.infrastructure;
+        }
+
+        // Apply previous tick's data to all CARRIERS the player does not own.
+        for (let i = 0; i < game.galaxy.carriers.length; i++) {
+            let gameCarrier = game.galaxy.carriers[i];
+
+            if (player && gameCarrier.ownedByPlayerId.equals(player._id)) {
+                continue;
+            }
+
+            let historyCarrier = history.carriers.find(x => x.carrierId.equals(gameCarrier._id));
+
+            // Remove any carriers that exist in the current tick but not in the previous tick.
+            if (!historyCarrier) {
+                game.galaxy.carriers.splice(i, 1);
+                i--;
+                continue;
+            }
+            
+            gameCarrier.ownedByPlayerId = historyCarrier.ownedByPlayerId;
+            gameCarrier.orbiting = historyCarrier.orbiting;
+            gameCarrier.inTransitFrom = historyCarrier.inTransitFrom;
+            gameCarrier.inTransitTo = historyCarrier.inTransitTo;
+            gameCarrier.ships = historyCarrier.ships;
+            gameCarrier.specialistId = historyCarrier.specialistId;
+            gameCarrier.isGift = historyCarrier.isGift;
+            gameCarrier.location = historyCarrier.location;
+        }
     }
 
 };
