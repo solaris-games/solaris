@@ -20,7 +20,9 @@ export default new Vuex.Store({
     cachedConversationComposeMessages: {},
     currentConversation: null,
     starSpecialists: null,
-    carrierSpecialists: null
+    carrierSpecialists: null,
+    confirmationDialog: null,
+    confirmationModalElement: null
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -51,6 +53,9 @@ export default new Vuex.Store({
     },
     clearSettings (state) {
       state.settings = null
+    },
+    setConfirmationModalElement (state, element) {
+      state.confirmationModalElement = element
     },
     openConversation (state, data) {
       state.currentConversation = {
