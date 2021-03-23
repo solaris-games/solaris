@@ -1,12 +1,14 @@
 <template>
   <dialog-modal
+  v-if="Boolean(dialogSettings)"
   :cancelText="dialogSettings.confirmText"
   :confirmText="dialogSettings.cancelText"
   :hideCancelButton="dialogSettings.hideCancelButton"
-  :modalName="confirmModal"
+  modalName="confirmModal"
   :titleText="dialogSettings.titleText"
-  ref="modalElement">
-  <p>{{dialogSettings.text}}</p>
+  @onConfirm="dialogSettings.onConfirm"
+  @onCancel="dialogSettings.onCancel">
+    <p>{{dialogSettings.text}}</p>
   </dialog-modal>
 </template>
 
@@ -18,9 +20,6 @@ export default {
   },
   props: {
     dialogSettings: Object
-  },
-  mounted () {
-    this.$store.commit('setConfirmationModalElement', this.$refs.modalElement)
   }
 }
 </script>

@@ -22,7 +22,6 @@ export default new Vuex.Store({
     starSpecialists: null,
     carrierSpecialists: null,
     confirmationDialog: null,
-    confirmationModalElement: null
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -54,8 +53,8 @@ export default new Vuex.Store({
     clearSettings (state) {
       state.settings = null
     },
-    setConfirmationModalElement (state, element) {
-      state.confirmationModalElement = element
+    setConfirmationDialogSettings (state, settings) {
+      state.confirmationDialog = settings
     },
     openConversation (state, data) {
       state.currentConversation = {
@@ -289,6 +288,27 @@ export default new Vuex.Store({
       
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
+    },
+    async confirm ({ commit, state }, data) {
+      return new Promise((resolve, _reject) => {
+        const settings = {
+          confirmText: data.confirmText || 'Yes',
+          cancelText: data.cancelText || 'No',
+          hideCancelButton: Boolean(data.hideCancelButton),
+          titleText: data.titleText,
+          text: data.text,
+          onConfirm: () => {
+            commit('setConfirmationDialogSettings', null)
+            resolve(true)
+          },
+          onCancel: () => {
+            commit('setConfirmationDialogSettings', null)
+            resolve(false)
+          }
+        }
+        commit('setConfirmationDialogSettings', settings)
+        window.$('#confirmModal').modal()
+      })
     }
   },
   getters: {
