@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+import $ from 'jquery'
 import 'bootstrap'
 import 'bootswatch/dist/darkly/bootstrap.min.css'
 
@@ -13,6 +14,7 @@ import 'pixi.js-legacy'
 import 'pixi-viewport'
 
 Vue.config.productionTip = false
+window.$ = $;
 
 Vue.use(new VueSocketio({
   debug: true,
