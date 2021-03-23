@@ -69,7 +69,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            let report = await container.shipTransferService.transfer(
+            await container.shipTransferService.transfer(
                 req.game,
                 req.player,
                 req.params.carrierId,
@@ -77,20 +77,7 @@ module.exports = (router, io, container) => {
                 req.body.starId,
                 req.body.starShips);
 
-            res.sendStatus(200);
-
-            // Broadcast the event to the current player and also all other players within scanning range.
-            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
-
-            playersWithinScanningRange.forEach(p => {
-                let canSeeStarGarrison = container.starService.canPlayerSeeStarGarrison(p, report.star);
-                let canSeeCarrierShips = container.carrierService.canPlayerSeeCarrierShips(p, report.carrier);
-
-                container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, 
-                    req.body.starId, canSeeStarGarrison ? req.body.starShips : null, 
-                    req.params.carrierId, canSeeCarrierShips ? req.body.carrierShips : null);
-            });
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -108,14 +95,6 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.player,
                 req.params.carrierId);
-
-            // TODO Implement this socket.
-            // // Broadcast the event to the current player and also all other players within scanning range.
-            // let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
-            // let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.body.starId, onlinePlayers);
-
-            // playersWithinScanningRange.forEach(p => 
-            //     container.broadcastService.gameStarCarrierShipTransferred(req.game, p._id, req.body.starId, req.body.starShips, req.params.carrierId, req.body.carrierShips));
 
             return res.sendStatus(200);
         } catch (err) {
