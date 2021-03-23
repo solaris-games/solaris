@@ -21,7 +21,7 @@ export default new Vuex.Store({
     currentConversation: null,
     starSpecialists: null,
     carrierSpecialists: null,
-    confirmationDialog: null,
+    confirmationDialog: {},
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -290,6 +290,10 @@ export default new Vuex.Store({
       commit('setStarSpecialists', responses[1].data)
     },
     async confirm ({ commit, state }, data) {
+      const modal = window.$('#confirmModal')
+      const close = () => {
+        modal.modal('toggle')
+      }
       return new Promise((resolve, _reject) => {
         const settings = {
           confirmText: data.confirmText || 'Yes',
@@ -298,16 +302,16 @@ export default new Vuex.Store({
           titleText: data.titleText,
           text: data.text,
           onConfirm: () => {
-            commit('setConfirmationDialogSettings', null)
+            close()
             resolve(true)
           },
           onCancel: () => {
-            commit('setConfirmationDialogSettings', null)
+            close()
             resolve(false)
           }
         }
         commit('setConfirmationDialogSettings', settings)
-        window.$('#confirmModal').modal()
+        modal.modal('toggle')
       })
     }
   },
