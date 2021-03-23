@@ -1,8 +1,8 @@
 <template>
   <dialog-modal
   v-if="Boolean(dialogSettings)"
-  :cancelText="dialogSettings.confirmText"
-  :confirmText="dialogSettings.cancelText"
+  :cancelText="dialogSettings.cancelText"
+  :confirmText="dialogSettings.confirmText"
   :hideCancelButton="dialogSettings.hideCancelButton"
   modalName="confirmModal"
   :titleText="dialogSettings.titleText"
