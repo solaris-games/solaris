@@ -6,8 +6,8 @@
   :hideCancelButton="dialogSettings.hideCancelButton"
   modalName="confirmModal"
   :titleText="dialogSettings.titleText"
-  @onConfirm="dialogSettings.onConfirm"
-  @onCancel="dialogSettings.onCancel">
+  @onConfirm="onConfirm"
+  @onCancel="onCancel">
     <p>{{dialogSettings.text}}</p>
   </dialog-modal>
 </template>
@@ -20,6 +20,14 @@ export default {
   },
   props: {
     dialogSettings: Object
+  },
+  methods: {
+    onConfirm (e) {
+      this.dialogSettings.onConfirm()
+    },
+    onCancel (e) {
+      this.dialogSettings.onCancel()
+    }
   }
 }
 </script>
