@@ -53,31 +53,6 @@ module.exports = class TechnologyService {
             manufacturing: player.research.manufacturing.level
         };
 
-        // TODO: Global effects needs to be split into different types.
-        // i.e global for the player (all stars and all carriers), global for all stars, and global for all carriers.
-        
-        // // Add global effects of stars.
-        // let stars = game.galaxy.stars.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
-
-        // for (let star of stars) {
-        //     let specialist = this.specialistService.getByIdStar(star.specialistId);
-
-        //     if (specialist.modifiers.global != null) {
-        //         this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
-        //     }
-        // }
-
-        // // Add global effects of carriers.
-        // let carriers = game.galaxy.carriers.filter(s => s.specialistId != null && s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
-
-        // for (let carrier of carriers) {
-        //     let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-
-        //     if (specialist.modifiers.global != null) {
-        //         this._applyTechModifiers(techs, specialist.modifiers.global, sanitize);
-        //     }
-        // }
-
         return techs;
     }
 
@@ -121,15 +96,69 @@ module.exports = class TechnologyService {
         return techs;
     }
 
-    getCarriersEffectiveWeaponsLevel(game, carriers, isCarrierToStarCombat) {
-        if (!carriers.length) {
-            return 1;
+    getStarWeaponsBuff(star) {
+        if (star.specialistId) {
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+            if (specialist.modifiers.local != null) {
+                return specialist.modifiers.local.weapons || 0;
+            }
         }
 
-        // Get the max tech level of all carriers in the array.
-        let techLevels = carriers.map(c => this.getCarrierEffectiveTechnologyLevels(game, c, isCarrierToStarCombat, true).weapons);
-
-        return techLevels.sort((a, b) => b - a)[0];
+        return 0;
     }
+
+    getCarrierWeaponsBuff(carrier, isCarrierToStarCombat) {
+        if (carrier.specialistId) {
+            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+            if (specialist.modifiers.local != null) {
+                if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat != null) {
+                    return specialist.modifiers.local.carrierToStarCombat;
+                } else if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat != null) {
+                    return specialist.modifiers.local.carrierToCarrierCombat;
+                } else {
+                    return specialist.modifiers.local.weapons || 0;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit) {
+        let weapons = player.research.weapons.level;
+
+        let buffs = [];
+
+        if (carriersInOrbit.length) {
+            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, false));
+        }
+
+        buffs.push(this.getStarWeaponsBuff(star));
+
+        return this._calculateActualWeaponsBuff(weapons, buffs);
+    }
+
+    getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat) {
+        let weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+
+        if (!carriers.length) {
+            return weapons;
+        }
+
+        let buffs = carriers.map(c => this.getCarrierWeaponsBuff(c, isCarrierToStarCombat));
+
+        return this._calculateActualWeaponsBuff(weapons, buffs);
+    }
+
+    _calculateActualWeaponsBuff(weapons, buffs) {
+        let buff = Math.max(0, buffs.sort((a, b) => b - a)[0]);
+        let debuff = buffs.sort((a, b) => a - b)[0];
+
+        let actualBuff = debuff < 0 ? debuff + buff : buff;
+
+        return Math.max(1, weapons + actualBuff);
+    }   
 
 }

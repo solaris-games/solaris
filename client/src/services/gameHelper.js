@@ -67,6 +67,12 @@ class GameHelper {
         carrier.inTransitTo === waypoint.destination
   }
 
+  getStarTotalKnownGarrison (game, star) {
+    let carriers = this.getCarriersOrbitingStar(game, star)
+
+    return (star.garrison || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
+  }
+
   getHyperspaceDistance (game, player, carrier) {
     let techLevel = player.research.hyperspace.effective
 
@@ -426,6 +432,30 @@ class GameHelper {
     return game.settings.general.playerOnlineStatus === 'hidden'
   }
 
+  isPlayerOnline (player) {
+    if (player.isOnline == null) {
+      return false;
+    }
+    else if (player.isOnline) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  getOnlineStatus (player) {
+    if (player.isOnline == null) {
+      return ''
+    }
+    else if (player.isOnline) {
+      return 'Online Now'
+    }
+    else {
+      return moment(player.lastSeen).utc().fromNow()
+    }
+  }
+
   calculateGalaxyCenterX (game) {
     let starFieldLeft = this.calculateMinStarX(game)
     let starFieldRight = this.calculateMaxStarX(game)
@@ -567,6 +597,10 @@ class GameHelper {
   }
 
   gameHasOpenSlots (game) {
+    if (this.isGameFinished(game)) {
+      return false
+    }
+
     return game.galaxy.players.filter(p => {
       return p.isEmptySlot || p.afk
     }).length > 0

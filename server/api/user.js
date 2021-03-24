@@ -16,6 +16,8 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.post('/api/user/', async (req, res, next) => {
+        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
         try {
             let errors = [];
 
@@ -51,7 +53,7 @@ module.exports = (router, io, container) => {
                 email: email,
                 username: req.body.username,
                 password: req.body.password
-            });
+            }, ip);
 
             return res.status(201).json({ id: userId });
         } catch (err) {

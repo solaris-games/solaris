@@ -1,7 +1,8 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button v-if="isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success"><i class="fas fa-pencil-alt"></i></button>
+      <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-warning"><i class="fas fa-calculator"></i></button>
+      <button v-if="isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
@@ -21,9 +22,9 @@
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
           <span title="In Transit" v-if="!carrier.orbiting">
-            <a title="Source Star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSource().name}}</a>
+            <a title="Source Star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
-            <a title="Destination Star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestination().name}}</a>
+            <a title="Destination Star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
           </span>
         </div>
         <div class="col-auto">
@@ -119,22 +120,22 @@
         </div>
       </div>
 
-      <div v-if="isStandardUIStyle && !carrier.waypoints.length" class="row bg-primary pt-2 pb-2 mb-0">
+      <div v-if="isStandardUIStyle && !hasWaypoints" class="row bg-primary pt-2 pb-2 mb-0">
         <div class="col">
           <p class="mb-0">Waypoints: None.</p>
         </div>
       </div>
 
-      <div v-if="carrier.waypoints.length && carrierOwningPlayer == userPlayer" class="row pt-0 pb-0 mb-0">
+      <div v-if="hasWaypoints && carrierOwningPlayer == userPlayer" class="row pt-0 pb-0 mb-0">
         <waypointTable :carrier="carrier" 
           @onEditWaypointRequested="onEditWaypointRequested"
           @onEditWaypointsRequested="editWaypoints"
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
-      <div class="row bg-primary pt-2 pb-0 mb-0" v-if="carrier.waypoints.length">
+      <div class="row bg-primary pt-2 pb-0 mb-0" v-if="hasWaypoints">
         <div class="col">
-          <p v-if="carrier.waypoints.length" class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
+          <p class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
       </div>
 
@@ -266,6 +267,9 @@ export default {
     onOpenFirstWaypointStarDetailRequested (e) {
       this.onOpenStarDetailRequested(this.getFirstWaypointDestination()._id)
     },
+    onViewCombatCalculatorRequested (e) {
+      this.$emit('onViewCarrierCombatCalculatorRequested', this.carrier._id)
+    },
     viewOnMap (e) {
       GameContainer.map.panToCarrier(this.carrier)
     },
@@ -276,12 +280,22 @@ export default {
 
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].source)
     },
+    getFirstWaypointSourceName () {
+      let source = this.getFirstWaypointSource()
+
+      return source ? source.name : 'Unknown'
+    },
     getFirstWaypointDestination () {
       if (!this.carrier.waypoints.length) {
         return null
       }
 
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].destination)
+    },
+    getFirstWaypointDestinationName () {
+      let destination = this.getFirstWaypointDestination()
+
+      return destination ? destination.name : 'Unknown'
     },
     async toggleWaypointsLooped () {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
@@ -303,7 +317,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     async onConfirmGiftCarrier (e) {
-      if (!confirm(`Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
+      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
         return
       }
 
@@ -357,10 +371,18 @@ export default {
       this.onOpenStarDetailRequested(this.getCarrierOrbitingStar()._id)
     },
     onOpenSourceStarDetailRequested (e) {
-      this.onOpenStarDetailRequested(this.carrier.waypoints[0].source)
+      let star = this.getFirstWaypointSource()
+
+      if (star) {
+        this.onOpenStarDetailRequested(this.carrier.waypoints[0].source)
+      }
     },
     onOpenDestinationStarDetailRequested (e) {
-      this.onOpenStarDetailRequested(this.carrier.waypoints[0].destination)
+      let star = this.getFirstWaypointDestination()
+
+      if (star) {
+        this.onOpenStarDetailRequested(this.carrier.waypoints[0].destination)
+      }
     },
     recalculateTimeRemaining () {
       if (this.carrier.ticksEta) {
@@ -381,6 +403,9 @@ export default {
     },
     isNotUserPlayerCarrier: function () {
       return this.carrier && !this.userPlayer || this.carrier.ownedByPlayerId != this.userPlayer._id
+    },
+    hasWaypoints: function () {
+      return this.carrier.waypoints && this.carrier.waypoints.length
     },
     canEditWaypoints: function () {
       return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)

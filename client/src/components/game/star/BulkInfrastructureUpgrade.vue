@@ -180,7 +180,7 @@ export default {
         return
       }
 
-      if (!confirm(`Are you sure you want to spend $${this.cost} credits to upgrade ${this.selectedType} across all of your stars?`)) {
+      if (!await this.$confirm('Bulk upgrade', `Are you sure you want to spend $${this.cost} credits to upgrade ${this.selectedType} across all of your stars?`)) {
         return
       }
 

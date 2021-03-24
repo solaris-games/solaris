@@ -172,6 +172,8 @@ button {
 .card-img {
   object-fit: cover;
   max-height: 150px;
+  min-height: 100%; 
+  width: auto;
 }
 
 .card-img-overlay {

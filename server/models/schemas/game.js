@@ -13,6 +13,10 @@ const schema = new Schema({
             createdByUserId: { type: Types.ObjectId, required: false },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false },
+			type: { type: Types.String, required: true, enum: [
+				'custom', 'standard_rt', 'standard_tb', 'standard_dark_rt', 'standard_dark_tb', '1v1_rt', '1v1_tb', 'new_player_rt', 'new_player_tb', '32_player_rt'
+			], default: 'custom' },
+			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
@@ -28,6 +32,7 @@ const schema = new Schema({
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
+			carrierUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
@@ -75,7 +80,8 @@ const schema = new Schema({
 				manufacturing: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				banking: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
-			}
+			},
+			bankingReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },

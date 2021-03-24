@@ -71,6 +71,10 @@
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierCost) }}</td>
             </tr>
             <tr>
+              <td>Carrier Upkeep Cost</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierUpkeepCost) }}</td>
+            </tr>
+            <tr>
               <td>Warpgate Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.warpgateCost) }}</td>
             </tr>
@@ -234,6 +238,10 @@
               <td>Weapons Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.weapons) }}</td>
             </tr>
+            <tr>
+              <td>Banking Reward</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.bankingReward) }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -324,7 +332,7 @@ export default {
   },
   methods: {
     async deleteGame () {
-      if (confirm('Are you sure you want to delete this game?')) {
+      if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
         this.isDeletingGame = true
 
         try {
@@ -366,7 +374,8 @@ export default {
         'normal': 'Normal',
         'extra': 'Extra',
         'hidden': 'Hidden',
-        'visible': 'Visible'
+        'visible': 'Visible',
+        'experimental': 'Experimental'
       }[option]
 
       return text || option

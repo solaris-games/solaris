@@ -446,7 +446,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
         let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
-        budget = Math.min(budget, player.credits * 10); // Prevent players from generating reports for stupid amounts of credits
+        budget = Math.min(budget, player.credits + 10000); // Prevent players from generating reports for stupid amounts of credits
 
         let upgradeSummary = {
             budget,

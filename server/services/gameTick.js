@@ -387,7 +387,7 @@ module.exports = class GameTickService extends EventEmitter {
         if (star) {
             combatResult = this.combatService.calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers);
         } else {
-            combatResult = this.combatService.calculateCarrier(game, defenderCarriers, attackerCarriers);
+            combatResult = this.combatService.calculateCarrier(game, defender, attackers, defenderCarriers, attackerCarriers);
         }
 
         await this._decreaseReputationForCombat(game, defender, attackers);
@@ -711,6 +711,7 @@ module.exports = class GameTickService extends EventEmitter {
 
                 let creditsResult = this.playerService.givePlayerMoney(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
+                let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -719,7 +720,8 @@ module.exports = class GameTickService extends EventEmitter {
                     creditsBanking: creditsResult.creditsFromBanking, 
                     experimentTechnology: experimentResult.technology,
                     experimentTechnologyLevel: experimentResult.level,
-                    experimentAmount: experimentResult.amount
+                    experimentAmount: experimentResult.amount,
+                    carrierUpkeep: carrierUpkeepResult
                 });
             }
 

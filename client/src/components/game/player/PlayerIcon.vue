@@ -41,18 +41,8 @@ export default {
   },
   methods: {
     recalculateOnlineStatus () {
-      if (this.player.isOnline == null) {
-        this.onlineStatus = ''
-        this.isOnline = false;
-      }
-      else if (this.player.isOnline) {
-        this.onlineStatus = 'Online Now'
-        this.isOnline = true;
-      }
-      else {
-        this.onlineStatus = moment(this.player.lastSeen).utc().fromNow()
-        this.isOnline = false;
-      }
+      this.isOnline = GameHelper.isPlayerOnline(this.player)
+      this.onlineStatus = GameHelper.getOnlineStatus(this.player)
     }
   },
   computed: {

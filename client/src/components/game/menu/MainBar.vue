@@ -42,7 +42,8 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"
-        @onCarrierRenameRequested="onCarrierRenameRequested" />
+        @onCarrierRenameRequested="onCarrierRenameRequested" 
+        @onViewCarrierCombatCalculatorRequested="onViewCarrierCombatCalculatorRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
@@ -56,7 +57,9 @@
         @onCloseRequested="onCloseRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         :carrierId="menuArguments" />
-      <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" @onCloseRequested="onCloseRequested"/>
+      <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" 
+        :carrierId="menuArguments"
+        @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
         :starId="menuArguments"
@@ -251,6 +254,9 @@ export default {
     },
     onCreateNewConversationRequested (e) {
       this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
+    },
+    onViewCarrierCombatCalculatorRequested (e) {
+      this.changeMenuState(MENU_STATES.COMBAT_CALCULATOR, e)
     }
   },
   computed: {
