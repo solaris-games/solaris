@@ -380,8 +380,7 @@ export default {
   position: absolute;
   bottom: 0;
   left: 0;
-  margin-left: 8px;
-  margin-bottom: 8px;
+  margin: 8px;
   background-color: #3498DB;
 }
 </style>
