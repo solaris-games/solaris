@@ -18,7 +18,7 @@
         <div v-if="users">
           <h4 class="mb-1">Users</h4>
           <small class="text-warning">Total Users: {{users.length}}</small>
-          <table class="mt-2 table table-sm table-striped">
+          <table class="mt-2 table table-sm table-striped table-responsive">
             <thead>
               <tr>
                 <th>Username</th>
@@ -63,7 +63,7 @@
           <p><small class="text-warning">Total Games: {{games.length}}</small></p>
           <p><small class="text-warning">Total Started: {{games.filter(x => x.state.startDate).length}}</small></p>
           <p><small class="text-warning">Total Completed: {{games.filter(x => x.state.endDate).length}}</small></p>
-          <table class="mt-2 table table-sm table-striped">
+          <table class="mt-2 table table-sm table-striped table-responsive">
             <thead>
               <tr>
                 <th>Name</th>

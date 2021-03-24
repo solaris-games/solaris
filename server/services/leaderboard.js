@@ -18,7 +18,9 @@ module.exports = class LeaderboardService {
         .select({
             username: 1,
             guildId: 1,
-            roles: 1,
+            'roles.contributor': 1,
+            'roles.developer': 1,
+            'roles.communityManager': 1,
             'achievements.victories': 1,
             'achievements.rank': 1,
             'achievements.renown': 1,
