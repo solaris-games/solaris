@@ -1,0 +1,13 @@
+Bring all apps down.
+
+db.games.updateMany({'settings.general.createdByUserId':{$ne:null}},{$set:{'settings.general.type':'custom'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'1 vs. 1'},{$set:{'settings.general.type':'1v1_rt'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'1 vs. 1 - Turn Based'},{$set:{'settings.general.type':'1v1_tb'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'32 Players'},{$set:{'settings.general.type':'32_player_rt'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'Dark Galaxy'},{$set:{'settings.general.type':'standard_dark_rt'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'New Players'},{$set:{'settings.general.type':'new_player_rt'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'Standard'},{$set:{'settings.general.type':'standard_rt'}})
+db.games.updateMany({'settings.general.createdByUserId':{$eq:null},'settings.general.description':'Turn Based'},{$set:{'settings.general.type':'standard_tb'}})
+db.users.updateOne({username:'Hyperi0n'},{$set:{'roles.administrator':true}})
+
+Deploy and bring apps up.

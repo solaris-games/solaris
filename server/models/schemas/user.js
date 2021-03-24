@@ -7,12 +7,15 @@ const schema = new Schema({
     guildId: { type: Types.ObjectId, default: null },
     email: { type: Types.String, required: true },
     emailEnabled: { type: Types.Boolean, default: true },
-    password: { type: Types.String, required: true },
+    password: { type: Types.String, required: false },
     resetPasswordToken: { type: Types.String, required: false },
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
     banned: { type: Types.Boolean, default: false },
+    lastSeen: { type: Types.Date, required: false },
+    lastSeenIP: { type: Types.String, required: false },
     roles: {
+        administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
         developer: { type: Types.Boolean, default: false },
         communityManager: { type: Types.Boolean, default: false }

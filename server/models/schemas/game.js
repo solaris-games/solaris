@@ -13,6 +13,10 @@ const schema = new Schema({
             createdByUserId: { type: Types.ObjectId, required: false },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false },
+			type: { type: Types.String, required: true, enum: [
+				'custom', 'standard_rt', 'standard_tb', 'standard_dark_rt', 'standard_dark_tb', '1v1_rt', '1v1_tb', 'new_player_rt', 'new_player_tb', '32_player_rt'
+			], default: 'custom' },
+			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
