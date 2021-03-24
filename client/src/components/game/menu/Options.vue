@@ -6,7 +6,7 @@
     <loading-spinner :loading="!settings"/>
 
     <form @submit.prevent="handleSubmit" v-if="settings" class="pb-2">
-      <h4 class="pt-2">Interface</h4>
+      <h5 class="pt-2">Interface</h5>
       
       <div class="row bg-secondary pt-1 pb-1">
         <label for="uiStyle" class="col-12 col-sm-6 col-form-label">UI Style</label>
@@ -29,7 +29,7 @@
       </div>
 
       <div class="row bg-secondary pt-1 pb-1">
-        <label for="audio" class="col-12 col-sm-6 col-form-label">Suggestions for player and star names</label>
+        <label for="suggestMentions" class="col-12 col-sm-6 col-form-label">Suggestions for player and star names</label>
         <div class="col-12 col-sm-6">
           <select class="form-control" id="suggestMentions" v-model="settings.interface.suggestMentions" :disabled="isSavingSettings">
             <option value="disabled">Disabled</option>
@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <h4 class="pt-2">Map</h4>
+      <h5 class="pt-2">Map</h5>
 
       <div class="row bg-secondary pt-1 pb-1">
         <label for="territory-style" class="col-12 col-sm-6 col-form-label">Territory Style</label>
@@ -126,7 +126,7 @@
         </div>
       </div>
 
-      <h4 class="pt-2">Carriers</h4>
+      <h5 class="pt-2">Carriers</h5>
 
       <div class="row bg-secondary pt-1 pb-1">
         <label for="carrierDefaultAction" class="col-12 col-sm-6 col-form-label">Default Action</label>
