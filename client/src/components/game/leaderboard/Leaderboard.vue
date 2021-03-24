@@ -201,7 +201,7 @@ export default {
       }
     },
     async confirmReady (player) {
-      if (!confirm('Are you sure you want to end your turn?')) {
+      if (!await this.$confirm('End turn', 'Are you sure you want to end your turn?')) {
         return
       }
       

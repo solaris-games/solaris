@@ -317,7 +317,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     async onConfirmGiftCarrier (e) {
-      if (!confirm(`Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
+      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
         return
       }
 
