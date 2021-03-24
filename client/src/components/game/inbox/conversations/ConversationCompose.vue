@@ -1,12 +1,12 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-primary" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
+    <div class="mention-overlay bg-primary mb-1" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
       <ul>
         <li v-for="(suggestion, index) in currentMention.suggestions" :class="{ selected: index === selectedSuggestion }" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
     </div>
     <div class="form-group mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" placeholder="Compose a message..." ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="updateSuggestions"></textarea>
+        <textarea class="form-control" id="txtMessage" rows="3" :placeholder="placeholderText" ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="updateSuggestions"></textarea>
     </div>
     <div class="form-group text-right">
         <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
@@ -37,18 +37,18 @@ export default {
       focused: false,
       suggestMentions: false,
       currentMention: null,
-      selectedSuggestion: 0
+      selectedSuggestion: null
     }
   },
   mounted () {
     this.$store.commit('setConversationElement', this.$refs.messageElement)
     this.suggestMentions = this.$store.state.settings.interface.suggestMentions === 'enabled'
-    console.warn(this.suggestMentions)
   },
   methods: {
     useSuggestion (suggestion) {
       if (this.suggestMentions && this.currentMention) {
         this.selectedSuggestion = null
+        
         this.$store.commit('replaceInConversationText', {
           mention: this.currentMention.mention,
           text: suggestion
@@ -78,7 +78,9 @@ export default {
     updateSuggestions () {
       if (this.suggestMentions) {
         const oldMention = Boolean(this.currentMention)
+
         this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
+
         if (oldMention && !this.currentMention) {
           this.selectedSuggestion = null //Mention was left
         } else if (!oldMention && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
@@ -130,6 +132,11 @@ export default {
       }
 
       this.isSendingMessage = false
+    }
+  },
+  computed: {
+    placeholderText: function () {
+      return !this.suggestMentions ? 'Compose a message...' : 'Compose a message. Use @ for players and # for stars.'
     }
   }
 }
