@@ -1,7 +1,8 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "1 vs. 1 - Turn Based",
+    "description": "Go head to head against a single opponent, this game will be down to pure skill.",
+    "type": "1v1_tb",
     "password": null,
     "starVictoryPercentage": 66,
     "playerLimit": 2,

@@ -12,6 +12,8 @@ const schema = new Schema({
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
     banned: { type: Types.Boolean, default: false },
+    lastSeen: { type: Types.Date, required: false },
+    lastSeenIP: { type: Types.String, required: false },
     roles: {
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },

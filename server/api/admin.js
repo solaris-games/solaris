@@ -84,6 +84,26 @@ module.exports = (router, io, container) => {
         }
     });
 
+    router.get('/api/admin/game', middleware.authenticateAdmin, async (req, res, next) => {
+        try {
+            let result = await container.adminService.listGames();
+            
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.patch('/api/admin/game/:gameId/featured', middleware.authenticateAdmin, async (req, res, next) => {
+        try {
+            await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    });
+
     return router;
 
 };

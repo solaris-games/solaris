@@ -13,10 +13,21 @@ module.exports = class AdminService {
             banned: 1,
             roles: 1,
             emailEnabled: 1,
-            resetPasswordToken: 1
+            resetPasswordToken: 1,
+            lastSeen: 1,
+            lastSeenIP: 1
         })
         .sort({
             username: 1
+        })
+        .lean({defaults: true})
+        .exec();
+    }
+
+    async listGames() {
+        return await this.gameModel.find({}, {
+            'settings.general': 1,
+            'state': 1
         })
         .lean({defaults: true})
         .exec();
@@ -69,6 +80,14 @@ module.exports = class AdminService {
             _id: userId
         }, {
             'credits': credits
+        }).exec();
+    }
+
+    async setGameFeatured(gameId, featured) {
+        await this.gameModel.updateOne({
+            _id: gameId
+        }, {
+            'settings.general.featured': featured
         }).exec();
     }
 

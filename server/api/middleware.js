@@ -14,6 +14,8 @@ module.exports = (container) => {
                 throw new ValidationError(`The account is banned.`, 401);
             }
 
+            await container.userService.updateLastSeen(req.session.userId, req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+
             next();
         },
 

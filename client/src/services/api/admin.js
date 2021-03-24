@@ -50,6 +50,17 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  getGames () {
+    return axios.get(this.BASE_URL + 'admin/game', { withCredentials: true })
+  }
+
+  setGameFeatured (gameId, featured) {
+    return axios.patch(this.BASE_URL + 'admin/game/' + gameId + '/featured', {
+      featured
+    },
+    { withCredentials: true })
+  }
+
 }
 
 export default new AdminService()

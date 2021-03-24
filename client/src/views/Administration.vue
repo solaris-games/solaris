@@ -22,6 +22,7 @@
             <thead>
               <tr>
                 <th>Username</th>
+                <th>Last Seen</th>
                 <th>Roles</th>
                 <th>Credits</th>
                 <th>Email</th>
@@ -32,6 +33,7 @@
             <tbody>
               <tr v-for="user of users" :key="user._id">
                 <td :title="user.email">{{user.username}}</td>
+                <td :title="getDuplicateIPs(user)" :class="{'text-warning':getDuplicateIPs(user).length}">{{getLastSeenString(user.lastSeen)}}</td>
                 <td>
                   <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}" @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
                   <i class="fas fa-code ml-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
@@ -58,12 +60,49 @@
       <div class="tab-pane fade" id="games">
         <div v-if="games">
           <h4 class="mb-1">Games</h4>
-          <small class="text-warning">Total Games: {{games.length}}</small>
-          
+          <p><small class="text-warning">Total Games: {{games.length}}</small></p>
+          <p><small class="text-warning">Total Started: {{games.filter(x => x.state.startDate).length}}</small></p>
+          <p><small class="text-warning">Total Completed: {{games.filter(x => x.state.endDate).length}}</small></p>
+          <table class="mt-2 table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Players</th>
+                <th>Featured</th>
+                <th>Started</th>
+                <th>Ended</th>
+                <th>Tick</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="game of games" :key="game._id">
+                <td>
+                  {{game.settings.general.name}}
+                </td>
+                <td>
+                  {{game.settings.general.type}}
+                </td>
+                <td>
+                  {{game.state.players}}/{{game.settings.general.playerLimit}}
+                </td>
+                <td>
+                  <i class="clickable fas" :class="{'fa-check text-success':game.settings.general.featured,'fa-times text-danger':!game.settings.general.featured}"
+                    @click="toggleFeaturedGame(game)"></i>
+                </td>
+                <td><i class="fas" :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}" :title="game.state.startDate"></i></td>
+                <td><i class="fas" :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}" :title="game.state.endDate"></i></td>
+                <td :class="{'text-warning':gameNeedsAttention(game)}">{{game.state.tick}}</td>
+                <td>
+                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success">View</router-link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-
   </view-container>
 </template>
 
@@ -73,6 +112,7 @@ import ViewTitle from '../components/ViewTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
 import AdminApiService from '../services/api/admin'
 import router from '../router'
+import moment from 'moment'
 
 export default {
   components: {
@@ -94,13 +134,18 @@ export default {
 
     try {
       let requests = [
-        AdminApiService.getUsers()
+        AdminApiService.getUsers(),
+        AdminApiService.getGames()
       ]
 
       let responses = await Promise.all(requests)
       
       if (responses[0].status === 200) {
         this.users = responses[0].data
+      }
+      
+      if (responses[1].status === 200) {
+        this.games = responses[1].data
       }
     } catch (err) {
       console.error(err)
@@ -109,6 +154,16 @@ export default {
     this.isLoading = false
   },
   methods: {
+    getLastSeenString (lastSeen) {
+      if (!lastSeen) {
+        return ''
+      }
+
+      return moment(lastSeen).utc().fromNow()
+    },
+    getDuplicateIPs (user) {
+      return this.users.filter(x => x._id !== user._id && x.lastSeenIP === user.lastSeenIP).map(x => x.username)
+    },
     async toggleRole (user, role) {
       try {
         user.roles[role] = !user.roles[role]
@@ -164,6 +219,18 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    },
+    async toggleFeaturedGame (game) {
+      try {
+        game.settings.general.featured = !game.settings.general.featured
+
+        await AdminApiService.setGameFeatured(game._id, game.settings.general.featured)
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    gameNeedsAttention (game) {
+      return game.state.endDate && game.state.tick <= 12
     }
   }
 }
