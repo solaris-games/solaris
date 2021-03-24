@@ -21,7 +21,8 @@ export default new Vuex.Store({
     currentConversation: null,
     starSpecialists: null,
     carrierSpecialists: null,
-    confirmationDialog: {},
+    settings: null,
+    confirmationDialog: {}
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -90,6 +91,9 @@ export default new Vuex.Store({
       } else {
         data.permitCallback(data.star)
       }
+    },
+    replaceInConversationText (state, data) {
+      MentionHelper.useSuggestion(state.currentConversation, data)
     },
 
     // ----------------

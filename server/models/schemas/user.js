@@ -96,6 +96,7 @@ const schema = new Schema({
             audio: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
             galaxyScreenUpgrades: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
             uiStyle: { type: Types.String, required: false, enum: ['standard', 'compact'], default: 'standard' },
+            suggestMentions: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' }
         },
         map: {
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
