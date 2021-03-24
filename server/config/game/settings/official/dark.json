@@ -1,7 +1,8 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "Dark Galaxy",
+    "description": "You aren't alone in this galaxy, although it may appear so, who knows what is beyond the horizon.",
+    "type": "standard_dark_rt",
     "password": null,
     "starVictoryPercentage": 50,
     "playerLimit": 8,

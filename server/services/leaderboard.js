@@ -102,7 +102,8 @@ module.exports = class LeaderboardService {
             // TODO: Maybe a better ranking system would be to simply award players
             // rank equal to the number of stars they have at the end of the game?
         
-            let isOfficialGame = game.settings.general.createdByUserId == null;
+            // Official games are either not user created or featured (featured games can be user created)
+            let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
 
             if (isOfficialGame) {
                 if (i == 0) {

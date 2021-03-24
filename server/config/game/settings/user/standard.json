@@ -2,6 +2,7 @@
     "general": {
         "name": null,
         "description": null,
+        "type": "custom",
         "password": null,
         "starVictoryPercentage": 50,
         "playerLimit": 8,
