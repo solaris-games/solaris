@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     async accept () {
-      if (!confirm(`Are you sure you want to accept the invitation from ${this.invite.name}[${this.invite.tag}]?`)) {
+      if (!await this.$confirm('Accept invitation', `Are you sure you want to accept the invitation from ${this.invite.name}[${this.invite.tag}]?`)) {
         return
       }
 
@@ -45,7 +45,7 @@ export default {
       this.isLoading = false
     },
     async reject () {
-      if (!confirm(`Are you sure you want to decline the invitation from ${this.invite.name}[${this.invite.tag}]?`)) {
+      if (!await this.$confirm('Decline invitation', `Are you sure you want to decline the invitation from ${this.invite.name}[${this.invite.tag}]?`)) {
         return
       }
 

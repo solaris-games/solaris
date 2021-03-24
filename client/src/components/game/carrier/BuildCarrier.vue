@@ -131,7 +131,7 @@ export default {
         this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     async saveTransfer (e) {
-      if (!confirm(`Are you sure you want to build a Carrier at ${this.star.name}? The carrier will cost ${this.star.upgradeCosts.carriers}.`)) {
+      if (!await this.$confirm('Build a carrier', `Are you sure you want to build a Carrier at ${this.star.name}? The carrier will cost ${this.star.upgradeCosts.carriers}.`)) {
         return
       }
 
