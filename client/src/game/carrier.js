@@ -216,6 +216,10 @@ class Carrier extends EventEmitter {
   }
 
   _drawLoopedPathSegment(lineWidth,lineAlpha, pointA, pointB) {
+      if( this.userSettings.map.carrierLoopStyle == 'thin' ) {
+        this._drawRegularPathSegment(lineWidth/2.0, lineAlpha, pointA, pointB)
+        return
+      }
       const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 12 )//clamp 1-12
       const VOID_LENGTH = DASH_LENGTH/2.0
       const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
