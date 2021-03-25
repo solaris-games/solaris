@@ -271,7 +271,23 @@ class Carrier extends EventEmitter {
       this.pathContainer.addChild(path)
   }
 
+  _isSourceLastDestination() {
+    let numof_waypoints = this.data.waypoints.length
+    let lastWaypoint = this.data.waypoints[numof_waypoints-1]
+    if (numof_waypoints<2) return false;
+    return (this.data.waypoints[0].source === lastWaypoint.destination)
+  }
+
   drawCarrierWaypoints () {
+    if( this.data.waypointsLooped ){
+    for( let waypoint of this.data.waypoints ) {
+      let star = this.stars.find(s => s.data._id === waypoint.source)
+      console.log(star.data.name)
+      star = this.stars.find(s => s.data._id === waypoint.destination)
+      console.log(star.data.name)
+    }
+    console.log('________')
+    }
     this._clearPaths()
 
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
@@ -279,10 +295,13 @@ class Carrier extends EventEmitter {
     let lineWidth = this.data.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
     let lineAlpha = this.data.waypointsLooped ? 0.5 : 0.3
     let lastPoint = this.data.location
-    // if looping, begin drawing path from the star instead of carrier
+    let sourceIsLastDestination = false
+    sourceIsLastDestination = this._isSourceLastDestination()
+    console.log(sourceIsLastDestination)
+    // if looping and source is last destination, begin drawing path from the star instead of carrier
     if ( this.data.waypointsLooped ) {
-      if ( this.data.inTransitFrom ) {
-        lastPoint = this.stars.find(s => s.data._id === this.data.inTransitFrom).data.location
+      if ( ( sourceIsLastDestination ) && (this.data.inTransitFrom) )  {
+        lastPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].source).data.location
       }
     }
     let star
@@ -301,16 +320,15 @@ class Carrier extends EventEmitter {
 
       lastPoint = star.data.location
     }
-    //draw path back to the first star
+    //draw path back to the first destination
     if ( this.data.waypointsLooped ) {
-      let firstPoint
-      if ( this.data.inTransitFrom ) {
-        firstPoint = this.stars.find(s => s.data._id === this.data.inTransitFrom).data.location
+      if ( !sourceIsLastDestination ) {
+        let firstPoint
+        firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination).data.location
+        if( firstPoint !== lastPoint ) {
+          this._drawLoopedPathSegment(lineWidth, lineAlpha, star.data.location, firstPoint)
+        }
       }
-      else {
-        firstPoint = this.data.location
-      }
-      this._drawLoopedPathSegment(lineWidth, lineAlpha, star.data.location, firstPoint)
     }
   }
 
