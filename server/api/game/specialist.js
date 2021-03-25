@@ -57,12 +57,6 @@ module.exports = (router, io, container) => {
                 result.specialist
             );
 
-            // Broadcast the event to the current player and also all other players within scanning range.
-            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, result.carrier.orbiting.toString(), onlinePlayers);
-
-            playersWithinScanningRange.forEach(p => container.broadcastService.gameCarrierSpecialistHired(req.game, p._id, result.carrier, result.specialist));
-
             return res.status(200).json({
                 waypoints: result.waypoints
             });
@@ -91,12 +85,6 @@ module.exports = (router, io, container) => {
                 result.star,
                 result.specialist
             );
-
-            // Broadcast the event to the current player and also all other players within scanning range.
-            let onlinePlayers = container.broadcastService.getOnlinePlayers(req.game);
-            let playersWithinScanningRange = container.playerService.getPlayersWithinScanningRangeOfStar(req.game, req.params.starId, onlinePlayers);
-
-            playersWithinScanningRange.forEach(p => container.broadcastService.gameStarSpecialistHired(req.game, p._id, result.star, result.specialist));
 
             return res.sendStatus(200);
         } catch (err) {

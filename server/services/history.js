@@ -7,10 +7,15 @@ module.exports = class HistoryService {
         this.playerService = playerService;
     }
 
-    async listByGameId(gameId, startTick = 0) {
+    async listStatistics(gameId, startTick = 0) {
         return await this.historyModel.find({
             gameId,
             tick: { $gte: startTick }
+        }, {
+            gameId: 1,
+            tick: 1,
+            'players.playerId': 1,
+            'players.statistics': 1
         })
         .sort({ tick: 1 })
         .lean({ defaults: true })
@@ -21,7 +26,10 @@ module.exports = class HistoryService {
         let history = new this.historyModel({
             gameId: game._id,
             tick: game.state.tick,
-            players: []
+            productionTick: game.state.productionTick,
+            players: [],
+            stars: [],
+            carriers: []
         });
 
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -30,6 +38,7 @@ module.exports = class HistoryService {
             let stats = this.playerService.getStats(game, player);
 
             history.players.push({
+                userId: player.userId,
                 playerId: player._id,
                 statistics: {
                     totalStars: stats.totalStars,
@@ -50,7 +59,16 @@ module.exports = class HistoryService {
                     scanning: player.research.scanning.level,
                     experimentation: player.research.experimentation.level,
                     terraforming: player.research.terraforming.level,
-                }
+                },
+                alias: player.alias,
+                avatar: player.avatar,
+                researchingNow: player.researchingNow,
+                researchingNext: player.researchingNext,
+                credits: player.credits,
+                defeated: player.defeated,
+                afk: player.afk,
+                ready: player.ready,
+                research: player.research
             });
         }
 
@@ -60,24 +78,31 @@ module.exports = class HistoryService {
                 ownedByPlayerId: s.ownedByPlayerId,
                 naturalResources: s.naturalResources,
                 garrison: s.garrison,
+                garrisonActual: s.garrisonActual,
                 specialistId: s.specialistId,
                 warpGate: s.warpGate,
+                ignoreBulkUpgrade: s.ignoreBulkUpgrade,
                 infrastructure: s.infrastructure
             };
         });
 
         history.carriers = game.galaxy.carriers.map(c => {
-            return {
+            let x = {
                 carrierId: c._id,
                 ownedByPlayerId: c.ownedByPlayerId,
                 orbiting: c.orbiting,
-                inTransitFrom: c.inTransitFrom,
-                inTransitTo: c.inTransitTo,
                 ships: c.ships,
                 specialistId: c.specialistId,
                 isGift: c.isGift,
-                location: c.location
+                location: c.location,
+                waypoints: []
             };
+
+            if (c.waypoints.length && !c.orbiting) {
+                x.waypoints = [c.waypoints[0]]; // Only need the waypoint in transit.
+            }
+
+            return x;
         });
 
         await history.save();

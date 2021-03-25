@@ -61,10 +61,7 @@ class GameHelper {
   }
 
   isCarrierInTransitToWaypoint (carrier, waypoint) {
-    return carrier.waypoints.indexOf(waypoint) === 0 &&
-        this.isCarrierInTransit(carrier) &&
-        carrier.inTransitFrom === waypoint.source &&
-        carrier.inTransitTo === waypoint.destination
+    return carrier.waypoints.indexOf(waypoint) === 0 && this.isCarrierInTransit(carrier)
   }
 
   getStarTotalKnownGarrison (game, star) {
@@ -175,10 +172,8 @@ class GameHelper {
     return totalTicks
   }
 
-  getTicksToProduction (game) {
+  getTicksToProduction (game, currentTick, currentProductionTick) {
     let productionTicks = game.settings.galaxy.productionTicks
-    let currentTick = game.state.tick
-    let currentProductionTick = game.state.productionTick
 
     let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
 
@@ -252,7 +247,7 @@ class GameHelper {
     // if the waypoint is going to the same star then it is at least 1
     // tick, plus any delay ticks.
     if (sourceStar._id === destinationStar._id) {
-      return 1 + waypoint.delayTicks
+      return 1 + (waypoint.delayTicks || 0);
     }
 
     let source = sourceStar.location
@@ -628,7 +623,44 @@ class GameHelper {
     }
 
     return nextTick.diff(moment().utc(), 'seconds') <= 0;
-}
+  }
+
+  starInfrastructureUpgraded(game, data) {
+    let userPlayer = this.getUserPlayer(game)
+
+    userPlayer.credits -= data.cost
+
+    if (data.currentResearchTicksEta != null) {
+      userPlayer.currentResearchTicksEta = data.currentResearchTicksEta
+    }
+
+    let star = this.getStarById(game, data.starId)
+
+    star.upgradeCosts[data.type] = data.nextCost
+    star.infrastructure[data.type] = data.infrastructure
+
+    if (data.manufacturing) {
+      let manufacturingDifference = +data.manufacturing - star.manufacturing
+
+      star.manufacturing = +data.manufacturing.toFixed(2)
+
+      userPlayer.stats.newShips = +(userPlayer.stats.newShips + manufacturingDifference).toFixed(2)
+    }
+
+    switch (data.type) {
+      case 'economy':
+        userPlayer.stats.totalEconomy++
+        break;
+      case 'industry':
+        userPlayer.stats.totalIndustry++
+        break;
+      case 'science':
+        userPlayer.stats.totalScience++
+        break;
+    }
+
+    return star
+  }
 }
 
 export default new GameHelper()

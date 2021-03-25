@@ -49,6 +49,10 @@ Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancel
   })
 }
 
+Vue.prototype.$isHistoricalMode = function() {
+  return this.$store.state.tick !== this.$store.state.game.state.tick
+}
+
 new Vue({
   router,
   store,

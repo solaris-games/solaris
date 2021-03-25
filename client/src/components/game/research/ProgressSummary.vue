@@ -121,14 +121,6 @@ import GameHelper from '../../../services/gameHelper'
 import TechnologyHelper from '../../../services/technologyHelper'
 
 export default {
-  data: function () {
-    return {
-      research: null
-    }
-  },
-  mounted () {
-    this.research = GameHelper.getUserPlayer(this.$store.state.game).research
-  },
   methods: {
     getRequiredTotal (technologyKey) {
       const game = this.$store.state.game
@@ -147,6 +139,11 @@ export default {
     },
     getIcon (technologyKey) {
       return 'fas fa-' + TechnologyHelper.getIcon(technologyKey)
+    }
+  },
+  computed: {
+    research: function () {
+      return GameHelper.getUserPlayer(this.$store.state.game).research
     }
   }
 }

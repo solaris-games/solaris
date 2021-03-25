@@ -1,5 +1,5 @@
 <template>
-<div class="container-fluid bg-primary header-bar">
+<div class="container-fluid header-bar" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
     <div class="row pt-2 pb-2 no-gutters">
         <div class="col-auto d-none d-md-block mr-5 pointer pt-1" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
@@ -11,22 +11,25 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
+        <div class="col pt-1">
+          <tick-selector />
+        </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
             <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
-                <i class="fas fa-dollar-sign"></i> {{userPlayer.credits}}
+                <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <research-progress class="d-none d-sm-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
+            <research-progress class="d-none d-sm-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-sm-inline-block ml-4">
-                <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
+            <span class="d-none d-sm-inline-block ml-3">
+                <i class="fas fa-money-bill-wave text-success mr-1"></i>{{userPlayer.stats.totalEconomy}}
             </span>
             <span class="d-none d-sm-inline-block ml-2">
-                <i class="fas fa-tools text-warning"></i> {{userPlayer.stats.totalIndustry}}
+                <i class="fas fa-tools text-warning mr-1"></i>{{userPlayer.stats.totalIndustry}}
             </span>
             <span class="d-none d-sm-inline-block ml-2">
-                <i class="fas fa-flask text-info"></i> {{userPlayer.stats.totalScience}}
+                <i class="fas fa-flask text-info mr-1"></i>{{userPlayer.stats.totalScience}}
             </span>
         </div>
         <div class="col-auto ml-1">
@@ -60,17 +63,18 @@ import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus'
 import ResearchProgressVue from './ResearchProgress'
-import * as moment from 'moment'
 import AudioService from '../../../game/audio'
 import ConversationApiService from '../../../services/api/conversation'
 import GameApiService from '../../../services/api/game'
 import HamburgerMenuVue from './HamburgerMenu'
+import TickSelectorVue from './TickSelector'
 
 export default {
   components: {
     'server-connection-status': ServerConnectionStatusVue,
     'research-progress': ResearchProgressVue,
-    'hamburger-menu': HamburgerMenuVue
+    'hamburger-menu': HamburgerMenuVue,
+    'tick-selector': TickSelectorVue
   },
   data () {
     return {
@@ -178,7 +182,7 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game)
+        let ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game, this.$store.state.tick, this.$store.state.productionTick)
 
         this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }

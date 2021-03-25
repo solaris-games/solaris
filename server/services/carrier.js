@@ -141,8 +141,6 @@ module.exports = class CarrierService {
                 _id: c._id,
                 ownedByPlayerId: c.ownedByPlayerId,
                 orbiting: c.orbiting,
-                inTransitFrom: c.inTransitFrom,
-                inTransitTo: c.inTransitTo,
                 name: c.name,
                 ships: c.ships,
                 location: c.location,
@@ -168,9 +166,11 @@ module.exports = class CarrierService {
                 // Hide any sensitive info about the waypoint.
                 let wp = waypoints[0];
 
-                wp.action = 'collectAll';
-                wp.actionShips = 0;
-                wp.delayTicks = 0;
+                if (wp) {
+                    wp.action = 'collectAll';
+                    wp.actionShips = 0;
+                    wp.delayTicks = 0;
+                }
             }
         }
 
@@ -333,8 +333,6 @@ module.exports = class CarrierService {
             combatRequiredStar: false
         };
 
-        carrier.inTransitFrom = null;
-        carrier.inTransitTo = null;
         carrier.orbiting = destinationStar._id;
         carrier.location = destinationStar.location;
 

@@ -5,8 +5,10 @@ const Types = Schema.Types;
 const schema = new Schema({
     gameId: { type: Types.ObjectId, required: true },
     tick: { type: Types.Number, required: true },
+    productionTick: { type: Types.Number, required: true },
     players: [
         {
+            userId: { type: Types.ObjectId, required: true },
             playerId: { type: Types.ObjectId, required: true },
             statistics: {
                 totalStars: { type: Types.Number, required: true, default: 0 },
@@ -27,6 +29,44 @@ const schema = new Schema({
                 experimentation: { type: Types.Number, required: true, default: 0 },
                 terraforming: { type: Types.Number, required: true, default: 0 },
                 warpgates: { type: Types.Number, required: true, default: 0 }
+            },
+            alias: { type: Types.String, required: true },
+            avatar: { type: Types.String, required: true },
+            researchingNow: { type: Types.String, required: true },
+            researchingNext: { type: Types.String, required: true },
+            credits: { type: Types.Number, required: true },
+            defeated: { type: Types.Boolean, required: true },
+            afk: { type: Types.Boolean, required: true },
+            ready: { type: Types.Boolean, required: false, default: false },
+            research: {
+                scanning: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                hyperspace: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                terraforming: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                experimentation: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                weapons: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                banking: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                manufacturing: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                }
             }
         }
     ],
@@ -36,8 +76,10 @@ const schema = new Schema({
             ownedByPlayerId: { type: Types.ObjectId, required: false, default: null},
             naturalResources: { type: Types.Number, required: true },
             garrison: { type: Types.Number, required: true },
+            garrisonActual: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },
             warpGate: { type: Types.Boolean, required: true },
+            ignoreBulkUpgrade: { type: Types.Boolean, required: true },
             infrastructure: {
                 economy: { type: Types.Number, required: true },
                 industry: { type: Types.Number, required: true },
@@ -50,15 +92,19 @@ const schema = new Schema({
             carrierId: { type: Types.ObjectId, required: true },
             ownedByPlayerId: { type: Types.ObjectId, required: true },
             orbiting: { type: Types.ObjectId, required: false, default: null },
-            inTransitFrom: { type: Types.ObjectId, required: false, default: null },
-            inTransitTo: { type: Types.ObjectId, required: false },
             ships: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },
             isGift: { type: Types.Boolean, required: true },
             location: {
                 x: { type: Types.Number, required: true },
                 y: { type: Types.Number, required: true }
-            }
+            },
+            waypoints: [
+                {
+                    source: { type: Types.ObjectId, required: true },
+                    destination: { type: Types.ObjectId, required: true }
+                }
+            ]
         }
     ]
 });

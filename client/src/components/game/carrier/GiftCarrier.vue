@@ -6,7 +6,7 @@
                 Convert this Carrier into a gift.
             </p>
         </div>
-        <div v-if="canGiftCarrier" class="col-auto">
+        <div v-if="!$isHistoricalMode() && canGiftCarrier" class="col-auto">
             <button type="button" class="btn btn-success btn-sm" :disabled="isGiftingCarrier" @click="giftCarrier">
                 <i class="fas fa-gift"></i>
                 Gift Carrier

@@ -60,9 +60,16 @@ module.exports = class ShipTransferService {
         await this.gameModel.bulkWrite(dbWrites);
 
         return {
-            player,
-            star,
-            carriersAtStar
+            star: {
+                _id: star._id,
+                garrison: star.garrison
+            },
+            carriers: carriersAtStar.map(c => {
+                return {
+                    _id: c._id,
+                    ships: c.ships
+                }
+            })
         };
     }
 

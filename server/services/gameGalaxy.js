@@ -22,7 +22,15 @@ module.exports = class GameGalaxyService {
         this.historyService = historyService;
     }
 
-    async getGalaxy(game, userId) {
+    async getGalaxy(gameId, userId, tick) {
+        let game = await this.gameService.getByIdGalaxyLean(gameId);
+
+        let isHistorical = tick != null && tick !== game.state.tick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
+
+        if (!isHistorical) {
+            tick = game.state.tick;
+        }
+
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
         
@@ -30,7 +38,7 @@ module.exports = class GameGalaxyService {
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
 
-        await this._maskGalaxy(game, player);
+        await this._maskGalaxy(game, player, isHistorical, tick);
 
         // Append the player stats to each player.
         this._setPlayerStats(game);
@@ -351,7 +359,7 @@ module.exports = class GameGalaxyService {
         doc.galaxy.carriers = [];
     }
 
-    async _maskGalaxy(game, player) {
+    async _maskGalaxy(game, player, isHistorical, tick) {
         /*
             Masking of galaxy data occurs here, it prevent players from seeing what other
             players are doing until the tick has finished.
@@ -367,46 +375,72 @@ module.exports = class GameGalaxyService {
                 - Ships, specialist and gift status needs to be reset.
             3. Continue to run through current logic as we do today.
 
-            Note: We do not reset other player data for the previous tick.
-        
             Things to consider:
             - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
             - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
         */
 
-        if (!this.gameService.isStarted(game) || game.state.tick === 0) {
+        if (!this.gameService.isStarted(game) || tick === 0) {
             return;
         }
 
-        let history = await this.historyService.getHistoryByTick(game._id, game.state.tick);
+        let history = await this.historyService.getHistoryByTick(game._id, tick);
 
         if (!history) {
             return;
+        }
+
+        // Apply previous tick's data to all PLAYERS except the current player.
+        for (let i = 0; i < game.galaxy.players.length; i++) {
+            let gamePlayer = game.galaxy.players[i];
+            
+            if (!isHistorical && player && gamePlayer._id.equals(player._id)) {
+                continue;
+            }
+            
+            let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
+
+            if (historyPlayer) {
+                gamePlayer.userId = historyPlayer.userId;
+                gamePlayer.alias = historyPlayer.alias;
+                gamePlayer.avatar = historyPlayer.avatar;
+                gamePlayer.researchingNow = historyPlayer.researchingNow;
+                gamePlayer.researchingNext = historyPlayer.researchingNext;
+                gamePlayer.credits = historyPlayer.credits;
+                gamePlayer.defeated = historyPlayer.defeated;
+                gamePlayer.afk = historyPlayer.afk;
+                gamePlayer.ready = historyPlayer.ready;
+                gamePlayer.research = historyPlayer.research;
+            }
         }
         
         // Apply previous tick's data to all STARS the player does not own.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let gameStar = game.galaxy.stars[i];
             
-            if (player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.equals(player._id)) {
+            if (!isHistorical && player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.equals(player._id)) {
                 continue;
             }
             
             let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
 
-            gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
-            gameStar.naturalResources = historyStar.naturalResources;
-            gameStar.garrison = historyStar.garrison;
-            gameStar.specialistId = historyStar.specialistId;
-            gameStar.warpGate = historyStar.warpGate;
-            gameStar.infrastructure = historyStar.infrastructure;
+            if (historyStar) {
+                gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
+                gameStar.naturalResources = historyStar.naturalResources;
+                gameStar.garrison = historyStar.garrison;
+                gameStar.garrisonActual = historyStar.garrisonActual;
+                gameStar.specialistId = historyStar.specialistId;
+                gameStar.warpGate = historyStar.warpGate;
+                gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
+                gameStar.infrastructure = historyStar.infrastructure;
+            }
         }
 
         // Apply previous tick's data to all CARRIERS the player does not own.
         for (let i = 0; i < game.galaxy.carriers.length; i++) {
             let gameCarrier = game.galaxy.carriers[i];
 
-            if (player && gameCarrier.ownedByPlayerId.equals(player._id)) {
+            if (!isHistorical && player && gameCarrier.ownedByPlayerId.equals(player._id)) {
                 continue;
             }
 
@@ -421,12 +455,17 @@ module.exports = class GameGalaxyService {
             
             gameCarrier.ownedByPlayerId = historyCarrier.ownedByPlayerId;
             gameCarrier.orbiting = historyCarrier.orbiting;
-            gameCarrier.inTransitFrom = historyCarrier.inTransitFrom;
-            gameCarrier.inTransitTo = historyCarrier.inTransitTo;
             gameCarrier.ships = historyCarrier.ships;
             gameCarrier.specialistId = historyCarrier.specialistId;
             gameCarrier.isGift = historyCarrier.isGift;
             gameCarrier.location = historyCarrier.location;
+            gameCarrier.waypoints = historyCarrier.waypoints;
+        }
+
+        // If the user is requesting a specific tick then we also need to update the game state to match
+        if (isHistorical) {
+            game.state.tick = history.tick
+            game.state.productionTick = history.productionTick
         }
     }
 

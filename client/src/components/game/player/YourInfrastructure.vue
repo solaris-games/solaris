@@ -2,25 +2,27 @@
   <div class="row">
     <div class="col bg-secondary pt-2 pb-2">
         <span>Yours</span>
-        <span class="float-right">{{economy}}</span>
+        <span class="float-right">{{player.stats.totalEconomy}}</span>
     </div>
     <div class="col bg-primary pt-2 pb-2">
         <span>Yours</span>
-        <span class="float-right">{{industry}}</span>
+        <span class="float-right">{{player.stats.totalIndustry}}</span>
     </div>
     <div class="col bg-secondary pt-2 pb-2">
         <span>Yours</span>
-        <span class="float-right">{{science}}</span>
+        <span class="float-right">{{player.stats.totalScience}}</span>
     </div>
   </div>
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
+
 export default {
-  props: {
-    economy: Number,
-    industry: Number,
-    science: Number
+  computed: {
+    player () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    }
   }
 }
 </script>

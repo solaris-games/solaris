@@ -61,7 +61,7 @@ export default {
 
       try {
         // 10 cycles ago
-        let startTick = Math.max(0, game.state.tick - (game.settings.galaxy.productionTicks * 10))
+        let startTick = Math.max(0, this.$store.state.tick - (game.settings.galaxy.productionTicks * 10))
 
         let response = await GameApiService.getEvents(this.$store.state.game._id, startTick)
 

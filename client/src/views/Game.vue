@@ -123,6 +123,8 @@ export default {
         // switched to another game.
         if (this.$route.query.id === galaxyResponse.data._id) {
           this.$store.commit('setGame', galaxyResponse.data) // Persist to storage
+          this.$store.commit('setTick', galaxyResponse.data.state.tick)
+          this.$store.commit('setProductionTick', galaxyResponse.data.state.productionTick)
 
           document.title = galaxyResponse.data.settings.general.name + ' - Solaris'
         }
@@ -220,18 +222,7 @@ export default {
       this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
       this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
       this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
-      this.sockets.subscribe('gameStarEconomyUpgraded', (data) => this.$store.commit('gameStarEconomyUpgraded', data))
-      this.sockets.subscribe('gameStarIndustryUpgraded', (data) => this.$store.commit('gameStarIndustryUpgraded', data))
-      this.sockets.subscribe('gameStarScienceUpgraded', (data) => this.$store.commit('gameStarScienceUpgraded', data))
-      this.sockets.subscribe('gameStarBulkUpgraded', (data) => this.$store.commit('gameStarBulkUpgraded', data))
-      this.sockets.subscribe('gameStarWarpGateBuilt', (data) => this.$store.commit('gameStarWarpGateBuilt', data))
-      this.sockets.subscribe('gameStarWarpGateDestroyed', (data) => this.$store.commit('gameStarWarpGateDestroyed', data))
-      this.sockets.subscribe('gameStarCarrierBuilt', (data) => this.$store.commit('gameStarCarrierBuilt', data))
-      this.sockets.subscribe('gameStarCarrierShipTransferred', (data) => this.$store.commit('gameStarCarrierShipTransferred', data))
-      this.sockets.subscribe('gameStarAbandoned', (data) => this.$store.commit('gameStarAbandoned', data))
       this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
-      this.sockets.subscribe('starSpecialistHired', (data) => this.$store.commit('starSpecialistHired', data))
-      this.sockets.subscribe('carrierSpecialistHired', (data) => this.$store.commit('carrierSpecialistHired', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
 
       if (!GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)) {
@@ -245,18 +236,7 @@ export default {
       this.sockets.unsubscribe('gamePlayerQuit')
       this.sockets.unsubscribe('gamePlayerReady')
       this.sockets.unsubscribe('gamePlayerNotReady')
-      this.sockets.unsubscribe('gameStarEconomyUpgraded')
-      this.sockets.unsubscribe('gameStarIndustryUpgraded')
-      this.sockets.unsubscribe('gameStarScienceUpgraded')
-      this.sockets.unsubscribe('gameStarBulkUpgraded')
-      this.sockets.unsubscribe('gameStarWarpGateBuilt')
-      this.sockets.unsubscribe('gameStarWarpGateDestroyed')
-      this.sockets.unsubscribe('gameStarCarrierBuilt')
-      this.sockets.unsubscribe('gameStarCarrierShipTransferred')
-      this.sockets.unsubscribe('gameStarAbandoned')
       this.sockets.unsubscribe('playerDebtSettled')
-      this.sockets.unsubscribe('starSpecialistHired')
-      this.sockets.unsubscribe('carrierSpecialistHired')
       this.sockets.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
@@ -342,7 +322,7 @@ export default {
           
           if (response.status === 200) {
             
-            if (this.$store.state.game.state.tick < response.data.state.tick) {
+            if (this.$store.state.tick < response.data.state.tick) {
               await this.reloadGame()
             }
           }

@@ -32,7 +32,7 @@
                 </h5>
             </div>
             <div class="col-auto mt-2">
-                <button class="btn btn-sm btn-success" v-if="!(carrier.specialistId && carrier.specialist.id === specialist.id)" :disabled="isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+                <button class="btn btn-sm btn-success" v-if="!(carrier.specialistId && carrier.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
                 <span class="badge badge-primary" v-if="carrier.specialistId && carrier.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">

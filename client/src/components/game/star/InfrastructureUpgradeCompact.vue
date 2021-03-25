@@ -3,35 +3,34 @@
     <div class="col pr-0">
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"
-              :disabled="isUpgradingEconomy || availableCredits < economy || isGameFinished"
+              :disabled="$isHistoricalMode() || isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"
               title="Upgrade Economy">
         <i class="fas fa-money-bill-wave mr-1"></i>${{economy}}
       </button>
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= industry, 'btn-primary': availableCredits < industry}"
-              :disabled="isUpgradingIndustry || availableCredits < industry || isGameFinished"
+              :disabled="$isHistoricalMode() || isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"
               title="Upgrade Industry">
         <i class="fas fa-tools mr-1"></i>${{industry}}
       </button>
       <button class="btn btn-sm"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
-              :disabled="isUpgradingScience || availableCredits < science || isGameFinished"
+              :disabled="$isHistoricalMode() || isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
               title="Upgrade Science">
         <i class="fas fa-flask mr-1"></i>${{science}}
       </button>
     </div>
     <div class="col-auto pl-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canBuildWarpGates && star.warpGate" :disabled="isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy Warp Gate">
+      <button v-if="canBuildWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy Warp Gate">
         <i class="fas fa-trash"></i> <i class="fas fa-dungeon ml-1"></i>
       </button>
-
-      <button :disabled="userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
+      <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
         <i class="fas fa-rocket mr-1"></i>${{star.upgradeCosts.carriers}}
       </button>
     </div>
@@ -78,11 +77,8 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Economy upgraded at ${this.star.name}.`)
 
-          this.$emit('onInfrastructureUpgraded', {
-            infrastructureKey: 'economy',
-            data: response.data
-          })
-
+          this.$store.commit('gameStarEconomyUpgraded', response.data)
+          
           AudioService.hover()
         }
       } catch (err) {
@@ -100,11 +96,8 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Industry upgraded at ${this.star.name}.`)
 
-          this.$emit('onInfrastructureUpgraded', {
-            infrastructureKey: 'industry',
-            data: response.data
-          })
-
+          this.$store.commit('gameStarIndustryUpgraded', response.data)
+          
           AudioService.hover()
         }
       } catch (err) {
@@ -122,11 +115,8 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Science upgraded at ${this.star.name}.`)
 
-          this.$emit('onInfrastructureUpgraded', {
-            infrastructureKey: 'science',
-            data: response.data
-          })
-
+          this.$store.commit('gameStarScienceUpgraded', response.data)
+          
           AudioService.hover()
         }
       } catch (err) {
@@ -146,8 +136,8 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
 
-          GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
-
+          this.$store.commit('gameStarWarpGateBuilt', response.data)
+          
           AudioService.join()
         }
       } catch (err) {
@@ -165,6 +155,10 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
 
+          this.$store.commit('gameStarWarpGateDestroyed', {
+            starId: this.star._id
+          })
+          
           AudioService.leave()
         }
       } catch (err) {

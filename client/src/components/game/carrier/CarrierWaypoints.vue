@@ -56,7 +56,7 @@
             <i class="fas fa-sync"></i>
           </button>
 		  	</div>
-		  	<div class="col-auto">
+		  	<div class="col-auto" v-if="!$isHistoricalMode()">
 		  		<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
             <i class="fas fa-save"></i>
             <span class="ml-1">Save</span>

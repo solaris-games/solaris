@@ -165,7 +165,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     calculateStartTicks () {
-      let currentTick = this.$store.state.game.state.tick
+      let currentTick = this.$store.state.tick
       let prodTicks = this.$store.state.game.settings.galaxy.productionTicks
 
       this.startTickOptions.push({
@@ -191,7 +191,7 @@ export default {
       this.history = null
 
       try {
-        let response = await GameApiService.getGameHistory(this.$store.state.game._id, this.startTick)
+        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick)
 
         if (response.status === 200) {
           this.history = response.data

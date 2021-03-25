@@ -26,13 +26,19 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  getGameHistory (id, startTick = 0) {
-    return axios.get(this.BASE_URL + 'game/' + id + '/history?startTick=' + startTick.toString(),
+  getGameIntel (id, startTick = 0) {
+    return axios.get(this.BASE_URL + 'game/' + id + '/intel?startTick=' + startTick.toString(),
       { withCredentials: true })
   }
 
-  getGameGalaxy (id) {
-    return axios.get(this.BASE_URL + 'game/' + id + '/galaxy',
+  getGameGalaxy (id, tick = null) {
+    let path = 'game/' + id + '/galaxy'
+
+    if (tick) {
+      path += '?tick=' + tick.toString()
+    }
+
+    return axios.get(this.BASE_URL + path,
       { withCredentials: true })
   }
 

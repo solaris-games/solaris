@@ -62,7 +62,7 @@
             </button>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-success btn-block" :disabled="isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+            <button type="button" class="btn btn-success btn-block" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
                 <i class="fas fa-rocket"></i>
                 Build for ${{star.upgradeCosts.carriers}}
             </button>
@@ -145,18 +145,11 @@ export default {
             if (response.status === 200) {
                 this.$toasted.show(`Carrier built at ${this.star.name}.`)
 
-                this.$store.state.game.galaxy.carriers.push(response.data.carrier)
-
-                let star = GameHelper.getStarById(this.$store.state.game, response.data.carrier.orbiting)
-                star.garrison = response.data.starGarrison
-
-                this.$emit('onEditWaypointsRequested', response.data.carrier._id)
-                GameHelper.getUserPlayer(this.$store.state.game).credits -= this.star.upgradeCosts.carriers
-
-                GameContainer.reloadStar(star)
-                GameContainer.reloadCarrier(response.data.carrier)
+                this.$store.commit('gameStarCarrierBuilt', response.data)
 
                 AudioService.join()
+                
+                this.$emit('onEditWaypointsRequested', data.carrier._id)
             }
         } catch (err) {
             console.error(err)

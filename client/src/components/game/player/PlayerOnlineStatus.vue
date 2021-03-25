@@ -25,6 +25,8 @@ export default {
   mounted () {
     let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
+    this.recalculateOnlineStatus()
+    
     if (!isHiddenPlayerOnlineStatus) {
       this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
     }

@@ -138,22 +138,20 @@ export default {
   props: {
     playerId: String
   },
-  data () {
-      return {
-          player: null,
-          userPlayer: null
-      }
-  }, 
-  mounted () {
-      this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
-      this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-  },
   methods: {
       hasHighestTechLevel (techKey) {
           return gameHelper.userPlayerHasHighestTechLevel(this.$store.state.game, techKey)
       },
       hasLowestTechLevel (techKey) {
           return gameHelper.userPlayerHasLowestTechLevel(this.$store.state.game, techKey)
+      }
+  },
+  computed: {
+      player () {
+          return gameHelper.getPlayerById(this.$store.state.game, this.playerId)
+      },
+      userPlayer () {
+          return gameHelper.getUserPlayer(this.$store.state.game)
       }
   }
 }
