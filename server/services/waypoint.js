@@ -53,6 +53,7 @@ module.exports = class WaypointService {
             let sourceStar = this.starService.getByObjectId(game, waypoint.source);
             let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
+            // Make sure the user isn't being a dumbass.
             if (waypoint.actionShips == null || waypoint.actionShips == '' || +waypoint.actionShips < 0) {
                 waypoint.actionShips = 0;
             }
@@ -60,6 +61,11 @@ module.exports = class WaypointService {
             // Make sure delay ticks isn't a decimal.
             if (+waypoint.delayTicks % 1 != 0) {
                 throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} delay cannot be a decimal.`);
+            }
+
+            // Make sure the user isn't being a dumbass.
+            if (+waypoint.delayTicks < 0) {
+                waypoint.delayTicks = 0;
             }
 
             if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {

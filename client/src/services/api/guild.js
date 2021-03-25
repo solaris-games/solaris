@@ -6,6 +6,10 @@ class GuildService extends BaseApiService {
     return axios.get(this.BASE_URL + 'guild', { withCredentials: true })
   }
 
+  getLeaderboard (limit = 10) {
+    return axios.get(this.BASE_URL + 'guild/leaderboard?limit=' + limit.toString(), { withCredentials: true })
+  }
+
   listInvitations () {
     return axios.get(this.BASE_URL + 'guild/invites', { withCredentials: true })
   }

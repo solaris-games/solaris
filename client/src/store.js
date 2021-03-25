@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 import GameHelper from './services/gameHelper'
+import MentionHelper from './services/mentionHelper'
 import GameContainer from './game/container'
+import SpecialistService from './services/api/specialist';
 
 Vue.use(Vuex)
 
@@ -15,9 +17,21 @@ export default new Vuex.Store({
   state: {
     userId: null,
     game: null,
-    cachedConversationComposeMessages: {}
+    cachedConversationComposeMessages: {},
+    currentConversation: null,
+    starSpecialists: null,
+    carrierSpecialists: null,
+    settings: null,
+    confirmationDialog: {}
   },
   mutations: {
+    setCarrierSpecialists (state, carrierSpecialists) {
+      state.carrierSpecialists = carrierSpecialists;
+    },
+    setStarSpecialists (state, starSpecialists) {
+      state.starSpecialists = starSpecialists;
+    },
+
     setUserId (state, userId) {
       state.userId = userId
     },
@@ -31,6 +45,7 @@ export default new Vuex.Store({
     clearGame (state) {
       state.game = null
       state.cachedConversationComposeMessages = {}
+      state.currentConversation = null;
     },
 
     setSettings (state, settings) {
@@ -39,8 +54,46 @@ export default new Vuex.Store({
     clearSettings (state) {
       state.settings = null
     },
-    storeConversationMessage (state, data) {
-      state.cachedConversationComposeMessages[data.conversationId] = data.message;
+    setConfirmationDialogSettings (state, settings) {
+      state.confirmationDialog = settings
+    },
+    openConversation (state, data) {
+      state.currentConversation = {
+        id: data,
+        element: null,
+        text: state.cachedConversationComposeMessages[data]
+      }
+    },
+    closeConversation (state) {
+      const id = state.currentConversation.id;
+      state.cachedConversationComposeMessages[id] = state.currentConversation.text
+      state.currentConversation = null
+    },
+    updateCurrentConversationText (state, data) {
+      state.currentConversation.text = data
+    },
+    resetCurrentConversationText (state, data) {
+      state.currentConversation.text = ''
+    },
+    setConversationElement (state, data) {
+      state.currentConversation.element = data
+    },
+    playerClicked (state, data) {
+      if (state.currentConversation) {
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+      } else {
+        data.permitCallback(data.player)
+      }
+    },
+    starClicked (state, data) {
+      if (state.currentConversation) {
+        MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
+      } else {
+        data.permitCallback(data.star)
+      }
+    },
+    replaceInConversationText (state, data) {
+      MentionHelper.useSuggestion(state.currentConversation, data)
     },
 
     // ----------------
@@ -48,6 +101,36 @@ export default new Vuex.Store({
 
     gameStarted (state, data) {
       state.game.state = data.state
+    },
+
+    gamePlayerJoined (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.isEmptySlot = false
+      player.alias = data.alias
+      player.avatar = data.avatar
+      player.defeated = false
+      player.afk = false
+    },
+
+    gamePlayerQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      
+      player.isEmptySlot = true
+      player.alias = 'Empty Slot'
+      player.avatar = null
+    },
+
+    gamePlayerReady (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = true
+    },
+
+    gamePlayerNotReady (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = false
     },
 
     gameStarEconomyUpgraded (state, data) {
@@ -197,7 +280,44 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async loadSpecialistData ({ commit, state }) {
+      const gameId = state.game._id;
 
+      let requests = [
+        SpecialistService.getCarrierSpecialists(gameId),
+        SpecialistService.getStarSpecialists(gameId)
+      ]
+
+      const responses = await Promise.all(requests)
+      
+      commit('setCarrierSpecialists', responses[0].data)
+      commit('setStarSpecialists', responses[1].data)
+    },
+    async confirm ({ commit, state }, data) {
+      const modal = window.$('#confirmModal')
+      const close = () => {
+        modal.modal('toggle')
+      }
+      return new Promise((resolve, _reject) => {
+        const settings = {
+          confirmText: data.confirmText || 'Yes',
+          cancelText: data.cancelText || 'No',
+          hideCancelButton: Boolean(data.hideCancelButton),
+          titleText: data.titleText,
+          text: data.text,
+          onConfirm: () => {
+            close()
+            resolve(true)
+          },
+          onCancel: () => {
+            close()
+            resolve(false)
+          }
+        }
+        commit('setConfirmationDialogSettings', settings)
+        modal.modal('toggle')
+      })
+    }
   },
   getters: {
     getConversationMessage: (state) => (conversationId) => {

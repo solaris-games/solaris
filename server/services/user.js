@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
+const moment = require('moment');
 
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -107,10 +108,24 @@ module.exports = class UserService extends EventEmitter {
         return user.banned;
     }
 
-    async create(user) {
+    async getUserIsAdmin(userId) {
+        let user = await this.userModel.findOne({
+            _id: userId
+        }, {
+            'roles.administrator': 1
+        })
+        .lean({defaults: true})
+        .exec();
+
+        return user.roles.administrator;
+    }
+
+    async create(user, ipAddress) {
         user.username = user.username.trim();
         user.email = user.email.trim();
         user.email = user.email.toLowerCase();
+        user.lastSeen = moment().utc();
+        user.lastSeenIP = ipAddress;
 
         if (user.username.length < 3 || user.username.length > 24) {
             throw new ValidationError('Username must be between 3 and 24 characters.');
@@ -143,7 +158,22 @@ module.exports = class UserService extends EventEmitter {
 
         let user = await this.userModel.findOne({
             username
-        });
+        }, { _id: 1 })
+        .lean()
+        .exec();
+
+        return user != null;
+    }
+
+    async otherUsernameExists(username, ignoreUserId) {
+        username = username.trim();
+
+        let user = await this.userModel.findOne({
+            _id: { $ne: ignoreUserId },
+            username
+        }, { _id: 1 })
+        .lean()
+        .exec();
 
         return user != null;
     }
@@ -268,6 +298,17 @@ module.exports = class UserService extends EventEmitter {
         user.gameSettings = settings;
 
         await user.save();
+    }
+
+    async updateLastSeen(userId, ipAddress) {
+        await this.userModel.updateOne({
+            _id: userId
+        }, {
+            $set: {
+                'lastSeen': moment().utc(),
+                'lastSeenIP': ipAddress
+            }
+        });
     }
 
 };

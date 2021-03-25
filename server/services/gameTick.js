@@ -387,7 +387,7 @@ module.exports = class GameTickService extends EventEmitter {
         if (star) {
             combatResult = this.combatService.calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers);
         } else {
-            combatResult = this.combatService.calculateCarrier(game, defenderCarriers, attackerCarriers);
+            combatResult = this.combatService.calculateCarrier(game, defender, attackers, defenderCarriers, attackerCarriers);
         }
 
         await this._decreaseReputationForCombat(game, defender, attackers);
@@ -711,6 +711,7 @@ module.exports = class GameTickService extends EventEmitter {
 
                 let creditsResult = this.playerService.givePlayerMoney(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
+                let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
                     game, 
@@ -719,7 +720,8 @@ module.exports = class GameTickService extends EventEmitter {
                     creditsBanking: creditsResult.creditsFromBanking, 
                     experimentTechnology: experimentResult.technology,
                     experimentTechnologyLevel: experimentResult.level,
-                    experimentAmount: experimentResult.amount
+                    experimentAmount: experimentResult.amount,
+                    carrierUpkeep: carrierUpkeepResult
                 });
             }
 
@@ -737,56 +739,22 @@ module.exports = class GameTickService extends EventEmitter {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
         let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
-        let afkThresholdDate = moment().utc().subtract(3, 'days');
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            if (isTurnBasedGame) {
-                // Reset whether we have sent the player a turn reminder.
-                player.hasSentTurnReminder = false;
-
-                // If the player wasn't ready when the game ticked, increase their number of missed turns.
-                if (!player.ready) {
-                    player.missedTurns++;
-                    player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
-                }
-                else {
-                    player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
-                }
-            }
-
-            // Check if the player has been AFK.
-            // If in real time mode, check if the player has not been seen for over 48 hours.
-            // OR if in turn based mode, check if the player has reached the maximum missed turn limit.
-            let isAfk = moment(player.lastSeen).utc() < afkThresholdDate
-                    || player.missedTurns >= game.settings.gameTime.missedTurnLimit;
-
-            if (isAfk) {
-                this.playerService.setPlayerAsAfk(game, player);
-            }
-
-            // Check if the player has been defeated by conquest.
-            if (!player.defeated) {
-                let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
-                // If there are no stars and there are no carriers then the player is defeated.
-                if (stars.length === 0) {
-                    let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
-        
-                    if (carriers.length === 0) {
-                        this.playerService.setPlayerAsDefeated(game, player);
-                    }
-                }
-            }
+            this.playerService.performDefeatedOrAfkCheck(game, player, isTurnBasedGame);
 
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.
 
                 let user = gameUsers.find(u => u._id.equals(player.userId));
 
-                if (isAfk) {
+                if (player.afk) {
+                    // Keep a log of players who have been afk so they cannot rejoin.
+                    game.afkers.push(player.userId);
+            
                     // AFK counts as a defeat as well.
                     if (user) {
                         user.achievements.defeated++;

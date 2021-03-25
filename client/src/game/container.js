@@ -25,7 +25,8 @@ class GameContainer {
     }
   }
 
-  setupApp () {
+  setupApp (store) {
+    this.store = store
 
     // Cleanup if the app already exists.
     if (this.app) {
@@ -73,7 +74,7 @@ class GameContainer {
     this.app.stage.addChild(this.viewport)
 
     // Add a new map to the viewport
-    this.map = new Map(this.app)
+    this.map = new Map(this.app, this.store, this)
     this.viewport.addChild(this.map.container)
   }
 

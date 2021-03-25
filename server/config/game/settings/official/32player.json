@@ -1,7 +1,8 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "32 Players",
+    "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
+    "type": "32_player_rt",
     "password": null,
     "starVictoryPercentage": 33,
     "playerLimit": 32,
@@ -14,6 +15,7 @@
   },
   "specialGalaxy": {
     "carrierCost": "standard",
+    "carrierUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
@@ -39,6 +41,7 @@
       "industry": "standard",
       "science": "standard"
     },
+    "tradeCredits": true,
     "tradeCost": 15,
     "tradeScanning": "scanned"
   },
@@ -60,7 +63,8 @@
       "manufacturing": "standard",
       "banking": "standard",
       "weapons": "standard"
-    }
+    },
+    "bankingReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",

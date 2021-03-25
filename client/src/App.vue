@@ -1,6 +1,19 @@
 <template>
+  <main>
+    <confirmation-dialog :dialogSettings="$store.state.confirmationDialog" />
     <router-view/>
+  </main>
 </template>
+
+<script>
+import ConfirmationDialog from './components/modal/ConfirmationDialog'
+
+export default {
+  components: {
+    'confirmation-dialog': ConfirmationDialog
+  }
+}
+</script>
 
 <style>
 body {
@@ -17,6 +30,11 @@ body {
   opacity: 1;
   animation-name: fadeInAnimation;
   animation-duration: 0.3s;
-  margin-bottom:52px;
+}
+
+@media(max-width: 473px) {
+    .menu-page {
+      margin-bottom:52px; /* This is to cater for the bottom bar */
+    }
 }
 </style>

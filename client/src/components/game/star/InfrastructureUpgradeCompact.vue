@@ -136,7 +136,7 @@ export default {
       this.isUpgradingScience = false
     },
     async confirmBuildWarpGate (e) {
-      if (!confirm(`Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
+      if (!await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
         return
       }
 
@@ -155,7 +155,7 @@ export default {
       }
     },
     async confirmDestroyWarpGate (e) {
-      if (!confirm(`Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
+      if (!await this.$confirm('Destroy Warp Gate', `Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
         return
       }
 

@@ -77,6 +77,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/list/inprogress', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listInProgressGames();
+
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/list/active', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listActiveGames(req.session.userId);

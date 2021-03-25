@@ -13,7 +13,10 @@
             <tr v-for="player in leaderboard" :key="player._id">
                 <td>{{player.position}}</td>
                 <td>
-                    <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">{{player.username}}</router-link>
+                    <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">
+                        <span>{{player.username}}</span>
+                        <span v-if="player.guild" class="d-md-none" :title="player.guild.name">[{{player.guild.tag}}]</span>
+                    </router-link>
                     <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
                     <i class="fas fa-code ml-1" title="This player is a developer" v-if="player.roles && player.roles.developer"></i>
                     <i class="fas fa-user-friends ml-1" title="This player is a community manager" v-if="player.roles && player.roles.communityManager"></i>

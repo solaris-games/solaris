@@ -47,7 +47,7 @@ module.exports = class StarService extends EventEmitter {
         // Set up the home star
         player.homeStarId = homeStar._id;
         homeStar.ownedByPlayerId = player._id;
-        homeStar.garrisonActual = gameSettings.player.startingShips;
+        homeStar.garrisonActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 star at the home star so that a carrier can be built there.
         homeStar.garrison = homeStar.garrisonActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.warpGate = false;

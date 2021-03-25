@@ -2,6 +2,7 @@
     "general": {
         "name": null,
         "description": null,
+        "type": "custom",
         "password": null,
         "starVictoryPercentage": 50,
         "playerLimit": 8,
@@ -16,6 +17,7 @@
     },
     "specialGalaxy": {
         "carrierCost": "standard",
+        "carrierUpkeepCost": "none",
         "warpgateCost": "standard",
         "specialistCost": "standard",
         "randomGates": "none",
@@ -41,6 +43,7 @@
         "industry": "standard",
         "science": "standard"
         },
+        "tradeCredits": true,
         "tradeCost": 15,
         "tradeScanning": "scanned"
     },
@@ -62,13 +65,14 @@
         "manufacturing": "standard",
         "banking": "standard",
         "weapons": "standard"
-        }
+        },
+        "bankingReward": "standard"
     },
     "gameTime": {
         "gameType": "realTime",
         "speed": 30,
         "startDelay": 30,
-        "turnJumps": 8,
+        "turnJumps": 6,
         "maxTurnWait": 24,
         "missedTurnLimit": 3
     }

@@ -77,21 +77,33 @@ module.exports = class GuildService {
         .exec();
 
         if (withUserInfo) {
-            let users = await this.userModel.find({}, {
+            let userSelectObject = {
                 username: 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1
-            })
+            };
+
+            let usersInGuild = await this.userModel.find({
+                guildId
+            }, userSelectObject)
+            .lean()
+            .exec();
+
+            let usersInvited = await this.userModel.find({
+                _id: {
+                    $in: guild.invitees
+                }
+            }, userSelectObject)
             .lean()
             .exec();
     
-            guild.leader = users.find(x => x._id.equals(guild.leader));
-            guild.officers = users.filter(x => this._isOfficer(guild, x._id));
-            guild.members = users.filter(x => this._isMember(guild, x._id));
-            guild.invitees = users.filter(x => this._isInvitee(guild, x._id));
+            guild.leader = usersInGuild.find(x => x._id.equals(guild.leader));
+            guild.officers = usersInGuild.filter(x => this._isOfficer(guild, x._id));
+            guild.members = usersInGuild.filter(x => this._isMember(guild, x._id));
+            guild.invitees = usersInvited;
 
-            guild.totalRank = users.reduce((sum, i) => sum + i.achievements.rank, 0);
+            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
         }
 
         return guild;
@@ -492,6 +504,53 @@ module.exports = class GuildService {
             _id: userId,
             guildId: { $ne: null }
         }).exec() > 0;
+    }
+
+    async listUserRanksInGuilds() {
+        return await this.userModel.find({
+            guildId: { $ne: null }
+        }, {
+            guildId: 1,
+            'achievements.rank': 1
+        })
+        .lean()
+        .exec();
+    }
+
+    async getLeaderboard(limit) {
+        limit = limit || 10;
+
+        let guilds = await this.guildModel.find({}, {
+            name: 1,
+            tag: 1,
+            leader: 1,
+            officers: 1,
+            members: 1
+        })
+        .lean()
+        .exec();
+
+        // Calculate the rankings of each guild.
+        let users = await this.listUserRanksInGuilds();
+
+        for (let guild of guilds) {
+            let usersInGuild = users.filter(x => x.guildId.equals(guild._id));
+
+            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+        }
+
+        let leaderboard = guilds
+                        .sort((a, b) => b.totalRank - a.totalRank)
+                        .slice(0, limit);
+
+        for (let i = 0; i < leaderboard.length; i++) {
+            leaderboard[i].position = i + 1;
+        }
+
+        return {
+            leaderboard,
+            totalGuilds: guilds.length
+        };
     }
 
 };

@@ -72,6 +72,24 @@
             "text": "Expensive"
             }
         ],
+        "carrierUpkeepCost": [
+            {
+            "value": "none",
+            "text": "None"
+            },
+            {
+            "value": "cheap",
+            "text": "Cheap"
+            },
+            {
+            "value": "standard",
+            "text": "Standard"
+            },
+            {
+            "value": "expensive",
+            "text": "Expensive"
+            }
+        ],
         "warpgateCost": [
             {
             "value": "none",
@@ -263,6 +281,9 @@
             }
         ],
         "productionTicks": [
+            10,
+            12,
+            14,
             16,
             18,
             20,
@@ -290,12 +311,14 @@
             10
         ],
         "startingCredits": [
-            25,
-            500,
-            1000,
-            1500,
-            2000,
-            2500,
+            25, 
+            50, 
+            100, 
+            500, 
+            1000, 
+            1500, 
+            2000, 
+            2500, 
             3000
         ],
         "startingShips": [
@@ -342,7 +365,21 @@
             "text": "Expensive"
             }
         ],
+        "tradeCredits": [
+            {
+            "value": false,
+            "text": "Disabled"
+            },
+            {
+            "value": true,
+            "text": "Enabled"
+            }
+        ],
         "tradeCost": [
+            {
+            "value": 0,
+            "text": "Trading Disabled"
+            },
             {
             "value": 5,
             "text": "Cheap"
@@ -376,69 +413,79 @@
         ]
         },
         "technology": {
-        "startingTechnologyLevel": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16
-        ],
-        "startingTechnologyLevelWithDisabled": [
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16
-        ],
-        "researchCosts": [
-            {
-            "value": "none",
-            "text": "No"
-            },
-            {
-            "value": "cheap",
-            "text": "Cheap"
-            },
-            {
-            "value": "standard",
-            "text": "Standard"
-            },
-            {
-            "value": "expensive",
-            "text": "Expensive"
-            },
-            {
-            "value": "veryExpensive",
-            "text": "Very Expensive"
-            },
-            {
-            "value": "crazyExpensive",
-            "text": "Crazy Expensive"
-            }
-        ]
+            "startingTechnologyLevel": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+            ],
+            "startingTechnologyLevelWithDisabled": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16
+            ],
+            "researchCosts": [
+                {
+                    "value": "none",
+                    "text": "No"
+                },
+                {
+                    "value": "cheap",
+                    "text": "Cheap"
+                },
+                {
+                    "value": "standard",
+                    "text": "Standard"
+                },
+                {
+                    "value": "expensive",
+                    "text": "Expensive"
+                },
+                {
+                    "value": "veryExpensive",
+                    "text": "Very Expensive"
+                },
+                {
+                    "value": "crazyExpensive",
+                    "text": "Crazy Expensive"
+                }
+            ],
+            "bankingReward": [
+                {
+                    "value": "standard",
+                    "text": "Standard"
+                },
+                {
+                    "value": "experimental",
+                    "text": "Experimental"
+                }
+            ]
         },
         "gameTime": {
         "gameType": [

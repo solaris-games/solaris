@@ -446,8 +446,8 @@ module.exports = class PlayerService extends EventEmitter {
         };
     }
 
-    updateLastSeen(game, player) {
-        player.lastSeen = moment().utc();
+    updateLastSeen(game, player, date) {
+        player.lastSeen = date || moment().utc();
     }
 
     async updateLastSeenLean(gameId, userId, ipAddress) {
@@ -463,17 +463,12 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
-        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
-
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.calculateTotalEconomy(playerStars);
 
-        let bankingMultiplier = isBankingEnabled ? effectiveTechs.banking : 0;
-
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = playerStars.length ? bankingMultiplier * 75 : 0; // Players must have stars in order to get credits from banking.
+        let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
@@ -482,6 +477,50 @@ module.exports = class PlayerService extends EventEmitter {
             creditsFromEconomy,
             creditsFromBanking,
             creditsTotal
+        };
+    }
+
+    _getBankingReward(game, player, playerStars, totalEco) {
+        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
+
+        if (!isBankingEnabled || !playerStars.length) { // Players must have stars in order to get credits from banking.
+            return 0;
+        }
+
+        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+
+        switch (game.settings.technology.bankingReward) {
+            case 'standard':
+                return effectiveTechs.banking * 75;
+            case 'experimental':
+                return Math.round((effectiveTechs.banking * 75) + (0.15 * effectiveTechs.banking * totalEco));
+        }
+
+        throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
+    }
+
+    deductCarrierUpkeepCost(game, player) {
+        const upkeepCosts = {
+            'none': 0,
+            'cheap': 1,
+            'standard': 3,
+            'expensive': 6
+        };
+
+        let costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+
+        if (!costPerCarrier) {
+            return null;
+        }
+
+        let carrierCount = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).length;
+        let totalCost = carrierCount * costPerCarrier;
+
+        player.credits -= totalCost; // Note: Don't care if this goes into negative figures.
+
+        return {
+            carrierCount,
+            totalCost
         };
     }
 
@@ -522,6 +561,73 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
+    performDefeatedOrAfkCheck(game, player, isTurnBasedGame) {
+        if (isTurnBasedGame) {
+            // Reset whether we have sent the player a turn reminder.
+            player.hasSentTurnReminder = false;
+
+            // If the player wasn't ready when the game ticked, increase their number of missed turns.
+            if (!player.ready) {
+                player.missedTurns++;
+                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
+            }
+            else {
+                player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
+            }
+        }
+
+        // Check if the player has been AFK.
+        let isAfk = this.isAfk(game, player, isTurnBasedGame);
+
+        if (isAfk) {
+            this.setPlayerAsAfk(game, player);
+        }
+
+        // Check if the player has been defeated by conquest.
+        if (!player.defeated) {
+            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+            // If there are no stars and there are no carriers then the player is defeated.
+            if (stars.length === 0) {
+                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
+    
+                if (carriers.length === 0) {
+                    this.setPlayerAsDefeated(game, player);
+                }
+            }
+        }
+    }
+
+    isAfk(game, player, isTurnBasedGame) {
+        // The player is afk if:
+        // 1. The afk threshold date is less than the last seen date
+        // 2. The number of missed turns is greater or equal to the missed turn liimt
+        // 3. The game is RT and the first cycle has completed and the player has not been seen since the start of the game
+        // 4. The game is TB and the first turn has been missed.
+
+        if (isTurnBasedGame) {
+            // Calculate what turn this is.
+            let isFirstTurn = game.state.tick <= game.settings.gameTime.turnJumps;
+
+            if (isFirstTurn) {
+                return player.missedTurns > 0; // Missed the first turn
+            } else {
+                return player.missedTurns >= game.settings.gameTime.missedTurnLimit
+                    || moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached turn limit or 72 hours
+            }
+        } else {
+            // If we have reached the first production tick then check here to see if
+            // the player has been active during the first 2 cycles, this is normally 24h.
+            let isWithinCycle = game.state.tick === (game.settings.galaxy.productionTicks * 2);
+
+            if (isWithinCycle) {
+                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc(); // Not seen for 2 cycles
+            } else {
+                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached 72 hours
+            }
+        }
+    }
+
     setPlayerAsDefeated(game, player) {
         player.defeated = true;
         player.researchingNext = 'random'; // Set up the AI for random research.
@@ -541,6 +647,16 @@ module.exports = class PlayerService extends EventEmitter {
         this.setPlayerAsDefeated(game, player);
 
         player.afk = true;
+    }
+
+    hasDuplicateLastSeenIP(game, player) {
+        if (!player.lastSeenIP) {
+            return false;
+        }
+
+        return game.galaxy.players.find(p => p.lastSeenIP 
+            && !p._id.equals(player._id) 
+            && p.lastSeenIP === player.lastSeenIP) != null;
     }
 
 }

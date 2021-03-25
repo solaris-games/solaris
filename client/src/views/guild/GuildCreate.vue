@@ -89,7 +89,7 @@ export default {
 
       if (this.errors.length) return
 
-      if (!confirm(`Are you sure you want to found a guild? It will cost 3 galactic credits.`)) {
+      if (!await this.$confirm('Found guild', `Are you sure you want to found a guild? It will cost 3 galactic credits.`)) {
         return
       }
 

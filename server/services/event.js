@@ -62,7 +62,7 @@ module.exports = class EventService {
             args.game, args.defender, args.attackers, args.combatResult));
         this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.game, args.player, args.star, args.capturedBy, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
-            args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount));
+            args.game, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.game, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.game, args.player));
@@ -195,7 +195,8 @@ module.exports = class EventService {
 
     async createPlayerDefeatedEvent(game, player) {
         let data = {
-            playerId: player._id
+            playerId: player._id,
+            alias: player.alias
         };
 
         return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
@@ -203,7 +204,8 @@ module.exports = class EventService {
 
     async createPlayerAfkEvent(game, player) {
         let data = {
-            playerId: player._id
+            playerId: player._id,
+            alias: player.alias
         };
 
         return await this.createGameEvent(game, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
@@ -230,12 +232,13 @@ module.exports = class EventService {
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(game, player, 
-        creditsEconomy, creditsBanking, experimentTechnology, experimentAmount) {
+        creditsEconomy, creditsBanking, experimentTechnology, experimentAmount, carrierUpkeep) {
         let data = {
             creditsEconomy,
             creditsBanking,
             experimentTechnology,
-            experimentAmount
+            experimentAmount,
+            carrierUpkeep
         };
 
         return await this.createPlayerEvent(game, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);

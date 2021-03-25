@@ -113,6 +113,15 @@
       </div>
 
       <div class="form-group">
+        <label for="carrierUpkeepCost" class="col-form-label">Carrier Upkeep Cost</label>
+        <select class="form-control" id="carrierUpkeepCost" v-model="settings.specialGalaxy.carrierUpkeepCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.carrierUpkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="warpgateCost" class="col-form-label">Warpgate Cost</label>
         <select class="form-control" id="warpgateCost" v-model="settings.specialGalaxy.warpgateCost" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.warpgateCost" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -270,15 +279,25 @@
       </div>
 
       <div class="form-group">
-        <label for="tradeCost" class="col-form-label">Trade Cost</label>
-        <select class="form-control" id="tradeCost" v-model="settings.player.tradeCost" :disabled="isCreatingGame">
-          <option v-for="opt in options.player.tradeCost" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }} Trades ${{ opt.value}}/level
+        <label for="tradeCredits" class="col-form-label">Trade Credits</label>
+        <select class="form-control" id="tradeCredits" v-model="settings.player.tradeCredits" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.tradeCredits" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
           </option>
         </select>
       </div>
 
       <div class="form-group">
+        <label for="tradeCost" class="col-form-label">Technology Trade Cost</label>
+        <select class="form-control" id="tradeCost" v-model="settings.player.tradeCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.tradeCost" v-bind:key="opt.value" v-bind:value="opt.value">
+            <span v-if="opt.value > 0">{{ opt.text }} Trades ${{ opt.value}}/level</span>
+            <span v-if="opt.value === 0">{{ opt.text }}</span>
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.player.tradeCost > 0">
         <label for="tradeScanning" class="col-form-label">Trade Scanning</label>
         <select class="form-control" id="tradeScanning" v-model="settings.player.tradeScanning" :disabled="isCreatingGame">
           <option v-for="opt in options.player.tradeScanning" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -365,6 +384,15 @@
         <select class="form-control" id="researchCostsTechWeapons" v-model="settings.technology.researchCosts.weapons" :disabled="isCreatingGame">
           <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Weapons Research
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="bankingReward" class="col-form-label">Banking Reward</label>
+        <select class="form-control" id="bankingReward" v-model="settings.technology.bankingReward" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.bankingReward" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
           </option>
         </select>
       </div>
