@@ -283,15 +283,6 @@ class Carrier extends EventEmitter {
   }
 
   drawCarrierWaypoints () {
-    if( this.data.waypointsLooped ){
-    for( let waypoint of this.data.waypoints ) {
-      let star = this.stars.find(s => s.data._id === waypoint.source)
-      console.log(star.data.name)
-      star = this.stars.find(s => s.data._id === waypoint.destination)
-      console.log(star.data.name)
-    }
-    console.log('________')
-    }
     this._clearPaths()
 
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
@@ -301,7 +292,6 @@ class Carrier extends EventEmitter {
     let lastPoint = this.data.location
     let sourceIsLastDestination = false
     sourceIsLastDestination = this._isSourceLastDestination()
-    console.log(sourceIsLastDestination)
     // if looping and source is last destination, begin drawing path from the star instead of carrier
     if ( this.data.waypointsLooped ) {
       if ( ( sourceIsLastDestination ) && (this.data.inTransitFrom) )  {
