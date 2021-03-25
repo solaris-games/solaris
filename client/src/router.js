@@ -21,6 +21,7 @@ import PremiumStore from './views/PremiumStore.vue'
 import Leaderboard from './views/Leaderboard.vue'
 import Guild from './views/guild/Guild.vue'
 import GuildCreate from './views/guild/GuildCreate.vue'
+import Administration from './views/Administration.vue'
 
 Vue.use(Router)
 
@@ -130,6 +131,11 @@ export default new Router({
       path: '/guild',
       name: 'guild',
       component: Guild
+    },
+    {
+      path: '/administration',
+      name: 'administration',
+      component: Administration
     }
   ]
 })

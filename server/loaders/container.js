@@ -6,6 +6,7 @@ const HistoryModel = require('../models/History');
 const EventModel = require('../models/Event');
 const GuildModel = require('../models/Guild');
 
+const AdminService = require('../services/admin');
 const PasswordService = require('../services/password');
 const AuthService = require('../services/auth');
 const BroadcastService = require('../services/broadcast');
@@ -62,6 +63,7 @@ module.exports = (io) => {
     
     const authService = new AuthService(UserModel, passwordService);
     const userService = new UserService(UserModel, passwordService);
+    const adminService = new AdminService(UserModel, GameModel);
 
     const guildService = new GuildService(GuildModel, UserModel);
     const guildUserService = new GuildUserService(UserModel, guildService);
@@ -108,6 +110,7 @@ module.exports = (io) => {
         ledgerService, conversationService);
 
     return {
+        adminService,
         passwordService,
         authService,
         broadcastService,

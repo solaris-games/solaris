@@ -20,7 +20,9 @@ export default new Vuex.Store({
     cachedConversationComposeMessages: {},
     currentConversation: null,
     starSpecialists: null,
-    carrierSpecialists: null
+    carrierSpecialists: null,
+    settings: null,
+    confirmationDialog: {}
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -51,6 +53,9 @@ export default new Vuex.Store({
     },
     clearSettings (state) {
       state.settings = null
+    },
+    setConfirmationDialogSettings (state, settings) {
+      state.confirmationDialog = settings
     },
     openConversation (state, data) {
       state.currentConversation = {
@@ -86,6 +91,9 @@ export default new Vuex.Store({
       } else {
         data.permitCallback(data.star)
       }
+    },
+    replaceInConversationText (state, data) {
+      MentionHelper.useSuggestion(state.currentConversation, data)
     },
 
     // ----------------
@@ -284,6 +292,31 @@ export default new Vuex.Store({
       
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
+    },
+    async confirm ({ commit, state }, data) {
+      const modal = window.$('#confirmModal')
+      const close = () => {
+        modal.modal('toggle')
+      }
+      return new Promise((resolve, _reject) => {
+        const settings = {
+          confirmText: data.confirmText || 'Yes',
+          cancelText: data.cancelText || 'No',
+          hideCancelButton: Boolean(data.hideCancelButton),
+          titleText: data.titleText,
+          text: data.text,
+          onConfirm: () => {
+            close()
+            resolve(true)
+          },
+          onCancel: () => {
+            close()
+            resolve(false)
+          }
+        }
+        commit('setConfirmationDialogSettings', settings)
+        modal.modal('toggle')
+      })
     }
   },
   getters: {

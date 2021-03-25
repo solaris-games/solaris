@@ -332,7 +332,7 @@ export default {
   },
   methods: {
     async deleteGame () {
-      if (confirm('Are you sure you want to delete this game?')) {
+      if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
         this.isDeletingGame = true
 
         try {

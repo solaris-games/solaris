@@ -58,6 +58,7 @@ module.exports = async (app, io, container) => {
 
     // ---------------
     // Register routes
+    const admin = require('../api/admin')(router, io, container);
     const game = require('../api/game')(router, io, container);
     const research = require('../api/game/research')(router, io, container);
     const trade = require('../api/game/trade')(router, io, container);
@@ -71,6 +72,7 @@ module.exports = async (app, io, container) => {
     const guild = require('../api/guild')(router, io, container);
 
     app.use(auth);
+    app.use(admin);
     app.use(user);
     app.use(game);
     app.use(research);

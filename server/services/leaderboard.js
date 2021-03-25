@@ -18,7 +18,9 @@ module.exports = class LeaderboardService {
         .select({
             username: 1,
             guildId: 1,
-            roles: 1,
+            'roles.contributor': 1,
+            'roles.developer': 1,
+            'roles.communityManager': 1,
             'achievements.victories': 1,
             'achievements.rank': 1,
             'achievements.renown': 1,
@@ -102,7 +104,8 @@ module.exports = class LeaderboardService {
             // TODO: Maybe a better ranking system would be to simply award players
             // rank equal to the number of stars they have at the end of the game?
         
-            let isOfficialGame = game.settings.general.createdByUserId == null;
+            // Official games are either not user created or featured (featured games can be user created)
+            let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
 
             if (isOfficialGame) {
                 if (i == 0) {

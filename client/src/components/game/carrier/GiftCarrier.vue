@@ -7,28 +7,21 @@
             </p>
         </div>
         <div v-if="canGiftCarrier" class="col-auto">
-          <modalButton modalName="confirmGiftCarrierModal" classText="btn btn-sm btn-success"><i class="fas fa-gift"></i> Gift Carrier</modalButton>
+            <button type="button" class="btn btn-success btn-sm" :disabled="isGiftingCarrier" @click="giftCarrier">
+                <i class="fas fa-gift"></i>
+                Gift Carrier
+            </button>
         </div>
     </div>
-
-    <dialogModal v-if="carrier" modalName="confirmGiftCarrierModal" titleText="Convert to Gift" cancelText="No" confirmText="Yes" @onConfirm="onConfirmGiftCarrier">
-      <p>Are you sure you want to convert <b>{{carrier.name}}</b> into a gift?</p>
-    </dialogModal>
 </div>
 </template>
 
 <script>
-import ModalButton from '../../modal/ModalButton'
-import DialogModal from '../../modal/DialogModal'
 import GameHelper from '../../../services/gameHelper'
 import CarrierApiService from '../../../services/api/carrier'
 import GameContainer from '../../../game/container'
 
 export default {
-  components: {
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal
-  },
   props: {
     carrierId: String
   },
@@ -45,7 +38,11 @@ export default {
     this.canGiftCarrier = !this.carrier.isGift && !this.carrier.orbiting
   },
   methods: {
-    async onConfirmGiftCarrier (e) {
+    async giftCarrier (e) {
+      if (!await this.$confirm('Gift carrier', `Are you sure you want to convert ${carrier.name} into a gift?`)) {
+        return
+      }
+
       this.isGiftingCarrier = true
 
       try {

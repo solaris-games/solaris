@@ -180,7 +180,7 @@ export default {
       }
     },
     async leaveConversation () {
-      if (confirm(`Are you sure you want to leave this conversation?`)) {
+      if (await this.$confirm('Leave conversation', `Are you sure you want to leave this conversation?`)) {
         try {
           this.onOpenInboxRequested()
 
