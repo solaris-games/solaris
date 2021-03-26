@@ -1,3 +1,5 @@
+const cache = require('memory-cache');
+
 module.exports = class GameGalaxyService {
 
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
@@ -23,13 +25,24 @@ module.exports = class GameGalaxyService {
     }
 
     async getGalaxy(gameId, userId, tick) {
-        let game = await this.gameService.getByIdGalaxyLean(gameId);
+        // Try loading the game for the user from the cache for historical ticks.
+        let gameStateTick = await this.gameService.getGameStateTick(gameId);
 
-        let isHistorical = tick != null && tick !== game.state.tick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
+        let isHistorical = tick != null && tick !== gameStateTick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
+
+        let cacheKey = `galaxy_${gameId}_${userId}_${tick}`;
 
         if (!isHistorical) {
-            tick = game.state.tick;
+            tick = gameStateTick;
+        } else {
+            let cached = cache.get(cacheKey);
+
+            if (cached) {
+                return cached;
+            }
         }
+
+        let game = await this.gameService.getByIdGalaxyLean(gameId);
 
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
@@ -60,10 +73,14 @@ module.exports = class GameGalaxyService {
             this._setStarInfoDetailed(game, player);
             await this._setPlayerInfoBasic(game, player);
         }
+
+        if (isHistorical) {
+            cache.put(cacheKey, game, 1200000); // 20 minutes.
+        }
         
         return game;
     }
-    
+
     _isDarkStart(doc) {
         // Work out whether we are in dark galaxy mode.
         // This is true if the dark galaxy setting is enabled,
@@ -387,6 +404,12 @@ module.exports = class GameGalaxyService {
         let history = await this.historyService.getHistoryByTick(game._id, tick);
 
         if (!history) {
+            return;
+        }
+
+        // Support for legacy games, not all history for players/stars/carriers have been logged so
+        // bomb out if we're missing any of those.
+        if (!history.players.length || !history.stars.length || !history.carriers.length) {
             return;
         }
 

@@ -1,4 +1,4 @@
-const ValidationError = require('../errors/validation');
+const cache = require('memory-cache');
 
 module.exports = class HistoryService {
 
@@ -7,19 +7,47 @@ module.exports = class HistoryService {
         this.playerService = playerService;
     }
 
-    async listStatistics(gameId, startTick = 0) {
-        return await this.historyModel.find({
+    async listIntel(gameId, startTick = 0) {
+        let cacheKey = `intel_${gameId}_${startTick}`;
+        let cached = cache.get(cacheKey);
+
+        if (cached) {
+            return cached;
+        }
+
+        let intel = await this.historyModel.find({
             gameId,
             tick: { $gte: startTick }
         }, {
             gameId: 1,
             tick: 1,
             'players.playerId': 1,
-            'players.statistics': 1
+            'players.statistics.totalStars': 1,
+            'players.statistics.totalEconomy': 1,
+            'players.statistics.totalIndustry': 1,
+            'players.statistics.totalScience': 1,
+            'players.statistics.totalShips': 1,
+            'players.statistics.totalCarriers': 1,
+            'players.statistics.totalSpecialists': 1,
+            'players.statistics.totalStarSpecialists': 1,
+            'players.statistics.totalCarrierSpecialists': 1,
+            'players.statistics.newShips': 1,
+            'players.statistics.warpgates': 1,
+            'players.research.weapons.level': 1,
+            'players.research.banking.level': 1,
+            'players.research.manufacturing.level': 1,
+            'players.research.hyperspace.level': 1,
+            'players.research.scanning.level': 1,
+            'players.research.experimentation.level': 1,
+            'players.research.terraforming.level': 1
         })
         .sort({ tick: 1 })
         .lean({ defaults: true })
         .exec();
+
+        cache.put(cacheKey, intel, 3600000); // 1 hour
+
+        return intel;
     }
 
     async log(game) {
@@ -51,14 +79,7 @@ module.exports = class HistoryService {
                     totalStarSpecialists: stats.totalStarSpecialists,
                     totalCarrierSpecialists: stats.totalCarrierSpecialists,
                     newShips: stats.newShips,
-                    warpgates: stats.warpgates,
-                    weapons: player.research.weapons.level,
-                    banking: player.research.banking.level,
-                    manufacturing: player.research.manufacturing.level,
-                    hyperspace: player.research.hyperspace.level,
-                    scanning: player.research.scanning.level,
-                    experimentation: player.research.experimentation.level,
-                    terraforming: player.research.terraforming.level,
+                    warpgates: stats.warpgates
                 },
                 alias: player.alias,
                 avatar: player.avatar,

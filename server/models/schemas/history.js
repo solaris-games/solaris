@@ -21,13 +21,6 @@ const schema = new Schema({
                 totalStarSpecialists: { type: Types.Number, required: true, default: 0 },
                 totalCarrierSpecialists: { type: Types.Number, required: true, default: 0 },
                 newShips: { type: Types.Number, required: true, default: 0 },
-                weapons: { type: Types.Number, required: true, default: 0 },
-                banking: { type: Types.Number, required: true, default: 0 },
-                manufacturing: { type: Types.Number, required: true, default: 0 },
-                hyperspace: { type: Types.Number, required: true, default: 0 },
-                scanning: { type: Types.Number, required: true, default: 0 },
-                experimentation: { type: Types.Number, required: true, default: 0 },
-                terraforming: { type: Types.Number, required: true, default: 0 },
                 warpgates: { type: Types.Number, required: true, default: 0 }
             },
             alias: { type: Types.String, required: true },

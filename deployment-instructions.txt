@@ -1,0 +1,18 @@
+// Takes around 5 min:
+db.gamehistories.find({}).forEach(
+    function(doc) {
+        doc.players.forEach(function(p) {
+            p.research = {
+                weapons:{level: p.statistics.weapons},
+                banking:{level: p.statistics.banking},
+                manufacturing:{level: p.statistics.manufacturing},
+                hyperspace:{level: p.statistics.hyperspace},
+                scanning:{level: p.statistics.scanning},
+                experimentation:{level: p.statistics.experimentation},
+                terraforming:{level: p.statistics.terraforming},
+            }
+        })
+
+        db.gamehistories.save(doc)
+    }
+)

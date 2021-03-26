@@ -267,7 +267,19 @@ export default {
           let history = this.history[e]
           let historyPlayer = history.players.find(p => p.playerId === player._id)
 
-          dataset.data.push(historyPlayer.statistics[this.intelType])
+          switch (this.intelType) {
+            case 'weapons':
+            case 'banking':
+            case 'manufacturing':
+            case 'hyperspace':
+            case 'scanning':
+            case 'experimentation':
+            case 'terraforming':
+              dataset.data.push(historyPlayer.research[this.intelType].level)
+              break
+            default:
+              dataset.data.push(historyPlayer.statistics[this.intelType])
+          }
         }
 
         dataCollection.datasets.push(dataset)

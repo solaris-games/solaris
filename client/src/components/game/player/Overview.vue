@@ -10,7 +10,6 @@
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
-                <!-- TODO: Figure out how to open the conversation with the player -->
                 <button class="btn btn-success mr-1" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"
                   :class="{'btn-warning': conversation && conversation.unreadCount}">
                   <i class="fas fa-envelope"></i>

@@ -43,7 +43,7 @@ module.exports = (router, io, container) => {
         try {
             let startTick = +req.query.startTick || 0;
             
-            let result = await container.historyService.listStatistics(req.params.gameId, startTick);
+            let result = await container.historyService.listIntel(req.params.gameId, startTick);
 
             return res.status(200).json(result);
         } catch (err) {
