@@ -1,7 +1,7 @@
 import gameHelper from './gameHelper.js'
 
 class MentionHelper {
-  static MENTION_REGEX = /(#|@)(\S*)/g
+  static MENTION_REGEX = /(#|@)(?:(?:{(.*)})|(\S*))/g
   static INTERNAL_MENTION_REGEX = /{{(\w)\/(\w+?)\/(.+?)}}/g
   static STAR_MENTION_CHARACTER = '#'
   static PLAYER_MENTION_CHARACTER = '@'
@@ -22,7 +22,13 @@ class MentionHelper {
     const element = conversation.element
 
     const character = this.getMentionCharacter(type)
-    const mention = `${character}${name}`
+    let mention
+    if (name.includes(' ')) {
+      mention = `${character}{${name}}`
+    } else {
+      mention = `${character}${name}`
+    }
+
     const newText = text.substring(0, start) + mention + text.substring(end)
 
     conversation.text = newText
@@ -34,12 +40,13 @@ class MentionHelper {
   }
 
   makeMentionsStatic(game, originalText) {
-    return originalText.replaceAll(MentionHelper.MENTION_REGEX, (match, typeGroup, nameGroup) => {
+    return originalText.replaceAll(MentionHelper.MENTION_REGEX, (match, typeGroup, nameGroup, nameGroup2) => {
+      const name = nameGroup || nameGroup2
       const type = this.getMentionType(typeGroup)
       if (type === 'star') {
-        return this.makeStarMentionStatic(game, nameGroup)
+        return this.makeStarMentionStatic(game, name)
       } else if (type === 'player') {
-        return this.makePlayerMentionStatic(game, nameGroup)
+        return this.makePlayerMentionStatic(game, name)
       } else {
         return match
       }
@@ -166,7 +173,7 @@ class MentionHelper {
         from: match.index,
         to: match.index + match[0].length,
         type: this.getMentionType(match[1]),
-        name: match[2]
+        name: match[2] || match[3] || ''
       }
     })
   }
