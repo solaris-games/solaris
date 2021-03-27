@@ -233,13 +233,15 @@ module.exports = class IrregularMapService {
         const RNG = randomSeeded.create(SEED);
         const SIMPLEX_NOISE = new simplexNoise(SEED);
         const NOISE_BASE_SPREAD = 32.0;
-        const NOISE_SPREAD = NOISE_BASE_SPREAD * Math.sqrt(starCount*1.3);// try to make the noise spread with the size of the galaxy. this makes the void gaps also proportional to galaxy size. 
+        //const NOISE_SPREAD = NOISE_BASE_SPREAD * Math.sqrt(starCount*1.3);// try to make the noise spread with the size of the galaxy. this makes the void gaps also proportional to galaxy size. 
         //const NOISE_SPREAD = 512; //optionally could keep the voids constant in size, no matter the galaxy size
         const TAU = 2.0*Math.PI;
         const STARS_PER_PLAYER = starCount/playerCount;
         const INITIAL_HYPER_RANGE = game.settings.technology.startingTechnologyLevel.hyperspace;
         const STARTING_STAR_COUNT = game.settings.player.startingStars-1;
         const MINIMUM_STAR_DISTANCE = game.constants.distances.minDistanceBetweenStars * 0.75; // TODO: This is a bit of a bodge to ensure that stars do not spawn too far away from players.
+
+        const NOISE_SPREAD = NOISE_BASE_SPREAD * ( (STARS_PER_PLAYER+20)/9.0 )
        
         //the amount of rings must produce about 30% more stars then requested. this way they can be pruned latter with noise to produce nice gap
         const STAR_COUNT_MULTIPLYER = 1.3;
