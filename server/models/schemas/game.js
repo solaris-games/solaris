@@ -23,7 +23,8 @@ const schema = new Schema({
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
-			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' }
+			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
+			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' }
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular'], default: 'circular' },

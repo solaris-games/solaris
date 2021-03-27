@@ -11,7 +11,7 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col pt-1">
+        <div class="col pt-1" v-if="isTimeMachineEnabled">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
@@ -332,6 +332,9 @@ export default {
     },
     isTurnBasedGame () {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
+    isTimeMachineEnabled () {
+      return this.$store.state.game.settings.general.timeMachine === 'enabled'
     }
   }
 }

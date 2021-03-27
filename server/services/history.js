@@ -127,6 +127,9 @@ module.exports = class HistoryService {
         });
 
         await history.save();
+
+        // TODO: For games where the time machine is disabled, should we clear out the previous tick's
+        // data to save DB space?
     }
 
     async getHistoryByTick(gameId, tick) {

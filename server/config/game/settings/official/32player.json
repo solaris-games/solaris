@@ -6,7 +6,10 @@
     "password": null,
     "starVictoryPercentage": 33,
     "playerLimit": 32,
-    "playerType": "all"
+    "playerType": "all",
+    "anonymity": "normal",
+    "playerOnlineStatus": "hidden",
+    "timeMachine": "disabled"
   },
   "galaxy": {
     "galaxyType": "doughnut",

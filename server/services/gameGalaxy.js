@@ -1,4 +1,5 @@
 const cache = require('memory-cache');
+const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
@@ -43,6 +44,10 @@ module.exports = class GameGalaxyService {
         }
 
         let game = await this.gameService.getByIdGalaxyLean(gameId);
+
+        if (isHistorical && game.settings.general.timeMachine === 'disabled') {
+            throw new ValidationError(`The time machine is disabled in this game.`);
+        }
 
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);

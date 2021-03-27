@@ -16,3 +16,5 @@ db.gamehistories.find({}).forEach(
         db.gamehistories.save(doc)
     }
 )
+
+db.games.updateMany({createdByUserId:{$eq:null}},{$set:{'settings.general.timeMachine':'enabled'}})
