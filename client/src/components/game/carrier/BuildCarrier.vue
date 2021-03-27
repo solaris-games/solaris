@@ -149,7 +149,7 @@ export default {
 
                 AudioService.join()
                 
-                this.$emit('onEditWaypointsRequested', data.carrier._id)
+                this.$emit('onEditWaypointsRequested', response.data.carrier._id)
             }
         } catch (err) {
             console.error(err)
