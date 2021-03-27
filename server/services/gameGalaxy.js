@@ -30,15 +30,15 @@ module.exports = class GameGalaxyService {
 
         let isHistorical = tick != null && tick !== gameStateTick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
 
-        let cacheKey = `galaxy_${gameId}_${userId}_${tick}`;
+        let cached;
 
         if (!isHistorical) {
             tick = gameStateTick;
         } else {
-            let cached = cache.get(cacheKey);
+            cached = this._getCachedGalaxy(gameId, userId, tick, gameStateTick);
 
-            if (cached) {
-                return cached;
+            if (cached.galaxy) {
+                return cached.galaxy;
             }
         }
 
@@ -74,11 +74,35 @@ module.exports = class GameGalaxyService {
             await this._setPlayerInfoBasic(game, player);
         }
 
-        if (isHistorical) {
-            cache.put(cacheKey, game, 1200000); // 20 minutes.
+        if (isHistorical && cached) {
+            cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
         
         return game;
+    }
+
+    _getCachedGalaxy(gameId, userId, requestedTick, currentTick) {
+        // Cache the last 24 ticks, it would be bonkers to cache everything.
+        if (currentTick - requestedTick > 24) {
+            return {
+                cacheKey: null,
+                galaxy: null
+            };
+        }
+
+        let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
+        let galaxy = null;
+
+        let cached = cache.get(cacheKey);
+
+        if (cached) {
+            galaxy = cached;
+        }
+
+        return {
+            cacheKey,
+            galaxy
+        };
     }
 
     _isDarkStart(doc) {

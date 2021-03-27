@@ -323,7 +323,14 @@ export default {
           if (response.status === 200) {
             
             if (this.$store.state.tick < response.data.state.tick) {
-              await this.reloadGame()
+              // If the user is currently using the time machine then only set the state variables.
+              // Otherwise reload the current game tick.
+              if (this.$isHistoricalMode()) {
+                this.$store.commit('setTick', response.data.state.tick)
+                this.$store.commit('setProductionTick', response.data.state.productionTick)
+              } else {
+                await this.reloadGame()
+              }
             }
           }
         } catch (e) {
