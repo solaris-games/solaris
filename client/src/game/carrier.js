@@ -140,28 +140,19 @@ class Carrier extends EventEmitter {
 
   drawGarrison () {
     if (this.text_garrison) {
-      this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
     }
 
     if (!this.text_garrison) {
-      let style = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
-        fill: 0xFFFFFF,
-        padding: 3,
-        fontSize: 4,
-        fontWeight: 'bold'
-      })
-
       let totalGarrison = this.data.ships == null ? '???' : this.data.ships
       
       let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
 
-      this.text_garrison = new PIXI.Text(garrisonText, style)
-      this.text_garrison.resolution = 10
+      let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
+      this.text_garrison = new PIXI.BitmapText(garrisonText, bitmapFont)
 
-      this.text_garrison.x = -(this.text_garrison.width / 2)
+      this.text_garrison.x = -(this.text_garrison.width / 2.0)
       this.text_garrison.y = 5
 
       this.container.addChild(this.text_garrison)

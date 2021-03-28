@@ -9,10 +9,41 @@ class TextureService {
 
     constructor () {
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
+        fontFamily: "'Space Mono', monospace",
         fill: 0xFFFFFF,
         padding: 3
       })
+
+      this.DEFAULT_FONT_STYLE_BOLD = new PIXI.TextStyle({
+        fontFamily: "'Space Mono', monospace",
+        fill: 0xFFFFFF,
+        fontWeight: "bold",
+        padding: 3
+      })
+
+      this.DEFAULT_FONT_BITMAP = PIXI.BitmapFont.from(
+        "space-mono",
+        this.DEFAULT_FONT_STYLE,
+        {
+          chars: PIXI.BitmapFont.ASCII,
+          resolution: 2
+        }
+      )
+      // disable mipmap 
+      this.DEFAULT_FONT_BITMAP.pageTextures[0].baseTexture.mipmap = 0
+      this.DEFAULT_FONT_BITMAP.pageTextures[1].baseTexture.mipmap = 0
+
+      this.DEFAULT_FONT_BOLD_BITMAP = PIXI.BitmapFont.from(
+        "space-mono-bold",
+        this.DEFAULT_FONT_STYLE_BOLD,
+        {
+          chars: PIXI.BitmapFont.ASCII,
+          resolution: 2
+        }
+      )
+      // disable mipmap 
+      this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[0].baseTexture.mipmap = 0
+      this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[1].baseTexture.mipmap = 0
 
       // NEBULAS
       this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1.png'))))

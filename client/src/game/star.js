@@ -394,12 +394,9 @@ class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
-
-      this.text_name = new PIXI.Text(this.data.name, style)
+      let bitmapFont = {fontName: "space-mono", fontSize: 4}
+      this.text_name = new PIXI.BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
-      this.text_name.resolution = 10
 
       this.container.addChild(this.text_name)
     }
@@ -415,14 +412,11 @@ class Star extends EventEmitter {
 
   drawGarrison () {
     if (this.text_garrison) {
-      this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
     }
 
     if (!this.text_garrison) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
 
       let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
@@ -450,13 +444,12 @@ class Star extends EventEmitter {
       }
 
       if (garrisonText) {
-        this.text_garrison = new PIXI.Text(garrisonText, style)
-        this.text_garrison.scale.x = 1.5
-        this.text_garrison.scale.y = 1.5
-        this.text_garrison.resolution = 10
+        garrisonText = garrisonText.toString()
+        let bitmapFont = {fontName: "space-mono", fontSize: 6}
+        this.text_garrison = new PIXI.BitmapText(garrisonText, bitmapFont);
 
         this.text_garrison.x = 5
-        this.text_garrison.y = -this.text_garrison.height + 1.5
+        this.text_garrison.y = -this.text_garrison.height+0.5
 
         this.container.addChild(this.text_garrison)
       }
@@ -465,21 +458,17 @@ class Star extends EventEmitter {
 
   drawInfrastructure () {
     if ( this.text_infrastructure ) {
-      this.text_infrastructure.texture.destroy(true)
       this.container.removeChild(this.text_infrastructure)
       this.text_infrastructure = null
     }
 
     if (!this.text_infrastructure) {
       if (this.data.ownedByPlayerId && this._isInScanningRange()) {
-        let style = TextureService.DEFAULT_FONT_STYLE
-        style.fontSize = 4
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
-        this.text_infrastructure = new PIXI.Text(displayInfrastructure, style)
-        this.text_infrastructure.resolution = 10
-
-        this.text_infrastructure.x = -(this.text_infrastructure.width / 2)
+        let bitmapFont = {fontName: "space-mono", fontSize: 4}
+        this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+        this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
 
         this.container.addChild(this.text_infrastructure)
