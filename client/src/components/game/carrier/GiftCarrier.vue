@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     async giftCarrier (e) {
-      if (!await this.$confirm('Gift carrier', `Are you sure you want to convert ${carrier.name} into a gift?`)) {
+      if (!await this.$confirm('Gift carrier', `Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
         return
       }
 
