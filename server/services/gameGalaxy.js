@@ -260,6 +260,8 @@ module.exports = class GameGalaxyService {
     }
 
     async _setPlayerInfoBasic(doc, player) {
+        let onlinePlayers = this.broadcastService.getOnlinePlayers(doc); // Need this for later.
+
         // Get the list of all guilds associated to players, we'll need this later.
         let guildUsers = [];
 
@@ -297,8 +299,6 @@ module.exports = class GameGalaxyService {
                 }
             }
 
-            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
-
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
 
@@ -306,14 +306,6 @@ module.exports = class GameGalaxyService {
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
-
-                player.research.scanning.effective = effectiveTechs.scanning;
-                player.research.hyperspace.effective = effectiveTechs.hyperspace;
-                player.research.terraforming.effective = effectiveTechs.terraforming;
-                player.research.experimentation.effective = effectiveTechs.experimentation;
-                player.research.weapons.effective = effectiveTechs.weapons;
-                player.research.banking.effective = effectiveTechs.banking;
-                player.research.manufacturing.effective = effectiveTechs.manufacturing;
 
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
@@ -326,8 +318,6 @@ module.exports = class GameGalaxyService {
                 p.isOnline = null;
             } else {
                 // Work out whether the player is online.
-                let onlinePlayers = this.broadcastService.getOnlinePlayers(doc);
-                
                 p.isOnline = (player && p._id == player._id) 
                     || onlinePlayers.find(op => op._id.equals(p._id)) != null;
             }
@@ -340,36 +330,31 @@ module.exports = class GameGalaxyService {
 
             // Return a subset of the user, key info only.
             return {
+                _id: p._id,
+                homeStarId: p.homeStarId,
                 colour: p.colour,
                 shape: p.shape,
                 research: {
                     scanning: { 
-                        level: p.research.scanning.level,
-                        effective: effectiveTechs.scanning
+                        level: p.research.scanning.level
                     },
                     hyperspace: { 
-                        level: p.research.hyperspace.level,
-                        effective: effectiveTechs.hyperspace
+                        level: p.research.hyperspace.level
                     },
                     terraforming: { 
-                        level: p.research.terraforming.level,
-                        effective: effectiveTechs.terraforming
+                        level: p.research.terraforming.level
                     },
                     experimentation: { 
-                        level: p.research.experimentation.level,
-                        effective: effectiveTechs.experimentation
+                        level: p.research.experimentation.level
                     },
                     weapons: { 
-                        level: p.research.weapons.level,
-                        effective: effectiveTechs.weapons
+                        level: p.research.weapons.level
                     },
                     banking: { 
-                        level: p.research.banking.level,
-                        effective: effectiveTechs.banking
+                        level: p.research.banking.level
                     },
                     manufacturing: { 
-                        level: p.research.manufacturing.level,
-                        effective: effectiveTechs.manufacturing
+                        level: p.research.manufacturing.level
                     }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
@@ -377,10 +362,8 @@ module.exports = class GameGalaxyService {
                 defeated: p.defeated,
                 afk: p.afk,
                 ready: p.ready,
-                _id: p._id,
                 alias: p.alias,
                 avatar: p.avatar,
-                homeStarId: p.homeStarId,
                 stats: p.stats,
                 reputation,
                 lastSeen: p.lastSeen,
@@ -461,8 +444,11 @@ module.exports = class GameGalaxyService {
                 gamePlayer.credits = historyPlayer.credits;
                 gamePlayer.defeated = historyPlayer.defeated;
                 gamePlayer.afk = historyPlayer.afk;
-                gamePlayer.ready = historyPlayer.ready;
                 gamePlayer.research = historyPlayer.research;
+
+                if (isHistorical) {
+                    gamePlayer.ready = historyPlayer.ready;
+                }
             }
         }
         

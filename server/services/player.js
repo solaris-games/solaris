@@ -487,13 +487,13 @@ module.exports = class PlayerService extends EventEmitter {
             return 0;
         }
 
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
+        let banking = player.research.banking.level;
 
         switch (game.settings.technology.bankingReward) {
             case 'standard':
-                return effectiveTechs.banking * 75;
+                return banking * 75;
             case 'experimental':
-                return Math.round((effectiveTechs.banking * 75) + (0.15 * effectiveTechs.banking * totalEco));
+                return Math.round((banking * 75) + (0.15 * banking * totalEco));
         }
 
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);

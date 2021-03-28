@@ -90,7 +90,6 @@ export default {
           let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
 
           playerTech.level = this.selectedTechnology.level
-          playerTech.effective = this.selectedTechnology.level
           
           gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
           

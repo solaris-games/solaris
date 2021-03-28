@@ -71,7 +71,7 @@ class GameHelper {
   }
 
   getHyperspaceDistance (game, player, carrier) {
-    let techLevel = player.research.hyperspace.effective
+    let techLevel = player.research.hyperspace.level
 
     if (carrier.specialist && carrier.specialist.modifiers.local) {
       techLevel += carrier.specialist.modifiers.local.hyperspace || 0
