@@ -54,63 +54,6 @@ module.exports = class BroadcastService {
         });
     }
 
-    gameStarEconomyUpgraded(game, playerId, starId, infrastructure) {
-        this.io.to(playerId.toString()).emit('gameStarEconomyUpgraded', {
-            starId,
-            infrastructure
-        });
-    }
-
-    gameStarIndustryUpgraded(game, playerId, starId, infrastructure, manufacturing) {
-        this.io.to(playerId.toString()).emit('gameStarIndustryUpgraded', {
-            starId,
-            infrastructure,
-            manufacturing
-        });
-    }
-
-    gameStarScienceUpgraded(game, playerId, starId, infrastructure) {
-        this.io.to(playerId.toString()).emit('gameStarScienceUpgraded', {
-            starId,
-            infrastructure
-        });
-    }
-
-    gameStarBulkUpgraded(game, playerId, summary) {
-        this.io.to(playerId.toString()).emit('gameStarBulkUpgraded', summary);
-    }
-
-    gameStarWarpGateBuilt(game, playerId, starId) {
-        this.io.to(playerId.toString()).emit('gameStarWarpGateBuilt', {
-            starId
-        });
-    }
-
-    gameStarWarpGateDestroyed(game, playerId, starId) {
-        this.io.to(playerId.toString()).emit('gameStarWarpGateDestroyed', {
-            starId
-        });
-    }
-
-    gameStarCarrierBuilt(game, playerId, report) {
-        this.io.to(playerId.toString()).emit('gameStarCarrierBuilt', report);
-    }
-    
-    gameStarCarrierShipTransferred(game, playerId, starId, starShips, carrierId, carrierShips) {
-        this.io.to(playerId.toString()).emit('gameStarCarrierShipTransferred', {
-            starId,
-            starShips,
-            carrierId,
-            carrierShips
-        });
-    }
-
-    gameStarAbandoned(game, starId) {
-        this.io.to(game.id).emit('gameStarAbandoned', {
-            starId
-        });
-    }
-
     gameMessageSent(game, message) {
         message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
     }
@@ -208,33 +151,5 @@ module.exports = class BroadcastService {
     // userRenownReceived(game, toUserId, renown) {
     //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?
     // }
-
-    gameStarSpecialistHired(game, playerId, star, specialist) {
-        let data = {
-            starId: star._id,
-            specialist: {
-                id: specialist.id,
-                name: specialist.name,
-                description: specialist.description,
-                modifiers: specialist.modifiers
-            }
-        };
-
-        this.io.to(playerId.toString()).emit('starSpecialistHired', data);
-    }
-
-    gameCarrierSpecialistHired(game, playerId, carrier, specialist) {
-        let data = {
-            carrierId: carrier._id,
-            specialist: {
-                id: specialist.id,
-                name: specialist.name,
-                description: specialist.description,
-                modifiers: specialist.modifiers
-            }
-        };
-
-        this.io.to(playerId.toString()).emit('carrierSpecialistHired', data);
-    }
 
 };

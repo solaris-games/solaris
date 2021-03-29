@@ -154,8 +154,7 @@ module.exports = class ResearchService extends EventEmitter {
             return;
         }
 
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
-        let researchAmount = effectiveTechs.experimentation * game.constants.research.progressMultiplier;
+        let researchAmount = player.research.experimentation.level * game.constants.research.progressMultiplier;
 
         tech.technology.progress += researchAmount;
 

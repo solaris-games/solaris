@@ -222,7 +222,7 @@ module.exports = class WaypointService {
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
         if (sourceStar._id.equals(destinationStar._id)) {
-            return 1 + waypoint.delayTicks;
+            return 1 + (waypoint.delayTicks || 0);
         }
 
         let source = sourceStar.location
@@ -480,8 +480,6 @@ module.exports = class WaypointService {
         }];
 
         carrier.waypointsLooped = false;
-        carrier.inTransitFrom = carrier.orbiting;
-        carrier.inTransitTo = nearestStar._id;
         carrier.orbiting = null;
 
         return nearestStar;

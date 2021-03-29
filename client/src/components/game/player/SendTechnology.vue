@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-5">
                     <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
-                      :disabled="isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
+                      :disabled="$isHistoricalMode() || isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
                 </div>
             </div>
         </form>
@@ -90,7 +90,6 @@ export default {
           let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
 
           playerTech.level = this.selectedTechnology.level
-          playerTech.effective = this.selectedTechnology.level
           
           gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
           

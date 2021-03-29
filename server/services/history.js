@@ -1,4 +1,4 @@
-const ValidationError = require('../errors/validation');
+const cache = require('memory-cache');
 
 module.exports = class HistoryService {
 
@@ -7,21 +7,57 @@ module.exports = class HistoryService {
         this.playerService = playerService;
     }
 
-    async listByGameId(gameId, startTick = 0) {
-        return await this.historyModel.find({
+    async listIntel(gameId, startTick = 0) {
+        let cacheKey = `intel_${gameId}_${startTick}`;
+        let cached = cache.get(cacheKey);
+
+        if (cached) {
+            return cached;
+        }
+
+        let intel = await this.historyModel.find({
             gameId,
             tick: { $gte: startTick }
+        }, {
+            gameId: 1,
+            tick: 1,
+            'players.playerId': 1,
+            'players.statistics.totalStars': 1,
+            'players.statistics.totalEconomy': 1,
+            'players.statistics.totalIndustry': 1,
+            'players.statistics.totalScience': 1,
+            'players.statistics.totalShips': 1,
+            'players.statistics.totalCarriers': 1,
+            'players.statistics.totalSpecialists': 1,
+            'players.statistics.totalStarSpecialists': 1,
+            'players.statistics.totalCarrierSpecialists': 1,
+            'players.statistics.newShips': 1,
+            'players.statistics.warpgates': 1,
+            'players.research.weapons.level': 1,
+            'players.research.banking.level': 1,
+            'players.research.manufacturing.level': 1,
+            'players.research.hyperspace.level': 1,
+            'players.research.scanning.level': 1,
+            'players.research.experimentation.level': 1,
+            'players.research.terraforming.level': 1
         })
         .sort({ tick: 1 })
         .lean({ defaults: true })
         .exec();
+
+        cache.put(cacheKey, intel, 3600000); // 1 hour
+
+        return intel;
     }
 
     async log(game) {
         let history = new this.historyModel({
             gameId: game._id,
             tick: game.state.tick,
-            players: []
+            productionTick: game.state.productionTick,
+            players: [],
+            stars: [],
+            carriers: []
         });
 
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -30,6 +66,7 @@ module.exports = class HistoryService {
             let stats = this.playerService.getStats(game, player);
 
             history.players.push({
+                userId: player.userId,
                 playerId: player._id,
                 statistics: {
                     totalStars: stats.totalStars,
@@ -42,19 +79,66 @@ module.exports = class HistoryService {
                     totalStarSpecialists: stats.totalStarSpecialists,
                     totalCarrierSpecialists: stats.totalCarrierSpecialists,
                     newShips: stats.newShips,
-                    warpgates: stats.warpgates,
-                    weapons: player.research.weapons.level,
-                    banking: player.research.banking.level,
-                    manufacturing: player.research.manufacturing.level,
-                    hyperspace: player.research.hyperspace.level,
-                    scanning: player.research.scanning.level,
-                    experimentation: player.research.experimentation.level,
-                    terraforming: player.research.terraforming.level,
-                }
-            })
+                    warpgates: stats.warpgates
+                },
+                alias: player.alias,
+                avatar: player.avatar,
+                researchingNow: player.researchingNow,
+                researchingNext: player.researchingNext,
+                credits: player.credits,
+                defeated: player.defeated,
+                afk: player.afk,
+                ready: player.ready,
+                research: player.research
+            });
         }
 
+        history.stars = game.galaxy.stars.map(s => {
+            return {
+                starId: s._id,
+                ownedByPlayerId: s.ownedByPlayerId,
+                naturalResources: s.naturalResources,
+                garrison: s.garrison,
+                garrisonActual: s.garrisonActual,
+                specialistId: s.specialistId,
+                warpGate: s.warpGate,
+                ignoreBulkUpgrade: s.ignoreBulkUpgrade,
+                infrastructure: s.infrastructure
+            };
+        });
+
+        history.carriers = game.galaxy.carriers.map(c => {
+            let x = {
+                carrierId: c._id,
+                ownedByPlayerId: c.ownedByPlayerId,
+                orbiting: c.orbiting,
+                ships: c.ships,
+                specialistId: c.specialistId,
+                isGift: c.isGift,
+                location: c.location,
+                waypoints: []
+            };
+
+            if (c.waypoints.length && !c.orbiting) {
+                x.waypoints = [c.waypoints[0]]; // Only need the waypoint in transit.
+            }
+
+            return x;
+        });
+
         await history.save();
+
+        // TODO: For games where the time machine is disabled, should we clear out the previous tick's
+        // data to save DB space?
+    }
+
+    async getHistoryByTick(gameId, tick) {
+        return await this.historyModel.findOne({
+            gameId,
+            tick
+        })
+        .lean({defaults: true})
+        .exec();
     }
 
 };

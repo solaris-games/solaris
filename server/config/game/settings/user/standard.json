@@ -8,7 +8,8 @@
         "playerLimit": 8,
         "playerType": "all",
         "anonymity": "normal",
-        "playerOnlineStatus": "hidden"
+        "playerOnlineStatus": "hidden",
+        "timeMachine": "disabled"
     },
     "galaxy": {
         "galaxyType": "circular",

@@ -50,6 +50,30 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async getGameStateTick(id) {
+        let game = await this.getByIdLean(id, {
+            'state.tick': 1
+        });
+
+        return game.state.tick;
+    }
+
+    async getGameSettings(id) {
+        let game = await this.getByIdLean(id, {
+            'settings': 1
+        });
+
+        return game.settings;
+    }
+
+    async getGameState(id) {
+        let game = await this.getByIdLean(id, {
+            'state': 1
+        });
+
+        return game.state;
+    }
+
     async getByIdInfo(id, userId) {
         let game = await this.getByIdLean(id, {
             settings: 1,

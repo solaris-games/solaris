@@ -12,7 +12,7 @@
                   <a href="javascript:;" @click="toggleShowAction">Action</a>
                 </td>
                 <td class="text-right">
-                  <a href="javascript:;" v-if="canEditWaypoints" @click="onEditWaypointsRequested">
+                  <a href="javascript:;" v-if="!$isHistoricalMode() && canEditWaypoints" @click="onEditWaypointsRequested">
                     <i class="fas fa-pencil-alt"></i>
                   </a>
                 </td>

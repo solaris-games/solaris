@@ -19,15 +19,39 @@
 </template>
 
 <script>
+import GameHelper from '../../../services/gameHelper'
+
 export default {
   props: {
-    economy: Number,
-    industry: Number,
-    science: Number
+    playerId: String,
+    starId: String
   },
   computed: {
     isSmallHeaders () {
       return this.economy >= 100 || this.industry >= 100 || this.science >= 100
+    },
+    economy () {
+      return this.player ? this.player.stats.totalEconomy : this.star.infrastructure.economy
+    },
+    industry () {
+      return this.player ? this.player.stats.totalIndustry : this.star.infrastructure.industry
+    },
+    science () {
+      return this.player ? this.player.stats.totalScience : this.star.infrastructure.science
+    },
+    player () {
+      if (!this.playerId) {
+        return null
+      }
+
+      return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+    },
+    star () {
+      if (!this.starId) {
+        return null
+      }
+
+      return GameHelper.getStarById(this.$store.state.game, this.starId)
     }
   }
 }

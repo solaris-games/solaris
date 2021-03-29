@@ -5,7 +5,6 @@
 </template>
 <script>
 import GameHelper from '../../../services/gameHelper'
-import moment from 'moment'
 import PlayerIconShape from './PlayerIconShape.vue'
 
 export default {

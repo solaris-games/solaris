@@ -6,7 +6,7 @@
                 Convert this Carrier into a gift.
             </p>
         </div>
-        <div v-if="canGiftCarrier" class="col-auto">
+        <div v-if="!$isHistoricalMode() && canGiftCarrier" class="col-auto">
             <button type="button" class="btn btn-success btn-sm" :disabled="isGiftingCarrier" @click="giftCarrier">
                 <i class="fas fa-gift"></i>
                 Gift Carrier
@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     async giftCarrier (e) {
-      if (!await this.$confirm('Gift carrier', `Are you sure you want to convert ${carrier.name} into a gift?`)) {
+      if (!await this.$confirm('Gift carrier', `Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
         return
       }
 

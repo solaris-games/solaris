@@ -18,10 +18,7 @@
 
     <h4 v-if="player" class="mt-2">Infrastructure</h4>
 
-    <infrastructure v-if="player"
-                    :economy="player.stats.totalEconomy"
-                    :industry="player.stats.totalIndustry"
-                    :science="player.stats.totalScience"/>
+    <infrastructure v-if="player" :playerId="player._id"/>
 
     <yourInfrastructure v-if="userPlayer && player != userPlayer"
                     :economy="userPlayer.stats.totalEconomy"

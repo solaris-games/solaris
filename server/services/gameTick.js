@@ -63,6 +63,8 @@ module.exports = class GameTickService extends EventEmitter {
         }
 
         while (iterations--) {
+            game.state.tick++;
+    
             logTime(`Tick ${game.state.tick}`);
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
@@ -72,14 +74,14 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Conduct research');
             this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
-            this._logHistory(game);
-            logTime('Log history');
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
             this._playAI(game);
             logTime('AI controlled players turn');
+            this._logHistory(game);
+            logTime('Log history');
 
             if (hasWinner) {
                 break;
@@ -255,8 +257,6 @@ module.exports = class GameTickService extends EventEmitter {
             // Also double check that the waypoint isn't travelling to the current star
             // that the carrier is in orbit of.
             if (carrier.orbiting && !carrier.orbiting.equals(waypoint.destination)) {
-                carrier.inTransitFrom = carrier.orbiting;
-                carrier.inTransitTo = waypoint.destination;
                 carrier.orbiting = null; // We are just about to move now so this needs to be null.
             }
 
@@ -697,8 +697,6 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _endOfGalacticCycleCheck(game) {
-        game.state.tick++;
-
         // Check if we have reached the production tick.
         if (game.state.tick % game.settings.galaxy.productionTicks === 0) {
             game.state.productionTick++;
