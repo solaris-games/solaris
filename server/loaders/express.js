@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const session = require('express-session');
+const compression = require('compression');
 const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 const config = require('../config');
@@ -55,6 +56,20 @@ module.exports = async (app, io, container) => {
     
     //  apply to all requests
     app.use(limiter);
+
+    // compress all responses
+    app.use(compression({
+        threshold: 0,
+        filter: (req, res) => {
+            if (req.headers['x-no-compression']) {
+                // don't compress responses if this request header is present
+                return false;
+            }
+        
+            // fallback to standard compression
+            return compression.filter(req, res);
+        }
+    }));
 
     // ---------------
     // Register routes
