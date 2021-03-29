@@ -19,16 +19,16 @@
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <research-progress class="d-none d-sm-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
+            <research-progress class="d-none d-md-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-sm-inline-block ml-3">
+            <span class="d-none d-md-inline-block ml-3">
                 <i class="fas fa-money-bill-wave text-success mr-1"></i>{{userPlayer.stats.totalEconomy}}
             </span>
-            <span class="d-none d-sm-inline-block ml-2">
+            <span class="d-none d-md-inline-block ml-2">
                 <i class="fas fa-tools text-warning mr-1"></i>{{userPlayer.stats.totalIndustry}}
             </span>
-            <span class="d-none d-sm-inline-block ml-2">
+            <span class="d-none d-md-inline-block ml-2">
                 <i class="fas fa-flask text-info mr-1"></i>{{userPlayer.stats.totalScience}}
             </span>
         </div>
