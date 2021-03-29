@@ -463,6 +463,12 @@ module.exports = class GameGalaxyService {
             let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
 
             if (historyStar) {
+                // If the player has abandoned the star in the current tick, then display that representation of the star
+                // instead of the historical version.
+                if (player && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.equals(player._id)) {
+                    continue;
+                }
+
                 gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
                 gameStar.naturalResources = historyStar.naturalResources;
                 gameStar.garrison = historyStar.garrison;
