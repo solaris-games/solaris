@@ -425,28 +425,27 @@ module.exports = class GameGalaxyService {
             return;
         }
 
-        // Apply previous tick's data to all PLAYERS except the current player.
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let gamePlayer = game.galaxy.players[i];
-            
-            if (!isHistorical && player && gamePlayer._id.equals(player._id)) {
-                continue;
-            }
-            
-            let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
+        // If in historical mode, apply the previous tick's data for all players.
+        // If the user is requesting the current tick then we need to ensure that the
+        // data returned for players is based on the current state of the game because
+        // players can be defeated, afk'd, ready etc. Player data does not need to be
+        // masked if requesting the current tick.
+        if (isHistorical) {
+            for (let i = 0; i < game.galaxy.players.length; i++) {
+                let gamePlayer = game.galaxy.players[i];
+                
+                let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
 
-            if (historyPlayer) {
-                gamePlayer.userId = historyPlayer.userId;
-                gamePlayer.alias = historyPlayer.alias;
-                gamePlayer.avatar = historyPlayer.avatar;
-                gamePlayer.researchingNow = historyPlayer.researchingNow;
-                gamePlayer.researchingNext = historyPlayer.researchingNext;
-                gamePlayer.credits = historyPlayer.credits;
-                gamePlayer.defeated = historyPlayer.defeated;
-                gamePlayer.afk = historyPlayer.afk;
-                gamePlayer.research = historyPlayer.research;
-
-                if (isHistorical) {
+                if (historyPlayer) {
+                    gamePlayer.userId = historyPlayer.userId;
+                    gamePlayer.alias = historyPlayer.alias;
+                    gamePlayer.avatar = historyPlayer.avatar;
+                    gamePlayer.researchingNow = historyPlayer.researchingNow;
+                    gamePlayer.researchingNext = historyPlayer.researchingNext;
+                    gamePlayer.credits = historyPlayer.credits;
+                    gamePlayer.defeated = historyPlayer.defeated;
+                    gamePlayer.afk = historyPlayer.afk;
+                    gamePlayer.research = historyPlayer.research;
                     gamePlayer.ready = historyPlayer.ready;
                 }
             }
