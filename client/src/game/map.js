@@ -347,6 +347,7 @@ class Map extends EventEmitter {
 
     this.carrierContainer.removeChild(carrier.container)
     this.carrierContainer.removeChild(carrier.fixedContainer)
+    this.carrierContainer.removeChild(carrier.pathContainer)
 
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
   }
