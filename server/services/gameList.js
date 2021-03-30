@@ -87,12 +87,15 @@ module.exports = class GameListService {
         .exec();
     }
 
-    async listOldCompletedGames() {
-        let date = moment().subtract(3, 'month');
+    async listOldCompletedGames(months = 3) {
+        let date = moment().subtract(months, 'month');
 
         return await this.gameModel.find({
             'state.endDate': { $lt: date }
+        }, {
+            _id: 1
         })
+        .lean()
         .exec();
     }
 

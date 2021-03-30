@@ -403,10 +403,6 @@ module.exports = class GameGalaxyService {
                 - Remove any carriers that exist in the current tick but not in the previous tick.
                 - Ships, specialist and gift status needs to be reset.
             3. Continue to run through current logic as we do today.
-
-            Things to consider:
-            - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
-            - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
         */
 
         if (!this.gameService.isStarted(game) || tick === 0) {
@@ -425,34 +421,35 @@ module.exports = class GameGalaxyService {
             return;
         }
 
-        // Apply previous tick's data to all PLAYERS except the current player.
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let gamePlayer = game.galaxy.players[i];
-            
-            if (!isHistorical && player && gamePlayer._id.equals(player._id)) {
-                continue;
-            }
-            
-            let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
+        // If in historical mode, apply the previous tick's data for all players.
+        // If the user is requesting the current tick then we need to ensure that the
+        // data returned for players is based on the current state of the game because
+        // players can be defeated, afk'd, ready etc. Player data does not need to be
+        // masked if requesting the current tick.
+        if (isHistorical) {
+            for (let i = 0; i < game.galaxy.players.length; i++) {
+                let gamePlayer = game.galaxy.players[i];
+                
+                let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
 
-            if (historyPlayer) {
-                gamePlayer.userId = historyPlayer.userId;
-                gamePlayer.alias = historyPlayer.alias;
-                gamePlayer.avatar = historyPlayer.avatar;
-                gamePlayer.researchingNow = historyPlayer.researchingNow;
-                gamePlayer.researchingNext = historyPlayer.researchingNext;
-                gamePlayer.credits = historyPlayer.credits;
-                gamePlayer.defeated = historyPlayer.defeated;
-                gamePlayer.afk = historyPlayer.afk;
-                gamePlayer.research = historyPlayer.research;
-
-                if (isHistorical) {
+                if (historyPlayer) {
+                    gamePlayer.userId = historyPlayer.userId;
+                    gamePlayer.alias = historyPlayer.alias;
+                    gamePlayer.avatar = historyPlayer.avatar;
+                    gamePlayer.researchingNow = historyPlayer.researchingNow;
+                    gamePlayer.researchingNext = historyPlayer.researchingNext;
+                    gamePlayer.credits = historyPlayer.credits;
+                    gamePlayer.defeated = historyPlayer.defeated;
+                    gamePlayer.afk = historyPlayer.afk;
+                    gamePlayer.research = historyPlayer.research;
                     gamePlayer.ready = historyPlayer.ready;
                 }
             }
         }
         
         // Apply previous tick's data to all STARS the player does not own.
+        // If historical mode, then its all star data in the requested tick.
+        // If not historical mode, then replace non-player owned star data.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let gameStar = game.galaxy.stars[i];
             
@@ -463,6 +460,12 @@ module.exports = class GameGalaxyService {
             let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
 
             if (historyStar) {
+                // If the player has abandoned the star in the current tick, then display that representation of the star
+                // instead of the historical version.
+                if (player && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.equals(player._id)) {
+                    continue;
+                }
+
                 gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
                 gameStar.naturalResources = historyStar.naturalResources;
                 gameStar.garrison = historyStar.garrison;
@@ -475,6 +478,8 @@ module.exports = class GameGalaxyService {
         }
 
         // Apply previous tick's data to all CARRIERS the player does not own.
+        // If historical mode, then its all carrier data in the requested tick.
+        // If not historical mode, then replace non-player owned carrier data.
         for (let i = 0; i < game.galaxy.carriers.length; i++) {
             let gameCarrier = game.galaxy.carriers[i];
 
@@ -492,12 +497,26 @@ module.exports = class GameGalaxyService {
             }
             
             gameCarrier.ownedByPlayerId = historyCarrier.ownedByPlayerId;
+            gameCarrier.name = historyCarrier.name;
             gameCarrier.orbiting = historyCarrier.orbiting;
             gameCarrier.ships = historyCarrier.ships;
             gameCarrier.specialistId = historyCarrier.specialistId;
             gameCarrier.isGift = historyCarrier.isGift;
             gameCarrier.location = historyCarrier.location;
             gameCarrier.waypoints = historyCarrier.waypoints;
+        }
+
+        // Add any carriers that were in the previous tick that do not exist in the current tick
+        // This is only applicable when requesting a historical tick as the current tick may have
+        // destroyed carriers.
+        if (isHistorical) {
+            for (let historyCarrier of history.carriers) {
+                let gameCarrier = game.galaxy.carriers.find(x => x._id.equals(historyCarrier.carrierId));
+    
+                if (!gameCarrier) {
+                    game.galaxy.carriers.push(historyCarrier);
+                }
+            }
         }
 
         // If the user is requesting a specific tick then we also need to update the game state to match

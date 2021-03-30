@@ -84,6 +84,7 @@ const schema = new Schema({
         {
             carrierId: { type: Types.ObjectId, required: true },
             ownedByPlayerId: { type: Types.ObjectId, required: true },
+            name: { type: Types.String, required: true },
             orbiting: { type: Types.ObjectId, required: false, default: null },
             ships: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },
