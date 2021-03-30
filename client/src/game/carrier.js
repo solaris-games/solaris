@@ -224,7 +224,7 @@ class Carrier extends EventEmitter {
   _drawLoopedPathSegment(lineWidth,lineAlpha, objectA, objectB) {
       let pointA = objectA.data.location
       let pointB = objectB.data.location
-      if( this.userSettings.map.carrierLoopStyle == 'thin' ) {
+      if( this.userSettings.map.carrierLoopStyle == 'solid' ) {
         this._drawRegularPathSegment(lineWidth/3.0, lineAlpha, objectA, objectB)
         return
       }

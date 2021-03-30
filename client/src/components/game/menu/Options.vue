@@ -120,7 +120,7 @@
         <div class="col-12 col-sm-6">
           <select class="form-control" id="loop-style" v-model="settings.map.carrierLoopStyle" :disabled="isSavingSettings">
             <option value="dashed">Dashed</option>
-            <option value="thin">Thin</option>
+            <option value="solid">Solid</option>
           </select>
         </div>
       </div>
