@@ -337,7 +337,7 @@ class Carrier extends EventEmitter {
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
 
     let lineWidth = this.data.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
-    let lineAlpha = this.data.waypointsLooped ? 0.5 : 0.3
+    let lineAlpha = this.data.waypointsLooped ? 0.3 : 0.5
     let lastPoint = this
     let sourceIsLastDestination = false
     sourceIsLastDestination = this._isSourceLastDestination()
