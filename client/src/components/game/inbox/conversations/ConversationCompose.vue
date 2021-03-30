@@ -59,7 +59,6 @@ export default {
       const suggestions = this.currentMention.suggestions.length
       //Modulo instead of remainder so instead of -1 we get the last suggestion
       this.selectedSuggestion = ((newSelected % suggestions) + suggestions) % suggestions
-      console.log(this.selectedSuggestion)
     },
     async onKeyDown (e) {
       if (e.key === "Enter" && e.ctrlKey) {
