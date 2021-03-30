@@ -78,7 +78,7 @@ export default {
       const date = GameHelper.getDateString(this.message.sentDate)
       let tick = ''
       if (this.message.sentTick || this.message.sentTick === 0) {
-        tick = ` (Tick: ${this.message.sentTick})`
+        tick = ` (${this.message.sentTick})`
       }
       return date + tick
     }
