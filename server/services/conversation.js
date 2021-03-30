@@ -179,6 +179,7 @@ module.exports = class ConversationService extends EventEmitter {
             fromPlayerId: playerId,
             message,
             sentDate: moment().utc(),
+            sentTick: game.state.tick,
             readBy: [playerId]
         };
 
@@ -289,7 +290,8 @@ module.exports = class ConversationService extends EventEmitter {
                 playerId: e.playerId,
                 type: e.type,
                 data: e.data,
-                sentDate: moment(e._id.getTimestamp())
+                sentDate: moment(e._id.getTimestamp()),
+                sentTick: game.state.tick
             }
         });
     }

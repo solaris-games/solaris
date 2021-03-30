@@ -120,6 +120,7 @@ export default {
             fromPlayerId: userPlayerId,
             message: message,
             sentDate: moment().utc(),
+            sentTick: this.$store.state.tick,
             readBy: [userPlayerId],
             type: 'message'
           })
