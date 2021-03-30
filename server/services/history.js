@@ -111,6 +111,7 @@ module.exports = class HistoryService {
             let x = {
                 carrierId: c._id,
                 ownedByPlayerId: c.ownedByPlayerId,
+                name: c.name,
                 orbiting: c.orbiting,
                 ships: c.ships,
                 specialistId: c.specialistId,
@@ -119,8 +120,9 @@ module.exports = class HistoryService {
                 waypoints: []
             };
 
-            if (c.waypoints.length && !c.orbiting) {
-                x.waypoints = [c.waypoints[0]]; // Only need the waypoint in transit.
+            // Trim off unwanted waypoints, we only care about the first one.
+            if (c.waypoints.length) {
+                x.waypoints = [c.waypoints[0]];
             }
 
             return x;
@@ -128,8 +130,38 @@ module.exports = class HistoryService {
 
         await history.save();
 
-        // TODO: For games where the time machine is disabled, should we clear out the previous tick's
-        // data to save DB space?
+        await cleanupTimeMachineHistory(game);
+    }
+
+    async cleanupTimeMachineHistory(game) {
+        // For games where the time machine is disabled, clear out the all previous tick
+        // data to save space as we only need the current tick data for masking.
+        if (game.settings.general.timeMachine === 'disabled') {
+            await this.historyModel.updateMany({
+                gameId: game._id,
+                tick: {
+                    $lt: game.state.tick
+                },
+                stars: {
+                    $exists: true,
+                    $not: { $size: 0 }
+                }
+            }, {
+                $unset: {
+                    'players.$[].alias': '',
+                    'players.$[].avatar': '',
+                    'players.$[].researchingNow': '',
+                    'players.$[].researchingNext': '',
+                    'players.$[].credits': '',
+                    'players.$[].defeated': '',
+                    'players.$[].afk': '',
+                    'players.$[].ready': '',
+                    'players.$[].alias': '',
+                    'stars': '',
+                    'carriers': ''
+                }
+            });
+        }
     }
 
     async getHistoryByTick(gameId, tick) {
@@ -138,6 +170,13 @@ module.exports = class HistoryService {
             tick
         })
         .lean({defaults: true})
+        .exec();
+    }
+
+    async deleteByGameId(gameId) {
+        await this.historyModel.deleteMany({
+            gameId
+        })
         .exec();
     }
 
