@@ -403,10 +403,6 @@ module.exports = class GameGalaxyService {
                 - Remove any carriers that exist in the current tick but not in the previous tick.
                 - Ships, specialist and gift status needs to be reset.
             3. Continue to run through current logic as we do today.
-
-            Things to consider:
-            - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
-            - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
         */
 
         if (!this.gameService.isStarted(game) || tick === 0) {
@@ -452,6 +448,8 @@ module.exports = class GameGalaxyService {
         }
         
         // Apply previous tick's data to all STARS the player does not own.
+        // If historical mode, then its all star data in the requested tick.
+        // If not historical mode, then replace non-player owned star data.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let gameStar = game.galaxy.stars[i];
             
@@ -480,6 +478,8 @@ module.exports = class GameGalaxyService {
         }
 
         // Apply previous tick's data to all CARRIERS the player does not own.
+        // If historical mode, then its all carrier data in the requested tick.
+        // If not historical mode, then replace non-player owned carrier data.
         for (let i = 0; i < game.galaxy.carriers.length; i++) {
             let gameCarrier = game.galaxy.carriers[i];
 
@@ -497,12 +497,26 @@ module.exports = class GameGalaxyService {
             }
             
             gameCarrier.ownedByPlayerId = historyCarrier.ownedByPlayerId;
+            gameCarrier.name = historyCarrier.name;
             gameCarrier.orbiting = historyCarrier.orbiting;
             gameCarrier.ships = historyCarrier.ships;
             gameCarrier.specialistId = historyCarrier.specialistId;
             gameCarrier.isGift = historyCarrier.isGift;
             gameCarrier.location = historyCarrier.location;
             gameCarrier.waypoints = historyCarrier.waypoints;
+        }
+
+        // Add any carriers that were in the previous tick that do not exist in the current tick
+        // This is only applicable when requesting a historical tick as the current tick may have
+        // destroyed carriers.
+        if (isHistorical) {
+            for (let historyCarrier of history.carriers) {
+                let gameCarrier = game.galaxy.carriers.find(x => x._id.equals(historyCarrier.carrierId));
+    
+                if (!gameCarrier) {
+                    game.galaxy.carriers.push(historyCarrier);
+                }
+            }
         }
 
         // If the user is requesting a specific tick then we also need to update the game state to match
