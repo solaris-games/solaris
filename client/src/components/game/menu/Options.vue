@@ -104,6 +104,34 @@
         </div>
       </div>
       
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="objects-scaling" class="col col-form-label">Carrier Paths</label>
+     </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carrier-path-width" class="col col-form-label">Path Width</label>
+        <div class="col">
+          <input type="number" class="form-control" id="carrier-path-width" v-model="settings.map.carrierPathWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div  class="row bg-secondary pt-1 pb-1">
+        <label for="loop-style" class="col-12 col-sm-6 col-form-label">Loop Style</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="loop-style" v-model="settings.map.carrierLoopStyle" :disabled="isSavingSettings">
+            <option value="dashed">Dashed</option>
+            <option value="solid">Solid</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.carrierLoopStyle=='dashed'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carrier-path-length" class="col col-form-label">Dash Length</label>
+        <div class="col">
+          <input type="number" class="form-control" id="carrier-path-length" v-model="settings.map.carrierPathDashLength" :disabled="isSavingSettings">
+        </div>
+      </div>
+
       <div  class="row bg-secondary pt-1 pb-1">
         <label for="naturalResources" class="col-12 col-sm-6 col-form-label">Natural Resources</label>
         <div class="col-12 col-sm-6">
