@@ -9,6 +9,7 @@ import PlayerNames from './playerNames'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 import AnimationService from './animation'
+import PathManager from './PathManager'
 
 class Map extends EventEmitter {
   // Represents the current game mode, these are as follows:
@@ -42,16 +43,21 @@ class Map extends EventEmitter {
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
+    this.container.addChild(this.pathManager.container)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.highlightLocationsContainer)
+
   }
 
   setup (game, userSettings) {
     this.game = game
+
+    this.pathManager = new PathManager( game, userSettings, this )
+    
     
     // Cleanup events
     this.stars.forEach(s => s.removeAllListeners())
@@ -159,7 +165,7 @@ class Map extends EventEmitter {
       this.carriers.splice(this.carriers.indexOf(existing), 1)
     }
 
-    let carrier = new Carrier()
+    let carrier = new Carrier( this.pathManager )
     let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
     carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)

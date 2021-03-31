@@ -7,7 +7,7 @@ class Carrier extends EventEmitter {
 
   static culling_margin = 16
 
-  constructor () {
+  constructor ( pathManager ) {
     super()
 
     this.container = new PIXI.Container()
@@ -28,6 +28,7 @@ class Carrier extends EventEmitter {
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.caps = Array()
+    this.pathManager = pathManager
 
     this.isMouseOver = false
     this.zoomPercent = 0
@@ -333,6 +334,12 @@ class Carrier extends EventEmitter {
 
   drawCarrierWaypoints () {
     this._clearPaths()
+    for( let  waypoint of this.data.waypoints) {
+      let sourceName = this.stars.find(s => s.data._id === waypoint.source).data.name
+      let destinationName = this.stars.find(s => s.data._id === waypoint.destination).data.name
+        
+      console.log(sourceName+' to '+destinationName)
+    }
 
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
 
@@ -343,7 +350,7 @@ class Carrier extends EventEmitter {
     sourceIsLastDestination = this._isSourceLastDestination()
     // if looping and source is last destination, begin drawing path from the star instead of carrier
     if ( this.data.waypointsLooped ) {
-      if ( ( sourceIsLastDestination ) && (this.data.inTransitFrom) )  {
+      if ( ( sourceIsLastDestination ) )  {
         lastPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].source)
       }
     }
@@ -355,7 +362,12 @@ class Carrier extends EventEmitter {
       if (!star) { break; }
 
       if ( this.data.waypointsLooped ) {
-        this._drawLoopedPathSegment(lineWidth, lineAlpha, lastPoint, star)
+        if (lastPoint === this) {
+          this._drawLoopedPathSegment(lineWidth, lineAlpha, lastPoint, star)
+        }
+        else {
+          this.pathManager.addPath( lastPoint, star, this )
+        }
       }
       else {
         this._drawRegularPathSegment(lineWidth, lineAlpha, lastPoint, star)
