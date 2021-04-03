@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
 import Map from './map'
+import gameHelper from '../services/gameHelper'
 
 class Carrier extends EventEmitter {
 
@@ -12,22 +13,23 @@ class Carrier extends EventEmitter {
 
     this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
+    this.pathContainer = new PIXI.Container()
     this.container.interactive = true
     this.container.interactiveChildren = false
     this.container.buttonMode = true
 
     this.graphics_colour = new PIXI.Graphics()
     this.graphics_ship = new PIXI.Graphics()
-    this.graphics_waypoints = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_colour)
     this.container.addChild(this.graphics_ship)
-    this.fixedContainer.addChild(this.graphics_waypoints)
 
     // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
+
+    this.caps = Array()
 
     this.isMouseOver = false
     this.zoomPercent = 100
@@ -223,27 +225,166 @@ class Carrier extends EventEmitter {
     }
   }
 
+  _clearPaths() {
+    while( this.pathContainer.children[0]) {
+      this.pathContainer.removeChild(this.pathContainer.children[0])
+    }
+    for( let cap of this.caps ) {
+      let mapObject = cap.mapObject
+      mapObject.container.removeChild(cap)
+    }
+  }
+
+  _drawLoopedPathSegment(lineWidth,lineAlpha, objectA, objectB) {
+      let pointA = objectA.data.location
+      let pointB = objectB.data.location
+      if( this.userSettings.map.carrierLoopStyle == 'solid' ) {
+        this._drawRegularPathSegment(lineWidth/3.0, lineAlpha, objectA, objectB)
+        return
+      }
+      const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 12 )//clamp 1-12
+      const VOID_LENGTH = DASH_LENGTH/2.0
+      const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
+
+      let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
+      
+      let dashCount = Math.floor( pathLength/(DASH_LENGTH+VOID_LENGTH) )
+      let endpointsLength =  pathLength - (dashCount*(DASH_LENGTH+VOID_LENGTH))
+
+      let initialX = (endpointsLength/2.0)+(VOID_LENGTH/2.0)
+      let path = new PIXI.Graphics()
+
+      path.moveTo(0, lineWidth)
+      path.beginFill(this.colour, lineAlpha)
+      path.lineTo(0, -lineWidth)
+      path.lineTo(Math.max(initialX-VOID_LENGTH,0), -lineWidth)
+      path.lineTo(Math.max(initialX-VOID_LENGTH,0), lineWidth)
+      path.endFill()
+
+      for( let i = 0; i<dashCount; i++ ) {
+        path.moveTo(initialX+(i*COMBINED_LENGTH), lineWidth)
+        path.beginFill(this.colour, lineAlpha)
+        path.lineTo(initialX+(i*COMBINED_LENGTH), -lineWidth)
+        path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, -lineWidth)
+        path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, lineWidth)
+        path.endFill()
+      }
+
+      path.moveTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), lineWidth)
+      path.beginFill(this.colour, lineAlpha)
+      path.lineTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), -lineWidth)
+      path.lineTo(pathLength, -lineWidth)
+      path.lineTo(pathLength, lineWidth)
+      path.endFill()
+
+      path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
+      path.position = pointA
+      this.pathContainer.addChild(path)
+
+      //TODO make line caps optional since they are barely visible and shit performance
+      let cap1 = new PIXI.Graphics()
+      cap1.beginFill(this.colour, lineAlpha)
+      cap1.arc(0, 0, lineWidth, 0, Math.PI)
+      cap1.endFill()
+      cap1.rotation = path.rotation+Math.PI/2.0
+      let cap2 = new PIXI.Graphics()
+      cap2.beginFill(this.colour, lineAlpha)
+      cap2.arc(0, 0, lineWidth, 0, Math.PI)
+      cap2.endFill()
+      cap2.rotation = path.rotation-Math.PI/2.0
+      // keep a list of caps so we can remove them latter
+      cap1.mapObject = objectA
+      cap2.mapObject = objectB
+      this.caps.push(cap1)
+      this.caps.push(cap2)
+      // add line caps to mapObject's container so they can inherit its scalling and be culled
+      objectA.container.addChild(cap1)
+      objectB.container.addChild(cap2)
+  }
+
+  _drawRegularPathSegment(lineWidth,lineAlpha, objectA, objectB) {
+      let pointA = objectA.data.location
+      let pointB = objectB.data.location
+      let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
+      
+      let path = new PIXI.Graphics()
+      path.beginFill(this.colour, lineAlpha)
+      path.moveTo(0, lineWidth)
+      path.lineTo(0, -lineWidth)
+      path.lineTo(pathLength, -lineWidth)
+      path.lineTo(pathLength, lineWidth)
+      path.endFill()
+      path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
+      path.position = pointA
+      this.pathContainer.addChild(path)
+
+      let cap1 = new PIXI.Graphics()
+      cap1.beginFill(this.colour, lineAlpha)
+      cap1.arc(0, 0, lineWidth, 0, Math.PI)
+      cap1.endFill()
+      cap1.rotation = path.rotation+Math.PI/2.0
+      let cap2 = new PIXI.Graphics()
+      cap2.beginFill(this.colour, lineAlpha)
+      cap2.arc(0, 0, lineWidth, 0, Math.PI)
+      cap2.endFill()
+      cap2.rotation = path.rotation-Math.PI/2.0
+      // keep a list of caps so we can remove them latter
+      cap1.mapObject = objectA
+      cap2.mapObject = objectB
+      this.caps.push(cap1)
+      this.caps.push(cap2)
+      // add line caps to mapObject's container so they can inherit its scalling and be culled
+      objectA.container.addChild(cap1)
+      objectB.container.addChild(cap2)
+  }
+
+  _isSourceLastDestination() {
+    let numof_waypoints = this.data.waypoints.length
+    let lastWaypoint = this.data.waypoints[numof_waypoints-1]
+    if (numof_waypoints<2) return false;
+    return (this.data.waypoints[0].source === lastWaypoint.destination)
+  }
+
   drawCarrierWaypoints () {
-    this.graphics_waypoints.clear()
+    this._clearPaths()
 
-    let lineWidth = this.data.waypointsLooped ? 1 : 2
-    let lineAlpha = this.data.waypointsLooped ? 0.2 : 0.4
+    const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
 
-    this.graphics_waypoints.moveTo(this.data.location.x, this.data.location.y)
-    this.graphics_waypoints.lineStyle(lineWidth, this.colour, lineAlpha)
-    this.graphics_waypoints._lineStyle.cap = PIXI.LINE_CAP.ROUND
-
+    let lineWidth = this.data.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
+    let lineAlpha = this.data.waypointsLooped ? 0.3 : 0.5
+    let lastPoint = this
+    let sourceIsLastDestination = false
+    sourceIsLastDestination = this._isSourceLastDestination()
+    // if looping and source is last destination, begin drawing path from the star instead of carrier
+    if ( this.data.waypointsLooped ) {
+      if (sourceIsLastDestination)  {
+        lastPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].source)
+      }
+    }
+    let star
     for (let i = 0; i < this.data.waypoints.length; i++) {
       let waypoint = this.data.waypoints[i]
-
       // Draw a line to each destination along the waypoints.
-      let star = this.stars.find(s => s.data._id === waypoint.destination)
+      star = this.stars.find(s => s.data._id === waypoint.destination)
+      if (!star) { break; }
 
-      if (!star) {
-        break
+      if ( this.data.waypointsLooped ) {
+        this._drawLoopedPathSegment(lineWidth, lineAlpha, lastPoint, star)
       }
-      
-      this.graphics_waypoints.lineTo(star.data.location.x, star.data.location.y)
+      else {
+        this._drawRegularPathSegment(lineWidth, lineAlpha, lastPoint, star)
+      }
+
+      lastPoint = star
+    }
+    //draw path back to the first destination
+    if ( this.data.waypointsLooped ) {
+      if (!sourceIsLastDestination && this.data.waypoints && this.data.waypoints.length) {
+        let firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
+        if( firstPoint && lastPoint && firstPoint !== lastPoint ) {
+          this._drawLoopedPathSegment(lineWidth, lineAlpha, star, firstPoint)
+        }
+      }
     }
   }
 
@@ -264,24 +405,28 @@ class Carrier extends EventEmitter {
   }
 
   setScale( zoomPercent ) {
-     if(this.clampedScaling) {
-       let currentScale = zoomPercent/100
-       if (currentScale < this.minScale) {
-         this.container.scale.x = (1/currentScale)*this.minScale
-         this.container.scale.y = (1/currentScale)*this.minScale
-       } else if (currentScale > this.maxScale) {
-         this.container.scale.x = (1/currentScale)*this.maxScale
-         this.container.scale.y = (1/currentScale)*this.maxScale
-       }
-       else {
-         this.container.scale.x = this.baseScale
-         this.container.scale.y = this.baseScale
-       }
-     }
-     else {
-       this.container.scale.x = this.baseScale
-       this.container.scale.y = this.baseScale
-     }
+    if(this.clampedScaling) {
+      let currentScale = zoomPercent/100
+      if (currentScale < this.minScale) {
+        this.container.scale.x = (1/currentScale)*this.minScale
+        this.container.scale.y = (1/currentScale)*this.minScale
+      } else if (currentScale > this.maxScale) {
+        this.container.scale.x = (1/currentScale)*this.maxScale
+        this.container.scale.y = (1/currentScale)*this.maxScale
+      }
+      else {
+        this.container.scale.x = this.baseScale
+        this.container.scale.y = this.baseScale
+      }
+    }
+    else {
+      this.container.scale.x = this.baseScale
+      this.container.scale.y = this.baseScale
+    }
+    
+    for( let path of this.pathContainer.children) {
+      path.scale.y = this.container.scale.y
+    }
   }
 
   updateVisibility() {

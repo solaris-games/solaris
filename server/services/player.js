@@ -463,17 +463,12 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     givePlayerMoney(game, player) {
-        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
-
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(game, player);
         let totalEco = this.calculateTotalEconomy(playerStars);
 
-        let bankingMultiplier = isBankingEnabled ? effectiveTechs.banking : 0;
-
         let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = playerStars.length ? bankingMultiplier * 75 : 0; // Players must have stars in order to get credits from banking.
+        let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
 
         player.credits += creditsTotal;
@@ -482,6 +477,50 @@ module.exports = class PlayerService extends EventEmitter {
             creditsFromEconomy,
             creditsFromBanking,
             creditsTotal
+        };
+    }
+
+    _getBankingReward(game, player, playerStars, totalEco) {
+        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
+
+        if (!isBankingEnabled || !playerStars.length) { // Players must have stars in order to get credits from banking.
+            return 0;
+        }
+
+        let banking = player.research.banking.level;
+
+        switch (game.settings.technology.bankingReward) {
+            case 'standard':
+                return banking * 75;
+            case 'experimental':
+                return Math.round((banking * 75) + (0.15 * banking * totalEco));
+        }
+
+        throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
+    }
+
+    deductCarrierUpkeepCost(game, player) {
+        const upkeepCosts = {
+            'none': 0,
+            'cheap': 1,
+            'standard': 3,
+            'expensive': 6
+        };
+
+        let costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+
+        if (!costPerCarrier) {
+            return null;
+        }
+
+        let carrierCount = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).length;
+        let totalCost = carrierCount * costPerCarrier;
+
+        player.credits -= totalCost; // Note: Don't care if this goes into negative figures.
+
+        return {
+            carrierCount,
+            totalCost
         };
     }
 
@@ -559,7 +598,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
-    isAfk(game, player, isTurnBasedGame, afkThresholdDate) {
+    isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
         // 1. The afk threshold date is less than the last seen date
         // 2. The number of missed turns is greater or equal to the missed turn liimt
@@ -571,9 +610,10 @@ module.exports = class PlayerService extends EventEmitter {
             let isFirstTurn = game.state.tick <= game.settings.gameTime.turnJumps;
 
             if (isFirstTurn) {
-                return player.missedTurns > 0;
+                return player.missedTurns > 0; // Missed the first turn
             } else {
-                return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
+                return player.missedTurns >= game.settings.gameTime.missedTurnLimit
+                    || moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached turn limit or 72 hours
             }
         } else {
             // If we have reached the first production tick then check here to see if
@@ -581,9 +621,9 @@ module.exports = class PlayerService extends EventEmitter {
             let isWithinCycle = game.state.tick === (game.settings.galaxy.productionTicks * 2);
 
             if (isWithinCycle) {
-                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc();
+                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc(); // Not seen for 2 cycles
             } else {
-                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days');
+                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached 72 hours
             }
         }
     }
@@ -607,6 +647,16 @@ module.exports = class PlayerService extends EventEmitter {
         this.setPlayerAsDefeated(game, player);
 
         player.afk = true;
+    }
+
+    hasDuplicateLastSeenIP(game, player) {
+        if (!player.lastSeenIP) {
+            return false;
+        }
+
+        return game.galaxy.players.find(p => p.lastSeenIP 
+            && !p._id.equals(player._id) 
+            && p.lastSeenIP === player.lastSeenIP) != null;
     }
 
 }

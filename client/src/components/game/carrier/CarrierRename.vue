@@ -16,7 +16,7 @@
         </button>
       </div>
       <div class="col-auto">
-        <button type="submit" class="btn btn-sm btn-success" :disabled="isSaving || isNameInvalid">
+        <button type="submit" class="btn btn-sm btn-success" :disabled="$isHistoricalMode() || isSaving || isNameInvalid">
           <i class="fas fa-save"></i>
           Rename
         </button>

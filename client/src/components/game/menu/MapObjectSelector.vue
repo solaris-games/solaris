@@ -83,12 +83,8 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`All ships transfered to ${star.data.name}.`)
-          let carriers = response.data.carriersAtStar
 
-          carriers.forEach(responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
-            mapObjectCarrier.ships = responseCarrier.ships
-          })
+          this.$store.commit('gameStarAllShipsTransferred', response.data)
         }
       } catch (err) {
         console.log(err)

@@ -106,9 +106,9 @@ export default {
       this.isChangingEmailNotifications = false
     },
     async closeAccount () {
-      if (confirm('Are you sure you want to close your account?')) {
-        if (confirm('Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
-          if (!confirm('Last chance?')) {
+      if (await this.$confirm('Close account', 'Are you sure you want to close your account?')) {
+        if (await this.$confirm('Close account', 'Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
+          if (!await this.$confirm('Close account', 'Last chance?')) {
             return
           }
         } else {

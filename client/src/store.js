@@ -17,10 +17,13 @@ export default new Vuex.Store({
   state: {
     userId: null,
     game: null,
+    tick: 0,
     cachedConversationComposeMessages: {},
     currentConversation: null,
     starSpecialists: null,
-    carrierSpecialists: null
+    carrierSpecialists: null,
+    settings: null,
+    confirmationDialog: {}
   },
   mutations: {
     setCarrierSpecialists (state, carrierSpecialists) {
@@ -37,6 +40,13 @@ export default new Vuex.Store({
       state.userId = null
     },
 
+    setTick (state, tick) {
+      state.tick = tick
+    },
+    setProductionTick (state, tick) {
+      state.productionTick = tick
+    },
+    
     setGame (state, game) {
       state.game = game
     },
@@ -51,6 +61,9 @@ export default new Vuex.Store({
     },
     clearSettings (state) {
       state.settings = null
+    },
+    setConfirmationDialogSettings (state, settings) {
+      state.confirmationDialog = settings
     },
     openConversation (state, data) {
       state.currentConversation = {
@@ -86,6 +99,9 @@ export default new Vuex.Store({
       } else {
         data.permitCallback(data.star)
       }
+    },
+    replaceInConversationText (state, data) {
+      MentionHelper.useSuggestion(state.currentConversation, data)
     },
 
     // ----------------
@@ -125,40 +141,6 @@ export default new Vuex.Store({
       player.ready = false
     },
 
-    gameStarEconomyUpgraded (state, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
-
-      star.infrastructure.economy = data.infrastructure
-
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalEconomy++
-
-      GameContainer.reloadStar(star)
-    },
-    gameStarIndustryUpgraded (state, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
-
-      let manufacturingDifference = data.manufacturing - star.manufacturing
-
-      star.infrastructure.industry = data.infrastructure
-      star.manufacturing = data.manufacturing
-
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalIndustry++
-      player.stats.newShips = +(player.stats.newShips + manufacturingDifference).toFixed(2)
-
-      GameContainer.reloadStar(star)
-    },
-    gameStarScienceUpgraded (state, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
-
-      star.infrastructure.science = data.infrastructure
-
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalScience++
-
-      GameContainer.reloadStar(star)
-    },
     gameStarBulkUpgraded (state, data) {
       data.stars.forEach(s => {
         let star = GameHelper.getStarById(state.game, s.starId)
@@ -173,7 +155,9 @@ export default new Vuex.Store({
       })
       
       // Update player total stats.
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getUserPlayer(state.game)
+
+      player.credits -= data.cost
 
       switch (data.infrastructureType) {
         case 'economy': 
@@ -192,6 +176,8 @@ export default new Vuex.Store({
 
       star.warpGate = true
 
+      GameHelper.getUserPlayer(state.game).credits -= data.cost
+
       GameContainer.reloadStar(star)
     },
     gameStarWarpGateDestroyed (state, data) {
@@ -209,14 +195,14 @@ export default new Vuex.Store({
       }
 
       let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
-
       star.garrison = data.starGarrison
 
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalCarriers++
+      let userPlayer = GameHelper.getUserPlayer(state.game)
+      userPlayer.credits -= star.upgradeCosts.carriers
+      userPlayer.stats.totalCarriers++
 
-      GameContainer.reloadCarrier(data.carrier)
       GameContainer.reloadStar(star)
+      GameContainer.reloadCarrier(data.carrier)
     },
     gameStarCarrierShipTransferred (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
@@ -227,6 +213,17 @@ export default new Vuex.Store({
 
       GameContainer.reloadStar(star)
       GameContainer.reloadCarrier(carrier)
+    },
+    gameStarAllShipsTransferred (state, data) {
+      let star = GameHelper.getStarById(state.game, data.star._id)
+
+      star.garrison = data.star.garrison
+
+      data.carriers.forEach(carrier => {
+        let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id) 
+
+        mapObjectCarrier.ships = carrier.ships
+      })
     },
     gameStarAbandoned (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
@@ -269,7 +266,23 @@ export default new Vuex.Store({
       carrier.specialist = data.specialist
 
       GameContainer.reloadCarrier(carrier)
-    }
+    },
+
+    gameStarEconomyUpgraded (state, data) {
+      data.type = 'economy'
+      let star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      GameContainer.reloadStar(star)
+    },
+    gameStarIndustryUpgraded (state, data) {
+      data.type = 'industry'
+      let star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      GameContainer.reloadStar(star)
+    },
+    gameStarScienceUpgraded (state, data) {
+      data.type = 'science'
+      let star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      GameContainer.reloadStar(star)
+    },
   },
   actions: {
     async loadSpecialistData ({ commit, state }) {
@@ -284,6 +297,31 @@ export default new Vuex.Store({
       
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
+    },
+    async confirm ({ commit, state }, data) {
+      const modal = window.$('#confirmModal')
+      const close = () => {
+        modal.modal('toggle')
+      }
+      return new Promise((resolve, _reject) => {
+        const settings = {
+          confirmText: data.confirmText || 'Yes',
+          cancelText: data.cancelText || 'No',
+          hideCancelButton: Boolean(data.hideCancelButton),
+          titleText: data.titleText,
+          text: data.text,
+          onConfirm: () => {
+            close()
+            resolve(true)
+          },
+          onCancel: () => {
+            close()
+            resolve(false)
+          }
+        }
+        commit('setConfirmationDialogSettings', settings)
+        modal.modal('toggle')
+      })
     }
   },
   getters: {

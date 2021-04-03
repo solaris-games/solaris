@@ -6,7 +6,7 @@
     <loading-spinner :loading="!settings"/>
 
     <form @submit.prevent="handleSubmit" v-if="settings" class="pb-2">
-      <h4 class="pt-2">Interface</h4>
+      <h5 class="pt-2">Interface</h5>
       
       <div class="row bg-secondary pt-1 pb-1">
         <label for="uiStyle" class="col-12 col-sm-6 col-form-label">UI Style</label>
@@ -29,6 +29,16 @@
       </div>
 
       <div class="row bg-secondary pt-1 pb-1">
+        <label for="suggestMentions" class="col-12 col-sm-6 col-form-label">Suggestions for player and star names</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="suggestMentions" v-model="settings.interface.suggestMentions" :disabled="isSavingSettings">
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1">
         <label for="galaxyScreenUpgrades" class="col-12 col-sm-6 col-form-label">Galaxy Screen</label>
         <div class="col-12 col-sm-6">
           <select class="form-control" id="galaxyScreenUpgrades" v-model="settings.interface.galaxyScreenUpgrades" :disabled="isSavingSettings">
@@ -38,7 +48,7 @@
         </div>
       </div>
 
-      <h4 class="pt-2">Map</h4>
+      <h5 class="pt-2">Map</h5>
 
       <div class="row bg-secondary pt-1 pb-1">
         <label for="territory-style" class="col-12 col-sm-6 col-form-label">Territory Style</label>
@@ -94,6 +104,34 @@
         </div>
       </div>
       
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="objects-scaling" class="col col-form-label">Carrier Paths</label>
+     </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carrier-path-width" class="col col-form-label">Path Width</label>
+        <div class="col">
+          <input type="number" class="form-control" id="carrier-path-width" v-model="settings.map.carrierPathWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div  class="row bg-secondary pt-1 pb-1">
+        <label for="loop-style" class="col-12 col-sm-6 col-form-label">Loop Style</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="loop-style" v-model="settings.map.carrierLoopStyle" :disabled="isSavingSettings">
+            <option value="dashed">Dashed</option>
+            <option value="solid">Solid</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.carrierLoopStyle=='dashed'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carrier-path-length" class="col col-form-label">Dash Length</label>
+        <div class="col">
+          <input type="number" class="form-control" id="carrier-path-length" v-model="settings.map.carrierPathDashLength" :disabled="isSavingSettings">
+        </div>
+      </div>
+
       <div  class="row bg-secondary pt-1 pb-1">
         <label for="naturalResources" class="col-12 col-sm-6 col-form-label">Natural Resources</label>
         <div class="col-12 col-sm-6">
@@ -116,7 +154,7 @@
         </div>
       </div>
 
-      <h4 class="pt-2">Carriers</h4>
+      <h5 class="pt-2">Carriers</h5>
 
       <div class="row bg-secondary pt-1 pb-1">
         <label for="carrierDefaultAction" class="col-12 col-sm-6 col-form-label">Default Action</label>

@@ -11,7 +11,7 @@
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
             <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
-            <p class="mb-2">Galactic Cycle {{game.state.productionTick}} - Tick {{game.state.tick}}</p>
+            <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
         </div>
     </div>
 
@@ -57,8 +57,8 @@
                         </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
-                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
-                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" title="End your turn"><i class="fas fa-check"></i></button>
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
+                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -201,7 +201,7 @@ export default {
       }
     },
     async confirmReady (player) {
-      if (!confirm('Are you sure you want to end your turn?')) {
+      if (!await this.$confirm('End turn', 'Are you sure you want to end your turn?')) {
         return
       }
       

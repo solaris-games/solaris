@@ -16,7 +16,10 @@ module.exports = class GameCreateService {
 
     async create(settings) {
         if (settings.general.createdByUserId) {
-            // Prevent players from being able to create loads of games?
+            settings.general.type = 'custom'; // All user games MUST be custom type.
+            settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
+
+            // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
 
             if (openGames.length) {

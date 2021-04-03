@@ -49,16 +49,6 @@ export default {
   props: {
     playerId: String
   },
-  data () {
-    return {
-      player: null,
-      userPlayer: null
-    }
-  },
-  mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-  },
   methods: {
     isUserPlayer () {
       return this.userPlayer && this.userPlayer._id === this.player._id
@@ -68,6 +58,14 @@ export default {
     },
     userIsInGame () {
       return this.userPlayer != null
+    }
+  },
+  computed: {
+    player () {
+        return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+    },
+    userPlayer () {
+        return GameHelper.getUserPlayer(this.$store.state.game)
     }
   }
 }

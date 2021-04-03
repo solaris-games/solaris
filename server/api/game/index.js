@@ -39,17 +39,27 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/history', middleware.authenticate, middleware.loadGameHistory, async (req, res, next) => {
+    router.get('/api/game/:gameId/intel', middleware.authenticate, async (req, res, next) => {
         try {
-            return res.status(200).json(req.history);
+            let startTick = +req.query.startTick || 0;
+            
+            let result = await container.historyService.listIntel(req.params.gameId, startTick);
+
+            return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/galaxy', middleware.authenticate, middleware.loadGameLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/galaxy', middleware.authenticate, async (req, res, next) => {
         try {
-            let game = await container.gameGalaxyService.getGalaxy(req.game, req.session.userId);
+            let tick = +req.query.tick || null;
+    
+            if (tick != null && tick < 0) {
+                throw new ValidationError(`Tick must be greater or equal to 0.`);
+            }
+    
+            let game = await container.gameGalaxyService.getGalaxy(req.params.gameId, req.session.userId, tick);
 
             return res.status(200).json(game);
         } catch (err) {

@@ -7,6 +7,7 @@ const schema = new Schema({
     toPlayerId: { type: Types.ObjectId, required: true },
     message: { type: Types.String, required: true },
     sentDate: { type: Types.Date, required: true },
+    sentTick: { type: Types.Number, required: true },
     read: { type: Types.Boolean, required: true, default: false }
 });
 

@@ -1,13 +1,15 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "1 vs. 1",
+    "description": "Go head to head against a single opponent, this game will be down to pure skill.",
+    "type": "1v1_rt",
     "password": null,
     "starVictoryPercentage": 66,
     "playerLimit": 2,
     "playerType": "all",
     "anonymity": "normal",
-    "playerOnlineStatus": "hidden"
+    "playerOnlineStatus": "hidden",
+    "timeMachine": "enabled"
   },
   "galaxy": {
     "galaxyType": "circular-balanced",
@@ -16,6 +18,7 @@
   },
   "specialGalaxy": {
     "carrierCost": "standard",
+    "carrierUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "randomGates": "none",
@@ -63,7 +66,8 @@
       "manufacturing": "expensive",
       "banking": "cheap",
       "weapons": "none"
-    }
+    },
+    "bankingReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",

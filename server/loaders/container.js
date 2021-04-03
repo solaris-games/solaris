@@ -6,6 +6,7 @@ const HistoryModel = require('../models/History');
 const EventModel = require('../models/Event');
 const GuildModel = require('../models/Guild');
 
+const AdminService = require('../services/admin');
 const PasswordService = require('../services/password');
 const AuthService = require('../services/auth');
 const BroadcastService = require('../services/broadcast');
@@ -62,6 +63,7 @@ module.exports = (io) => {
     
     const authService = new AuthService(UserModel, passwordService);
     const userService = new UserService(UserModel, passwordService);
+    const adminService = new AdminService(UserModel, GameModel);
 
     const guildService = new GuildService(GuildModel, UserModel);
     const guildUserService = new GuildUserService(UserModel, guildService);
@@ -97,8 +99,8 @@ module.exports = (io) => {
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService);
     const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService);
     const aiService = new AIService(starUpgradeService);
-    const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService);
     const historyService = new HistoryService(HistoryModel, playerService);
+    const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
@@ -108,6 +110,7 @@ module.exports = (io) => {
         ledgerService, conversationService);
 
     return {
+        adminService,
         passwordService,
         authService,
         broadcastService,

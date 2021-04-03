@@ -63,6 +63,31 @@
       </p>
     </div>
 
+    <div ref="trade">
+      <view-subtitle title="Trade"/>
+
+      <p>
+        Trade is an integral part of diplomacy. When you select a player in a game there will be an option to trade either technology or credits. 
+        Trading technology with another player will cost a certain amount of credits based on the game's settings. 
+        In a standard game the transfer cost of technology is $15 per tech level, so trading a level 2 technology would cost 
+        $30 and a level 3 technology would cost $45.
+      </p>
+
+      <p>
+        Alongside technology you can also send credits to another player. To send credits to a player simply input how much you want to give 
+        to the player in the text box at the bottom. 
+      </p>
+
+      <p>
+        To keep track of trade there is a ledger. It details how much a player owes. Players have the option to repay their debt or the 
+        creditor can forgive all debt.
+      </p>
+
+      <p>
+        Depending on game settings a player may have to be in scanning distance with another player in order to trade with them.
+      </p>
+    </div>
+
     <div ref="galaxy">
       <view-subtitle title="Galaxy"/>
 
@@ -76,6 +101,17 @@
         <li>Warp Gates</li>
         <li>Specialists</li>
       </ul>
+
+      <h6>Galaxy Territories</h6>
+      <p>
+        If you zoom far out the territories held by players will be visible. This gives you a good indication of where empires are located, 
+        and you will be able to identify strong areas and weak points that are cut off from the rest of a player's stars. 
+        There are two different styles of territory appearance, which can be accessed from the in-game options menu.
+      </p>
+<!-- 
+      <img :src="require('../assets/screenshots/codex/territories1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The galaxy in Voronoi mode"/>
+
+      <img :src="require('../assets/screenshots/codex/territories2.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The galaxy in Marching Squares mode"/> -->
 
       <h5>Stars</h5>
       <p>
@@ -131,6 +167,7 @@
       
       <ul>
         <li>The star name.</li>
+        <li>The star owning player denoted by its colour.</li>
         <li>The star's total garrison.</li>
         <li>The star's infrastructure. (Economy, Industry, Science)</li>
         <li>Whether the star has a warp gate.</li>

@@ -165,7 +165,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     calculateStartTicks () {
-      let currentTick = this.$store.state.game.state.tick
+      let currentTick = this.$store.state.tick
       let prodTicks = this.$store.state.game.settings.galaxy.productionTicks
 
       this.startTickOptions.push({
@@ -191,7 +191,7 @@ export default {
       this.history = null
 
       try {
-        let response = await GameApiService.getGameHistory(this.$store.state.game._id, this.startTick)
+        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick)
 
         if (response.status === 200) {
           this.history = response.data
@@ -267,7 +267,19 @@ export default {
           let history = this.history[e]
           let historyPlayer = history.players.find(p => p.playerId === player._id)
 
-          dataset.data.push(historyPlayer.statistics[this.intelType])
+          switch (this.intelType) {
+            case 'weapons':
+            case 'banking':
+            case 'manufacturing':
+            case 'hyperspace':
+            case 'scanning':
+            case 'experimentation':
+            case 'terraforming':
+              dataset.data.push(historyPlayer.research[this.intelType].level)
+              break
+            default:
+              dataset.data.push(historyPlayer.statistics[this.intelType])
+          }
         }
 
         dataCollection.datasets.push(dataset)

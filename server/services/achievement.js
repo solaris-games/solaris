@@ -9,7 +9,9 @@ module.exports = class AchievementService {
             // Remove fields we don't want to send back.
             achievements: 1,
             username: 1,
-            roles: 1
+            'roles.contributor': 1,
+            'roles.developer': 1,
+            'roles.communityManager': 1
         })
         .lean({ defaults: true })
         .exec();

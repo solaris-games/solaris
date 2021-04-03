@@ -52,11 +52,11 @@
           <span class="mr-1">Next</span>
           <i class="fas fa-chevron-right"></i>
         </button>
-				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints">
+				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="$isHistoricalMode() || !canLoop" title="Loop/Unloop Waypoints">
           <i class="fas fa-sync"></i>
         </button>
 			</div>
-			<div class="col-auto">
+			<div class="col-auto" v-if="!$isHistoricalMode()">
 				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ml-1">Save</span>

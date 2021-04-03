@@ -95,7 +95,7 @@ export default {
     async forgiveDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)
 
-      if (confirm(`Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
+      if (await this.$confirm('Forgive debt', `Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
         try {
           ledger.isForgivingDebt = true
 
@@ -116,7 +116,7 @@ export default {
     async settleDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)
 
-      if (confirm(`Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
+      if (await this.$confirm('Settle debt', `Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
         try {
           ledger.isSettlingDebt = true
 

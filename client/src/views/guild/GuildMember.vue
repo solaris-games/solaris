@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     async promote () {
-      if (!confirm(`Are you sure you want to promote ${this.player.username}?`)) {
+      if (!await this.$confirm('Promote player', `Are you sure you want to promote ${this.player.username}?`)) {
         return
       }
 
@@ -72,7 +72,7 @@ export default {
       this.isLoading = false
     },
     async demote () {
-      if (!confirm(`Are you sure you want to demote ${this.player.username}?`)) {
+      if (!await this.$confirm('Demote player', `Are you sure you want to demote ${this.player.username}?`)) {
         return
       }
 
@@ -93,7 +93,7 @@ export default {
       this.isLoading = false
     },
     async kick () {
-      if (!confirm(`Are you sure you want to kick ${this.player.username}?`)) {
+      if (!await this.$confirm('Kick player', `Are you sure you want to kick ${this.player.username}?`)) {
         return
       }
 
@@ -114,7 +114,7 @@ export default {
       this.isLoading = false
     },
     async uninvite () {
-      if (!confirm(`Are you sure you want to uninvite ${this.player.username}?`)) {
+      if (!await this.$confirm('Uninvite player', `Are you sure you want to uninvite ${this.player.username}?`)) {
         return
       }
 
@@ -135,7 +135,7 @@ export default {
       this.isLoading = false
     },
     async leave () {
-      if (!confirm(`Are you sure you want to leave the guild?`)) {
+      if (!await this.$confirm('Leave guild', `Are you sure you want to leave the guild?`)) {
         return
       }
 
@@ -156,8 +156,8 @@ export default {
       this.isLoading = false
     },
     async disband () {
-      if (confirm(`Are you sure you want to disband the guild?`)) {
-        if (!confirm(`Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`)) {
+      if (await this.$confirm('Disband guild', `Are you sure you want to disband the guild?`)) {
+        if (!await this.$confirm('Disband guild', `Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`)) {
           return
         }
       }

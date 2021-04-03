@@ -91,7 +91,7 @@ class Waypoints extends EventEmitter {
     let player = this.game.galaxy.players.find(p => p.userId)
 
     // TODO: Use the game helper instead?
-    let techLevel = player.research.hyperspace.effective
+    let techLevel = player.research.hyperspace.level
     
     if (this.carrier.specialist && this.carrier.specialist.modifiers.local) {
       techLevel += this.carrier.specialist.modifiers.local.hyperspace || 0

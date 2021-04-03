@@ -7,12 +7,15 @@ const schema = new Schema({
     guildId: { type: Types.ObjectId, default: null },
     email: { type: Types.String, required: true },
     emailEnabled: { type: Types.Boolean, default: true },
-    password: { type: Types.String, required: true },
+    password: { type: Types.String, required: false },
     resetPasswordToken: { type: Types.String, required: false },
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
     banned: { type: Types.Boolean, default: false },
+    lastSeen: { type: Types.Date, required: false },
+    lastSeenIP: { type: Types.String, required: false },
     roles: {
+        administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
         developer: { type: Types.Boolean, default: false },
         communityManager: { type: Types.Boolean, default: false }
@@ -93,9 +96,13 @@ const schema = new Schema({
             audio: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
             galaxyScreenUpgrades: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
             uiStyle: { type: Types.String, required: false, enum: ['standard', 'compact'], default: 'standard' },
+            suggestMentions: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' }
         },
         map: {
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
+            carrierLoopStyle: { type: Types.String, required: false, enum: ['solid', 'dashed'], default: 'dashed' },
+            carrierPathWidth: { type: Types.Number, required: false, default: 1 },
+            carrierPathDashLength: { type: Types.Number, required: false, default: 6 },
             territoryStyle: { type: Types.String, required: false, enum: ['marching-square', 'voronoi'], default: 'marching-square' },
             marchingSquareGridSize: { type: Types.Number, required: false, default: 6 },
             marchingSquareTerritorySize:{ type: Types.Number, required: false, default: 5 },

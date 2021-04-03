@@ -7,7 +7,7 @@
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
         <td class="text-right" v-if="showEdit">
-          <a href="javascript:;" v-if="canEditWaypoints" @click="editWaypoint">Edit</a>
+          <a href="javascript:;" v-if="!$isHistoricalMode() && canEditWaypoints" @click="editWaypoint">Edit</a>
         </td>
     </tr>
 </template>

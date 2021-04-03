@@ -1,6 +1,6 @@
 <template>
 <span v-if="userPlayer" @click="onViewResearchRequested">
-    <i :class="getIcon()"></i> {{researchProgress}}%
+    <i class="mr-1" :class="getIcon()"></i>{{researchProgress}}%
 </span>
 </template>
 
@@ -9,14 +9,6 @@ import GameHelper from '../../../services/gameHelper'
 import TechnologyHelper from '../../../services/technologyHelper'
 
 export default {
-  data () {
-    return {
-      userPlayer: null
-    }
-  },
-  mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-  },
   methods: {
     getIcon (technologyKey) {
       return 'fas fa-' + TechnologyHelper.getIcon(this.userPlayer.researchingNow)
@@ -26,6 +18,9 @@ export default {
     }
   },
   computed: {
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     researchProgress () {
       let tech = this.userPlayer.research[this.userPlayer.researchingNow]
       let requiredProgress = TechnologyHelper.getRequiredResearchProgress(this.$store.state.game, this.userPlayer.researchingNow, tech.level)

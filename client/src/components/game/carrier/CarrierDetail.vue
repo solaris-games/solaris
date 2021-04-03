@@ -2,7 +2,7 @@
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
       <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-warning"><i class="fas fa-calculator"></i></button>
-      <button v-if="isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
+      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <div class="row pb-2 pt-2 bg-secondary" v-if="canGiftCarrier || canTransferShips || canEditWaypoints">
+      <div class="row pb-2 pt-2 bg-secondary" v-if="!$isHistoricalMode() && (canGiftCarrier || canTransferShips || canEditWaypoints)">
         <div class="col">
           <button class="btn btn-sm btn-primary" @click="onShipTransferRequested" v-if="canTransferShips">
             Transfer <i class="fas fa-exchange-alt"></i>
@@ -113,7 +113,7 @@
         <div class="col">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" v-if="!$isHistoricalMode()">
           <button class="btn btn-sm btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
             <i class="fas fa-exchange-alt"></i> Ship Transfer
           </button>
@@ -139,7 +139,7 @@
         </div>
       </div>
 
-      <div v-if="canEditWaypoints && isStandardUIStyle" class="row bg-secondary pt-2 pb-2 mb-0">
+      <div v-if="!$isHistoricalMode() && canEditWaypoints && isStandardUIStyle" class="row bg-secondary pt-2 pb-2 mb-0">
         <div class="col">
           <button class="btn btn-success" :class="{'btn-sm':isCompactUIStyle}" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
@@ -317,7 +317,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     async onConfirmGiftCarrier (e) {
-      if (!confirm(`Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
+      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
         return
       }
 
@@ -422,7 +422,7 @@ export default {
     isOwnedByUserPlayer: function () {
       let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
 
-      return owner && this.userPlayer && owner == this.userPlayer
+      return owner && this.userPlayer && owner._id === this.userPlayer._id
     }
   }
 }

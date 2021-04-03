@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const session = require('express-session');
+const compression = require('compression');
 const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 const config = require('../config');
@@ -56,8 +57,23 @@ module.exports = async (app, io, container) => {
     //  apply to all requests
     app.use(limiter);
 
+    // compress all responses
+    app.use(compression({
+        threshold: 0,
+        filter: (req, res) => {
+            if (req.headers['x-no-compression']) {
+                // don't compress responses if this request header is present
+                return false;
+            }
+        
+            // fallback to standard compression
+            return compression.filter(req, res);
+        }
+    }));
+
     // ---------------
     // Register routes
+    const admin = require('../api/admin')(router, io, container);
     const game = require('../api/game')(router, io, container);
     const research = require('../api/game/research')(router, io, container);
     const trade = require('../api/game/trade')(router, io, container);
@@ -71,6 +87,7 @@ module.exports = async (app, io, container) => {
     const guild = require('../api/guild')(router, io, container);
 
     app.use(auth);
+    app.use(admin);
     app.use(user);
     app.use(game);
     app.use(research);

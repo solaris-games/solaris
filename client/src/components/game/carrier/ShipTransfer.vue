@@ -57,7 +57,7 @@
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
         <div class="col pr-0">
-            <button type="button" class="btn btn-success btn-block mr-1" :disabled="isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
+            <button type="button" class="btn btn-success btn-block mr-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
         </div>
         <div class="col-auto pl-1">
             <button type="button" class="btn btn-primary" @click="onOpenCarrierDetailRequested"><i class="fas fa-plus"></i></button>
@@ -163,10 +163,16 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
 
+          this.$store.commit('gameStarCarrierShipTransferred', {
+            starId: this.star._id,
+            carrierId: this.carrier._id,
+            starShips: sShips,
+            carrierShips: cShips
+          })
+
           this.star.garrison = sShips
           this.carrier.ships = cShips
 
-          // Note: The web socket event handles setting the carrier and star ships.
           this.$emit('onShipsTransferred', this.carrier._id)
         }
       } catch (err) {

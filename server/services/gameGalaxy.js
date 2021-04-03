@@ -1,3 +1,4 @@
+const cache = require('memory-cache');
 const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
@@ -5,7 +6,7 @@ module.exports = class GameGalaxyService {
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService) {
+        guildUserService, historyService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -21,9 +22,33 @@ module.exports = class GameGalaxyService {
         this.technologyService = technologyService;
         this.reputationService = reputationService;
         this.guildUserService = guildUserService;
+        this.historyService = historyService;
     }
 
-    async getGalaxy(game, userId) {
+    async getGalaxy(gameId, userId, tick) {
+        // Try loading the game for the user from the cache for historical ticks.
+        let gameStateTick = await this.gameService.getGameStateTick(gameId);
+
+        let isHistorical = tick != null && tick !== gameStateTick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
+
+        let cached;
+
+        if (!isHistorical) {
+            tick = gameStateTick;
+        } else {
+            cached = this._getCachedGalaxy(gameId, userId, tick, gameStateTick);
+
+            if (cached.galaxy) {
+                return cached.galaxy;
+            }
+        }
+
+        let game = await this.gameService.getByIdGalaxyLean(gameId);
+
+        if (isHistorical && game.settings.general.timeMachine === 'disabled') {
+            throw new ValidationError(`The time machine is disabled in this game.`);
+        }
+
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
         
@@ -31,28 +56,7 @@ module.exports = class GameGalaxyService {
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
 
-        /*
-            TODO: Implement masking of galaxy data here, prevent players from seeing what other
-            players are doing until the tick has finished.
-
-            This will be a combination of the current state of the galaxy for the player and
-            the previous tick's galaxy data for other players.
-
-            I think the following should do it:
-            1. Apply previous tick's data to all STARS the player does not own.
-                - Garrison, specialist, warp gate and infrastructure needs to be reset.
-            2. Apply previous tick's data to all CARRIERS the player does not own.
-                - Remove any carriers that exist in the current tick but not in the previous tick.
-                - Ships, specialist and gift status needs to be reset.
-            3. Continue to run through current logic as we do today.
-
-            Note: I don't think we need to reset other player data for the previous tick.
-        
-            Things to consider:
-            - We first off need to actually log the state of the galaxy every time the game ticks.
-            - What gets displayed in the event log? Are there any events that are visible in the current tick that apply to other players?
-            - We need to remove any realtime updates when players perform actions in the current tick which need to be masked.
-        */
+        await this._maskGalaxy(game, player, isHistorical, tick);
 
         // Append the player stats to each player.
         this._setPlayerStats(game);
@@ -74,10 +78,38 @@ module.exports = class GameGalaxyService {
             this._setStarInfoDetailed(game, player);
             await this._setPlayerInfoBasic(game, player);
         }
+
+        if (isHistorical && cached) {
+            cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
+        }
         
         return game;
     }
-    
+
+    _getCachedGalaxy(gameId, userId, requestedTick, currentTick) {
+        // Cache the last 24 ticks, it would be bonkers to cache everything.
+        if (currentTick - requestedTick > 24) {
+            return {
+                cacheKey: null,
+                galaxy: null
+            };
+        }
+
+        let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
+        let galaxy = null;
+
+        let cached = cache.get(cacheKey);
+
+        if (cached) {
+            galaxy = cached;
+        }
+
+        return {
+            cacheKey,
+            galaxy
+        };
+    }
+
     _isDarkStart(doc) {
         // Work out whether we are in dark galaxy mode.
         // This is true if the dark galaxy setting is enabled,
@@ -228,6 +260,8 @@ module.exports = class GameGalaxyService {
     }
 
     async _setPlayerInfoBasic(doc, player) {
+        let onlinePlayers = this.broadcastService.getOnlinePlayers(doc); // Need this for later.
+
         // Get the list of all guilds associated to players, we'll need this later.
         let guildUsers = [];
 
@@ -244,6 +278,8 @@ module.exports = class GameGalaxyService {
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
+
+        this._populatePlayerHasDuplicateIPs(doc);
         
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
@@ -263,8 +299,6 @@ module.exports = class GameGalaxyService {
                 }
             }
 
-            let effectiveTechs = this.technologyService.getPlayerEffectiveTechnologyLevels(doc, p);
-
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
 
@@ -272,14 +306,6 @@ module.exports = class GameGalaxyService {
             // player we are looking at then return everything.
             if (player && p._id == player._id) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
-
-                player.research.scanning.effective = effectiveTechs.scanning;
-                player.research.hyperspace.effective = effectiveTechs.hyperspace;
-                player.research.terraforming.effective = effectiveTechs.terraforming;
-                player.research.experimentation.effective = effectiveTechs.experimentation;
-                player.research.weapons.effective = effectiveTechs.weapons;
-                player.research.banking.effective = effectiveTechs.banking;
-                player.research.manufacturing.effective = effectiveTechs.manufacturing;
 
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
@@ -292,8 +318,6 @@ module.exports = class GameGalaxyService {
                 p.isOnline = null;
             } else {
                 // Work out whether the player is online.
-                let onlinePlayers = this.broadcastService.getOnlinePlayers(doc);
-                
                 p.isOnline = (player && p._id == player._id) 
                     || onlinePlayers.find(op => op._id.equals(p._id)) != null;
             }
@@ -306,36 +330,31 @@ module.exports = class GameGalaxyService {
 
             // Return a subset of the user, key info only.
             return {
+                _id: p._id,
+                homeStarId: p.homeStarId,
                 colour: p.colour,
                 shape: p.shape,
                 research: {
                     scanning: { 
-                        level: p.research.scanning.level,
-                        effective: effectiveTechs.scanning
+                        level: p.research.scanning.level
                     },
                     hyperspace: { 
-                        level: p.research.hyperspace.level,
-                        effective: effectiveTechs.hyperspace
+                        level: p.research.hyperspace.level
                     },
                     terraforming: { 
-                        level: p.research.terraforming.level,
-                        effective: effectiveTechs.terraforming
+                        level: p.research.terraforming.level
                     },
                     experimentation: { 
-                        level: p.research.experimentation.level,
-                        effective: effectiveTechs.experimentation
+                        level: p.research.experimentation.level
                     },
                     weapons: { 
-                        level: p.research.weapons.level,
-                        effective: effectiveTechs.weapons
+                        level: p.research.weapons.level
                     },
                     banking: { 
-                        level: p.research.banking.level,
-                        effective: effectiveTechs.banking
+                        level: p.research.banking.level
                     },
                     manufacturing: { 
-                        level: p.research.manufacturing.level,
-                        effective: effectiveTechs.manufacturing
+                        level: p.research.manufacturing.level
                     }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
@@ -343,17 +362,22 @@ module.exports = class GameGalaxyService {
                 defeated: p.defeated,
                 afk: p.afk,
                 ready: p.ready,
-                _id: p._id,
                 alias: p.alias,
                 avatar: p.avatar,
-                homeStarId: p.homeStarId,
                 stats: p.stats,
                 reputation,
                 lastSeen: p.lastSeen,
                 isOnline: p.isOnline,
-                guild: playerGuild
+                guild: playerGuild,
+                hasDuplicateIP: p.hasDuplicateIP
             };
         });
+    }
+
+    _populatePlayerHasDuplicateIPs(game) {
+        for (let player of game.galaxy.players) {
+            player.hasDuplicateIP = this.playerService.hasDuplicateLastSeenIP(game, player);
+        }
     }
 
     _hasGameStarted(doc) {
@@ -362,6 +386,144 @@ module.exports = class GameGalaxyService {
 
     _clearPlayerCarriers(doc) {
         doc.galaxy.carriers = [];
+    }
+
+    async _maskGalaxy(game, player, isHistorical, tick) {
+        /*
+            Masking of galaxy data occurs here, it prevent players from seeing what other
+            players are doing until the tick has finished.
+
+            This will be a combination of the current state of the galaxy for the player and
+            the previous tick's galaxy data for other players.
+
+            The following logic will be applied to the galaxy:
+            1. Apply previous tick's data to all STARS the player does not own.
+                - Garrison, specialist, warp gate and infrastructure needs to be reset.
+            2. Apply previous tick's data to all CARRIERS the player does not own.
+                - Remove any carriers that exist in the current tick but not in the previous tick.
+                - Ships, specialist and gift status needs to be reset.
+            3. Continue to run through current logic as we do today.
+        */
+
+        if (!this.gameService.isStarted(game) || tick === 0) {
+            return;
+        }
+
+        let history = await this.historyService.getHistoryByTick(game._id, tick);
+
+        if (!history) {
+            return;
+        }
+
+        // Support for legacy games, not all history for players/stars/carriers have been logged so
+        // bomb out if we're missing any of those.
+        if (!history.players.length || !history.stars.length || !history.carriers.length) {
+            return;
+        }
+
+        // If in historical mode, apply the previous tick's data for all players.
+        // If the user is requesting the current tick then we need to ensure that the
+        // data returned for players is based on the current state of the game because
+        // players can be defeated, afk'd, ready etc. Player data does not need to be
+        // masked if requesting the current tick.
+        if (isHistorical) {
+            for (let i = 0; i < game.galaxy.players.length; i++) {
+                let gamePlayer = game.galaxy.players[i];
+                
+                let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
+
+                if (historyPlayer) {
+                    gamePlayer.userId = historyPlayer.userId;
+                    gamePlayer.alias = historyPlayer.alias;
+                    gamePlayer.avatar = historyPlayer.avatar;
+                    gamePlayer.researchingNow = historyPlayer.researchingNow;
+                    gamePlayer.researchingNext = historyPlayer.researchingNext;
+                    gamePlayer.credits = historyPlayer.credits;
+                    gamePlayer.defeated = historyPlayer.defeated;
+                    gamePlayer.afk = historyPlayer.afk;
+                    gamePlayer.research = historyPlayer.research;
+                    gamePlayer.ready = historyPlayer.ready;
+                }
+            }
+        }
+        
+        // Apply previous tick's data to all STARS the player does not own.
+        // If historical mode, then its all star data in the requested tick.
+        // If not historical mode, then replace non-player owned star data.
+        for (let i = 0; i < game.galaxy.stars.length; i++) {
+            let gameStar = game.galaxy.stars[i];
+            
+            if (!isHistorical && player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.equals(player._id)) {
+                continue;
+            }
+            
+            let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
+
+            if (historyStar) {
+                // If the player has abandoned the star in the current tick, then display that representation of the star
+                // instead of the historical version.
+                if (player && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.equals(player._id)) {
+                    continue;
+                }
+
+                gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
+                gameStar.naturalResources = historyStar.naturalResources;
+                gameStar.garrison = historyStar.garrison;
+                gameStar.garrisonActual = historyStar.garrisonActual;
+                gameStar.specialistId = historyStar.specialistId;
+                gameStar.warpGate = historyStar.warpGate;
+                gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
+                gameStar.infrastructure = historyStar.infrastructure;
+            }
+        }
+
+        // Apply previous tick's data to all CARRIERS the player does not own.
+        // If historical mode, then its all carrier data in the requested tick.
+        // If not historical mode, then replace non-player owned carrier data.
+        for (let i = 0; i < game.galaxy.carriers.length; i++) {
+            let gameCarrier = game.galaxy.carriers[i];
+
+            if (!isHistorical && player && gameCarrier.ownedByPlayerId.equals(player._id)) {
+                continue;
+            }
+
+            let historyCarrier = history.carriers.find(x => x.carrierId.equals(gameCarrier._id));
+
+            // Remove any carriers that exist in the current tick but not in the previous tick.
+            if (!historyCarrier) {
+                game.galaxy.carriers.splice(i, 1);
+                i--;
+                continue;
+            }
+            
+            gameCarrier.ownedByPlayerId = historyCarrier.ownedByPlayerId;
+            gameCarrier.name = historyCarrier.name;
+            gameCarrier.orbiting = historyCarrier.orbiting;
+            gameCarrier.ships = historyCarrier.ships;
+            gameCarrier.specialistId = historyCarrier.specialistId;
+            gameCarrier.isGift = historyCarrier.isGift;
+            gameCarrier.location = historyCarrier.location;
+            gameCarrier.waypoints = historyCarrier.waypoints;
+        }
+
+        // Add any carriers that were in the previous tick that do not exist in the current tick
+        // This is only applicable when requesting a historical tick as the current tick may have
+        // destroyed carriers.
+        if (isHistorical) {
+            for (let historyCarrier of history.carriers) {
+                let gameCarrier = game.galaxy.carriers.find(x => x._id.equals(historyCarrier.carrierId));
+    
+                if (!gameCarrier) {
+                    game.galaxy.carriers.push(historyCarrier);
+                }
+            }
+        }
+
+        // If the user is requesting a specific tick then we also need to update the game state to match
+        if (isHistorical) {
+            game.state.tick = history.tick
+            game.state.productionTick = history.productionTick
+        }
     }
 
 };

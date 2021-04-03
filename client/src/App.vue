@@ -1,6 +1,19 @@
 <template>
+  <main>
+    <confirmation-dialog :dialogSettings="$store.state.confirmationDialog" />
     <router-view/>
+  </main>
 </template>
+
+<script>
+import ConfirmationDialog from './components/modal/ConfirmationDialog'
+
+export default {
+  components: {
+    'confirmation-dialog': ConfirmationDialog
+  }
+}
+</script>
 
 <style>
 body {

@@ -9,7 +9,7 @@
     <div class="form-group row pt-2 pb-2 mb-0 bg-secondary" v-if="!player.defeated">
         <label class="col-5 col-form-label">Researching:</label>
         <div class="col-7">
-            <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow" :disabled="isGameFinished">
+            <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow" :disabled="$isHistoricalMode() || isGameFinished">
                 <option v-for="option in optionsNow" v-bind:value="option.value" v-bind:key="option.value">
                     {{ option.text }}
                 </option>
@@ -27,7 +27,7 @@
     <div class="form-group row pt-2 pb-2 mb-2 bg-secondary" v-if="!player.defeated">
         <label class="col-5 col-form-label">Next:</label>
         <div class="col-7">
-            <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext" :disabled="isGameFinished">
+            <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext" :disabled="$isHistoricalMode() || isGameFinished">
                 <option v-for="option in optionsNext" v-bind:value="option.value" v-bind:key="option.value">
                     {{ option.text }}
                 </option>
@@ -51,7 +51,6 @@ export default {
       audio: null,
       loadingNow: false,
       loadingNext: false,
-      player: null,
       optionsNow: [],
       optionsNext: [],
       timeRemainingEta: null,
@@ -59,7 +58,6 @@ export default {
     }
   },
   mounted () {
-    this.player = GameHelper.getUserPlayer(this.$store.state.game)
     this.loadTechnologies()
 
     this.recalculateTimeRemaining()
@@ -126,6 +124,9 @@ export default {
     }
   },
   computed: {
+    player: function () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
     }

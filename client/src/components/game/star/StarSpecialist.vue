@@ -4,7 +4,7 @@
             <h5 v-if="!star.specialist" class="pt-1 text-danger">None Assigned</h5>
             <h5 v-if="star.specialist" class="pt-1 text-warning">{{star.specialist.name}}</h5>
         </div>
-        <div v-if="canHireSpecialist && !isGameFinished" class="col-auto">
+        <div v-if="!$isHistoricalMode() && canHireSpecialist && !isGameFinished" class="col-auto">
             <button class="btn btn-sm btn-success" @click="onViewHireStarSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">

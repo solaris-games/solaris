@@ -14,6 +14,22 @@ module.exports = (container) => {
                 throw new ValidationError(`The account is banned.`, 401);
             }
 
+            await container.userService.updateLastSeen(req.session.userId, req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+
+            next();
+        },
+
+        async authenticateAdmin(req, res, next) {
+            if (!req.session.userId) {
+                return res.sendStatus(401);
+            }
+
+            let isAdmin = await container.userService.getUserIsAdmin(req.session.userId);
+
+            if (!isAdmin) {
+                throw new ValidationError(`The account is not an administrator.`, 401);
+            }
+
             next();
         },
 
@@ -120,16 +136,6 @@ module.exports = (container) => {
                     'galaxy.players': 1,
                     'settings': 1
                 });
-            }
-
-            return next();
-        },
-
-        async loadGameHistory(req, res, next) {
-            if (req.params.gameId) {
-                let startTick = +req.query.startTick || 0;
-
-                req.history = await container.historyService.listByGameId(req.params.gameId, startTick);
             }
 
             return next();

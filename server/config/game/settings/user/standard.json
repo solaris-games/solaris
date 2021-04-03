@@ -2,12 +2,14 @@
     "general": {
         "name": null,
         "description": null,
+        "type": "custom",
         "password": null,
         "starVictoryPercentage": 50,
         "playerLimit": 8,
         "playerType": "all",
         "anonymity": "normal",
-        "playerOnlineStatus": "hidden"
+        "playerOnlineStatus": "hidden",
+        "timeMachine": "disabled"
     },
     "galaxy": {
         "galaxyType": "circular",
@@ -16,6 +18,7 @@
     },
     "specialGalaxy": {
         "carrierCost": "standard",
+        "carrierUpkeepCost": "none",
         "warpgateCost": "standard",
         "specialistCost": "standard",
         "randomGates": "none",
@@ -63,7 +66,8 @@
         "manufacturing": "standard",
         "banking": "standard",
         "weapons": "standard"
-        }
+        },
+        "bankingReward": "standard"
     },
     "gameTime": {
         "gameType": "realTime",

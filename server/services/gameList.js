@@ -8,15 +8,13 @@ module.exports = class GameListService {
 
     async listOfficialGames() {
         return await this.gameModel.find({
-            'settings.general.createdByUserId': { $eq: null },
+            'settings.general.type': { $ne: 'custom' },
             'state.startDate': { $eq: null }
         })
-        .sort({
-            'settings.general.description': 1 // Sort description ascending
-        })
         .select({
+            'settings.general.type': 1,
+            'settings.general.featured': 1,
             'settings.general.name': 1,
-            'settings.general.description': 1,
             'settings.general.playerLimit': 1,
             state: 1
         })
@@ -26,13 +24,15 @@ module.exports = class GameListService {
 
     async listUserGames(select) {
         select = select || {
+            'settings.general.type': 1,
+            'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             state: 1
         };
 
         return await this.gameModel.find({
-            'settings.general.createdByUserId': { $ne: null },
+            'settings.general.type': { $eq: 'custom' },
             'state.startDate': { $eq: null }
         })
         .select(select)
@@ -87,12 +87,15 @@ module.exports = class GameListService {
         .exec();
     }
 
-    async listOldCompletedGames() {
-        let date = moment().subtract(3, 'month');
+    async listOldCompletedGames(months = 3) {
+        let date = moment().subtract(months, 'month');
 
         return await this.gameModel.find({
             'state.endDate': { $lt: date }
+        }, {
+            _id: 1
         })
+        .lean()
         .exec();
     }
 

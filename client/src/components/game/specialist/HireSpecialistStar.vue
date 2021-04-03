@@ -28,7 +28,7 @@
                 </h5>
             </div>
             <div class="col-auto mt-2">
-                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
                 <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
@@ -76,7 +76,7 @@ export default {
       this.$emit('onOpenStarDetailRequested', star._id)
     },
     async hireSpecialist (specialist) {
-        if (!confirm(`Are you sure you want to hire a ${specialist.name} for $${specialist.cost}?`)) {
+        if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for $${specialist.cost}?`)) {
             return
         }
         

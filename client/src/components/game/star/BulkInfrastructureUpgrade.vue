@@ -32,7 +32,7 @@
       </div>
       <div class="form-group col-12 col-sm-4">
         <button class="btn btn-success btn-block" v-on:click="doAction"
-                :disabled="isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
+                :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
       </div>
     </form>
     <div v-if="hasChecked" class="row bg-secondary">
@@ -180,7 +180,7 @@ export default {
         return
       }
 
-      if (!confirm(`Are you sure you want to spend $${this.cost} credits to upgrade ${this.selectedType} across all of your stars?`)) {
+      if (!await this.$confirm('Bulk upgrade', `Are you sure you want to spend $${this.cost} credits to upgrade ${this.selectedType} across all of your stars?`)) {
         return
       }
 
@@ -196,14 +196,10 @@ export default {
         if (response.status === 200) {
           AudioService.join()
 
-          this.$emit('onBulkInfrastructureUpgraded', {
-            type: this.selectedType,
-            amount: this.amount
-          })
-
+          this.$store.commit('gameStarBulkUpgraded', response.data)
+          
           this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
 
-          GameHelper.getUserPlayer(this.$store.state.game).credits -= response.data.cost
           this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
         }
       } catch (err) {

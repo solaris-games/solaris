@@ -18,7 +18,7 @@ class RulerPoints extends EventEmitter {
     let userPlayer = game.galaxy.players.find(x => x.userId)
 
     if (userPlayer) {
-      this.techLevel = userPlayer.research.hyperspace.effective
+      this.techLevel = userPlayer.research.hyperspace.level
     }
 
     this.emit('onRulerPointsCleared')
