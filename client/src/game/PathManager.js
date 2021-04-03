@@ -13,8 +13,6 @@ class PathManager {
      * each managed path is the following dictionary:
      * {
      *  id = string
-     *  star1: star mapObject
-     *  star2: star mapObject
      *  carriers: array of carrier mapObject
      *  graphics: PIXI.Graphics
      * }
@@ -22,6 +20,17 @@ class PathManager {
     */
 
     this.container = new PIXI.Container()
+
+    this.reloadSettings(this.userSettings)
+
+  }
+
+  reloadSettings(userSettings) {
+    this.userSettings = userSettings
+    this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
+    this.baseScale = 1
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
   }
 
   addPath( objectA, objectB, carrierMapObject ) {
@@ -34,10 +43,8 @@ class PathManager {
       console.log('creating new path '+objectA.data.name+'-'+objectB.data.name)
       path = {
         id: pathID,
-        star1: mapObjects[0],
-        star2: mapObjects[1],
         carriers: Array(),
-        graphics: this.createPathGraphics( mapObjects[0], mapObjects[1], carrierMapObject.colour )
+        graphics: this._createLoopedPathGraphics( mapObjects[0], mapObjects[1], carrierMapObject.colour )
       }
       this.paths.push(path)
     }
@@ -55,23 +62,61 @@ class PathManager {
   removePath( pathID ) {
 
   }
+
+  addUniquePath( carrier, star, looped ) {
+    const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
+    let lineAlpha = looped? 0.3 : 0.5
+    let lineWidth = PATH_WIDTH
+    let path
+    if(looped) {
+      path = this._createLoopedPathGraphics( carrier, star, carrier.colour )
+    }
+    else{
+      path = this._createSolidPathGraphics( lineAlpha, lineWidth, carrier, star, carrier.colour )
+    }
+    this.container.addChild( path )
+  }
+
+  removeUniquePath( path ) {
+    this.container.removeChild( path )
+  }
+
+  onTick( zoomPercent, viewportData ) {
+    this.setScale( zoomPercent )
+  }
   
-  createPathGraphics( objectA, objectB, pathColour ) {
+  setScale( zoomPercent ) {
+    let yscale = this.baseScale
+    if(this.clampedScaling) {
+      let currentScale = zoomPercent/100
+      if (currentScale < this.minScale) {
+        yscale = (1/currentScale)*this.minScale
+      } else if (currentScale > this.maxScale) {
+        yscale = (1/currentScale)*this.maxScale
+      }
+    }
+    
+    for( let path of this.container.children) {
+      path.scale.y = yscale
+    }
+  }
+
+  _createLoopedPathGraphics( objectA, objectB, pathColour ) {
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
     let lineAlpha = 0.3
     let lineWidth = PATH_WIDTH
 
     let pathGraphics
     if( this.userSettings.map.carrierLoopStyle == 'solid' ) {
-      pathGraphics = this.createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
+      pathGraphics = this._createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
     }
     else {
-      pathGraphics = this.createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour )
+      pathGraphics = this._createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour )
     }
     return pathGraphics
   }
 
-  createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
+  _createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
     let pointA = objectA.data.location
     let pointB = objectB.data.location
     const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 12 )//clamp 1-12
@@ -138,7 +183,7 @@ class PathManager {
     return path
   }
 
-  createSolidPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
+  _createSolidPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
     let pointA = objectA.data.location
     let pointB = objectB.data.location
     let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
@@ -152,6 +197,7 @@ class PathManager {
     path.endFill()
     path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
     path.position = pointA
+
     this.container.addChild(path)
     return path
   }

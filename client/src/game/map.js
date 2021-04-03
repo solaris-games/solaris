@@ -203,6 +203,8 @@ class Map extends EventEmitter {
 
   reloadGame (game, userSettings) {
     this.game = game
+
+    this.pathManager.reloadSettings(userSettings)
     
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -511,6 +513,7 @@ class Map extends EventEmitter {
 
     this.stars.forEach(s => s.onTick(deltaTime, zoomPercent, viewportData))
     this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData))
+    this.pathManager.onTick(zoomPercent)
 
     this.background.onTick(deltaTime, viewportData)
   }

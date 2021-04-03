@@ -27,8 +27,8 @@ class Carrier extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    this.caps = Array()
     this.pathManager = pathManager
+    this.paths = Array()
 
     this.isMouseOver = false
     this.zoomPercent = 0
@@ -213,116 +213,9 @@ class Carrier extends EventEmitter {
   }
 
   _clearPaths() {
-    while( this.pathContainer.children[0]) {
-      this.pathContainer.removeChild(this.pathContainer.children[0])
+    for(let path of this.paths) {
+      this.pathManager.removePath(path)
     }
-    for( let cap of this.caps ) {
-      let mapObject = cap.mapObject
-      mapObject.container.removeChild(cap)
-    }
-  }
-
-  _drawLoopedPathSegment(lineWidth,lineAlpha, objectA, objectB) {
-      let pointA = objectA.data.location
-      let pointB = objectB.data.location
-      if( this.userSettings.map.carrierLoopStyle == 'solid' ) {
-        this._drawRegularPathSegment(lineWidth/3.0, lineAlpha, objectA, objectB)
-        return
-      }
-      const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 12 )//clamp 1-12
-      const VOID_LENGTH = DASH_LENGTH/2.0
-      const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
-
-      let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
-      
-      let dashCount = Math.floor( pathLength/(DASH_LENGTH+VOID_LENGTH) )
-      let endpointsLength =  pathLength - (dashCount*(DASH_LENGTH+VOID_LENGTH))
-
-      let initialX = (endpointsLength/2.0)+(VOID_LENGTH/2.0)
-      let path = new PIXI.Graphics()
-
-      path.moveTo(0, lineWidth)
-      path.beginFill(this.colour, lineAlpha)
-      path.lineTo(0, -lineWidth)
-      path.lineTo(Math.max(initialX-VOID_LENGTH,0), -lineWidth)
-      path.lineTo(Math.max(initialX-VOID_LENGTH,0), lineWidth)
-      path.endFill()
-
-      for( let i = 0; i<dashCount; i++ ) {
-        path.moveTo(initialX+(i*COMBINED_LENGTH), lineWidth)
-        path.beginFill(this.colour, lineAlpha)
-        path.lineTo(initialX+(i*COMBINED_LENGTH), -lineWidth)
-        path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, -lineWidth)
-        path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, lineWidth)
-        path.endFill()
-      }
-
-      path.moveTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), lineWidth)
-      path.beginFill(this.colour, lineAlpha)
-      path.lineTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), -lineWidth)
-      path.lineTo(pathLength, -lineWidth)
-      path.lineTo(pathLength, lineWidth)
-      path.endFill()
-
-      path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
-      path.position = pointA
-      this.pathContainer.addChild(path)
-
-      //TODO make line caps optional since they are barely visible and shit performance
-      let cap1 = new PIXI.Graphics()
-      cap1.beginFill(this.colour, lineAlpha)
-      cap1.arc(0, 0, lineWidth, 0, Math.PI)
-      cap1.endFill()
-      cap1.rotation = path.rotation+Math.PI/2.0
-      let cap2 = new PIXI.Graphics()
-      cap2.beginFill(this.colour, lineAlpha)
-      cap2.arc(0, 0, lineWidth, 0, Math.PI)
-      cap2.endFill()
-      cap2.rotation = path.rotation-Math.PI/2.0
-      // keep a list of caps so we can remove them latter
-      cap1.mapObject = objectA
-      cap2.mapObject = objectB
-      this.caps.push(cap1)
-      this.caps.push(cap2)
-      // add line caps to mapObject's container so they can inherit its scalling and be culled
-      objectA.container.addChild(cap1)
-      objectB.container.addChild(cap2)
-  }
-
-  _drawRegularPathSegment(lineWidth,lineAlpha, objectA, objectB) {
-      let pointA = objectA.data.location
-      let pointB = objectB.data.location
-      let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
-      
-      let path = new PIXI.Graphics()
-      path.beginFill(this.colour, lineAlpha)
-      path.moveTo(0, lineWidth)
-      path.lineTo(0, -lineWidth)
-      path.lineTo(pathLength, -lineWidth)
-      path.lineTo(pathLength, lineWidth)
-      path.endFill()
-      path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
-      path.position = pointA
-      this.pathContainer.addChild(path)
-
-      let cap1 = new PIXI.Graphics()
-      cap1.beginFill(this.colour, lineAlpha)
-      cap1.arc(0, 0, lineWidth, 0, Math.PI)
-      cap1.endFill()
-      cap1.rotation = path.rotation+Math.PI/2.0
-      let cap2 = new PIXI.Graphics()
-      cap2.beginFill(this.colour, lineAlpha)
-      cap2.arc(0, 0, lineWidth, 0, Math.PI)
-      cap2.endFill()
-      cap2.rotation = path.rotation-Math.PI/2.0
-      // keep a list of caps so we can remove them latter
-      cap1.mapObject = objectA
-      cap2.mapObject = objectB
-      this.caps.push(cap1)
-      this.caps.push(cap2)
-      // add line caps to mapObject's container so they can inherit its scalling and be culled
-      objectA.container.addChild(cap1)
-      objectB.container.addChild(cap2)
   }
 
   _isSourceLastDestination() {
@@ -334,12 +227,6 @@ class Carrier extends EventEmitter {
 
   drawCarrierWaypoints () {
     this._clearPaths()
-    for( let  waypoint of this.data.waypoints) {
-      let sourceName = this.stars.find(s => s.data._id === waypoint.source).data.name
-      let destinationName = this.stars.find(s => s.data._id === waypoint.destination).data.name
-        
-      console.log(sourceName+' to '+destinationName)
-    }
 
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
 
@@ -363,14 +250,14 @@ class Carrier extends EventEmitter {
 
       if ( this.data.waypointsLooped ) {
         if (lastPoint === this) {
-          this._drawLoopedPathSegment(lineWidth, lineAlpha, lastPoint, star)
+          this.paths.push( this.pathManager.addUniquePath( lastPoint, star, true ) )
         }
         else {
           this.pathManager.addPath( lastPoint, star, this )
         }
       }
       else {
-        this._drawRegularPathSegment(lineWidth, lineAlpha, lastPoint, star)
+        this.paths.push( this.pathManager.addUniquePath( lastPoint, star, false ) )
       }
 
       lastPoint = star
@@ -381,7 +268,7 @@ class Carrier extends EventEmitter {
         let firstPoint
         firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
         if( firstPoint !== lastPoint ) {
-          this._drawLoopedPathSegment(lineWidth, lineAlpha, star, firstPoint)
+          this.pathManager.addPath( lastPoint, star, this )
         }
       }
     }
