@@ -1,7 +1,7 @@
 import gameHelper from './gameHelper.js'
 
 class MentionHelper {
-  static MENTION_REGEX = /(#|@)(?:(?:{(.*)})|(\S*))/g
+  static MENTION_REGEX = /(#|@)(?:(?:{(.*)})|([\w\[\]]*))/g
   static INTERNAL_MENTION_REGEX = /{{(\w)\/(\w+?)\/(.+?)}}/g
   static STAR_MENTION_CHARACTER = '#'
   static PLAYER_MENTION_CHARACTER = '@'
@@ -23,7 +23,7 @@ class MentionHelper {
 
     const character = this.getMentionCharacter(type)
     let mention
-    if (name.includes(' ')) {
+    if (name.match(/[^\w\[\]]/)) {
       mention = `${character}{${name}}`
     } else {
       mention = `${character}${name}`

@@ -66,20 +66,28 @@ module.exports = class GameTickService extends EventEmitter {
             game.state.tick++;
     
             logTime(`Tick ${game.state.tick}`);
+
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
+
             await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
+
             await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
+
             this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
+
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
+
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
-            this._playAI(game);
+
+            await this._playAI(game);
             logTime('AI controlled players turn');
+            
             this._logHistory(game);
             logTime('Log history');
 
@@ -729,8 +737,8 @@ module.exports = class GameTickService extends EventEmitter {
         }
     }
 
-    _logHistory(game) {
-        this.historyService.log(game);
+    async _logHistory(game) {
+        await this.historyService.log(game);
     }
 
     async _gameLoseCheck(game, gameUsers) {

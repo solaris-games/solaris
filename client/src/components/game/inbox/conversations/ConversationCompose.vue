@@ -56,7 +56,9 @@ export default {
       }
     },
     setSelectedSuggestion (newSelected) {
-      this.selectedSuggestion = newSelected % this.currentMention.suggestions.length
+      const suggestions = this.currentMention.suggestions.length
+      //Modulo instead of remainder so instead of -1 we get the last suggestion
+      this.selectedSuggestion = ((newSelected % suggestions) + suggestions) % suggestions
     },
     async onKeyDown (e) {
       if (e.key === "Enter" && e.ctrlKey) {
@@ -120,6 +122,7 @@ export default {
             fromPlayerId: userPlayerId,
             message: message,
             sentDate: moment().utc(),
+            sentTick: this.$store.state.tick,
             readBy: [userPlayerId],
             type: 'message'
           })

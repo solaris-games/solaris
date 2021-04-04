@@ -12,7 +12,7 @@
       <div class="col-auto">
         <p class="mt-0 mb-0">
           <i class="fas fa-envelope mr-2" v-if="!userPlayerHasReadMessage"></i>
-          <small><em>{{getDateString(message.sentDate)}}</em></small>
+          <small><em>{{dateText}}</em></small>
         </p>
       </div>
     </div>
@@ -48,9 +48,6 @@ export default {
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
-    getDateString (date) {
-      return GameHelper.getDateString(date)
-    },
     getFriendlyColour (colour) {
       return GameHelper.getFriendlyColour(colour)
     },
@@ -76,6 +73,14 @@ export default {
     },
     userPlayerHasReadMessage: function () {
       return this.message.readBy.find(x => this.getUserPlayer()._id === x) != null
+    },
+    dateText: function () {
+      const date = GameHelper.getDateString(this.message.sentDate)
+      let tick = ''
+      if (this.message.sentTick || this.message.sentTick === 0) {
+        tick = ` (${this.message.sentTick})`
+      }
+      return date + tick
     }
   }
 }

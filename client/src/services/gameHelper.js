@@ -400,6 +400,9 @@ class GameHelper {
 
   getSortedLeaderboardPlayerList (game) {
     // Sort by total number of stars, then by total ships, then by total carriers.
+    // Note that this sorting is different from the server side sorting as
+    // on the UI we want to preserve defeated player positions relative to how many
+    // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
         // Sort by total stars descending

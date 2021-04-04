@@ -245,7 +245,7 @@ class Carrier extends EventEmitter {
     sourceIsLastDestination = this._isSourceLastDestination()
     // if looping and source is last destination, begin drawing path from the star instead of carrier
     if ( this.data.waypointsLooped ) {
-      if ( ( sourceIsLastDestination ) )  {
+      if (sourceIsLastDestination)  {
         lastPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].source)
       }
     }
@@ -272,11 +272,10 @@ class Carrier extends EventEmitter {
     }
     //draw path back to the first destination
     if ( this.data.waypointsLooped ) {
-      if ( !sourceIsLastDestination ) {
-        let firstPoint
-        firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
-        if( firstPoint !== lastPoint ) {
-          this.sharedPathsIDs.push( this.pathManager.addSharedPath( lastPoint, star, this ) )
+      if (!sourceIsLastDestination && this.data.waypoints && this.data.waypoints.length) {
+        let firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
+        if( firstPoint && lastPoint && firstPoint !== lastPoint ) {
+          this._drawLoopedPathSegment(lineWidth, lineAlpha, star, firstPoint)
         }
       }
     }

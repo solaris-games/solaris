@@ -130,7 +130,7 @@ module.exports = class HistoryService {
 
         await history.save();
 
-        await cleanupTimeMachineHistory(game);
+        await this.cleanupTimeMachineHistory(game);
     }
 
     async cleanupTimeMachineHistory(game) {

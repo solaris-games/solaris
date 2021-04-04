@@ -55,23 +55,34 @@ module.exports = class LeaderboardService {
             }
         });
 
-        let leaderboard = playerStats
-            .sort((a, b) => {
-                // Sort by total stars descending
-                if (a.stats.totalStars > b.stats.totalStars) return -1;
-                if (a.stats.totalStars < b.stats.totalStars) return 1;
+        function sortPlayers(a, b) {
+            // Sort by total stars descending
+            if (a.stats.totalStars > b.stats.totalStars) return -1;
+            if (a.stats.totalStars < b.stats.totalStars) return 1;
 
-                // Then by total ships descending
-                if (a.stats.totalShips > b.stats.totalShips) return -1;
-                if (a.stats.totalShips < b.stats.totalShips) return 1;
+            // Then by total ships descending
+            if (a.stats.totalShips > b.stats.totalShips) return -1;
+            if (a.stats.totalShips < b.stats.totalShips) return 1;
 
-                // Then by total carriers descending
-                if (a.stats.totalCarriers > b.stats.totalCarriers) return -1;
-                if (a.stats.totalCarriers < b.stats.totalCarriers) return 1;
+            // Then by total carriers descending
+            if (a.stats.totalCarriers > b.stats.totalCarriers) return -1;
+            if (a.stats.totalCarriers < b.stats.totalCarriers) return 1;
 
-                // Then by defeated descending
-                return (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1;
-            });
+            return 0; // Both are equal
+        }
+
+        // Sort the undefeated players first.
+        let undefeatedLeaderboard = playerStats
+            .filter(x => !x.player.defeated)
+            .sort(sortPlayers);
+
+        // Sort the defeated players next.
+        let defeatedLeaderboard = playerStats
+            .filter(x => x.player.defeated)
+            .sort(sortPlayers);
+
+        // Join both sorted arrays together to produce the leaderboard.
+        let leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard);
 
         return leaderboard;
     }
