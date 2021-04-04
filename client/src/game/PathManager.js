@@ -33,14 +33,14 @@ class PathManager {
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
   }
 
-  addPath( objectA, objectB, carrierMapObject ) {
+  addSharedPath( objectA, objectB, carrierMapObject ) {
     let mapObjects = [ objectA, objectB ]
     this._orderObjects(mapObjects)
     
     let pathID = mapObjects[0].data._id + mapObjects[1].data._id
     let path = this._findPath(pathID)
     if(!path) {
-      console.log('creating new path '+objectA.data.name+'-'+objectB.data.name)
+     //onsole.log('creating new path '+objectA.data.name+'-'+objectB.data.name)
       path = {
         id: pathID,
         carriers: Array(),
@@ -49,35 +49,47 @@ class PathManager {
       this.paths.push(path)
     }
     else {
-      console.log('path '+objectA.data.name+'-'+objectB.data.name+' already exists')
+     //onsole.log('path '+objectA.data.name+'-'+objectB.data.name+' already exists')
     }
     if( !this._pathContainsCarrier(carrierMapObject, path) ) {
-      console.log('adding carrier')
+     //onsole.log('adding carrier')
       path.carriers.push(carrierMapObject)
     }
-    path.graphics.alpha = 0.2+path.carriers.length*0.1
-    return path
+    path.graphics.alpha = 0.3+path.carriers.length*0.1
+    console.log('shared paths: '+this.paths.length)
+    return pathID
   }
 
-  removePath( pathID ) {
-
+  removeSharedPath( pathID, carrier ) {
+    let path = this._findPath(pathID)
+    console.log('removing shared path: '+pathID)
+    if(path) {
+     console.log('removing shared path: ')
+      path.carriers.splice(path.carriers.indexOf(carrier), 1)
+      if(path.carriers.length === 0) {
+        this.container.removeChild(path.graphics)
+        this.paths.splice(this.paths.indexOf(path), 1)
+      }
+    }
   }
 
-  addUniquePath( carrier, star, looped ) {
+  addUniquePath( mapObject, star, looped, colour ) {
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
-    let lineAlpha = looped? 0.3 : 0.5
+    let lineAlpha = looped ? 0.3 : 0.5
     let lineWidth = PATH_WIDTH
     let path
     if(looped) {
-      path = this._createLoopedPathGraphics( carrier, star, carrier.colour )
+      path = this._createLoopedPathGraphics( mapObject, star, colour )
     }
     else{
-      path = this._createSolidPathGraphics( lineAlpha, lineWidth, carrier, star, carrier.colour )
+      path = this._createSolidPathGraphics( lineAlpha, lineWidth, mapObject, star, colour )
     }
-    this.container.addChild( path )
+    path.alpha = lineAlpha
+    return path
   }
 
   removeUniquePath( path ) {
+    console.log('removing unique path: '+path)
     this.container.removeChild( path )
   }
 
@@ -132,7 +144,7 @@ class PathManager {
     let path = new PIXI.Graphics()
 
     path.moveTo(0, lineWidth)
-    path.beginFill(pathColour, 1)
+    path.beginFill(pathColour)
     path.lineTo(0, -lineWidth)
     path.lineTo(Math.max(initialX-VOID_LENGTH,0), -lineWidth)
     path.lineTo(Math.max(initialX-VOID_LENGTH,0), lineWidth)
@@ -140,7 +152,7 @@ class PathManager {
 
     for( let i = 0; i<dashCount; i++ ) {
       path.moveTo(initialX+(i*COMBINED_LENGTH), lineWidth)
-      path.beginFill(pathColour, 1)
+      path.beginFill(pathColour)
       path.lineTo(initialX+(i*COMBINED_LENGTH), -lineWidth)
       path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, -lineWidth)
       path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, lineWidth)
@@ -148,7 +160,7 @@ class PathManager {
     }
 
     path.moveTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), lineWidth)
-    path.beginFill(pathColour, 1)
+    path.beginFill(pathColour)
     path.lineTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), -lineWidth)
     path.lineTo(pathLength, -lineWidth)
     path.lineTo(pathLength, lineWidth)
@@ -189,7 +201,7 @@ class PathManager {
     let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
     
     let path = new PIXI.Graphics()
-    path.beginFill(pathColour, 1)
+    path.beginFill(pathColour)
     path.moveTo(0, lineWidth)
     path.lineTo(0, -lineWidth)
     path.lineTo(pathLength, -lineWidth)

@@ -353,6 +353,8 @@ class Map extends EventEmitter {
     carrier.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
+    carrier.clearPaths()
+
     this.carrierContainer.removeChild(carrier.container)
     this.carrierContainer.removeChild(carrier.fixedContainer)
 

@@ -28,7 +28,8 @@ class Carrier extends EventEmitter {
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.pathManager = pathManager
-    this.paths = Array()
+    this.sharedPathsIDs = Array()
+    this.uniquePaths = Array()
 
     this.isMouseOver = false
     this.zoomPercent = 0
@@ -212,10 +213,15 @@ class Carrier extends EventEmitter {
     }
   }
 
-  _clearPaths() {
-    for(let path of this.paths) {
-      this.pathManager.removePath(path)
+  clearPaths() {
+    for(let path of this.uniquePaths) {
+      this.pathManager.removeUniquePath(path)
     }
+    for(let pathID of this.sharedPathsIDs) {
+      this.pathManager.removeSharedPath(pathID, this)
+    }
+    this.uniquePaths = Array()
+    this.sharedPathsIDs = Array()
   }
 
   _isSourceLastDestination() {
@@ -226,7 +232,9 @@ class Carrier extends EventEmitter {
   }
 
   drawCarrierWaypoints () {
-    this._clearPaths()
+    console.log(this.uniquePaths)
+    console.log(this.sharedPathsIDs)
+    this.clearPaths()
 
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
 
@@ -250,14 +258,14 @@ class Carrier extends EventEmitter {
 
       if ( this.data.waypointsLooped ) {
         if (lastPoint === this) {
-          this.paths.push( this.pathManager.addUniquePath( lastPoint, star, true ) )
+          this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, true, this.colour ) )
         }
         else {
-          this.pathManager.addPath( lastPoint, star, this )
+          this.sharedPathsIDs.push( this.pathManager.addSharedPath( lastPoint, star, this ) )
         }
       }
       else {
-        this.paths.push( this.pathManager.addUniquePath( lastPoint, star, false ) )
+        this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, false, this.colour ) )
       }
 
       lastPoint = star
@@ -268,7 +276,7 @@ class Carrier extends EventEmitter {
         let firstPoint
         firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
         if( firstPoint !== lastPoint ) {
-          this.pathManager.addPath( lastPoint, star, this )
+          this.sharedPathsIDs.push( this.pathManager.addSharedPath( lastPoint, star, this ) )
         }
       }
     }
