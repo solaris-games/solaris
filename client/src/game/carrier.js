@@ -214,7 +214,6 @@ class Carrier extends EventEmitter {
   }
 
   clearPaths() {
-    console.log('clearing')
     for(let path of this.uniquePaths) {
       this.pathManager.removeUniquePath(path)
     }
@@ -233,8 +232,6 @@ class Carrier extends EventEmitter {
   }
 
   drawCarrierWaypoints () {
-    console.log(this.uniquePaths)
-    console.log(this.sharedPathsIDs)
     this.clearPaths()
 
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
@@ -280,8 +277,6 @@ class Carrier extends EventEmitter {
         }
       }
     }
-    console.log(this.uniquePaths)
-    console.log(this.sharedPathsIDs)
   }
 
   enableInteractivity() {

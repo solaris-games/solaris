@@ -52,31 +52,18 @@ class PathManager {
      //onsole.log('path '+objectA.data.name+'-'+objectB.data.name+' already exists')
     }
     if( !this._pathContainsCarrier(carrierMapObject, path) ) {
-     console.log('adding carrier')
       path.carriers.push(carrierMapObject)
     }
-    console.log(path.carriers.length)
     path.graphics.alpha = 0.3+path.carriers.length*0.1
-    console.log('shared paths: '+this.paths.length)
     return pathID
   }
 
   removeSharedPath( pathID, carrier ) {
     let path = this._findPath(pathID)
     if(path) {
-      console.log('removing shared path: '+pathID+' carrier '+carrier.data._id)
-      console.log('before')
-      for(let c of path.carriers){
-        console.log(c.data._id)
-      }
       let carrierIndex = path.carriers.indexOf(carrier)
-      console.log(carrierIndex)
       if(carrierIndex>=0) {
         path.carriers.splice(path.carriers.indexOf(carrier), 1)
-      }
-      console.log('after')
-      for(let c of path.carriers){
-        console.log(c.data._id)
       }
       path.graphics.alpha = 0.3+path.carriers.length*0.1
       if(path.carriers.length === 0) {
@@ -102,7 +89,6 @@ class PathManager {
   }
 
   removeUniquePath( path ) {
-    console.log('removing unique path: '+path)
     this.container.removeChild( path )
   }
 

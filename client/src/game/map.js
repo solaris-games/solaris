@@ -361,13 +361,12 @@ class Map extends EventEmitter {
 
   drawWaypoints () {
     this.waypoints.draw(this.modeArgs)
-    /*
+
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
 
       c.drawCarrierWaypoints()
     }
-    */
   }
 
   clearWaypoints () {
