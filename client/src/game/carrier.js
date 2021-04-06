@@ -12,7 +12,6 @@ class Carrier extends EventEmitter {
 
     this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
-    this.pathContainer = new PIXI.Container()
     this.container.interactive = true
     this.container.buttonMode = true
 
@@ -326,10 +325,6 @@ class Carrier extends EventEmitter {
     else {
       this.container.scale.x = this.baseScale
       this.container.scale.y = this.baseScale
-    }
-    
-    for( let path of this.pathContainer.children) {
-      path.scale.y = this.container.scale.y
     }
   }
 
