@@ -214,6 +214,7 @@ class Carrier extends EventEmitter {
   }
 
   clearPaths() {
+    console.log('clearing')
     for(let path of this.uniquePaths) {
       this.pathManager.removeUniquePath(path)
     }
@@ -275,10 +276,12 @@ class Carrier extends EventEmitter {
       if (!sourceIsLastDestination && this.data.waypoints && this.data.waypoints.length) {
         let firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
         if( firstPoint && lastPoint && firstPoint !== lastPoint ) {
-          this._drawLoopedPathSegment(lineWidth, lineAlpha, star, firstPoint)
+          this.sharedPathsIDs.push( this.pathManager.addSharedPath( star, firstPoint, this ) )
         }
       }
     }
+    console.log(this.uniquePaths)
+    console.log(this.sharedPathsIDs)
   }
 
   enableInteractivity() {

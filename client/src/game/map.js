@@ -150,37 +150,26 @@ class Map extends EventEmitter {
   }
 
   setupCarrier (game, userSettings, carrierData) {
-    let existing = this.carriers.find(x => x.data._id === carrierData._id)
+    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
 
-    if (existing) {
-      existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-      existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-      existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+    if (!carrier) {
+      carrier = new Carrier( this.pathManager )
+      this.carriers.push(carrier)
 
-      this.carrierContainer.removeChild(existing.fixedContainer)
-      this.carrierContainer.removeChild(existing.container)
-      this.carrierContainer.removeChild(existing.pathContainer)
+      this.carrierContainer.addChild(carrier.fixedContainer)
+      this.carrierContainer.addChild(carrier.container)
+      this.carrierContainer.addChild(carrier.pathContainer)
 
-      this.carriers.splice(this.carriers.indexOf(existing), 1)
+      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+      carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
+      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
     }
 
-    let carrier = new Carrier( this.pathManager )
     let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
     carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
     carrier.refreshZoom(this.zoomPercent)
-
-    this.carriers.push(carrier)
-
-    this.carrierContainer.addChild(carrier.fixedContainer)
-    this.carrierContainer.addChild(carrier.container)
-    this.carrierContainer.addChild(carrier.pathContainer)
-
-    carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-    carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-    carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-    carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
     return carrier
   }
@@ -372,12 +361,13 @@ class Map extends EventEmitter {
 
   drawWaypoints () {
     this.waypoints.draw(this.modeArgs)
-
+    /*
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
 
       c.drawCarrierWaypoints()
     }
+    */
   }
 
   clearWaypoints () {
