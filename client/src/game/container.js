@@ -50,7 +50,7 @@ class GameContainer {
     this.app.ticker.add(this.onTick.bind(this))
 
     if ( process.env.NODE_ENV == 'development') {
-      //this.app.ticker.add(this.calcFPS.bind(this))
+      this.app.ticker.add(this.calcFPS.bind(this))
     }
 
     // create viewport

@@ -40,16 +40,12 @@ class PathManager {
     let pathID = mapObjects[0].data._id + mapObjects[1].data._id
     let path = this._findPath(pathID)
     if(!path) {
-     //onsole.log('creating new path '+objectA.data.name+'-'+objectB.data.name)
       path = {
         id: pathID,
         carriers: Array(),
         graphics: this._createLoopedPathGraphics( mapObjects[0], mapObjects[1], carrierMapObject.colour )
       }
       this.paths.push(path)
-    }
-    else {
-     //onsole.log('path '+objectA.data.name+'-'+objectB.data.name+' already exists')
     }
     if( !this._pathContainsCarrier(carrierMapObject, path) ) {
       path.carriers.push(carrierMapObject)
