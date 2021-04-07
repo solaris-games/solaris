@@ -15,7 +15,7 @@
       <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the conversation.</i></small>
     </p>
 
-    <conversation-participants v-if="toggleDisplay" :conversation="conversation"/>
+    <conversation-participants v-if="toggleDisplay" :conversation="conversation" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested""/>
 
     <div class="pt-0 mb-2 mt-2 messages-container" v-if="toggleDisplay && conversation.messages.length">
       <div v-for="message in conversation.messages" v-bind:key="message._id" class="mb-1">
