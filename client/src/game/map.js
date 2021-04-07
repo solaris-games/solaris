@@ -508,6 +508,7 @@ class Map extends EventEmitter {
     this.carriers.forEach(c => c.onTick(deltaTime, zoomPercent, viewportData))
 
     this.background.onTick(deltaTime, viewportData)
+    this.playerNames.onTick(zoomPercent)
   }
 
   onViewportPointerDown(e) {
