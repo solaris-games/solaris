@@ -44,6 +44,7 @@ class GameContainer {
       height: window.innerHeight, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
+      antialias: true,
       autoResize: true
     })
 
