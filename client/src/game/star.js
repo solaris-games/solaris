@@ -13,10 +13,10 @@ class Star extends EventEmitter {
     Potentially even make user defined.
   */
   static zoomLevelDefinitions = {
-    1: 150,
-    2: 200,
-    3: 250,
-    4: 320
+    1: 0,
+    2: 150,
+    3: 225,
+    4: 300
   }
 
   constructor (app) {
@@ -418,53 +418,64 @@ class Star extends EventEmitter {
   }
 
   drawGarrison () {
-    if (this.text_garrison) {
-      this.text_garrison.texture.destroy(true)
-      this.container.removeChild(this.text_garrison)
-      this.text_garrison = null
+    if (this.text_garrison_small) {
+      this.text_garrison_small.texture.destroy(true)
+      this.container.removeChild(this.text_garrison_small)
+      this.text_garrison_small = null
     }
 
-    if (!this.text_garrison) {
-      let style = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
-      let small = this.zoomDepth > 2 || this.isSelected
-      style.fontSize = small ? 4 : 7
+    if (this.text_garrison_big) {
+      this.text_garrison_big.texture.destroy(true)
+      this.container.removeChild(this.text_garrison_big)
+      this.text_garrison_big = null
+    }
 
-      let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let style_small = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
+    let style_big = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
+    style_small.fontSize = 4
+    style_big.fontSize = 7
 
-      let carriersOrbiting = this._getStarCarriers()
-      let carrierCount = carriersOrbiting.length
+    let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
-      let garrisonText = ''
-      let scramblers = 0
-      if (carriersOrbiting) {
-        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+    let carriersOrbiting = this._getStarCarriers()
+    let carrierCount = carriersOrbiting.length
+
+    let garrisonText = ''
+    let scramblers = 0
+    if (carriersOrbiting) {
+      scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+    }
+    if ( (scramblers == carrierCount) && (this.data.garrison == null) ) {
+      garrisonText = '???'
+    }
+    else {
+      garrisonText = totalKnownGarrison
+      if( (scramblers > 0) || (this.data.garrison == null) ) {
+        garrisonText += '*'
       }
-      if ( (scramblers == carrierCount) && (this.data.garrison == null) ) {
-        garrisonText = '???'
-      }
-      else {
-        garrisonText = totalKnownGarrison
-        if( (scramblers > 0) || (this.data.garrison == null) ) {
-          garrisonText += '*'
-        }
-      }
+    }
 
-      if (carrierCount) {
-        garrisonText += '/'
-        garrisonText += carrierCount.toString()
-      }
+    if (carrierCount) {
+      garrisonText += '/'
+      garrisonText += carrierCount.toString()
+    }
 
-      if (garrisonText) {
-        this.text_garrison = new PIXI.Text(garrisonText, style)
-        this.text_garrison.scale.x = 1.5
-        this.text_garrison.scale.y = 1.5
-        this.text_garrison.resolution = 10
+    function make_garrison_text(small) {
+      let text_garrison = new PIXI.Text(garrisonText, small ? style_small : style_big)
+      text_garrison.scale.x = 1.5
+      text_garrison.scale.y = 1.5
+      text_garrison.resolution = 10
 
-        this.text_garrison.x = 5
-        this.text_garrison.y = -this.text_garrison.height + (small ? 1.5 : 6)
+      text_garrison.x = 5
+      text_garrison.y = -text_garrison.height + (small ? 1.5 : 6)
+      return text_garrison
+    }
 
-        this.container.addChild(this.text_garrison)
-      }
+    if (garrisonText) {
+      this.text_garrison_small = make_garrison_text(true)
+      this.text_garrison_big = make_garrison_text(false)
+      this.container.addChild(this.text_garrison_small)
+      this.container.addChild(this.text_garrison_big)
     }
   }
 
@@ -573,7 +584,8 @@ class Star extends EventEmitter {
      if (this.text_name) this.text_name.visible = false
      if (this.container_planets) this.container_planets.visible = false
      if (this.text_infrastructure) this.text_infrastructure.visible = false
-     if (this.text_garrison) this.text_garrison.visible = false
+     if (this.text_garrison_small) this.text_garrison_small.visible = false
+     if (this.text_garrison_big) this.text_garrison_big.visible = false
    } 
    else {
      this.updateVisibility()
@@ -618,9 +630,6 @@ class Star extends EventEmitter {
         // this.setScale()
       }
     }
-
-    //Redraw
-    this.draw()
   }
 
   updateVisibility() {
@@ -630,11 +639,19 @@ class Star extends EventEmitter {
     this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomDepth >= 4
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomDepth >= 3
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomDepth >= 2
+    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomDepth >= 4
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomDepth >= 4
-    if (this.text_garrison) this.text_garrison.visible = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomDepth >= 2))
 
-    let partial_ring = this.text_garrison && this.text_garrison.visible || this.text_name && this.text_name.visible
+    let small_garrison = this.zoomDepth > 2 || this.isSelected
+    let visible_garrison = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomDepth >= 2))
+
+    if (this.text_garrison_small) this.text_garrison_small.visible = small_garrison && visible_garrison
+    if (this.text_garrison_big) this.text_garrison_big.visible = !small_garrison && visible_garrison
+
+    let partial_ring = this.text_garrison_big && this.text_garrison_big.visible
+      || this.text_garrison_small && this.text_garrison_small.visible
+      || this.text_name && this.text_name.visible
+
     this.graphics_shape_part.visible = partial_ring
     this.graphics_shape_full.visible = !partial_ring
     this.graphics_shape_part_warp.visible = partial_ring && this.warpGate
@@ -678,7 +695,7 @@ class Star extends EventEmitter {
     }
 
     //Update everything
-    if (this.zoomDepth != old) this.draw()
+    if (this.zoomDepth != old) this.updateVisibility()
   }
 }
 
