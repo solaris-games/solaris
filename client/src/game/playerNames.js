@@ -32,7 +32,7 @@ class PlayerNames {
       let text_name = new PIXI.Text(player.alias, style)
       text_name.x = empireCenter.x - (text_name.width / 2)
       text_name.y = empireCenter.y - (text_name.height / 2)
-      text_name.resolution = 10
+      text_name.resolution = 2
       text_name.zIndex = 10
 
       let graphics = new PIXI.Graphics()
@@ -46,6 +46,14 @@ class PlayerNames {
     }
 
     this.refreshZoom(this.zoomPercent || 0)
+  }
+
+  onTick( zoomPercent ) {
+    this.zoomPercent = zoomPercent
+
+    if (this.container) {
+      this.container.visible = zoomPercent <= 90
+    }
   }
 
   refreshZoom (zoomPercent) {
