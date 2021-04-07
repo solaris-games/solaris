@@ -18,7 +18,7 @@ module.exports = class AdminService {
             lastSeenIP: 1
         })
         .sort({
-            username: 1
+            lastSeen: -1
         })
         .lean({defaults: true})
         .exec();

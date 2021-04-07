@@ -162,7 +162,7 @@ export default {
       return moment(lastSeen).utc().fromNow()
     },
     getDuplicateIPs (user) {
-      return this.users.filter(x => x._id !== user._id && x.lastSeenIP === user.lastSeenIP).map(x => x.username)
+      return this.users.filter(x => x._id !== user._id && x.lastSeenIP && x.lastSeenIP === user.lastSeenIP).map(x => x.username)
     },
     async toggleRole (user, role) {
       try {
