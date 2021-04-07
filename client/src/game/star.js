@@ -6,6 +6,19 @@ class Star extends EventEmitter {
 
   static culling_margin = 16
 
+  /*
+    Defines what zoompercentage correspond to what
+    depth level.
+    This is something you can tinker with
+    Potentially even make user defined.
+  */
+  static zoomLevelDefinitions = {
+    1: 150,
+    2: 200,
+    3: 250,
+    4: 320
+  }
+
   constructor (app) {
     super()
 
@@ -42,6 +55,21 @@ class Star extends EventEmitter {
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 0
+   
+    /**
+      Zoomdepth
+      I'd make this an enum if I could...
+
+      This is a value ranging from 1 to 4
+      1: Display stars only
+      2: Display shipcounts and orbit
+      3: Display shipcount, orbit and name
+      4: Display shipcount, orbit, name and infrastructure
+    
+      What zoompercentage corresponds with what depth level
+      can be read from static property "zoomLevelDefinitions"
+    */
+    this.zoomDepth = 1
   }
 
   _getStarPlayer () {
@@ -370,12 +398,12 @@ class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let style = TextureService.DEFAULT_FONT_STYLE
+      let style = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
       style.fontSize = 4
 
       this.text_name = new PIXI.Text(this.data.name, style)
       this.text_name.x = 5
-      this.text_name.resolution = 10
+      this.text_name.resolution = 15
 
       this.container.addChild(this.text_name)
     }
@@ -397,8 +425,9 @@ class Star extends EventEmitter {
     }
 
     if (!this.text_garrison) {
-      let style = TextureService.DEFAULT_FONT_STYLE
-      style.fontSize = 4
+      let style = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
+      let small = this.zoomDepth > 2 || this.isSelected
+      style.fontSize = small ? 4 : 7
 
       let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
@@ -432,7 +461,7 @@ class Star extends EventEmitter {
         this.text_garrison.resolution = 10
 
         this.text_garrison.x = 5
-        this.text_garrison.y = -this.text_garrison.height + 1.5
+        this.text_garrison.y = -this.text_garrison.height + (small ? 1.5 : 6)
 
         this.container.addChild(this.text_garrison)
       }
@@ -589,24 +618,27 @@ class Star extends EventEmitter {
         // this.setScale()
       }
     }
+
+    //Redraw
+    this.draw()
   }
 
   updateVisibility() {
-    const displayTextZoom = 150
-
     this.graphics_star.visible = !this.hasSpecialist()
-    this.graphics_shape_part.visible = this.zoomPercent > displayTextZoom
-    this.graphics_shape_full.visible = this.zoomPercent <= displayTextZoom
-    this.graphics_shape_part_warp.visible = this.zoomPercent > displayTextZoom && this.data.warpGate
-    this.graphics_shape_full_warp.visible = this.zoomPercent <= displayTextZoom && this.data.warpGate
-    this.graphics_hyperspaceRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.graphics_scanningRange.visible = this.isSelected// && this.zoomPercent < 100
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
+    this.graphics_hyperspaceRange.visible = this.isSelected
+    this.graphics_scanningRange.visible = this.isSelected
+    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomDepth >= 4
 
-    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent > displayTextZoom
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent > displayTextZoom
-    if (this.text_infrastructure) this.text_infrastructure.visible = this.isMouseOver || this.isSelected || this.zoomPercent > displayTextZoom
-    if (this.text_garrison) this.text_garrison.visible = this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent > displayTextZoom)
+    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomDepth >= 3
+    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomDepth >= 2
+    if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomDepth >= 4
+    if (this.text_garrison) this.text_garrison.visible = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomDepth >= 2))
+
+    let partial_ring = this.text_garrison && this.text_garrison.visible || this.text_name && this.text_name.visible
+    this.graphics_shape_part.visible = partial_ring
+    this.graphics_shape_full.visible = !partial_ring
+    this.graphics_shape_part_warp.visible = partial_ring && this.warpGate
+    this.graphics_shape_full_warp.visible = !partial_ring && this.warpGate
 
     // this.baseScale = this.isSelected ? 1.5 : 1
   }
@@ -628,8 +660,25 @@ class Star extends EventEmitter {
     this.emit('onStarMouseOut', this.data)
   }
 
+  //This could in the future be a setter function on ZoomPercent
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
+    this._updateDepthLevel()
+  }
+
+  //I hope I can make this independant from this class at some point
+  ///Updates the zoomDepth value according to zoomPercent
+  _updateDepthLevel() {
+    let old = this.zoomDepth
+    this.zoomDepth = 1
+    for (let depth in Star.zoomLevelDefinitions) {
+      if (Star.zoomLevelDefinitions[depth] < this.zoomPercent) {
+        this.zoomDepth = depth
+      }
+    }
+
+    //Update everything
+    if (this.zoomDepth != old) this.draw()
   }
 }
 
