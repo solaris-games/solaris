@@ -174,8 +174,12 @@
       </ul>
 
       <p>
-        Click on a star to view the star detail, this screen displays all information related to a star.
-        For example who owns the star, how many resources it has, its infrastructure and what carriers are in orbit.
+        Click on a star to view the star statistics in detail. This screen displays all of the information related to the star. 
+        In order displayed in the image, is the star name, a button for centering on the star, a button to close the menu, the 
+        owner of the star, the star’s natural/terraformed resources, the star’s economy, industry, and science levels, how many ships 
+        are stationed at the star, the specialist that is stationed at the star, and how many ships the star manufactures every tick. 
+        Below that are the buttons to purchase more economy, industry, and science, as well as a button for creating a carrier at the 
+        star and a button for purchasing a warpgate at the star.
       </p>
 
       <img :src="require('../assets/screenshots/codex/star3.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The star detail screen (compact mode)"/>
@@ -199,17 +203,31 @@
       </ul>
 
       <p>
-        <strong>Warp Gates</strong> will improve the speed of which Carriers will travel between stars in hyperspace.
-        A warp gate must be built at the source star <strong>and</strong> the destination star in order for a Carrier
-        to receive the speed boost.
+        <strong>Warp Gates</strong> will improve the speed by times 3 of what Carriers typically travel between star. 
+        A warp gate must be built at the departure star and the destination star in order for a Carrier to receive the speed 
+        boost. The warp gate speed boost also multiplies by 3 even if the traveling carrier has a speed boost from a specialist. 
+        Therefore, if the carrier has a times 2 speed boost from a specialist, then when that carrier is traveling between two warp 
+        gates it will travel at times 6 speed.
       </p>
 
       <img :src="require('../assets/screenshots/codex/star4.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="A star with a warp gate"/>
 
       <p>
-        You may choose to <strong>abandon a star</strong>, in which case all Carriers and Ships at the star will be destroyed
-        and all infrastructure will remain intact, including a warp gate if present. The warp gate will be inactive so it will
-        not grant a speed boost to incoming Carriers.
+        You may choose to <strong>abandon a star</strong>, in which case all Carriers and Ships at the star will be destroyed and all infrastructure 
+        will remain intact, including a warp gate if present. When abandoned the warp gate will become inactive until the star is 
+        claimed again, so it will not grant a speed boost to incoming Carriers.
+      </p>
+
+      <p>
+        When you select a star its Hyperspace Range and Scanning Range will become visible. Hyperspace Range is displayed as a ridged ring centered 
+        on the star and the Scanning Range is displayed as a solid circle around the star.
+      </p>
+
+      <h5>Specialists</h5>
+      <p>
+        If a star or carrier has a specialist, the matching specialist icon will be displayed instead of the standard star/carrier icon. 
+        To view the specialist in detail, click on the star/carrier and scroll to the "Specialist" section. Specialists can provide 
+        any number of modifiers to a star or carrier’s statistics, and are fundamental to a strategically successful game.
       </p>
     </div>
 
@@ -243,10 +261,15 @@
         <li>Transfer Ships between Carriers and Stars.</li>
         <li>Capture neutral or enemy Stars by sending a Carrier to one.</li>
         <li>Send a Carrier to intercept an incoming enemy Carrier.</li>
-        <li>Upgrade Carriers with Specialists to grant special abilities.</li>
+        <li>Purchase a specialist on a carrier to grant special abilities.</li>
       </ul>
 
       <img :src="require('../assets/screenshots/codex/carrier2.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The carrier detail screen (compact mode)"/>
+
+      <p>
+        Carriers are displayed as small ship icons with a coloured shape, matching its owner's stars. The number of ships 
+        that a carrier has is displayed when you zoom in on it. Click on the carrier to view its statistics in detail.
+      </p>
 
       <p>
         By default a Carrier will transfer <strong>all</strong> garrisoned Ships at the Star it was built at,
