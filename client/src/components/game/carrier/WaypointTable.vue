@@ -5,10 +5,10 @@
             <tr class="bg-primary">
                 <td>Delay</td>
                 <td>Destination</td>
-                <td v-if="!showAction">
+                <td v-if="!showAction" title="Show actions">
                   <a href="javascript:;" @click="toggleShowAction">ETA</a>
                 </td>
-                <td v-if="showAction">
+                <td v-if="showAction" title="Show ETA's">
                   <a href="javascript:;" @click="toggleShowAction">Action</a>
                 </td>
                 <td class="text-right">
