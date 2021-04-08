@@ -102,6 +102,7 @@ class Map extends EventEmitter {
     this.rulerPoints.setup(game)
     this.rulerPoints.onRulerPointCreatedHandler = this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.onRulerPointsClearedHandler = this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
+    this.rulerPoints.onRulerPointRemovedHandler = this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
 
     this.rulerPointContainer.addChild(this.rulerPoints.container)
 
@@ -299,6 +300,10 @@ class Map extends EventEmitter {
 
   resetMode () {
     this.setMode('galaxy', this.modeArgs)
+  }
+
+  removeLastRulerPoint () {
+    this.rulerPoints.removeLastRulerPoint()
   }
 
   drawStars () {
@@ -626,6 +631,10 @@ class Map extends EventEmitter {
 
   onRulerPointCreated (e) {
     this.emit('onRulerPointCreated', e)
+  }
+
+  onRulerPointRemoved (e) {
+    this.emit('onRulerPointRemoved', e)
   }
 
   onRulerPointsCleared (e) {

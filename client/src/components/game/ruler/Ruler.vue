@@ -2,6 +2,7 @@
 <div class="menu-page container">
     <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
         <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
+        <button class="btn btn-sm btn-warning ml-1" @click="popRulerPoint" :disabled="points.length === 0"><i class="fas fa-undo"></i> Last</button>
     </menu-title>
     <div v-if="isCompactUIStyle">
     <div class="row bg-primary pt-2 pb-2">
@@ -154,6 +155,9 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
+    popRulerPoint () {
+      GameContainer.map.removeLastRulerPoint()
+    },
     resetRulerPoints () {
       // Bit hacky but it works.
       GameContainer.resetMode()
@@ -162,20 +166,19 @@ export default {
     onRulerPointCreated (e) {
       this.points.push(e)
 
-      this.recalculateETAs()
-      this.recalculateHyperspaceScanningLevel()
-      this.recalculateDistanceLightYears()
+      this.recalculateAll()
     },
     onRulerPointRemoved (e) {
       this.points.splice(this.points.indexOf(e), 1)
 
-      this.recalculateETAs()
-      this.recalculateHyperspaceScanningLevel()
-      this.recalculateDistanceLightYears()
+      this.recalculateAll()
     },
     onRulerPointsCleared (e) {
       this.points = []
 
+      this.recalculateAll()
+    },
+    recalculateAll () {
       this.recalculateETAs()
       this.recalculateHyperspaceScanningLevel()
       this.recalculateDistanceLightYears()
