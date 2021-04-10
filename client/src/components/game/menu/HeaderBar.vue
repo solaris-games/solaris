@@ -41,7 +41,7 @@
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (I)">
+            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
@@ -60,6 +60,7 @@ import GameHelper from '../../../services/gameHelper'
 import router from '../../../router'
 import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
+import KEYBOARD_SHORTCUTS from '../../data/keyboardShortcuts'
 import GameContainer from '../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus'
 import ResearchProgressVue from './ResearchProgress'
@@ -238,66 +239,32 @@ export default {
       }
 
       let isInGame = this.userPlayer != null
+      let menuState = KEYBOARD_SHORTCUTS.generic[keyCode.toString()]
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
       if (isInGame) {
-        switch (keyCode) {
-          case 82: // R
-            this.setMenuState(MENU_STATES.RESEARCH)
-            break
-          case 83: // S
-            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
-            break
-          case 70: // F
-            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
-            break
-          case 73: // I
-            this.setMenuState(MENU_STATES.INBOX)
-            break
-          case 86: // V
-            this.setMenuState(MENU_STATES.RULER)
-            break
-          case 78: // N
-            this.setMenuState(MENU_STATES.GAME_NOTES)
-            break
-          case 75: // K
-            this.setMenuState(MENU_STATES.LEDGER)
-            break
-          case 66: // B
-            this.setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
-            break
-          case 72: // H
-            this.panToHomeStar()
-            break
-        }
+        menuState = menuState || KEYBOARD_SHORTCUTS.player[keyCode.toString()]
       }
 
-      // Handle keyboard shortcuts for any user type.
-      switch (keyCode) {
-        case 27: // Esc
+      switch (menuState) {
+        case null:
           this.setMenuState(null, null)
           break
-        case 187: // +
-          GameContainer.zoomIn()
+        case 'HOME_STAR':
+          this.panToHomeStar()
           break
-        case 189: // -
-          GameContainer.zoomOut()
-          break
-        case 48: // -
+        case 'FIT_GALAXY':
           this.fitGalaxy()
           break
-        case 76: // L
-          this.setMenuState(MENU_STATES.LEADERBOARD)
+        case 'ZOOM_IN':
+          GameContainer.zoomIn()
           break
-        case 67: // C
-          this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
+        case 'ZOOM_OUT':
+          GameContainer.zoomOut()
           break
-        case 71: // G
-          this.setMenuState(MENU_STATES.INTEL)
-          break
-        case 79: // O
-          this.setMenuState(MENU_STATES.OPTIONS)
+        default:
+          this.setMenuState(menuState)
           break
       }
     },
