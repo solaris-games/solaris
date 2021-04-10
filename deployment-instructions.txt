@@ -1,0 +1,28 @@
+db.games.find({}).forEach(function(game) {
+	db.gamehistories.updateOne({
+            gameId: game._id,
+            tick: {
+                $lt: game.state.tick - 24
+            },
+            stars: {
+                $exists: true,
+                $not: { $size: 0 }
+            }
+        }, {
+            $unset: {
+                'players.$[].alias': '',
+                'players.$[].avatar': '',
+                'players.$[].researchingNow': '',
+                'players.$[].researchingNext': '',
+                'players.$[].credits': '',
+                'players.$[].defeated': '',
+                'players.$[].afk': '',
+                'players.$[].ready': '',
+                'players.$[].alias': '',
+                'stars': '',
+                'carriers': ''
+            }
+        });
+});
+
+db.runCommand({compact:'gamehistories'})

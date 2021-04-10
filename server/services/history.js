@@ -1,5 +1,7 @@
 const cache = require('memory-cache');
 
+const MIN_HISTORY_TICK_OFFSET = 24;
+
 module.exports = class HistoryService {
 
     constructor(historyModel, playerService) {
@@ -7,8 +9,11 @@ module.exports = class HistoryService {
         this.playerService = playerService;
     }
 
-    async listIntel(gameId, startTick = 0) {
-        let cacheKey = `intel_${gameId}_${startTick}`;
+    async listIntel(gameId, startTick, endTick) {
+        startTick = startTick || 0;
+        endTick = endTick || Number.MAX_VALUE;;
+
+        let cacheKey = `intel_${gameId}_${startTick}_${endTick}`;
         let cached = cache.get(cacheKey);
 
         if (cached) {
@@ -17,7 +22,10 @@ module.exports = class HistoryService {
 
         let intel = await this.historyModel.find({
             gameId,
-            tick: { $gte: startTick }
+            tick: { 
+                $gte: startTick,
+                $lte: endTick
+            }
         }, {
             gameId: 1,
             tick: 1,
@@ -134,34 +142,41 @@ module.exports = class HistoryService {
     }
 
     async cleanupTimeMachineHistory(game) {
+        let maxTick;
+
         // For games where the time machine is disabled, clear out the all previous tick
         // data to save space as we only need the current tick data for masking.
+        // Otherwise limit normal games to 24 ticks ago to save space.
         if (game.settings.general.timeMachine === 'disabled') {
-            await this.historyModel.updateMany({
-                gameId: game._id,
-                tick: {
-                    $lt: game.state.tick
-                },
-                stars: {
-                    $exists: true,
-                    $not: { $size: 0 }
-                }
-            }, {
-                $unset: {
-                    'players.$[].alias': '',
-                    'players.$[].avatar': '',
-                    'players.$[].researchingNow': '',
-                    'players.$[].researchingNext': '',
-                    'players.$[].credits': '',
-                    'players.$[].defeated': '',
-                    'players.$[].afk': '',
-                    'players.$[].ready': '',
-                    'players.$[].alias': '',
-                    'stars': '',
-                    'carriers': ''
-                }
-            });
+            maxTick = game.state.tick;
+        } else {
+            maxTick = Math.max(1, game.state.tick - MIN_HISTORY_TICK_OFFSET);
         }
+
+        await this.historyModel.updateMany({
+            gameId: game._id,
+            tick: {
+                $lt: game.state.tick
+            },
+            stars: {
+                $exists: true,
+                $not: { $size: 0 }
+            }
+        }, {
+            $unset: {
+                'players.$[].alias': '',
+                'players.$[].avatar': '',
+                'players.$[].researchingNow': '',
+                'players.$[].researchingNext': '',
+                'players.$[].credits': '',
+                'players.$[].defeated': '',
+                'players.$[].afk': '',
+                'players.$[].ready': '',
+                'players.$[].alias': '',
+                'stars': '',
+                'carriers': ''
+            }
+        });
     }
 
     async getHistoryByTick(gameId, tick) {

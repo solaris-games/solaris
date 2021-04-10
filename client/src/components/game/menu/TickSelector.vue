@@ -10,13 +10,13 @@
     <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display" style="position:absolute;width:300px;left:-100px;">
         <div class="row mt-0 pt-2 pb-2">
             <div class="col-12 mb-1">
-                <input type="range" min="1" :max="stateTick" class="slider" v-model="tick" @change="onRequestedTickChanged" :disabled="isLoading">
+                <input type="range" :min="minimumTick" :max="stateTick" class="slider" v-model="tick" @change="onRequestedTickChanged" :disabled="isLoading">
             </div>
 			<div class="col">
-				<button class="btn btn-sm btn-secondary" @click="loadPreviousTick(6)" :disabled="isLoading || tick <= 6" title="Jump back 6 ticks">
+				<button class="btn btn-sm btn-secondary" @click="loadPreviousTick(6)" :disabled="isLoading || tick <= minimumTick" title="Jump back 6 ticks">
                     <i class="fas fa-angle-double-left"></i>
                 </button>
-                <button class="btn btn-sm btn-secondary ml-1" @click="loadPreviousTick(1)" :disabled="isLoading || tick <= 1" title="Previous tick">
+                <button class="btn btn-sm btn-secondary ml-1" @click="loadPreviousTick(1)" :disabled="isLoading || tick <= minimumTick" title="Previous tick">
                     <i class="fas fa-angle-left"></i> Prev
                 </button>
 			</div>
@@ -24,7 +24,7 @@
 				<button class="btn btn-sm btn-secondary" @click="loadNextTick(1)" :disabled="isLoading || tick >= stateTick" title="Next tick">
                     Next <i class="fas fa-angle-right"></i>
                 </button>
-                <button class="btn btn-sm btn-secondary ml-1" @click="loadNextTick(6)" :disabled="isLoading || tick > stateTick - 6" title="Jump forward 6 ticks">
+                <button class="btn btn-sm btn-secondary ml-1" @click="loadNextTick(6)" :disabled="isLoading || tick >= stateTick" title="Jump forward 6 ticks">
                     <i class="fas fa-angle-double-right"></i>
                 </button>
 			</div>
@@ -78,7 +78,7 @@ export default {
         await this.onRequestedTickChanged()
     },
     async loadPreviousTick (ticks) {
-        this.tick = Math.max(1, this.tick - ticks)
+        this.tick = Math.max(this.minimumTick, this.tick - ticks)
         await this.onRequestedTickChanged()
     },
     async loadNextTick (ticks) {
@@ -92,6 +92,11 @@ export default {
       },
       gameTick: function () {
           return this.$store.state.game.state.tick
+      },
+      minimumTick: function () {
+          let min = this.stateTick - 24 // Maximum of 24 ticks ago.
+
+          return Math.max(1, min)
       }
   }
 }

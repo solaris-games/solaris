@@ -42,8 +42,9 @@ module.exports = (router, io, container) => {
     router.get('/api/game/:gameId/intel', middleware.authenticate, async (req, res, next) => {
         try {
             let startTick = +req.query.startTick || 0;
+            let endTick = +req.query.endTick || Number.MAX_VALUE;
             
-            let result = await container.historyService.listIntel(req.params.gameId, startTick);
+            let result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
 
             return res.status(200).json(result);
         } catch (err) {

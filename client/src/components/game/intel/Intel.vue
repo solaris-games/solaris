@@ -191,7 +191,7 @@ export default {
       this.history = null
 
       try {
-        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick)
+        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick, this.$store.state.tick)
 
         if (response.status === 200) {
           this.history = response.data

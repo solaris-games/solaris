@@ -87,13 +87,15 @@ module.exports = class GameGalaxyService {
     }
 
     _getCachedGalaxy(gameId, userId, requestedTick, currentTick) {
-        // Cache the last 24 ticks, it would be bonkers to cache everything.
-        if (currentTick - requestedTick > 24) {
-            return {
-                cacheKey: null,
-                galaxy: null
-            };
-        }
+        // Note: As we are only logging the last 24 ticks we can safely cache everything.
+        // Otherwise we'll need to add in some logic to limit how far back we cache.
+        
+        // if (currentTick - requestedTick > 24) {
+        //     return {
+        //         cacheKey: null,
+        //         galaxy: null
+        //     };
+        // }
 
         let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
         let galaxy = null;
