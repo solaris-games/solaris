@@ -636,10 +636,10 @@ class Star extends EventEmitter {
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomDepth >= 4
+    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomDepth >= 3
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomDepth >= 3
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomDepth >= 4
+    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomDepth >= 3
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomDepth >= 4
 
     let small_garrison = this.zoomDepth > 2 || this.isSelected
