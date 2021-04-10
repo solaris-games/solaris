@@ -648,14 +648,14 @@ class Star extends EventEmitter {
     if (this.text_garrison_small) this.text_garrison_small.visible = small_garrison && visible_garrison
     if (this.text_garrison_big) this.text_garrison_big.visible = !small_garrison && visible_garrison
 
-    let partial_ring = this.text_garrison_big && this.text_garrison_big.visible
-      || this.text_garrison_small && this.text_garrison_small.visible
-      || this.text_name && this.text_name.visible
+    let partial_ring = (this.text_garrison_big && this.text_garrison_big.visible)
+      || (this.text_garrison_small && this.text_garrison_small.visible)
+      || (this.text_name && this.text_name.visible)
 
     this.graphics_shape_part.visible = partial_ring
     this.graphics_shape_full.visible = !partial_ring
-    this.graphics_shape_part_warp.visible = partial_ring && this.warpGate
-    this.graphics_shape_full_warp.visible = !partial_ring && this.warpGate
+    this.graphics_shape_part_warp.visible = partial_ring && this.data.warpGate
+    this.graphics_shape_full_warp.visible = !partial_ring && this.data.warpGate
 
     // this.baseScale = this.isSelected ? 1.5 : 1
   }
