@@ -16,8 +16,9 @@ export default {
     '72': 'HOME_STAR', // H
     '32': 'HOME_STAR', // Space
     '82': MENU_STATES.RESEARCH, // R
-    '71': MENU_STATES.GALAXY, // G
-    '70': MENU_STATES.GALAXY, // F
+    '71': `${MENU_STATES.GALAXY}|stars`, // G
+    '70': `${MENU_STATES.GALAXY}|carriers`, // F
+    '83': `${MENU_STATES.GALAXY}|ships`, // S
     '77': MENU_STATES.INBOX, // M
     '78': MENU_STATES.GAME_NOTES, // N
     '76': MENU_STATES.LEDGER, // L

@@ -247,6 +247,13 @@ export default {
         menuState = menuState || KEYBOARD_SHORTCUTS.player[keyCode.toString()]
       }
 
+      if (!menuState) {
+        return
+      }
+
+      let menuArguments = menuState.split('|')[1]
+      menuState = menuState.split('|')[0]
+      
       switch (menuState) {
         case null:
           this.setMenuState(null, null)
@@ -264,7 +271,7 @@ export default {
           GameContainer.zoomOut()
           break
         default:
-          this.setMenuState(menuState)
+          this.setMenuState(menuState, menuArguments || null)
           break
       }
     },

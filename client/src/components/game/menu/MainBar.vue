@@ -75,6 +75,7 @@
         @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
+        :tab="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
