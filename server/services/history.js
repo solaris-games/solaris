@@ -156,7 +156,7 @@ module.exports = class HistoryService {
         await this.historyModel.updateMany({
             gameId: game._id,
             tick: {
-                $lt: game.state.tick
+                $lt: maxTick
             },
             stars: {
                 $exists: true,
