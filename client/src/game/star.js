@@ -14,9 +14,9 @@ class Star extends EventEmitter {
   */
   static zoomLevelDefinitions = {
     1: 0,
-    2: 150,
-    3: 225,
-    4: 300
+    2: 120,
+    3: 160,
+    4: 200
   }
 
   constructor (app) {
