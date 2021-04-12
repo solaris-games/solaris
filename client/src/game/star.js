@@ -253,7 +253,9 @@ class Star extends EventEmitter {
       return
     }
 
-    let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
+    // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
+    // TODO: Experimental:
+    let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
 
     this.graphics_natural_resources_ring.clear()
     this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
