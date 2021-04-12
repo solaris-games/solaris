@@ -66,8 +66,8 @@ export default {
 
     try {
       let requests = [
-        UserApiService.getLeaderboard(100),
-        GuildApiService.getLeaderboard(10)
+        UserApiService.getLeaderboard(null),
+        GuildApiService.getLeaderboard(null)
       ]
 
       let responses = await Promise.all(requests)
