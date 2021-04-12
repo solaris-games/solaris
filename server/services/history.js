@@ -150,7 +150,7 @@ module.exports = class HistoryService {
         if (game.settings.general.timeMachine === 'disabled') {
             maxTick = game.state.tick;
         } else {
-            maxTick = Math.max(1, game.state.tick - MIN_HISTORY_TICK_OFFSET);
+            maxTick = Math.max(0, game.state.tick - MIN_HISTORY_TICK_OFFSET);
         }
 
         await this.historyModel.updateMany({

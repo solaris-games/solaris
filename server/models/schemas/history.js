@@ -8,7 +8,7 @@ const schema = new Schema({
     productionTick: { type: Types.Number, required: true },
     players: [
         {
-            userId: { type: Types.ObjectId, required: true },
+            userId: { type: Types.ObjectId, required: false, default: null },
             playerId: { type: Types.ObjectId, required: true },
             statistics: {
                 totalStars: { type: Types.Number, required: true, default: 0 },
@@ -24,7 +24,7 @@ const schema = new Schema({
                 warpgates: { type: Types.Number, required: true, default: 0 }
             },
             alias: { type: Types.String, required: true },
-            avatar: { type: Types.String, required: true },
+            avatar: { type: Types.String, required: false, default: null },
             researchingNow: { type: Types.String, required: true },
             researchingNext: { type: Types.String, required: true },
             credits: { type: Types.Number, required: true },
