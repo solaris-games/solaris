@@ -18,9 +18,9 @@
                     <td></td>
                     <td class="text-right"><a href="javascript:;" @click="sort(['ships'])"><i class="fas fa-rocket"></i></a></td>
                     <td class="text-right"><a href="javascript:;" @click="sort(['waypoints', 'length'])"><i class="fas fa-map-marker-alt"></i></a></td>
-                    <td></td>
-                    <td><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
-                    <!-- <td>Total ETA</td> -->
+                    <!-- <td></td> -->
+                    <td class="text-right"><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
+                    <td class="text-right"><a href="javascript:;" @click="sort(['ticksEtaTotal'])">Total</a></td>
                 </tr>
             </thead>
             <tbody>

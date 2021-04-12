@@ -5,10 +5,14 @@
     <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
     <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
     <td class="text-right">{{carrier.ships == null ? '???' : carrier.ships}}</td>
-    <td class="text-right">{{carrier.waypoints.length}}</td>
-    <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td>
-    <td><span v-if="carrier.waypoints.length">{{timeRemainingEta}}</span></td>
-    <!-- <td><span v-if="carrier.waypoints.length">{{timeRemainingEtaTotal}}</span></td> -->
+    <td class="text-right" :class="{'text-warning':carrier.waypointsLooped}" :title="carrier.waypointsLooped?'Looped':'Unlooped'">{{carrier.waypoints.length}}</td>
+    <!-- <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td> -->
+    <td class="text-right">
+      <span class="text-small" v-if="carrier.waypoints.length" :title="timeRemainingEtaActual">{{timeRemainingEta}}</span>
+    </td>
+    <td class="text-right text-muted">
+      <span v-if="carrier.waypoints.length" class="text-small" :title="timeRemainingEtaTotalActual">{{timeRemainingEtaTotal}}</span>
+    </td>
 </tr>
 </template>
 
@@ -28,6 +32,8 @@ export default {
     return {
       timeRemainingEta: null,
       timeRemainingEtaTotal: null,
+      timeRemainingEtaActual: null,
+      timeRemainingEtaTotalActual: null,
       intervalFunction: null
     }
   },
@@ -49,10 +55,10 @@ export default {
       gameContainer.map.panToLocation(this.carrier.location)
     },
     recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta)
-
-      // TODO: Get total time of carrier eta
-      // this.timeRemainingEtaTotal = GameHelper.getCountdownTimeString(this.$store.state.game, this.carrier.ticksEtaTotal)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, true)
+      this.timeRemainingEtaActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, false)
+      this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, true)
+      this.timeRemainingEtaTotalActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, false)
     }
   }
 }

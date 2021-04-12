@@ -180,7 +180,7 @@ class GameHelper {
     return ticksToProduction
   }
 
-  getCountdownTimeString (game, date) {
+  getCountdownTimeString (game, date, largestUnitOnly = false) {
     if (date == null) {
       return 'Unknown'
     }
@@ -188,16 +188,16 @@ class GameHelper {
     let relativeTo = moment().utc()
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
-    return this.getDateToString(t)
+    return this.getDateToString(t, largestUnitOnly)
   }
 
-  getCountdownTimeStringByTicks (game, ticks, useNowDate = false) {
+  getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
     if (game.settings.gameTime.gameType === 'realTime') {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 
       let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
 
-      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate)
+      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
 
       return timeRemainingEta
     }
@@ -205,7 +205,7 @@ class GameHelper {
     return `${ticks} ticks`
   }
 
-  getDateToString (date) {
+  getDateToString (date, largestUnitOnly = false) {
     let days = Math.floor(date / (1000 * 60 * 60 * 24))
     let hours = Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     let mins = Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
@@ -222,15 +222,27 @@ class GameHelper {
     if (days > 0) {
       str += `${days}d `
       showDays = true
+
+      if (largestUnitOnly) {
+        return str
+      }
     }
 
     if (showDays || hours > 0) {
       str += `${hours}h `
       showHours = true
+
+      if (largestUnitOnly) {
+        return str
+      }
     }
 
     if (showHours || mins > 0) {
       str += `${mins}m `
+
+      if (largestUnitOnly) {
+        return str
+      }
     }
 
     str += `${secs}s`
