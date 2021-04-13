@@ -5,9 +5,9 @@
             <th>#</th>
             <th>Player</th>
             <th class="d-none d-md-table-cell">Guild</th>
-            <th class="text-right" title="Rank" @click="sortLeaderboard('rank')"><i class="fas fa-star text-info"></i></th>
-            <th class="text-right" title="Victories" @click="sortLeaderboard('victories')"><i class="fas fa-trophy text-warning"></i></th>
-            <th class="text-right" title="Renown" @click="sortLeaderboard('renown')"><i class="fas fa-heart text-danger"></i></th>
+            <th class="text-right" :class="getColumnClass('rank')" title="Rank" @click="sortLeaderboard('rank')"><i class="fas fa-star text-info"></i></th>
+            <th class="text-right" :class="getColumnClass('victories')" title="Victories" @click="sortLeaderboard('victories')"><i class="fas fa-trophy text-warning"></i></th>
+            <th class="text-right" :class="getColumnClass('renown')" title="Renown" @click="sortLeaderboard('renown')"><i class="fas fa-heart text-danger"></i></th>
         </thead>
         <tbody>
             <tr v-for="player in leaderboard" :key="player._id">
@@ -24,9 +24,9 @@
                 <td class="d-none d-md-table-cell">
                     {{player.guild ? player.guild.name + ' [' + player.guild.tag + ']' : ''}}
                 </td>
-                <td align="right">{{player.achievements.rank}}</td>
-                <td align="right">{{player.achievements.victories}}</td>
-                <td align="right">{{player.achievements.renown}}</td>
+                <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
+                <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
+                <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
             </tr>
         </tbody>
     </table>
@@ -44,10 +44,19 @@ export default {
   methods: {
     sortLeaderboard(sortingKey) {
       this.$emit('sortingRequested', sortingKey)
+    },
+    getColumnClass(sortingKey) {
+      return { 'table-primary': this.activeSortingKey === sortingKey }
     }
   }
 }
 </script>
 
 <style scoped>
+th {
+  border-radius: 8px 8px 0 0;
+}
+tr:last-of-type td {
+  border-radius: 0 0 8px 8px;
+}
 </style>
