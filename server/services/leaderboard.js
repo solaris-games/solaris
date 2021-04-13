@@ -1,19 +1,19 @@
 module.exports = class LeaderboardService {
     static SORTERS = {
         rank: {
-            'rank': -1,
-            'victories': -1,
-            'renown': -1
+            'achievements.rank': -1,
+            'achievements.victories': -1,
+            'achievements.renown': -1
         },
         victories: {
-            'victories': -1,
-            'rank': -1,
-            'renown': -1
+            'achievements.victories': -1,
+            'achievements.rank': -1,
+            'achievements.renown': -1
         },
         renown: {
-            'renown': -1,
-            'rank': -1,
-            'victories': -1
+            'achievements.renown': -1,
+            'achievements.rank': -1,
+            'achievements.victories': -1
         }
     }
 
