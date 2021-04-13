@@ -5,9 +5,9 @@
             <th>#</th>
             <th>Player</th>
             <th class="d-none d-md-table-cell">Guild</th>
-            <th class="text-right" :class="getColumnClass('rank')" title="Rank" @click="sortLeaderboard('rank')"><i class="fas fa-star text-info"></i></th>
-            <th class="text-right" :class="getColumnClass('victories')" title="Victories" @click="sortLeaderboard('victories')"><i class="fas fa-trophy text-warning"></i></th>
-            <th class="text-right" :class="getColumnClass('renown')" title="Renown" @click="sortLeaderboard('renown')"><i class="fas fa-heart text-danger"></i></th>
+            <th class="text-right sortable-header" :class="getColumnClass('rank')" title="Rank" @click="sortLeaderboard('rank')"><i class="fas fa-star text-info"></i></th>
+            <th class="text-right sortable-header" :class="getColumnClass('victories')" title="Victories" @click="sortLeaderboard('victories')"><i class="fas fa-trophy text-warning"></i></th>
+            <th class="text-right sortable-header" :class="getColumnClass('renown')" title="Renown" @click="sortLeaderboard('renown')"><i class="fas fa-heart text-danger"></i></th>
         </thead>
         <tbody>
             <tr v-for="player in leaderboard" :key="player._id">
@@ -58,5 +58,8 @@ th {
 }
 tr:last-of-type td {
   border-radius: 0 0 8px 8px;
+}
+.sortable-header {
+  cursor: pointer;
 }
 </style>
