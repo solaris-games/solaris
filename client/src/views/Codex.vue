@@ -102,17 +102,6 @@
         <li>Specialists</li>
       </ul>
 
-      <h6>Galaxy Territories</h6>
-      <p>
-        If you zoom far out the territories held by players will be visible. This gives you a good indication of where empires are located, 
-        and you will be able to identify strong areas and weak points that are cut off from the rest of a player's stars. 
-        There are two different styles of territory appearance, which can be accessed from the in-game options menu.
-      </p>
-<!-- 
-      <img :src="require('../assets/screenshots/codex/territories1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The galaxy in Voronoi mode"/>
-
-      <img :src="require('../assets/screenshots/codex/territories2.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="The galaxy in Marching Squares mode"/> -->
-
       <h5>Stars</h5>
       <p>
         Stars are displayed as star shaped icons with a circular halo denoating which player the star belongs to by colour.
@@ -148,9 +137,11 @@
       </p>
 
       <h5>Galaxy Territories</h5>
-      <p>If you zoom far out the territories held by players will be visible. This gives you a good indication of where empires are located,
-        and you will be able to identify strong areas and weak points.</p>
-
+      <p>
+        If you zoom far out the territories held by players will be visible. This gives you a good indication of where empires are located, 
+        and you will be able to identify strong areas and weak points that are cut off from the rest of a player's stars. 
+        There are two different styles of territory appearance, which can be accessed from the in-game options menu.
+      </p> 
       <img :src="require('../assets/screenshots/codex/map1.png')" class="img-thumbnail rounded mx-auto d-block img-sm mb-2" alt="Galaxy territories"/>
     </div>
 
