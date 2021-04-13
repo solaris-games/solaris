@@ -18,7 +18,7 @@
         <div v-if="userLeaderboard">
           <h4 class="mb-1">Top 100 Players</h4>
           <small class="text-warning">Total Players: {{totalPlayers}}</small>
-          <leaderboard-user-table class="mt-2" :leaderboard="userLeaderboard"></leaderboard-user-table>
+          <leaderboard-user-table class="mt-2" :leaderboard="userSortedLeaderboard" :activeSortingKey="userSortingKey" @sortingRequested="sortUserLeaderboard"></leaderboard-user-table>
         </div>
       </div>
       <div class="tab-pane fade" id="guilds">
@@ -54,6 +54,8 @@ export default {
     return {
       isLoading: false,
       userLeaderboard: null,
+      userSortingKey: 'rank',
+      userSortedLeaderboard: null,
       totalPlayers: 0,
       guildLeaderboard: null,
       totalGuilds: 0
@@ -75,6 +77,7 @@ export default {
       if (responses[0].status === 200) {
         this.userLeaderboard = responses[0].data.leaderboard
         this.totalPlayers = responses[0].data.totalPlayers
+        this.sortUserLeaderboard(this.userSortingKey)
       }
       
       if (responses[1].status === 200) {
@@ -86,6 +89,15 @@ export default {
     }
 
     this.isLoading = false
+  },
+  methods: {
+    sortUserLeaderboard(sortingKey) {
+      this.userSortingKey = sortingKey
+      this.userLeaderboard.sort((a, b) => {
+        return b.achievements[sortingKey] - a.achievements[sortingKey]
+      })
+      this.userSortedLeaderboard = this.userLeaderboard.slice(0, 100)
+    }
   }
 }
 </script>
