@@ -7,23 +7,42 @@ module.exports = class CombatService {
         this.specialistService = specialistService;
     }
 
-    calculate(game, defender, attacker, defenderBonus) {
+    calculate(game, defender, attacker, defenderBonus, calculateNeeded = false) {
         if (defenderBonus == null) {
             defenderBonus = game.settings.specialGalaxy.defenderBonus === 'enabled';
         }
     
-        let defenderShipsRemaining = defender.ships,
-            attackerShipsRemaining = attacker.ships;
+        let defenderShipsRemaining = defender.ships
+        let attackerShipsRemaining = attacker.ships
 
-        let defendPower = defender.weaponsLevel + (defenderBonus ? 1 : 0),
-            attackPower = attacker.weaponsLevel;
-            
-        if (Math.ceil(attacker.ships/defendPower) <= Math.ceil(defender.ships/attackPower))  {
+        const defendPower = defender.weaponsLevel + (defenderBonus ? 1 : 0)
+        const attackPower = attacker.weaponsLevel
+        
+        const defenderTurnsExact = attacker.ships / defendPower
+        const attackerTurnsExact = defender.ships / attackPower
+        const defenderTurns = Math.ceil(defenderTurnsExact)
+        const attackerTurns = Math.ceil(attackerTurnsExact)
+
+        let needed = null
+
+        if (defenderTurns <= attackerTurns)  {
             attackerShipsRemaining = 0
-            defenderShipsRemaining = defender.ships - (Math.ceil(attacker.ships/defendPower) -1) * attackPower
+            defenderShipsRemaining = defender.ships - (defenderTurns - 1) * attackPower
+            if (calculateNeeded) {
+                needed = {
+                    defender: 0,
+                    attacker: Math.ceil((attackerTurnsExact - defenderTurnsExact) * defendPower)
+                }
+            }
         } else {
             defenderShipsRemaining = 0
-            attackerShipsRemaining = attacker.ships - Math.ceil(defender.ships/attackPower) * defendPower
+            attackerShipsRemaining = attacker.ships - attackerTurns * defendPower
+            if (calculateNeeded) {
+                needed = {
+                    attacker: 0,
+                    defender: Math.ceil((defenderTurnsExact - attackerTurnsExact) * attackPower)
+                }
+            }
         }
 
         attackerShipsRemaining = Math.max(0, attackerShipsRemaining)
@@ -45,7 +64,8 @@ module.exports = class CombatService {
             lost: {
                 defender: defender.ships - defenderShipsRemaining,
                 attacker: attacker.ships - attackerShipsRemaining
-            }
+            },
+            needed
         };
     }
 
