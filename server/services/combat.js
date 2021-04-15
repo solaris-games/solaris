@@ -46,7 +46,7 @@ module.exports = class CombatService {
         attackerShipsRemaining = Math.max(0, attackerShipsRemaining)
         defenderShipsRemaining = Math.max(0, defenderShipsRemaining)
 
-        return {
+        let result = {
             weapons: {
                 defender: defendPower,
                 attacker: attackPower
@@ -62,9 +62,14 @@ module.exports = class CombatService {
             lost: {
                 defender: defender.ships - defenderShipsRemaining,
                 attacker: attacker.ships - attackerShipsRemaining
-            },
-            needed
-        };
+            }
+        }
+
+        if (calculateNeeded) {
+            result.needed = needed
+        }
+
+        return result
     }
 
     calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers) {
