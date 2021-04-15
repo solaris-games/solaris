@@ -2,18 +2,18 @@
 <div class="table-responsive">
     <table class="table table-striped table-hover" v-if="leaderboard">
         <thead>
-            <th>#</th>
-            <th>Player</th>
-            <th class="d-none d-md-table-cell">Guild</th>
-            <th class="text-right sortable-header col-sm-2" :class="getColumnClass('rank')" title="Rank" @click="sortLeaderboard('rank')">
+            <th style="width: 5%">#</th>
+            <th style="width: 30%">Player</th>
+            <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
+            <th style="width: 10%" class="text-right sortable-header col" :class="getColumnClass('rank')" title="Rank" @click="sortLeaderboard('rank')">
               <i class="fas fa-star text-info"></i>
               <i v-if="activeSortingKey === 'rank'" class="fas fa-chevron-down ml-2"></i>
             </th>
-            <th class="text-right sortable-header col-sm-2" :class="getColumnClass('victories')" title="Victories" @click="sortLeaderboard('victories')">
+            <th style="width: 10%" class="text-right sortable-header col" :class="getColumnClass('victories')" title="Victories" @click="sortLeaderboard('victories')">
               <i class="fas fa-trophy text-warning"></i>
               <i v-if="activeSortingKey === 'victories'" class="fas fa-chevron-down ml-2"></i>
             </th>
-            <th class="text-right sortable-header col-sm-2" :class="getColumnClass('renown')" title="Renown" @click="sortLeaderboard('renown')">
+            <th style="width: 10%" class="text-right sortable-header col" :class="getColumnClass('renown')" title="Renown" @click="sortLeaderboard('renown')">
               <i class="fas fa-heart text-danger"></i>
               <i v-if="activeSortingKey === 'renown'" class="fas fa-chevron-down ml-2"></i>
             </th>
