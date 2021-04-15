@@ -6,8 +6,8 @@ module.exports = (router, io, container) => {
 
     router.get('/api/user/leaderboard', middleware.authenticate, async (req, res, next) => {
         try {
-            let limit = +req.query.limit || null;
-            let result = await container.leaderboardService.getLeaderboard(limit);
+            const limit = +req.query.limit || null;
+            const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey);
                 
             return res.status(200).json(result);
         } catch (err) {

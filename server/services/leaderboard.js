@@ -1,4 +1,21 @@
 module.exports = class LeaderboardService {
+    static SORTERS = {
+        rank: {
+            'achievements.rank': -1,
+            'achievements.victories': -1,
+            'achievements.renown': -1
+        },
+        victories: {
+            'achievements.victories': -1,
+            'achievements.rank': -1,
+            'achievements.renown': -1
+        },
+        renown: {
+            'achievements.renown': -1,
+            'achievements.rank': -1,
+            'achievements.victories': -1
+        }
+    }
 
     constructor(userModel, userService, playerService, guildUserService) {
         this.userModel = userModel;
@@ -7,14 +24,11 @@ module.exports = class LeaderboardService {
         this.guildUserService = guildUserService;
     }
 
-    async getLeaderboard(limit) {
+    async getLeaderboard(limit, sortingKey) {
+        const sorter = LeaderboardService.SORTERS[sortingKey] || LeaderboardService.SORTERS['rank']
         let leaderboard = await this.userModel.find({})
         .limit(limit)
-        .sort({
-            'achievements.rank': -1,
-            'achievements.victories': -1,
-            'achievements.renown': -1
-        })
+        .sort(sorter)
         .select({
             username: 1,
             guildId: 1,
