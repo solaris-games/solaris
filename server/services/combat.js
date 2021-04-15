@@ -18,10 +18,8 @@ module.exports = class CombatService {
         const defendPower = defender.weaponsLevel + (defenderBonus ? 1 : 0)
         const attackPower = attacker.weaponsLevel
         
-        const defenderTurnsExact = attacker.ships / defendPower
-        const attackerTurnsExact = defender.ships / attackPower
-        const defenderTurns = Math.ceil(defenderTurnsExact)
-        const attackerTurns = Math.ceil(attackerTurnsExact)
+        const defenderTurns = Math.ceil(attacker.ships / defendPower)
+        const attackerTurns = Math.ceil(defender.ships / attackPower)
 
         let needed = null
 
@@ -31,7 +29,7 @@ module.exports = class CombatService {
             if (calculateNeeded) {
                 needed = {
                     defender: 0,
-                    attacker: Math.ceil((attackerTurnsExact - defenderTurnsExact) * defendPower)
+                    attacker: Math.ceil((attackerTurns + 1) * defendPower)
                 }
             }
         } else {
@@ -40,7 +38,7 @@ module.exports = class CombatService {
             if (calculateNeeded) {
                 needed = {
                     attacker: 0,
-                    defender: Math.ceil((defenderTurnsExact - attackerTurnsExact) * attackPower)
+                    defender: Math.ceil(defenderTurns * attackPower)
                 }
             }
         }
