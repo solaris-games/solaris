@@ -114,9 +114,9 @@ module.exports = class TechnologyService {
 
             if (specialist.modifiers.local != null) {
                 if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat != null) {
-                    return specialist.modifiers.local.carrierToStarCombat;
+                    return specialist.modifiers.local.carrierToStarCombat.weapons || 0;
                 } else if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat != null) {
-                    return specialist.modifiers.local.carrierToCarrierCombat;
+                    return specialist.modifiers.local.carrierToCarrierCombat.weapons || 0;
                 } else {
                     return specialist.modifiers.local.weapons || 0;
                 }

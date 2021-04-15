@@ -58,6 +58,11 @@ module.exports = class WaypointService {
                 waypoint.actionShips = 0;
             }
 
+            // Make damn sure there is a delay ticks defined.
+            if (waypoint.delayTicks == null) {
+                waypoint.delayTicks = 0;
+            }
+
             // Make sure delay ticks isn't a decimal.
             if (+waypoint.delayTicks % 1 != 0) {
                 throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} delay cannot be a decimal.`);

@@ -26,7 +26,7 @@
                               <player-icon-shape :filled="true" :shape="getStarShape()" :iconColour="getStarColour()" />
                               {{star.name}}
                             </span>
-                            <span v-if="star.specialist" :title="star.specialist.description"> ({{star.specialist.name}})</span>
+                            <span v-if="event.data.combatResult.star.specialist" :title="event.data.combatResult.star.specialist.description"> ({{event.data.combatResult.star.specialist.name}})</span>
                         </td>
                         <td class="text-right">{{event.data.combatResult.star.before}}</td>
                         <td class="text-right">{{event.data.combatResult.star.lost}}</td>
