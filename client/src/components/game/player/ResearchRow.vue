@@ -33,39 +33,37 @@ export default {
       return this.userPlayer.research[this.research].level;
     },
     playerStyle() {
-      return {
-        "text-success":
-          this.userPlayer &&
-          this.player == this.userPlayer &&
-          this.hasHighestTechLevel(this.research),
-        "text-danger":
-          this.userPlayer &&
-          this.player == this.userPlayer &&
-          this.hasLowestTechLevel(this.research),
-      };
+      if (this.userPlayer && this.userPlayer == this.player) {
+        return {
+          "text-success": this.hasHighestTechLevel,
+          "text-danger": this.hasLowestTechLevel,
+        };
+      } else {
+        return {};
+      }
     },
     userPlayerStyle() {
-        if (this.userPlayer) {
-            return {
-                "text-success": this.playerResearchLevel < this.userPlayerResearchLevel,
-                "text-danger": this.playerResearchLevel > this.userPlayerResearchLevel
-            };
-        } else {
-            return {}
-        }
+      if (this.userPlayer) {
+        return {
+          "text-success":
+            this.playerResearchLevel < this.userPlayerResearchLevel,
+          "text-danger":
+            this.playerResearchLevel > this.userPlayerResearchLevel,
+        };
+      } else {
+        return {};
+      }
     },
-  },
-  methods: {
-    hasHighestTechLevel(techKey) {
+    hasHighestTechLevel() {
       return gameHelper.userPlayerHasHighestTechLevel(
         this.$store.state.game,
-        techKey
+        this.research
       );
     },
-    hasLowestTechLevel(techKey) {
+    hasLowestTechLevel() {
       return gameHelper.userPlayerHasLowestTechLevel(
         this.$store.state.game,
-        techKey
+        this.research
       );
     },
   },
