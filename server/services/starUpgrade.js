@@ -55,7 +55,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         this.emit('onPlayerWarpGateBuilt', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star
         });
@@ -89,7 +90,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         this.emit('onPlayerWarpGateDestroyed', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star
         });
@@ -163,7 +165,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         this.emit('onPlayerCarrierBuilt', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star,
             carrier
@@ -433,7 +436,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= upgradeSummary.cost;
 
         this.emit('onPlayerInfrastructureBulkUpgraded', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             upgradeSummary
         });

@@ -51,7 +51,8 @@ module.exports = (router, io, container) => {
                 +req.params.specialistId);
 
             await container.eventService.createPlayerCarrierSpecialistHired(
-                req.game,
+                req.game._id,
+                req.game.state.tick,
                 req.player,
                 result.carrier,
                 result.specialist
@@ -80,7 +81,8 @@ module.exports = (router, io, container) => {
                 +req.params.specialistId);
 
             await container.eventService.createPlayerStarSpecialistHired(
-                req.game,
+                req.game._id,
+                req.game.state.tick,
                 req.player,
                 result.star,
                 result.specialist

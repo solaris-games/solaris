@@ -527,20 +527,31 @@ module.exports = class PlayerService extends EventEmitter {
     async declareReady(game, player) {
         player.ready = true;
 
-        await game.save();
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': true
+            }
+        });
 
         this.emit('onGamePlayerReady', {
-            game
+            gameId: game._id,
+            gameTick: game.state.tick,
         });
     }
 
     async undeclareReady(game, player) {
         player.ready = false;
 
-        await game.save();
-
-        this.emit('onGamePlayerNotReady', {
-            game
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': false
+            }
         });
     }
 

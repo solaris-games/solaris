@@ -41,7 +41,8 @@ module.exports = class LedgerService extends EventEmitter {
         ledgerB.debt -= debt;   // Player A has paid off some of the debt to player B
 
         this.emit('onDebtAdded', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             debtor: debtor._id,
             creditor: creditor._id,
             amount: debt
@@ -78,7 +79,8 @@ module.exports = class LedgerService extends EventEmitter {
         await game.save();
 
         this.emit('onDebtSettled', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             debtor: debtor._id,
             creditor: creditor._id,
             amount: debtAmount
@@ -106,7 +108,8 @@ module.exports = class LedgerService extends EventEmitter {
         await game.save();
 
         this.emit('onDebtForgiven', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             debtor: debtor._id,
             creditor: creditor._id,
             amount: debtAmount
