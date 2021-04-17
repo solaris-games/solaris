@@ -26,14 +26,14 @@ export default {
     iconClass: String,
   },
   computed: {
-    playerResearchLevel() {
+    playerResearchLevel () {
       return this.player.research[this.research].level;
     },
-    userPlayerResearchLevel() {
+    userPlayerResearchLevel () {
       return this.userPlayer.research[this.research].level;
     },
-    playerStyle() {
-      if (this.userPlayer && this.userPlayer == this.player) {
+    playerStyle () {
+      if ((this.userPlayer && this.userPlayer == this.player) || !this.userPlayer) {
         return {
           "text-success": this.hasHighestTechLevel,
           "text-danger": this.hasLowestTechLevel,
@@ -42,7 +42,7 @@ export default {
         return {};
       }
     },
-    userPlayerStyle() {
+    userPlayerStyle () {
       if (this.userPlayer) {
         return {
           "text-success":
@@ -54,19 +54,21 @@ export default {
         return {};
       }
     },
-    hasHighestTechLevel() {
-      return gameHelper.userPlayerHasHighestTechLevel(
+    hasHighestTechLevel () {
+      return gameHelper.playerHasHighestTechLevel(
         this.$store.state.game,
-        this.research
+        this.research,
+        this.player
       );
     },
-    hasLowestTechLevel() {
-      return gameHelper.userPlayerHasLowestTechLevel(
+    hasLowestTechLevel () {
+      return gameHelper.playerHasLowestTechLevel(
         this.$store.state.game,
-        this.research
+        this.research,
+        this.player
       );
-    },
-  },
+    }
+  }
 };
 </script>
 <style scoped>
