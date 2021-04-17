@@ -24,7 +24,8 @@ const schema = new Schema({
 			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
-			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' }
+			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular'], default: 'circular' },
