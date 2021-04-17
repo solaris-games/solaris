@@ -39,7 +39,7 @@ class GameContainer {
       this.viewport.destroy()
     }
 
-    let antialiasing = this.userSettings.map.antiAliasing === 'enabled';
+    let antialiasing = userSettings.map.antiAliasing === 'enabled';
 
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
