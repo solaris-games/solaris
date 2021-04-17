@@ -15,10 +15,10 @@
 
     <div class="tab-content pt-2" v-if="!isLoading">
       <div class="tab-pane fade show active" id="players">
-        <div v-if="userLeaderboard">
+        <div v-if="currentLeaderboard">
           <h4 class="mb-1">Top 100 Players</h4>
           <small class="text-warning">Total Players: {{totalPlayers}}</small>
-          <leaderboard-user-table class="mt-2" :leaderboard="userLeaderboard"></leaderboard-user-table>
+          <leaderboard-user-table class="mt-2" :leaderboard="currentLeaderboard" :activeSortingKey="userSortingKey" @sortingRequested="switchToLeaderboard"></leaderboard-user-table>
         </div>
       </div>
       <div class="tab-pane fade" id="guilds">
@@ -53,7 +53,8 @@ export default {
   data () {
     return {
       isLoading: false,
-      userLeaderboard: null,
+      userLeaderboards: {},
+      userSortingKey: 'rank',
       totalPlayers: 0,
       guildLeaderboard: null,
       totalGuilds: 0
@@ -61,20 +62,21 @@ export default {
   },
   async mounted () {
     this.isLoading = true
-    this.userLeaderboard = null
     this.guildLeaderboard = null
 
     try {
       let requests = [
-        UserApiService.getLeaderboard(100),
-        GuildApiService.getLeaderboard(10)
+        await UserApiService.getLeaderboard(100, this.userSortingKey),
+        GuildApiService.getLeaderboard(100)
       ]
 
       let responses = await Promise.all(requests)
       
       if (responses[0].status === 200) {
-        this.userLeaderboard = responses[0].data.leaderboard
-        this.totalPlayers = responses[0].data.totalPlayers
+        const result = responses[0].data
+        this.userLeaderboards = result.leaderboard
+        this.$set(this.userLeaderboards, this.userSortingKey, result.leaderboard)
+        this.totalPlayers = result.totalPlayers
       }
       
       if (responses[1].status === 200) {
@@ -86,6 +88,28 @@ export default {
     }
 
     this.isLoading = false
+  },
+  methods: {
+    async switchToLeaderboard(sortingKey) {
+      try {
+        this.userSortingKey = sortingKey
+        if (this.userLeaderboards[sortingKey]) {
+          return
+        }
+        this.isLoading = true
+        const result = await UserApiService.getLeaderboard(100, sortingKey)
+        this.$set(this.userLeaderboards, sortingKey, result.data.leaderboard)
+        this.isLoading = false
+        this.totalPlayers = result.data.totalPlayers
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  },
+  computed: {
+    currentLeaderboard () {
+      return this.userLeaderboards[this.userSortingKey]
+    }
   }
 }
 </script>

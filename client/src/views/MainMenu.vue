@@ -140,7 +140,7 @@ export default {
     },
     async loadLeaderboard () {
       try {
-        let response = await userService.getLeaderboard(10)
+        let response = await userService.getLeaderboard(10, 'rank')
 
         this.leaderboard = response.data.leaderboard
       } catch (err) {
