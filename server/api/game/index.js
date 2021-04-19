@@ -249,7 +249,7 @@ module.exports = (router, io, container) => {
         
         try {
             let events = await container.eventService.getPlayerEvents(
-                req.game,
+                req.game._id,
                 req.player,
                 startTick
             );

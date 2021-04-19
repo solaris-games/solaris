@@ -210,7 +210,8 @@ module.exports = class StarService extends EventEmitter {
         await game.save();
 
         this.emit('onPlayerStarAbandoned', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star
         });

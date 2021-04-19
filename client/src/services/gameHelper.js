@@ -366,27 +366,8 @@ class GameHelper {
     return 'Unknown'
   }
 
-  userPlayerHasHighestTechLevel (game, techKey) {
-    let userPlayer = this.getUserPlayer(game)
-
-    let levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
-
-    // If all players have the same level then nobody has the highest.
-    if (levels.length === 1) {
-      return false
-    }
-
-    let maxLevel = levels.sort((a, b) => b - a)[0]
-
-    return maxLevel === userPlayer.research[techKey].level
-  }
-
-  userPlayerHasLowestTechLevel (game, techKey) {
-    let userPlayer = this.getUserPlayer(game)
-
-    let levels = [...new Set(game.galaxy.players.map(p => {
+  playerHasLowestTechLevel (game, techKey, player) {
+    const levels = [...new Set(game.galaxy.players.map(p => {
       return p.research[techKey].level
     }))]
 
@@ -395,9 +376,36 @@ class GameHelper {
       return false
     }
 
-    let minLevel = levels.sort((a, b) => a - b)[0]
+    const minLevel = levels.sort((a, b) => a - b)[0]
 
-    return minLevel === userPlayer.research[techKey].level
+    return minLevel === player.research[techKey].level
+  }
+
+  playerHasHighestTechLevel (game, techKey, player) {
+    const levels = [...new Set(game.galaxy.players.map(p => {
+      return p.research[techKey].level
+    }))]
+
+    // If all players have the same level then nobody has the highest.
+    if (levels.length === 1) {
+      return false
+    }
+
+    const maxLevel = levels.sort((a, b) => b - a)[0]
+
+    return maxLevel === player.research[techKey].level
+  }
+
+  userPlayerHasHighestTechLevel (game, techKey) {
+    const userPlayer = this.getUserPlayer(game)
+
+    return this.playerHasHighestTechLevel(game, techKey, userPlayer)
+  }
+
+  userPlayerHasLowestTechLevel (game, techKey) {
+    const userPlayer = this.getUserPlayer(game)
+
+    return this.playerHasLowestTechLevel(game, techKey, userPlayer)
   }
 
   getPlayerStatus (player) {

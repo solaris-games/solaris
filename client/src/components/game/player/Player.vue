@@ -25,7 +25,7 @@
                     :industry="userPlayer.stats.totalIndustry"
                     :science="userPlayer.stats.totalScience"/>
 
-    <h4 v-if="userPlayer" class="mt-2">Technology</h4>
+    <h4 v-if="player" class="mt-2">Technology</h4>
     
     <research v-if="player" :playerId="player._id"/>
 

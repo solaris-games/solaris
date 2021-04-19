@@ -12,32 +12,32 @@
     "timeMachine": "disabled"
   },
   "galaxy": {
-    "galaxyType": "doughnut",
+    "galaxyType": "irregular",
     "starsPerPlayer": 20,
     "productionTicks": 20
   },
   "specialGalaxy": {
     "carrierCost": "standard",
-    "carrierUpkeepCost": "none",
+    "carrierUpkeepCost": "standard",
     "warpgateCost": "standard",
     "specialistCost": "standard",
-    "randomGates": "none",
-    "darkGalaxy": "start",
+    "randomGates": "rare",
+    "darkGalaxy": "enabled",
     "giftCarriers": "enabled",
-    "defenderBonus": "enabled",
+    "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 10
+    "carrierSpeed": 20
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 500,
+    "startingCredits": 1000,
     "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 5,
-      "industry": 5,
-      "science": 1
+      "economy": 10,
+      "industry": 10,
+      "science": 2
     },
     "developmentCost": {
       "economy": "standard",
@@ -52,8 +52,8 @@
     "startingTechnologyLevel": {
       "terraforming": 1,
       "experimentation": 1,
-      "scanning": 1,
-      "hyperspace": 1,
+      "scanning": 3,
+      "hyperspace": 2,
       "manufacturing": 1,
       "banking": 1,
       "weapons": 1
@@ -67,11 +67,11 @@
       "banking": "standard",
       "weapons": "standard"
     },
-    "bankingReward": "standard"
+    "bankingReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 30,
-    "startDelay": 30
+    "speed": 60,
+    "startDelay": 120
   }
 }

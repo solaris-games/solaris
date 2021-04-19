@@ -327,7 +327,7 @@ module.exports = class GameGalaxyService {
             let reputation = null;
 
             if (player) {
-                reputation = this.reputationService.getReputation(doc, p, player);
+                reputation = this.reputationService.getReputation(p, player);
             }
 
             // Return a subset of the user, key info only.

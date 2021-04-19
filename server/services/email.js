@@ -69,11 +69,11 @@ module.exports = class EmailService {
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
 
-        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.game));
-        this.gameTickService.on('onGameEnded', (data) => this.sendGameFinishedEmail(data.game));
-        this.gameTickService.on('onGameGalacticCycleTicked', (data) => this.sendGameCycleSummaryEmail(data.game));
+        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
+        this.gameTickService.on('onGameEnded', (data) => this.sendGameFinishedEmail(data.gameId));
+        this.gameTickService.on('onGameGalacticCycleTicked', (data) => this.sendGameCycleSummaryEmail(data.gameId));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
-        this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.game));
+        this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
     }
 
     _getTransport() {
@@ -149,7 +149,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameStartedEmail(game) {
+    async sendGameStartedEmail(gameId) {
+        let game = await this.gameService.getById(gameId);
         let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
@@ -171,7 +172,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameFinishedEmail(game) {
+    async sendGameFinishedEmail(gameId) {
+        let game = await this.gameService.getById(gameId);
         let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
@@ -193,7 +195,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameCycleSummaryEmail(game) {        
+    async sendGameCycleSummaryEmail(gameId) {      
+        let game = await this.gameService.getById(gameId);  
         let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
         let leaderboardHtml = leaderboard.map(l => {
@@ -234,7 +237,9 @@ module.exports = class EmailService {
         }
     }
 
-    async trySendLastPlayerTurnReminder(game) {
+    async trySendLastPlayerTurnReminder(gameId) {
+        let game = await this.gameService.getById(gameId);
+
         if (!this.gameService.isTurnBasedGame(game)) {
             throw new Error('Cannot send a last turn reminder for non turn based games.');
         }
@@ -276,7 +281,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendCustomGameRemovedEmail(game) {
+    async sendCustomGameRemovedEmail(gameId) {
+        let game = await this.gameService.getById(gameId);
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {

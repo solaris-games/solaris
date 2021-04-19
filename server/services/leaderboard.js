@@ -1,4 +1,21 @@
 module.exports = class LeaderboardService {
+    static SORTERS = {
+        rank: {
+            'achievements.rank': -1,
+            'achievements.victories': -1,
+            'achievements.renown': -1
+        },
+        victories: {
+            'achievements.victories': -1,
+            'achievements.rank': -1,
+            'achievements.renown': -1
+        },
+        renown: {
+            'achievements.renown': -1,
+            'achievements.rank': -1,
+            'achievements.victories': -1
+        }
+    }
 
     constructor(userModel, userService, playerService, guildUserService) {
         this.userModel = userModel;
@@ -7,14 +24,11 @@ module.exports = class LeaderboardService {
         this.guildUserService = guildUserService;
     }
 
-    async getLeaderboard(limit) {
+    async getLeaderboard(limit, sortingKey) {
+        const sorter = LeaderboardService.SORTERS[sortingKey] || LeaderboardService.SORTERS['rank']
         let leaderboard = await this.userModel.find({})
         .limit(limit)
-        .sort({
-            'achievements.rank': -1,
-            'achievements.victories': -1,
-            'achievements.renown': -1
-        })
+        .sort(sorter)
         .select({
             username: 1,
             guildId: 1,
@@ -123,6 +137,11 @@ module.exports = class LeaderboardService {
                     user.achievements.victories++; // Increase the winner's victory count
                     user.credits++; // Give the winner a galactic credit.
                     user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
+
+                    // Break out here if the rank is awarded to the winner only.
+                    if (game.settings.general.awardRankTo === 'winner') {
+                        break;
+                    }
                 } else {
                     user.achievements.rank += leaderboard.length / 2 - i;
                     user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.

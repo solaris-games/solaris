@@ -115,7 +115,7 @@ module.exports = class BroadcastService {
         });
     }
 
-    gamePlayerDebtAdded(game, debtorPlayerId, creditorPlayerId, amount) {
+    gamePlayerDebtAdded(debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -126,7 +126,7 @@ module.exports = class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtAdded', data);
     }
 
-    gamePlayerDebtForgiven(game, debtorPlayerId, creditorPlayerId, amount) {
+    gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -137,7 +137,7 @@ module.exports = class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtForgiven', data);
     }
 
-    gamePlayerDebtSettled(game, debtorPlayerId, creditorPlayerId, amount) {
+    gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
