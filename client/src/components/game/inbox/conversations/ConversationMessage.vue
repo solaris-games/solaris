@@ -42,7 +42,7 @@ export default {
     let onStarClicked = (id) => this.panToStar(id)
     let onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
     
-    mentionHelper.renderMessageWithMentions(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
+    mentionHelper.renderMessageWithMentionsAndLinks(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
   },
   methods: {
     getUserPlayer () {
