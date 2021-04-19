@@ -576,7 +576,8 @@ module.exports = class GameTickService extends EventEmitter {
         // Log the combat event
         if (star) {
             this.emit('onPlayerCombatStar', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 defender,
                 attackers,
                 star,
@@ -584,7 +585,8 @@ module.exports = class GameTickService extends EventEmitter {
             });
         } else {
             this.emit('onPlayerCombatCarrier', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 defender,
                 attackers,
                 combatResult
@@ -639,7 +641,8 @@ module.exports = class GameTickService extends EventEmitter {
             }
 
             this.emit('onStarCaptured', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 player: newStarPlayer,
                 star,
                 capturedBy: newStarPlayer,
@@ -647,7 +650,8 @@ module.exports = class GameTickService extends EventEmitter {
             });
             
             this.emit('onStarCaptured', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 player: defender,
                 star,
                 capturedBy: newStarPlayer,
@@ -720,7 +724,8 @@ module.exports = class GameTickService extends EventEmitter {
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
 
                 this.emit('onPlayerGalacticCycleCompleted', {
-                    game, 
+                    gameId: game._id,
+                    gameTick: game.state.tick,
                     player, 
                     creditsEconomy: creditsResult.creditsFromEconomy, 
                     creditsBanking: creditsResult.creditsFromBanking, 
@@ -732,7 +737,8 @@ module.exports = class GameTickService extends EventEmitter {
             }
 
             this.emit('onGameGalacticCycleTicked', {
-                game
+                gameId: game._id,
+                gameTick: game.state.tick
             });
         }
     }
@@ -768,7 +774,8 @@ module.exports = class GameTickService extends EventEmitter {
                     }
 
                     this.emit('onPlayerAfk', {
-                        game, 
+                        gameId: game._id,
+                        gameTick: game.state.tick,
                         player
                     });
                 }
@@ -778,7 +785,8 @@ module.exports = class GameTickService extends EventEmitter {
                     }
 
                     this.emit('onPlayerDefeated', {
-                        game, 
+                        gameId: game._id,
+                        gameTick: game.state.tick,
                         player
                     });
                 }
@@ -802,7 +810,8 @@ module.exports = class GameTickService extends EventEmitter {
             }
 
             this.emit('onGameEnded', {
-                game
+                gameId: game._id,
+                gameTick: game.state.tick
             });
 
             return true;

@@ -241,13 +241,15 @@ module.exports = class GameService extends EventEmitter {
         await user.save();
 
         this.emit('onPlayerJoined', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player
         });
 
         if (gameIsFull) {
             this.emit('onGameStarted', {
-                game
+                gameId: game._id,
+                gameTick: game.state.tick
             });
         }
 
@@ -281,7 +283,8 @@ module.exports = class GameService extends EventEmitter {
         await user.save();
 
         this.emit('onPlayerQuit', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             alias
         });
@@ -322,7 +325,8 @@ module.exports = class GameService extends EventEmitter {
         await game.save();
 
         this.emit('onPlayerDefeated', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player
         });
     }

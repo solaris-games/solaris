@@ -58,7 +58,7 @@
     </div>
 
     <div class="mt-3">
-      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount">Close Account</button>
+      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount">Delete Account</button>
       <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
     </div>
   </view-container>
@@ -106,9 +106,9 @@ export default {
       this.isChangingEmailNotifications = false
     },
     async closeAccount () {
-      if (await this.$confirm('Close account', 'Are you sure you want to close your account?')) {
-        if (await this.$confirm('Close account', 'Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
-          if (!await this.$confirm('Close account', 'Last chance?')) {
+      if (await this.$confirm('Delete account', 'Are you sure you want to close your account?')) {
+        if (await this.$confirm('Delete account', 'Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
+          if (!await this.$confirm('Delete account', 'Last chance?')) {
             return
           }
         } else {

@@ -25,7 +25,7 @@ class GameContainer {
     }
   }
 
-  setupApp (store) {
+  setupApp (store, userSettings) {
     this.store = store
 
     // Cleanup if the app already exists.
@@ -39,12 +39,14 @@ class GameContainer {
       this.viewport.destroy()
     }
 
+    let antialiasing = userSettings.map.antiAliasing === 'enabled';
+
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
       height: window.innerHeight, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
-      antialias: true,
+      antialias: antialiasing,
       autoResize: true
     })
 

@@ -69,7 +69,8 @@ module.exports = class TradeService extends EventEmitter {
         await toPlayerUser.save();
 
         let eventObject = {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
             amount,
@@ -128,7 +129,8 @@ module.exports = class TradeService extends EventEmitter {
         await toUser.save();
 
         let eventObject = {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
             amount,
@@ -203,7 +205,8 @@ module.exports = class TradeService extends EventEmitter {
         await toUser.save();
 
         let eventObject = {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
             technology: {
