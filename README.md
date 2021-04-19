@@ -1,10 +1,22 @@
 # Solaris
 
-This is a 4X strategy game that aims to loosely clone the game [Neptune's Pride](https://np.ironhelmet.com).
-
-Visit [solaris.games](https://solaris.games) to play now!
+Solaris is a slow-burn browser game heavily inspired by [Neptune's Pride](https://np.ironhelmet.com) and [Subterfuge](http://subterfuge-game.com/).
 
 ![](client/src/assets/screenshots/game1.png)
+
+- Build economic, industrial and scientific infrastructure to improve your empire.
+- Build carriers to travel to new stars or to fight your enemies.
+- Research new technologies to gain an edge over your opponents.
+- Hire specialists which grant special abilities to stars and carriers like increased weapons and speed.
+- Set up trade with your allies to get ahead of the curve.
+- Play games with up to 32 players at a time.
+- Participate in group chats with your allies to discuss strategy.
+- Fight other players and capture stars to win the game.
+- Games last around 2-3 weeks, and you don't need to commit a lot of time to play!
+- Play on any device that has a web browser.
+- Its completely free!
+
+Visit [solaris.games](https://solaris.games) to play now!
 
 ### Server
 The server uses the following tech:
