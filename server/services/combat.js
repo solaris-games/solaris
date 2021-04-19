@@ -12,39 +12,41 @@ module.exports = class CombatService {
             defenderBonus = game.settings.specialGalaxy.defenderBonus === 'enabled';
         }
     
-        let defenderShipsRemaining = defender.ships
-        let attackerShipsRemaining = attacker.ships
+        let defenderShipsRemaining = defender.ships;
+        let attackerShipsRemaining = attacker.ships;
 
-        const defendPower = defender.weaponsLevel + (defenderBonus ? 1 : 0)
-        const attackPower = attacker.weaponsLevel
+        const defendPower = defender.weaponsLevel + (defenderBonus ? 1 : 0);
+        const attackPower = attacker.weaponsLevel;
         
-        const defenderTurns = Math.ceil(attacker.ships / defendPower)
-        const attackerTurns = Math.ceil(defender.ships / attackPower)
+        const defenderTurns = Math.ceil(attacker.ships / defendPower);
+        const attackerTurns = Math.ceil(defender.ships / attackPower);
 
-        let needed = null
+        let needed = null;
 
         if (defenderTurns <= attackerTurns)  {
-            attackerShipsRemaining = 0
-            defenderShipsRemaining = defender.ships - (defenderTurns - 1) * attackPower
+            attackerShipsRemaining = 0;
+            defenderShipsRemaining = defender.ships - (defenderTurns - 1) * attackPower;
+
             if (calculateNeeded) {
                 needed = {
                     defender: 0,
                     attacker: Math.ceil((attackerTurns + 1) * defendPower)
-                }
+                };
             }
         } else {
-            defenderShipsRemaining = 0
-            attackerShipsRemaining = attacker.ships - attackerTurns * defendPower
+            defenderShipsRemaining = 0;
+            attackerShipsRemaining = attacker.ships - attackerTurns * defendPower;
+
             if (calculateNeeded) {
                 needed = {
                     attacker: 0,
                     defender: Math.ceil(defenderTurns * attackPower)
-                }
+                };
             }
         }
 
-        attackerShipsRemaining = Math.max(0, attackerShipsRemaining)
-        defenderShipsRemaining = Math.max(0, defenderShipsRemaining)
+        attackerShipsRemaining = Math.max(0, attackerShipsRemaining);
+        defenderShipsRemaining = Math.max(0, defenderShipsRemaining);
 
         let result = {
             weapons: {
@@ -63,13 +65,13 @@ module.exports = class CombatService {
                 defender: defender.ships - defenderShipsRemaining,
                 attacker: attacker.ships - attackerShipsRemaining
             }
-        }
+        };
 
         if (calculateNeeded) {
-            result.needed = needed
+            result.needed = needed;
         }
 
-        return result
+        return result;
     }
 
     calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers) {
