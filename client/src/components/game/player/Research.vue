@@ -13,6 +13,7 @@
           </thead>
           <tbody>
             <research-row
+              v-if="isTechnologyEnabled('scanning')"
               research="scanning"
               iconClass="fa-binoculars"
               title="Scanning"
@@ -20,6 +21,7 @@
               :userPlayer="userPlayer"
             ></research-row>
             <research-row
+              v-if="isTechnologyEnabled('hyperspace')"
               research="hyperspace"
               iconClass="fa-gas-pump"
               title="Hyperspace Range"
@@ -27,6 +29,7 @@
               :userPlayer="userPlayer"
             ></research-row>
             <research-row
+              v-if="isTechnologyEnabled('terraforming')"
               research="terraforming"
               iconClass="fa-globe-europe"
               title="Terraforming"
@@ -34,6 +37,7 @@
               :userPlayer="userPlayer"
             ></research-row>
             <research-row
+              v-if="isTechnologyEnabled('experimentation')"
               research="experimentation"
               iconClass="fa-microscope"
               title="Experimentation"
@@ -41,6 +45,7 @@
               :userPlayer="userPlayer"
             ></research-row>
             <research-row
+              v-if="isTechnologyEnabled('weapons')"
               research="weapons"
               iconClass="fa-fighter-jet"
               title="Weapons"
@@ -48,6 +53,7 @@
               :userPlayer="userPlayer"
             ></research-row>
             <research-row
+              v-if="isTechnologyEnabled('banking')"
               research="banking"
               iconClass="fa-money-bill-alt"
               title="Banking"
@@ -55,6 +61,7 @@
               :userPlayer="userPlayer"
             ></research-row>
             <research-row
+              v-if="isTechnologyEnabled('manufacturing')"
               research="manufacturing"
               iconClass="fa-industry"
               title="Manufacturing"
@@ -69,8 +76,9 @@
 </template>
 
 <script>
-import gameHelper from "../../../services/gameHelper";
-import ResearchRow from "./ResearchRow";
+import gameHelper from "../../../services/gameHelper"
+import TechnologyHelper from "../../../services/technologyHelper"
+import ResearchRow from "./ResearchRow"
 
 export default {
   components: {
@@ -78,6 +86,14 @@ export default {
   },
   props: {
     playerId: String,
+  },
+  methods: {
+    isTechnologyEnabled (technologyKey) {
+      return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, technologyKey)
+    },
+    isTechnologyResearchable (technologyKey) {
+      return TechnologyHelper.isTechnologyResearchable(this.$store.state.game, technologyKey)
+    }
   },
   computed: {
     player() {
