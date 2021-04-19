@@ -30,7 +30,7 @@ module.exports = class CombatService {
             if (calculateNeeded) {
                 needed = {
                     defender: 0,
-                    attacker: Math.ceil((attackerTurns + 1) * defendPower)
+                    attacker: attackerTurns * defendPower + 1
                 };
             }
         } else {
@@ -40,7 +40,7 @@ module.exports = class CombatService {
             if (calculateNeeded) {
                 needed = {
                     attacker: 0,
-                    defender: Math.ceil(defenderTurns * attackPower)
+                    defender: (defenderTurns - 1) * attackPower + 1
                 };
             }
         }
