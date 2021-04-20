@@ -201,7 +201,13 @@ class Carrier extends EventEmitter {
       let starDestination = this.stars.find(s => s.data._id === waypoint.destination)
 
       if (!starDestination) {
-        return
+        const sourceStar = this.stars.find(s => s.data._id === waypoint.source)
+        if (!sourceStar) {
+          return
+        }
+
+        const angle = this.getAngleTowardsLocation(this.data.location, sourceStar.data.location)
+        graphics.angle = (angle * (180 / Math.PI)) - 90
       }
 
       let destination = starDestination.data.location
