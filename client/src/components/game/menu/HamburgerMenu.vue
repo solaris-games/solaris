@@ -35,8 +35,8 @@
             <router-link to="/codex" class="dropdown-item"><i class="fas fa-question mr-2"></i>Help</router-link>
             <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
-            <router-link to="/" class="dropdown-item"><i class="fas fa-sign-in-alt mr-2"></i>Log In</router-link>
-            <router-link to="/account/create" class="dropdown-item"><i class="fas fa-user-plus mr-2"></i>Register</router-link>
+            <router-link v-if="!isLoggedIn" to="/" class="dropdown-item"><i class="fas fa-sign-in-alt mr-2"></i>Log In</router-link>
+            <router-link v-if="!isLoggedIn" to="/account/create" class="dropdown-item"><i class="fas fa-user-plus mr-2"></i>Register</router-link>
         </div>
     </div>
 </template>
