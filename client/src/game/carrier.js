@@ -208,6 +208,7 @@ class Carrier extends EventEmitter {
 
         const angle = this.getAngleTowardsLocation(this.data.location, sourceStar.data.location)
         graphics.angle = (angle * (180 / Math.PI)) - 90
+        return
       }
 
       let destination = starDestination.data.location
