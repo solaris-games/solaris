@@ -61,7 +61,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
     
-    router.get('/api/user/settings', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/settings', async (req, res, next) => {
         try {
             let settings = await container.userService.getGameSettings(req.session.userId);
 

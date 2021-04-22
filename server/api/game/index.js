@@ -52,7 +52,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/galaxy', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/:gameId/galaxy', async (req, res, next) => {
         try {
             let tick = +req.query.tick || null;
     

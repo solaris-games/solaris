@@ -29,6 +29,7 @@ export default {
     
     if (!isHiddenPlayerOnlineStatus) {
       this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
+      this.recalculateOnlineStatus()
     }
   },
   methods: {

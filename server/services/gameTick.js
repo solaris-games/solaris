@@ -114,8 +114,8 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     canTick(game) {
-        // Cannot perform a game tick on a paused game
-        if (game.state.paused) {
+        // Cannot perform a game tick on a paused or completed game.
+        if (game.state.paused || game.state.endDate) {
             return false;
         }
 

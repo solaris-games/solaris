@@ -625,6 +625,10 @@ class GameHelper {
   }
 
   canTick(game) {
+    if (this.isGameFinished(game)) {
+      return false
+    }
+
     let lastTick = moment(game.state.lastTickDate).utc();
     let nextTick;
 

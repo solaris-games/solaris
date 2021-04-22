@@ -3,13 +3,13 @@
     :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer}">
     <div class="row mt-0" :style="{'background-color': getFriendlyColour(fromPlayer.colour.value)}" style="height:6px;"></div>
     <div class="row mt-0 bg-secondary" v-if="message">
-      <div class="col mt-1">
+      <div class="col-12 mt-1 mb-0">
         <span class="pointer" @click="onOpenPlayerDetailRequested(fromPlayer)">
           <player-icon :playerId="fromPlayer._id"/>
           <strong class="ml-2">{{fromPlayer.alias}}</strong>
         </span>
       </div>
-      <div class="col-auto">
+      <div class="col-12">
         <p class="mt-0 mb-0">
           <i class="fas fa-envelope mr-2" v-if="!userPlayerHasReadMessage"></i>
           <small><em>{{dateText}}</em></small>
@@ -78,7 +78,7 @@ export default {
       const date = GameHelper.getDateString(this.message.sentDate)
       let tick = ''
       if (this.message.sentTick || this.message.sentTick === 0) {
-        tick = ` (${this.message.sentTick})`
+        tick = ` (tick ${this.message.sentTick})`
       }
       return date + tick
     }

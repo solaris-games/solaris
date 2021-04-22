@@ -24,6 +24,7 @@ module.exports = (router, io, container) => {
     
             // Store the user id in the session.
             req.session.userId = userId;
+            req.session.isImpersonating = false;
 
             return res.status(200).json({id: userId});
         } catch (err) {

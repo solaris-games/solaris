@@ -50,9 +50,10 @@ export default {
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
 
-    this.polling = setInterval(this.touchPlayer, 60000)
-
-    this.touchPlayer()
+    if (this.$store.state.userId) {
+      this.polling = setInterval(this.touchPlayer, 60000)
+      this.touchPlayer()
+    }
   },
 
   destroyed () {

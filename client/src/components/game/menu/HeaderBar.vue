@@ -11,7 +11,7 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col pt-1" v-if="isTimeMachineEnabled">
+        <div class="col pt-1" v-if="isLoggedIn && isTimeMachineEnabled">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
@@ -122,7 +122,8 @@ export default {
       this.recalculateTimeRemaining()
 
       if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+        this.recalculateTimeRemaining()
       }
     },
     setMenuState (state, args) {
@@ -238,8 +239,14 @@ export default {
         return
       }
 
+      let isLoggedIn = this.$store.state.userId != null
       let isInGame = this.userPlayer != null
-      let menuState = KEYBOARD_SHORTCUTS.generic[keyCode.toString()]
+
+      let menuState = KEYBOARD_SHORTCUTS.all[keyCode.toString()]
+
+      if (isLoggedIn) {
+        menuState = menuState || KEYBOARD_SHORTCUTS.user[keyCode.toString()]
+      }
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
@@ -282,6 +289,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
