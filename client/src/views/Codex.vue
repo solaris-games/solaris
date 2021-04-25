@@ -18,6 +18,7 @@
       <li><a @click="scrollTo('turnBasedGames')" href="javascript:;">Turn Based Games</a></li>
       <li><a @click="scrollTo('achievements')" href="javascript:;">Achievements</a></li>
       <!-- <li><a @click="scrollTo('keyboardShortcuts')" href="javascript:;">Keyboard Shortcuts</a></li> -->
+      <li><a @click="scrollTo('gameTickEvents')" href="javascript:;">Game Tick Events</a></li>
     </ul>
 
     <div ref="introduction">
@@ -380,6 +381,31 @@
 
       <p></p>
     </div> -->
+
+    <div ref="gameTickEvents">
+      <view-subtitle title="Game Tick Events"/>
+
+      <p>
+        The game runs in ticks, during a tick the following events happen in order:
+      </p>
+
+      <ul>
+        <li>1. Carriers move and carrier-to-carrier combat is resolved.</li>
+        <li>2. Carrier-to-star combat is resolved.</li>
+        <li>3. Carrier drop actions are performed.</li>
+        <li>4. Ships are built at stars.</li>
+        <li>5. Carrier collect actions are performed.</li>
+        <li>6. Carrier garrison actions are performed.</li>
+        <li>7. Research is performed.</li>
+        <li>8. If at the end of a galactic cycle:</li>
+        <li>8a. Players receive credits from economy and banking.</li>
+        <li>8b. Experimentations are performed.</li>
+        <li>8c. Carrier upkeep is deducted.</li>
+        <li>9. Game checks for afk and defeated players.</li>
+        <li>10. Game checks for a winner.</li>
+        <li>11. AI actions are performed.</li>
+      </ul>
+    </div>
   </view-container>
 </template>
 

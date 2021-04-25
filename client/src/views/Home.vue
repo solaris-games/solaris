@@ -7,10 +7,11 @@
     </div>
 
     <div class="row">
-      <div class="col-sm-12 col-md-6">
+      <div class="col-sm-12 col-md-6 pb-3">
         <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p>Will you conquer the galaxy?</p>
+        <router-link to="/codex">Learn more...</router-link>
       </div>
       <div class="col-sm-12 col-md-6">
         <h4>Login</h4>

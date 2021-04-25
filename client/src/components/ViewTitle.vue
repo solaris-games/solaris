@@ -21,7 +21,16 @@ export default {
   },
   methods: {
     navigate () {
-      router.push({ name: this.navigation })
+      if (this.isLoggedIn) {
+        router.push({ name: this.navigation })
+      } else {
+        router.push({name: 'home'})
+      }
+    }
+  },
+  computed: {
+    isLoggedIn () {
+      return this.$store.state.userId != null
     }
   }
 }
