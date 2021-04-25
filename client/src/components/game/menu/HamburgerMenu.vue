@@ -10,7 +10,7 @@
                 <button class="btn btn-primary btn-sm mr-1 mb-1" @click="zoomOut()" title="Zoom Out (-)"><i class="fas fa-search-minus"></i></button>
                 <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="panToHomeStar()" title="Home (H)"><i class="fas fa-home"></i></button>
                 <div>
-                    <button class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></button>
+                    <button v-if="isLoggedIn" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></button>
                     <button v-if="userPlayer" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.RULER)" title="Ruler (V)"><i class="fas fa-ruler"></i></button>
                     <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm mr-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></button>
                     <button class="btn btn-primary btn-sm mr-1 mb-1" @click="reloadPage" title="Reload Game"><i class="fas fa-sync"></i></button>
@@ -30,11 +30,13 @@
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
             </div>
-            <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-            <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
+            <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+            <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
             <router-link to="/codex" class="dropdown-item"><i class="fas fa-question mr-2"></i>Help</router-link>
             <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
-            <a class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
+            <a v-if="isLoggedIn" class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
+            <router-link v-if="!isLoggedIn" to="/" class="dropdown-item"><i class="fas fa-sign-in-alt mr-2"></i>Log In</router-link>
+            <router-link v-if="!isLoggedIn" to="/account/create" class="dropdown-item"><i class="fas fa-user-plus mr-2"></i>Register</router-link>
         </div>
     </div>
 </template>
@@ -101,10 +103,13 @@ export default {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
     gameIsJoinable () {
-      return GameHelper.gameHasOpenSlots(this.$store.state.game)
+      return this.$store.state.userId != null && GameHelper.gameHasOpenSlots(this.$store.state.game)
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     }
   }
 }

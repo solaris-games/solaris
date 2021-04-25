@@ -73,8 +73,12 @@
         <loading-spinner :loading="isLoading"/>
 
         <div class="row bg-secondary pt-2 pb-2" v-if="result">
-            <p class="col text-right mb-0" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
-            <p class="col text-right mb-0" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
+          <p class="col text-center mb-0" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
+          <p class="col text-center mb-0" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
+        </div>
+        <div class="row bg-secondary pb-2" v-if="result">
+          <p class="col text-center mb-0" v-if="result.needed.defender"><small><span class="text-success">Defender</span> would need <span class="text-success">{{result.needed.defender}}</span> ship(s) to win.</small></p>
+          <p class="col text-center mb-0" v-if="result.needed.attacker"><small><span class="text-danger">Attacker</span> would need <span class="text-danger">{{result.needed.attacker}}</span> ship(s) to win.</small></p>
         </div>
     </div>
 </template>

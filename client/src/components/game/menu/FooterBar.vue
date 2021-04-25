@@ -24,7 +24,7 @@
             <i class="fas fa-sun"></i>
           </button>
         </div>
-        <div class="col">
+        <div class="col" v-if="isLoggedIn">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.INTEL)">
             <i class="fas fa-chart-line"></i>
           </button>
@@ -88,6 +88,9 @@ export default {
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     }
   }
 }

@@ -38,7 +38,7 @@ module.exports = class GameGalaxyService {
         } else {
             cached = this._getCachedGalaxy(gameId, userId, tick, gameStateTick);
 
-            if (cached.galaxy) {
+            if (cached && cached.galaxy) {
                 return cached.galaxy;
             }
         }
@@ -97,6 +97,10 @@ module.exports = class GameGalaxyService {
         //     };
         // }
 
+        if (!userId) {
+            return null;
+        }
+
         let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
         let galaxy = null;
 
@@ -124,6 +128,10 @@ module.exports = class GameGalaxyService {
     }
 
     _getUserPlayer(doc, userId) {
+        if (!userId) {
+            return null;
+        }
+        
         return doc.galaxy.players.find(x => x.userId === userId.toString());
     }
 

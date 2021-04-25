@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/api/game/:gameId/specialists/carrier', middleware.authenticate, middleware.loadGameLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/specialists/carrier', middleware.loadGameLean, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {
@@ -20,7 +20,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/specialists/star', middleware.authenticate, middleware.loadGameLean, async (req, res, next) => {
+    router.get('/api/game/:gameId/specialists/star', middleware.loadGameLean, async (req, res, next) => {
         let errors = [];
 
         if (errors.length) {

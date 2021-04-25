@@ -1,16 +1,18 @@
 import MENU_STATES from './menuStates'
 
 export default {
-  generic: {
+  all: {
     '27': null, // Esc
     '81': MENU_STATES.LEADERBOARD, // Q
+    '187': 'ZOOM_IN', // +
+    '189': 'ZOOM_OUT', // -
+    '90': 'FIT_GALAXY' // Z
+  },
+  user: {
     '67': MENU_STATES.COMBAT_CALCULATOR, // C
     '86': MENU_STATES.RULER, // V
     '73': MENU_STATES.INTEL, // I
     '79': MENU_STATES.OPTIONS, // O
-    '187': 'ZOOM_IN', // +
-    '189': 'ZOOM_OUT', // -
-    '90': 'FIT_GALAXY' // Z
   },
   player: {
     '72': 'HOME_STAR', // H

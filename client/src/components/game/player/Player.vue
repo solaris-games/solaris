@@ -25,7 +25,7 @@
                     :industry="userPlayer.stats.totalIndustry"
                     :science="userPlayer.stats.totalScience"/>
 
-    <h4 v-if="userPlayer" class="mt-2">Technology</h4>
+    <h4 v-if="player" class="mt-2">Technology</h4>
     
     <research v-if="player" :playerId="player._id"/>
 
@@ -110,7 +110,7 @@ export default {
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
-    if (!this.player.isEmptySlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
+    if (this.$store.state.userId && !this.player.isEmptySlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
       try {
         let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 

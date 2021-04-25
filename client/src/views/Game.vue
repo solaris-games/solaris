@@ -82,7 +82,7 @@ export default {
     if (userPlayer && !userPlayer.defeated) {
       this.menuState = MENU_STATES.LEADERBOARD
     } else {
-      if (GameHelper.gameHasOpenSlots(this.$store.state.game)) {
+      if (this.$store.state.userId && GameHelper.gameHasOpenSlots(this.$store.state.game)) {
         this.menuState = MENU_STATES.WELCOME
       } else {
         this.menuState = MENU_STATES.LEADERBOARD // Assume the user is spectating.
@@ -313,6 +313,10 @@ export default {
       player.isOnline = false
     },
     async reloadGameCheck () {
+      if (!this.isLoggedIn) {
+        return
+      }
+
       // Check if the next tick date has passed, if so check if the server has finished the game tick.
       let canTick = gameHelper.canTick(this.$store.state.game)
 
@@ -345,6 +349,9 @@ export default {
     },
     hasGame () {
       return this.$store.state.game
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     }
   }
 }

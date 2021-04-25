@@ -24,7 +24,9 @@ module.exports = class UserService extends EventEmitter {
             password: 0,
             resetPasswordToken: 0,
             premiumEndDate: 0,
-            banned: 0
+            banned: 0,
+            lastSeen: 0,
+            lastSeenIP: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -53,7 +55,9 @@ module.exports = class UserService extends EventEmitter {
             email: 0,
             emailEnabled: 0,
             username: 0,
-            gameSettings: 0
+            gameSettings: 0,
+            lastSeen: 0,
+            lastSeenIP: 0
         });
     }
 
@@ -68,7 +72,9 @@ module.exports = class UserService extends EventEmitter {
             email: 0,
             emailEnabled: 0,
             username: 0,
-            gameSettings: 0
+            gameSettings: 0,
+            lastSeen: 0,
+            lastSeenIP: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -283,6 +289,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async getGameSettings(userId) {
+        if (!userId) {
+            return new this.userModel().gameSettings; // Return the default config
+        }
+
         let user = await this.getMe(userId);
 
         return user.gameSettings;
