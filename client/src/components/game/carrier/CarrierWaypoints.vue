@@ -132,6 +132,7 @@ export default {
     onCloseRequested (e) {
       this.carrier.waypoints = this.oldWaypoints
       this.carrier.waypointsLooped = this.oldWaypointsLooped
+      GameContainer.drawWaypoints()
 
       this.$emit('onCloseRequested', e)
     },
