@@ -101,4 +101,24 @@ module.exports = class AchievementService {
         .exec();
     }
 
+    async incrementTradeCreditsSent(userId, amount = 0) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.trade.creditsSent': amount }
+        })
+        .exec();
+    }
+
+    async incrementTradeCreditsReceived(userId, amount = 0) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.trade.creditsReceived': amount }
+        })
+        .exec();
+    }
+
 };

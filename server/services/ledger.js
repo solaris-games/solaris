@@ -3,9 +3,10 @@ const EventEmitter = require('events');
 
 module.exports = class LedgerService extends EventEmitter {
 
-    constructor(playerService) {
+    constructor(gameModel, playerService) {
         super();
 
+        this.gameModel = gameModel;
         this.playerService = playerService;
     }
 
@@ -32,13 +33,48 @@ module.exports = class LedgerService extends EventEmitter {
         return fullLedger.find(l => l.playerId.equals(playerId));
     }
 
-    addDebt(game, creditor, debtor, debt) {
+    async addDebt(game, creditor, debtor, debt) {
         // Get both of the ledgers between the two players.
         let ledgerA = this.getLedgerForPlayer(game, creditor, debtor._id);
         let ledgerB = this.getLedgerForPlayer(game, debtor, creditor._id);
 
         ledgerA.debt += debt;   // Player B now has debt to player A
         ledgerB.debt -= debt;   // Player A has paid off some of the debt to player B
+
+        let dbWrites = [
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id
+                    },
+                    update: {
+                        'galaxy.players.$[p].ledger.$[l]': ledgerA
+                    },
+                    arrayFilters: [
+                        { 'p._id': creditor._id },
+                        { 'l.playerId': ledgerA.playerId }
+                    ],
+                    upsert: true // TODO: This needs to be tested.
+                }
+            },
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id
+                    },
+                    update: {
+                        'galaxy.players.$[p].ledger.$[l]': ledgerB
+                    },
+                    arrayFilters: [
+                        { 'p._id': debtor._id },
+                        { 'l.playerId': ledgerB.playerId }
+                    ],
+                    upsert: true
+                }
+            }
+        ];
+
+        await this.gameModel.bulkWrite(dbWrites);
 
         this.emit('onDebtAdded', {
             gameId: game._id,

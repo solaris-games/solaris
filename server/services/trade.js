@@ -4,12 +4,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(userService, playerService, ledgerService) {
+    constructor(gameModel, userService, playerService, ledgerService, achievementService) {
         super();
         
+        this.gameModel = gameModel;
         this.userService = userService;
         this.playerService = playerService;
         this.ledgerService = ledgerService;
+        this.achievementService = achievementService;
     }
 
     isTradingCreditsDisabled(game) {
@@ -50,24 +52,50 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`There is no user associated with this player.`);
         }
 
-        fromPlayer.credits -= amount;
+        let dbWrites = [
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': fromPlayer._id
+                    },
+                    update: {
+                        $inc: {
+                            'galaxy.players.$.credits': -amount
+                        }
+                    }
+                }
+            },
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': toPlayer._id
+                    },
+                    update: {
+                        $inc: {
+                            'galaxy.players.$.credits': amount
+                        }
+                    }
+                }
+            }
+        ];
+
+        await this.gameModel.bulkWrite(dbWrites);
+
+        // fromPlayer.credits -= amount;
+        // toPlayer.credits += amount;
 
         if (!fromPlayer.defeated) {
-            fromPlayerUser.achievements.trade.creditsSent += amount;
+            await this.achievementService.incrementTradeCreditsSent(fromPlayerUser._id, amount);
         }
-
-        toPlayer.credits += amount;
 
         if (!toPlayer.defeated) {
-            toPlayerUser.achievements.trade.creditsReceived += amount;
+            await this.achievementService.incrementTradeCreditsReceived(fromPlayerUser._id, amount);
         }
 
-        this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
-
-        await game.save();
-        await fromPlayerUser.save();
-        await toPlayerUser.save();
-
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
+        
         let eventObject = {
             gameId: game._id,
             gameTick: game.state.tick,

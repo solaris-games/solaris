@@ -87,11 +87,11 @@ module.exports = (io) => {
     const irregularMapService = new IrregularMapService(randomService, starService, starDistanceService, distanceService);
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService);
     const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
-    const ledgerService = new LedgerService(playerService);
+    const ledgerService = new LedgerService(GameModel, playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService);
     const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService);
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, starService, userService);
-    const tradeService = new TradeService(userService, playerService, ledgerService);
+    const tradeService = new TradeService(GameModel, userService, playerService, ledgerService, achievementService);
     const reputationService = new ReputationService(GameModel, tradeService, playerService, gameService);
     const waypointService = new WaypointService(GameModel, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService);

@@ -284,7 +284,7 @@ module.exports = class GameGalaxyService {
         let playersInRange = [];
         
         if (player) {
-            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, player);
+            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player);
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';

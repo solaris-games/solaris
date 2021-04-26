@@ -43,10 +43,10 @@ module.exports = class PlayerService extends EventEmitter {
         return playersWithinRange;
     }
 
-    getPlayersWithinScanningRangeOfPlayer(game, player) {
+    getPlayersWithinScanningRangeOfPlayer(game, players, player) {
         let inRange = [player];
 
-        for (let p of game.galaxy.players) {
+        for (let p of players) {
             if (inRange.indexOf(p) > -1) {
                 continue;
             }
@@ -71,7 +71,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
-        return this.getPlayersWithinScanningRangeOfPlayer(game, sourcePlayer)
+        return this.getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
             .find(p => p._id.equals(targetPlayer._id)) != null;
     }
 
