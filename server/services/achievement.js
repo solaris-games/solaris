@@ -121,4 +121,44 @@ module.exports = class AchievementService {
         .exec();
     }
 
+    async incrementTradeTechnologySent(userId, amount = 1) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.trade.technologySent': amount }
+        })
+        .exec();
+    }
+
+    async incrementTradeTechnologyReceived(userId, amount = 1) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.trade.technologyReceived': amount }
+        })
+        .exec();
+    }
+
+    async incrementRenownSent(userId, amount = 1) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.trade.renownSent': amount }
+        })
+        .exec();
+    }
+
+    async incrementRenownReceived(userId, amount = 1) {
+        await this.userModel.updateOne({
+            _id: userId
+        },
+        {
+            $inc: { 'achievements.renown': amount }
+        })
+        .exec();
+    }
+
 };

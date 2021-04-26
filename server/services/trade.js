@@ -45,13 +45,6 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`The player does not own ${amount} credits.`);
         }
 
-        let fromPlayerUser = await this.userService.getById(fromPlayer.userId);
-        let toPlayerUser = await this.userService.getById(toPlayer.userId);
-
-        if (!toPlayerUser) {
-            throw new ValidationError(`There is no user associated with this player.`);
-        }
-
         let dbWrites = [
             {
                 updateOne: {
@@ -87,11 +80,11 @@ module.exports = class TradeService extends EventEmitter {
         // toPlayer.credits += amount;
 
         if (!fromPlayer.defeated) {
-            await this.achievementService.incrementTradeCreditsSent(fromPlayerUser._id, amount);
+            await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
         }
 
-        if (!toPlayer.defeated) {
-            await this.achievementService.incrementTradeCreditsReceived(fromPlayerUser._id, amount);
+        if (!toPlayer.defeated && toPlayer.userId) {
+            await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
         }
 
         await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
@@ -137,8 +130,8 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot award renown to an empty slot.`);
         }
 
-        // Get the user of the player to award renown to.
-        let fromUser = await this.userService.getById(fromPlayer.userId);
+        // The receiving player has to be a legit user otherwise
+        // renown should not be sent. It's possible that players can delete their accounts.
         let toUser = await this.userService.getById(toPlayer.userId);
 
         if (!toUser) {
@@ -147,14 +140,17 @@ module.exports = class TradeService extends EventEmitter {
 
         // Note: AI will never ever send renown so no need to check
         // if players are AI controlled here.
-        fromPlayer.renownToGive -= amount;
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': fromPlayer._id
+        }, {
+            $inc: {
+                'galaxy.players.$.renownToGive': -amount
+            }
+        });
 
-        fromUser.achievements.trade.renownSent += amount;
-        toUser.achievements.renown += amount; // TODO: Refactor into trade?
-
-        await game.save();
-        await fromUser.save();
-        await toUser.save();
+        await this.achievementService.incrementRenownSent(fromPlayer.userId, amount);
+        await this.achievementService.incrementRenownReceived(toPlayer.userId, amount); // Note we have already checked for null user id above.
 
         let eventObject = {
             gameId: game._id,
@@ -203,34 +199,26 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError('The player cannot afford to trade this technology.');
         }
 
-        let fromUser = await this.userService.getById(fromPlayer.userId);
-        let toUser = await this.userService.getById(toPlayer.userId);
-
-        if (!toUser) {
-            throw new ValidationError(`There is no user associated with this player.`);
-        }
-
         let levelDifference = tradeTech.level - toPlayerTech.level;
 
         toPlayerTech.level = tradeTech.level;
         toPlayerTech.progress = 0;
 
-        // Need to assert that the trading players aren't controlled by AI.
-        if (!toPlayer.defeated) {
-            toUser.achievements.trade.technologyReceived++;
+        // Need to assert that the trading players aren't controlled by AI
+        // and the player user has an account.
+        if (!toPlayer.defeated && toPlayer.userId) {
+            await this.achievementService.incrementTradeTechnologyReceived(toPlayer.userId, 1);
         }
 
         fromPlayer.credits -= tradeTech.cost;
 
         if (!fromPlayer.defeated) {
-            fromUser.achievements.trade.technologySent++;
+            await this.achievementService.incrementTradeTechnologySent(fromPlayer.userIdd, 1);
         }
 
-        this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
 
         await game.save();
-        await fromUser.save();
-        await toUser.save();
 
         let eventObject = {
             gameId: game._id,
