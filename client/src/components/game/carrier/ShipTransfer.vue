@@ -60,7 +60,7 @@
             <button type="button" class="btn btn-success btn-block mr-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
         </div>
         <div class="col-auto pl-1">
-            <button type="button" class="btn btn-primary" @click="onOpenCarrierDetailRequested"><i class="fas fa-plus"></i></button>
+            <button type="button" class="btn btn-primary" @click="onEditWaypointsRequested"><i class="fas fa-plus"></i></button>
         </div>
     </div>
 </div>
@@ -147,6 +147,22 @@ export default {
       this.starShips-=e
     },
     async saveTransfer (e) {
+      let result = await this.performSaveTransfer()
+
+      if (result) {
+        this.$emit('onShipsTransferred', this.carrier._id)
+      }
+    },
+    async onEditWaypointsRequested (e) {
+      let result = await this.performSaveTransfer()
+
+      if (result) {
+        this.$emit('onEditWaypointsRequested', this.carrier._id)
+      }
+    },
+    async performSaveTransfer() {
+      let transferred = false
+
       try {
         this.isTransferringShips = true
 
@@ -173,18 +189,15 @@ export default {
           this.star.garrison = sShips
           this.carrier.ships = cShips
 
-          this.$emit('onShipsTransferred', this.carrier._id)
+          transferred = true
         }
       } catch (err) {
         console.log(err)
       }
 
       this.isTransferringShips = false
-    },
-    async onOpenCarrierDetailRequested (e) {
-      await this.saveTransfer(e)
-      
-      this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
+
+      return transferred
     }
   },
   computed: mapState(['game']),

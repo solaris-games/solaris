@@ -62,7 +62,11 @@
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" 
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" 
+        @onCloseRequested="onCloseRequested" 
+        :carrierId="menuArguments" 
+        @onShipsTransferred="onShipsTransferred" 
+        @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
         :starId="menuArguments"
         @onCloseRequested="onCloseRequested"
