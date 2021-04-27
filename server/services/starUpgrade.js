@@ -3,7 +3,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService) {
+    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService, playerService) {
         super();
         
         this.gameModel = gameModel;
@@ -12,6 +12,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         this.achievementService = achievementService;
         this.researchService = researchService;
         this.technologyService = technologyService;
+        this.playerService = playerService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -371,7 +372,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             // Generate the DB writes for all the stars to upgrade, including deducting the credits
             // for the player and also updating the player's achievement statistics.
             let dbWrites = [
-                this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
+                await this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
             ];
 
             for (let star of upgradeSummary.stars) {
@@ -552,20 +553,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return star.upgradeCosts;
     }
 
-    _getDeductPlayerCreditsDBWrite(game, player, cost) {
-        return {
-            updateOne: {
-                filter: {
-                    _id: game._id,
-                    'galaxy.players._id': player._id
-                },
-                update: {
-                    $inc: {
-                        'galaxy.players.$.credits': -cost
-                    }
-                }
-            }
-        };
+    async _getDeductPlayerCreditsDBWrite(game, player, cost) {
+        return await this.playerService.addCredits(game, player, -cost, false);
     }
 
     _getSetStarWarpGateDBWrite(game, star, warpGate) {

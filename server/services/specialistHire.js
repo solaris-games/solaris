@@ -2,11 +2,12 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class SpecialistHireService {
 
-    constructor(gameModel, specialistService, achievementService, waypointService) {
+    constructor(gameModel, specialistService, achievementService, waypointService, playerService) {
         this.gameModel = gameModel;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
+        this.playerService = playerService;
     }
 
     async hireCarrierSpecialist(game, player, carrierId, specialistId) {
@@ -46,19 +47,7 @@ module.exports = class SpecialistHireService {
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.players._id': player._id
-                    },
-                    update: {
-                        $inc: {
-                            'galaxy.players.$.credits': -cost
-                        }
-                    }
-                }
-            },
+            await this.playerService.addCredits(game, player, -cost, false),
             {
                 updateOne: {
                     filter: {
@@ -124,19 +113,7 @@ module.exports = class SpecialistHireService {
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.players._id': player._id
-                    },
-                    update: {
-                        $inc: {
-                            'galaxy.players.$.credits': -cost
-                        }
-                    }
-                }
-            },
+            await this.playerService.addCredits(game, player, -cost, false),
             {
                 updateOne: {
                     filter: {

@@ -670,4 +670,28 @@ module.exports = class PlayerService extends EventEmitter {
             && p.lastSeenIP === player.lastSeenIP) != null;
     }
 
+    async addCredits(game, player, amount, commit = true) {
+        player.credits += amount;
+
+        let query = {
+            updateOne: {
+                filter: {
+                    _id: game._id,
+                    'galaxy.players._id': player._id
+                },
+                update: {
+                    $inc: {
+                        'galaxy.players.$.credits': amount
+                    }
+                }
+            }
+        }
+        
+        if (commit) {
+            await this.gameModel.bulkWrite([query]);
+        }
+        
+        return query;
+    }
+
 }

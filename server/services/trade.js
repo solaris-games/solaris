@@ -46,38 +46,13 @@ module.exports = class TradeService extends EventEmitter {
         }
 
         let dbWrites = [
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.players._id': fromPlayer._id
-                    },
-                    update: {
-                        $inc: {
-                            'galaxy.players.$.credits': -amount
-                        }
-                    }
-                }
-            },
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.players._id': toPlayer._id
-                    },
-                    update: {
-                        $inc: {
-                            'galaxy.players.$.credits': amount
-                        }
-                    }
-                }
-            }
+            await this.playerService.addCredits(game, fromPlayer, -amount, false),
+            await this.playerService.addCredits(game, toPlayer, amount, false)
         ];
 
         await this.gameModel.bulkWrite(dbWrites);
 
-        // fromPlayer.credits -= amount;
-        // toPlayer.credits += amount;
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
 
         if (!fromPlayer.defeated) {
             await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
@@ -86,8 +61,6 @@ module.exports = class TradeService extends EventEmitter {
         if (!toPlayer.defeated && toPlayer.userId) {
             await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
         }
-
-        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
         
         let eventObject = {
             gameId: game._id,
@@ -201,8 +174,30 @@ module.exports = class TradeService extends EventEmitter {
 
         let levelDifference = tradeTech.level - toPlayerTech.level;
 
-        toPlayerTech.level = tradeTech.level;
-        toPlayerTech.progress = 0;
+        // toPlayerTech.level = tradeTech.level;
+        // toPlayerTech.progress = 0;
+        // fromPlayer.credits -= tradeTech.cost;
+        
+        let updateResearchQuery = {};
+        updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.level'] = tradeTech.level;
+        updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
+
+        let dbWrites = [
+            await this.playerService.addCredits(game, fromPlayer, -tradeTech.cost, false),
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': toPlayer._id
+                    },
+                    update: updateResearchQuery
+                }
+            }
+        ];
+
+        await this.gameModel.bulkWrite(dbWrites);
+
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
 
         // Need to assert that the trading players aren't controlled by AI
         // and the player user has an account.
@@ -210,15 +205,9 @@ module.exports = class TradeService extends EventEmitter {
             await this.achievementService.incrementTradeTechnologyReceived(toPlayer.userId, 1);
         }
 
-        fromPlayer.credits -= tradeTech.cost;
-
         if (!fromPlayer.defeated) {
-            await this.achievementService.incrementTradeTechnologySent(fromPlayer.userIdd, 1);
+            await this.achievementService.incrementTradeTechnologySent(fromPlayer.userId, 1);
         }
-
-        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
-
-        await game.save();
 
         let eventObject = {
             gameId: game._id,
