@@ -244,8 +244,17 @@ module.exports = class CarrierService {
         firstWaypoint.delayTicks = 0;
 
         carrier.waypoints = [firstWaypoint];
-        
-        await game.save();
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.carriers._id': carrier._id
+        }, {
+            $set: {
+                'galaxy.carriers.$.isGift': true,
+                'galaxy.carriers.$.waypointsLooped': false,
+                'galaxy.carriers.$.waypoints': [firstWaypoint]
+            }
+        })
     }
 
     async rename(game, player, carrierId, name) {
