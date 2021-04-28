@@ -396,14 +396,15 @@
         <li>4. Ships are built at stars.</li>
         <li>5. Carrier collect actions are performed.</li>
         <li>6. Carrier garrison actions are performed.</li>
-        <li>7. Research is performed.</li>
-        <li>8. If at the end of a galactic cycle:</li>
-        <li>8a. Players receive credits from economy and banking.</li>
-        <li>8b. Experimentations are performed.</li>
-        <li>8c. Carrier upkeep is deducted.</li>
-        <li>9. Game checks for afk and defeated players.</li>
-        <li>10. Game checks for a winner.</li>
-        <li>11. AI actions are performed.</li>
+        <li>7. If at the end of a galactic cycle:</li>
+        <li>7a. Players receive credits from economy and banking.</li>
+        <li>7b. Experimentations are performed.</li>
+        <li>7c. Carrier upkeep is deducted.</li>
+        <li>8. Game checks for afk and defeated players.</li>
+        <li>9. Game checks for a winner.</li>
+        <li>10. AI actions are performed.</li>
+        <li>11. Research is performed.</li>
+        <li>12. Intel is logged.</li>
       </ul>
     </div>
   </view-container>

@@ -73,9 +73,6 @@ module.exports = class GameTickService extends EventEmitter {
             await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
 
-            await this.researchService.conductResearchAll(game, gameUsers);
-            logTime('Conduct research');
-
             this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
 
@@ -88,7 +85,10 @@ module.exports = class GameTickService extends EventEmitter {
             await this._playAI(game);
             logTime('AI controlled players turn');
             
-            this._logHistory(game);
+            await this.researchService.conductResearchAll(game, gameUsers);
+            logTime('Conduct research');
+
+            await this._logHistory(game);
             logTime('Log history');
 
             if (hasWinner) {
