@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(gameModel, userService, playerService, ledgerService, achievementService) {
+    constructor(gameModel, userService, playerService, ledgerService, achievementService, reputationService) {
         super();
         
         this.gameModel = gameModel;
@@ -12,6 +12,7 @@ module.exports = class TradeService extends EventEmitter {
         this.playerService = playerService;
         this.ledgerService = ledgerService;
         this.achievementService = achievementService;
+        this.reputationService = reputationService;
     }
 
     isTradingCreditsDisabled(game) {
@@ -62,12 +63,15 @@ module.exports = class TradeService extends EventEmitter {
             await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
         }
         
+        let reputation = await this.reputationService.tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount);
+
         let eventObject = {
             gameId: game._id,
             gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
             amount,
+            reputation,
             date: moment().utc()
         };
 
@@ -209,16 +213,21 @@ module.exports = class TradeService extends EventEmitter {
             await this.achievementService.incrementTradeTechnologySent(fromPlayer.userId, 1);
         }
 
+        let eventTechnology = {
+            name: tradeTech.name,
+            level: tradeTech.level,
+            difference: levelDifference
+        };
+
+        let reputation = await this.reputationService.tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, eventTechnology);
+
         let eventObject = {
             gameId: game._id,
             gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
-            technology: {
-                name: tradeTech.name,
-                level: tradeTech.level,
-                difference: levelDifference
-            },
+            technology: eventTechnology,
+            reputation,
             date: moment().utc()
         };
 

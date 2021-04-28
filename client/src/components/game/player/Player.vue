@@ -31,7 +31,7 @@
 
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
       <h4 class="mt-2">Trade</h4>
-      
+
       <div v-if="canTradeWithPlayer">
         <reputation v-if="player.defeated" :playerId="player._id"/>
         <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
@@ -174,7 +174,7 @@ export default {
       return this.user && this.user.achievements
     },
     canTradeWithPlayer: function () {
-      return this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange)
+      return this.player.stats.totalStars > 0 && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)

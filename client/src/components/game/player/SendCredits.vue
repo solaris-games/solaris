@@ -58,6 +58,8 @@ export default {
 
           this.userPlayer.credits -= this.amount
           this.amount = 0
+
+          this.player.reputation = response.data.reputation
         }
       } catch (err) {
         console.error(err)

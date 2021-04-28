@@ -6,16 +6,11 @@ const REPUTATION_INCREMENT = 1;
 
 module.exports = class ReputationService extends EventEmitter {
 
-    constructor(gameModel, tradeService, playerService, gameService) {
+    constructor(gameModel, playerService) {
         super();
         
         this.gameModel = gameModel;
-        this.tradeService = tradeService;
         this.playerService = playerService;
-        this.gameService = gameService;
-
-        this.tradeService.on('onPlayerCreditsReceived', (args) => this.onPlayerCreditsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerTechnologyReceived', (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
     }
 
     getReputation(player, forPlayer) {
@@ -64,6 +59,8 @@ module.exports = class ReputationService extends EventEmitter {
                 score: reputation.score
             });
         }
+
+        return reputation;
     }
 
     async decreaseReputation(game, player, forPlayer, resetReputationAboveZero = false, updateDatabase = true) {
@@ -128,21 +125,19 @@ module.exports = class ReputationService extends EventEmitter {
         }
     }
 
-    async onPlayerCreditsReceived(gameId, fromPlayer, toPlayer, amount) {
-        let game = await this.gameService.getById(gameId);
-        
+    async tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount) {
         let playerStats = this.playerService.getStats(game, toPlayer);
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
 
         if (amount >= creditsRequired) {
-            await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
+            return await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
         }
+
+        return this.getReputation(toPlayer, fromPlayer);
     }
 
-    async onPlayerTechnologyReceived(gameId, fromPlayer, toPlayer, technology) {
-        let game = await this.gameService.getById(gameId);
-
-        await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
+    async tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, technology) {
+        return await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
     }
 
 };

@@ -36,7 +36,9 @@ module.exports = (router, io, container) => {
                 req.body.toPlayerId,
                 req.body.amount);
             
-            res.sendStatus(200);
+            res.status(200).json({
+                reputation: trade.reputation
+            });
 
             container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.amount, trade.date);
         } catch (err) {
@@ -102,8 +104,10 @@ module.exports = (router, io, container) => {
                 req.body.technology,
                 req.body.level);
 
-            res.sendStatus(200);
-
+            res.status(200).json({
+                reputation: trade.reputation
+            });
+            
             container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.technology, trade.date);
         } catch (err) {
             return next(err);

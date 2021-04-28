@@ -47,7 +47,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            this._getDeductPlayerCreditsDBWrite(game, player, cost),
+            await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             this._getSetStarWarpGateDBWrite(game, star, true)
         ]);
 
@@ -134,7 +134,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            this._getDeductPlayerCreditsDBWrite(game, player, cost),
+            await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             {
                 updateOne: {
                     filter: {
@@ -192,7 +192,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
     async _upgradeInfrastructureUpdateDB(game, player, star, cost, economyType) {
         let dbWrites = [
-            this._getDeductPlayerCreditsDBWrite(game, player, cost)
+            await this._getDeductPlayerCreditsDBWrite(game, player, cost)
         ];
 
         switch (economyType) {

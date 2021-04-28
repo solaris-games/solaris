@@ -130,7 +130,7 @@ class Carrier extends EventEmitter {
         fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
         padding: 3,
-        fontSize: 4,
+        fontSize: 5,
         fontWeight: 'bold'
       })
 

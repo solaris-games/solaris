@@ -93,6 +93,8 @@ export default {
           
           gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
           
+          this.player.reputation = response.data.reputation
+
           this.getTradeableTechnologies()
         }
       } catch (err) {
