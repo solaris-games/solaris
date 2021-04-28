@@ -93,7 +93,7 @@ module.exports = class SpecialistService {
     getSpecialistActualCost(game, specialist) {
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
 
-        let cost = TIER_BASE_COSTS[specialist.tier.toString()] * expenseConfig;
+        let cost = specialist.baseCostCredits * expenseConfig;
 
         return cost;
     }
