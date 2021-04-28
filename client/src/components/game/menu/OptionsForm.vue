@@ -209,6 +209,9 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'form-error-list': FormErrorList
   },
+  props: {
+    isInGame: Boolean
+  },
   data () {
     return {
       isSavingSettings: false,
@@ -254,7 +257,9 @@ export default {
           
           this.$store.commit('setSettings', this.settings)
 
-          GameContainer.reloadGame(this.$store.state.game, this.$store.state.settings)
+          if (this.isInGame) {
+            GameContainer.reloadGame(this.$store.state.game, this.$store.state.settings)
+          }
           
           this.onOptionsSaved()
         }

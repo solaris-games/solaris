@@ -76,10 +76,10 @@
         <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
       </div>
         <div class="col text-right pr-2">
-            <modalButton v-if="!game.state.startDate" modalName="quitGameModal" classText="btn btn-sm btn-danger">
+            <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
               <i class="fas fa-sign-out-alt"></i> Quit Game
             </modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
+            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
               <i class="fas fa-skull-crossbones"></i> Concede Defeat
             </modalButton>
         </div>
@@ -123,7 +123,9 @@ export default {
     return {
       audio: null,
       players: [],
-      timeRemaining: null
+      timeRemaining: null,
+      isQuittingGame: false,
+      isConcedingDefeat: false
     }
   },
   mounted () {
@@ -176,6 +178,8 @@ export default {
       }
     },
     async concedeDefeat () {
+      this.isConcedingDefeat = true
+
       try {
         let response = await gameService.concedeDefeat(this.$store.state.game._id)
 
@@ -187,8 +191,12 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isConcedingDefeat = false
     },
     async quitGame () {
+      this.isQuittingGame = true
+
       try {
         let response = await gameService.quitGame(this.$store.state.game._id)
 
@@ -200,6 +208,8 @@ export default {
       } catch (err) {
         console.error(err)
       }
+
+      this.isQuittingGame = false
     },
     async confirmReady (player) {
       if (!await this.$confirm('End turn', 'Are you sure you want to end your turn?')) {

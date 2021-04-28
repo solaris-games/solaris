@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, starService, carrierService, playerService, passwordService) {
+    constructor(gameModel, userService, starService, carrierService, playerService, passwordService, achievementService) {
         super();
         
         this.gameModel = gameModel;
@@ -13,6 +13,7 @@ module.exports = class GameService extends EventEmitter {
         this.carrierService = carrierService;
         this.playerService = playerService;
         this.passwordService = passwordService;
+        this.achievementService = achievementService;
     }
 
     async getByIdAll(id) {
@@ -236,9 +237,9 @@ module.exports = class GameService extends EventEmitter {
 
         await game.save();
 
-        let user = await this.getPlayerUser(game, player._id);
-        user.achievements.joined++;
-        await user.save();
+        if (player.userId) {
+            await this.achievementService.incrementJoined(player.userId);
+        }
 
         this.emit('onPlayerJoined', {
             gameId: game._id,
@@ -265,13 +266,11 @@ module.exports = class GameService extends EventEmitter {
             throw new ValidationError('Cannot quit a game that has finished.');
         }
         
-        let user = await this.userService.getById(player.userId);
-
         let alias = player.alias;
 
         game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
 
-        user.achievements.quit++;
+        await this.achievementService.incrementQuit(player.userId);
 
         // Reset everything the player may have done to their empire.
         // This is to prevent the next player joining this slot from being screwed over.
@@ -280,7 +279,6 @@ module.exports = class GameService extends EventEmitter {
         game.state.players = game.galaxy.players.filter(p => p.userId).length;
 
         await game.save();
-        await user.save();
 
         this.emit('onPlayerQuit', {
             gameId: game._id,
@@ -318,9 +316,9 @@ module.exports = class GameService extends EventEmitter {
         // TODO: Instead of above, just clear the player's looped waypoints.
         this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
 
-        let userPlayer = await this.getPlayerUser(game, player._id);
-        userPlayer.achievements.defeated++;
-        await userPlayer.save();
+        if (player.userId) {
+            await this.achievementService.incrementDefeated(player.userId, 1);
+        }
 
         await game.save();
 
@@ -347,11 +345,7 @@ module.exports = class GameService extends EventEmitter {
             // Deduct "joined" count for all players who already joined the game.
             for (let player of game.galaxy.players) {
                 if (player.userId) {
-                    let user = await this.userService.getById(player.userId);
-    
-                    user.achievements.joined--;
-    
-                    await user.save();
+                    await this.achievementService.incrementJoined(player.userId, -1);
                 }
             }
         }

@@ -3,7 +3,7 @@
   <div class="container">
     <menu-title title="Options" @onCloseRequested="onCloseRequested"/>
 
-    <options-form @onOptionsSaved="onCloseRequested"/>
+    <options-form @onOptionsSaved="onCloseRequested" :isInGame="true"/>
   </div>
 </div>
 </template>
