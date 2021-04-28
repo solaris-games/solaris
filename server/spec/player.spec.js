@@ -36,7 +36,8 @@ const game = {
                 hyperspace: 1,
                 manufacturing: 1,
                 banking: 1,
-                weapons: 1
+                weapons: 1,
+                specialists: 1
             },
             researchCosts: {
                 terraforming: 'standard',
@@ -45,7 +46,8 @@ const game = {
                 hyperspace: 'standard',
                 manufacturing: 'standard',
                 banking: 'standard',
-                weapons: 'standard'
+                weapons: 'standard',
+                specialists: 'standard'
             }
         },
         galaxy: {

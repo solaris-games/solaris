@@ -90,6 +90,7 @@ module.exports = class SpecialistService {
         return this.list(game, TYPES.STAR);
     }
 
+    // TODO: Refactor this to return both the credits cost and the token cost.
     getSpecialistActualCost(game, specialist) {
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
 

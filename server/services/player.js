@@ -92,7 +92,8 @@ module.exports = class PlayerService extends EventEmitter {
                 hyperspace: { level: game.settings.technology.startingTechnologyLevel.hyperspace },
                 manufacturing: { level: game.settings.technology.startingTechnologyLevel.manufacturing },
                 banking: { level: game.settings.technology.startingTechnologyLevel.banking },
-                weapons: { level: game.settings.technology.startingTechnologyLevel.weapons }
+                weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
+                specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             }
         };
     }

@@ -56,7 +56,8 @@
       "hyperspace": 1,
       "manufacturing": 1,
       "banking": 1,
-      "weapons": 3
+      "weapons": 3,
+      "specialists": 3
     },
     "researchCosts": {
       "terraforming": "standard",
@@ -65,7 +66,8 @@
       "hyperspace": "standard",
       "manufacturing": "expensive",
       "banking": "cheap",
-      "weapons": "none"
+      "weapons": "none",
+      "specialists": "standard"
     },
     "bankingReward": "standard"
   },

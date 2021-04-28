@@ -68,6 +68,14 @@
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
+            <research-row
+              v-if="isTechnologyEnabled('specialists')"
+              research="specialists"
+              iconClass="fa-user-astronaut"
+              title="Specialists"
+              :player="player"
+              :userPlayer="userPlayer"
+            ></research-row>
           </tbody>
         </table>
       </div>

@@ -365,6 +365,9 @@ module.exports = class GameGalaxyService {
                     },
                     manufacturing: { 
                         level: p.research.manufacturing.level
+                    },
+                    specialists: { 
+                        level: p.research.specialists.level
                     }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.

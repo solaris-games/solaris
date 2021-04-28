@@ -38,6 +38,8 @@ module.exports = class SpecialistHireService {
         // Calculate how much the spec will cost.
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
+        // TODO: This needs to depend on whether the specialist tech is enabled, if so
+        // it needs to deduct from specialist tokens, not credits.
         if (player.credits < cost) {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }
@@ -104,6 +106,8 @@ module.exports = class SpecialistHireService {
         // Calculate how much the spec will cost.
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
+        // TODO: This needs to depend on whether the specialist tech is enabled, if so
+        // it needs to deduct from specialist tokens, not credits.
         if (player.credits < cost) {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }

@@ -6,7 +6,8 @@ class TechnologyHelper {
       experimentation: 'Experimentation',
       weapons: 'Weapons',
       banking: 'Banking',
-      manufacturing: 'Manufacturing'
+      manufacturing: 'Manufacturing',
+      specialists: 'Specialists'
     }
 
     getFriendlyName (technologyKey) {
@@ -45,6 +46,8 @@ class TechnologyHelper {
           return 'money-bill-alt'
         case 'manufacturing':
           return 'industry'
+        case 'specialists':
+          return 'user-astronaut'
       }
 
       return 'question'

@@ -63,6 +63,7 @@ const schema = new Schema({
             weapons: { type: Types.Number, default: 0 },
             banking: { type: Types.Number, default: 0 },
             manufacturing: { type: Types.Number, default: 0 },
+            specialists: { type: Types.Number, default: 0 }
         },
         trade: {
             creditsSent: { type: Types.Number, default: 0 },

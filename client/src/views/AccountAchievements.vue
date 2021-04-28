@@ -184,6 +184,10 @@
               <td>Experimentation</td>
               <td class="text-right">{{ user.achievements.research.experimentation }}</td>
             </tr>
+            <tr>
+              <td>Specialists</td>
+              <td class="text-right">{{ user.achievements.research.specialists }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -604,7 +608,8 @@ export default {
           'Weapons',
           'Banking',
           'Manufacturing',
-          'Experimentation'
+          'Experimentation',
+          'Specialists'
         ],
         datasets: [{
           data: [
@@ -614,7 +619,8 @@ export default {
             this.user.achievements.research.weapons,
             this.user.achievements.research.banking,
             this.user.achievements.research.manufacturing,
-            this.user.achievements.research.experimentation
+            this.user.achievements.research.experimentation,
+            this.user.achievements.research.specialists
           ],
           backgroundColor: [
             '#888',
@@ -623,7 +629,8 @@ export default {
             '#F39C12',
             '#E74C3C',
             '#00bc8c',
-            '#3498DB'
+            '#3498DB',
+            '#333'
           ]
         }]
       }

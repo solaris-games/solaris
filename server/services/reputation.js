@@ -140,4 +140,6 @@ module.exports = class ReputationService extends EventEmitter {
         return await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
     }
 
+    // TODO: Increase reputation for specialist tokens?
+
 };

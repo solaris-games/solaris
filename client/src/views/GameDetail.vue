@@ -211,6 +211,10 @@
               <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.weapons }}</td>
             </tr>
             <tr>
+              <td>Starting Specialists Level</td>
+              <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.specialists }}</td>
+            </tr>
+            <tr>
               <td>Terraforming Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.terraforming) }}</td>
             </tr>
@@ -237,6 +241,10 @@
             <tr>
               <td>Weapons Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.weapons) }}</td>
+            </tr>
+            <tr>
+              <td>Specialists Cost</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.specialists) }}</td>
             </tr>
             <tr>
               <td>Banking Reward</td>

@@ -54,6 +54,10 @@ const schema = new Schema({
         manufacturing: {
             level: { type: Types.Number, required: true, default: 1  },
             progress: { type: Types.Number, required: true, default: 0  },
+        },
+        specialists: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
         }
     },
     ledger: [

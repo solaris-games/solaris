@@ -343,6 +343,7 @@
         <li><strong>Weapons</strong> - Improves the amount of enemy carriers each friendly carrier destroys in combat. Each carrier destroys enemy carriers exactly equal to the local weapons level.</li>
         <li><strong>Banking</strong> - Earns 75 extra credits every production. If experimental banking is enabled in game settings, you get additional extra credits based from your economy level.</li>
         <li><strong>Manufacturing</strong> - Increases ship production rate on all stars. The exact formula is a star produces <code>(X*(Y+5))/T</code> ships per tick, where X is the star's industry, Y is the star's manufacturing level, and T is the number of ticks in every production cycle.</li>
+        <li><strong>Specialists</strong> - Increases the number of specialist tokens awarded at the end of a galactic cycle, these are used to hire specialists.</li>
       </ul>
     </div>
 
