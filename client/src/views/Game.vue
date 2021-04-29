@@ -119,6 +119,10 @@ export default {
   },
   methods: {
     async attemptLogin () {
+      if (this.$store.state.userId) {
+        return;
+      }
+      
       try {
         let response = await authService.verify()
 
