@@ -53,7 +53,8 @@ export default {
       let response = await ApiAuthService.verify()
 
       if (response.status === 200) {
-        if (response.data.valid) {
+        if (response.data.id) {
+          this.$store.commit('setUserId', response.data.id)
           router.push({ name: 'main-menu' })
         }
       }

@@ -280,8 +280,10 @@ module.exports = (router, io, container) => {
         try {
             let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-            await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
-
+            if (!req.session.isImpersonating) {
+                await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
+            }
+            
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
