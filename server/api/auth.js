@@ -49,7 +49,7 @@ module.exports = (router, io, container) => {
 
     router.post('/api/auth/verify', (req, res, next) => {
         return res.status(200).json({
-            valid: req.session.userId != null
+            id: req.session.userId
         });
     });
 
