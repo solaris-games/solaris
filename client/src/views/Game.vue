@@ -33,6 +33,7 @@ import GameHelper from '../services/gameHelper'
 import AudioService from '../game/audio'
 import moment from 'moment'
 import gameHelper from '../services/gameHelper'
+import authService from '../services/api/auth'
 
 export default {
   components: {
@@ -51,6 +52,8 @@ export default {
     }
   },
   async created () {
+    await this.attemptLogin()
+
     AudioService.loadStore(this.$store)
 
     this.$store.commit('clearGame')
@@ -115,6 +118,19 @@ export default {
     document.title = 'Solaris'
   },
   methods: {
+    async attemptLogin () {
+      try {
+        let response = await authService.verify()
+
+        if (response.status === 200) {
+          if (response.data.id) {
+            this.$store.commit('setUserId', response.data.id)
+          }
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     async reloadGame () {
       try {
         let galaxyResponse = await GameApiService.getGameGalaxy(this.$route.query.id)
