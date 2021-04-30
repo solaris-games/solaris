@@ -7,6 +7,8 @@ class Carrier extends EventEmitter {
 
   static culling_margin = 16
 
+  static zoomLevel = 140
+
   constructor ( pathManager ) {
     super()
 
@@ -50,8 +52,12 @@ class Carrier extends EventEmitter {
 
     this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
     this.baseScale = 1
-    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
+
+    if( userSettings.map.zoomLevels ) {
+      Carrier.zoomLevelDefinitions = userSettings.map.zoomLevels.carrier
+    }
   }
 
   draw () {
@@ -135,7 +141,7 @@ class Carrier extends EventEmitter {
       })
 
       let totalGarrison = this.data.ships == null ? '???' : this.data.ships
-      
+
       let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
 
       this.text_garrison = new PIXI.Text(garrisonText, style)
@@ -349,11 +355,11 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-    let displayTextZoom = 150
 
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent > displayTextZoom || (this.isSelected && this.zoomPercent > displayTextZoom ) || (this.isMouseOver && this.zoomPercent > displayTextZoom))
+    if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > displayTextZoom ) || (this.isMouseOver && this.zoomPercent > displayTextZoom))
   }
+
 
   deselectAllText () {
     if (window.getSelection) {window.getSelection().removeAllRanges();}

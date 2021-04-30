@@ -109,7 +109,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Territories
     this.territories = new Territories()
-    this.territories.setup(game)
+    this.territories.setup(game, userSettings)
 
     this.territoryContainer.addChild(this.territories.container)
     this.territories.draw(userSettings)
@@ -117,7 +117,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Player Names
     this.playerNames = new PlayerNames()
-    this.playerNames.setup(game)
+    this.playerNames.setup(game, userSettings)
 
     this.playerNamesContainer.addChild(this.playerNames.container)
     this.playerNames.draw()

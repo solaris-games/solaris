@@ -4,6 +4,9 @@ import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'
 
 class Background {
+
+  static zoomLevel = 100
+
   NEBULA_GENERATION = {
     none: 0,
     sparse: 0.05,
@@ -24,6 +27,10 @@ class Background {
     this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
     this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()
+
+    if( userSettings.map.zoomLevels.background ) {
+      Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
+    }
   }
 
   clear () {
@@ -72,7 +79,7 @@ class Background {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent > 100
+      this.container.visible = zoomPercent > Background.zoomLevel
     }
   }
 
