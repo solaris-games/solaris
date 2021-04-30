@@ -180,7 +180,7 @@
     </div>
 
     <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="carriers-ship-zoom" class="col col-form-label">Carrie Ships</label>
+      <label for="carriers-ship-zoom" class="col col-form-label">Carrier Ships</label>
       <div class="col">
         <input type="number" class="form-control" id="carriers-ship-zoom" v-model="settings.map.zoomLevels.carrierShips" :disabled="isSavingSettings">
       </div>
@@ -317,7 +317,7 @@ export default {
           this.onOptionsSaved()
         }
       } catch (err) {
-				console.log(err)
+        console.error(err)
         this.errors = err.response.data.errors || []
       }
 
