@@ -55,9 +55,7 @@ class Carrier extends EventEmitter {
     this.minScale = this.userSettings.map.objectsMinimumScale/4.0
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
 
-    if( userSettings.map.zoomLevels ) {
-      Carrier.zoomLevelDefinitions = userSettings.map.zoomLevels.carrier
-    }
+    Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
   }
 
   draw () {
@@ -158,22 +156,22 @@ class Carrier extends EventEmitter {
     if (!this.hasSpecialist() || this.data.orbiting) {
       return
     }
-    
+
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, true)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 6
     specialistSprite.height = 6
     specialistSprite.x = -3
     specialistSprite.y = -3
-    
+
     this.container.addChild(specialistSprite)
   }
 
   hasSpecialist () {
     return this.data.specialistId && this.data.specialistId > 0
   }
-  
-  _drawShapeDiamond() {  
+
+  _drawShapeDiamond() {
     this.graphics_colour.moveTo(0, -5)
     this.graphics_colour.lineTo(5, 0)
     this.graphics_colour.lineTo(0, 5)
@@ -311,7 +309,7 @@ class Carrier extends EventEmitter {
      this.graphics_colour.visible = false
      this.graphics_ship.visible = false
      if (this.text_garrison) this.text_garrison.visible = false
-   } 
+   }
    else {
      this.graphics_colour.visible = true
      if (this.text_garrison) this.text_garrison.visible = true
@@ -357,7 +355,7 @@ class Carrier extends EventEmitter {
   updateVisibility() {
 
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > displayTextZoom ) || (this.isMouseOver && this.zoomPercent > displayTextZoom))
+    if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
 
 

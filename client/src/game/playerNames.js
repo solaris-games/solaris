@@ -14,9 +14,7 @@ class PlayerNames {
   setup (game, userSettings) {
     this.game = game
 
-    if( userSettings.zoomLevels ) {
-      PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
-    }
+    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
   }
 
   draw () {

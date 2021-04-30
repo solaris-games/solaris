@@ -15,9 +15,7 @@ class Territories {
   setup (game, userSettings) {
     this.game = game
 
-    if( userSettings.map.zoomLevels ) {
-      Territories.zoomLevel = userSettings.map.zoomLevels.territories
-    }
+    Territories.zoomLevel = userSettings.map.zoomLevels.territories
   }
 
   draw (userSettings) {

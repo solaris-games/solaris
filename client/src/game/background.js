@@ -28,9 +28,7 @@ class Background {
     this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()
 
-    if( userSettings.map.zoomLevels.background ) {
-      Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
-    }
+    Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
   }
 
   clear () {

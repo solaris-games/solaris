@@ -111,9 +111,7 @@ class Star extends EventEmitter {
     this.minScale = this.userSettings.map.objectsMinimumScale/4.0
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
 
-    if(userSettings.map.zoomLevels) {
-      Star.zoomLevelDefinitions = userSettings.map.zoomLevels.star
-    }
+    Star.zoomLevelDefinitions = userSettings.map.zoomLevels.star
   }
 
   draw () {

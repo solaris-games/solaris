@@ -54,11 +54,12 @@ class Map extends EventEmitter {
   }
 
   setup (game, userSettings) {
+    this.userSettings = userSettings
     this.game = game
 
     this.pathManager = new PathManager( game, userSettings, this )
-    
-    
+
+
     // Cleanup events
     this.stars.forEach(s => s.removeAllListeners())
     this.carriers.forEach(s => s.removeAllListeners())
@@ -194,7 +195,7 @@ class Map extends EventEmitter {
     this.game = game
 
     this.pathManager.reloadSettings(userSettings)
-    
+
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
@@ -385,13 +386,13 @@ class Map extends EventEmitter {
   }
 
   drawTerritories (userSettings) {
-    this.territories.setup(this.game)
+    this.territories.setup(this.game, userSettings)
     this.territories.draw(userSettings)
   }
 
   drawPlayerNames () {
-    this.playerNames.setup(this.game)
-    this.playerNames.draw()
+    this.playerNames.setup(this.game, this.userSettings)
+    this.playerNames.draw(this.userSettings)
   }
 
   panToPlayer (game, player) {
@@ -492,10 +493,10 @@ class Map extends EventEmitter {
   onTick(deltaTime) {
     let viewportWidth = this.gameContainer.viewport.right - this.gameContainer.viewport.left
     let viewportHeight = this.gameContainer.viewport.bottom - this.gameContainer.viewport.top
-    
+
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
-    
+
     let viewportCenter = this.gameContainer.viewport.center
 
     let zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
@@ -525,7 +526,7 @@ class Map extends EventEmitter {
     let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition.x - position.x),2)
     let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition.y - position.y),2)
     let distance = Math.sqrt(dxSquared+dySquared)
-    
+
     return (distance > DRAG_THRESHOLD)
   }
 
@@ -533,7 +534,7 @@ class Map extends EventEmitter {
     // ignore clicks if its a drag motion
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
-    
+
     // dispatch click event to the store, so it can be intercepted for adding star name to open message
     this.store.commit('starClicked', {
       star: dic.starData,
@@ -542,7 +543,7 @@ class Map extends EventEmitter {
         if (this.mode === 'galaxy') {
           let selectedStar = this.stars.find(x => x.data._id === e._id)
           selectedStar.isSelected = !selectedStar.isSelected
-        
+
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
@@ -571,7 +572,7 @@ class Map extends EventEmitter {
   onCarrierClicked (dic) {
     // ignore clicks if its a drag motion
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
-    
+
     let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
@@ -579,7 +580,7 @@ class Map extends EventEmitter {
       if (e.orbiting) {
         let star = this.stars.find(x => x.data._id === e.orbiting)
         let eventData = dic ? dic.eventData : null
-  
+
         return this.onStarClicked({starData: star.data, eventData})
       }
 
@@ -588,7 +589,7 @@ class Map extends EventEmitter {
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
-      
+
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
@@ -666,7 +667,7 @@ class Map extends EventEmitter {
         }
       })
       .filter(s => s.distance <= distance)
-    
+
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
       .sort((a, b) => {
@@ -676,7 +677,7 @@ class Map extends EventEmitter {
 
         return a.distance < b.distance // Then distance ascending.
       })
-    
+
     if (closeObjects.length > 1) {
       this.emit('onObjectsClicked', closeObjects)
 
