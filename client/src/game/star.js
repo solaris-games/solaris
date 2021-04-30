@@ -65,7 +65,7 @@ class Star extends EventEmitter {
       2: Display shipcounts and orbit
       3: Display shipcount, orbit and name
       4: Display shipcount, orbit, name and infrastructure
-    
+
       What zoompercentage corresponds with what depth level
       can be read from static property "zoomLevelDefinitions"
     */
@@ -108,7 +108,7 @@ class Star extends EventEmitter {
     this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
     this.baseScale = 1 //TODO add user setting for this independent of clamped or default
     //divide these by 4 to allow more control while keeping the UI as int
-    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
 
     if(userSettings.map.zoomLevels) {
@@ -165,7 +165,7 @@ class Star extends EventEmitter {
       this.container.removeChild(this.specialistSprite)
       this.specialistSprite = null
     }
-    
+
     //FIXME potential resource leak, should not create a new sprite every time
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
     this.specialistSprite = new PIXI.Sprite(specialistTexture)
@@ -174,7 +174,7 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
-    
+
     this.container.addChild(this.specialistSprite)
   }
 
@@ -270,7 +270,7 @@ class Star extends EventEmitter {
     if (!this.data.naturalResources) {
       return 0
     }
-    
+
     return Math.min(Math.floor(this.data.naturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 
@@ -301,10 +301,10 @@ class Star extends EventEmitter {
     this.graphics_shape_full_warp.lineStyle(2, player.colour.value)
 
     switch (player.shape) {
-      case 'circle': 
+      case 'circle':
         this._drawColourCircle()
         break
-      case 'square': 
+      case 'square':
         this._drawColourSquare()
         break
       case 'diamond':
@@ -319,7 +319,7 @@ class Star extends EventEmitter {
   _drawColourCircle () {
     this.graphics_shape_part.arc(0, 0, 7, 0.785398, -0.785398)
     this.graphics_shape_full.drawCircle(0, 0, 7)
-    
+
     this.graphics_shape_part_warp.arc(0, 0, 10, 0.785398, -0.785398)
     this.graphics_shape_full_warp.drawCircle(0, 0, 10)
   }
@@ -329,7 +329,7 @@ class Star extends EventEmitter {
     this.graphics_shape_part.lineTo(-7, -7)
     this.graphics_shape_part.lineTo(-7, 7)
     this.graphics_shape_part.lineTo(7, 7)
-    
+
     this.graphics_shape_full.drawRect(-7, -7, 14, 14)
 
     this.graphics_shape_part_warp.moveTo(7, -10)
@@ -353,7 +353,7 @@ class Star extends EventEmitter {
     this.graphics_shape_full.lineTo(0, s)
     this.graphics_shape_full.lineTo(s, 0)
     this.graphics_shape_full.closePath()
-    
+
     this.graphics_shape_part_warp.moveTo(0, -w)
     this.graphics_shape_part_warp.lineTo(-w, 0)
     this.graphics_shape_part_warp.lineTo(0, w)
@@ -398,7 +398,7 @@ class Star extends EventEmitter {
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-      let scrambler = this.data.garrison == null 
+      let scrambler = this.data.garrison == null
       return ( (scramblers || scrambler) && this._isInScanningRange() )
   }
 
@@ -419,7 +419,7 @@ class Star extends EventEmitter {
     if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
       this.text_name.y = 0
     } else {
-      this.text_name.y = - (this.text_name.height / 2)
+      this.text_name.y = -(this.text_name.height / 2)
     }
   }
 
@@ -519,7 +519,7 @@ class Star extends EventEmitter {
 
     // TODO: Use the game helper instead?
     let techLevel = player.research.scanning.level
-    
+
     if (this.data.specialist && this.data.specialist.modifiers.local) {
       techLevel += this.data.specialist.modifiers.local.scanning || 0
     }
@@ -553,7 +553,7 @@ class Star extends EventEmitter {
 
     // TODO: Use the game helper instead?
     let techLevel = player.research.hyperspace.level
-    
+
     if (this.data.specialist && this.data.specialist.modifiers.local) {
       techLevel += this.data.specialist.modifiers.local.hyperspace || 0
     }
@@ -576,7 +576,7 @@ class Star extends EventEmitter {
   onTick( deltaTime, zoomPercent, viewportData ) {
    let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
    let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
- 
+
    if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
      //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
      // maybe put them on their own container, since this piece of code should remain as small as possible
@@ -592,7 +592,7 @@ class Star extends EventEmitter {
      if (this.text_infrastructure) this.text_infrastructure.visible = false
      if (this.text_garrison_small) this.text_garrison_small.visible = false
      if (this.text_garrison_big) this.text_garrison_big.visible = false
-   } 
+   }
    else {
      this.updateVisibility()
      this.setScale(zoomPercent)
@@ -630,7 +630,7 @@ class Star extends EventEmitter {
 
       // Need to do this otherwise sometimes text gets highlighted.
       this.deselectAllText()
-    
+
       if (this._getStarPlayer()) {
         this.updateVisibility()
         // this.setScale()
