@@ -13,10 +13,10 @@ class Star extends EventEmitter {
     Potentially even make user defined.
   */
   static zoomLevelDefinitions = {
-    1: 0,
-    2: 120,
-    3: 160,
-    4: 200
+    infrastructure: 200,
+    name: 160,
+    naturalResources: 160,
+    shipCount: 120
   }
 
   constructor (app) {
@@ -46,7 +46,7 @@ class Star extends EventEmitter {
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
-    
+
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
@@ -55,7 +55,7 @@ class Star extends EventEmitter {
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 0
-   
+
     /**
       Zoomdepth
       I'd make this an enum if I could...
@@ -110,6 +110,10 @@ class Star extends EventEmitter {
     //divide these by 4 to allow more control while keeping the UI as int
     this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
+
+    if(userSettings.map.zoomLevels) {
+      Star.zoomLevelDefinitions = userSettings.map.zoomLevels.star
+    }
   }
 
   draw () {
@@ -626,7 +630,7 @@ class Star extends EventEmitter {
 
       // Need to do this otherwise sometimes text gets highlighted.
       this.deselectAllText()
-      
+    
       if (this._getStarPlayer()) {
         this.updateVisibility()
         // this.setScale()
@@ -638,14 +642,14 @@ class Star extends EventEmitter {
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomDepth >= 3
+    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
 
-    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomDepth >= 3
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomDepth >= 3
-    if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomDepth >= 4
+    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
+    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
 
-    let small_garrison = this.zoomDepth > 2 || this.isSelected
-    let visible_garrison = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomDepth >= 2))
+    let small_garrison = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
+    let visible_garrison = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
 
     if (this.text_garrison_small) this.text_garrison_small.visible = small_garrison && visible_garrison
     if (this.text_garrison_big) this.text_garrison_big.visible = !small_garrison && visible_garrison
