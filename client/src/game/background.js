@@ -6,7 +6,7 @@ import gameHelper from '../services/gameHelper'
 class Background {
 
   static MAX_PARALLAX = 0.333
-  static STAR_DENSITY = 8
+  static STAR_DENSITY = 16
   static STAR_SCALE = 1.0/8.0
 
   NEBULA_GENERATION = {
@@ -19,10 +19,10 @@ class Background {
   constructor () {
     this.container = new PIXI.Container()
     this.starContainer = new PIXI.Container()
-    this.container.alpha = 0.5
+    this.container.alpha = 1.0
     this.zoomPercent = 0
-    this.container.interactiveChildre = false
-    this.starContainer.interactiveChildre = false
+    this.container.interactiveChildren = false
+    this.starContainer.interactiveChildren = false
   }
 
   setup (game, userSettings) {
@@ -84,12 +84,14 @@ class Background {
       }
     }
 
+    //add locations to the chunks for quick lookup
     for(let star of this.game.galaxy.stars) {
       let cx = Math.floor(star.location.x/CHUNK_SIZE)-firstChunkX
       let cy = Math.floor(star.location.y/CHUNK_SIZE)-firstChunkY
       chunks[cx][cy].push(star.location)
     }
 
+    //generate nebulas and starfields on the chunks
     for( let x=0; x<chunksXlen; x+=1) {
       for( let y=0; y<chunksYlen; y+=1) {
         if(chunks[x][y].length > MINIMUM_STARS) {
@@ -97,7 +99,16 @@ class Background {
           let i
           let texture
           let sprite
-          let nebulaTextureCount = TextureService.NEBULA_TEXTURES.length
+          let nebulaTextureCount
+          let textures
+          if(GENERATE_STARS) {
+            nebulaTextureCount = TextureService.STARLESS_NEBULA_TEXTURES.length
+            textures = TextureService.STARLESS_NEBULA_TEXTURES
+          }
+          else {
+            nebulaTextureCount = TextureService.NEBULA_TEXTURES.length
+            textures = TextureService.NEBULA_TEXTURES
+          }
 
           if( Math.round(this.rng.random()*10) <= NEBULA_FREQUENCY ) {
             let nebulaCount = 0
@@ -105,7 +116,7 @@ class Background {
               nebulaCount+=1
               if(NEBULA_DENSITY>2) { if(this.rng.random()<0.5) { continue; } }
               i = Math.round(this.rng.random()*(nebulaTextureCount-1))
-              texture = TextureService.NEBULA_TEXTURES[i]
+              texture = textures[i]
               sprite = new PIXI.Sprite(texture)
               sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
               sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
@@ -119,6 +130,13 @@ class Background {
               sprite.originX = sprite.x
               sprite.originY = sprite.y
               sprite.rotation = this.rng.random()*Math.PI*2.0
+
+              if(GENERATE_STARS) {
+                sprite.tint = 0xff9142
+                if(this.rng.random()>0.5) { sprite.tint = 0xff4785 }
+                sprite.scale.x = 1.25
+                sprite.scale.y = 1.25
+              }
 
               this.container.addChild(sprite)
 
@@ -140,8 +158,9 @@ class Background {
                   sprite.originX = sprite.x
                   sprite.originY = sprite.y
 
-                  sprite.scale.x = Background.STAR_SCALE
-                  sprite.scale.y = Background.STAR_SCALE
+                  let inverseParallaxNormalized = 1.0-(sprite.parallax/Background.MAX_PARALLAX)
+                  sprite.scale.x = ( (Background.STAR_SCALE) + (inverseParallaxNormalized*Background.STAR_SCALE) )/2.0
+                  sprite.scale.y = ( (Background.STAR_SCALE) + (inverseParallaxNormalized*Background.STAR_SCALE) )/2.0
 
                   this.starContainer.addChild(sprite)
                 }

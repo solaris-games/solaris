@@ -4,6 +4,7 @@ import gameHelper from '../services/gameHelper'
 class TextureService {
     DEFAULT_FONT_STYLE = null
 
+    STARLESS_NEBULA_TEXTURES = []
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
 
@@ -21,6 +22,10 @@ class TextureService {
       this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb2.png'))))
       this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb3.png'))))
       this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb4.png'))))
+
+      // STARLESS NEBULAS
+      this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb0-starless.png'))))
+      this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1-starless.png'))))
 
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')
