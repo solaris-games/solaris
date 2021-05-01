@@ -37,21 +37,29 @@ module.exports = (router, io, container) => {
                 throw new ValidationError(errors);
             }
 
-            let email = req.body.email.toLowerCase();
+            const email = req.body.email.toLowerCase();
 
-            let exists = await container.userService.userExists(email);
+            const emailExists = await container.userService.userExists(email);
 
-            if (exists) {
-                return res.status(400).json({
-                    errors: [
-                        'An account with this email already exists.'
-                    ]
-                });
+            if (emailExists) {
+                errors.push('An account with this email already exists');
             }
-            
+
+            const username = req.body.username;
+
+            const usernameExists = await container.userService.usernameExists(username);
+
+            if (usernameExists) {
+                errors.push('An account with this username already exists');
+            }
+
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let userId = await container.userService.create({
                 email: email,
-                username: req.body.username,
+                username,
                 password: req.body.password
             }, ip);
 
