@@ -56,11 +56,12 @@ class Background {
       let texture = TextureService.NEBULA_TEXTURES[i]
 
       let sprite = new PIXI.Sprite(texture)
-      sprite.x = star.location.x - 320 // Note: the file isn't loaded at this point so we need to use hard coded width and height
-      sprite.y = star.location.y - 320
+      sprite.x = star.location.x
+      sprite.y = star.location.y
+      sprite.anchor.set(0.5)
 
-      sprite.parallax = this.rng.random()
-        
+      sprite.parallax = this.rng.random()*0.333
+
       sprite.originX = sprite.x
       sprite.originY = sprite.y
 
@@ -77,11 +78,11 @@ class Background {
   }
 
   onTick (deltaTime, viewportData) {
-    let deltax = viewportData.center.x-this.galaxyCenterX
-    let deltay = viewportData.center.y-this.galaxyCenterY
- 
+
     for (let i = 0; i < this.container.children.length; i++) {
       let child = this.container.children[i]
+      let deltax = viewportData.center.x-child.originX
+      let deltay = viewportData.center.y-child.originY
 
       child.x = child.originX + deltax * child.parallax
       child.y = child.originY + deltay * child.parallax
