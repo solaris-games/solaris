@@ -2,14 +2,19 @@ import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
 
 class PlayerNames {
+
+  static zoomLevel = 90
+
   constructor () {
     this.container = new PIXI.Container()
 
     this.zoomPercent = 0
   }
 
-  setup (game) {
+  setup (game, userSettings) {
     this.game = game
+
+    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
   }
 
   draw () {
@@ -52,7 +57,7 @@ class PlayerNames {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent <= 90
+      this.container.visible = zoomPercent <= PlayerNames.zoomLevel
     }
   }
 
@@ -60,7 +65,7 @@ class PlayerNames {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent <= 90
+      this.container.visible = zoomPercent <= PlayerNames.zoomLevel
     }
   }
 

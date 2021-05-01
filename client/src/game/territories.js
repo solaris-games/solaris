@@ -3,14 +3,19 @@ import * as Voronoi from 'voronoi'
 import gameHelper from '../services/gameHelper'
 
 class Territories {
+
+  static zoomLevel = 100
+
   constructor () {
     this.container = new PIXI.Container()
 
     this.zoomPercent = 0
   }
 
-  setup (game) {
+  setup (game, userSettings) {
     this.game = game
+
+    Territories.zoomLevel = userSettings.map.zoomLevels.territories
   }
 
   draw (userSettings) {
@@ -289,7 +294,7 @@ class Territories {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent <= 100
+      this.container.visible = zoomPercent <= Territories.zoomLevel
     }
   }
 
