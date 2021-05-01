@@ -128,6 +128,7 @@ class Map extends EventEmitter {
     this.background.setup(game, userSettings)
 
     this.backgroundContainer.addChild(this.background.container)
+    this.backgroundContainer.addChild(this.background.starContainer)
     this.background.draw()
   }
 

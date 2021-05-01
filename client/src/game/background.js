@@ -6,6 +6,8 @@ import gameHelper from '../services/gameHelper'
 class Background {
 
   static MAX_PARALLAX = 0.333
+  static STAR_DENSITY = 8
+  static STAR_SCALE = 1.0/8.0
 
   NEBULA_GENERATION = {
     none: 0,
@@ -16,9 +18,11 @@ class Background {
 
   constructor () {
     this.container = new PIXI.Container()
+    this.starContainer = new PIXI.Container()
     this.container.alpha = 0.5
     this.zoomPercent = 0
     this.container.interactiveChildre = false
+    this.starContainer.interactiveChildre = false
   }
 
   setup (game, userSettings) {
@@ -45,6 +49,7 @@ class Background {
     //TODO get these values from 
     let NEBULA_FREQUENCY = 9
     let NEBULA_DENSITY = 3
+    let GENERATE_STARS = true
 
     let generationChance = this.NEBULA_GENERATION[this.userSettings.map.nebulaDensity]
 
@@ -116,6 +121,32 @@ class Background {
               sprite.rotation = this.rng.random()*Math.PI*2.0
 
               this.container.addChild(sprite)
+
+              if(GENERATE_STARS) {
+                let starCount = 0
+                texture = TextureService.STAR_TEXTURE
+                while(starCount < Background.STAR_DENSITY) {
+                  starCount+=1
+                  sprite = new PIXI.Sprite(texture)
+                  sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
+                  sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
+                  sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
+                  sprite.y += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
+                  sprite.anchor.set(0.5)
+
+                  sprite.parallax = this.rng.random()*Background.MAX_PARALLAX
+                  sprite.blendMode = PIXI.BLEND_MODES.ADD
+
+                  sprite.originX = sprite.x
+                  sprite.originY = sprite.y
+
+                  sprite.scale.x = Background.STAR_SCALE
+                  sprite.scale.y = Background.STAR_SCALE
+
+                  this.starContainer.addChild(sprite)
+                }
+              }
+
             }
           }
         }
@@ -135,6 +166,15 @@ class Background {
 
     for (let i = 0; i < this.container.children.length; i++) {
       let child = this.container.children[i]
+      let deltax = viewportData.center.x-child.originX
+      let deltay = viewportData.center.y-child.originY
+
+      child.x = child.originX + deltax * child.parallax
+      child.y = child.originY + deltay * child.parallax
+    }
+
+    for (let i = 0; i < this.starContainer.children.length; i++) {
+      let child = this.starContainer.children[i]
       let deltax = viewportData.center.x-child.originX
       let deltay = viewportData.center.y-child.originY
 
