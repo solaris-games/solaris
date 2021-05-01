@@ -4,6 +4,9 @@ import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'
 
 class Background {
+
+  static zoomLevel = 100
+
   NEBULA_GENERATION = {
     none: 0,
     sparse: 0.05,
@@ -24,6 +27,8 @@ class Background {
     this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
     this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()
+
+    Background.zoomLevel = userSettings.map.zoomLevels.background
   }
 
   clear () {
@@ -60,7 +65,7 @@ class Background {
       sprite.y = star.location.y - 320
 
       sprite.parallax = this.rng.random()
-        
+
       sprite.originX = sprite.x
       sprite.originY = sprite.y
 
@@ -72,14 +77,14 @@ class Background {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent > 100
+      this.container.visible = zoomPercent > Background.zoomLevel
     }
   }
 
   onTick (deltaTime, viewportData) {
     let deltax = viewportData.center.x-this.galaxyCenterX
     let deltay = viewportData.center.y-this.galaxyCenterY
- 
+
     for (let i = 0; i < this.container.children.length; i++) {
       let child = this.container.children[i]
 

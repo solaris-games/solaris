@@ -102,7 +102,7 @@
     </div>
     
     <div class="row bg-secondary pt-1 pb-1">
-      <label for="objects-scaling" class="col col-form-label">Carrier Paths</label>
+      <label for="" class="col col-form-label">Carrier Paths</label>
     </div>
 
     <div class="row bg-secondary pt-1 pb-1 ml-1">
@@ -158,6 +158,59 @@
           <option value="enabled">Enabled</option>
           <option value="disabled">Disabled</option>
         </select>
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="" class="col col-form-label">Zoom Levels(%)</label>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="territories-zoom" class="col col-form-label">Territories</label>
+      <div class="col">
+        <input type="number" class="form-control" id="territories-zoom" v-model="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="player-names-zoom" class="col col-form-label">Player Names</label>
+      <div class="col">
+        <input type="number" class="form-control" id="player-names-zoom" v-model="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="carriers-ship-zoom" class="col col-form-label">Carrier Ships</label>
+      <div class="col">
+        <input type="number" class="form-control" id="carriers-ship-zoom" v-model="settings.map.zoomLevels.carrierShips" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="star-ship-zoom" class="col col-form-label">Star Ships</label>
+      <div class="col">
+        <input type="number" class="form-control" id="star-ship-zoom" v-model="settings.map.zoomLevels.star.shipCount" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="star-name-zoom" class="col col-form-label">Star Name</label>
+      <div class="col">
+        <input type="number" class="form-control" id="star-name-zoom" v-model="settings.map.zoomLevels.star.name" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="star-resources-zoom" class="col col-form-label">Star Natural Resources</label>
+      <div class="col">
+        <input type="number" class="form-control" id="star-resources-zoom" v-model="settings.map.zoomLevels.star.naturalResources" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="star-infrastructure-zoom" class="col col-form-label">Star Infrastructure</label>
+      <div class="col">
+        <input type="number" class="form-control" id="star-infrastructure-zoom" v-model="settings.map.zoomLevels.star.infrastructure" :disabled="isSavingSettings">
       </div>
     </div>
 
@@ -264,6 +317,7 @@ export default {
           this.onOptionsSaved()
         }
       } catch (err) {
+        console.error(err)
         this.errors = err.response.data.errors || []
       }
 

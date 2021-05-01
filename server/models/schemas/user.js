@@ -113,6 +113,17 @@ const schema = new Schema({
             objectsMaximumScale: { type: Types.Number, required: false, default: 16 },
             nebulaDensity: { type: Types.String, required: false, enum: ['none', 'sparse', 'standard', 'abundant'], default: 'standard' },
             antiAliasing: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+            zoomLevels: {
+              territories: { type: Types.Number, required: false, default: 100 },
+              playerNames: { type: Types.Number, required: false, default: 100 },
+              carrierShips: { type: Types.Number, required: false, default: 140 },
+              star: {
+                shipCount: { type: Types.Number, required: false, default: 120 },
+                name: { type: Types.Number, required: false, default: 160 },
+                naturalResources: { type: Types.Number, required: false, default: 160 },
+                infrastructure: { type: Types.Number, required: false, default: 200 }
+              }
+            }
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },
