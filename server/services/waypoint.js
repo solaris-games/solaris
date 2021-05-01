@@ -368,9 +368,9 @@ module.exports = class WaypointService {
     }
 
     _performWaypointActionDropPercentage(carrier, star, waypoint) {
-        const toDrop = carrier.ships * (waypoint.actionShips * 0.01)
+        const toDrop = Math.floor(carrier.ships * (waypoint.actionShips * 0.01))
 
-        if (toDrop > 0) {
+        if (toDrop > 1 && carrier.ships - toDrop > 0) {
             star.garrisonActual += toDrop
             star.garrison = Math.floor(star.garrisonActual)
             carrier.ships -= toDrop
@@ -392,9 +392,9 @@ module.exports = class WaypointService {
     }
 
     _performWaypointActionCollectPercentage(carrier, star, waypoint) {
-        const toTransfer = star.garrison * (waypoint.actionShips * 0.01)
+        const toTransfer = Math.floor(star.garrison * (waypoint.actionShips * 0.01))
 
-        if (toTransfer > 0) {
+        if (toTransfer > 1 && star.garrison - toTransfer >= 0) {
             star.garrisonActual -= toTransfer
             star.garrison = Math.floor(star.garrisonActual)
             carrier.ships += toTransfer
