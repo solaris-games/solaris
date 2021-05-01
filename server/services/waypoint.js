@@ -280,6 +280,9 @@ module.exports = class WaypointService {
             case 'drop':
                 this._performWaypointActionDrop(carrier, star, waypoint);
                 break;
+            case 'dropPercentage':
+                this._performWaypointActionDropPercentage(carrier, star, waypoint);
+                break;
             case 'dropAllBut':
                 this._performWaypointActionDropAllBut(carrier, star, waypoint);
                 break;
@@ -288,6 +291,9 @@ module.exports = class WaypointService {
                 break;
             case 'collect':
                 this._performWaypointActionCollect(carrier, star, waypoint);
+                break;
+            case 'collectPercentage':
+                this._performWaypointActionCollectPercentage(carrier, star, waypoint);
                 break;
             case 'collectAllBut':
                 this._performWaypointActionCollectAllBut(carrier, star, waypoint);
@@ -340,7 +346,7 @@ module.exports = class WaypointService {
     }
     
     performWaypointActionsDrops(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut']);
+        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut', 'dropPercentage']);
     }
 
     _performWaypointActionCollect(carrier, star, waypoint) {
@@ -358,7 +364,17 @@ module.exports = class WaypointService {
     }
 
     performWaypointActionsCollects(game, waypoints) {
-        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut']);
+        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut', 'collectPercentage']);
+    }
+
+    _performWaypointActionDropPercentage(carrier, star, waypoint) {
+        const toDrop = carrier.ships * (waypoint.actionShips * 0.01)
+
+        if (toDrop > 0) {
+            star.garrisonActual += toDrop
+            star.garrison = Math.floor(star.garrisonActual)
+            carrier.ships -= toDrop
+        }
     }
 
     _performWaypointActionDropAllBut(carrier, star, waypoint) {
@@ -372,6 +388,16 @@ module.exports = class WaypointService {
             star.garrisonActual += difference;
             star.garrison = Math.floor(star.garrisonActual);
             carrier.ships -= difference;
+        }
+    }
+
+    _performWaypointActionCollectPercentage(carrier, star, waypoint) {
+        const toTransfer = star.garrison * (waypoint.actionShips * 0.01)
+
+        if (toTransfer > 0) {
+            star.garrisonActual -= toTransfer
+            star.garrison = Math.floor(star.garrisonActual)
+            carrier.ships += toTransfer
         }
     }
 
