@@ -54,12 +54,16 @@ module.exports = class WaypointService {
             let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
             // Make sure the user isn't being a dumbass.
+            waypoint.actionShips = waypoint.actionShips || 0;
+
             if (waypoint.actionShips == null || waypoint.actionShips == '' || +waypoint.actionShips < 0) {
                 waypoint.actionShips = 0;
             }
 
             // Make damn sure there is a delay ticks defined.
-            if (waypoint.delayTicks == null) {
+            waypoint.delayTicks = waypoint.delayTicks || 0;
+            
+            if (waypoint.delayTicks == null || waypoint.delayTicks == '' || +waypoint.delayTicks < 0) {
                 waypoint.delayTicks = 0;
             }
 
