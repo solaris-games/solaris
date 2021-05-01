@@ -62,7 +62,7 @@ module.exports = class EventService {
             args.gameId, args.gameTick, args.defender, args.attackers, args.combatResult));
         this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.gameId, args.gameTick, args.player, args.star, args.capturedBy, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
-            args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
+            args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
@@ -232,10 +232,11 @@ module.exports = class EventService {
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(gameId, gameTick, player, 
-        creditsEconomy, creditsBanking, experimentTechnology, experimentAmount, carrierUpkeep) {
+        creditsEconomy, creditsBanking, creditsSpecialists, experimentTechnology, experimentAmount, carrierUpkeep) {
         let data = {
             creditsEconomy,
             creditsBanking,
+            creditsSpecialists,
             experimentTechnology,
             experimentAmount,
             carrierUpkeep

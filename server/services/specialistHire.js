@@ -35,21 +35,18 @@ module.exports = class SpecialistHireService {
             throw new ValidationError(`The carrier already has the specialist assigned.`);
         }
         
-        // Calculate how much the spec will cost.
-        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
-
-        // TODO: This needs to depend on whether the specialist tech is enabled, if so
-        // it needs to deduct from specialist tokens, not credits.
-        if (player.credits < cost) {
+        // Calculate whether the player can afford to buy the specialist.
+        if (!this._canAffordSpecialist(game, player, specialist)) {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }
 
+        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+
         carrier.specialistId = specialist.id;
-        player.credits -= cost;
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            await this.playerService.addCredits(game, player, -cost, false),
+            await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {
                     filter: {
@@ -103,21 +100,18 @@ module.exports = class SpecialistHireService {
             throw new ValidationError(`The star already has the specialist assigned.`);
         }
         
-        // Calculate how much the spec will cost.
-        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
-
-        // TODO: This needs to depend on whether the specialist tech is enabled, if so
-        // it needs to deduct from specialist tokens, not credits.
-        if (player.credits < cost) {
+        // Calculate whether the player can afford to buy the specialist.
+        if (!this._canAffordSpecialist(game, player, specialist)) {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }
 
+        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+
         star.specialistId = specialist.id;
-        player.credits -= cost;
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            await this.playerService.addCredits(game, player, -cost, false),
+            await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {
                     filter: {
@@ -143,6 +137,37 @@ module.exports = class SpecialistHireService {
             specialist,
             cost
         };
+    }
+
+    _canAffordSpecialist(game, player, specialist) {
+        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+
+        switch (game.settings.specialGalaxy.specialistsCurrency) {
+            case 'credits':
+                return player.credits >= cost.credits;
+            case 'creditsSpecialists':
+                return player.creditsSpecialists >= cost.creditsSpecialists;
+            default:
+                throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
+        }
+    }
+
+    async _deductSpecialistCost(game, player, specialist) {
+        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+
+        switch (game.settings.specialGalaxy.specialistsCurrency) {
+            case 'credits':
+                player.credits -= cost.credits;
+
+                return await this.playerService.addCredits(game, player, -cost.credits, false);
+            case 'creditsSpecialists':
+                player.creditsSpecialists -= cost.creditsSpecialists;
+
+                return await this.playerService.addCreditsSpecialists(game, player, -cost.creditsSpecialists, false);
+            default:
+                throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
+        }
+        
     }
 
 };

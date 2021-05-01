@@ -79,7 +79,9 @@ module.exports = class SpecialistService {
             spec.cost = this.getSpecialistActualCost(game, spec);
         }
 
-        return specs.sort((a, b) => a.cost - b.cost);
+        let currency = game.settings.specialGalaxy.specialistsCurrency;
+
+        return specs.sort((a, b) => a.cost[currency] - b.cost[currency]);
     }
 
     listCarrier(game) {
@@ -90,13 +92,18 @@ module.exports = class SpecialistService {
         return this.list(game, TYPES.STAR);
     }
 
-    // TODO: Refactor this to return both the credits cost and the token cost.
     getSpecialistActualCost(game, specialist) {
+        let result = {
+            credits: 0,
+            creditsSpecialists: 0
+        };
+
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
 
-        let cost = specialist.baseCostCredits * expenseConfig;
+        result.credits = specialist.baseCostCredits * expenseConfig;
+        result.creditsSpecialists = specialist.baseCostCreditsSpecialists * expenseConfig;
 
-        return cost;
+        return result;
     }
 
     _getCarrierSpecialValue(carrier, name, defaultValue) {

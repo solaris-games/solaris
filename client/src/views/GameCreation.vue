@@ -139,6 +139,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.specialGalaxy.specialistCost !== 'none'">
+        <label for="specialistsCurrency" class="col-form-label">Specialist Currency</label>
+        <select class="form-control" id="specialistsCurrency" v-model="settings.specialGalaxy.specialistsCurrency" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.specialistsCurrency" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="randomGates" class="col-form-label">Random Gates</label>
         <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates" :disabled="isCreatingGame">
@@ -227,6 +236,15 @@
         <select class="form-control" id="startingCredits" v-model="settings.player.startingCredits" :disabled="isCreatingGame">
           <option v-for="opt in options.player.startingCredits" v-bind:key="opt" v-bind:value="opt">
             ${{ opt }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
+        <label for="startingCreditsSpecialists" class="col-form-label">Starting Specialist Tokens</label>
+        <select class="form-control" id="startingCreditsSpecialists" v-model="settings.player.startingCreditsSpecialists" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.startingCreditsSpecialists" v-bind:key="opt" v-bind:value="opt">
+            {{ opt }} Tokens
           </option>
         </select>
       </div>

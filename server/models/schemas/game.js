@@ -37,6 +37,7 @@ const schema = new Schema({
 			carrierUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
@@ -49,6 +50,7 @@ const schema = new Schema({
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
 			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
+			startingCreditsSpecialists: { type: Types.Number, required: true, enum: [0, 1, 3, 5, 10, 25, 50, 100], default: 5 },
 			startingShips: { type: Types.Number, required: true, enum: [0, 10, 50, 100], default: 10 },
 			startingInfrastructure: {
 				economy: { type: Types.Number, required: true, enum: [0, 5, 10, 20, 30], default: 5 },

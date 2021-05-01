@@ -15,7 +15,7 @@
       </div>
 
       <view-subtitle title="General Settings"/>
-      <div class="table-responsive">
+      <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
@@ -43,7 +43,7 @@
       </div>
 
       <view-subtitle title="Galaxy Settings"/>
-      <div class="table-responsive">
+      <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
@@ -63,7 +63,7 @@
       </div>
 
       <view-subtitle title="Special Galaxy Settings"/>
-      <div class="table-responsive">
+      <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
@@ -81,6 +81,10 @@
             <tr>
               <td>Specialist Cost</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistCost) }}</td>
+            </tr>
+            <tr v-if="game.settings.specialGalaxy.specialistCost !== 'none'">
+              <td>Specialist Currency</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistsCurrency) }}</td>
             </tr>
             <tr>
               <td>Random Gates</td>
@@ -119,7 +123,7 @@
       </div>
 
       <view-subtitle title="Player Settings"/>
-      <div class="table-responsive">
+      <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
@@ -129,6 +133,10 @@
             <tr>
               <td>Starting Credits</td>
               <td class="text-right">{{ game.settings.player.startingCredits }}</td>
+            </tr>
+            <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
+              <td>Starting Specialist Tokens</td>
+              <td class="text-right">{{ game.settings.player.startingCreditsSpecialists }}</td>
             </tr>
             <tr>
               <td>Starting Ships</td>
@@ -179,7 +187,7 @@
       </div>
 
       <view-subtitle title="Technology Settings"/>
-      <div class="table-responsive">
+      <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
@@ -255,7 +263,7 @@
       </div>
 
       <view-subtitle title="Game Time Settings"/>
-      <div class="table-responsive">
+      <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
@@ -383,7 +391,9 @@ export default {
         'extra': 'Extra',
         'hidden': 'Hidden',
         'visible': 'Visible',
-        'experimental': 'Experimental'
+        'experimental': 'Experimental',
+        'credits': 'Credits',
+        'creditsSpecialists': 'Specialist Tokens'
       }[option]
 
       return text || option

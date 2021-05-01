@@ -15,8 +15,12 @@
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
-            <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" title="Credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
+            </span>
+
+            <span v-if="isSpecialistsTechnologyEnabled" title="Specialist Tokens">
+                <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
             <research-progress class="d-none d-md-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
@@ -319,6 +323,9 @@ export default {
     },
     isTimeMachineEnabled () {
       return this.$store.state.game.settings.general.timeMachine === 'enabled'
+    },
+    isSpecialistsTechnologyEnabled () {
+      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     }
   }
 }

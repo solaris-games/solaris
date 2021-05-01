@@ -21,6 +21,7 @@
     "carrierUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
+    "specialistsCurrency": "creditsSpecialists",
     "randomGates": "none",
     "darkGalaxy": "disabled",
     "giftCarriers": "enabled",
@@ -33,6 +34,7 @@
   "player": {
     "startingStars": 3,
     "startingCredits": 500,
+    "startingCreditsSpecialists": 10,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,
