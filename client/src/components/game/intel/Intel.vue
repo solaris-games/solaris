@@ -276,6 +276,7 @@ export default {
             case 'scanning':
             case 'experimentation':
             case 'terraforming':
+            case 'specialists':
               dataset.data.push(historyPlayer.research[this.intelType].level)
               break
             default:

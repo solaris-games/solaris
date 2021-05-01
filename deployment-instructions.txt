@@ -16,3 +16,7 @@ db.games.find().forEach(function(game) {
 	
 	db.games.save(game);
 });
+
+TODO: Trade and trade events
+TODO: Trade achievements
+TODO: AI respond to tokens
