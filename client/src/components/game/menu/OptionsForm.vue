@@ -146,7 +146,7 @@
     <div class="row bg-secondary pt-1 pb-1 ml-1">
       <label for="nebula-frequency" class="col col-form-label">Nebula Frequency</label>
       <div class="col">
-        <input type="number" class="form-control" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
+        <input type="number" min="0" max="16" step="1" class="form-control" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
       </div>
     </div>
 
@@ -154,6 +154,30 @@
       <label for="nebula-density" class="col col-form-label">Nebula Density</label>
       <div class="col">
         <input type="number" class="form-control" id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="nebula-opacity" class="col col-form-label">Nebula Opacity</label>
+      <div class="col">
+        <input type="number" min="0.0" max="1.0" step="0.125" class="form-control" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="stars-opacity" class="col col-form-label">Stars Opacity</label>
+      <div class="col">
+        <input type="number" min="0.0" max="1.0" step="0.125" class="form-control" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="background-blend-mode" class="col-12 col-sm-6 col-form-label">Blend Mode</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="background-blend-mode" v-model="settings.map.background.blendMode" :disabled="isSavingSettings">
+          <option value="ADD">ADD</option>
+          <option value="NORMAL">NORMAL</option>
+        </select>
       </div>
     </div>
 
@@ -210,6 +234,20 @@
       <label for="territories-zoom" class="col col-form-label">Territories</label>
       <div class="col">
         <input type="number" class="form-control" id="territories-zoom" v-model="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="nebulas-zoom" class="col col-form-label">Nebulas</label>
+      <div class="col">
+        <input type="number" class="form-control" id="nebulas-zoom" v-model="settings.map.zoomLevels.background.nebulas" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="background-stars-zoom" class="col col-form-label">Background Stars</label>
+      <div class="col">
+        <input type="number" class="form-control" id="background-stars-zoom" v-model="settings.map.zoomLevels.background.stars" :disabled="isSavingSettings">
       </div>
     </div>
 

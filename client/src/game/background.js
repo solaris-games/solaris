@@ -39,7 +39,7 @@ class Background {
 
     Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
     this.container.alpha = userSettings.map.background.nebulaOpacity
-    this.container.alpha = userSettings.map.background.starsOpacity
+    this.starContainer.alpha = userSettings.map.background.starsOpacity
     this.blendMode = userSettings.map.background.blendMode == 'ADD' ?
       PIXI.BLEND_MODES.ADD : PIXI.BLEND_MODES.NORMAL
   }
