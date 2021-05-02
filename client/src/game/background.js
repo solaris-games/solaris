@@ -46,6 +46,7 @@ class Background {
 
   clear () {
     this.container.removeChildren()
+    this.starContainer.removeChildren()
   }
 
   draw () {
