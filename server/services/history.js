@@ -59,14 +59,26 @@ module.exports = class HistoryService {
     }
 
     async log(game) {
-        let history = new this.historyModel({
+        // Check if there is already a history record with this tick, if so we should
+        // overwrite it.
+        let history = await this.historyModel.findOne({
             gameId: game._id,
-            tick: game.state.tick,
-            productionTick: game.state.productionTick,
-            players: [],
-            stars: [],
-            carriers: []
-        });
+            tick: game.state.tick
+        })
+        .exec();
+
+        if (!history) {
+            history = new this.historyModel({
+                gameId: game._id,
+                tick: game.state.tick,
+                productionTick: game.state.productionTick
+            });
+        }
+
+        // Reset just in case there was an existing history.
+        history.players = [];
+        history.stars = [];
+        history.carriers = [];
 
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];

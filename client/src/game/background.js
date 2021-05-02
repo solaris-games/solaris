@@ -9,6 +9,8 @@ class Background {
   static STAR_DENSITY = 10 // maybe make this into a user setting?
   static STAR_SCALE = 1.0/8.0
 
+  static zoomLevel = 100
+
   NEBULA_GENERATION = {
     none: 0,
     sparse: 0.05,
@@ -19,7 +21,6 @@ class Background {
   constructor () {
     this.container = new PIXI.Container()
     this.starContainer = new PIXI.Container()
-    this.container.alpha = 1.0
     this.zoomPercent = 0
     this.container.interactiveChildren = false
     this.starContainer.interactiveChildren = false
@@ -32,6 +33,8 @@ class Background {
     this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
     this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()
+
+    Background.zoomLevel = userSettings.map.zoomLevels.territories
   }
 
   clear () {
@@ -175,12 +178,11 @@ class Background {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent > 100
+      this.container.visible = zoomPercent > Background.zoomLevel
     }
   }
 
   onTick (deltaTime, viewportData) {
-
     for (let i = 0; i < this.container.children.length; i++) {
       let child = this.container.children[i]
       let deltax = viewportData.center.x-child.originX

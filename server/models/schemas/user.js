@@ -118,6 +118,17 @@ const schema = new Schema({
               nebulaColor1: { type: Types.String, required: false, default: '#ffad42' },
               nebulaColor2: { type: Types.String, required: false, default: '#ffad42' },
               nebulaColor3: { type: Types.String, required: false, default: '#ff3b86' }
+            },
+            zoomLevels: {
+              territories: { type: Types.Number, required: false, default: 100 },
+              playerNames: { type: Types.Number, required: false, default: 100 },
+              carrierShips: { type: Types.Number, required: false, default: 140 },
+              star: {
+                shipCount: { type: Types.Number, required: false, default: 120 },
+                name: { type: Types.Number, required: false, default: 160 },
+                naturalResources: { type: Types.Number, required: false, default: 160 },
+                infrastructure: { type: Types.Number, required: false, default: 200 }
+              }
             }
         },
         carrier: {
