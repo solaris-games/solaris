@@ -6,7 +6,7 @@ import gameHelper from '../services/gameHelper'
 class Background {
 
   static MAX_PARALLAX = 0.333
-  static STAR_DENSITY = 10
+  static STAR_DENSITY = 10 // maybe make this into a user setting?
   static STAR_SCALE = 1.0/8.0
 
   NEBULA_GENERATION = {
@@ -132,8 +132,8 @@ class Background {
                 sprite.tint = NEBULA_COLOR1
                 if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOR2 }
                 if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOR3 }
-                sprite.scale.x = 1.25
-                sprite.scale.y = 1.25
+                sprite.scale.x = 1.5
+                sprite.scale.y = 1.5
               }
 
               this.container.addChild(sprite)

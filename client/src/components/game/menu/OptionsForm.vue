@@ -138,19 +138,60 @@
         </select>
       </div>
     </div>
-    
+
     <div class="row bg-secondary pt-1 pb-1">
-      <label for="nebulaDensity" class="col-12 col-sm-6 col-form-label">Nebula Density</label>
+      <label for="" class="col col-form-label">Background</label>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="nebula-frequency" class="col col-form-label">Nebula Frequency</label>
+      <div class="col">
+        <input type="number" class="form-control" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1 ml-1">
+      <label for="nebula-density" class="col col-form-label">Nebula Density</label>
+      <div class="col">
+        <input type="number" class="form-control" id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
+      </div>
+    </div>
+
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="background-stars" class="col-12 col-sm-6 col-form-label">Background Stars</label>
       <div class="col-12 col-sm-6">
-        <select class="form-control" id="nebulaDensity" v-model="settings.map.nebulaDensity" :disabled="isSavingSettings">
-          <option value="none">None</option>
-          <option value="sparse">Sparse</option>
-          <option value="standard">Standard</option>
-          <option value="abundant">Abundant</option>
+        <select class="form-control" id="antiAliasing" v-model="settings.map.background.backgroundStars" :disabled="isSavingSettings">
+          <option value="enabled">Enabled</option>
+          <option value="disabled">Disabled</option>
         </select>
       </div>
     </div>
-    
+
+    <div v-if="settings.map.background.backgroundStars=='enabled'">
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-color-1" class="col-12 col-sm-6 col-form-label">Nebula Color 1</label>
+        <div class="col-12 col-sm-6">
+        <input type="text" class="form-control" id="nebula-color-1" v-model="settings.map.background.nebulaColor1" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-color-2" class="col-12 col-sm-6 col-form-label">Nebula Color 2</label>
+        <div class="col-12 col-sm-6">
+        <input type="text" class="form-control" id="nebula-color-2" v-model="settings.map.background.nebulaColor2" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-color-3" class="col-12 col-sm-6 col-form-label">Nebula Color 3</label>
+        <div class="col-12 col-sm-6">
+        <input type="text" class="form-control" id="nebula-color-3" v-model="settings.map.background.nebulaColor3" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+    </div>
+
     <div class="row bg-secondary pt-1 pb-1">
       <label for="antiAliasing" class="col-12 col-sm-6 col-form-label">Anti Aliasing</label>
       <div class="col-12 col-sm-6">
