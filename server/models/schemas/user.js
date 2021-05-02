@@ -128,6 +128,10 @@ const schema = new Schema({
                 name: { type: Types.Number, required: false, default: 160 },
                 naturalResources: { type: Types.Number, required: false, default: 160 },
                 infrastructure: { type: Types.Number, required: false, default: 200 }
+              },
+              background: {
+                nebulas: { type: Types.Number, required: false, default: 100 },
+                stars: { type: Types.Number, required: false, default: 100 }
               }
             }
         },

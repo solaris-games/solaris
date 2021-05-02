@@ -9,7 +9,10 @@ class Background {
   static STAR_DENSITY = 10 // maybe make this into a user setting?
   static STAR_SCALE = 1.0/8.0
 
-  static zoomLevel = 100
+  static zoomLevelDefinitions = {
+    nebulas: 100,
+    stars: 100,
+  }
 
   NEBULA_GENERATION = {
     none: 0,
@@ -34,7 +37,7 @@ class Background {
     this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()
 
-    Background.zoomLevel = userSettings.map.zoomLevels.territories
+    Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
   }
 
   clear () {
@@ -178,7 +181,10 @@ class Background {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent > Background.zoomLevel
+      this.container.visible = zoomPercent > Background.zoomLevelDefinitions.nebulas
+    }
+    if (this.starContainer) {
+      this.starContainer.visible = zoomPercent > Background.zoomLevelDefinitions.stars
     }
   }
 
