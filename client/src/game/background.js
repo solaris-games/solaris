@@ -38,6 +38,8 @@ class Background {
     this.clear()
 
     Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
+    this.container.alpha = userSettings.map.background.nebulaOpacity
+    this.container.alpha = userSettings.map.background.starsOpacity
   }
 
   clear () {
