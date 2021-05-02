@@ -110,8 +110,15 @@ const schema = new Schema({
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16 },
-            nebulaDensity: { type: Types.String, required: false, enum: ['none', 'sparse', 'standard', 'abundant'], default: 'standard' },
             antiAliasing: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+            background:{
+              nebulaFrequency: { type: Types.Number, required: false, default: 12 },
+              nebulaDensity: { type: Types.Number, required: false, default: 3 },
+              backgroundStars: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+              nebulaColor1: { type: Types.String, required: false, default: '#ffad42' },
+              nebulaColor2: { type: Types.String, required: false, default: '#ffad42' },
+              nebulaColor3: { type: Types.String, required: false, default: '#ff3b86' }
+            }
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison'], default: 'collectAll' },

@@ -6,7 +6,7 @@ import gameHelper from '../services/gameHelper'
 class Background {
 
   static MAX_PARALLAX = 0.333
-  static STAR_DENSITY = 16
+  static STAR_DENSITY = 10
   static STAR_SCALE = 1.0/8.0
 
   NEBULA_GENERATION = {
@@ -46,16 +46,12 @@ class Background {
 
   drawNebulas () {
 
-    //TODO get these values from 
-    let NEBULA_FREQUENCY = 9
-    let NEBULA_DENSITY = 3
-    let GENERATE_STARS = true
-
-    let generationChance = this.NEBULA_GENERATION[this.userSettings.map.nebulaDensity]
-
-    if (generationChance === 0) {
-      return
-    }
+    let NEBULA_FREQUENCY = this.userSettings.map.background.nebulaFrequency
+    let NEBULA_DENSITY = this.userSettings.map.background.nebulaDensity
+    let GENERATE_STARS = this.userSettings.map.background.backgroundStars == 'enabled'
+    let NEBULA_COLOR1 = parseInt(this.userSettings.map.background.nebulaColor1.replace(/^#/, '').substring(0, 6), 16)
+    let NEBULA_COLOR2 = parseInt(this.userSettings.map.background.nebulaColor2.replace(/^#/, '').substring(0, 6), 16)
+    let NEBULA_COLOR3 = parseInt(this.userSettings.map.background.nebulaColor3.replace(/^#/, '').substring(0, 6), 16)
 
     //divide the galaxy in chunks roughly the nebula size
 
@@ -92,6 +88,7 @@ class Background {
     }
 
     //generate nebulas and starfields on the chunks
+    //TODO use these chunks to implement viewport culling
     for( let x=0; x<chunksXlen; x+=1) {
       for( let y=0; y<chunksYlen; y+=1) {
         if(chunks[x][y].length > MINIMUM_STARS) {
@@ -110,7 +107,7 @@ class Background {
             textures = TextureService.NEBULA_TEXTURES
           }
 
-          if( Math.round(this.rng.random()*10) <= NEBULA_FREQUENCY ) {
+          if( Math.round(this.rng.random()*16) <= NEBULA_FREQUENCY ) {
             let nebulaCount = 0
             while(nebulaCount < NEBULA_DENSITY) {
               nebulaCount+=1
@@ -132,8 +129,9 @@ class Background {
               sprite.rotation = this.rng.random()*Math.PI*2.0
 
               if(GENERATE_STARS) {
-                sprite.tint = 0xff9142
-                if(this.rng.random()>0.5) { sprite.tint = 0xff4785 }
+                sprite.tint = NEBULA_COLOR1
+                if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOR2 }
+                if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOR3 }
                 sprite.scale.x = 1.25
                 sprite.scale.y = 1.25
               }
