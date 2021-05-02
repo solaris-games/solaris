@@ -40,6 +40,8 @@ class Background {
     Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
     this.container.alpha = userSettings.map.background.nebulaOpacity
     this.container.alpha = userSettings.map.background.starsOpacity
+    this.blendMode = userSettings.map.background.blendMode == 'ADD' ?
+      PIXI.BLEND_MODES.ADD : PIXI.BLEND_MODES.NORMAL
   }
 
   clear () {
@@ -130,7 +132,7 @@ class Background {
               sprite.anchor.set(0.5)
 
               sprite.parallax = this.rng.random()*Background.MAX_PARALLAX
-              sprite.blendMode = PIXI.BLEND_MODES.ADD
+              sprite.blendMode = this.blendMode
 
               sprite.originX = sprite.x
               sprite.originY = sprite.y
@@ -159,7 +161,7 @@ class Background {
                   sprite.anchor.set(0.5)
 
                   sprite.parallax = this.rng.random()*Background.MAX_PARALLAX
-                  sprite.blendMode = PIXI.BLEND_MODES.ADD
+                  sprite.blendMode = this.blendMode
 
                   sprite.originX = sprite.x
                   sprite.originY = sprite.y
