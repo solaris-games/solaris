@@ -8,17 +8,13 @@ class Background {
   static MAX_PARALLAX = 0.333
   static STAR_DENSITY = 10 // maybe make this into a user setting?
   static STAR_SCALE = 1.0/8.0
+  static NEBULA_SCALE = 1.5
+  static NEBULA_DELTA_SCALE = Background.NEBULA_SCALE*0.25
+  static NEBULA_DELTA_ROTATION = (Math.PI*2.0)/64.0
 
   static zoomLevelDefinitions = {
     nebulas: 100,
     stars: 100,
-  }
-
-  NEBULA_GENERATION = {
-    none: 0,
-    sparse: 0.05,
-    standard: 0.1,
-    abundant: 0.2
   }
 
   constructor () {
@@ -27,6 +23,7 @@ class Background {
     this.zoomPercent = 0
     this.container.interactiveChildren = false
     this.starContainer.interactiveChildren = false
+    this.time = 0
   }
 
   setup (game, userSettings) {
@@ -40,6 +37,9 @@ class Background {
     Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
     this.container.alpha = userSettings.map.background.nebulaOpacity
     this.starContainer.alpha = userSettings.map.background.starsOpacity
+
+    this.moveNebulas = true
+    this.timeScale = (1.0/(2048.0*64.0))
     this.blendMode = userSettings.map.background.blendMode == 'ADD' ?
       PIXI.BLEND_MODES.ADD : PIXI.BLEND_MODES.NORMAL
   }
@@ -137,14 +137,16 @@ class Background {
 
               sprite.originX = sprite.x
               sprite.originY = sprite.y
-              sprite.rotation = this.rng.random()*Math.PI*2.0
+              sprite.baseRotation = this.rng.random()*Math.PI*2.0
+              sprite.baseRotationTime = this.rng.random()*Math.PI*2.0
+              sprite.baseScaleTime = this.rng.random()*Math.PI*2.0
 
               if(GENERATE_STARS) {
                 sprite.tint = NEBULA_COLOR1
                 if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOR2 }
                 if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOR3 }
-                sprite.scale.x = 1.5
-                sprite.scale.y = 1.5
+                sprite.scale.x = Background.NEBULA_SCALE
+                sprite.scale.y = Background.NEBULA_SCALE
               }
 
               this.container.addChild(sprite)
@@ -194,6 +196,8 @@ class Background {
   }
 
   onTick (deltaTime, viewportData) {
+    this.time += deltaTime*1000
+    let compressedTime = this.time*this.timeScale
     for (let i = 0; i < this.container.children.length; i++) {
       let child = this.container.children[i]
       let deltax = viewportData.center.x-child.originX
@@ -201,6 +205,11 @@ class Background {
 
       child.x = child.originX + deltax * child.parallax
       child.y = child.originY + deltay * child.parallax
+
+      if( this.moveNebulas ) { // TODO compare performance of this conditional branch with looping the child array twice
+        child.scale.x = Background.NEBULA_SCALE + Math.sin(child.baseScaleTime+compressedTime)*Background.NEBULA_DELTA_SCALE
+        child.rotation = child.baseRotation + Math.sin(child.baseRotationTime+compressedTime)*Background.NEBULA_DELTA_ROTATION
+      }
     }
 
     for (let i = 0; i < this.starContainer.children.length; i++) {
