@@ -36,7 +36,7 @@ const schema = new Schema({
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
 			carrierUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
-			specialistCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+			specialistCost: { type: Types.String, required: true, enum: ['none', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
@@ -145,6 +145,12 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 4 },
 				veryExpensive: { type: Types.Number, required: true, default: 8 },
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
+			},
+			specialistsExpenseMultipliers: {
+				standard: { type: Types.Number, required: true, default: 1 },
+				expensive: { type: Types.Number, required: true, default: 2 },
+				veryExpensive: { type: Types.Number, required: true, default: 4 },
+				crazyExpensive: { type: Types.Number, required: true, default: 8 }
 			}
 		}
 	},

@@ -98,7 +98,7 @@ module.exports = class SpecialistService {
             creditsSpecialists: 0
         };
 
-        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
+        const expenseConfig = game.constants.star.specialistsExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
 
         result.credits = specialist.baseCostCredits * expenseConfig;
         result.creditsSpecialists = specialist.baseCostCreditsSpecialists * expenseConfig;

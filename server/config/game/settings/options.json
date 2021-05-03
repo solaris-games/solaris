@@ -114,16 +114,20 @@
                 "text": "No"
             },
             {
-                "value": "cheap",
-                "text": "Cheap"
-            },
-            {
                 "value": "standard",
                 "text": "Standard"
             },
             {
                 "value": "expensive",
                 "text": "Expensive"
+            },
+            {
+                "value": "veryExpensive",
+                "text": "Very Expensive"
+            },
+            {
+                "value": "crazyExpensive",
+                "text": "Crazy Expensive"
             }
         ],
         "specialistsCurrency": [
