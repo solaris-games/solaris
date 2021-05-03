@@ -175,8 +175,8 @@
       <label for="background-blend-mode" class="col-12 col-sm-6 col-form-label">Blend Mode</label>
       <div class="col-12 col-sm-6">
         <select class="form-control" id="background-blend-mode" v-model="settings.map.background.blendMode" :disabled="isSavingSettings">
-          <option value="ADD">ADD</option>
-          <option value="NORMAL">NORMAL</option>
+          <option value="ADD">Vibrant</option>
+          <option value="NORMAL">Soft</option>
         </select>
       </div>
     </div>
