@@ -1,25 +1,27 @@
 <template>
 <div class="row bg-secondary pt-2 pb-2">
     <div class="col">
-        <p class="mb-2">Give this player <strong>Credits</strong>. (You have <span class="text-warning">${{userPlayer.credits}}</span>)</p>
+        <p class="mb-2">Give this player <strong>Specialist Tokens</strong>. (You have <span class="text-warning">{{userPlayer.creditsSpecialists}}</span>)</p>
 
         <form>
             <div class="form-row">
                 <div class="col-7 input-group">
                   <div class="input-group-prepend">
-                    <span class="input-group-text">$</span>
+                    <span class="input-group-text">
+                      <i class="fas fa-user-astronaut"></i>
+                    </span>
                   </div>
                   <input type="number" class="form-control" v-model="amount"/>
                 </div>
                 <div class="col-5">
-                    <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits"><i class="fas fa-paper-plane"></i> Send</modalButton>
+                    <modalButton modalName="sendCreditsSpecialistsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits"><i class="fas fa-paper-plane"></i> Send</modalButton>
                 </div>
             </div>
         </form>
     </div>
 
-    <dialogModal modalName="sendCreditsModal" titleText="Send Credits" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
-      <p>Are you sure you want to send <b>${{amount}}</b> to <b>{{player.alias}}</b>?</p>
+    <dialogModal modalName="sendCreditsSpecialistsModal" titleText="Send Specialist Tokens" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
+      <p>Are you sure you want to send <b>{{amount}}</b> specialist token(s) to <b>{{player.alias}}</b>?</p>
     </dialogModal>
 </div>
 </template>
@@ -49,14 +51,14 @@ export default {
       this.isSendingCredits = true
 
       try {
-        let response = await tradeService.sendCredits(this.$store.state.game._id, this.player._id, this.amount)
+        let response = await tradeService.sendCreditsSpecialists(this.$store.state.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
-          this.$emit('onCreditsSent', this.amount)
+          this.$emit('onCreditsSpecialistsSent', this.amount)
 
-          this.$toasted.show(`Sent ${this.amount} credits to ${this.player.alias}.`)
+          this.$toasted.show(`Sent ${this.amount} specialist token(s) to ${this.player.alias}.`)
 
-          this.userPlayer.credits -= this.amount
+          this.userPlayer.creditsSpecialists -= this.amount
           this.amount = 0
 
           this.player.reputation = response.data.reputation

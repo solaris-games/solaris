@@ -305,6 +305,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
+        <label for="tradeCreditsSpecialists" class="col-form-label">Trade Specialist Tokens</label>
+        <select class="form-control" id="tradeCreditsSpecialists" v-model="settings.player.tradeCreditsSpecialists" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.tradeCreditsSpecialists" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="tradeCost" class="col-form-label">Technology Trade Cost</label>
         <select class="form-control" id="tradeCost" v-model="settings.player.tradeCost" :disabled="isCreatingGame">

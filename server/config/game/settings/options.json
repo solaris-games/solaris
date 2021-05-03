@@ -399,6 +399,16 @@
             "text": "Enabled"
             }
         ],
+        "tradeCreditsSpecialists": [
+            {
+            "value": false,
+            "text": "Disabled"
+            },
+            {
+            "value": true,
+            "text": "Enabled"
+            }
+        ],
         "tradeCost": [
             {
             "value": 0,

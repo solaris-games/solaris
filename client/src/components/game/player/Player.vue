@@ -36,6 +36,7 @@
         <reputation v-if="player.defeated" :playerId="player._id"/>
         <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
         <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
+        <sendCreditsSpecialists v-if="tradeCreditsSpecialistsIsEnabled" :player="player" :userPlayer="userPlayer"/>
       </div>
 
       <p v-if="!canTradeWithPlayer" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
@@ -69,6 +70,7 @@ import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
 import SendTechnology from './SendTechnology'
 import SendCredits from './SendCredits'
+import SendCreditsSpecialists from './SendCreditsSpecialists'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import Badges from './Badges'
@@ -87,6 +89,7 @@ export default {
     'research': Research,
     'sendTechnology': SendTechnology,
     'sendCredits': SendCredits,
+    'sendCreditsSpecialists': SendCreditsSpecialists,
     'achievements': Achievements,
     'sendRenown': SendRenown,
     'badges': Badges,
@@ -181,6 +184,10 @@ export default {
     },
     tradeCreditsIsEnabled () {
       return this.game.settings.player.tradeCredits
+    },
+    tradeCreditsSpecialistsIsEnabled () {
+      return this.game.settings.player.tradeCreditsSpecialists
+        && this.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     },
     tradeTechnologyIsEnabled () {
       return this.game.settings.player.tradeCost > 0

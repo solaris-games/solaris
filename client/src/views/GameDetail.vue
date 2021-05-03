@@ -173,6 +173,13 @@
                 <span v-if="!game.settings.player.tradeCredits">Disabled</span>
               </td>
             </tr>
+            <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
+              <td>Trade Specialist Tokens</td>
+              <td class="text-right" v-if="game.settings.player.tradeCreditsSpecialists">
+                <span v-if="game.settings.player.tradeCreditsSpecialists">Enabled</span>
+                <span v-if="!game.settings.player.tradeCreditsSpecialists">Disabled</span>
+              </td>
+            </tr>
             <tr>
               <td>Trade Cost</td>
               <td class="text-right" v-if="game.settings.player.tradeCost > 0">{{ getFriendlyText(game.settings.player.tradeCost) }} credits/level</td>

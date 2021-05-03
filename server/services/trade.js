@@ -20,6 +20,10 @@ module.exports = class TradeService extends EventEmitter {
     isTradingCreditsDisabled(game) {
         return game.settings.player.tradeCredits === false;
     }
+    
+    isTradingCreditsSpecialistsDisabled(game) {
+        return game.settings.player.tradeCreditsSpecialists === false;
+    }
 
     isTradingTechnologyDisabled(game) {
         return game.settings.player.tradeCost === 0;

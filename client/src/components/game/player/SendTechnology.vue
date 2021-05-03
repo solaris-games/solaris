@@ -1,7 +1,7 @@
 <template>
 <div class="row bg-primary pt-2 pb-2" v-if="selectedTechnology">
     <div class="col">
-        <p class="mb-2">Give this player Technology. (Costs ${{getTradeCost()}} per tech level)</p>
+        <p class="mb-2">Give this player Technology. (Costs <span class="text-warning">${{getTradeCost()}}</span> per tech level)</p>
 
         <form>
             <div class="form-row">

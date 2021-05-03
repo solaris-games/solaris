@@ -47,6 +47,7 @@
       "science": "cheap"
     },
     "tradeCredits": false,
+    "tradeCreditsSpecialists": false,
     "tradeCost": 0,
     "tradeScanning": "all"
   },
