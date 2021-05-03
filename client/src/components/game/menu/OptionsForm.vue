@@ -184,7 +184,7 @@
     <div class="row bg-secondary pt-1 pb-1">
       <label for="background-stars" class="col-12 col-sm-6 col-form-label">Background Stars</label>
       <div class="col-12 col-sm-6">
-        <select class="form-control" id="antiAliasing" v-model="settings.map.background.backgroundStars" :disabled="isSavingSettings">
+        <select class="form-control" id="background-stars" v-model="settings.map.background.backgroundStars" :disabled="isSavingSettings">
           <option value="enabled">Enabled</option>
           <option value="disabled">Disabled</option>
         </select>
@@ -192,6 +192,25 @@
     </div>
 
     <div v-if="settings.map.background.backgroundStars=='enabled'">
+
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="moving-nebulas" class="col-12 col-sm-6 col-form-label">Moving Nebulas</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="moving-nebulas" v-model="settings.map.background.moveNebulas" :disabled="isSavingSettings">
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.background.moveNebulas=='enabled'">
+        <div class="row bg-secondary pt-1 pb-1 ml-1">
+          <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
+          <div class="col">
+            <input type="number" min="0.0" max="2.0" step="0.25" class="form-control" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
+          </div>
+        </div>
+      </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-color-1" class="col-12 col-sm-6 col-form-label">Nebula Color 1</label>
