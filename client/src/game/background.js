@@ -38,8 +38,8 @@ class Background {
     this.container.alpha = userSettings.map.background.nebulaOpacity
     this.starContainer.alpha = userSettings.map.background.starsOpacity
 
-    this.moveNebulas = true
-    this.timeScale = (1.0/(2048.0*64.0))
+    this.moveNebulas = userSettings.map.background.moveNebulas == 'enabled'
+    this.timeScale = (1.0/(2048.0*64.0)) * userSettings.map.background.nebulaMovementSpeed
     this.blendMode = userSettings.map.background.blendMode == 'ADD' ?
       PIXI.BLEND_MODES.ADD : PIXI.BLEND_MODES.NORMAL
   }
