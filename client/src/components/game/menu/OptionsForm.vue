@@ -213,23 +213,23 @@
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="nebula-color-1" class="col-12 col-sm-6 col-form-label">Nebula Color 1</label>
+        <label for="nebula-colour-1" class="col-12 col-sm-6 col-form-label">Nebula Colour 1</label>
         <div class="col-12 col-sm-6">
-        <input type="text" class="form-control" id="nebula-color-1" v-model="settings.map.background.nebulaColor1" :disabled="isSavingSettings">
+        <input type="text" class="form-control" id="nebula-colour-1" v-model="settings.map.background.nebulaColour1" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="nebula-color-2" class="col-12 col-sm-6 col-form-label">Nebula Color 2</label>
+        <label for="nebula-colour-2" class="col-12 col-sm-6 col-form-label">Nebula Colour 2</label>
         <div class="col-12 col-sm-6">
-        <input type="text" class="form-control" id="nebula-color-2" v-model="settings.map.background.nebulaColor2" :disabled="isSavingSettings">
+        <input type="text" class="form-control" id="nebula-colour-2" v-model="settings.map.background.nebulaColour2" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="nebula-color-3" class="col-12 col-sm-6 col-form-label">Nebula Color 3</label>
+        <label for="nebula-colour-3" class="col-12 col-sm-6 col-form-label">Nebula Colour 3</label>
         <div class="col-12 col-sm-6">
-        <input type="text" class="form-control" id="nebula-color-3" v-model="settings.map.background.nebulaColor3" :disabled="isSavingSettings">
+        <input type="text" class="form-control" id="nebula-colour-3" v-model="settings.map.background.nebulaColour3" :disabled="isSavingSettings">
         </div>
       </div>
 

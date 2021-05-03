@@ -60,9 +60,9 @@ class Background {
     let NEBULA_FREQUENCY = this.userSettings.map.background.nebulaFrequency
     let NEBULA_DENSITY = this.userSettings.map.background.nebulaDensity
     let GENERATE_STARS = this.userSettings.map.background.backgroundStars == 'enabled'
-    let NEBULA_COLOR1 = parseInt(this.userSettings.map.background.nebulaColor1.replace(/^#/, '').substring(0, 6), 16)
-    let NEBULA_COLOR2 = parseInt(this.userSettings.map.background.nebulaColor2.replace(/^#/, '').substring(0, 6), 16)
-    let NEBULA_COLOR3 = parseInt(this.userSettings.map.background.nebulaColor3.replace(/^#/, '').substring(0, 6), 16)
+    let NEBULA_COLOUR1 = parseInt(this.userSettings.map.background.nebulaColour1.replace(/^#/, '').substring(0, 6), 16)
+    let NEBULA_COLOUR2 = parseInt(this.userSettings.map.background.nebulaColour2.replace(/^#/, '').substring(0, 6), 16)
+    let NEBULA_COLOUR3 = parseInt(this.userSettings.map.background.nebulaColour3.replace(/^#/, '').substring(0, 6), 16)
 
     //divide the galaxy in chunks roughly the nebula size
 
@@ -142,9 +142,9 @@ class Background {
               sprite.baseScaleTime = this.rng.random()*Math.PI*2.0
 
               if(GENERATE_STARS) {
-                sprite.tint = NEBULA_COLOR1
-                if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOR2 }
-                if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOR3 }
+                sprite.tint = NEBULA_COLOUR1
+                if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOUR2 }
+                if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOUR3 }
                 sprite.scale.x = Background.NEBULA_SCALE
                 sprite.scale.y = Background.NEBULA_SCALE
               }
