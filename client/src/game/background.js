@@ -60,9 +60,24 @@ class Background {
     let NEBULA_FREQUENCY = this.userSettings.map.background.nebulaFrequency
     let NEBULA_DENSITY = this.userSettings.map.background.nebulaDensity
     let GENERATE_STARS = this.userSettings.map.background.backgroundStars == 'enabled'
-    let NEBULA_COLOUR1 = parseInt(this.userSettings.map.background.nebulaColour1.replace(/^#/, '').substring(0, 6), 16)
-    let NEBULA_COLOUR2 = parseInt(this.userSettings.map.background.nebulaColour2.replace(/^#/, '').substring(0, 6), 16)
-    let NEBULA_COLOUR3 = parseInt(this.userSettings.map.background.nebulaColour3.replace(/^#/, '').substring(0, 6), 16)
+
+    const FALLBACK_NEBULA_COLOR = 0xffffff
+
+    let NEBULA_COLOUR1
+    let NEBULA_COLOUR2
+    let NEBULA_COLOUR3
+
+    try {
+      NEBULA_COLOUR1 = this._getNumberFromHexString(this.userSettings.map.background.nebulaColour1)
+      NEBULA_COLOUR2 = this._getNumberFromHexString(this.userSettings.map.background.nebulaColour2)
+      NEBULA_COLOUR3 = this._getNumberFromHexString(this.userSettings.map.background.nebulaColour3)
+    }
+    catch(err) {
+      NEBULA_COLOUR1 = FALLBACK_NEBULA_COLOR
+      NEBULA_COLOUR2 = FALLBACK_NEBULA_COLOR
+      NEBULA_COLOUR3 = FALLBACK_NEBULA_COLOR
+      console.error(err)
+    }
 
     //divide the galaxy in chunks roughly the nebula size
 
@@ -220,6 +235,16 @@ class Background {
       child.x = child.originX + deltax * child.parallax
       child.y = child.originY + deltay * child.parallax
     }
+  }
+
+  _getNumberFromHexString( colorString ) {
+    let hexString = colorString.replace(/^#/, '')
+
+    if( !(/^[0-9A-F]{6}$/i.test(hexString)) ) { throw new Error('Invalid Hex Color String') }
+
+    let hex = parseInt(hexString, 16)
+
+    return hex
   }
 }
 
