@@ -13,7 +13,8 @@
                 <span>Action</span>
             </div>
             <div class="col-2 text-center">
-                <span>Ships</span>
+                <span v-if="!currentWaypoint || !currentWaypoint.action || !isActionRequiresPercentage(currentWaypoint.action)">Ships</span>
+                <span v-if="currentWaypoint && currentWaypoint.action && isActionRequiresPercentage(currentWaypoint.action)">%</span>
             </div>
         </div>
 
@@ -35,6 +36,8 @@
                     <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAllBut')}}</option>
                     <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAllBut')}}</option>
                     <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(currentWaypoint, 'garrison')}}</option>
+                    <option key="collectPercentage" value="collectPercentage">{{getWaypointActionFriendlyText(currentWaypoint, 'collectPercentage')}}</option>
+                    <option key="dropPercentage" value="dropPercentage">{{getWaypointActionFriendlyText(currentWaypoint, 'dropPercentage')}}</option>
                 </select>
             </div>
             <div class="col-2 text-center">
@@ -135,6 +138,10 @@ export default {
           return `Drop All But ${waypoint.actionShips}`
         case 'garrison':
           return `Garrison ${waypoint.actionShips}`
+        case 'dropPercentage':
+          return `Drop ${waypoint.actionShips}%`
+        case 'collectPercentage':
+          return `Collect ${waypoint.actionShips}%`
       }
     },
     isActionRequiresShips (action) {
@@ -143,11 +150,16 @@ export default {
         case 'drop':
         case 'collectAllBut':
         case 'dropAllBut':
+        case 'collectPercentage':
+        case 'dropPercentage':
         case 'garrison':
           return true
       }
 
       return false
+    },
+    isActionRequiresPercentage (action) {
+      return action === 'dropPercentage' || action === 'collectPercentage';
     },
     previousWaypoint () {
       let index = this.waypoints.indexOf(this.currentWaypoint)

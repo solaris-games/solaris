@@ -68,6 +68,10 @@ export default {
           return `Drop All But ${waypoint.actionShips} Ships`
         case 'garrison':
           return `Garrison ${waypoint.actionShips} Ships`
+        case 'collectPercentage':
+          return `Collect ${waypoint.actionShips}% Of Ships`
+        case 'dropPercentage':
+          return `Drop ${waypoint.actionShips}% Of Ships`
       }
     },
     recalculateTimeRemaining () {
