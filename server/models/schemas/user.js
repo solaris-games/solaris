@@ -110,8 +110,20 @@ const schema = new Schema({
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16 },
-            nebulaDensity: { type: Types.String, required: false, enum: ['none', 'sparse', 'standard', 'abundant'], default: 'standard' },
             antiAliasing: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+            background:{
+              nebulaFrequency: { type: Types.Number, required: false, default: 12 },
+              nebulaDensity: { type: Types.Number, required: false, default: 3 },
+              nebulaOpacity: { type: Types.Number, required: false, default: 1.0 },
+              moveNebulas: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+              nebulaMovementSpeed: { type: Types.Number, required: false, default: 1.0 },
+              starsOpacity: { type: Types.Number, required: false, default: 1.0 },
+              blendMode: { type: Types.String, required: false, enum: ['ADD', 'NORMAL'], default: 'NORMAL' },
+              backgroundStars: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+              nebulaColour1: { type: Types.String, required: false, default: '#FF0000' },
+              nebulaColour2: { type: Types.String, required: false, default: '#00FF00' },
+              nebulaColour3: { type: Types.String, required: false, default: '#0000FF' }
+            },
             zoomLevels: {
               territories: { type: Types.Number, required: false, default: 100 },
               playerNames: { type: Types.Number, required: false, default: 100 },
@@ -121,6 +133,10 @@ const schema = new Schema({
                 name: { type: Types.Number, required: false, default: 160 },
                 naturalResources: { type: Types.Number, required: false, default: 160 },
                 infrastructure: { type: Types.Number, required: false, default: 200 }
+              },
+              background: {
+                nebulas: { type: Types.Number, required: false, default: 100 },
+                stars: { type: Types.Number, required: false, default: 100 }
               }
             }
         },
