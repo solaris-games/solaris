@@ -4,6 +4,10 @@ db.games.find().forEach(function(game) {
 	game.settings.technology.researchCosts.specialists = 'none';
 	game.settings.specialGalaxy.specialistsCurrency = 'credits';
 
+	if (game.settings.specialGalaxy.specialistCost === 'cheap') {
+		game.settings.specialGalaxy.specialistCost = 'standard';
+	}
+
 	// Set default research levels for all players
 	game.galaxy.players.forEach(function(player) {
 		player.creditsSpecialists = 0; // Set default credit amount.
