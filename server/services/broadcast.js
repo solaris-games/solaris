@@ -89,6 +89,19 @@ module.exports = class BroadcastService {
         });
     }
 
+    gamePlayerCreditsSpecialistsReceived(game, fromPlayerId, toPlayerId, creditsSpecialists, date) {
+        this.io.to(toPlayerId).emit('playerCreditsSpecialistsReceived', {
+            playerId: toPlayerId,
+            type: 'playerCreditsSpecialistsReceived',
+            date,
+            data: {
+                fromPlayerId,
+                toPlayerId,
+                creditsSpecialists
+            }
+        });
+    }
+
     gamePlayerRenownReceived(game, fromPlayerId, toPlayerId, renown, date) {
         this.io.to(toPlayerId).emit('playerRenownReceived', {
             playerId: toPlayerId,

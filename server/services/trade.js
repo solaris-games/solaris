@@ -36,7 +36,7 @@ module.exports = class TradeService extends EventEmitter {
 
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.state.startDate) {
-            throw new ValidationError(`Cannot award renown, the game has not started yet.`);
+            throw new ValidationError(`Cannot trade credits, the game has not started yet.`);
         }
         
         // Get the players.
@@ -83,6 +83,62 @@ module.exports = class TradeService extends EventEmitter {
 
         this.emit('onPlayerCreditsReceived', eventObject);
         this.emit('onPlayerCreditsSent', eventObject);
+
+        return eventObject;
+    }
+
+    async sendCreditsSpecialists(game, fromPlayer, toPlayerId, amount) {
+        if (this.isTradingCreditsSpecialistsDisabled(game)) {
+            throw new ValidationError(`Trading specialist tokens is disabled.`);
+        }
+
+        // TODO: Maybe this validation needs to be in the middleware?
+        if (!game.state.startDate) {
+            throw new ValidationError(`Cannot trade specialist tokens, the game has not started yet.`);
+        }
+        
+        // Get the players.
+        let toPlayer = this.playerService.getById(game, toPlayerId);
+
+        if (fromPlayer === toPlayer) {
+            throw new ValidationError(`Cannot send specialist tokens to yourself.`);
+        }
+
+        this._tradeScanningCheck(game, fromPlayer, toPlayer);
+
+        if (fromPlayer.credits < amount) {
+            throw new ValidationError(`The player does not own ${amount} specialist tokens.`);
+        }
+
+        let dbWrites = [
+            await this.playerService.addCreditsSpecialists(game, fromPlayer, -amount, false),
+            await this.playerService.addCreditsSpecialists(game, toPlayer, amount, false)
+        ];
+
+        await this.gameModel.bulkWrite(dbWrites);
+
+        if (!fromPlayer.defeated) {
+            await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
+        }
+
+        if (!toPlayer.defeated && toPlayer.userId) {
+            await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
+        }
+        
+        let reputation = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount);
+
+        let eventObject = {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            fromPlayer,
+            toPlayer,
+            amount,
+            reputation,
+            date: moment().utc()
+        };
+
+        this.emit('onPlayerCreditsSpecialistsReceived', eventObject);
+        this.emit('onPlayerCreditsSpecialistsSent', eventObject);
 
         return eventObject;
     }

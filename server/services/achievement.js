@@ -81,6 +81,14 @@ module.exports = class AchievementService {
         return await this.incrementAchievement(userId, 'achievements.trade.creditsReceived', amount);
     }
 
+    async incrementTradeCreditsSpecialistsSent(userId, amount = 0) {
+        return await this.incrementAchievement(userId, 'achievements.trade.creditsSpecialistsSent', amount);
+    }
+
+    async incrementTradeCreditsSpecialistsReceived(userId, amount = 0) {
+        return await this.incrementAchievement(userId, 'achievements.trade.creditsSpecialistsReceived', amount);
+    }
+
     async incrementTradeTechnologySent(userId, amount = 1) {
         return await this.incrementAchievement(userId, 'achievements.trade.technologySent', amount);
     }

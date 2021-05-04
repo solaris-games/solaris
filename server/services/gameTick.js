@@ -719,8 +719,6 @@ module.exports = class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                // TODO: Award specialist tokens to players.
-                
                 let creditsResult = this.playerService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);

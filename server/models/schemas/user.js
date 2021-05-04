@@ -68,6 +68,8 @@ const schema = new Schema({
         trade: {
             creditsSent: { type: Types.Number, default: 0 },
             creditsReceived: { type: Types.Number, default: 0 },
+            creditsSpecialistsSent: { type: Types.Number, default: 0 },
+            creditsSpecialistsReceived: { type: Types.Number, default: 0 },
             technologySent: { type: Types.Number, default: 0 },
             technologyReceived: { type: Types.Number, default: 0 },
             giftsSent: { type: Types.Number, default: 0 },

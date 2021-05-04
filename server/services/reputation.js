@@ -136,10 +136,18 @@ module.exports = class ReputationService extends EventEmitter {
         return this.getReputation(toPlayer, fromPlayer);
     }
 
+    async tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount) {
+        let creditsRequired = Math.round(toPlayer.research.specialists.level / 2);
+
+        if (amount >= creditsRequired) {
+            return await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
+        }
+
+        return this.getReputation(toPlayer, fromPlayer);
+    }
+
     async tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, technology) {
         return await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
     }
-
-    // TODO: Increase reputation for specialist tokens?
 
 };

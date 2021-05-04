@@ -6,7 +6,7 @@
   </p>
   
   <p v-if="event.data.creditsSpecialists">
-    You have received <strong><span class="text-success">{{event.data.creditsSpecialists}}</span> specialist tokens</strong> from your
+    You have received <strong><span class="text-success">{{event.data.creditsSpecialists}}</span> specialist token(s)</strong> from your
     specialists technology.
   </p>
 

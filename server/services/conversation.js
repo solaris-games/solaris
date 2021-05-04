@@ -272,9 +272,11 @@ module.exports = class ConversationService extends EventEmitter {
             type: {
                 $in: [
                     'playerCreditsReceived',
+                    'playerCreditsSpecialistsReceived',
                     'playerRenownReceived',
                     'playerTechnologyReceived',
                     'playerCreditsSent',
+                    'playerCreditsSpecialistsSent',
                     'playerRenownSent',
                     'playerTechnologySent'
                 ]

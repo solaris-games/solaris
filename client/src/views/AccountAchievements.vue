@@ -210,6 +210,14 @@
               <td class="text-right">{{ user.achievements.trade.creditsReceived }}</td>
             </tr>
             <tr>
+              <td>Specialist Tokens Sent</td>
+              <td class="text-right">{{ user.achievements.trade.creditsSpecialistsSent }}</td>
+            </tr>
+            <tr>
+              <td>Specialist Tokens Received</td>
+              <td class="text-right">{{ user.achievements.trade.creditsSpecialistsReceived }}</td>
+            </tr>
+            <tr>
               <td>Technology Sent</td>
               <td class="text-right">{{ user.achievements.trade.technologySent }}</td>
             </tr>
@@ -656,6 +664,17 @@ export default {
               '#3498DB'
             ],
             label: 'Credits'
+          },
+          {
+            data: [
+              this.user.achievements.trade.creditsSpecialistsSent,
+              this.user.achievements.trade.creditsSpecialistsReceived
+            ],
+            backgroundColor: [
+              '#00bc8c',
+              '#3498DB'
+            ],
+            label: 'Specialist Tokens'
           },
           {
             data: [

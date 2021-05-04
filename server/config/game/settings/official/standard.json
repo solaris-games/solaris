@@ -34,7 +34,7 @@
   "player": {
     "startingStars": 6,
     "startingCredits": 500,
-    "startingCreditsSpecialists": 10,
+    "startingCreditsSpecialists": 5,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,

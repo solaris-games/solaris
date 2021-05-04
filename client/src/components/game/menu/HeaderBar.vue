@@ -104,6 +104,7 @@ export default {
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
 
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
   destroyed () {
@@ -113,6 +114,7 @@ export default {
 
     this.sockets.unsubscribe('gameStarted')
     this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
     this.sockets.unsubscribe('gameConversationRead')
   },
   methods: {
@@ -148,6 +150,14 @@ export default {
       player.credits += data.data.credits
 
       this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+    },
+    onCreditsSpecialistsReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.creditsSpecialists += data.data.creditsSpecialists
+
+      this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
     },
     onTechnologyReceived (data) {
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
