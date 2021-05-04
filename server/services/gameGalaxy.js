@@ -452,6 +452,7 @@ module.exports = class GameGalaxyService {
                     gamePlayer.researchingNow = historyPlayer.researchingNow;
                     gamePlayer.researchingNext = historyPlayer.researchingNext;
                     gamePlayer.credits = historyPlayer.credits;
+                    gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
                     gamePlayer.defeated = historyPlayer.defeated;
                     gamePlayer.afk = historyPlayer.afk;
                     gamePlayer.research = historyPlayer.research;

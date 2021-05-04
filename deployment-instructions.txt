@@ -21,6 +21,17 @@ db.games.find().forEach(function(game) {
 	db.games.save(game);
 });
 
+// Set default value for any time machine history.
+db.gamehistories.updateMany({
+	'players.credits': {
+		$exists: true
+	}
+}, {
+	$set: {
+		'players.$[].creditsSpecialists': 0
+	}
+});
+
 TODO: Trade and trade events
 TODO: Trade achievements
 TODO: AI respond to tokens
