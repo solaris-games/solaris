@@ -79,13 +79,14 @@ export default {
     },
     updateSuggestions () {
       if (this.suggestMentions) {
-        const oldMention = Boolean(this.currentMention)
+        const oldMention = this.currentMention
 
         this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
+        const newSuggestions = this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length
 
         if (oldMention && !this.currentMention) {
           this.selectedSuggestion = null //Mention was left
-        } else if ((!oldMention || !oldMention.suggestions.length) && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
+        } else if ((!oldMention || !oldMention.suggestions || !oldMention.suggestions.length) && newSuggestions) {
           this.selectedSuggestion = 0 //Mention was started
         }
 
