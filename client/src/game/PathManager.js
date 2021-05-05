@@ -126,12 +126,12 @@ class PathManager {
   _createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
     let pointA = objectA.data.location
     let pointB = objectB.data.location
-    const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 12 )//clamp 1-12
+    const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 16 )
     const VOID_LENGTH = DASH_LENGTH/2.0
     const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
 
     let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
-    
+
     let dashCount = Math.floor( pathLength/(DASH_LENGTH+VOID_LENGTH) )
     let endpointsLength =  pathLength - (dashCount*(DASH_LENGTH+VOID_LENGTH))
 
