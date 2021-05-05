@@ -85,7 +85,7 @@ export default {
 
         if (oldMention && !this.currentMention) {
           this.selectedSuggestion = null //Mention was left
-        } else if (!oldMention && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
+        } else if ((!oldMention || !oldMention.suggestions.length) && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
           this.selectedSuggestion = 0 //Mention was started
         }
 
