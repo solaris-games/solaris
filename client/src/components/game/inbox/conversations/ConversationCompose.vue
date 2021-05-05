@@ -68,7 +68,7 @@ export default {
         if (e.key === "Enter" && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
           e.preventDefault()
           this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
-        } else if (e.key === "ArrowDown") {
+        } else if (e.key === "ArrowDown" || e.key === "Tab") {
           e.preventDefault()
           this.setSelectedSuggestion(this.selectedSuggestion + 1)
         } else if (e.key === "ArrowUp") {
