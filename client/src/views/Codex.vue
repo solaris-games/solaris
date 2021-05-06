@@ -130,7 +130,7 @@
         slightly thinner.
       </p>
 
-      <h5>Specialists</h5>
+      <h5 ref="specialists">Specialists</h5>
       <p>
         If a star or carrier has a specialist, the matching specialist icon will be displayed instead of the standard star/carrier icon. 
         To view the specialist in detail, click on the star/carrier and scroll to the "Specialist" section. Specialists can provide 

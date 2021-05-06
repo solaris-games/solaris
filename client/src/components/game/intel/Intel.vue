@@ -29,7 +29,7 @@
           <option key="scanning" value="scanning">Scanning</option>
           <option key="experimentation" value="experimentation">Experimentation</option>
           <option key="terraforming" value="terraforming">Terraforming</option>
-          <option key="specialists" value="specialists">Specialists</option>
+          <option key="specialists" value="specialists" v-if="isSpecialistsTechnologyEnabled">Specialists</option>
         </select>
         </div>
         <div class="col-auto ml-1">
@@ -288,6 +288,11 @@ export default {
       }
 
       this.datacollection = dataCollection
+    }
+  },
+  computed: {
+    isSpecialistsTechnologyEnabled () {
+      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     }
   }
 }

@@ -32,6 +32,12 @@ db.gamehistories.updateMany({
 	}
 });
 
-TODO: Trade and trade events
-TODO: Trade achievements
-TODO: AI respond to tokens
+db.users.updateMany({
+	'gameSettings.map.objectsMaximumScale': {
+		$lt: 12
+	}
+}, {
+	$set: {
+		'gameSettings.map.objectsMaximumScale': 12
+	}
+});

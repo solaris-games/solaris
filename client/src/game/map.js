@@ -540,7 +540,7 @@ class Map extends EventEmitter {
     this.store.commit('starClicked', {
       star: dic.starData,
       permitCallback: () => {
-        dic.permitCallback()
+        dic.permitCallback && dic.permitCallback()
 
         // Clicking stars should only raise events to the UI if in galaxy mode.
         if (this.mode === 'galaxy') {
