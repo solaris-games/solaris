@@ -68,7 +68,7 @@ export default {
         if (e.key === "Enter" && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
           e.preventDefault()
           this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
-        } else if (e.key === "ArrowDown") {
+        } else if (e.key === "ArrowDown" || e.key === "Tab") {
           e.preventDefault()
           this.setSelectedSuggestion(this.selectedSuggestion + 1)
         } else if (e.key === "ArrowUp") {
@@ -79,13 +79,14 @@ export default {
     },
     updateSuggestions () {
       if (this.suggestMentions) {
-        const oldMention = Boolean(this.currentMention)
+        const oldMention = this.currentMention
 
         this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
+        const newSuggestions = this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length
 
         if (oldMention && !this.currentMention) {
           this.selectedSuggestion = null //Mention was left
-        } else if (!oldMention && this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length) {
+        } else if ((!oldMention || !oldMention.suggestions || !oldMention.suggestions.length) && newSuggestions) {
           this.selectedSuggestion = 0 //Mention was started
         }
 

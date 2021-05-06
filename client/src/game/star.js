@@ -624,15 +624,19 @@ class Star extends EventEmitter {
     } else {
       let eventData = e ? e.data : null
 
-      this.emit('onStarClicked', {starData: this.data, eventData} )
+      this.emit('onStarClicked', {
+        starData: this.data,
+        eventData,
+        permitCallback: () => {
+          // Need to do this otherwise sometimes text gets highlighted.
+          this.deselectAllText()
 
-      // Need to do this otherwise sometimes text gets highlighted.
-      this.deselectAllText()
-
-      if (this._getStarPlayer()) {
-        this.updateVisibility()
-        // this.setScale()
-      }
+          if (this._getStarPlayer()) {
+            this.updateVisibility()
+            // this.setScale()
+          }
+        }
+      })
     }
   }
 
