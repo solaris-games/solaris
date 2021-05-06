@@ -47,268 +47,290 @@
 
     <h5 class="pt-2">Map</h5>
 
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="territory-style" class="col-12 col-sm-6 col-form-label">Territory Style</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="territory-style" v-model="settings.map.territoryStyle" :disabled="isSavingSettings">
-          <option value="marching-square">Marching Square</option>
-          <option value="voronoi">Voronoi</option>
-        </select>
+    <div class="mb-1 pb-1">
+
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="territory-style" class="col-12 col-sm-6 col-form-label">Territory Style</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="territory-style" v-model="settings.map.territoryStyle" :disabled="isSavingSettings">
+            <option value="marching-square">Marching Square</option>
+            <option value="voronoi">Voronoi</option>
+          </select>
+        </div>
       </div>
+
+      <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="territory-size" class="col-12 col-sm-6 col-form-label">Territory Size</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="2" max="32" class="form-control" id="territory-size" v-model="settings.map.marchingSquareTerritorySize" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="grid-size" class="col-12 col-sm-6 col-form-label">Grid Size</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="2" max="32" class="form-control" id="grid-size" v-model="settings.map.marchingSquareGridSize" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="border-width" class="col-12 col-sm-6 col-form-label">Border Width</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="0" max="8" class="form-control" id="border-width" v-model="settings.map.marchingSquareBorderWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
     </div>
 
-    <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="territory-size" class="col-12 col-sm-6 col-form-label">Territory Size</label>
-      <div class="col-12 col-sm-6">
-        <input type="number" class="form-control" id="territory-size" v-model="settings.map.marchingSquareTerritorySize" :disabled="isSavingSettings">
-      </div>
-    </div>
+    <div class="mb-1 pb-1">
 
-    <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="grid-size" class="col-12 col-sm-6 col-form-label">Grid Size</label>
-      <div class="col-12 col-sm-6">
-        <input type="number" class="form-control" id="grid-size" v-model="settings.map.marchingSquareGridSize" :disabled="isSavingSettings">
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="objects-scaling" class="col-12 col-sm-6 col-form-label">Objects Scaling</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="objects-scaling" v-model="settings.map.objectsScaling" :disabled="isSavingSettings">
+            <option value="default">Default</option>
+            <option value="clamped">Clamped</option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="border-width" class="col-12 col-sm-6 col-form-label">Border Width</label>
-      <div class="col-12 col-sm-6">
-        <input type="number" class="form-control" id="border-width" v-model="settings.map.marchingSquareBorderWidth" :disabled="isSavingSettings">
+      <div v-if="settings.map.objectsScaling=='clamped'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="minimum-scale" class="col-12 col-sm-6 col-form-label">Minimum Scale</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="0" max="32" class="form-control" id="minimum-scale" v-model="settings.map.objectsMinimumScale" :disabled="isSavingSettings">
+        </div>
       </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="objects-scaling" class="col-12 col-sm-6 col-form-label">Objects Scaling</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="objects-scaling" v-model="settings.map.objectsScaling" :disabled="isSavingSettings">
-          <option value="default">Default</option>
-          <option value="clamped">Clamped</option>
-        </select>
+      <div v-if="settings.map.objectsScaling=='clamped'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="maximum-scale" class="col-12 col-sm-6 col-form-label">Maximum Scale</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="12" max="128" class="form-control" id="maximum-scale" v-model="settings.map.objectsMaximumScale" :disabled="isSavingSettings">
+        </div>
       </div>
-    </div>
-
-    <div v-if="settings.map.objectsScaling=='clamped'" class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="minimum-scale" class="col-12 col-sm-6 col-form-label">Minimum Scale</label>
-      <div class="col-12 col-sm-6">
-        <input type="number" class="form-control" id="minimum-scale" v-model="settings.map.objectsMinimumScale" :disabled="isSavingSettings">
-      </div>
-    </div>
-    <div v-if="settings.map.objectsScaling=='clamped'" class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="maximum-scale" class="col-12 col-sm-6 col-form-label">Maximum Scale</label>
-      <div class="col-12 col-sm-6">
-        <input type="number" class="form-control" id="maximum-scale" v-model="settings.map.objectsMaximumScale" :disabled="isSavingSettings">
-      </div>
-    </div>
     
+    </div>
+
     <div class="row bg-secondary pt-1 pb-1">
       <label for="" class="col col-form-label">Carrier Paths</label>
     </div>
 
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="carrier-path-width" class="col col-form-label">Path Width</label>
-      <div class="col">
-        <input type="number" class="form-control" id="carrier-path-width" v-model="settings.map.carrierPathWidth" :disabled="isSavingSettings">
+    <div class="mb-1 pb-1">
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carrier-path-width" class="col col-form-label">Path Width</label>
+        <div class="col">
+          <input type="number" min="1" max="8" class="form-control" id="carrier-path-width" v-model="settings.map.carrierPathWidth" :disabled="isSavingSettings">
+        </div>
       </div>
-    </div>
 
-    <div  class="row bg-secondary pt-1 pb-1">
-      <label for="loop-style" class="col-12 col-sm-6 col-form-label">Loop Style</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="loop-style" v-model="settings.map.carrierLoopStyle" :disabled="isSavingSettings">
-          <option value="dashed">Dashed</option>
-          <option value="solid">Solid</option>
-        </select>
-      </div>
-    </div>
-
-    <div v-if="settings.map.carrierLoopStyle=='dashed'" class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="carrier-path-length" class="col col-form-label">Dash Length</label>
-      <div class="col">
-        <input type="number" class="form-control" id="carrier-path-length" v-model="settings.map.carrierPathDashLength" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div  class="row bg-secondary pt-1 pb-1">
-      <label for="naturalResources" class="col-12 col-sm-6 col-form-label">Natural Resources</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="naturalResources" v-model="settings.map.naturalResources" :disabled="isSavingSettings">
-          <option value="planets">Planets</option>
-          <option value="single-ring">Single Ring</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="" class="col col-form-label">Background</label>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="nebula-frequency" class="col col-form-label">Nebula Frequency</label>
-      <div class="col">
-        <input type="number" min="0" max="16" step="1" class="form-control" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="nebula-density" class="col col-form-label">Nebula Density</label>
-      <div class="col">
-        <input type="number" class="form-control" id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="nebula-opacity" class="col col-form-label">Nebula Opacity</label>
-      <div class="col">
-        <input type="number" min="0.0" max="1.0" step="0.125" class="form-control" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="stars-opacity" class="col col-form-label">Stars Opacity</label>
-      <div class="col">
-        <input type="number" min="0.0" max="1.0" step="0.125" class="form-control" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="background-blend-mode" class="col-12 col-sm-6 col-form-label">Blend Mode</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="background-blend-mode" v-model="settings.map.background.blendMode" :disabled="isSavingSettings">
-          <option value="ADD">Vibrant</option>
-          <option value="NORMAL">Soft</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="background-stars" class="col-12 col-sm-6 col-form-label">Background Stars</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="background-stars" v-model="settings.map.background.backgroundStars" :disabled="isSavingSettings">
-          <option value="enabled">Enabled</option>
-          <option value="disabled">Disabled</option>
-        </select>
-      </div>
-    </div>
-
-    <div v-if="settings.map.background.backgroundStars=='enabled'">
-
-      <div class="row bg-secondary pt-1 pb-1">
-        <label for="moving-nebulas" class="col-12 col-sm-6 col-form-label">Moving Nebulas</label>
+      <div  class="row bg-secondary pt-1 pb-1">
+        <label for="loop-style" class="col-12 col-sm-6 col-form-label">Loop Style</label>
         <div class="col-12 col-sm-6">
-          <select class="form-control" id="moving-nebulas" v-model="settings.map.background.moveNebulas" :disabled="isSavingSettings">
+          <select class="form-control" id="loop-style" v-model="settings.map.carrierLoopStyle" :disabled="isSavingSettings">
+            <option value="dashed">Dashed</option>
+            <option value="solid">Solid</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.carrierLoopStyle=='dashed'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carrier-path-length" class="col col-form-label">Dash Length</label>
+        <div class="col">
+          <input type="number" min="4" max="16" class="form-control" id="carrier-path-length" v-model="settings.map.carrierPathDashLength" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mb-1 pb-1">
+      <div  class="row bg-secondary pt-1 pb-1">
+        <label for="naturalResources" class="col-12 col-sm-6 col-form-label">Natural Resources</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="naturalResources" v-model="settings.map.naturalResources" :disabled="isSavingSettings">
+            <option value="planets">Planets</option>
+            <option value="single-ring">Single Ring</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-1 pb-1">
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="" class="col col-form-label">Background</label>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-frequency" class="col col-form-label">Nebula Frequency</label>
+        <div class="col">
+            <input type="range" min="0" max="16" step="1" class="form-range" style="width:100%" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-density" class="col col-form-label">Nebula Density</label>
+        <div class="col">
+          <input type="range" min="0" max="8" class="form-range form-control" style="width:100%" id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-opacity" class="col col-form-label">Nebula Opacity</label>
+        <div class="col">
+          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range" style="width:100%" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="stars-opacity" class="col col-form-label">Stars Opacity</label>
+        <div class="col">
+          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range" style="width:100%" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="background-blend-mode" class="col-12 col-sm-6 col-form-label">Blend Mode</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="background-blend-mode" v-model="settings.map.background.blendMode" :disabled="isSavingSettings">
+            <option value="ADD">Vibrant</option>
+            <option value="NORMAL">Soft</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="background-stars" class="col-12 col-sm-6 col-form-label">Background Stars</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="background-stars" v-model="settings.map.background.backgroundStars" :disabled="isSavingSettings">
             <option value="enabled">Enabled</option>
             <option value="disabled">Disabled</option>
           </select>
         </div>
       </div>
 
-      <div v-if="settings.map.background.moveNebulas=='enabled'">
+      <div v-if="settings.map.background.backgroundStars=='enabled'" class="ml-3">
+
         <div class="row bg-secondary pt-1 pb-1 ml-1">
-          <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
-          <div class="col">
-            <input type="number" min="0.0" max="2.0" step="0.25" class="form-control" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
+          <label for="moving-nebulas" class="col-12 col-sm-6 col-form-label">Moving Nebulas</label>
+          <div class="col-12 col-sm-6">
+            <select class="form-control" id="moving-nebulas" v-model="settings.map.background.moveNebulas" :disabled="isSavingSettings">
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
           </div>
         </div>
+
+        <div v-if="settings.map.background.moveNebulas=='enabled'" class="ml-3">
+          <div class="row bg-secondary pt-1 pb-1 ml-1">
+            <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
+            <div class="col">
+              <input type="range" min="0.0" max="2.0" step="0.125" class="form-range" style="width:100%" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
+            </div>
+          </div>
+        </div>
+
+        <div class="row bg-secondary pt-1 pb-1 ml-1">
+          <label for="nebula-colour-1" class="col-12 col-sm-6 col-form-label">Nebula Colour 1</label>
+          <div class="col-12 col-sm-6">
+          <input type="text" class="form-control" id="nebula-colour-1" v-model="settings.map.background.nebulaColour1" :disabled="isSavingSettings">
+          </div>
+        </div>
+
+        <div class="row bg-secondary pt-1 pb-1 ml-1">
+          <label for="nebula-colour-2" class="col-12 col-sm-6 col-form-label">Nebula Colour 2</label>
+          <div class="col-12 col-sm-6">
+          <input type="text" class="form-control" id="nebula-colour-2" v-model="settings.map.background.nebulaColour2" :disabled="isSavingSettings">
+          </div>
+        </div>
+
+        <div class="row bg-secondary pt-1 pb-1 ml-1">
+          <label for="nebula-colour-3" class="col-12 col-sm-6 col-form-label">Nebula Colour 3</label>
+          <div class="col-12 col-sm-6">
+          <input type="text" class="form-control" id="nebula-colour-3" v-model="settings.map.background.nebulaColour3" :disabled="isSavingSettings">
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="mb-1 pb-1">
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="" class="col col-form-label">Zoom Levels(%)</label>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="nebula-colour-1" class="col-12 col-sm-6 col-form-label">Nebula Colour 1</label>
-        <div class="col-12 col-sm-6">
-        <input type="text" class="form-control" id="nebula-colour-1" v-model="settings.map.background.nebulaColour1" :disabled="isSavingSettings">
+        <label for="territories-zoom" class="col col-form-label">Territories</label>
+        <div class="col">
+          <input type="number" class="form-control" id="territories-zoom" v-model="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="nebula-colour-2" class="col-12 col-sm-6 col-form-label">Nebula Colour 2</label>
-        <div class="col-12 col-sm-6">
-        <input type="text" class="form-control" id="nebula-colour-2" v-model="settings.map.background.nebulaColour2" :disabled="isSavingSettings">
+        <label for="nebulas-zoom" class="col col-form-label">Nebulas</label>
+        <div class="col">
+          <input type="number" class="form-control" id="nebulas-zoom" v-model="settings.map.zoomLevels.background.nebulas" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="nebula-colour-3" class="col-12 col-sm-6 col-form-label">Nebula Colour 3</label>
-        <div class="col-12 col-sm-6">
-        <input type="text" class="form-control" id="nebula-colour-3" v-model="settings.map.background.nebulaColour3" :disabled="isSavingSettings">
+        <label for="background-stars-zoom" class="col col-form-label">Background Stars</label>
+        <div class="col">
+          <input type="number" class="form-control" id="background-stars-zoom" v-model="settings.map.zoomLevels.background.stars" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="player-names-zoom" class="col col-form-label">Player Names</label>
+        <div class="col">
+          <input type="number" class="form-control" id="player-names-zoom" v-model="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="carriers-ship-zoom" class="col col-form-label">Carrier Ships</label>
+        <div class="col">
+          <input type="number" class="form-control" id="carriers-ship-zoom" v-model="settings.map.zoomLevels.carrierShips" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="star-ship-zoom" class="col col-form-label">Star Ships</label>
+        <div class="col">
+          <input type="number" class="form-control" id="star-ship-zoom" v-model="settings.map.zoomLevels.star.shipCount" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="star-name-zoom" class="col col-form-label">Star Name</label>
+        <div class="col">
+          <input type="number" class="form-control" id="star-name-zoom" v-model="settings.map.zoomLevels.star.name" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="star-resources-zoom" class="col col-form-label">Star Natural Resources</label>
+        <div class="col">
+          <input type="number" class="form-control" id="star-resources-zoom" v-model="settings.map.zoomLevels.star.naturalResources" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="star-infrastructure-zoom" class="col col-form-label">Star Infrastructure</label>
+        <div class="col">
+          <input type="number" class="form-control" id="star-infrastructure-zoom" v-model="settings.map.zoomLevels.star.infrastructure" :disabled="isSavingSettings">
         </div>
       </div>
 
     </div>
 
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="antiAliasing" class="col-12 col-sm-6 col-form-label">Anti Aliasing</label>
-      <div class="col-12 col-sm-6">
-        <select class="form-control" id="antiAliasing" v-model="settings.map.antiAliasing" :disabled="isSavingSettings">
-          <option value="enabled">Enabled</option>
-          <option value="disabled">Disabled</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1">
-      <label for="" class="col col-form-label">Zoom Levels(%)</label>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="territories-zoom" class="col col-form-label">Territories</label>
-      <div class="col">
-        <input type="number" class="form-control" id="territories-zoom" v-model="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="nebulas-zoom" class="col col-form-label">Nebulas</label>
-      <div class="col">
-        <input type="number" class="form-control" id="nebulas-zoom" v-model="settings.map.zoomLevels.background.nebulas" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="background-stars-zoom" class="col col-form-label">Background Stars</label>
-      <div class="col">
-        <input type="number" class="form-control" id="background-stars-zoom" v-model="settings.map.zoomLevels.background.stars" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="player-names-zoom" class="col col-form-label">Player Names</label>
-      <div class="col">
-        <input type="number" class="form-control" id="player-names-zoom" v-model="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="carriers-ship-zoom" class="col col-form-label">Carrier Ships</label>
-      <div class="col">
-        <input type="number" class="form-control" id="carriers-ship-zoom" v-model="settings.map.zoomLevels.carrierShips" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="star-ship-zoom" class="col col-form-label">Star Ships</label>
-      <div class="col">
-        <input type="number" class="form-control" id="star-ship-zoom" v-model="settings.map.zoomLevels.star.shipCount" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="star-name-zoom" class="col col-form-label">Star Name</label>
-      <div class="col">
-        <input type="number" class="form-control" id="star-name-zoom" v-model="settings.map.zoomLevels.star.name" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="star-resources-zoom" class="col col-form-label">Star Natural Resources</label>
-      <div class="col">
-        <input type="number" class="form-control" id="star-resources-zoom" v-model="settings.map.zoomLevels.star.naturalResources" :disabled="isSavingSettings">
-      </div>
-    </div>
-
-    <div class="row bg-secondary pt-1 pb-1 ml-1">
-      <label for="star-infrastructure-zoom" class="col col-form-label">Star Infrastructure</label>
-      <div class="col">
-        <input type="number" class="form-control" id="star-infrastructure-zoom" v-model="settings.map.zoomLevels.star.infrastructure" :disabled="isSavingSettings">
+    <div class="mb-1 pb-1">
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="antiAliasing" class="col-12 col-sm-6 col-form-label">Anti Aliasing</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="antiAliasing" v-model="settings.map.antiAliasing" :disabled="isSavingSettings">
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
       </div>
     </div>
 
