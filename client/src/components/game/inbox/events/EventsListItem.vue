@@ -30,6 +30,10 @@
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-credits-sent :event="event" v-if="event.type === 'playerCreditsSent'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-credits-specialists-received :event="event" v-if="event.type === 'playerCreditsSpecialistsReceived'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-credits-specialists-sent :event="event" v-if="event.type === 'playerCreditsSpecialistsSent'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-galactic-cycle-complete :event="event" v-if="event.type === 'playerGalacticCycleComplete'"/>
         <player-renown-received :event="event" v-if="event.type === 'playerRenownReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -78,6 +82,8 @@ import PlayerCombatStarEventVue from './PlayerCombatStarEvent'
 import PlayerCombatCarrierEventVue from './PlayerCombatCarrierEvent'
 import PlayerCreditsReceivedVue from './PlayerCreditsReceived'
 import PlayerCreditsSentVue from './PlayerCreditsSent'
+import PlayerCreditsSpecialistsReceivedVue from './PlayerCreditsSpecialistsReceived'
+import PlayerCreditsSpecialistsSentVue from './PlayerCreditsSpecialistsSent'
 import PlayerGalacticCycleCompleteEventVue from './PlayerGalacticCycleCompleteEvent'
 import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
@@ -111,6 +117,8 @@ export default {
     'player-combat-carrier': PlayerCombatCarrierEventVue,
     'player-credits-received': PlayerCreditsReceivedVue,
     'player-credits-sent': PlayerCreditsSentVue,
+    'player-credits-specialists-received': PlayerCreditsSpecialistsReceivedVue,
+    'player-credits-specialists-sent': PlayerCreditsSpecialistsSentVue,
     'player-galactic-cycle-complete': PlayerGalacticCycleCompleteEventVue,
     'player-renown-received': PlayerRenownReceivedVue,
     'player-renown-sent': PlayerRenownSentVue,

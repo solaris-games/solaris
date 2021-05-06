@@ -28,7 +28,7 @@
                 </h5>
             </div>
             <div class="col-auto mt-2">
-                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || userPlayer.credits < specialist.cost" @click="hireSpecialist(specialist)">Hire for ${{specialist.cost}}</button>
+                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || canAffordSpecialist(specialist)" @click="hireSpecialist(specialist)">Hire for {{getSpecialistActualCostString(specialist)}}</button>
                 <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
@@ -76,7 +76,7 @@ export default {
       this.$emit('onOpenStarDetailRequested', star._id)
     },
     async hireSpecialist (specialist) {
-        if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for $${specialist.cost}?`)) {
+        if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for ${this.getSpecialistActualCostString(specialist)}?`)) {
             return
         }
         
@@ -88,9 +88,11 @@ export default {
             if (response.status === 200) {
                 this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
 
+                let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
+
                 this.star.specialistId = specialist.id
                 this.star.specialist = specialist
-                this.userPlayer.credits -= specialist.cost
+                this.userPlayer[currency] -= specialist.cost[currency]
 
                 GameContainer.reloadStar(this.star)
             }
@@ -99,6 +101,22 @@ export default {
         }
         
         this.isHiringSpecialist = false
+    },
+    getSpecialistActualCost (specialist) {
+        return specialist.cost[this.$store.state.game.settings.specialGalaxy.specialistsCurrency]
+    },
+    getSpecialistActualCostString (specialist) {
+      let actualCost = this.getSpecialistActualCost(specialist)
+
+      switch (this.$store.state.game.settings.specialGalaxy.specialistsCurrency) {
+        case 'credits':
+          return `$${actualCost}`
+        case 'creditsSpecialists':
+          return `${actualCost} token${actualCost > 1 ? 's' : ''}`
+      }
+    },
+    canAffordSpecialist (specialist) {
+        return this.userPlayer[this.$store.state.game.settings.specialGalaxy.specialistsCurrency] < this.getSpecialistActualCost(specialist)
     }
   }
 }

@@ -10,6 +10,14 @@ class TradeService extends BaseApiService {
     { withCredentials: true })
   }
 
+  sendCreditsSpecialists (gameId, toPlayerId, amount) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/trade/creditsSpecialists', {
+      toPlayerId,
+      amount
+    },
+    { withCredentials: true })
+  }
+
   sendRenown (gameId, toPlayerId, amount = 1) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/trade/renown', {
       toPlayerId,

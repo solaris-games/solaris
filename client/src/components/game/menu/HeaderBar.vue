@@ -15,8 +15,12 @@
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
-            <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" title="Credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
+            </span>
+
+            <span v-if="isSpecialistsTechnologyEnabled" title="Specialist Tokens">
+                <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
             <research-progress class="d-none d-md-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
@@ -100,6 +104,7 @@ export default {
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
 
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
   destroyed () {
@@ -109,6 +114,7 @@ export default {
 
     this.sockets.unsubscribe('gameStarted')
     this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
     this.sockets.unsubscribe('gameConversationRead')
   },
   methods: {
@@ -144,6 +150,14 @@ export default {
       player.credits += data.data.credits
 
       this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+    },
+    onCreditsSpecialistsReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.creditsSpecialists += data.data.creditsSpecialists
+
+      this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
     },
     onTechnologyReceived (data) {
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
@@ -319,6 +333,9 @@ export default {
     },
     isTimeMachineEnabled () {
       return this.$store.state.game.settings.general.timeMachine === 'enabled'
+    },
+    isSpecialistsTechnologyEnabled () {
+      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     }
   }
 }

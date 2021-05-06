@@ -719,7 +719,7 @@ module.exports = class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                let creditsResult = this.playerService.givePlayerMoney(game, player);
+                let creditsResult = this.playerService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
 
@@ -728,7 +728,8 @@ module.exports = class GameTickService extends EventEmitter {
                     gameTick: game.state.tick,
                     player, 
                     creditsEconomy: creditsResult.creditsFromEconomy, 
-                    creditsBanking: creditsResult.creditsFromBanking, 
+                    creditsBanking: creditsResult.creditsFromBanking,
+                    creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
                     experimentTechnology: experimentResult.technology,
                     experimentTechnologyLevel: experimentResult.level,
                     experimentAmount: experimentResult.amount,

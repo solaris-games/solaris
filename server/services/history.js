@@ -47,7 +47,8 @@ module.exports = class HistoryService {
             'players.research.hyperspace.level': 1,
             'players.research.scanning.level': 1,
             'players.research.experimentation.level': 1,
-            'players.research.terraforming.level': 1
+            'players.research.terraforming.level': 1,
+            'players.research.specialists.level': 1,
         })
         .sort({ tick: 1 })
         .lean({ defaults: true })
@@ -106,6 +107,7 @@ module.exports = class HistoryService {
                 researchingNow: player.researchingNow,
                 researchingNext: player.researchingNext,
                 credits: player.credits,
+                creditsSpecialists: player.creditsSpecialists,
                 defeated: player.defeated,
                 afk: player.afk,
                 ready: player.ready,
@@ -181,6 +183,7 @@ module.exports = class HistoryService {
                 'players.$[].researchingNow': '',
                 'players.$[].researchingNext': '',
                 'players.$[].credits': '',
+                'players.$[].creditsSpecialists': '',
                 'players.$[].defeated': '',
                 'players.$[].afk': '',
                 'players.$[].ready': '',

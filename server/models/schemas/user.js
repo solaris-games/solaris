@@ -63,10 +63,13 @@ const schema = new Schema({
             weapons: { type: Types.Number, default: 0 },
             banking: { type: Types.Number, default: 0 },
             manufacturing: { type: Types.Number, default: 0 },
+            specialists: { type: Types.Number, default: 0 }
         },
         trade: {
             creditsSent: { type: Types.Number, default: 0 },
             creditsReceived: { type: Types.Number, default: 0 },
+            creditsSpecialistsSent: { type: Types.Number, default: 0 },
+            creditsSpecialistsReceived: { type: Types.Number, default: 0 },
             technologySent: { type: Types.Number, default: 0 },
             technologyReceived: { type: Types.Number, default: 0 },
             giftsSent: { type: Types.Number, default: 0 },

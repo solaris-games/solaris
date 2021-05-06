@@ -184,6 +184,10 @@
               <td>Experimentation</td>
               <td class="text-right">{{ user.achievements.research.experimentation }}</td>
             </tr>
+            <tr>
+              <td>Specialists</td>
+              <td class="text-right">{{ user.achievements.research.specialists }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -204,6 +208,14 @@
             <tr>
               <td>Credits Received</td>
               <td class="text-right">{{ user.achievements.trade.creditsReceived }}</td>
+            </tr>
+            <tr>
+              <td>Specialist Tokens Sent</td>
+              <td class="text-right">{{ user.achievements.trade.creditsSpecialistsSent }}</td>
+            </tr>
+            <tr>
+              <td>Specialist Tokens Received</td>
+              <td class="text-right">{{ user.achievements.trade.creditsSpecialistsReceived }}</td>
             </tr>
             <tr>
               <td>Technology Sent</td>
@@ -604,7 +616,8 @@ export default {
           'Weapons',
           'Banking',
           'Manufacturing',
-          'Experimentation'
+          'Experimentation',
+          'Specialists'
         ],
         datasets: [{
           data: [
@@ -614,7 +627,8 @@ export default {
             this.user.achievements.research.weapons,
             this.user.achievements.research.banking,
             this.user.achievements.research.manufacturing,
-            this.user.achievements.research.experimentation
+            this.user.achievements.research.experimentation,
+            this.user.achievements.research.specialists
           ],
           backgroundColor: [
             '#888',
@@ -623,7 +637,8 @@ export default {
             '#F39C12',
             '#E74C3C',
             '#00bc8c',
-            '#3498DB'
+            '#3498DB',
+            '#333'
           ]
         }]
       }
@@ -649,6 +664,17 @@ export default {
               '#3498DB'
             ],
             label: 'Credits'
+          },
+          {
+            data: [
+              this.user.achievements.trade.creditsSpecialistsSent,
+              this.user.achievements.trade.creditsSpecialistsReceived
+            ],
+            backgroundColor: [
+              '#00bc8c',
+              '#3498DB'
+            ],
+            label: 'Specialist Tokens'
           },
           {
             data: [

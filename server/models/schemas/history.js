@@ -28,6 +28,7 @@ const schema = new Schema({
             researchingNow: { type: Types.String, required: true },
             researchingNext: { type: Types.String, required: true },
             credits: { type: Types.Number, required: true },
+            creditsSpecialists: { type: Types.Number, required: true },
             defeated: { type: Types.Boolean, required: true },
             afk: { type: Types.Boolean, required: true },
             ready: { type: Types.Boolean, required: false, default: false },
@@ -57,6 +58,10 @@ const schema = new Schema({
                     progress: { type: Types.Number, required: true, default: 0  },
                 },
                 manufacturing: {
+                    level: { type: Types.Number, required: true, default: 1  },
+                    progress: { type: Types.Number, required: true, default: 0  },
+                },
+                specialists: {
                     level: { type: Types.Number, required: true, default: 1  },
                     progress: { type: Types.Number, required: true, default: 0  },
                 }

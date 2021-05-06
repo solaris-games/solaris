@@ -36,7 +36,8 @@ const schema = new Schema({
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
 			carrierUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
-			specialistCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+			specialistCost: { type: Types.String, required: true, enum: ['none', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
 			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
@@ -49,6 +50,7 @@ const schema = new Schema({
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
 			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
+			startingCreditsSpecialists: { type: Types.Number, required: true, enum: [0, 1, 3, 5, 10, 25, 50, 100], default: 5 },
 			startingShips: { type: Types.Number, required: true, enum: [0, 10, 50, 100], default: 10 },
 			startingInfrastructure: {
 				economy: { type: Types.Number, required: true, enum: [0, 5, 10, 20, 30], default: 5 },
@@ -61,7 +63,8 @@ const schema = new Schema({
 				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
 			},
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
-			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 },
+			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
+			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
         },
         technology: {
@@ -72,7 +75,8 @@ const schema = new Schema({
 				hyperspace: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				manufacturing: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				banking: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
-				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
+				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
+				specialists: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
 			},
 			researchCosts: {
 				terraforming: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
@@ -81,7 +85,8 @@ const schema = new Schema({
 				hyperspace: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				manufacturing: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				banking: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
-				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
+				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
+				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
@@ -141,6 +146,12 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 4 },
 				veryExpensive: { type: Types.Number, required: true, default: 8 },
 				crazyExpensive: { type: Types.Number, required: true, default: 16 }
+			},
+			specialistsExpenseMultipliers: {
+				standard: { type: Types.Number, required: true, default: 1 },
+				expensive: { type: Types.Number, required: true, default: 2 },
+				veryExpensive: { type: Types.Number, required: true, default: 4 },
+				crazyExpensive: { type: Types.Number, required: true, default: 8 }
 			}
 		}
 	},

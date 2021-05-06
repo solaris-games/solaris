@@ -21,6 +21,8 @@ module.exports = class EventService {
         PLAYER_TECHNOLOGY_SENT: 'playerTechnologySent',
         PLAYER_CREDITS_RECEIVED: 'playerCreditsReceived',
         PLAYER_CREDITS_SENT: 'playerCreditsSent',
+        PLAYER_CREDITS_SPECIALISTS_RECEIVED: 'playerCreditsSpecialistsReceived',
+        PLAYER_CREDITS_SPECIALISTS_SENT: 'playerCreditsSpecialistsSent',
         PLAYER_RENOWN_RECEIVED: 'playerRenownReceived',
         PLAYER_RENOWN_SENT: 'playerRenownSent',
         PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
@@ -62,7 +64,7 @@ module.exports = class EventService {
             args.gameId, args.gameTick, args.defender, args.attackers, args.combatResult));
         this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.gameId, args.gameTick, args.player, args.star, args.capturedBy, args.captureReward));
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
-            args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
+            args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
@@ -79,6 +81,8 @@ module.exports = class EventService {
 
         this.tradeService.on('onPlayerCreditsReceived', (args) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
         this.tradeService.on('onPlayerCreditsSent', (args) => this.createCreditsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerCreditsSpecialistsReceived', (args) => this.createCreditsSpecialistsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerCreditsSpecialistsSent', (args) => this.createCreditsSpecialistsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
         this.tradeService.on('onPlayerRenownReceived', (args) => this.createRenownReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
         this.tradeService.on('onPlayerRenownSent', (args) => this.createRenownSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
@@ -152,6 +156,8 @@ module.exports = class EventService {
                     this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED,
                     this.EVENT_TYPES.PLAYER_CREDITS_SENT,
                     this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT,
+                    this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED,
                     this.EVENT_TYPES.PLAYER_RENOWN_SENT,
                     this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
                 ]
@@ -232,10 +238,11 @@ module.exports = class EventService {
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(gameId, gameTick, player, 
-        creditsEconomy, creditsBanking, experimentTechnology, experimentAmount, carrierUpkeep) {
+        creditsEconomy, creditsBanking, creditsSpecialists, experimentTechnology, experimentAmount, carrierUpkeep) {
         let data = {
             creditsEconomy,
             creditsBanking,
+            creditsSpecialists,
             experimentTechnology,
             experimentAmount,
             carrierUpkeep
@@ -331,6 +338,24 @@ module.exports = class EventService {
         };
 
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data);
+    }
+
+    async createCreditsSpecialistsReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, creditsSpecialists) {
+        let data = {
+            fromPlayerId: fromPlayer._id,
+            creditsSpecialists
+        };
+
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED, data);
+    }
+
+    async createCreditsSpecialistsSentEvent(gameId, gameTick, fromPlayer, toPlayer, creditsSpecialists) {
+        let data = {
+            toPlayerId: toPlayer._id,
+            creditsSpecialists
+        };
+
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data);
     }
 
     async createRenownReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, renown) {

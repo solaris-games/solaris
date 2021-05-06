@@ -83,6 +83,7 @@ module.exports = class PlayerService extends EventEmitter {
             colour: colour,
             shape: shape,
             credits: game.settings.player.startingCredits,
+            creditsSpecialists: game.settings.player.startingCreditsSpecialists,
             renownToGive: game.settings.general.playerLimit,
             carriers: [],
             research: {
@@ -92,7 +93,8 @@ module.exports = class PlayerService extends EventEmitter {
                 hyperspace: { level: game.settings.technology.startingTechnologyLevel.hyperspace },
                 manufacturing: { level: game.settings.technology.startingTechnologyLevel.manufacturing },
                 banking: { level: game.settings.technology.startingTechnologyLevel.banking },
-                weapons: { level: game.settings.technology.startingTechnologyLevel.weapons }
+                weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
+                specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             }
         };
     }
@@ -238,6 +240,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.alias = "Empty Slot";
         player.avatar = null;
         player.credits = game.settings.player.startingCredits;
+        player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
         player.ready = false;
 
         // Reset the player's research
@@ -462,7 +465,7 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
-    givePlayerMoney(game, player) {
+    givePlayerCreditsEndOfCycleRewards(game, player) {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let totalEco = this.calculateTotalEconomy(playerStars);
@@ -470,13 +473,16 @@ module.exports = class PlayerService extends EventEmitter {
         let creditsFromEconomy = totalEco * 10;
         let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
+        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player);
 
         player.credits += creditsTotal;
+        player.creditsSpecialists += creditsFromSpecialistsTechnology;
 
         return {
             creditsFromEconomy,
             creditsFromBanking,
-            creditsTotal
+            creditsTotal,
+            creditsFromSpecialistsTechnology
         };
     }
 
@@ -497,6 +503,16 @@ module.exports = class PlayerService extends EventEmitter {
         }
 
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
+    }
+
+    _getCreditsSpecialistsReward(game, player) {
+        let isSpecialistsCreditsEnabled = this.technologyService.isTechnologyEnabled(game, 'specialists');
+
+        if (!isSpecialistsCreditsEnabled) {
+            return 0;
+        }
+
+        return player.research.specialists.level;
     }
 
     deductCarrierUpkeepCost(game, player) {
@@ -682,6 +698,30 @@ module.exports = class PlayerService extends EventEmitter {
                 update: {
                     $inc: {
                         'galaxy.players.$.credits': amount
+                    }
+                }
+            }
+        }
+        
+        if (commit) {
+            await this.gameModel.bulkWrite([query]);
+        }
+        
+        return query;
+    }
+
+    async addCreditsSpecialists(game, player, amount, commit = true) {
+        player.creditsSpecialists += amount;
+
+        let query = {
+            updateOne: {
+                filter: {
+                    _id: game._id,
+                    'galaxy.players._id': player._id
+                },
+                update: {
+                    $inc: {
+                        'galaxy.players.$.creditsSpecialists': amount
                     }
                 }
             }

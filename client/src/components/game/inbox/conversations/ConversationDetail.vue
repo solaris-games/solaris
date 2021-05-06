@@ -15,7 +15,7 @@
       <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the conversation.</i></small>
     </p>
 
-    <conversation-participants v-if="toggleDisplay" :conversation="conversation" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested""/>
+    <conversation-participants v-if="toggleDisplay" :conversation="conversation" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="pt-0 mb-2 mt-2 messages-container" v-if="toggleDisplay && conversation.messages.length">
       <div v-for="message in conversation.messages" v-bind:key="message._id" class="mb-1">
@@ -67,6 +67,7 @@ export default {
     this.sockets.subscribe('gameConversationRead', this.onConversationRead)
     this.sockets.subscribe('gameConversationLeft', this.onConversationLeft)
     this.sockets.subscribe('playerCreditsReceived', this.onTradeEventReceived)
+    this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
   },
@@ -75,6 +76,7 @@ export default {
     this.sockets.unsubscribe('gameConversationRead')
     this.sockets.unsubscribe('gameConversationLeft')
     this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
     this.sockets.unsubscribe('playerRenownReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
 

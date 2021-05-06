@@ -29,6 +29,7 @@
           <option key="scanning" value="scanning">Scanning</option>
           <option key="experimentation" value="experimentation">Experimentation</option>
           <option key="terraforming" value="terraforming">Terraforming</option>
+          <option key="specialists" value="specialists">Specialists</option>
         </select>
         </div>
         <div class="col-auto ml-1">
@@ -275,6 +276,7 @@ export default {
             case 'scanning':
             case 'experimentation':
             case 'terraforming':
+            case 'specialists':
               dataset.data.push(historyPlayer.research[this.intelType].level)
               break
             default:

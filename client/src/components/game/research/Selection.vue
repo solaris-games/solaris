@@ -76,7 +76,8 @@ export default {
         { text: 'Experimentation', value: 'experimentation' },
         { text: 'Weapons', value: 'weapons' },
         { text: 'Banking', value: 'banking' },
-        { text: 'Manufacturing', value: 'manufacturing' }
+        { text: 'Manufacturing', value: 'manufacturing' },
+        { text: 'Specialists', value: 'specialists' }
       ]
 
       this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value) 
