@@ -2,14 +2,19 @@ import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
 
 class PlayerNames {
+
+  static zoomLevel = 90
+
   constructor () {
     this.container = new PIXI.Container()
 
     this.zoomPercent = 0
   }
 
-  setup (game) {
+  setup (game, userSettings) {
     this.game = game
+
+    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
   }
 
   draw () {
@@ -32,7 +37,7 @@ class PlayerNames {
       let text_name = new PIXI.Text(player.alias, style)
       text_name.x = empireCenter.x - (text_name.width / 2)
       text_name.y = empireCenter.y - (text_name.height / 2)
-      text_name.resolution = 10
+      text_name.resolution = 2
       text_name.zIndex = 10
 
       let graphics = new PIXI.Graphics()
@@ -48,11 +53,19 @@ class PlayerNames {
     this.refreshZoom(this.zoomPercent || 0)
   }
 
+  onTick( zoomPercent ) {
+    this.zoomPercent = zoomPercent
+
+    if (this.container) {
+      this.container.visible = zoomPercent <= PlayerNames.zoomLevel
+    }
+  }
+
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent <= 90
+      this.container.visible = zoomPercent <= PlayerNames.zoomLevel
     }
   }
 

@@ -58,9 +58,13 @@
     </div>
 
     <div class="mt-3">
-      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount">Close Account</button>
+      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount">Delete Account</button>
       <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
     </div>
+
+    <view-subtitle title="Options" class="mt-3"/>
+
+    <options-form />
   </view-container>
 </template>
 
@@ -68,6 +72,8 @@
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
+import ViewSubtitleVue from '../components/ViewSubtitle'
+import OptionsFormVue from '../components/game/menu/OptionsForm'
 import userService from '../services/api/user'
 import router from '../router'
 
@@ -75,7 +81,9 @@ export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
-    'view-title': ViewTitle
+    'view-title': ViewTitle,
+    'view-subtitle': ViewSubtitleVue,
+    'options-form': OptionsFormVue
   },
   data () {
     return {
@@ -106,9 +114,9 @@ export default {
       this.isChangingEmailNotifications = false
     },
     async closeAccount () {
-      if (await this.$confirm('Close account', 'Are you sure you want to close your account?')) {
-        if (await this.$confirm('Close account', 'Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
-          if (!await this.$confirm('Close account', 'Last chance?')) {
+      if (await this.$confirm('Delete account', 'Are you sure you want to close your account?')) {
+        if (await this.$confirm('Delete account', 'Are you absolutely sure you want to close your account? We will remove all of your data and it cannot be recovered.')) {
+          if (!await this.$confirm('Delete account', 'Last chance?')) {
             return
           }
         } else {

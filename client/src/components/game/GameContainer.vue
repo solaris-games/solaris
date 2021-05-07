@@ -25,7 +25,7 @@ export default {
 
   beforeMount () {
     this.gameContainer = GameContainer
-    this.gameContainer.setupApp(this.$store)
+    this.gameContainer.setupApp(this.$store, this.$store.state.settings)
     this.loadGame(this.$store.state.game)
   },
 
@@ -50,9 +50,10 @@ export default {
     this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
 
-    this.polling = setInterval(this.touchPlayer, 60000)
-
-    this.touchPlayer()
+    if (this.$store.state.userId) {
+      this.polling = setInterval(this.touchPlayer, 60000)
+      this.touchPlayer()
+    }
   },
 
   destroyed () {

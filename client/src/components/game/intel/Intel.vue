@@ -29,6 +29,7 @@
           <option key="scanning" value="scanning">Scanning</option>
           <option key="experimentation" value="experimentation">Experimentation</option>
           <option key="terraforming" value="terraforming">Terraforming</option>
+          <option key="specialists" value="specialists" v-if="isSpecialistsTechnologyEnabled">Specialists</option>
         </select>
         </div>
         <div class="col-auto ml-1">
@@ -191,7 +192,7 @@ export default {
       this.history = null
 
       try {
-        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick)
+        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick, this.$store.state.tick)
 
         if (response.status === 200) {
           this.history = response.data
@@ -275,6 +276,7 @@ export default {
             case 'scanning':
             case 'experimentation':
             case 'terraforming':
+            case 'specialists':
               dataset.data.push(historyPlayer.research[this.intelType].level)
               break
             default:
@@ -286,6 +288,11 @@ export default {
       }
 
       this.datacollection = dataCollection
+    }
+  },
+  computed: {
+    isSpecialistsTechnologyEnabled () {
+      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     }
   }
 }

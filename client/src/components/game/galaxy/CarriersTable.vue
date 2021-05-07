@@ -1,10 +1,15 @@
 <template>
 <div class="container">
-  <div class="mb-2">
+  <div class="row mb-2 no-gutters">
+    <div class="col-auto">
       <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
+    </div>
+    <div class="col ml-2">
+      <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
+    </div>
   </div>
 
   <div class="row">
@@ -18,9 +23,9 @@
                     <td></td>
                     <td class="text-right"><a href="javascript:;" @click="sort(['ships'])"><i class="fas fa-rocket"></i></a></td>
                     <td class="text-right"><a href="javascript:;" @click="sort(['waypoints', 'length'])"><i class="fas fa-map-marker-alt"></i></a></td>
-                    <td></td>
-                    <td><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
-                    <!-- <td>Total ETA</td> -->
+                    <!-- <td></td> -->
+                    <td class="text-right"><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
+                    <td class="text-right"><a href="javascript:;" @click="sort(['ticksEtaTotal'])">Total</a></td>
                 </tr>
             </thead>
             <tbody>
@@ -48,7 +53,8 @@ export default {
       showAll: false,
       tableData: [],
       sortBy: ['ticksEta'],
-      sortDirection: true
+      sortDirection: true,
+      searchFilter: ''
     }
   },
   mounted () {
@@ -94,18 +100,22 @@ export default {
           (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
       }
 
+      let filterFunction = a => a.name.toLowerCase().includes(this.searchFilter.toLowerCase())
+
       if (this.sortBy == null) {
-        return this.tableData
+        return this.tableData.filter(filterFunction)
       }
 
-      return this.tableData.sort((a, b) => {
-        if (this.sortDirection) { // Ascending
-          return getNestedObject(b, this.sortBy) < getNestedObject(a, this.sortBy) ? 1 : -1
-        }
+      return this.tableData
+        .filter(filterFunction)
+        .sort((a, b) => {
+          if (this.sortDirection) { // Ascending
+            return getNestedObject(b, this.sortBy) < getNestedObject(a, this.sortBy) ? 1 : -1
+          }
 
-        // Descending
-        return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
-      })
+          // Descending
+          return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
+        })
     }
   }
 }

@@ -4,7 +4,7 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService) {
         this.gameModel = gameModel;
         this.gameListService = gameListService;
         this.nameService = nameService;
@@ -12,6 +12,7 @@ module.exports = class GameCreateService {
         this.playerService = playerService;
         this.passwordService = passwordService;
         this.conversationService = conversationService;
+        this.historyService = historyService;
     }
 
     async create(settings) {
@@ -80,6 +81,13 @@ module.exports = class GameCreateService {
 
         this.conversationService.createConversationAllPlayers(game);
 
-        return await game.save();
+        let gameObject = await game.save();
+
+        // TODO: This is a bit more complicated as we need to update the history
+        // for the very first tick when players join the game. The galaxy masking
+        // should only be applied for stars and carriers if its the very first tick.
+        // await this.historyService.log(gameObject);
+        
+        return gameObject;
     }
 }

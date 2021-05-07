@@ -139,6 +139,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.specialGalaxy.specialistCost !== 'none'">
+        <label for="specialistsCurrency" class="col-form-label">Specialist Currency</label>
+        <select class="form-control" id="specialistsCurrency" v-model="settings.specialGalaxy.specialistsCurrency" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.specialistsCurrency" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="randomGates" class="col-form-label">Random Gates</label>
         <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates" :disabled="isCreatingGame">
@@ -231,6 +240,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
+        <label for="startingCreditsSpecialists" class="col-form-label">Starting Specialist Tokens</label>
+        <select class="form-control" id="startingCreditsSpecialists" v-model="settings.player.startingCreditsSpecialists" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.startingCreditsSpecialists" v-bind:key="opt" v-bind:value="opt">
+            {{ opt }} Tokens
+          </option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="startingShips" class="col-form-label">Starting Ships</label>
         <select class="form-control" id="startingShips" v-model="settings.player.startingShips" :disabled="isCreatingGame">
@@ -287,6 +305,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
+        <label for="tradeCreditsSpecialists" class="col-form-label">Trade Specialist Tokens</label>
+        <select class="form-control" id="tradeCreditsSpecialists" v-model="settings.player.tradeCreditsSpecialists" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.tradeCreditsSpecialists" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="tradeCost" class="col-form-label">Technology Trade Cost</label>
         <select class="form-control" id="tradeCost" v-model="settings.player.tradeCost" :disabled="isCreatingGame">
@@ -334,6 +361,11 @@
         <select class="form-control" id="startingTechLevelManufacturing" v-model="settings.technology.startingTechnologyLevel.manufacturing" :disabled="isCreatingGame">
           <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
             Level {{ opt }} Manufacturing
+          </option>
+        </select>
+        <select class="form-control" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
+            Level {{ opt }} Specialists
           </option>
         </select>
         <select class="form-control" id="startingTechLevelBanking" v-model="settings.technology.startingTechnologyLevel.banking" :disabled="isCreatingGame">
@@ -384,6 +416,11 @@
         <select class="form-control" id="researchCostsTechWeapons" v-model="settings.technology.researchCosts.weapons" :disabled="isCreatingGame">
           <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Weapons Research
+          </option>
+        </select>
+        <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }} Specialists Research
           </option>
         </select>
       </div>

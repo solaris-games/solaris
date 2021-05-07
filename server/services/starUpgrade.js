@@ -3,7 +3,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService) {
+    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService, playerService) {
         super();
         
         this.gameModel = gameModel;
@@ -12,6 +12,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         this.achievementService = achievementService;
         this.researchService = researchService;
         this.technologyService = technologyService;
+        this.playerService = playerService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -46,7 +47,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            this._getDeductPlayerCreditsDBWrite(game, player, cost),
+            await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             this._getSetStarWarpGateDBWrite(game, star, true)
         ]);
 
@@ -55,7 +56,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         this.emit('onPlayerWarpGateBuilt', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star
         });
@@ -89,7 +91,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         this.emit('onPlayerWarpGateDestroyed', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star
         });
@@ -131,7 +134,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Update the DB.
         await this.gameModel.bulkWrite([
-            this._getDeductPlayerCreditsDBWrite(game, player, cost),
+            await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             {
                 updateOne: {
                     filter: {
@@ -163,7 +166,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         this.emit('onPlayerCarrierBuilt', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             star,
             carrier
@@ -188,7 +192,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
     async _upgradeInfrastructureUpdateDB(game, player, star, cost, economyType) {
         let dbWrites = [
-            this._getDeductPlayerCreditsDBWrite(game, player, cost)
+            await this._getDeductPlayerCreditsDBWrite(game, player, cost)
         ];
 
         switch (economyType) {
@@ -368,7 +372,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             // Generate the DB writes for all the stars to upgrade, including deducting the credits
             // for the player and also updating the player's achievement statistics.
             let dbWrites = [
-                this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
+                await this._getDeductPlayerCreditsDBWrite(game, player, upgradeSummary.cost)
             ];
 
             for (let star of upgradeSummary.stars) {
@@ -433,7 +437,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= upgradeSummary.cost;
 
         this.emit('onPlayerInfrastructureBulkUpgraded', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             player,
             upgradeSummary
         });
@@ -548,20 +553,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return star.upgradeCosts;
     }
 
-    _getDeductPlayerCreditsDBWrite(game, player, cost) {
-        return {
-            updateOne: {
-                filter: {
-                    _id: game._id,
-                    'galaxy.players._id': player._id
-                },
-                update: {
-                    $inc: {
-                        'galaxy.players.$.credits': -cost
-                    }
-                }
-            }
-        };
+    async _getDeductPlayerCreditsDBWrite(game, player, cost) {
+        return await this.playerService.addCredits(game, player, -cost, false);
     }
 
     _getSetStarWarpGateDBWrite(game, star, warpGate) {

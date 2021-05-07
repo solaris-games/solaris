@@ -11,6 +11,9 @@
         <p v-if="event.data.credits" class="mb-1">
             <em>Sent <span class="text-warning">{{event.data.credits}}</span> credits.</em>
         </p>
+        <p v-if="event.data.creditsSpecialists" class="mb-1">
+            <em>Sent <span class="text-warning">{{event.data.creditsSpecialists}}</span> specialist token(s).</em>
+        </p>
         <p v-if="event.data.technology" class="mb-1">
             <em>Sent <span class="text-warning">Level {{event.data.technology.level}} {{getTechnologyFriendlyName(event.data.technology.name)}}</span>.</em>
         </p>
@@ -47,10 +50,12 @@ export default {
     getFromPlayer () {
       switch (this.event.type) {
         case 'playerCreditsReceived':
+        case 'playerCreditsSpecialistsReceived':
         case 'playerRenownReceived':
         case 'playerTechnologyReceived':
           return GameHelper.getPlayerById(this.$store.state.game, this.event.data.fromPlayerId)
         case 'playerCreditsSent':
+        case 'playerCreditsSpecialistsSent':
         case 'playerRenownSent':
         case 'playerTechnologySent':
           return GameHelper.getPlayerById(this.$store.state.game, this.event.playerId)

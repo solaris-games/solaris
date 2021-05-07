@@ -4,16 +4,25 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(userService, playerService, ledgerService) {
+    constructor(gameModel, userService, playerService, ledgerService, achievementService, reputationService) {
         super();
         
+        this.gameModel = gameModel;
         this.userService = userService;
         this.playerService = playerService;
         this.ledgerService = ledgerService;
+        this.achievementService = achievementService;
+        this.reputationService = reputationService;
     }
 
+    // TODO: Specialist token trading
+    
     isTradingCreditsDisabled(game) {
         return game.settings.player.tradeCredits === false;
+    }
+    
+    isTradingCreditsSpecialistsDisabled(game) {
+        return game.settings.player.tradeCreditsSpecialists === false;
     }
 
     isTradingTechnologyDisabled(game) {
@@ -27,7 +36,7 @@ module.exports = class TradeService extends EventEmitter {
 
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.state.startDate) {
-            throw new ValidationError(`Cannot award renown, the game has not started yet.`);
+            throw new ValidationError(`Cannot trade credits, the game has not started yet.`);
         }
         
         // Get the players.
@@ -43,41 +52,93 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`The player does not own ${amount} credits.`);
         }
 
-        let fromPlayerUser = await this.userService.getById(fromPlayer.userId);
-        let toPlayerUser = await this.userService.getById(toPlayer.userId);
+        let dbWrites = [
+            await this.playerService.addCredits(game, fromPlayer, -amount, false),
+            await this.playerService.addCredits(game, toPlayer, amount, false)
+        ];
 
-        if (!toPlayerUser) {
-            throw new ValidationError(`There is no user associated with this player.`);
-        }
+        await this.gameModel.bulkWrite(dbWrites);
 
-        fromPlayer.credits -= amount;
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
 
         if (!fromPlayer.defeated) {
-            fromPlayerUser.achievements.trade.creditsSent += amount;
+            await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
         }
 
-        toPlayer.credits += amount;
-
-        if (!toPlayer.defeated) {
-            toPlayerUser.achievements.trade.creditsReceived += amount;
+        if (!toPlayer.defeated && toPlayer.userId) {
+            await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
         }
-
-        this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
-
-        await game.save();
-        await fromPlayerUser.save();
-        await toPlayerUser.save();
+        
+        let reputation = await this.reputationService.tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount);
 
         let eventObject = {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
             amount,
+            reputation,
             date: moment().utc()
         };
 
         this.emit('onPlayerCreditsReceived', eventObject);
         this.emit('onPlayerCreditsSent', eventObject);
+
+        return eventObject;
+    }
+
+    async sendCreditsSpecialists(game, fromPlayer, toPlayerId, amount) {
+        if (this.isTradingCreditsSpecialistsDisabled(game)) {
+            throw new ValidationError(`Trading specialist tokens is disabled.`);
+        }
+
+        // TODO: Maybe this validation needs to be in the middleware?
+        if (!game.state.startDate) {
+            throw new ValidationError(`Cannot trade specialist tokens, the game has not started yet.`);
+        }
+        
+        // Get the players.
+        let toPlayer = this.playerService.getById(game, toPlayerId);
+
+        if (fromPlayer === toPlayer) {
+            throw new ValidationError(`Cannot send specialist tokens to yourself.`);
+        }
+
+        this._tradeScanningCheck(game, fromPlayer, toPlayer);
+
+        if (fromPlayer.credits < amount) {
+            throw new ValidationError(`The player does not own ${amount} specialist tokens.`);
+        }
+
+        let dbWrites = [
+            await this.playerService.addCreditsSpecialists(game, fromPlayer, -amount, false),
+            await this.playerService.addCreditsSpecialists(game, toPlayer, amount, false)
+        ];
+
+        await this.gameModel.bulkWrite(dbWrites);
+
+        if (!fromPlayer.defeated) {
+            await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
+        }
+
+        if (!toPlayer.defeated && toPlayer.userId) {
+            await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
+        }
+        
+        let reputation = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount);
+
+        let eventObject = {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            fromPlayer,
+            toPlayer,
+            amount,
+            reputation,
+            date: moment().utc()
+        };
+
+        this.emit('onPlayerCreditsSpecialistsReceived', eventObject);
+        this.emit('onPlayerCreditsSpecialistsSent', eventObject);
 
         return eventObject;
     }
@@ -108,8 +169,8 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot award renown to an empty slot.`);
         }
 
-        // Get the user of the player to award renown to.
-        let fromUser = await this.userService.getById(fromPlayer.userId);
+        // The receiving player has to be a legit user otherwise
+        // renown should not be sent. It's possible that players can delete their accounts.
         let toUser = await this.userService.getById(toPlayer.userId);
 
         if (!toUser) {
@@ -118,17 +179,21 @@ module.exports = class TradeService extends EventEmitter {
 
         // Note: AI will never ever send renown so no need to check
         // if players are AI controlled here.
-        fromPlayer.renownToGive -= amount;
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': fromPlayer._id
+        }, {
+            $inc: {
+                'galaxy.players.$.renownToGive': -amount
+            }
+        });
 
-        fromUser.achievements.trade.renownSent += amount;
-        toUser.achievements.renown += amount; // TODO: Refactor into trade?
-
-        await game.save();
-        await fromUser.save();
-        await toUser.save();
+        await this.achievementService.incrementRenownSent(fromPlayer.userId, amount);
+        await this.achievementService.incrementRenownReceived(toPlayer.userId, amount); // Note we have already checked for null user id above.
 
         let eventObject = {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
             amount,
@@ -173,44 +238,58 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError('The player cannot afford to trade this technology.');
         }
 
-        let fromUser = await this.userService.getById(fromPlayer.userId);
-        let toUser = await this.userService.getById(toPlayer.userId);
-
-        if (!toUser) {
-            throw new ValidationError(`There is no user associated with this player.`);
-        }
-
         let levelDifference = tradeTech.level - toPlayerTech.level;
 
-        toPlayerTech.level = tradeTech.level;
-        toPlayerTech.progress = 0;
+        // toPlayerTech.level = tradeTech.level;
+        // toPlayerTech.progress = 0;
+        // fromPlayer.credits -= tradeTech.cost;
+        
+        let updateResearchQuery = {};
+        updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.level'] = tradeTech.level;
+        updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
 
-        // Need to assert that the trading players aren't controlled by AI.
-        if (!toPlayer.defeated) {
-            toUser.achievements.trade.technologyReceived++;
+        let dbWrites = [
+            await this.playerService.addCredits(game, fromPlayer, -tradeTech.cost, false),
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': toPlayer._id
+                    },
+                    update: updateResearchQuery
+                }
+            }
+        ];
+
+        await this.gameModel.bulkWrite(dbWrites);
+
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
+
+        // Need to assert that the trading players aren't controlled by AI
+        // and the player user has an account.
+        if (!toPlayer.defeated && toPlayer.userId) {
+            await this.achievementService.incrementTradeTechnologyReceived(toPlayer.userId, 1);
         }
-
-        fromPlayer.credits -= tradeTech.cost;
 
         if (!fromPlayer.defeated) {
-            fromUser.achievements.trade.technologySent++;
+            await this.achievementService.incrementTradeTechnologySent(fromPlayer.userId, 1);
         }
 
-        this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
+        let eventTechnology = {
+            name: tradeTech.name,
+            level: tradeTech.level,
+            difference: levelDifference
+        };
 
-        await game.save();
-        await fromUser.save();
-        await toUser.save();
+        let reputation = await this.reputationService.tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, eventTechnology);
 
         let eventObject = {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             fromPlayer,
             toPlayer,
-            technology: {
-                name: tradeTech.name,
-                level: tradeTech.level,
-                difference: levelDifference
-            },
+            technology: eventTechnology,
+            reputation,
             date: moment().utc()
         };
 

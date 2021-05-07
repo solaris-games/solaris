@@ -7,9 +7,9 @@ import RulerPoints from './rulerPoints'
 import Territories from './territories'
 import PlayerNames from './playerNames'
 import EventEmitter from 'events'
-import GameHelper from '../services/gameHelper'
-import AnimationService from './animation'
 import gameHelper from '../services/gameHelper'
+import AnimationService from './animation'
+import PathManager from './PathManager'
 
 class Map extends EventEmitter {
   static chunkSize = 128
@@ -51,17 +51,23 @@ class Map extends EventEmitter {
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
+    this.container.addChild(this.pathManager.container)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.highlightLocationsContainer)
+
   }
 
   setup (game, userSettings) {
+    this.userSettings = userSettings
     this.game = game
-    
+
+    this.pathManager = new PathManager( game, userSettings, this )
+
+
     // Cleanup events
     this.stars.forEach(s => s.removeAllListeners())
     this.carriers.forEach(s => s.removeAllListeners())
@@ -105,13 +111,14 @@ class Map extends EventEmitter {
     this.rulerPoints.setup(game)
     this.rulerPoints.onRulerPointCreatedHandler = this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.onRulerPointsClearedHandler = this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
+    this.rulerPoints.onRulerPointRemovedHandler = this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
 
     this.rulerPointContainer.addChild(this.rulerPoints.container)
 
     // -----------
     // Setup Territories
     this.territories = new Territories()
-    this.territories.setup(game)
+    this.territories.setup(game, userSettings)
 
     this.territoryContainer.addChild(this.territories.container)
     this.territories.draw(userSettings)
@@ -119,7 +126,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Player Names
     this.playerNames = new PlayerNames()
-    this.playerNames.setup(game)
+    this.playerNames.setup(game, userSettings)
 
     this.playerNamesContainer.addChild(this.playerNames.container)
     this.playerNames.draw()
@@ -130,6 +137,7 @@ class Map extends EventEmitter {
     this.background.setup(game, userSettings)
 
     this.backgroundContainer.addChild(this.background.container)
+    this.backgroundContainer.addChild(this.background.starContainer)
     this.background.draw()
 
     // Setup Chunks
@@ -196,44 +204,33 @@ class Map extends EventEmitter {
     }
 
     star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.refreshZoom(this.zoomPercent)
 
     return star
   }
 
   setupCarrier (game, userSettings, carrierData) {
-    let existing = this.carriers.find(x => x.data._id === carrierData._id)
+    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
 
-    if (existing) {
-      existing.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-      existing.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-      existing.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-      existing.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+    if (!carrier) {
+      carrier = new Carrier( this.pathManager )
+      this.carriers.push(carrier)
 
-      this.carrierContainer.removeChild(existing.fixedContainer)
-      this.carrierContainer.removeChild(existing.container)
-      this.carrierContainer.removeChild(existing.pathContainer)
+      this.carrierContainer.addChild(carrier.fixedContainer)
 
-      this.carriers.splice(this.carriers.indexOf(existing), 1)
-
-      existing.removeContainerFromChunk(this.chunks, this.firstChunkX, this.firstChunkY)
+      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+      carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
+      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+    }
+    else {
+      carrier.removeContainerFromChunk(this.chunks, this.firstChunkX, this.firstChunkY)
     }
 
-    let carrier = new Carrier()
-    let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
+    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
     carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
     carrier.refreshZoom(this.zoomPercent)
-
-    this.carriers.push(carrier)
-
-    this.carrierContainer.addChild(carrier.fixedContainer)
-    this.carrierContainer.addChild(carrier.container)
-    this.carrierContainer.addChild(carrier.pathContainer)
-
-    carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-    carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-    carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-    carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
     return carrier
   }
@@ -256,11 +253,13 @@ class Map extends EventEmitter {
 
   reloadGame (game, userSettings) {
     this.game = game
-    
+
+    this.pathManager.reloadSettings(userSettings)
+
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
-      let gameStar = GameHelper.getStarById(game, star.data._id)
+      let gameStar = gameHelper.getStarById(game, star.data._id)
 
       if (!gameStar) {
         this._undrawStar(star)
@@ -271,7 +270,7 @@ class Map extends EventEmitter {
     // Check for carriers that are no longer in scanning range or have been destroyed.
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
-      let gameCarrier = GameHelper.getCarrierById(game, carrier.data._id)
+      let gameCarrier = gameHelper.getCarrierById(game, carrier.data._id)
 
       if (!gameCarrier) {
         this._undrawCarrier(carrier)
@@ -300,7 +299,7 @@ class Map extends EventEmitter {
       let existing = this.carriers.find(x => x.data._id === carrierData._id)
 
       if (existing) {
-        let player = GameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
+        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
         existing.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
       } else {
@@ -364,6 +363,10 @@ class Map extends EventEmitter {
     this.setMode('galaxy', this.modeArgs)
   }
 
+  removeLastRulerPoint () {
+    this.rulerPoints.removeLastRulerPoint()
+  }
+
   drawStars () {
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
@@ -405,8 +408,10 @@ class Map extends EventEmitter {
     carrier.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
     carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
 
+    carrier.clearPaths()
+
+    this.carrierContainer.removeChild(carrier.container)
     this.carrierContainer.removeChild(carrier.fixedContainer)
-    this.carrierContainer.removeChild(carrier.pathContainer)
 
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
   }
@@ -442,17 +447,17 @@ class Map extends EventEmitter {
   }
 
   drawTerritories (userSettings) {
-    this.territories.setup(this.game)
+    this.territories.setup(this.game, userSettings)
     this.territories.draw(userSettings)
   }
 
   drawPlayerNames () {
-    this.playerNames.setup(this.game)
-    this.playerNames.draw()
+    this.playerNames.setup(this.game, this.userSettings)
+    this.playerNames.draw(this.userSettings)
   }
 
   panToPlayer (game, player) {
-    let empireCenter = GameHelper.getPlayerEmpireCenter(game, player)
+    let empireCenter = gameHelper.getPlayerEmpireCenter(game, player)
 
     if (!empireCenter) {
       return
@@ -466,7 +471,7 @@ class Map extends EventEmitter {
   }
 
   panToUser (game) {
-    let player = GameHelper.getUserPlayer(game)
+    let player = gameHelper.getUserPlayer(game)
 
     if (!player) {
       this.panToLocation({ x: 0, y: 0 })
@@ -575,10 +580,10 @@ class Map extends EventEmitter {
   onTick(deltaTime) {
     let viewportWidth = this.gameContainer.viewport.right - this.gameContainer.viewport.left
     let viewportHeight = this.gameContainer.viewport.bottom - this.gameContainer.viewport.top
-    
+
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
-    
+
     let viewportCenter = this.gameContainer.viewport.center
 
     this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
@@ -622,6 +627,10 @@ class Map extends EventEmitter {
     this.background.onTick(deltaTime, viewportData)
 
     this.lastZoomPercent = this.zoomPercent
+    this.pathManager.onTick(this.zoomPercent)
+
+    this.background.onTick(deltaTime, viewportData)
+    this.playerNames.onTick(this.zoomPercent)
   }
 
   onViewportPointerDown(e) {
@@ -635,7 +644,7 @@ class Map extends EventEmitter {
     let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition.x - position.x),2)
     let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition.y - position.y),2)
     let distance = Math.sqrt(dxSquared+dySquared)
-    
+
     return (distance > DRAG_THRESHOLD)
   }
 
@@ -643,16 +652,18 @@ class Map extends EventEmitter {
     // ignore clicks if its a drag motion
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
-    
+
     // dispatch click event to the store, so it can be intercepted for adding star name to open message
     this.store.commit('starClicked', {
       star: dic.starData,
       permitCallback: () => {
+        dic.permitCallback && dic.permitCallback()
+
         // Clicking stars should only raise events to the UI if in galaxy mode.
         if (this.mode === 'galaxy') {
           let selectedStar = this.stars.find(x => x.data._id === e._id)
           selectedStar.isSelected = !selectedStar.isSelected
-        
+
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
@@ -681,7 +692,7 @@ class Map extends EventEmitter {
   onCarrierClicked (dic) {
     // ignore clicks if its a drag motion
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
-    
+
     let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
@@ -689,7 +700,7 @@ class Map extends EventEmitter {
       if (e.orbiting) {
         let star = this.stars.find(x => x.data._id === e.orbiting)
         let eventData = dic ? dic.eventData : null
-  
+
         return this.onStarClicked({starData: star.data, eventData})
       }
 
@@ -698,7 +709,7 @@ class Map extends EventEmitter {
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
-      
+
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
@@ -743,6 +754,10 @@ class Map extends EventEmitter {
     this.emit('onRulerPointCreated', e)
   }
 
+  onRulerPointRemoved (e) {
+    this.emit('onRulerPointRemoved', e)
+  }
+
   onRulerPointsCleared (e) {
     this.emit('onRulerPointsCleared', e)
   }
@@ -757,7 +772,7 @@ class Map extends EventEmitter {
       .map(s => {
         return {
           type: 'star',
-          distance: GameHelper.getDistanceBetweenLocations(location, s.data.location),
+          distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
           data: s.data
         }
       })
@@ -767,12 +782,12 @@ class Map extends EventEmitter {
       .map(s => {
         return {
           type: 'carrier',
-          distance: GameHelper.getDistanceBetweenLocations(location, s.data.location),
+          distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
           data: s.data
         }
       })
       .filter(s => s.distance <= distance)
-    
+
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
       .sort((a, b) => {
@@ -782,7 +797,7 @@ class Map extends EventEmitter {
 
         return a.distance < b.distance // Then distance ascending.
       })
-    
+
     if (closeObjects.length > 1) {
       this.emit('onObjectsClicked', closeObjects)
 

@@ -68,15 +68,12 @@ module.exports = class GameListService {
     }
 
     async listCompletedGames(userId) {
-        return await this.gameModel.find({
+        let games = await this.gameModel.find({
             'galaxy.players': { $elemMatch: { userId } },   // User is in game
             $or: [                                          // and (game is in progress OR user's player is defeated)
                 { 'state.endDate': { $ne: null } },
                 { 'galaxy.players': { $elemMatch: { userId, defeated: true } } }
             ]
-        })
-        .sort({
-            'state.startDate': -1 // Sort start date descending (most recent finished games appear first)
         })
         .select({
             'settings.general.name': 1,
@@ -85,6 +82,18 @@ module.exports = class GameListService {
         })
         .lean({ defaults: true })
         .exec();
+
+        // Sort the games by date date where in progress
+        // games are listed first.
+        let inProgress = games
+            .filter(x => !x.state.endDate)
+            .sort((a, b) => b.state.startDate - a.state.startDate);
+
+        let completed = games
+            .filter(x => x.state.endDate)
+            .sort((a, b) => b.state.endDate - a.state.endDate);
+
+        return inProgress.concat(completed);
     }
 
     async listOldCompletedGames(months = 3) {

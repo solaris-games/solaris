@@ -87,24 +87,24 @@ module.exports = (io) => {
     const irregularMapService = new IrregularMapService(randomService, starService, starDistanceService, distanceService);
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService);
     const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
-    const ledgerService = new LedgerService(playerService);
+    const ledgerService = new LedgerService(GameModel, playerService);
     const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService);
-    const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService);
+    const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService, achievementService);
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, starService, userService);
-    const tradeService = new TradeService(userService, playerService, ledgerService);
-    const reputationService = new ReputationService(GameModel, tradeService, playerService);
+    const reputationService = new ReputationService(GameModel, playerService);
+    const tradeService = new TradeService(GameModel, userService, playerService, ledgerService, achievementService, reputationService);
     const waypointService = new WaypointService(GameModel, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
-    const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService);
+    const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService, playerService);
     const conversationService = new ConversationService(GameModel, EventModel);
-    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService);
-    const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService);
+    const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService, playerService);
     const aiService = new AIService(starUpgradeService);
     const historyService = new HistoryService(HistoryModel, playerService);
+    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService);
     const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService);
     const emailService = new EmailService(config, gameService, gameTickService, userService, leaderboardService, playerService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
-    const aiTradeService = new AITradeService(reputationService, randomService, tradeService);
+    const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService);

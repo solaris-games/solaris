@@ -17,44 +17,34 @@ module.exports = class AchievementService {
         .exec();
     }
 
-    async incrementSpecialistsHired(userId) {
+    async incrementAchievement(userId, achievement, amount = 1) {
+        let updateQuery = {
+            $inc: {}
+        };
+
+        updateQuery.$inc[achievement] = amount;
+
         await this.userModel.updateOne({
             _id: userId
         },
-        {
-            $inc: { 'achievements.infrastructure.specialistsHired': 1 }
-        })
+        updateQuery)
         .exec();
     }
 
-    async incrementWarpGatesBuilt(userId) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.warpGates': 1 }
-        })
-        .exec();
+    async incrementSpecialistsHired(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.specialistsHired', amount);
     }
 
-    async incrementWarpGatesDestroyed(userId) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.warpGatesDestroyed': 1 }
-        })
-        .exec();
+    async incrementWarpGatesBuilt(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGates', amount);
     }
 
-    async incrementCarriersBuilt(userId) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.carriers': 1 }
-        })
-        .exec();
+    async incrementWarpGatesDestroyed(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGatesDestroyed', amount);
+    }
+
+    async incrementCarriersBuilt(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.carriers', amount);
     }
 
     async incrementInfrastructureBuilt(type, userId, amount = 1) {
@@ -72,33 +62,58 @@ module.exports = class AchievementService {
     }
 
     async incrementEconomyBuilt(userId, amount = 1) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.economy': amount }
-        })
-        .exec();
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.economy', amount);
     }
 
     async incrementIndustryBuilt(userId, amount = 1) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.industry': amount }
-        })
-        .exec();
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.industry', amount);
     }
 
     async incrementScienceBuilt(userId, amount = 1) {
-        await this.userModel.updateOne({
-            _id: userId
-        },
-        {
-            $inc: { 'achievements.infrastructure.science': amount }
-        })
-        .exec();
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.science', amount);
     }
 
+    async incrementTradeCreditsSent(userId, amount = 0) {
+        return await this.incrementAchievement(userId, 'achievements.trade.creditsSent', amount);
+    }
+
+    async incrementTradeCreditsReceived(userId, amount = 0) {
+        return await this.incrementAchievement(userId, 'achievements.trade.creditsReceived', amount);
+    }
+
+    async incrementTradeCreditsSpecialistsSent(userId, amount = 0) {
+        return await this.incrementAchievement(userId, 'achievements.trade.creditsSpecialistsSent', amount);
+    }
+
+    async incrementTradeCreditsSpecialistsReceived(userId, amount = 0) {
+        return await this.incrementAchievement(userId, 'achievements.trade.creditsSpecialistsReceived', amount);
+    }
+
+    async incrementTradeTechnologySent(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.trade.technologySent', amount);
+    }
+
+    async incrementTradeTechnologyReceived(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.trade.technologyReceived', amount);
+    }
+
+    async incrementRenownSent(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.trade.renownSent', amount);
+    }
+
+    async incrementRenownReceived(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.renown', amount);
+    }
+
+    async incrementDefeated(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.defeated', amount);
+    }
+
+    async incrementJoined(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.joined', amount);
+    }
+
+    async incrementQuit(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.quit', amount);
+    }
 };

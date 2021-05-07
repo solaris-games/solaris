@@ -7,6 +7,8 @@
   <div class="menu">
     <div class="header-buffer"></div>
 
+    <not-logged-in-bar v-if="!isLoggedIn"/>
+
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="menu-content bg-dark" v-if="menuState">
@@ -60,7 +62,11 @@
       <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" 
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" @onCloseRequested="onCloseRequested" :carrierId="menuArguments" @onShipsTransferred="onShipsTransferred" @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" 
+        @onCloseRequested="onCloseRequested" 
+        :carrierId="menuArguments" 
+        @onShipsTransferred="onShipsTransferred" 
+        @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
         :starId="menuArguments"
         @onCloseRequested="onCloseRequested"
@@ -75,6 +81,7 @@
         @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
+        :tab="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
@@ -152,6 +159,7 @@ import OptionsVue from './Options.vue'
 import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 import FooterBarVue from './FooterBar.vue'
+import NotLoggedInBarVue from './NotLoggedInBar'
 
 export default {
   components: {
@@ -182,7 +190,8 @@ export default {
     'game-notes': GameNotesVue,
     'options': OptionsVue,
     'create-conversation': ConversationCreateVue,
-    'conversation': ConversationDetailVue
+    'conversation': ConversationDetailVue,
+    'not-logged-in-bar': NotLoggedInBarVue
   },
   props: {
     menuState: String,
@@ -262,6 +271,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     }
   }
 }

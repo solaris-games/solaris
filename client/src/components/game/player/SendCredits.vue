@@ -1,7 +1,7 @@
 <template>
 <div class="row bg-secondary pt-2 pb-2">
     <div class="col">
-        <p class="mb-2">Give this player Credits. (You have ${{userPlayer.credits}})</p>
+        <p class="mb-2">Give this player <strong>Credits</strong>. (You have <span class="text-warning">${{userPlayer.credits}}</span>)</p>
 
         <form>
             <div class="form-row">
@@ -58,6 +58,8 @@ export default {
 
           this.userPlayer.credits -= this.amount
           this.amount = 0
+
+          this.player.reputation = response.data.reputation
         }
       } catch (err) {
         console.error(err)

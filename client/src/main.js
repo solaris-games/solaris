@@ -36,7 +36,7 @@ if (trackingCode) {
 
 Vue.use(Toasted, {
   position: 'bottom-right',
-  duration: 3000
+  duration: 2500
 })
 
 Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false) {

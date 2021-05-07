@@ -180,7 +180,7 @@ class GameHelper {
     return ticksToProduction
   }
 
-  getCountdownTimeString (game, date) {
+  getCountdownTimeString (game, date, largestUnitOnly = false) {
     if (date == null) {
       return 'Unknown'
     }
@@ -188,16 +188,16 @@ class GameHelper {
     let relativeTo = moment().utc()
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
-    return this.getDateToString(t)
+    return this.getDateToString(t, largestUnitOnly)
   }
 
-  getCountdownTimeStringByTicks (game, ticks, useNowDate = false) {
+  getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
     if (game.settings.gameTime.gameType === 'realTime') {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 
       let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
 
-      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate)
+      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
 
       return timeRemainingEta
     }
@@ -205,7 +205,7 @@ class GameHelper {
     return `${ticks} ticks`
   }
 
-  getDateToString (date) {
+  getDateToString (date, largestUnitOnly = false) {
     let days = Math.floor(date / (1000 * 60 * 60 * 24))
     let hours = Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     let mins = Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
@@ -222,15 +222,27 @@ class GameHelper {
     if (days > 0) {
       str += `${days}d `
       showDays = true
+
+      if (largestUnitOnly) {
+        return str
+      }
     }
 
     if (showDays || hours > 0) {
       str += `${hours}h `
       showHours = true
+
+      if (largestUnitOnly) {
+        return str
+      }
     }
 
     if (showHours || mins > 0) {
       str += `${mins}m `
+
+      if (largestUnitOnly) {
+        return str
+      }
     }
 
     str += `${secs}s`
@@ -354,27 +366,8 @@ class GameHelper {
     return 'Unknown'
   }
 
-  userPlayerHasHighestTechLevel (game, techKey) {
-    let userPlayer = this.getUserPlayer(game)
-
-    let levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
-
-    // If all players have the same level then nobody has the highest.
-    if (levels.length === 1) {
-      return false
-    }
-
-    let maxLevel = levels.sort((a, b) => b - a)[0]
-
-    return maxLevel === userPlayer.research[techKey].level
-  }
-
-  userPlayerHasLowestTechLevel (game, techKey) {
-    let userPlayer = this.getUserPlayer(game)
-
-    let levels = [...new Set(game.galaxy.players.map(p => {
+  playerHasLowestTechLevel (game, techKey, player) {
+    const levels = [...new Set(game.galaxy.players.map(p => {
       return p.research[techKey].level
     }))]
 
@@ -383,9 +376,36 @@ class GameHelper {
       return false
     }
 
-    let minLevel = levels.sort((a, b) => a - b)[0]
+    const minLevel = levels.sort((a, b) => a - b)[0]
 
-    return minLevel === userPlayer.research[techKey].level
+    return minLevel === player.research[techKey].level
+  }
+
+  playerHasHighestTechLevel (game, techKey, player) {
+    const levels = [...new Set(game.galaxy.players.map(p => {
+      return p.research[techKey].level
+    }))]
+
+    // If all players have the same level then nobody has the highest.
+    if (levels.length === 1) {
+      return false
+    }
+
+    const maxLevel = levels.sort((a, b) => b - a)[0]
+
+    return maxLevel === player.research[techKey].level
+  }
+
+  userPlayerHasHighestTechLevel (game, techKey) {
+    const userPlayer = this.getUserPlayer(game)
+
+    return this.playerHasHighestTechLevel(game, techKey, userPlayer)
+  }
+
+  userPlayerHasLowestTechLevel (game, techKey) {
+    const userPlayer = this.getUserPlayer(game)
+
+    return this.playerHasLowestTechLevel(game, techKey, userPlayer)
   }
 
   getPlayerStatus (player) {
@@ -400,6 +420,9 @@ class GameHelper {
 
   getSortedLeaderboardPlayerList (game) {
     // Sort by total number of stars, then by total ships, then by total carriers.
+    // Note that this sorting is different from the server side sorting as
+    // on the UI we want to preserve defeated player positions relative to how many
+    // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
         // Sort by total stars descending
@@ -602,6 +625,10 @@ class GameHelper {
   }
 
   canTick(game) {
+    if (this.isGameFinished(game)) {
+      return false
+    }
+
     let lastTick = moment(game.state.lastTickDate).utc();
     let nextTick;
 

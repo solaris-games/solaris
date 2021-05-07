@@ -2,12 +2,21 @@
 <div class="table-responsive">
     <table class="table table-striped table-hover" v-if="leaderboard">
         <thead>
-            <th>#</th>
-            <th>Player</th>
-            <th class="d-none d-md-table-cell">Guild</th>
-            <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
-            <th class="text-right" title="Victories"><i class="fas fa-trophy text-warning"></i></th>
-            <th class="text-right" title="Renown"><i class="fas fa-heart text-danger"></i></th>
+            <th style="width: 5%">#</th>
+            <th style="width: 30%">Player</th>
+            <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
+            <th style="width: 10%" class="text-right sortable-header col" :class="getColumnClass('rank')" title="Rank" @click="sortLeaderboard('rank')">
+              <i class="fas fa-star text-info"></i>
+              <i v-if="activeSortingKey === 'rank'" class="fas fa-chevron-down ml-2"></i>
+            </th>
+            <th style="width: 10%" class="text-right sortable-header col" :class="getColumnClass('victories')" title="Victories" @click="sortLeaderboard('victories')">
+              <i class="fas fa-trophy text-warning"></i>
+              <i v-if="activeSortingKey === 'victories'" class="fas fa-chevron-down ml-2"></i>
+            </th>
+            <th style="width: 10%" class="text-right sortable-header col" :class="getColumnClass('renown')" title="Renown" @click="sortLeaderboard('renown')">
+              <i class="fas fa-heart text-danger"></i>
+              <i v-if="activeSortingKey === 'renown'" class="fas fa-chevron-down ml-2"></i>
+            </th>
         </thead>
         <tbody>
             <tr v-for="player in leaderboard" :key="player._id">
@@ -24,9 +33,9 @@
                 <td class="d-none d-md-table-cell">
                     {{player.guild ? player.guild.name + ' [' + player.guild.tag + ']' : ''}}
                 </td>
-                <td align="right">{{player.achievements.rank}}</td>
-                <td align="right">{{player.achievements.victories}}</td>
-                <td align="right">{{player.achievements.renown}}</td>
+                <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
+                <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
+                <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
             </tr>
         </tbody>
     </table>
@@ -38,10 +47,28 @@ export default {
   components: {
   },
   props: {
-    leaderboard: Array
+    leaderboard: Array,
+    activeSortingKey: String
+  },
+  methods: {
+    sortLeaderboard(sortingKey) {
+      this.$emit('sortingRequested', sortingKey)
+    },
+    getColumnClass(sortingKey) {
+      return { 'table-primary': this.activeSortingKey === sortingKey }
+    }
   }
 }
 </script>
 
 <style scoped>
+th {
+  border-radius: 8px 8px 0 0;
+}
+tr:last-of-type td {
+  border-radius: 0 0 8px 8px;
+}
+.sortable-header {
+  cursor: pointer;
+}
 </style>

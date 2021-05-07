@@ -24,7 +24,9 @@ module.exports = class UserService extends EventEmitter {
             password: 0,
             resetPasswordToken: 0,
             premiumEndDate: 0,
-            banned: 0
+            banned: 0,
+            lastSeen: 0,
+            lastSeenIP: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -53,7 +55,9 @@ module.exports = class UserService extends EventEmitter {
             email: 0,
             emailEnabled: 0,
             username: 0,
-            gameSettings: 0
+            gameSettings: 0,
+            lastSeen: 0,
+            lastSeenIP: 0
         });
     }
 
@@ -68,7 +72,9 @@ module.exports = class UserService extends EventEmitter {
             email: 0,
             emailEnabled: 0,
             username: 0,
-            gameSettings: 0
+            gameSettings: 0,
+            lastSeen: 0,
+            lastSeenIP: 0
         })
         .lean({ defaults: true })
         .exec();
@@ -179,26 +185,26 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async updateEmailPreference(id, preference) {
-        let user = await this.userModel.findById(id);
-
-        user.emailEnabled = preference;
-
-        return await user.save();
+        await this.userModel.updateOne({
+            _id: id
+        }, {
+            emailEnabled: preference
+        });
     }
 
     async updateEmailAddress(id, email) {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userModel.findById(id);
-        
         if (await this.userExists(email)) {
             throw new ValidationError('Cannot change your email address, the new email address is already in use by another account.');
         }
 
-        user.email = email;
-
-        return await user.save();
+        await this.userModel.updateOne({
+            _id: id
+        }, {
+            email
+        });
     }
 
     async updateUsername(id, username) {
@@ -208,15 +214,15 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError('Username must be between 3 and 24 characters.');
         }
 
-        let user = await this.userModel.findById(id);
-        
         if (await this.usernameExists(username)) {
             throw new ValidationError('Cannot change your username, the new username is already in use by another account.');
         }
 
-        user.username = username;
-
-        return await user.save();
+        await this.userModel.updateOne({
+            _id: id
+        }, {
+            username
+        });
     }
 
     async updatePassword(id, currentPassword, newPassword) {
@@ -229,9 +235,11 @@ module.exports = class UserService extends EventEmitter {
             // Update the current password to the new password.
             let hash = await this.passwordService.hash(newPassword, 10);
             
-            user.password = hash;
-
-            return await user.save();
+            await this.userModel.updateOne({
+                _id: user._id
+            }, {
+                password: hash
+            });
         } else {
             throw new ValidationError('The current password is incorrect.');
         }
@@ -249,11 +257,15 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError(`An account does not exist with the email address: ${email}`);
         }
 
-        user.resetPasswordToken = uuidv4();
+        let resetPasswordToken = uuidv4();
 
-        await user.save();
+        await this.userModel.updateOne({
+            _id: user._id
+        }, {
+            resetPasswordToken
+        });
 
-        return user.resetPasswordToken;
+        return resetPasswordToken;
     }
 
     async resetPassword(resetPasswordToken, newPassword) {
@@ -272,10 +284,12 @@ module.exports = class UserService extends EventEmitter {
         // Update the current password to the new password.
         let hash = await this.passwordService.hash(newPassword, 10);
         
-        user.password = hash;
-        user.resetPasswordToken = null;
-
-        await user.save();
+        await this.userModel.updateOne({
+            _id: user._id
+        }, {
+            password: hash,
+            resetPasswordToken: null
+        });
     }
 
     async closeAccount(id) {
@@ -283,6 +297,10 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async getGameSettings(userId) {
+        if (!userId) {
+            return new this.userModel().gameSettings; // Return the default config
+        }
+
         let user = await this.getMe(userId);
 
         return user.gameSettings;
@@ -293,11 +311,11 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError(`Carrier default amount must be greater than 0.`);
         }
 
-        let user = await this.getById(userId);
-
-        user.gameSettings = settings;
-
-        await user.save();
+        await this.userModel.updateOne({
+            _id: userId
+        }, {
+            gameSettings: settings
+        });
     }
 
     async updateLastSeen(userId, ipAddress) {

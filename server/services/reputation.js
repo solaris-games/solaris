@@ -6,18 +6,14 @@ const REPUTATION_INCREMENT = 1;
 
 module.exports = class ReputationService extends EventEmitter {
 
-    constructor(gameModel, tradeService, playerService) {
+    constructor(gameModel, playerService) {
         super();
         
         this.gameModel = gameModel;
-        this.tradeService = tradeService;
         this.playerService = playerService;
-
-        this.tradeService.on('onPlayerCreditsReceived', (args) => this.onPlayerCreditsReceived(args.game, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerTechnologyReceived', (args) => this.onPlayerTechnologyReceived(args.game, args.fromPlayer, args.toPlayer, args.technology));
     }
 
-    getReputation(game, player, forPlayer) {
+    getReputation(player, forPlayer) {
         let reputation = null;
 
         if (player.reputations) {
@@ -41,7 +37,7 @@ module.exports = class ReputationService extends EventEmitter {
     }
 
     async increaseReputation(game, player, forPlayer, amount = 1, updateDatabase = true) {
-        let reputation = this.getReputation(game, player, forPlayer);
+        let reputation = this.getReputation(player, forPlayer);
         let increased = false;
 
         if (reputation.score < MAX_REPUTATION) {
@@ -56,16 +52,19 @@ module.exports = class ReputationService extends EventEmitter {
 
         if (increased) {
             this.emit('onReputationIncreased', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 player,
                 forPlayer,
                 score: reputation.score
             });
         }
+
+        return reputation;
     }
 
     async decreaseReputation(game, player, forPlayer, resetReputationAboveZero = false, updateDatabase = true) {
-        let reputation = this.getReputation(game, player, forPlayer);
+        let reputation = this.getReputation(player, forPlayer);
         let decreased = false;
 
         if (reputation.score > MIN_REPUTATION) {
@@ -85,7 +84,8 @@ module.exports = class ReputationService extends EventEmitter {
 
         if (decreased) {
             this.emit('onReputationDecreased', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 player,
                 forPlayer,
                 score: reputation.score
@@ -125,17 +125,29 @@ module.exports = class ReputationService extends EventEmitter {
         }
     }
 
-    async onPlayerCreditsReceived(game, fromPlayer, toPlayer, amount) {
+    async tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount) {
         let playerStats = this.playerService.getStats(game, toPlayer);
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
 
         if (amount >= creditsRequired) {
-            await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
+            return await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
         }
+
+        return this.getReputation(toPlayer, fromPlayer);
     }
 
-    async onPlayerTechnologyReceived(game, fromPlayer, toPlayer, technology) {
-        await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
+    async tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount) {
+        let creditsRequired = Math.round(toPlayer.research.specialists.level / 2);
+
+        if (amount >= creditsRequired) {
+            return await this.increaseReputation(game, toPlayer, fromPlayer, REPUTATION_INCREMENT);
+        }
+
+        return this.getReputation(toPlayer, fromPlayer);
+    }
+
+    async tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, technology) {
+        return await this.increaseReputation(game, toPlayer, fromPlayer, technology.difference);
     }
 
 };

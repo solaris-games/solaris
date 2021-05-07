@@ -15,6 +15,8 @@ module.exports = (container) => {
 
                 try {
                     await container.historyService.deleteByGameId(game._id);
+                    
+                    // TODO: Cleanup events too.
                 } catch (e) {
                     console.error(e);
                 }

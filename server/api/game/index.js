@@ -42,8 +42,9 @@ module.exports = (router, io, container) => {
     router.get('/api/game/:gameId/intel', middleware.authenticate, async (req, res, next) => {
         try {
             let startTick = +req.query.startTick || 0;
+            let endTick = +req.query.endTick || Number.MAX_VALUE;
             
-            let result = await container.historyService.listIntel(req.params.gameId, startTick);
+            let result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
 
             return res.status(200).json(result);
         } catch (err) {
@@ -51,7 +52,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/galaxy', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/:gameId/galaxy', async (req, res, next) => {
         try {
             let tick = +req.query.tick || null;
     
@@ -248,7 +249,7 @@ module.exports = (router, io, container) => {
         
         try {
             let events = await container.eventService.getPlayerEvents(
-                req.game,
+                req.game._id,
                 req.player,
                 startTick
             );
@@ -279,8 +280,10 @@ module.exports = (router, io, container) => {
         try {
             let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-            await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
-
+            if (!req.session.isImpersonating) {
+                await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
+            }
+            
             return res.sendStatus(200);
         } catch (err) {
             return next(err);

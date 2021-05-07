@@ -1,5 +1,7 @@
 const cache = require('memory-cache');
 
+const MIN_HISTORY_TICK_OFFSET = 24;
+
 module.exports = class HistoryService {
 
     constructor(historyModel, playerService) {
@@ -7,8 +9,11 @@ module.exports = class HistoryService {
         this.playerService = playerService;
     }
 
-    async listIntel(gameId, startTick = 0) {
-        let cacheKey = `intel_${gameId}_${startTick}`;
+    async listIntel(gameId, startTick, endTick) {
+        startTick = startTick || 0;
+        endTick = endTick || Number.MAX_VALUE;;
+
+        let cacheKey = `intel_${gameId}_${startTick}_${endTick}`;
         let cached = cache.get(cacheKey);
 
         if (cached) {
@@ -17,7 +22,10 @@ module.exports = class HistoryService {
 
         let intel = await this.historyModel.find({
             gameId,
-            tick: { $gte: startTick }
+            tick: { 
+                $gte: startTick,
+                $lte: endTick
+            }
         }, {
             gameId: 1,
             tick: 1,
@@ -39,7 +47,8 @@ module.exports = class HistoryService {
             'players.research.hyperspace.level': 1,
             'players.research.scanning.level': 1,
             'players.research.experimentation.level': 1,
-            'players.research.terraforming.level': 1
+            'players.research.terraforming.level': 1,
+            'players.research.specialists.level': 1,
         })
         .sort({ tick: 1 })
         .lean({ defaults: true })
@@ -51,14 +60,26 @@ module.exports = class HistoryService {
     }
 
     async log(game) {
-        let history = new this.historyModel({
+        // Check if there is already a history record with this tick, if so we should
+        // overwrite it.
+        let history = await this.historyModel.findOne({
             gameId: game._id,
-            tick: game.state.tick,
-            productionTick: game.state.productionTick,
-            players: [],
-            stars: [],
-            carriers: []
-        });
+            tick: game.state.tick
+        })
+        .exec();
+
+        if (!history) {
+            history = new this.historyModel({
+                gameId: game._id,
+                tick: game.state.tick,
+                productionTick: game.state.productionTick
+            });
+        }
+
+        // Reset just in case there was an existing history.
+        history.players = [];
+        history.stars = [];
+        history.carriers = [];
 
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
@@ -86,6 +107,7 @@ module.exports = class HistoryService {
                 researchingNow: player.researchingNow,
                 researchingNext: player.researchingNext,
                 credits: player.credits,
+                creditsSpecialists: player.creditsSpecialists,
                 defeated: player.defeated,
                 afk: player.afk,
                 ready: player.ready,
@@ -130,38 +152,46 @@ module.exports = class HistoryService {
 
         await history.save();
 
-        await cleanupTimeMachineHistory(game);
+        await this.cleanupTimeMachineHistory(game);
     }
 
     async cleanupTimeMachineHistory(game) {
+        let maxTick;
+
         // For games where the time machine is disabled, clear out the all previous tick
         // data to save space as we only need the current tick data for masking.
+        // Otherwise limit normal games to 24 ticks ago to save space.
         if (game.settings.general.timeMachine === 'disabled') {
-            await this.historyModel.updateMany({
-                gameId: game._id,
-                tick: {
-                    $lt: game.state.tick
-                },
-                stars: {
-                    $exists: true,
-                    $not: { $size: 0 }
-                }
-            }, {
-                $unset: {
-                    'players.$[].alias': '',
-                    'players.$[].avatar': '',
-                    'players.$[].researchingNow': '',
-                    'players.$[].researchingNext': '',
-                    'players.$[].credits': '',
-                    'players.$[].defeated': '',
-                    'players.$[].afk': '',
-                    'players.$[].ready': '',
-                    'players.$[].alias': '',
-                    'stars': '',
-                    'carriers': ''
-                }
-            });
+            maxTick = game.state.tick;
+        } else {
+            maxTick = Math.max(0, game.state.tick - MIN_HISTORY_TICK_OFFSET);
         }
+
+        await this.historyModel.updateMany({
+            gameId: game._id,
+            tick: {
+                $lt: maxTick
+            },
+            stars: {
+                $exists: true,
+                $not: { $size: 0 }
+            }
+        }, {
+            $unset: {
+                'players.$[].alias': '',
+                'players.$[].avatar': '',
+                'players.$[].researchingNow': '',
+                'players.$[].researchingNext': '',
+                'players.$[].credits': '',
+                'players.$[].creditsSpecialists': '',
+                'players.$[].defeated': '',
+                'players.$[].afk': '',
+                'players.$[].ready': '',
+                'players.$[].alias': '',
+                'stars': '',
+                'carriers': ''
+            }
+        });
     }
 
     async getHistoryByTick(gameId, tick) {

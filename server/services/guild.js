@@ -282,7 +282,7 @@ module.exports = class GuildService {
         }
 
         // Remove all invites to this user for any guild.
-        await this.guildModel.update({
+        await this.guildModel.updateMany({
             invitees: {
                 $in: [userId]
             }

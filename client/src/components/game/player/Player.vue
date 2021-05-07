@@ -25,17 +25,18 @@
                     :industry="userPlayer.stats.totalIndustry"
                     :science="userPlayer.stats.totalScience"/>
 
-    <h4 v-if="userPlayer" class="mt-2">Technology</h4>
+    <h4 v-if="player" class="mt-2">Technology</h4>
     
     <research v-if="player" :playerId="player._id"/>
 
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
       <h4 class="mt-2">Trade</h4>
-      
+
       <div v-if="canTradeWithPlayer">
         <reputation v-if="player.defeated" :playerId="player._id"/>
         <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
         <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
+        <sendCreditsSpecialists v-if="tradeCreditsSpecialistsIsEnabled" :player="player" :userPlayer="userPlayer"/>
       </div>
 
       <p v-if="!canTradeWithPlayer" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
@@ -69,6 +70,7 @@ import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
 import SendTechnology from './SendTechnology'
 import SendCredits from './SendCredits'
+import SendCreditsSpecialists from './SendCreditsSpecialists'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import Badges from './Badges'
@@ -87,6 +89,7 @@ export default {
     'research': Research,
     'sendTechnology': SendTechnology,
     'sendCredits': SendCredits,
+    'sendCreditsSpecialists': SendCreditsSpecialists,
     'achievements': Achievements,
     'sendRenown': SendRenown,
     'badges': Badges,
@@ -110,7 +113,7 @@ export default {
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
-    if (!this.player.isEmptySlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
+    if (this.$store.state.userId && !this.player.isEmptySlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
       try {
         let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 
@@ -174,13 +177,17 @@ export default {
       return this.user && this.user.achievements
     },
     canTradeWithPlayer: function () {
-      return this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange)
+      return this.player.stats.totalStars > 0 && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
     tradeCreditsIsEnabled () {
       return this.game.settings.player.tradeCredits
+    },
+    tradeCreditsSpecialistsIsEnabled () {
+      return this.game.settings.player.tradeCreditsSpecialists
+        && this.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     },
     tradeTechnologyIsEnabled () {
       return this.game.settings.player.tradeCost > 0

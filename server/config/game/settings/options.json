@@ -114,16 +114,30 @@
                 "text": "No"
             },
             {
-                "value": "cheap",
-                "text": "Cheap"
-            },
-            {
                 "value": "standard",
                 "text": "Standard"
             },
             {
                 "value": "expensive",
                 "text": "Expensive"
+            },
+            {
+                "value": "veryExpensive",
+                "text": "Very Expensive"
+            },
+            {
+                "value": "crazyExpensive",
+                "text": "Crazy Expensive"
+            }
+        ],
+        "specialistsCurrency": [
+            {
+                "value": "credits",
+                "text": "Credits"
+            },
+            {
+                "value": "creditsSpecialists",
+                "text": "Specialist Tokens"
             }
         ],
         "randomGates": [
@@ -321,6 +335,16 @@
             2500, 
             3000
         ],
+        "startingCreditsSpecialists": [
+            0,
+            1,
+            3,
+            5,
+            10,
+            25,
+            50,
+            100
+        ],
         "startingShips": [
             0,
             10,
@@ -366,6 +390,16 @@
             }
         ],
         "tradeCredits": [
+            {
+            "value": false,
+            "text": "Disabled"
+            },
+            {
+            "value": true,
+            "text": "Enabled"
+            }
+        ],
+        "tradeCreditsSpecialists": [
             {
             "value": false,
             "text": "Disabled"

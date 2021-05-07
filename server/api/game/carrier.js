@@ -164,7 +164,8 @@ module.exports = (router, io, container) => {
                 req.game,
                 req.body.defender,
                 req.body.attacker,
-                req.body.includeDefenderBonus);
+                req.body.includeDefenderBonus,
+                true);
 
             return res.status(200).json(result);
         } catch (err) {

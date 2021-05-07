@@ -11,12 +11,16 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col pt-1" v-if="isTimeMachineEnabled">
+        <div class="col pt-1" v-if="isLoggedIn && isTimeMachineEnabled">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
-            <span class="pointer" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" title="Credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
+            </span>
+
+            <span v-if="isSpecialistsTechnologyEnabled" title="Specialist Tokens">
+                <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
             <research-progress class="d-none d-md-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
@@ -41,7 +45,7 @@
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (I)">
+            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
             </button>
 
@@ -60,6 +64,7 @@ import GameHelper from '../../../services/gameHelper'
 import router from '../../../router'
 import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
+import KEYBOARD_SHORTCUTS from '../../data/keyboardShortcuts'
 import GameContainer from '../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus'
 import ResearchProgressVue from './ResearchProgress'
@@ -99,6 +104,7 @@ export default {
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
 
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
   destroyed () {
@@ -108,6 +114,7 @@ export default {
 
     this.sockets.unsubscribe('gameStarted')
     this.sockets.unsubscribe('playerCreditsReceived')
+    this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
     this.sockets.unsubscribe('gameConversationRead')
   },
   methods: {
@@ -121,7 +128,8 @@ export default {
       this.recalculateTimeRemaining()
 
       if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+        this.recalculateTimeRemaining()
       }
     },
     setMenuState (state, args) {
@@ -142,6 +150,14 @@ export default {
       player.credits += data.data.credits
 
       this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+    },
+    onCreditsSpecialistsReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
+      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.creditsSpecialists += data.data.creditsSpecialists
+
+      this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
     },
     onTechnologyReceived (data) {
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
@@ -237,67 +253,46 @@ export default {
         return
       }
 
+      let isLoggedIn = this.$store.state.userId != null
       let isInGame = this.userPlayer != null
+
+      let menuState = KEYBOARD_SHORTCUTS.all[keyCode.toString()]
+
+      if (isLoggedIn) {
+        menuState = menuState || KEYBOARD_SHORTCUTS.user[keyCode.toString()]
+      }
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
       if (isInGame) {
-        switch (keyCode) {
-          case 82: // R
-            this.setMenuState(MENU_STATES.RESEARCH)
-            break
-          case 83: // S
-            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open star tab
-            break
-          case 70: // F
-            this.setMenuState(MENU_STATES.GALAXY) // TODO: Open carrier tab
-            break
-          case 73: // I
-            this.setMenuState(MENU_STATES.INBOX)
-            break
-          case 86: // V
-            this.setMenuState(MENU_STATES.RULER)
-            break
-          case 78: // N
-            this.setMenuState(MENU_STATES.GAME_NOTES)
-            break
-          case 75: // K
-            this.setMenuState(MENU_STATES.LEDGER)
-            break
-          case 66: // B
-            this.setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
-            break
-          case 72: // H
-            this.panToHomeStar()
-            break
-        }
+        menuState = menuState || KEYBOARD_SHORTCUTS.player[keyCode.toString()]
       }
 
-      // Handle keyboard shortcuts for any user type.
-      switch (keyCode) {
-        case 27: // Esc
+      if (!menuState) {
+        return
+      }
+
+      let menuArguments = menuState.split('|')[1]
+      menuState = menuState.split('|')[0]
+      
+      switch (menuState) {
+        case null:
           this.setMenuState(null, null)
           break
-        case 187: // +
-          GameContainer.zoomIn()
+        case 'HOME_STAR':
+          this.panToHomeStar()
           break
-        case 189: // -
-          GameContainer.zoomOut()
-          break
-        case 48: // -
+        case 'FIT_GALAXY':
           this.fitGalaxy()
           break
-        case 76: // L
-          this.setMenuState(MENU_STATES.LEADERBOARD)
+        case 'ZOOM_IN':
+          GameContainer.zoomIn()
           break
-        case 67: // C
-          this.setMenuState(MENU_STATES.COMBAT_CALCULATOR)
+        case 'ZOOM_OUT':
+          GameContainer.zoomOut()
           break
-        case 71: // G
-          this.setMenuState(MENU_STATES.INTEL)
-          break
-        case 79: // O
-          this.setMenuState(MENU_STATES.OPTIONS)
+        default:
+          this.setMenuState(menuState, menuArguments || null)
           break
       }
     },
@@ -308,6 +303,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     },
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
@@ -335,6 +333,9 @@ export default {
     },
     isTimeMachineEnabled () {
       return this.$store.state.game.settings.general.timeMachine === 'enabled'
+    },
+    isSpecialistsTechnologyEnabled () {
+      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
     }
   }
 }

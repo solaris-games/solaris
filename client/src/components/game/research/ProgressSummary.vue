@@ -109,6 +109,21 @@
                     </td>
                     <td v-if="!isTechnologyResearchable('manufacturing')"></td>
                 </tr>
+                <tr v-if="isTechnologyEnabled('specialists')">
+                    <td class="row-icon"><i :class="getIcon('specialists')"></i></td>
+                    <td>Specialists</td>
+                    <td>
+                      <span class="level-label">Level</span>
+                      {{research.specialists.level}}
+                    </td>
+                    <td class="text-right" v-if="isTechnologyResearchable('specialists')">
+                      {{research.specialists.progress}}
+                      <span class="of-label">of</span>
+                      <span class="slash-label">/</span>
+                      {{getRequiredTotal('specialists')}}
+                    </td>
+                    <td v-if="!isTechnologyResearchable('specialists')"></td>
+                </tr>
             </tbody>
         </table>
       </div>

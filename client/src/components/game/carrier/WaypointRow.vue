@@ -31,7 +31,8 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+      this.recalculateTimeRemaining()
     }
   },
   destroyed () {
@@ -67,6 +68,10 @@ export default {
           return `Drop All But ${waypoint.actionShips} Ships`
         case 'garrison':
           return `Garrison ${waypoint.actionShips} Ships`
+        case 'collectPercentage':
+          return `Collect ${waypoint.actionShips}% Of Ships`
+        case 'dropPercentage':
+          return `Drop ${waypoint.actionShips}% Of Ships`
       }
     },
     recalculateTimeRemaining () {

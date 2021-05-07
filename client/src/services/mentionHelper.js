@@ -3,6 +3,7 @@ import gameHelper from './gameHelper.js'
 class MentionHelper {
   static MENTION_REGEX = /(#|@)(?:(?:{(.*)})|([\w\[\]]*))/g
   static INTERNAL_MENTION_REGEX = /{{(\w)\/(\w+?)\/(.+?)}}/g
+  static HYPERLINK_REGEX = /https?:\/\/\S+/g
   static STAR_MENTION_CHARACTER = '#'
   static PLAYER_MENTION_CHARACTER = '@'
 
@@ -81,16 +82,40 @@ class MentionHelper {
     return message.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, _type, _id, name) => name)
   }
 
-  renderMessageWithMentions(element, message, onStarClickedCallback, onPlayerClickedCallback) {
+  renderTextWithLinks(element, text) {
+    let lastLinkEnd = 0
+
+    for (const match of text.matchAll(MentionHelper.HYPERLINK_REGEX)) {
+      const plaintext = text.substring(lastLinkEnd, match.index)
+
+      if (plaintext) {
+        const node = document.createTextNode(plaintext)
+        element.appendChild(node)
+      }
+
+      lastLinkEnd = match.index + match[0].length
+
+      const linkElement = this.createHyperlinkElement(match[0])
+
+      element.appendChild(linkElement)
+    }
+
+    const lastText = text.substring(lastLinkEnd)
+
+    if (lastText) {
+      const node = document.createTextNode(lastText)
+      element.appendChild(node)
+    }
+  }
+
+  renderMessageWithMentionsAndLinks(element, message, onStarClickedCallback, onPlayerClickedCallback) {
     let lastMentionEnd = 0
 
     for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
       const text = message.substring(lastMentionEnd, match.index)
 
       if (text) {
-        const node = document.createTextNode(text)
-
-        element.appendChild(node)
+        this.renderTextWithLinks(element, text)
       }
 
       lastMentionEnd = match.index + match[0].length
@@ -103,10 +128,16 @@ class MentionHelper {
     const lastText = message.substring(lastMentionEnd)
 
     if (lastText) {
-      const node = document.createTextNode(lastText)
-
-      element.appendChild(node)
+      this.renderTextWithLinks(element, lastText)
     }
+  }
+
+  createHyperlinkElement(url) {
+    const node = document.createElement("a")
+    node.setAttribute("href", url)
+    node.text = url
+    node.setAttribute("target", "_blank")
+    return node
   }
 
   createMentionLinkElement(type, id, name, onStarClickedCallback, onPlayerClickedCallback) {

@@ -90,6 +90,8 @@ export default {
           'playerTechnologySent',
           'playerCreditsReceived',
           'playerCreditsSent',
+          'playerCreditsSpecialistsReceived',
+          'playerCreditsSpecialistsSent',
           'playerRenownReceived',
           'playerRenownSent',
           'playerDebtSettled',

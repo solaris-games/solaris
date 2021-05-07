@@ -77,14 +77,16 @@ module.exports = class ConversationService extends EventEmitter {
         });
 
         this.emit('onConversationCreated', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             convo: newConvo,
             playerId
         });
 
         for (let i = 1; i < newConvo.participants.length; i++) {
             this.emit('onConversationInvited', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 convo: newConvo,
                 playerId: newConvo.participants[i]
             });
@@ -254,7 +256,8 @@ module.exports = class ConversationService extends EventEmitter {
         // TODO: Delete the conversation if no longer any participants?
 
         this.emit('onConversationLeft', {
-            game,
+            gameId: game._id,
+            gameTick: game.state.tick,
             convo,
             playerId
         });
@@ -269,9 +272,11 @@ module.exports = class ConversationService extends EventEmitter {
             type: {
                 $in: [
                     'playerCreditsReceived',
+                    'playerCreditsSpecialistsReceived',
                     'playerRenownReceived',
                     'playerTechnologyReceived',
                     'playerCreditsSent',
+                    'playerCreditsSpecialistsSent',
                     'playerRenownSent',
                     'playerTechnologySent'
                 ]

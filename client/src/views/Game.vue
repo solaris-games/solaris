@@ -33,6 +33,7 @@ import GameHelper from '../services/gameHelper'
 import AudioService from '../game/audio'
 import moment from 'moment'
 import gameHelper from '../services/gameHelper'
+import authService from '../services/api/auth'
 
 export default {
   components: {
@@ -51,6 +52,8 @@ export default {
     }
   },
   async created () {
+    await this.attemptLogin()
+
     AudioService.loadStore(this.$store)
 
     this.$store.commit('clearGame')
@@ -82,7 +85,7 @@ export default {
     if (userPlayer && !userPlayer.defeated) {
       this.menuState = MENU_STATES.LEADERBOARD
     } else {
-      if (GameHelper.gameHasOpenSlots(this.$store.state.game)) {
+      if (this.$store.state.userId && GameHelper.gameHasOpenSlots(this.$store.state.game)) {
         this.menuState = MENU_STATES.WELCOME
       } else {
         this.menuState = MENU_STATES.LEADERBOARD // Assume the user is spectating.
@@ -115,6 +118,23 @@ export default {
     document.title = 'Solaris'
   },
   methods: {
+    async attemptLogin () {
+      if (this.$store.state.userId) {
+        return;
+      }
+      
+      try {
+        let response = await authService.verify()
+
+        if (response.status === 200) {
+          if (response.data.id) {
+            this.$store.commit('setUserId', response.data.id)
+          }
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     async reloadGame () {
       try {
         let galaxyResponse = await GameApiService.getGameGalaxy(this.$route.query.id)
@@ -313,6 +333,10 @@ export default {
       player.isOnline = false
     },
     async reloadGameCheck () {
+      if (!this.isLoggedIn) {
+        return
+      }
+
       // Check if the next tick date has passed, if so check if the server has finished the game tick.
       let canTick = gameHelper.canTick(this.$store.state.game)
 
@@ -345,6 +369,9 @@ export default {
     },
     hasGame () {
       return this.$store.state.game
+    },
+    isLoggedIn () {
+      return this.$store.state.userId != null
     }
   }
 }

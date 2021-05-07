@@ -21,6 +21,7 @@
     "carrierUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
+    "specialistsCurrency": "creditsSpecialists",
     "randomGates": "none",
     "darkGalaxy": "start",
     "giftCarriers": "enabled",
@@ -33,6 +34,7 @@
   "player": {
     "startingStars": 6,
     "startingCredits": 500,
+    "startingCreditsSpecialists": 5,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,
@@ -45,6 +47,7 @@
       "science": "standard"
     },
     "tradeCredits": true,
+    "tradeCreditsSpecialists": true,
     "tradeCost": 15,
     "tradeScanning": "scanned"
   },
@@ -56,7 +59,8 @@
       "hyperspace": 1,
       "manufacturing": 1,
       "banking": 1,
-      "weapons": 1
+      "weapons": 1,
+      "specialists": 1
     },
     "researchCosts": {
       "terraforming": "standard",
@@ -65,7 +69,8 @@
       "hyperspace": "standard",
       "manufacturing": "standard",
       "banking": "standard",
-      "weapons": "standard"
+      "weapons": "standard",
+      "specialists": "standard"
     },
     "bankingReward": "standard"
   },

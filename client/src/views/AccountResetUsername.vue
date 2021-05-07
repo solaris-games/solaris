@@ -61,7 +61,7 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`Username updated.`, { type: 'success' })
-          router.push({ name: 'main-menu' })
+          router.push({ name: 'account-settings' })
         } else {
           this.$toasted.show(`There was a problem updating your username, please try again.`, { type: 'error' })
         }

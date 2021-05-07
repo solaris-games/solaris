@@ -4,16 +4,12 @@ const fakeGameModel = {
     // Bit of a pain in the ass to fake this model because mongoose is a dick.
     find() {
         return {
-            sort() {
+            select() {
                 return {
-                    select() {
+                    lean() {
                         return {
-                            lean() {
-                                return {
-                                    exec() {
-                                        return 1;
-                                    }
-                                }
+                            exec() {
+                                return 1;
                             }
                         }
                     }

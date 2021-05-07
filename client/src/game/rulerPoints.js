@@ -70,7 +70,7 @@ class RulerPoints extends EventEmitter {
     let graphics = new PIXI.Graphics()
 
     let radius = ((this.techLevel || 1) + 1.5) * this.lightYearDistance
-    
+
     graphics.lineStyle(1, 0xFFFFFF, 0.2)
     graphics.beginFill(0xFFFFFF, 0.075)
     graphics.drawStar(lastPoint.x, lastPoint.y, radius, radius, radius - 3)
@@ -88,6 +88,14 @@ class RulerPoints extends EventEmitter {
     this._createRulerPoint(e.location)
   }
 
+  removeLastRulerPoint () {
+    const old = this.rulerPoints.pop()
+
+    this.draw()
+
+    this.emit('onRulerPointRemoved', old)
+  }
+
   _createRulerPoint (desiredLocation) {
     let lastPoint = this.rulerPoints[this.rulerPoints.length - 1]
 
@@ -97,9 +105,7 @@ class RulerPoints extends EventEmitter {
       return
     }
 
-    desiredLocation.distance = 
-
-    this.rulerPoints.push(desiredLocation)
+    desiredLocation.distance = this.rulerPoints.push(desiredLocation)
 
     this.draw()
 

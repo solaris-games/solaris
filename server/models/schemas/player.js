@@ -18,6 +18,7 @@ const schema = new Schema({
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },
+    creditsSpecialists: { type: Types.Number, required: true },
     defeated: { type: Types.Boolean, required: false, default: false },
     afk: { type: Types.Boolean, required: false, default: false },
     renownToGive: { type: Types.Number, required: true, default: 8 },
@@ -52,6 +53,10 @@ const schema = new Schema({
             progress: { type: Types.Number, required: true, default: 0  },
         },
         manufacturing: {
+            level: { type: Types.Number, required: true, default: 1  },
+            progress: { type: Types.Number, required: true, default: 0  },
+        },
+        specialists: {
             level: { type: Types.Number, required: true, default: 1  },
             progress: { type: Types.Number, required: true, default: 0  },
         }

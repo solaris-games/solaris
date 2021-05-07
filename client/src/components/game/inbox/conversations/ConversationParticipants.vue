@@ -1,7 +1,7 @@
 <template>
 <div class="participant-container">
   <p v-if="isPartialPlayers">
-    <span v-for="participant in conversation.participants" :key="participant" class="mr-2">
+    <span v-for="participant in conversation.participants" :key="participant" class="mr-2" @click="onOpenPlayerDetailRequested(participant)">
       <player-icon :playerId="getPlayer(participant)._id"/>
 
       {{getPlayer(participant).alias}}
@@ -29,6 +29,9 @@ export default {
     conversation: Object
   },
   methods: {
+    onOpenPlayerDetailRequested (playerId) {
+      this.$emit('onOpenPlayerDetailRequested', playerId)
+    },
     getPlayer (playerId) {
       return GameHelper.getPlayerById(this.$store.state.game, playerId)
     },

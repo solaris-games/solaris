@@ -36,9 +36,53 @@ module.exports = (router, io, container) => {
                 req.body.toPlayerId,
                 req.body.amount);
             
-            res.sendStatus(200);
+            res.status(200).json({
+                reputation: trade.reputation
+            });
 
             container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.amount, trade.date);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/trade/creditsSpecialists', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        let errors = [];
+
+        if (!req.body.toPlayerId) {
+            errors.push('toPlayerId is required.');
+        }
+
+        if (req.session.userId === req.body.toPlayerId) {
+            errors.push('Cannot send specialist tokens to yourself.');
+        }
+        
+        req.body.amount = parseInt(req.body.amount || 0);
+
+        if (!req.body.amount) {
+            errors.push('amount is required.');
+        }
+        
+        if (req.body.amount <= 0) {
+            errors.push('amount must be greater than 0.');
+        }
+
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
+
+        try {
+            let trade = await container.tradeService.sendCreditsSpecialists(
+                req.game,
+                req.player,
+                req.body.toPlayerId,
+                req.body.amount);
+            
+            res.status(200).json({
+                reputation: trade.reputation
+            });
+
+            container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.amount, trade.date);
         } catch (err) {
             return next(err);
         }
@@ -102,8 +146,10 @@ module.exports = (router, io, container) => {
                 req.body.technology,
                 req.body.level);
 
-            res.sendStatus(200);
-
+            res.status(200).json({
+                reputation: trade.reputation
+            });
+            
             container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.technology, trade.date);
         } catch (err) {
             return next(err);

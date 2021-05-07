@@ -28,6 +28,7 @@ module.exports = class TechnologyService {
         techs.weapons += modifiers.weapons || 0;
         techs.banking += modifiers.banking || 0;
         techs.manufacturing += modifiers.manufacturing || 0;
+        techs.specialists += modifiers.specialists || 0;
         
         if (sanitize) {
             techs.scanning = Math.max(1, techs.scanning);
@@ -37,6 +38,7 @@ module.exports = class TechnologyService {
             techs.weapons = Math.max(1, techs.weapons);
             techs.banking = Math.max(1, techs.banking);
             techs.manufacturing = Math.max(1, techs.manufacturing);
+            techs.specialists = Math.max(1, techs.specialists);
         }
 
         return techs;
@@ -50,7 +52,8 @@ module.exports = class TechnologyService {
             experimentation: player.research.experimentation.level,
             weapons: player.research.weapons.level,
             banking: player.research.banking.level,
-            manufacturing: player.research.manufacturing.level
+            manufacturing: player.research.manufacturing.level,
+            specialists: player.research.specialists.level
         };
 
         return techs;
@@ -114,9 +117,9 @@ module.exports = class TechnologyService {
 
             if (specialist.modifiers.local != null) {
                 if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat != null) {
-                    return specialist.modifiers.local.carrierToStarCombat;
+                    return specialist.modifiers.local.carrierToStarCombat.weapons || 0;
                 } else if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat != null) {
-                    return specialist.modifiers.local.carrierToCarrierCombat;
+                    return specialist.modifiers.local.carrierToCarrierCombat.weapons || 0;
                 } else {
                     return specialist.modifiers.local.weapons || 0;
                 }

@@ -63,7 +63,8 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 100)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+      this.recalculateTimeRemaining()
     }
   },
   methods: {
@@ -75,7 +76,8 @@ export default {
         { text: 'Experimentation', value: 'experimentation' },
         { text: 'Weapons', value: 'weapons' },
         { text: 'Banking', value: 'banking' },
-        { text: 'Manufacturing', value: 'manufacturing' }
+        { text: 'Manufacturing', value: 'manufacturing' },
+        { text: 'Specialists', value: 'specialists' }
       ]
 
       this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value) 

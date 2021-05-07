@@ -4,21 +4,22 @@ const TRADE_CHANCE_MIN_REPUTATION = 1;
 
 module.exports = class AITradeService {
 
-    constructor(reputationService, randomService, tradeService) {
+    constructor(reputationService, randomService, tradeService, gameService) {
         this.reputationService = reputationService;
         this.randomService = randomService;
         this.tradeService = tradeService;
+        this.gameService = gameService;
 
-        this.reputationService.on('onReputationIncreased', (args) => this.onReputationIncreased(args.game, args.player, args.forPlayer, args.amount));
+        this.reputationService.on('onReputationIncreased', (args) => this.onReputationIncreased(args.gameId, args.player, args.forPlayer, args.amount));
     }
 
-    async onReputationIncreased(game, player, forPlayer) {
+    async onReputationIncreased(gameId, player, forPlayer) {
         // Make sure the player is AI.
         if (!player.defeated) {
             return;
         }
 
-        let reputation = this.reputationService.getReputation(game, player, forPlayer);
+        let reputation = this.reputationService.getReputation(player, forPlayer);
 
         if (reputation.score < TRADE_CHANCE_MIN_REPUTATION) {
             return;
@@ -28,11 +29,13 @@ module.exports = class AITradeService {
         let tradeRoll = this.randomService.getRandomNumber(100);
 
         if (tradeRoll <= tradeChance || true) {
-            await this._tryTrade(game, player, forPlayer);
+            await this._tryTrade(gameId, player, forPlayer);
         }
     }
 
-    async _tryTrade(game, player, toPlayer) {
+    async _tryTrade(gameId, player, toPlayer) {
+        let game = await this.gameService.getById(gameId);
+        
         // TODO: Consider scanning range trade setting.
         // TODO: Trade may need to be refactored first as it uses the old method of saving to DB.
 

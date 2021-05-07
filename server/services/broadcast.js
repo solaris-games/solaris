@@ -89,6 +89,19 @@ module.exports = class BroadcastService {
         });
     }
 
+    gamePlayerCreditsSpecialistsReceived(game, fromPlayerId, toPlayerId, creditsSpecialists, date) {
+        this.io.to(toPlayerId).emit('playerCreditsSpecialistsReceived', {
+            playerId: toPlayerId,
+            type: 'playerCreditsSpecialistsReceived',
+            date,
+            data: {
+                fromPlayerId,
+                toPlayerId,
+                creditsSpecialists
+            }
+        });
+    }
+
     gamePlayerRenownReceived(game, fromPlayerId, toPlayerId, renown, date) {
         this.io.to(toPlayerId).emit('playerRenownReceived', {
             playerId: toPlayerId,
@@ -115,7 +128,7 @@ module.exports = class BroadcastService {
         });
     }
 
-    gamePlayerDebtAdded(game, debtorPlayerId, creditorPlayerId, amount) {
+    gamePlayerDebtAdded(debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -126,7 +139,7 @@ module.exports = class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtAdded', data);
     }
 
-    gamePlayerDebtForgiven(game, debtorPlayerId, creditorPlayerId, amount) {
+    gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -137,7 +150,7 @@ module.exports = class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtForgiven', data);
     }
 
-    gamePlayerDebtSettled(game, debtorPlayerId, creditorPlayerId, amount) {
+    gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,

@@ -48,7 +48,7 @@
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
-                  <h5 class="card-title">
+                  <h5 class="card-title featured-card-title">
                     <i class="fas fa-user-graduate"></i>
                     <span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span>
                   </h5>
@@ -150,7 +150,7 @@
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/32_player.png')" alt="32 Player Game">
                 <div class="card-img-overlay">
-                  <h5 class="card-title featured-card-title">
+                  <h5 class="card-title">
                     <i class="fas fa-users"></i>
                     <span class="ml-2">{{games.thirtyTwoPlayerRT.settings.general.name}}</span>
                   </h5>

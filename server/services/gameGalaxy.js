@@ -38,7 +38,7 @@ module.exports = class GameGalaxyService {
         } else {
             cached = this._getCachedGalaxy(gameId, userId, tick, gameStateTick);
 
-            if (cached.galaxy) {
+            if (cached && cached.galaxy) {
                 return cached.galaxy;
             }
         }
@@ -87,12 +87,18 @@ module.exports = class GameGalaxyService {
     }
 
     _getCachedGalaxy(gameId, userId, requestedTick, currentTick) {
-        // Cache the last 24 ticks, it would be bonkers to cache everything.
-        if (currentTick - requestedTick > 24) {
-            return {
-                cacheKey: null,
-                galaxy: null
-            };
+        // Note: As we are only logging the last 24 ticks we can safely cache everything.
+        // Otherwise we'll need to add in some logic to limit how far back we cache.
+        
+        // if (currentTick - requestedTick > 24) {
+        //     return {
+        //         cacheKey: null,
+        //         galaxy: null
+        //     };
+        // }
+
+        if (!userId) {
+            return null;
         }
 
         let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
@@ -122,6 +128,10 @@ module.exports = class GameGalaxyService {
     }
 
     _getUserPlayer(doc, userId) {
+        if (!userId) {
+            return null;
+        }
+        
         return doc.galaxy.players.find(x => x.userId === userId.toString());
     }
 
@@ -274,7 +284,7 @@ module.exports = class GameGalaxyService {
         let playersInRange = [];
         
         if (player) {
-            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, player);
+            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player);
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
@@ -325,7 +335,7 @@ module.exports = class GameGalaxyService {
             let reputation = null;
 
             if (player) {
-                reputation = this.reputationService.getReputation(doc, p, player);
+                reputation = this.reputationService.getReputation(p, player);
             }
 
             // Return a subset of the user, key info only.
@@ -355,6 +365,9 @@ module.exports = class GameGalaxyService {
                     },
                     manufacturing: { 
                         level: p.research.manufacturing.level
+                    },
+                    specialists: { 
+                        level: p.research.specialists.level
                     }
                 },
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
@@ -439,6 +452,7 @@ module.exports = class GameGalaxyService {
                     gamePlayer.researchingNow = historyPlayer.researchingNow;
                     gamePlayer.researchingNext = historyPlayer.researchingNext;
                     gamePlayer.credits = historyPlayer.credits;
+                    gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
                     gamePlayer.defeated = historyPlayer.defeated;
                     gamePlayer.afk = historyPlayer.afk;
                     gamePlayer.research = historyPlayer.research;

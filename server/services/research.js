@@ -59,8 +59,6 @@ module.exports = class ResearchService extends EventEmitter {
                 'galaxy.players.$.researchingNext': preference
             }
         });
-
-        return await game.save();
     }
 
     async conductResearch(game, user, player) {
@@ -89,7 +87,8 @@ module.exports = class ResearchService extends EventEmitter {
             tech.progress -= requiredProgress;
 
             this.emit('onPlayerResearchCompleted', {
-                game,
+                gameId: game._id,
+                gameTick: game.state.tick,
                 player,
                 technology: {name:techKey,level:tech.level}
             });
