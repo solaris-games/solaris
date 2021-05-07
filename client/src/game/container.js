@@ -29,10 +29,12 @@ class GameContainer {
 
     let fps = 1000.0/elapsed
     if( fps < this.lowest ) { this.lowest = fps }
+    this.fpsNowText.text = ( 'fps: ' + fps.toFixed(1) )
 
-    if(this.frames==120) {
-      console.log('fps: ' + movingAvaregeFPS.toFixed(2) )
-      console.log('jitter: ' +(movingAvaregeFPS-this.lowest).toFixed(2) )
+    if(this.frames==29) {
+      this.fpsMAText.text =  ( 'fps: ' + movingAvaregeFPS.toFixed(1) )
+      this.jitterText.text = ( 'jitter: ' + (movingAvaregeFPS-this.lowest).toFixed(1) )
+      this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(1) )
       this.frames = 0
       this.lowest = 1000
     }
@@ -93,6 +95,7 @@ class GameContainer {
     // Add a new map to the viewport
     this.map = new Map(this.app, this.store, this)
     this.viewport.addChild(this.map.container)
+
   }
 
   zoomIn () {
@@ -139,12 +142,33 @@ class GameContainer {
 
   setup (game, userSettings) {
     this.userSettings = userSettings
-    
+
     this.map.setup(this.game, userSettings)
   }
 
   draw () {
     this.map.draw()
+
+    if ( process.env.NODE_ENV == 'development') {
+      let bitmapFont = { fontName: "space-mono", fontSize: 16 }
+
+      this.fpsNowText = new PIXI.BitmapText("", bitmapFont)
+      this.fpsMAText = new PIXI.BitmapText("", bitmapFont)
+      this.jitterText = new PIXI.BitmapText("", bitmapFont)
+      this.lowestText = new PIXI.BitmapText("", bitmapFont)
+      this.fpsNowText.x = 32
+      this.fpsNowText.y = 128+16
+      this.fpsMAText.x = 32
+      this.fpsMAText.y = this.fpsNowText.y + 32+2
+      this.jitterText.x = 32
+      this.jitterText.y = this.fpsMAText.y + 32+2
+      this.lowestText.x = 32
+      this.lowestText.y = this.jitterText.y +32+2
+      this.app.stage.addChild(this.fpsNowText)
+      this.app.stage.addChild(this.jitterText)
+      this.app.stage.addChild(this.lowestText)
+      this.app.stage.addChild(this.fpsMAText)
+    }
   }
 
   drawWaypoints () {
