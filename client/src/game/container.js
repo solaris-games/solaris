@@ -4,24 +4,37 @@ import Map from './map'
 import gameHelper from '../services/gameHelper'
 
 class GameContainer {
+
+
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
     PIXI.GRAPHICS_CURVES.minSegments = 20 // Smooth arcs
 
     this.frames = 0
-    this.dtAccum = 0
+    this.dtAccum = 33.0*16
+    this.lowest = 1000
+    this.previousDTs = [ 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0 ]
   }
 
   calcFPS(deltaTime) {
-    //assumes PIXI ticker is set to 60(default)
-    this.frames++
-    this.dtAccum += deltaTime/60.0
-    if (this.frames >= 60*5) {
-      let avg = this.dtAccum/(60.0*5.0)
-      console.log( 'avg dt: '+avg )
-      console.log( 'avg fps: '+1000.0/(1000.0*avg) )
+    let elapsed = this.app.ticker.elapsedMS
+    this.frames+=1
+    this.previousDTs.pop()
+    this.previousDTs.unshift(elapsed)
+
+    this.dtAccum = this.previousDTs.reduce( (total, current) => { return total+current } )
+
+    let movingAvaregeDT = this.dtAccum/16.0
+    let movingAvaregeFPS = 1000.0/movingAvaregeDT
+
+    let fps = 1000.0/elapsed
+    if( fps < this.lowest ) { this.lowest = fps }
+
+    if(this.frames==120) {
+      console.log('fps: ' + movingAvaregeFPS.toFixed(2) )
+      console.log('jitter: ' +(movingAvaregeFPS-this.lowest).toFixed(2) )
       this.frames = 0
-      this.dtAccum = 0
+      this.lowest = 1000
     }
   }
 
@@ -51,6 +64,7 @@ class GameContainer {
     })
 
     this.app.ticker.add(this.onTick.bind(this))
+    this.app.ticker.maxFPS = 0
 
     if ( process.env.NODE_ENV == 'development') {
       this.app.ticker.add(this.calcFPS.bind(this))
