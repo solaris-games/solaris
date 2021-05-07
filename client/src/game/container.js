@@ -4,25 +4,39 @@ import Map from './map'
 import gameHelper from '../services/gameHelper'
 
 class GameContainer {
+
+
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
     PIXI.GRAPHICS_CURVES.minSegments = 20 // Smooth arcs
 
     this.frames = 0
-    this.dtAccum = 0
+    this.dtAccum = 33.0*16
+    this.lowest = 1000
+    this.previousDTs = [ 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0 ]
   }
 
   calcFPS(deltaTime) {
-    //assumes PIXI ticker is set to 60(default)
-    this.frames++
-    this.dtAccum += deltaTime/60.0
-    if (this.frames >= 60*5) {
-      let avg = this.dtAccum/(60.0*5.0)
-      console.log( 'avg dt: '+avg )
-      console.log( 'avg fps: '+1000.0/(1000.0*avg) )
-      console.log( 'zoom%' + this.map.zoomPercent )
+    let elapsed = this.app.ticker.elapsedMS
+    this.frames+=1
+    this.previousDTs.pop()
+    this.previousDTs.unshift(elapsed)
+
+    this.dtAccum = this.previousDTs.reduce( (total, current) => { return total+current } )
+
+    let movingAvaregeDT = this.dtAccum/16.0
+    let movingAvaregeFPS = 1000.0/movingAvaregeDT
+
+    let fps = 1000.0/elapsed
+    if( fps < this.lowest ) { this.lowest = fps }
+    this.fpsNowText.text = ( 'fps: ' + fps.toFixed(1) )
+
+    if(this.frames==29) {
+      this.fpsMAText.text =  ( 'fpsMA: ' + movingAvaregeFPS.toFixed(1) )
+      this.jitterText.text = ( 'jitter: ' + (movingAvaregeFPS-this.lowest).toFixed(1) )
+      this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(1) )
       this.frames = 0
-      this.dtAccum = 0
+      this.lowest = 1000
     }
   }
 
@@ -52,6 +66,7 @@ class GameContainer {
     })
 
     this.app.ticker.add(this.onTick.bind(this))
+    this.app.ticker.maxFPS = 0
 
     if ( process.env.NODE_ENV == 'development') {
       this.app.ticker.add(this.calcFPS.bind(this))
@@ -80,6 +95,7 @@ class GameContainer {
     // Add a new map to the viewport
     this.map = new Map(this.app, this.store, this)
     this.viewport.addChild(this.map.container)
+
   }
 
   zoomIn () {
@@ -127,12 +143,33 @@ class GameContainer {
 
   setup (game, userSettings) {
     this.userSettings = userSettings
-    
+
     this.map.setup(this.game, userSettings)
   }
 
   draw () {
     this.map.draw()
+
+    if ( process.env.NODE_ENV == 'development') {
+      let bitmapFont = { fontName: "space-mono", fontSize: 16 }
+
+      this.fpsNowText = new PIXI.BitmapText("", bitmapFont)
+      this.fpsMAText = new PIXI.BitmapText("", bitmapFont)
+      this.jitterText = new PIXI.BitmapText("", bitmapFont)
+      this.lowestText = new PIXI.BitmapText("", bitmapFont)
+      this.fpsNowText.x = 32
+      this.fpsNowText.y = 128+16
+      this.fpsMAText.x = 32
+      this.fpsMAText.y = this.fpsNowText.y + 32+2
+      this.jitterText.x = 32
+      this.jitterText.y = this.fpsMAText.y + 32+2
+      this.lowestText.x = 32
+      this.lowestText.y = this.jitterText.y +32+2
+      this.app.stage.addChild(this.fpsNowText)
+      this.app.stage.addChild(this.jitterText)
+      this.app.stage.addChild(this.lowestText)
+      this.app.stage.addChild(this.fpsMAText)
+    }
   }
 
   drawWaypoints () {
