@@ -6,6 +6,9 @@ import Map from './map'
 class Star extends EventEmitter {
 
   static culling_margin = 16
+  static nameSize = 4
+  static garrisonSmallSize = 6
+  static garrisonBigSize = 10
 
   /*
     Defines what zoompercentage correspond to what
@@ -425,7 +428,7 @@ class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let bitmapFont = {fontName: "space-mono", fontSize: 4}
+      let bitmapFont = {fontName: "space-mono", fontSize: Star.nameSize}
       this.text_name = new PIXI.BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
 
@@ -435,29 +438,13 @@ class Star extends EventEmitter {
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
     if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
-      this.text_name.y = 0
+      this.text_name.y = ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
     }
   }
 
   drawGarrison () {
-    if (this.text_garrison_small) {
-      this.text_garrison_small.texture.destroy(true)
-      this.container.removeChild(this.text_garrison_small)
-      this.text_garrison_small = null
-    }
-
-    if (this.text_garrison_big) {
-      this.text_garrison_big.texture.destroy(true)
-      this.container.removeChild(this.text_garrison_big)
-      this.text_garrison_big = null
-    }
-
-    let style_small = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
-    let style_big = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
-    style_small.fontSize = 4
-    style_big.fontSize = 7
 
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
@@ -479,36 +466,29 @@ class Star extends EventEmitter {
       }
     }
 
-      /*
-      if (garrisonText) {
-        garrisonText = garrisonText.toString()
-        let bitmapFont = {fontName: "space-mono", fontSize: 6}
-        this.text_garrison = new PIXI.BitmapText(garrisonText, bitmapFont);
-
-        this.text_garrison.x = 5
-        this.text_garrison.y = -this.text_garrison.height+0.5
-      */
     if (carrierCount) {
       garrisonText += '/'
       garrisonText += carrierCount.toString()
     }
 
-    function make_garrison_text(small) {
-      let text_garrison = new PIXI.Text(garrisonText, small ? style_small : style_big)
-      text_garrison.scale.x = 1.5
-      text_garrison.scale.y = 1.5
-      text_garrison.resolution = 10
-
-      text_garrison.x = 5
-      text_garrison.y = -text_garrison.height + (small ? 1.5 : 6)
-      return text_garrison
-    }
-
     if (garrisonText) {
-      this.text_garrison_small = make_garrison_text(true)
-      this.text_garrison_big = make_garrison_text(false)
-      this.container.addChild(this.text_garrison_small)
-      this.container.addChild(this.text_garrison_big)
+      if (!this.text_garrison_small) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonSmallSize}
+        this.text_garrison_small = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_garrison_small)
+        this.text_garrison_small.x = 5
+        this.text_garrison_small.y = (-this.text_garrison_small.height) +( ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize )
+      }
+
+      if (!this.text_garrison_big) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonBigSize}
+        this.text_garrison_big = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_garrison_big)
+        this.text_garrison_big.x = 5
+        this.text_garrison_big.y = -this.text_garrison_big.height/2.0
+      }
+      this.text_garrison_small.text = garrisonText
+      this.text_garrison_big.text = garrisonText
     }
   }
 
