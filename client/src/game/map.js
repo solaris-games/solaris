@@ -12,7 +12,7 @@ import AnimationService from './animation'
 import PathManager from './PathManager'
 
 class Map extends EventEmitter {
-  static chunkSize = 128
+  static chunkSize = 256
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
   // waypoints - Displays waypoints overlay for a given carrier
@@ -623,8 +623,6 @@ class Map extends EventEmitter {
         }
       }
     }
-
-    this.background.onTick(deltaTime, viewportData)
 
     this.lastZoomPercent = this.zoomPercent
     this.pathManager.onTick(this.zoomPercent)
