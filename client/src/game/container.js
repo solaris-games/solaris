@@ -43,6 +43,7 @@ class GameContainer {
       this.frames = 0
       this.lowest = 1000
       this.ma32accum = 0
+      this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
     }
   }
 
@@ -164,6 +165,7 @@ class GameContainer {
       this.fpsMA32Text = new PIXI.BitmapText("", bitmapFont)
       this.jitterText = new PIXI.BitmapText("", bitmapFont)
       this.lowestText = new PIXI.BitmapText("", bitmapFont)
+      this.zoomText = new PIXI.BitmapText("", bitmapFont)
       this.fpsNowText.x = 32
       this.fpsNowText.y = 128+16
       this.fpsMAText.x = 32
@@ -174,11 +176,14 @@ class GameContainer {
       this.jitterText.y = this.fpsMA32Text.y + 32+2
       this.lowestText.x = 32
       this.lowestText.y = this.jitterText.y +32+2
+      this.zoomText.x = 32
+      this.zoomText.y = this.lowestText.y +32+2
       this.app.stage.addChild(this.fpsNowText)
       this.app.stage.addChild(this.jitterText)
       this.app.stage.addChild(this.lowestText)
       this.app.stage.addChild(this.fpsMAText)
       this.app.stage.addChild(this.fpsMA32Text)
+      this.app.stage.addChild(this.zoomText)
     }
   }
 
