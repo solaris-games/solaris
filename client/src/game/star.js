@@ -9,6 +9,7 @@ class Star extends EventEmitter {
   static nameSize = 4
   static garrisonSmallSize = 6
   static garrisonBigSize = 10
+  static maxLod = 4
 
   /*
     Defines what zoompercentage correspond to what
@@ -38,12 +39,12 @@ class Star extends EventEmitter {
     this.graphics_shape_part_warp = new PIXI.Graphics()
     this.graphics_shape_full_warp = new PIXI.Graphics()
     this.graphics_hyperspaceRange = new PIXI.Graphics()
-    this.graphics_natural_resources_ring = new PIXI.Graphics()
+    this.graphics_natural_resources_ring = new Array(Star.maxLod)
     this.graphics_scanningRange = new PIXI.Graphics()
     this.graphics_star = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
-    this.container.addChild(this.graphics_natural_resources_ring)
+    //this.container.addChild(this.graphics_natural_resources_ring)
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
     this.container.addChild(this.graphics_shape_part_warp)
@@ -254,19 +255,31 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
-    this.graphics_natural_resources_ring.clear()
+    for(let lod = 0; lod<Star.maxLod; lod+=1) {
+      if(!this.graphics_natural_resources_ring[lod]) {
+        this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
+      }
+      this.graphics_natural_resources_ring[lod].clear()
 
-    if (this.userSettings.map.naturalResources !== 'single-ring') {
-      return
+      if (this.userSettings.map.naturalResources !== 'single-ring') {
+        return
+      }
+
+      // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
+      // TODO: Experimental:
+      let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
+
+      ringRadius /= 8.0
+      let lineWidht = 1.0/8.0
+      ringRadius *= lod+1
+      lineWidht *= lod+1
+      this.graphics_natural_resources_ring[lod].clear()
+      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, 0.1)
+      this.graphics_natural_resources_ring[lod].drawCircle(0, 0, ringRadius * 0.75)
+      this.graphics_natural_resources_ring[lod].scale.x = 1.0/( (1.0/8.0)*(lod+1) )
+      this.graphics_natural_resources_ring[lod].scale.y = 1.0/( (1.0/8.0)*(lod+1) )
+      this.container.addChild(this.graphics_natural_resources_ring[lod])
     }
-
-    // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
-    // TODO: Experimental:
-    let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
-
-    this.graphics_natural_resources_ring.clear()
-    this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
-    this.graphics_natural_resources_ring.drawCircle(0, 0, ringRadius * 0.75)
   }
 
   _getPlanetsCount () {
@@ -626,10 +639,17 @@ class Star extends EventEmitter {
   }
 
   updateVisibility() {
+    //TODO compute on the map tick
+    let aparentScale = this.container.scale.x * (this.zoomPercent/100.0)
+    let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
+    for(let l = 0; l<Star.maxLod; l+= 1) {
+      this.graphics_natural_resources_ring[l].visible = false
+    }
+
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
