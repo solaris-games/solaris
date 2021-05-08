@@ -507,8 +507,9 @@ module.exports = class PlayerService extends EventEmitter {
 
     _getCreditsSpecialistsReward(game, player) {
         let isSpecialistsCreditsEnabled = this.technologyService.isTechnologyEnabled(game, 'specialists');
+        let isCreditsSpecialistsCurrency = game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists';
 
-        if (!isSpecialistsCreditsEnabled) {
+        if (!isSpecialistsCreditsEnabled || !isCreditsSpecialistsCurrency) {
             return 0;
         }
 
