@@ -14,6 +14,7 @@ class GameContainer {
     this.dtAccum = 33.0*16
     this.lowest = 1000
     this.previousDTs = [ 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0 ]
+    this.ma32accum = 0
   }
 
   calcFPS(deltaTime) {
@@ -23,20 +24,25 @@ class GameContainer {
     this.previousDTs.unshift(elapsed)
 
     this.dtAccum = this.previousDTs.reduce( (total, current) => { return total+current } )
+    this.ma32accum += elapsed
 
-    let movingAvaregeDT = this.dtAccum/16.0
-    let movingAvaregeFPS = 1000.0/movingAvaregeDT
+    let movingAverageDT = this.dtAccum/16.0
+    let movingAverageFPS = 1000.0/movingAverageDT
+    let ma32DT = this.ma32accum/32.0
 
     let fps = 1000.0/elapsed
     if( fps < this.lowest ) { this.lowest = fps }
-    this.fpsNowText.text = ( 'fps: ' + fps.toFixed(1) )
+    this.fpsNowText.text = ( 'fps: ' + fps.toFixed(0) )
 
-    if(this.frames==29) {
-      this.fpsMAText.text =  ( 'fpsMA: ' + movingAvaregeFPS.toFixed(1) )
-      this.jitterText.text = ( 'jitter: ' + (movingAvaregeFPS-this.lowest).toFixed(1) )
-      this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(1) )
+    if(this.frames==31) {
+      let ma32FPS = 1000.0/ma32DT
+      this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
+      this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
+      this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
+      this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(0) )
       this.frames = 0
       this.lowest = 1000
+      this.ma32accum = 0
     }
   }
 
@@ -155,20 +161,24 @@ class GameContainer {
 
       this.fpsNowText = new PIXI.BitmapText("", bitmapFont)
       this.fpsMAText = new PIXI.BitmapText("", bitmapFont)
+      this.fpsMA32Text = new PIXI.BitmapText("", bitmapFont)
       this.jitterText = new PIXI.BitmapText("", bitmapFont)
       this.lowestText = new PIXI.BitmapText("", bitmapFont)
       this.fpsNowText.x = 32
       this.fpsNowText.y = 128+16
       this.fpsMAText.x = 32
       this.fpsMAText.y = this.fpsNowText.y + 32+2
+      this.fpsMA32Text.x = 32
+      this.fpsMA32Text.y = this.fpsMAText.y +32+2
       this.jitterText.x = 32
-      this.jitterText.y = this.fpsMAText.y + 32+2
+      this.jitterText.y = this.fpsMA32Text.y + 32+2
       this.lowestText.x = 32
       this.lowestText.y = this.jitterText.y +32+2
       this.app.stage.addChild(this.fpsNowText)
       this.app.stage.addChild(this.jitterText)
       this.app.stage.addChild(this.lowestText)
       this.app.stage.addChild(this.fpsMAText)
+      this.app.stage.addChild(this.fpsMA32Text)
     }
   }
 
