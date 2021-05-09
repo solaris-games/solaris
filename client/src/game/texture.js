@@ -2,13 +2,25 @@ import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
 
 class TextureService {
+
+    static WARP_GATE_INDEX = 1
+    static PARTIAL_STRIDE = 2
+
     DEFAULT_FONT_STYLE = null
 
     STARLESS_NEBULA_TEXTURES = []
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
+    PLAYER_SYMBOLS = {}
+    STAR_SYMBOLS = {}
+    CARRIER_TEXTURE = null
 
     constructor () {
+      this._loadPlayerSymbols()
+      this._loadStarSymbols()
+
+      this.CARRIER_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_carrier.svg')))
+
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
         fontFamily: "'Space Mono', monospace",
         fill: 0xFFFFFF,
@@ -30,7 +42,7 @@ class TextureService {
           resolution: 2
         }
       )
-      // disable mipmap 
+      // disable mipmap
       this.DEFAULT_FONT_BITMAP.pageTextures[0].baseTexture.mipmap = 0
       this.DEFAULT_FONT_BITMAP.pageTextures[1].baseTexture.mipmap = 0
 
@@ -42,7 +54,7 @@ class TextureService {
           resolution: 2
         }
       )
-      // disable mipmap 
+      // disable mipmap
       this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[0].baseTexture.mipmap = 0
       this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[1].baseTexture.mipmap = 0
 
@@ -95,6 +107,38 @@ class TextureService {
       let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
 
       return this.SPECIALIST_TEXTURES[name]
+    }
+
+    _loadPlayerSymbols() {
+      this.PLAYER_SYMBOLS['circle'] = [
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle_warp_gate.svg')))
+      ]
+      this.PLAYER_SYMBOLS['hexagon'] = [
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon_warp_gate.svg')))
+      ]
+      this.PLAYER_SYMBOLS['diamond'] = [
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond_warp_gate.svg')))
+      ]
+      this.PLAYER_SYMBOLS['square'] = [
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square_warp_gate.svg')))
+      ]
+    }
+
+    _loadStarSymbols() {
+      this.STAR_SYMBOLS['scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable.svg')))
+      this.STAR_SYMBOLS['unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable.svg')))
     }
 }
 

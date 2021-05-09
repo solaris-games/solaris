@@ -94,6 +94,13 @@ class Carrier extends EventEmitter {
   }
 
   drawShape() {
+    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][0])
+    this.graphics_colour.anchor.set(0.5)
+    this.graphics_colour.width = 12.0
+    this.graphics_colour.height = 12.0
+    this.graphics_colour.tint = this.colour
+    this.container.addChild(this.graphics_colour)
+    return
     switch(this.player.shape) {
       case 'circle':
         this._drawShapeCircle()
@@ -122,6 +129,12 @@ class Carrier extends EventEmitter {
   }
 
   drawShip () {
+    this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
+    this.graphics_ship.anchor.set(0.5)
+    this.graphics_ship.width = 12.0 
+    this.graphics_ship.height = 12.0 
+    this.container.addChild(this.graphics_ship)
+    return
     this.graphics_ship.clear()
 
     // this.graphics_ship.lineStyle(0.3, 0x000000)

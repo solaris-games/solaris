@@ -141,22 +141,19 @@ class Star extends EventEmitter {
 
 
   drawStar () {
-    this.graphics_star.clear()
+    this.container.removeChild(this.graphics_star)
 
     let isInScanningRange = this._isInScanningRange()
-    let radius = 4
-    let alpha = isInScanningRange ? 1 : 0.5
-    let starPoints = 6
-
-    this.graphics_star.lineStyle(1, 0xFFFFFF, alpha)
-
     if (isInScanningRange) {
-      this.graphics_star.beginFill(0xFFFFFF, alpha)
+      this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['scannable'])
     }
-    this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 2)
     if (isInScanningRange) {
-      this.graphics_star.endFill()
+      this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
     }
+    this.graphics_star.anchor.set(0.5)
+    this.graphics_star.width = 24.0/2.0
+    this.graphics_star.height = 24.0/2.0
+    this.container.addChild(this.graphics_star)
 
   }
 
@@ -316,6 +313,8 @@ class Star extends EventEmitter {
     this.graphics_shape_part_warp.lineStyle(2, player.colour.value)
     this.graphics_shape_full_warp.lineStyle(2, player.colour.value)
 
+    this.container.removeChild(this.graphics_shape_part)
+    this.container.removeChild(this.graphics_shape_full)
     switch (player.shape) {
       case 'circle':
         this._drawColourCircle()
@@ -330,85 +329,36 @@ class Star extends EventEmitter {
         this._drawColourHexagon()
         break;
     }
+    this.graphics_shape_part.tint = player.colour.value
+    this.graphics_shape_full.tint = player.colour.value
+    this.graphics_shape_part.anchor.set(0.5)
+    this.graphics_shape_full.anchor.set(0.5)
+    this.graphics_shape_part.width = 24.0
+    this.graphics_shape_part.height = 24.0
+    this.graphics_shape_full.width = 24.0
+    this.graphics_shape_full.height = 24.0
+    this.container.addChild(this.graphics_shape_part)
+    this.container.addChild(this.graphics_shape_full)
   }
 
   _drawColourCircle () {
-    this.graphics_shape_part.arc(0, 0, 7, 0.785398, -0.785398)
-    this.graphics_shape_full.drawCircle(0, 0, 7)
-
-    this.graphics_shape_part_warp.arc(0, 0, 10, 0.785398, -0.785398)
-    this.graphics_shape_full_warp.drawCircle(0, 0, 10)
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][1])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][1])
   }
 
   _drawColourSquare () {
-    this.graphics_shape_part.moveTo(7, -7)
-    this.graphics_shape_part.lineTo(-7, -7)
-    this.graphics_shape_part.lineTo(-7, 7)
-    this.graphics_shape_part.lineTo(7, 7)
-
-    this.graphics_shape_full.drawRect(-7, -7, 14, 14)
-
-    this.graphics_shape_part_warp.moveTo(7, -10)
-    this.graphics_shape_part_warp.lineTo(-10, -10)
-    this.graphics_shape_part_warp.lineTo(-10, 10)
-    this.graphics_shape_part_warp.lineTo(7, 10)
-
-    this.graphics_shape_full_warp.drawRect(-10, -10, 20, 20)
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][1])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][1])
   }
 
   _drawColourDiamond () {
-    let s = 9;
-    let w = 14;
-
-    this.graphics_shape_part.moveTo(0, -s)
-    this.graphics_shape_part.lineTo(-s, 0)
-    this.graphics_shape_part.lineTo(0, s)
-
-    this.graphics_shape_full.moveTo(0, -s)
-    this.graphics_shape_full.lineTo(-s, 0)
-    this.graphics_shape_full.lineTo(0, s)
-    this.graphics_shape_full.lineTo(s, 0)
-    this.graphics_shape_full.closePath()
-
-    this.graphics_shape_part_warp.moveTo(0, -w)
-    this.graphics_shape_part_warp.lineTo(-w, 0)
-    this.graphics_shape_part_warp.lineTo(0, w)
-
-    this.graphics_shape_full_warp.moveTo(0, -w)
-    this.graphics_shape_full_warp.lineTo(-w, 0)
-    this.graphics_shape_full_warp.lineTo(0, w)
-    this.graphics_shape_full_warp.lineTo(w, 0)
-    this.graphics_shape_full_warp.closePath()
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][1])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][1])
   }
 
   _drawColourHexagon () {
-    this.graphics_shape_part.moveTo(4, -7)
-    this.graphics_shape_part.lineTo(-4, -7)
-    this.graphics_shape_part.lineTo(-8, 0)
-    this.graphics_shape_part.lineTo(-4, 7)
-    this.graphics_shape_part.lineTo(4, 7)
-
-    this.graphics_shape_full.moveTo(4, -7)
-    this.graphics_shape_full.lineTo(-4, -7)
-    this.graphics_shape_full.lineTo(-8, 0)
-    this.graphics_shape_full.lineTo(-4, 7)
-    this.graphics_shape_full.lineTo(4, 7)
-    this.graphics_shape_full.lineTo(8, 0)
-    this.graphics_shape_full.closePath()
-
-    this.graphics_shape_part_warp.moveTo(6.5, -10.5)
-    this.graphics_shape_part_warp.lineTo(-6.5, -10.5)
-    this.graphics_shape_part_warp.lineTo(-12, 0)
-    this.graphics_shape_part_warp.lineTo(-6.5, 10.5)
-    this.graphics_shape_part_warp.lineTo(6.5, 10.5)
-
-    this.graphics_shape_full_warp.moveTo(6.5, -10.5)
-    this.graphics_shape_full_warp.lineTo(-6.5, -10.5)
-    this.graphics_shape_full_warp.lineTo(-12, 0)
-    this.graphics_shape_full_warp.lineTo(-6.5, 10.5)
-    this.graphics_shape_full_warp.lineTo(6.5, 10.5)
-    this.graphics_shape_full_warp.lineTo(12, 0)
-    this.graphics_shape_full_warp.closePath()
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][1])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][1])
   }
 
   _hasUnknownShips() {
