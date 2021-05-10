@@ -20,8 +20,33 @@ class PathManager {
     */
 
     this.container = new PIXI.Container()
+    this.chunklessContainer = new PIXI.Container()
+    this.container.addChild(this.chunklessContainer)
 
     this.reloadSettings(this.userSettings)
+    this.chunkSize = 512.0
+
+    let minX = gameHelper.calculateMinStarX(this.game)
+    let minY = gameHelper.calculateMinStarY(this.game)
+    let maxX = gameHelper.calculateMaxStarX(this.game)
+    let maxY = gameHelper.calculateMaxStarY(this.game)
+
+    this.firstChunkX = Math.floor(minX/this.chunkSize)
+    this.firstChunkY = Math.floor(minY/this.chunkSize)
+    this.lastChunkX = Math.floor(maxX/this.chunkSize)
+    this.lastChunkY = Math.floor(maxY/this.chunkSize)
+
+    this.chunksXlen = (this.lastChunkX-this.firstChunkX)+1
+    this.chunksYlen = (this.lastChunkY-this.firstChunkY)+1
+
+    this.chunks = Array(this.chunksXlen)
+    for(let x=0; x<this.chunksXlen; x+=1) {
+      this.chunks[x] = Array(this.chunksYlen)
+      for(let y=0; y<this.chunksYlen; y+=1) {
+        this.chunks[x][y] = new PIXI.Container()
+        this.container.addChild(this.chunks[x][y])
+      }
+    }
 
   }
 
@@ -29,14 +54,14 @@ class PathManager {
     this.userSettings = userSettings
     this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
     this.baseScale = 1
-    this.minScale = this.userSettings.map.objectsMinimumScale/4.0 
+    this.minScale = this.userSettings.map.objectsMinimumScale/4.0
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
   }
 
   addSharedPath( objectA, objectB, carrierMapObject ) {
     let mapObjects = [ objectA, objectB ]
     this._orderObjects(mapObjects)
-    
+
     let pathID = mapObjects[0].data._id + mapObjects[1].data._id
     let path = this._findPath(pathID)
     if(!path) {
@@ -88,11 +113,29 @@ class PathManager {
     this.container.removeChild( path )
   }
 
-  onTick( zoomPercent, viewportData ) {
-    this.setScale( zoomPercent )
+  addPathToChunk(pathGraphics, locA, locB) {
+    let chunkXA = Math.floor(locA.x/this.chunkSize)
+    let chunkYA = Math.floor(locA.y/this.chunkSize)
+    let chunkXB = Math.floor(locB.x/this.chunkSize)
+    let chunkYB = Math.floor(locB.y/this.chunkSize)
+
+    if( (chunkXA === chunkXB) && (chunkYA === chunkYB) ) {
+      let ix = chunkXA-this.firstChunkX
+      let iy = chunkYA-this.firstChunkY
+
+      this.chunks[ix][iy].addChild(pathGraphics)
+      pathGraphics.belongsToChunk = true
+    }
+    else {
+      this.chunklessContainer.addChild(pathGraphics)
+    }
   }
-  
-  setScale( zoomPercent ) {
+
+  onTick( zoomPercent, viewport, zoomChanging ) {
+    this.setScale( zoomPercent, viewport, zoomChanging )
+  }
+
+  setScale( zoomPercent, viewport, zoomChanging ) {
     let yscale = this.baseScale
     if(this.clampedScaling) {
       let currentScale = zoomPercent/100
@@ -102,9 +145,37 @@ class PathManager {
         yscale = (1/currentScale)*this.maxScale
       }
     }
-    
-    for( let path of this.container.children) {
-      path.scale.y = yscale
+
+    if( zoomChanging ) {
+      for( let path of this.chunklessContainer.children) {
+        path.scale.y = yscale
+      }
+    }
+
+    //chunk culling
+    let firstX = Math.floor(viewport.left/this.chunkSize)
+    let firstY = Math.floor(viewport.top/this.chunkSize)
+
+    let lastX = Math.floor(viewport.right/this.chunkSize)
+    let lastY = Math.floor(viewport.bottom/this.chunkSize)
+
+    for(let ix=0; ix<this.chunksXlen; ix+=1) {
+      for(let iy=0; iy<this.chunksYlen; iy+=1) {
+        if(
+        (ix>=(firstX-this.firstChunkX))&&(ix<=(lastX-this.firstChunkX)) &&
+        (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
+        ) {
+          this.chunks[ix][iy].visible = true
+          if( zoomChanging ) {
+            for( let path of this.chunks[ix][iy].children ) {
+              path.scale.y = yscale
+            }
+          }
+        }
+        else {
+          this.chunks[ix][iy].visible = false
+        }
+      }
     }
   }
 
@@ -186,7 +257,7 @@ class PathManager {
     objectA.container.addChild(cap1)
     objectB.container.addChild(cap2)
     */
-    this.container.addChild(path)
+    this.addPathToChunk(path, pointA, pointB)
     return path
   }
 
@@ -194,7 +265,7 @@ class PathManager {
     let pointA = objectA.data.location
     let pointB = objectB.data.location
     let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
-    
+
     let path = new PIXI.Graphics()
     path.beginFill(pathColour)
     path.moveTo(0, lineWidth)
@@ -205,7 +276,7 @@ class PathManager {
     path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
     path.position = pointA
 
-    this.container.addChild(path)
+    this.addPathToChunk(path, pointA, pointB)
     return path
   }
 
@@ -223,7 +294,7 @@ class PathManager {
   }
 
   _findPath( pathID ) {
-    let path = this.paths.find( p => p.id === pathID ) 
+    let path = this.paths.find( p => p.id === pathID )
     return path
   }
 
