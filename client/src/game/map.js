@@ -141,6 +141,75 @@ class Map extends EventEmitter {
     this.background.draw()
 
     // Setup Chunks
+    this._setupChunks()
+
+  }
+
+  setupStar (game, userSettings, starData) {
+    let star = this.stars.find(x => x.data._id === starData._id)
+
+    if (!star) {
+      star = new Star(this.app)
+      this.stars.push(star)
+
+      this.starContainer.addChild(star.fixedContainer)
+
+      star.on('onStarClicked', this.onStarClicked.bind(this))
+      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
+    }
+
+    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+
+    return star
+  }
+
+  setupCarrier (game, userSettings, carrierData) {
+    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
+
+    if (!carrier) {
+      carrier = new Carrier( this.pathManager )
+      this.carriers.push(carrier)
+
+      this.carrierContainer.addChild(carrier.fixedContainer)
+
+      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+      carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
+      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+    }
+
+    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
+
+    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
+
+    return carrier
+  }
+
+  draw () {
+    if (this.mode === 'waypoints') {
+      this.drawWaypoints()
+    } else {
+      this.drawStars()
+      this.drawCarriers()
+      this.clearWaypoints()
+    }
+
+    if (this.mode === 'ruler') {
+      this.drawRulerPoints()
+    } else {
+      this.clearRulerPoints()
+    }
+  }
+
+  _setupChunks() {
+
+    if(this.chunksContainer) {
+      console.log('resetting chunks')
+      this.container.removeChild(this.chunksContainer)
+    }
+    this.chunksContainer = new PIXI.Container()
+    this.container.addChild(this.chunksContainer)
+
     let minX = gameHelper.calculateMinStarX(this.game)
     let minY = gameHelper.calculateMinStarY(this.game)
     let maxX = gameHelper.calculateMaxStarX(this.game)
@@ -163,9 +232,9 @@ class Map extends EventEmitter {
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
         this.chunks[ix][iy] = new PIXI.Container()
-        this.container.addChild(this.chunks[ix][iy])
+        this.chunksContainer.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
-        if(false)
+        //if(false)
         {
         let chunkVisualizer = new PIXI.Graphics()
         chunkVisualizer.alpha = 0.5
@@ -184,71 +253,6 @@ class Map extends EventEmitter {
 
     this.stars.forEach( s => s.addContainerToChunk(this.chunks, this.firstChunkX, this.firstChunkY) )
     this.carriers.forEach( c => c.addContainerToChunk(this.chunks, this.firstChunkX, this.firstChunkY) )
-    
-  }
-
-  setupStar (game, userSettings, starData) {
-    let star = this.stars.find(x => x.data._id === starData._id)
-
-    if (!star) {
-      star = new Star(this.app)
-      this.stars.push(star)
-
-      this.starContainer.addChild(star.fixedContainer)
-
-      star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
-    }
-    else {
-      star.removeContainerFromChunk(this.chunks, this.firstChunkX, this.firstChunkY)
-    }
-
-    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
-    star.refreshZoom(this.zoomPercent)
-
-    return star
-  }
-
-  setupCarrier (game, userSettings, carrierData) {
-    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
-
-    if (!carrier) {
-      carrier = new Carrier( this.pathManager )
-      this.carriers.push(carrier)
-
-      this.carrierContainer.addChild(carrier.fixedContainer)
-
-      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-      carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
-    }
-    else {
-      carrier.removeContainerFromChunk(this.chunks, this.firstChunkX, this.firstChunkY)
-    }
-
-    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
-
-    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
-    carrier.refreshZoom(this.zoomPercent)
-
-    return carrier
-  }
-
-  draw () {
-    if (this.mode === 'waypoints') {
-      this.drawWaypoints()
-    } else {
-      this.drawStars()
-      this.drawCarriers()
-      this.clearWaypoints()
-    }
-
-    if (this.mode === 'ruler') {
-      this.drawRulerPoints()
-    } else {
-      this.clearRulerPoints()
-    }
   }
 
   reloadGame (game, userSettings) {
@@ -314,6 +318,8 @@ class Map extends EventEmitter {
 
     this.background.setup(game, userSettings)
     this.background.draw(game, userSettings)
+
+    this._setupChunks()
   }
 
 
