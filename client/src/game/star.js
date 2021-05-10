@@ -458,6 +458,14 @@ class Star extends EventEmitter {
   }
 
   drawGarrison () {
+    if (this.text_garrison_small) {
+      this.container.removeChild(this.text_garrison_small)
+      this.text_garrison_small = null
+    }
+    if (this.text_garrison_big) {
+      this.container.removeChild(this.text_garrison_big)
+      this.text_garrison_big = null
+    }
 
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
