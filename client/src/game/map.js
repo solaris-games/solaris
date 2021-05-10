@@ -25,7 +25,6 @@ class Map extends EventEmitter {
     this.store = store
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
-    this.container.interactiveChildren = false
 
     this.stars = []
     this.carriers = []
@@ -603,6 +602,7 @@ class Map extends EventEmitter {
     let lastX = Math.floor(this.gameContainer.viewport.right/Map.chunkSize)
     let lastY = Math.floor(this.gameContainer.viewport.bottom/Map.chunkSize)
 
+    let zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
         if(
@@ -612,7 +612,7 @@ class Map extends EventEmitter {
           this.chunks[ix][iy].visible = true
           //this.chunks[ix][iy].visualizer.visible = true
 
-          if( this.zoomPercent != this.lastZoomPercent ) {
+          if( zoomChanging ) {
             for( let mapObject of this.chunks[ix][iy].mapObjects ) {
               mapObject.onZoomChanging(this.zoomPercent)
             }
@@ -626,7 +626,7 @@ class Map extends EventEmitter {
     }
 
     this.lastZoomPercent = this.zoomPercent
-    this.pathManager.onTick(this.zoomPercent, this.gameContainer.viewport)
+    this.pathManager.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
 
     this.background.onTick(deltaTime, viewportData)
     this.playerNames.onTick(this.zoomPercent)

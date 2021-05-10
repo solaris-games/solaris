@@ -131,11 +131,11 @@ class PathManager {
     }
   }
 
-  onTick( zoomPercent, viewport ) {
-    this.setScale( zoomPercent, viewport )
+  onTick( zoomPercent, viewport, zoomChanging ) {
+    this.setScale( zoomPercent, viewport, zoomChanging )
   }
 
-  setScale( zoomPercent, viewport ) {
+  setScale( zoomPercent, viewport, zoomChanging ) {
     let yscale = this.baseScale
     if(this.clampedScaling) {
       let currentScale = zoomPercent/100
@@ -146,11 +146,13 @@ class PathManager {
       }
     }
 
-    for( let path of this.chunklessContainer.children) {
-      path.scale.y = yscale
+    if( zoomChanging ) {
+      for( let path of this.chunklessContainer.children) {
+        path.scale.y = yscale
+      }
     }
-    //chunk culling
 
+    //chunk culling
     let firstX = Math.floor(viewport.left/this.chunkSize)
     let firstY = Math.floor(viewport.top/this.chunkSize)
 
@@ -164,8 +166,10 @@ class PathManager {
         (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
         ) {
           this.chunks[ix][iy].visible = true
-          for( let path of this.chunks[ix][iy].children ) {
-            path.scale.y = yscale
+          if( zoomChanging ) {
+            for( let path of this.chunks[ix][iy].children ) {
+              path.scale.y = yscale
+            }
           }
         }
         else {
