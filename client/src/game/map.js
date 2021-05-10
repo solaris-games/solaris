@@ -25,6 +25,7 @@ class Map extends EventEmitter {
     this.store = store
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
+    this.container.interactiveChildren = false
 
     this.stars = []
     this.carriers = []
@@ -625,7 +626,7 @@ class Map extends EventEmitter {
     }
 
     this.lastZoomPercent = this.zoomPercent
-    this.pathManager.onTick(this.zoomPercent)
+    this.pathManager.onTick(this.zoomPercent, this.gameContainer.viewport)
 
     this.background.onTick(deltaTime, viewportData)
     this.playerNames.onTick(this.zoomPercent)
