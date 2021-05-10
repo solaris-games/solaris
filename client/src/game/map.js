@@ -552,31 +552,6 @@ class Map extends EventEmitter {
       })
   }
 
-  onMouseMove(eventData) {
-    let world_mousePosition = this.gameContainer.viewport.toWorld(eventData.data.global)
-    this.mouseChunkX = Math.floor(world_mousePosition.x/Map.chunkSize)
-    this.mouseChunkY = Math.floor(world_mousePosition.y/Map.chunkSize)
-    this.minMouseChunkX = this.mouseChunkX-1
-    this.maxMouseChunkX = this.mouseChunkX+1
-    this.minMouseChunkY = this.mouseChunkY-1
-    this.maxMouseChunkY = this.mouseChunkY+1
-    for(let ix=0; ix<this.numof_chunkX; ix++) {
-    for(let iy=0; iy<this.numof_chunkY; iy++) {
-      if(
-      (ix>=(this.minMouseChunkX-this.firstChunkX))&&(ix<=(this.maxMouseChunkX-this.firstChunkX)) &&
-      (iy>=(this.minMouseChunkY-this.firstChunkY))&&(iy<=(this.maxMouseChunkY-this.firstChunkY))
-      ) {
-        this.chunks[ix][iy].interactiveChildren = true
-        //this.chunks[ix][iy].visualizer.visible = true
-      }
-      else {
-        this.chunks[ix][iy].interactiveChildren = false
-        //this.chunks[ix][iy].visualizer.visible = false
-      }
-    }
-    }
-  }
-
   onTick(deltaTime) {
     let viewportWidth = this.gameContainer.viewport.right - this.gameContainer.viewport.left
     let viewportHeight = this.gameContainer.viewport.bottom - this.gameContainer.viewport.top
@@ -610,6 +585,7 @@ class Map extends EventEmitter {
         (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
         ) {
           this.chunks[ix][iy].visible = true
+          this.chunks[ix][iy].interactiveChildren = true
           //this.chunks[ix][iy].visualizer.visible = true
 
           if( zoomChanging ) {
@@ -620,6 +596,7 @@ class Map extends EventEmitter {
         }
         else {
           this.chunks[ix][iy].visible = false
+          this.chunks[ix][iy].interactiveChildren = false
           //this.chunks[ix][iy].visualizer.visible = false
         }
       }

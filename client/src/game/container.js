@@ -145,7 +145,6 @@ class GameContainer {
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
-    this.viewport.on('mousemove', this.map.onMouseMove.bind(this.map))
   }
 
   setup (game, userSettings) {
