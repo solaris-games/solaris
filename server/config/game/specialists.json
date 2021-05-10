@@ -166,7 +166,7 @@
         {
             "id": 13,
             "name": "Pirate",
-            "description": "Grants +3 Weapons in Carrier-to-Carrier combat, -2 Weapons in Carrier-to-Star combat and x1.5 Speed.",
+            "description": "Grants +3 Weapons in Carrier-to-Carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "modifiers": {
@@ -190,6 +190,23 @@
             "modifiers": {
                 "local": {
                     "hyperspace": 1
+                }
+            }
+        },
+        {
+            "id": 15,
+            "name": "Marauder",
+            "description": "The carrier does not participate in carrier-to-carrier combat. x1.5 Speed, -2 Hyperspace Range, -1 Weapons.",
+            "baseCostCredits": 500,
+            "baseCostCreditsSpecialists": 5,
+            "modifiers": {
+                "local": {
+                    "speed": 1.5,
+                    "hyperspace": -2,
+                    "weapons": -1
+                },
+                "special": {
+                    "avoidCombatCarrierToCarrier": true
                 }
             }
         }

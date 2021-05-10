@@ -210,6 +210,13 @@ module.exports = class GameTickService extends EventEmitter {
                             && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext);       // Will be in front of the carrier 
                 });
 
+            // Filter any carriers that avoid carrier-to-carrier combat.
+            collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
+
+            if (!collisionCarriers.length) {
+                continue;
+            }
+
             // If all of the carriers that have collided are friendly then no need to do combat.
             let friendlyCarriers = collisionCarriers
                 .filter(c => c.carrier.ships > 0 && c.carrier.ownedByPlayerId.equals(friendlyCarrier.carrier.ownedByPlayerId));
@@ -234,6 +241,19 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this._performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
         }
+    }
+
+    _filterAvoidCarrierToCarrierCombatCarriers(carriers) {
+        return carriers.filter(c => {
+            let specialist = this.specialistService.getByIdCarrier(c.carrier.specialistId);
+
+            if (specialist && specialist.modifiers && specialist.modifiers.special 
+                && specialist.modifiers.special.avoidCombatCarrierToCarrier) {
+                return false;
+            }
+
+            return true;
+        });
     }
 
     async _moveCarriers(game, gameUsers) {
