@@ -20,9 +20,6 @@
         <game-started :event="event" v-if="event.type === 'gameStarted'"/>
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
-        <player-carrier-built :event="event" v-if="event.type === 'playerCarrierBuilt'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"
-            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'"/>
@@ -77,7 +74,6 @@ import GamePlayerJoinedVue from './GamePlayerJoined'
 import GamePlayerQuitVue from './GamePlayerQuit'
 import GameStartedVue from './GameStarted'
 import PlayerBulkInfrastructureUpgradedVue from './PlayerBulkInfrastructureUpgraded'
-import PlayerCarrierBuiltVue from './PlayerCarrierBuilt'
 import PlayerCombatStarEventVue from './PlayerCombatStarEvent'
 import PlayerCombatCarrierEventVue from './PlayerCombatCarrierEvent'
 import PlayerCreditsReceivedVue from './PlayerCreditsReceived'
@@ -112,7 +108,6 @@ export default {
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,
     'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
-    'player-carrier-built': PlayerCarrierBuiltVue,
     'player-combat-star': PlayerCombatStarEventVue,
     'player-combat-carrier': PlayerCombatCarrierEventVue,
     'player-credits-received': PlayerCreditsReceivedVue,

@@ -27,7 +27,6 @@ module.exports = class EventService {
         PLAYER_RENOWN_SENT: 'playerRenownSent',
         PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
         PLAYER_STAR_CAPTURED: 'playerStarCaptured',
-        PLAYER_CARRIER_BUILT: 'playerCarrierBuilt',
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
@@ -76,7 +75,6 @@ module.exports = class EventService {
         
         this.starUpgradeService.on('onPlayerWarpGateBuilt', (args) => this.createWarpGateBuiltEvent(args.gameId, args.gameTick, args.player, args.star));
         this.starUpgradeService.on('onPlayerWarpGateDestroyed', (args) => this.createWarpGateDestroyedEvent(args.gameId, args.gameTick, args.player, args.star));
-        this.starUpgradeService.on('onPlayerCarrierBuilt', (args) => this.createCarrierBuiltEvent(args.gameId, args.gameTick, args.player, args.star, args.carrier));
         this.starUpgradeService.on('onPlayerInfrastructureBulkUpgraded', (args) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
 
         this.tradeService.on('onPlayerCreditsReceived', (args) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
@@ -392,16 +390,6 @@ module.exports = class EventService {
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_CAPTURED, data);
-    }
-
-    async createCarrierBuiltEvent(gameId, gameTick, player, star, carrier) {
-        let data = {
-            starId: star._id,
-            carrierId: carrier._id,
-            carrierName: carrier.name
-        };
-
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_CARRIER_BUILT, data);
     }
 
     async createInfrastructureBulkUpgraded(gameId, gameTick, player, upgradeReport) {

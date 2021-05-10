@@ -165,14 +165,6 @@ module.exports = class StarUpgradeService extends EventEmitter {
             await this.achievementService.incrementCarriersBuilt(player.userId);
         }
 
-        this.emit('onPlayerCarrierBuilt', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            star,
-            carrier
-        });
-
         return {
             carrier,
             starGarrison: star.garrison
