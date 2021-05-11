@@ -2,9 +2,13 @@
 
 <div>
     <div @click="toggleDisplay">
-        <span class="user-select-none pointer">
-            Tick {{tick}} <i class="fas d-none d-sm-inline-block" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i>
+        <span class="d-none d-md-inline-block">
+            Tick
         </span>
+        <span class="d-inline-block d-md-none">
+            <i class="fas fa-stopwatch"></i>
+        </span>
+        <span class="user-select-none pointer ml-1">{{tick}} <i class="fas d-none d-sm-inline-block" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i></span>
     </div>
 
     <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display" style="position:absolute;width:300px;left:-100px;">

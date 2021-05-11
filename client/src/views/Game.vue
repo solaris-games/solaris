@@ -52,12 +52,11 @@ export default {
     }
   },
   async created () {
-    await this.attemptLogin()
-
     AudioService.loadStore(this.$store)
 
     this.$store.commit('clearGame')
 
+    await this.attemptLogin()
     await this.reloadSettings()
     await this.reloadGame()
 
