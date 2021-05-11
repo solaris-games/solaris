@@ -53,11 +53,13 @@ class PlayerNames {
     this.refreshZoom(this.zoomPercent || 0)
   }
 
-  onTick( zoomPercent ) {
+  onTick( zoomPercent, zoomChanging ) {
     this.zoomPercent = zoomPercent
 
-    if (this.container) {
-      this.container.visible = zoomPercent <= PlayerNames.zoomLevel
+    if( zoomChanging ) {
+      if (this.container) {
+        this.container.visible = zoomPercent <= PlayerNames.zoomLevel
+      }
     }
   }
 

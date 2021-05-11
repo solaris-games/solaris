@@ -20,8 +20,10 @@ class PathManager {
     */
 
     this.container = new PIXI.Container()
+    this.chunksContainer = new PIXI.Container()
     this.chunklessContainer = new PIXI.Container()
     this.container.addChild(this.chunklessContainer)
+    this.container.addChild(this.chunksContainer)
 
     this.reloadSettings(this.userSettings)
     this.chunkSize = 512.0
@@ -44,7 +46,73 @@ class PathManager {
       this.chunks[x] = Array(this.chunksYlen)
       for(let y=0; y<this.chunksYlen; y+=1) {
         this.chunks[x][y] = new PIXI.Container()
-        this.container.addChild(this.chunks[x][y])
+        this.chunksContainer.addChild(this.chunks[x][y])
+        //if(false)
+        {
+        let chunkVisualizer = new PIXI.Graphics()
+        chunkVisualizer.alpha = 0.5
+        chunkVisualizer.lineStyle(4, 0xFF0000, 1);
+        chunkVisualizer.beginFill(0xDE3249);
+        chunkVisualizer.drawRect(
+          (this.firstChunkX+x)*this.chunkSize, (this.firstChunkY+y)*this.chunkSize,
+          this.chunkSize, this.chunkSize
+        );
+        chunkVisualizer.endFill()
+        this.chunksContainer.addChild(chunkVisualizer)
+        this.chunks[x][y].visualizer = chunkVisualizer
+        }
+      }
+    }
+
+  }
+
+  setup(game) {
+
+    this.game = game
+
+    this.paths = Array()
+
+    this.container.removeChild(this.chunklessContainer)
+    this.container.removeChild(this.chunksContainer)
+
+    this.chunksContainer = new PIXI.Container()
+    this.chunklessContainer = new PIXI.Container()
+    this.container.addChild(this.chunklessContainer)
+    this.container.addChild(this.chunksContainer)
+
+    let minX = gameHelper.calculateMinStarX(this.game)
+    let minY = gameHelper.calculateMinStarY(this.game)
+    let maxX = gameHelper.calculateMaxStarX(this.game)
+    let maxY = gameHelper.calculateMaxStarY(this.game)
+
+    this.firstChunkX = Math.floor(minX/this.chunkSize)
+    this.firstChunkY = Math.floor(minY/this.chunkSize)
+    this.lastChunkX = Math.floor(maxX/this.chunkSize)
+    this.lastChunkY = Math.floor(maxY/this.chunkSize)
+
+    this.chunksXlen = (this.lastChunkX-this.firstChunkX)+1
+    this.chunksYlen = (this.lastChunkY-this.firstChunkY)+1
+
+    this.chunks = Array(this.chunksXlen)
+    for(let x=0; x<this.chunksXlen; x+=1) {
+      this.chunks[x] = Array(this.chunksYlen)
+      for(let y=0; y<this.chunksYlen; y+=1) {
+        this.chunks[x][y] = new PIXI.Container()
+        this.chunksContainer.addChild(this.chunks[x][y])
+        //if(false)
+        {
+        let chunkVisualizer = new PIXI.Graphics()
+        chunkVisualizer.alpha = 0.5
+        chunkVisualizer.lineStyle(4, 0xFF0000, 1);
+        chunkVisualizer.beginFill(0xDE3249);
+        chunkVisualizer.drawRect(
+          (this.firstChunkX+x)*this.chunkSize, (this.firstChunkY+y)*this.chunkSize,
+          this.chunkSize, this.chunkSize
+        );
+        chunkVisualizer.endFill()
+        this.chunksContainer.addChild(chunkVisualizer)
+        this.chunks[x][y].visualizer = chunkVisualizer
+        }
       }
     }
 
@@ -88,7 +156,12 @@ class PathManager {
       }
       path.graphics.alpha = 0.3+path.carriers.length*0.1
       if(path.carriers.length === 0) {
-        this.container.removeChild(path.graphics)
+        if(path.chunk) {
+          path.chunk.removeChild(path)
+        }
+        else {
+          this.chunklessContainer.removeChild( path )
+        }
         this.paths.splice(this.paths.indexOf(path), 1)
       }
     }
@@ -110,7 +183,12 @@ class PathManager {
   }
 
   removeUniquePath( path ) {
-    this.container.removeChild( path )
+    if(path.chunk) {
+      path.chunk.removeChild(path)
+    }
+    else {
+      this.chunklessContainer.removeChild( path )
+    }
   }
 
   addPathToChunk(pathGraphics, locA, locB) {
@@ -124,7 +202,7 @@ class PathManager {
       let iy = chunkYA-this.firstChunkY
 
       this.chunks[ix][iy].addChild(pathGraphics)
-      pathGraphics.belongsToChunk = true
+      pathGraphics.chunk = this.chunks[ix][iy]
     }
     else {
       this.chunklessContainer.addChild(pathGraphics)

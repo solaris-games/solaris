@@ -58,6 +58,9 @@ class Carrier extends EventEmitter {
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
+
+    this.sharedPathsIDs = Array()
+    this.uniquePaths = Array()
   }
 
   addContainerToChunk(chunks, firstX, firstY) {

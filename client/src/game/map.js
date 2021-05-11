@@ -25,6 +25,7 @@ class Map extends EventEmitter {
     this.store = store
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
+    this.container.sortableChildren = true
 
     this.stars = []
     this.carriers = []
@@ -46,7 +47,9 @@ class Map extends EventEmitter {
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
+    this.territoryContainer.zIndex = 2
     this.playerNamesContainer = new PIXI.Container()
+    this.playerNamesContainer.zIndex = 3
     this.highlightLocationsContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
@@ -56,8 +59,8 @@ class Map extends EventEmitter {
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
-    this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.highlightLocationsContainer)
+    this.container.addChild(this.playerNamesContainer)
 
   }
 
@@ -208,12 +211,23 @@ class Map extends EventEmitter {
       this.container.removeChild(this.chunksContainer)
     }
     this.chunksContainer = new PIXI.Container()
+    this.chunksContainer.zIndex = 1
     this.container.addChild(this.chunksContainer)
 
-    let minX = gameHelper.calculateMinStarX(this.game)
-    let minY = gameHelper.calculateMinStarY(this.game)
-    let maxX = gameHelper.calculateMaxStarX(this.game)
-    let maxY = gameHelper.calculateMaxStarY(this.game)
+    let carrierMinX = gameHelper.calculateMinCarrierX(this.game)
+    let carrierMinY = gameHelper.calculateMinCarrierY(this.game)
+    let carrierMaxX = gameHelper.calculateMaxCarrierX(this.game)
+    let carrierMaxY = gameHelper.calculateMaxCarrierY(this.game)
+
+    let starMinX = gameHelper.calculateMinStarX(this.game)
+    let starMinY = gameHelper.calculateMinStarY(this.game)
+    let starMaxX = gameHelper.calculateMaxStarX(this.game)
+    let starMaxY = gameHelper.calculateMaxStarY(this.game)
+
+    let minX = Math.min(carrierMinX, starMinX)
+    let minY = Math.min(carrierMinY, starMinY)
+    let maxX = Math.max(carrierMaxX, starMaxX)
+    let maxY = Math.max(carrierMaxY, starMaxY)
 
     this.firstChunkX = Math.floor(minX/Map.chunkSize)
     this.firstChunkY = Math.floor(minY/Map.chunkSize)
@@ -234,7 +248,7 @@ class Map extends EventEmitter {
         this.chunks[ix][iy] = new PIXI.Container()
         this.chunksContainer.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
-        //if(false)
+        if(false)
         {
         let chunkVisualizer = new PIXI.Graphics()
         chunkVisualizer.alpha = 0.5
@@ -259,6 +273,7 @@ class Map extends EventEmitter {
     this.game = game
 
     this.pathManager.reloadSettings(userSettings)
+    this.pathManager.setup(game)
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -589,10 +604,16 @@ class Map extends EventEmitter {
         if(
         (ix>=(firstX-this.firstChunkX))&&(ix<=(lastX-this.firstChunkX)) &&
         (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
-        ) {
-          this.chunks[ix][iy].visible = true
-          this.chunks[ix][iy].interactiveChildren = true
-          //this.chunks[ix][iy].visualizer.visible = true
+        ) 
+        {
+          if( !this.chunks[ix][iy].visible ) {
+            this.chunks[ix][iy].visible = true
+            this.chunks[ix][iy].interactiveChildren = true
+            //this.chunks[ix][iy].visualizer.visible = true
+            for( let mapObject of this.chunks[ix][iy].mapObjects ) {
+              mapObject.onZoomChanging(this.zoomPercent)
+            }
+          }
 
           if( zoomChanging ) {
             for( let mapObject of this.chunks[ix][iy].mapObjects ) {
@@ -608,11 +629,11 @@ class Map extends EventEmitter {
       }
     }
 
-    this.lastZoomPercent = this.zoomPercent
     this.pathManager.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
-
     this.background.onTick(deltaTime, viewportData)
-    this.playerNames.onTick(this.zoomPercent)
+    this.playerNames.onTick(this.zoomPercent, zoomChanging)
+
+    this.lastZoomPercent = this.zoomPercent
   }
 
   onViewportPointerDown(e) {
