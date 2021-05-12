@@ -62,7 +62,7 @@ class PathManager {
       for(let y=0; y<this.chunksYlen; y+=1) {
         this.chunks[x][y] = new PIXI.Container()
         this.chunksContainer.addChild(this.chunks[x][y])
-        //if(false)
+        if(false)
         {
         let chunkVisualizer = new PIXI.Graphics()
         chunkVisualizer.alpha = 0.5

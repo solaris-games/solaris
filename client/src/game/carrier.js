@@ -246,7 +246,6 @@ class Carrier extends EventEmitter {
     for(let pathID of this.sharedPathsIDs) {
       this.pathManager.removeSharedPath(pathID, this)
     }
-    console.log('clearPaths')
     this.uniquePaths = Array()
     this.sharedPathsIDs = Array()
   }
