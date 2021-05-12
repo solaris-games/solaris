@@ -59,8 +59,7 @@ class Carrier extends EventEmitter {
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
-    this.sharedPathsIDs = Array()
-    this.uniquePaths = Array()
+    this.clearPaths() // clear on setup since this is used to reset waypoints
   }
 
   addContainerToChunk(chunks, firstX, firstY) {
@@ -247,6 +246,7 @@ class Carrier extends EventEmitter {
     for(let pathID of this.sharedPathsIDs) {
       this.pathManager.removeSharedPath(pathID, this)
     }
+    console.log('clearPaths')
     this.uniquePaths = Array()
     this.sharedPathsIDs = Array()
   }

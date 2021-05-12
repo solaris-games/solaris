@@ -272,8 +272,7 @@ class Map extends EventEmitter {
   reloadGame (game, userSettings) {
     this.game = game
 
-    this.pathManager.reloadSettings(userSettings)
-    this.pathManager.setup(game)
+    this.pathManager.setup(game, userSettings)
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -614,10 +613,11 @@ class Map extends EventEmitter {
               mapObject.onZoomChanging(this.zoomPercent)
             }
           }
-
-          if( zoomChanging ) {
-            for( let mapObject of this.chunks[ix][iy].mapObjects ) {
-              mapObject.onZoomChanging(this.zoomPercent)
+          else {
+            if( zoomChanging ) {
+              for( let mapObject of this.chunks[ix][iy].mapObjects ) {
+                mapObject.onZoomChanging(this.zoomPercent)
+              }
             }
           }
         }
