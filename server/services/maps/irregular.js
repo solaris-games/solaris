@@ -46,7 +46,31 @@ module.exports = class IrregularMapService {
         };
     }
 
-    _getRingCount( starsPerPlayer ) {
+    _getRingCount( starsPerPlayerMin, starsPerPlayerMax ) {
+      let ringCount = this._getNecessaryRingCount(starsPerPlayerMin)
+      ringCount += 1 
+      while(this._getStarCountInRings(ringCount)<starsPerPlayerMax) {
+        ringCount += 1 
+      }
+      ringCount -= 1
+      return ringCount
+    }
+
+    _getStarCountInRings( ringCount ) {
+        let starCount = 0;
+        let ringIndex = 0;
+        let lastLayerPruning = 0;
+        while(ringIndex<ringCount) {
+            starCount += lastLayerPruning;
+            starCount += 6+(ringIndex*6);
+            lastLayerPruning = 4 + ( (ringIndex*6)/2 );
+            starCount -= lastLayerPruning;
+            ringIndex += 1;
+        }
+        return starCount;
+    }
+
+    _getNecessaryRingCount( starsPerPlayer ) {
         let starCount = 0;
         let ringIndex = 0;
         let lastLayerPruning = 0;
@@ -182,8 +206,9 @@ module.exports = class IrregularMapService {
         const ONE_SIXTH = 1.0/6.0;
         const TAU = 2.0*Math.PI;
         for( let location of locations ) {
-            let amount = (threshold/2.0) + ((rng.random()*threshold)/2.0);
-            let rotation = (ONE_SIXTH*TAU) * (Math.round(rng.random()*5.0));
+            let amount = (3.0*(threshold/4.0)) + ((rng.random()*threshold)/4.0);
+            amount *= 0.866 // sqrt(3)/2.0
+            let rotation = rng.random()*TAU
             let dislocation = { x: amount, y: 0.0 };
             dislocation = this._rotatedLocation(dislocation, rotation);
             let newLocation = this._displacedLocation(location, dislocation);
@@ -230,6 +255,7 @@ module.exports = class IrregularMapService {
     generateLocations(game, starCount, resourceDistribution, playerCount) {
 
         const SEED = ( Math.random()*(10**8) ).toFixed(0);
+        const SPREAD = 2.5
         const RNG = randomSeeded.create(SEED);
         const SIMPLEX_NOISE = new simplexNoise(SEED);
         const NOISE_BASE_SPREAD = 32.0;
@@ -245,9 +271,9 @@ module.exports = class IrregularMapService {
        
         //the amount of rings must produce about 30% more stars then requested. this way they can be pruned latter with noise to produce nice gap
         const STAR_COUNT_MULTIPLYER = 1.3;
-        const RING_COUNT = this._getRingCount(STARS_PER_PLAYER*STAR_COUNT_MULTIPLYER);
-        const STAR_DISTANCE = MINIMUM_STAR_DISTANCE*3.0;
-        const STAR_DISLOCATION_THRESHOLD = STAR_DISTANCE/3.0;
+        const RING_COUNT = this._getRingCount(STARS_PER_PLAYER, (STARS_PER_PLAYER*STAR_COUNT_MULTIPLYER));
+        const STAR_DISTANCE = MINIMUM_STAR_DISTANCE*SPREAD;
+        const STAR_DISLOCATION_THRESHOLD = MINIMUM_STAR_DISTANCE*((SPREAD-1.0)/2.0);
         const PIVOT_DISTANCE = RING_COUNT*STAR_DISTANCE;
 
         let locations = [];
