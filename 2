@@ -206,7 +206,7 @@ module.exports = class IrregularMapService {
         const ONE_SIXTH = 1.0/6.0;
         const TAU = 2.0*Math.PI;
         for( let location of locations ) {
-            let amount = (3.0*(threshold/4.0)) + ((rng.random()*threshold)/4.0);
+            let amount = (threshold/2.0) + ((rng.random()*threshold)/2.0);
             amount *= 0.866 // sqrt(3)/2.0
             let rotation = rng.random()*TAU
             let dislocation = { x: amount, y: 0.0 };
