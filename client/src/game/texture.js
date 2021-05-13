@@ -10,13 +10,13 @@ class TextureService {
 
     constructor () {
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
-        fontFamily: "'Space Mono', monospace",
+        fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
         padding: 3
       })
 
       this.DEFAULT_FONT_STYLE_BOLD = new PIXI.TextStyle({
-        fontFamily: "'Space Mono', monospace",
+        fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
         fontWeight: "bold",
         padding: 3
