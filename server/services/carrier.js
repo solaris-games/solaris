@@ -234,8 +234,10 @@ module.exports = class CarrierService {
         // Convert the carrier into a gift.
         // Remove all waypoints except from the first waypoint
         // Set its waypoint action to be "do nothing"
+        // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
         carrier.isGift = true;
         carrier.waypointsLooped = false;
+        carrier.specialistId = null;
 
         let firstWaypoint = carrier.waypoints[0];
 
@@ -252,6 +254,7 @@ module.exports = class CarrierService {
             $set: {
                 'galaxy.carriers.$.isGift': true,
                 'galaxy.carriers.$.waypointsLooped': false,
+                'galaxy.carriers.$.specialistId': null,
                 'galaxy.carriers.$.waypoints': [firstWaypoint]
             }
         })
