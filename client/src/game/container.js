@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
 import gameHelper from '../services/gameHelper'
+import textureService from './texture'
 
 class GameContainer {
 
@@ -149,6 +150,7 @@ class GameContainer {
 
   setup (game, userSettings) {
     this.userSettings = userSettings
+    textureService.initialize()
 
     this.map.setup(this.game, userSettings)
   }

@@ -8,7 +8,7 @@ class TextureService {
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
 
-    constructor () {
+    initialize () {
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
         fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
