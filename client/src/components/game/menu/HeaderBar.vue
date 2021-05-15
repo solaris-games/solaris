@@ -102,7 +102,6 @@ export default {
     this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
-
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
     this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
@@ -113,9 +112,11 @@ export default {
     clearInterval(this.intervalFunction)
 
     this.sockets.unsubscribe('gameStarted')
+    this.sockets.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('gameConversationRead')
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
-    this.sockets.unsubscribe('gameConversationRead')
+    this.sockets.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     gameStarted () {
