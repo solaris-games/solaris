@@ -63,7 +63,8 @@ module.exports = class GameGalaxyService {
 
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like garrisons.
-        if (!player) {
+        // If the game has finished then everyone should be able to view the full game.
+        if (!player && !this.gameService.isFinished(game)) {
             this._setStarInfoBasic(game);
 
             // Also remove all carriers from players.
@@ -182,7 +183,11 @@ module.exports = class GameGalaxyService {
         }
 
         // Get all of the player's stars.
-        let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+        let playerStars = [];
+
+        if (player) {
+            playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+        }
 
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = doc.galaxy.stars
@@ -263,7 +268,7 @@ module.exports = class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                if (player && !this.carrierService.canPlayerSeeCarrierShips(player, c)) {
                     c.ships = null;
                 }
             });

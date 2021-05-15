@@ -34,7 +34,8 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    this.canHireSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
+    this.canHireSpecialist = this.userPlayer
+      && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
       && this.userPlayer._id === this.carrier.ownedByPlayerId
       && this.carrier.orbiting
       && !this.carrier.isGift

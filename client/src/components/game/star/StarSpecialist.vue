@@ -34,7 +34,7 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
-    this.canHireSpecialist = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
+    this.canHireSpecialist = this.userPlayer && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
       && this.userPlayer._id === this.star.ownedByPlayerId
   },
   methods: {
