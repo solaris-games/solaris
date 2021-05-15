@@ -69,7 +69,7 @@ module.exports = class EventService {
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick));
         
-        this.gameTickService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.player, args.technology));
+        this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
         this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
         
@@ -278,12 +278,15 @@ module.exports = class EventService {
         }
     }
 
-    async createResearchCompleteEvent(gameId, gameTick, player, technology) {
+    async createResearchCompleteEvent(gameId, gameTick, playerId, technologyKey, technologyLevel, technologyKeyNext, technologyLevelNext) {
         let data = {
-            technology
+            technologyKey,
+            technologyLevel,
+            technologyKeyNext,
+            technologyLevelNext
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
+        return await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
     }
 
     async createWarpGateBuiltEvent(gameId, gameTick, player, star) {
