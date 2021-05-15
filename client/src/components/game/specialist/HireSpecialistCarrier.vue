@@ -103,6 +103,9 @@ export default {
                     this.carrier.waypointsLooped = response.data.waypoints.waypointsLooped
                 }
 
+                this.userPlayer.stats.totalCarrierSpecialists++
+                this.userPlayer.stats.totalSpecialists++
+
                 GameContainer.reloadCarrier(this.carrier)
             }
         } catch (err) {

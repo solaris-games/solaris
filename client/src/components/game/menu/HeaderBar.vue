@@ -19,7 +19,7 @@
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <span v-if="isSpecialistsTechnologyEnabled" title="Specialist Tokens">
+            <span v-if="isSpecialistsCurrencyCreditsSpecialists" title="Specialist Tokens">
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
@@ -334,8 +334,8 @@ export default {
     isTimeMachineEnabled () {
       return this.$store.state.game.settings.general.timeMachine === 'enabled'
     },
-    isSpecialistsTechnologyEnabled () {
-      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+    isSpecialistsCurrencyCreditsSpecialists () {
+      return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
     }
   }
 }
