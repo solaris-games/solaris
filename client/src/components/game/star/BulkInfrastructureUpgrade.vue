@@ -41,14 +41,19 @@
         </div>
         <div class="form-group col-12 col-sm-4">
           <button class="btn btn-success btn-block" v-on:click="doAction"
-                  :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
+                  :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ hasChecked ? " Upgrade" : " Check" }}</button>
         </div>
       </div>
     </form>
     <div v-if="hasChecked" class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p><b class="text-warning">${{this.amount}}</b> budget: <b class="text-success">{{this.upgradeAvailable}}</b> upgrades for <b class="text-danger">${{this.cost}}</b></p>
-        <p v-if="this.ignoredCount"><small>{{this.ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
+        <p v-if="selectedUpgradeStrategy === 'totalCredits'">
+          <b class="text-warning">${{amount}}</b> budget: <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
+        </p>
+        <p v-if="selectedUpgradeStrategy === 'infrastructureAmount' || selectedUpgradeStrategy === 'belowPrice'">
+          <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
+        </p>
+        <p v-if="ignoredCount"><small>{{ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
       </div>
     </div>
     <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
