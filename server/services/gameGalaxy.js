@@ -117,17 +117,6 @@ module.exports = class GameGalaxyService {
         };
     }
 
-    _isDarkStart(doc) {
-        // Work out whether we are in dark galaxy mode.
-        // This is true if the dark galaxy setting is enabled,
-        // OR if its "start only" and the game has not yet started.
-        return doc.settings.specialGalaxy.darkGalaxy === 'start'
-    }
-    
-    _isDarkMode(doc) {
-        return doc.settings.specialGalaxy.darkGalaxy === 'enabled';
-    }
-
     _getUserPlayer(doc, userId) {
         if (!userId) {
             return null;
@@ -147,8 +136,8 @@ module.exports = class GameGalaxyService {
         // Work out whether we are in dark galaxy mode.
         // This is true if the dark galaxy setting is enabled,
         // OR if its "start only" and the game has not yet started.
-        const isDarkStart = this._isDarkStart(doc);
-        const isDarkMode = this._isDarkMode(doc);
+        const isDarkStart = this.gameService.isDarkStart(doc);
+        const isDarkMode = this.gameService.isDarkMode(doc);
 
         // If its a dark galaxy start then return no stars.
         if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
@@ -169,8 +158,8 @@ module.exports = class GameGalaxyService {
 
     _setStarInfoDetailed(doc, player) { 
         const isFinished = this.gameService.isFinished(doc);
-        const isDarkStart = this._isDarkStart(doc);
-        const isDarkMode = this._isDarkMode(doc);
+        const isDarkStart = this.gameService.isDarkStart(doc);
+        const isDarkMode = this.gameService.isDarkMode(doc);
 
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.

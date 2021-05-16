@@ -424,8 +424,17 @@ module.exports = class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
+    isDarkStart(game) {
+        return game.settings.specialGalaxy.darkGalaxy === 'start';
+    }
+
     isDarkMode(game) {
-        return game.settings.specialGalaxy.darkGalaxy === 'enabled';
+        return game.settings.specialGalaxy.darkGalaxy === 'standard'
+            || game.settings.specialGalaxy.darkGalaxy === 'extra';
+    }
+
+    isDarkModeExtra(game) {
+        return game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
     
     async quitAllActiveGames(userId) {

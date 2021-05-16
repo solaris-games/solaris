@@ -1,3 +1,7 @@
-db.gameevents.remove({
-	type: 'playerCarrierBuilt'
+db.games.updateMany({
+	'settings.specialGalaxy.darkGalaxy': 'enabled'
+}, {
+	$set: {
+		'settings.specialGalaxy.darkGalaxy': 'standard'
+	}
 });
