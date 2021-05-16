@@ -533,6 +533,22 @@ class GameHelper {
 
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
+  
+  isSpecialistsEnabled (game) {
+    return game.settings.specialGalaxy.specialistCost !== 'none'
+  }
+
+  isSpecialistsTechnologyEnabled (game) {
+    return game.settings.technology.researchCosts.specialists !== 'none'
+  }
+
+  isSpecialistsCurrencyCredits (game) {
+    return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'credits'
+  }
+
+  isSpecialistsCurrencyCreditsSpecialists (game) {
+    return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+  }
 
   getSpecialistName (type, specialistId) {
     if (type === 'carrier') {

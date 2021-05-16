@@ -52,15 +52,7 @@ class GameContainer {
     this.store = store
 
     // Cleanup if the app already exists.
-    if (this.app) {
-      this.app.destroy(false, {
-        children: true
-      })
-    }
-
-    if (this.viewport) {
-      this.viewport.destroy()
-    }
+    this.destroy()
 
     let antialiasing = userSettings.map.antiAliasing === 'enabled';
 
@@ -104,6 +96,22 @@ class GameContainer {
     this.map = new Map(this.app, this.store, this)
     this.viewport.addChild(this.map.container)
 
+  }
+
+  destroy () {
+    // Cleanup if the app already exists.
+    if (this.app) {
+      this.app.destroy(false, {
+        children: true
+      })
+
+      this.app = null
+    }
+
+    if (this.viewport) {
+      this.viewport.destroy()
+      this.viewport = null
+    }
   }
 
   zoomIn () {
