@@ -449,7 +449,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async _upgradeStar(upgradeSummary, upgradeStar, infrastructureType) {
+    async _upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType) {
         let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
 
         if (!summaryStar) {
@@ -494,16 +494,21 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Make sure we are not spending enormous amounts of time on this
         while (upgradeSummary.upgraded <= 200) {
-            const upgrades = stars.filter(s.infrastructureCost <= amount);
+            const upgrades = stars
+                .filter(s => s.infrastructureCost <= amount)
+                .sort((a, b) => a.infrastructureCost - b.infrastructureCost);
+
+            console.log(upgrades.length);
+
             if (upgrades.length === 0) {
                 break
             }
 
             for (let upgradeStar of upgrades) {
-                this._upgradeStar(upgradeSummary, upgradeStar, infrastructureType)
+                await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType)
 
-                if (upgradeSummary.upgraded === 200) {
-                    break;
+                if (upgradeSummary.upgraded >= 200) {
+                    break
                 }
             }
         }
@@ -527,7 +532,6 @@ module.exports = class StarUpgradeService extends EventEmitter {
         for (let i = 0; i < amount; i++) {
             //TODO: Introduce priority queue
             let upgradeStar = stars
-                .filter(s => s.infrastructureCost <= budget)
                 .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
 
             // If no stars can be upgraded then break out here.
@@ -535,7 +539,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            this._upgradeStar(upgradeSummary, upgradeStar, infrastructureType);
+            await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType);
         }
 
         return upgradeSummary;
@@ -567,7 +571,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            budget -= this._upgradeStar(upgradeSummary, upgradeStar, infrastructureType);
+            budget -= await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType);
         }
 
         return upgradeSummary;
