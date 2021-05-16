@@ -10,7 +10,7 @@
 
     <form @submit.prevent>
       <div class="row no-gutters mb-2">
-        <select class="form-control" id="strategyType" v-on:change="resetStrategy" v-model="selectedUpgradeStrategy">
+        <select class="form-control" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy">
           <option value="totalCredits">Total credits</option>
           <option value="infrastructureAmount">Infrastructure amount</option>
           <option value="belowPrice">Below Price</option>
@@ -30,7 +30,7 @@
           />
         </div>
         <div class="form-group col-6 col-sm-4 pl-1 pr-1">
-          <select class="form-control" id="infrastructureType" v-on:change="resetStrategy" v-model="selectedType">
+          <select class="form-control" id="infrastructureType" v-on:change="resetPreview" v-model="selectedType">
             <option
               v-for="opt in types"
               v-bind:key="opt.key"
