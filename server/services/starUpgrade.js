@@ -517,6 +517,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount) {
+        //Enforce some max size constraint
+        amount = Math.min(amount, 200);
         const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
         const stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
