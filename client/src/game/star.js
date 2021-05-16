@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import Map from './map'
 
 class Star extends EventEmitter {
 
@@ -416,27 +415,6 @@ class Star extends EventEmitter {
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
       let scrambler = this.data.garrison == null
       return ( (scramblers || scrambler) && this._isInScanningRange() )
-  }
-
-  addContainerToChunk(chunks, firstX, firstY) { //TODO maybe obtain a map instance
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].addChild(this.container)
-    chunks[ix][iy].mapObjects.push(this)
-  }
-
-  removeContainerFromChunk(chunks, firstX, firstY) {
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].removeChild(this.container)
-    let index = chunks[ix][iy].mapObjects.indexOf(this)
-    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
   drawName () {

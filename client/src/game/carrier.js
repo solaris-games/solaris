@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import Map from './map'
-import gameHelper from '../services/gameHelper'
 
 class Carrier extends EventEmitter {
 
@@ -60,27 +58,6 @@ class Carrier extends EventEmitter {
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
     this.clearPaths() // clear on setup since this is used to reset waypoints
-  }
-
-  addContainerToChunk(chunks, firstX, firstY) {
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].addChild(this.container)
-    chunks[ix][iy].mapObjects.push(this)
-  }
-
-  removeContainerFromChunk(chunks, firstX, firstY) {
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].removeChild(this.container)
-    let index = chunks[ix][iy].mapObjects.indexOf(this)
-    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
   draw () {

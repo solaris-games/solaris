@@ -265,8 +265,29 @@ class Map extends EventEmitter {
       }
     }
 
-    this.stars.forEach( s => s.addContainerToChunk(this.chunks, this.firstChunkX, this.firstChunkY) )
-    this.carriers.forEach( c => c.addContainerToChunk(this.chunks, this.firstChunkX, this.firstChunkY) )
+    this.stars.forEach( s => this.addContainerToChunk(s, this.chunks, this.firstChunkX, this.firstChunkY) )
+    this.carriers.forEach( c => this.addContainerToChunk(c, this.chunks, this.firstChunkX, this.firstChunkY) )
+  }
+
+  addContainerToChunk (mapObject, chunks, firstX, firstY) { // Star or carrier
+    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
+
+    chunks[ix][iy].addChild(mapObject.container)
+    chunks[ix][iy].mapObjects.push(mapObject)
+  }
+
+  removeContainerFromChunk (mapObject, chunks, firstX, firstY) {
+    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
+
+    chunks[ix][iy].removeChild(mapObject.container)
+    let index = chunks[ix][iy].mapObjects.indexOf(mapObject)
+    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
   reloadGame (game, userSettings) {
