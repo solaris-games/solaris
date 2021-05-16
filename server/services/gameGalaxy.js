@@ -80,6 +80,16 @@ module.exports = class GameGalaxyService {
             await this._setPlayerInfoBasic(game, player);
         }
 
+        // For extra dark mode games, overwrite the player stats as by this stage
+        // scanning range will have kicked in and filtered out stars and carriers the player
+        // can't see and therefore global stats should display what the current player can see
+        // instead of their actual values.
+        // TODO: Consider non-logged in users
+        // TODO: Better to not overwrite, but just not do it above in the first place.
+        if (this.gameService.isDarkModeExtra(game)) {
+            this._setPlayerStats(game);
+        }
+
         if (isHistorical && cached) {
             cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }

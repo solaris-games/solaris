@@ -5,3 +5,9 @@ db.games.updateMany({
 		'settings.specialGalaxy.darkGalaxy': 'standard'
 	}
 });
+
+TODO: Hide research levels if not in scanning range
+TODO: Disable Intel screen
+TODO: Time machine?
+TODO: Do not log intel history
+TODO: UI cleanup for labels and text that will inevitably be broken by these changes
