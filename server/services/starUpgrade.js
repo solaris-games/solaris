@@ -449,6 +449,36 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
     }
 
+    async _upgradeStar(upgradeSummary, upgradeStar, infrastructureType) {
+        let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
+
+        if (!summaryStar) {
+            summaryStar = {
+                starId: upgradeStar.star._id,
+                naturalResources: upgradeStar.star.naturalResources,
+                infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
+                infrastructureCostTotal: 0
+            }
+    
+            upgradeSummary.stars.push(summaryStar);
+        }
+
+        const upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
+
+        upgradeSummary.upgraded++;
+        upgradeSummary.cost += upgradeReport.cost;
+        summaryStar.infrastructureCostTotal += upgradeReport.cost;
+
+        // Update the stars next infrastructure cost so next time
+        // we loop we will have the most up to date info.
+        upgradeStar.infrastructureCost = upgradeReport.nextCost;
+
+        summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
+        summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
+
+        return upgradeReport.cost;
+    }
+
     async generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount) {
         const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
         const stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
@@ -470,31 +500,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
 
             for (let upgradeStar of upgrades) {
-                let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
-
-                if (!summaryStar) {
-                    summaryStar = {
-                        starId: upgradeStar.star._id,
-                        naturalResources: upgradeStar.star.naturalResources,
-                        infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
-                        infrastructureCostTotal: 0
-                    }
-    
-                    upgradeSummary.stars.push(summaryStar);
-                }
-
-                const upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
-
-                upgradeSummary.upgraded++;
-                upgradeSummary.cost += upgradeReport.cost;
-                summaryStar.infrastructureCostTotal += upgradeReport.cost;
-
-                // Update the stars next infrastructure cost so next time
-                // we loop we will have the most up to date info.
-                upgradeStar.infrastructureCost = upgradeReport.nextCost;
-
-                summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
-                summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
+                this._upgradeStar(upgradeSummary, upgradeStar, infrastructureType)
 
                 if (upgradeSummary.upgraded === 200) {
                     break;
@@ -529,34 +535,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            // Add the star that we upgraded to the summary result.
-            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
-
-            if (!summaryStar) {
-                summaryStar = {
-                    starId: upgradeStar.star._id,
-                    naturalResources: upgradeStar.star.naturalResources,
-                    infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
-                    infrastructureCostTotal: 0
-                }
-
-                upgradeSummary.stars.push(summaryStar);
-            }
-
-            let upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
-
-            budget -= upgradeReport.cost;
-
-            upgradeSummary.upgraded++;
-            upgradeSummary.cost += upgradeReport.cost;
-            summaryStar.infrastructureCostTotal += upgradeReport.cost;
-
-            // Update the stars next infrastructure cost so next time
-            // we loop we will have the most up to date info.
-            upgradeStar.infrastructureCost = upgradeReport.nextCost;
-
-            summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
-            summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
+            this._upgradeStar(upgradeSummary, upgradeStar, infrastructureType);
         }
 
         return upgradeSummary;
@@ -588,34 +567,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 break;
             }
 
-            // Add the star that we upgraded to the summary result.
-            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
-
-            if (!summaryStar) {
-                summaryStar = {
-                    starId: upgradeStar.star._id,
-                    naturalResources: upgradeStar.star.naturalResources,
-                    infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
-                    infrastructureCostTotal: 0
-                }
-
-                upgradeSummary.stars.push(summaryStar);
-            }
-
-            let upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
-
-            budget -= upgradeReport.cost;
-
-            upgradeSummary.upgraded++;
-            upgradeSummary.cost += upgradeReport.cost;
-            summaryStar.infrastructureCostTotal += upgradeReport.cost;
-
-            // Update the stars next infrastructure cost so next time
-            // we loop we will have the most up to date info.
-            upgradeStar.infrastructureCost = upgradeReport.nextCost;
-
-            summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
-            summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
+            budget -= this._upgradeStar(upgradeSummary, upgradeStar, infrastructureType);
         }
 
         return upgradeSummary;
