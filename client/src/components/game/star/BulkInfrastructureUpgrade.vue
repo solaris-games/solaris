@@ -8,31 +8,40 @@
 
     <form-error-list v-bind:errors="errors"/>
 
-    <form class="row no-gutters" @submit.prevent>
-      <div class="form-group input-group col-6 col-sm-4">
-        <div class="input-group-prepend">
-          <span class="input-group-text">$</span>
-        </div>
-        <input v-on:input="resetHasChecked"
-          class="form-control"
-          id="amount"
-          v-model="amount"
-          type="number"
-          required="required"
-        />
-      </div>
-      <div class="form-group col-6 col-sm-4 pl-1 pr-1">
-        <select class="form-control" id="infrastructureType" v-on:change="onInfrastructureSelectionChanged" v-model="selectedType">
-          <option
-            v-for="opt in types"
-            v-bind:key="opt.key"
-            v-bind:value="opt.key"
-          >{{ opt.name }}</option>
+    <form @submit.prevent>
+      <div class="row no-gutters mb-2">
+        <select class="form-control" id="strategyType" v-on:change="resetStrategy" v-model="selectedUpgradeStrategy">
+          <option value="totalCredits">Total credits</option>
+          <option value="infrastructureAmount">Infrastructure amount</option>
+          <option value="belowPrice">Below Price</option>
         </select>
       </div>
-      <div class="form-group col-12 col-sm-4">
-        <button class="btn btn-success btn-block" v-on:click="doAction"
-                :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
+      <div class="row no-gutters">
+        <div class="form-group input-group col-6 col-sm-4">
+          <div class="input-group-prepend">
+            <span class="input-group-text">{{ upgradeStrategyUnit }}</span>
+          </div>
+          <input v-on:input="resetHasChecked"
+            class="form-control"
+            id="amount"
+            v-model="amount"
+            type="number"
+            required="required"
+          />
+        </div>
+        <div class="form-group col-6 col-sm-4 pl-1 pr-1">
+          <select class="form-control" id="infrastructureType" v-on:change="resetStrategy" v-model="selectedType">
+            <option
+              v-for="opt in types"
+              v-bind:key="opt.key"
+              v-bind:value="opt.key"
+            >{{ opt.name }}</option>
+          </select>
+        </div>
+        <div class="form-group col-12 col-sm-4">
+          <button class="btn btn-success btn-block" v-on:click="doAction"
+                  :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
+        </div>
       </div>
     </form>
     <div v-if="hasChecked" class="row bg-secondary">
@@ -101,6 +110,7 @@ export default {
       cost: 0,
       ignoredCount: 0,
       selectedType: 'economy',
+      selectedUpgradeStrategy: 'totalCredits',
       types: [
         {
           key: 'economy',
@@ -124,7 +134,7 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onInfrastructureSelectionChanged (e) {
+    resetPreview (e) {
       this.hasChecked = false
       this.upgradePreview = null
     },
@@ -211,6 +221,17 @@ export default {
     },
     getStar(starId) {
       return GameHelper.getStarById(this.$store.state.game, starId)
+    }
+  },
+  computed: {
+    upgradeStrategyUnit () {
+      if (this.selectedUpgradeStrategy === 'totalCredits') {
+        return '$'
+      } else if (this.selectedUpgradeStrategy === 'belowPrice') {
+        return '<$'
+      } else if (this.selectedUpgradeStrategy === 'infrastructureAmount') {
+        return '1'
+      }
     }
   }
 }
