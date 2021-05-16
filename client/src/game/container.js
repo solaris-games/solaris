@@ -213,13 +213,13 @@ class GameContainer {
   reloadStar (star) {
     let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)
-    starObject.addContainerToChunk(this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    this.map.addContainerToChunk(starObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
   }
 
   reloadCarrier (carrier) {
     let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
     this.map.drawCarrier(carrierObject)
-    carrierObject.addContainerToChunk(this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    this.map.addContainerToChunk(carrierObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
   }
 
   undrawCarrier (carrier) {
