@@ -62,6 +62,7 @@ module.exports = (router, io, container) => {
             let summary = await container.starUpgradeService.upgradeBulk(
                 req.game,
                 req.player,
+                req.body.upgradeStrategy,
                 req.body.infrastructure,
                 +req.body.amount);
 
@@ -76,6 +77,7 @@ module.exports = (router, io, container) => {
             let summary = await container.starUpgradeService.generateUpgradeBulkReport(
                 req.game,
                 req.player,
+                req.body.upgradeStrategy,
                 req.body.infrastructure,
                 +req.body.amount);
 

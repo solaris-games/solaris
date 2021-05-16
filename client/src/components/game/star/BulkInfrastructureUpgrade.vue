@@ -166,6 +166,7 @@ export default {
         this.isChecking = true
         let response = await starService.checkBulkUpgradedAmount(
           this.$store.state.game._id,
+          this.selectedUpgradeStrategy,
           this.selectedType,
           this.amount
         )
@@ -199,6 +200,7 @@ export default {
 
         let response = await starService.bulkInfrastructureUpgrade(
           this.$store.state.game._id,
+          this.selectedUpgradeStrategy,
           this.selectedType,
           this.cost
         )

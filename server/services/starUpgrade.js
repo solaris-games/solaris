@@ -352,13 +352,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
             });
     }
 
-    async upgradeBulk(game, player, infrastructureType, amount, writeToDB = true) {
+    async upgradeBulk(game, player, upgradeStrategy, infrastructureType, amount, writeToDB = true) {
         // Check that the amount the player wants to spend isn't more than the amount he has
         if (player.credits < amount) {
             throw new ValidationError(`The player does not own enough credits to afford to bulk upgrade.`);
         }
 
-        let upgradeSummary = await this.generateUpgradeBulkReport(game, player, infrastructureType, amount);
+        let upgradeSummary = await this.generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, amount);
 
         if (writeToDB) {
             // Generate the DB writes for all the stars to upgrade, including deducting the credits
@@ -438,7 +438,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    async generateUpgradeBulkReport(game, player, infrastructureType, budget) {
+    async generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, budget) {
         // Get all of the player stars and what the next upgrade cost will be.
         let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
         let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
