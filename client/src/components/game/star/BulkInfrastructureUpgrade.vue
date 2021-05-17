@@ -48,7 +48,7 @@
     <div v-if="hasChecked" class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="selectedUpgradeStrategy === 'totalCredits'">
-          <b class="text-warning">${{amount}}</b> budget: <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
+          <b class="text-warning">${{previewAmount}}</b> budget: <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
         </p>
         <p v-if="selectedUpgradeStrategy === 'infrastructureAmount' || selectedUpgradeStrategy === 'belowPrice'">
           <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
@@ -112,6 +112,7 @@ export default {
       hasChecked: false,
       upgradePreview: null,
       amount: 0,
+      previewAmount: 0,
       upgradeAvailable: 0,
       cost: 0,
       ignoredCount: 0,
@@ -181,10 +182,8 @@ export default {
           this.upgradePreview = response.data
           this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
+          this.previewAmount = response.data.budget
           this.ignoredCount = response.data.ignoredCount
-          if (this.selectedUpgradeStrategy === 'totalCredits') {
-            this.amount = response.data.budget
-          }
         }
       } catch (err) {
         this.errors = err.response.data.errors || []
@@ -210,7 +209,7 @@ export default {
           this.$store.state.game._id,
           this.selectedUpgradeStrategy,
           this.selectedType,
-          this.cost
+          this.amount
         )
 
         if (response.status === 200) {
@@ -220,7 +219,9 @@ export default {
           
           this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
 
-          this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+          if (this.selectedUpgradeStrategy === 'totalCredits') {
+            this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+          }
         }
       } catch (err) {
         this.errors = err.response.data.errors || []
