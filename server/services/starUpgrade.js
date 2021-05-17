@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
+const Heap = require('qheap');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
@@ -449,6 +450,15 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
     }
 
+    _createUpgradeQueue(size) {
+        return new Heap({
+            comparBefore: (s1, s2) => s1.infrastructureCost < s2.infrastructureCost,
+            compar: (s1, s2) => s1.infrastructureCost - s2.infrastructureCost,
+            freeSpace: false,
+            size
+        })
+    }
+
     async _upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType) {
         let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
 
@@ -492,24 +502,23 @@ module.exports = class StarUpgradeService extends EventEmitter {
             ignoredCount
         };
 
+        const affordableStars = stars.filter(s => s.infrastructureCost <= amount);
+        const upgradeQueue = this._createUpgradeQueue(stars.length);
+        affordableStars.forEach(star => {
+            upgradeQueue.insert(star)
+        });
+
         // Make sure we are not spending enormous amounts of time on this
         while (upgradeSummary.upgraded <= 200) {
-            const upgrades = stars
-                .filter(s => s.infrastructureCost <= amount)
-                .sort((a, b) => a.infrastructureCost - b.infrastructureCost);
-
-            console.log(upgrades.length);
-
-            if (upgrades.length === 0) {
-                break
+            const nextStar = upgradeQueue.dequeue();
+            if (!nextStar) {
+                break;
             }
 
-            for (let upgradeStar of upgrades) {
-                await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType)
+            await this._upgradeStarAndSummary(game, player, upgradeSummary, nextStar, infrastructureType);
 
-                if (upgradeSummary.upgraded >= 200) {
-                    break
-                }
+            if (nextStar.infrastructureCost <= amount) {
+                upgradeQueue.insert(nextStar);
             }
         }
 
@@ -531,10 +540,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
             ignoredCount
         };
 
+        const upgradeQueue = this._createUpgradeQueue(stars.length);
+        stars.forEach(star => {
+            upgradeQueue.insert(star);
+        });
+
         for (let i = 0; i < amount; i++) {
-            //TODO: Introduce priority queue
-            let upgradeStar = stars
-                .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
+            let upgradeStar = upgradeQueue.dequeue();
 
             // If no stars can be upgraded then break out here.
             if (!upgradeStar) {
@@ -542,6 +554,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
 
             await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType);
+
+            upgradeQueue.insert(upgradeStar)
         }
 
         return upgradeSummary;
@@ -562,18 +576,22 @@ module.exports = class StarUpgradeService extends EventEmitter {
             ignoredCount
         };
 
+        const upgradeStars = this._createUpgradeQueue(stars.length);
+        stars.forEach(star => {
+            upgradeStars.insert(star)
+        });
+
         while (budget) {
             // Get the next star that can be upgraded, cheapest first.
-            let upgradeStar = stars
-                .filter(s => s.infrastructureCost <= budget)
-                .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
+            let upgradeStar = upgradeStars.dequeue();
 
             // If no stars can be upgraded then break out here.
-            if (!upgradeStar) {
+            if (!upgradeStar || upgradeStar.infrastructureCost > budget) {
                 break;
             }
 
             budget -= await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType);
+            upgradeStars.insert(upgradeStar)
         }
 
         return upgradeSummary;
