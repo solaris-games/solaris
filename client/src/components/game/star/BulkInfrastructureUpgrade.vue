@@ -182,7 +182,9 @@ export default {
           this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
           this.ignoredCount = response.data.ignoredCount
-          this.amount = response.data.budget
+          if (this.selectedUpgradeStrategy === 'totalCredits') {
+            this.amount = response.data.budget
+          }
         }
       } catch (err) {
         this.errors = err.response.data.errors || []
