@@ -194,7 +194,7 @@ export default {
     async upgrade () {
       this.errors = []
 
-      if (this.cost <= 0) {
+      if (this.cost <= 0 || this.amount <= 0) {
         return
       }
 

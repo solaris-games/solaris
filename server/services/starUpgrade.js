@@ -354,6 +354,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async upgradeBulk(game, player, upgradeStrategy, infrastructureType, amount, writeToDB = true) {
+        if (!amount || amount <= 0) {
+            throw new ValidationError(`Invalid upgrade amount given`);
+        }
+
         const upgradeSummary = await this.generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, amount);
 
         // Check that the amount the player wants to spend isn't more than the amount he has
@@ -440,6 +444,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, amount) {
+        if (!amount || amount <= 0) {
+            throw new ValidationError(`Invalid upgrade amount given`);
+        }
+
         // Get all of the player stars and what the next upgrade cost will be.
         if (upgradeStrategy === 'totalCredits') {
             return await this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount)
