@@ -11,9 +11,9 @@
     <form @submit.prevent>
       <div class="row no-gutters mb-2">
         <select class="form-control" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
-          <option value="totalCredits">Total credits</option>
-          <option value="infrastructureAmount">Infrastructure amount</option>
-          <option value="belowPrice">Below Price</option>
+          <option value="totalCredits">Spend credits</option>
+          <option value="infrastructureAmount">Buy infrastructure amount</option>
+          <option value="belowPrice">Buy below price</option>
         </select>
       </div>
       <div class="row no-gutters">
