@@ -32,6 +32,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError('The game settings has disabled the building of warp gates.');
         }
 
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot build a warp gate on a dead star.');
+        }
+
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
@@ -113,6 +117,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
         }
 
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot build a carrier on a dead star.');
+        }
+
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
         const cost = this.calculateCarrierCost(game, expenseConfig);
 
@@ -172,6 +180,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     _calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback) {
+        if (this.starService.isDeadStar(star)) {
+            return null;
+        }
+
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         // Calculate how much the upgrade will cost.
@@ -249,6 +261,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player._id.toString()) {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
+        }
+
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot build infrastructure on a dead star.');
         }
 
         let cost = this._calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback);
@@ -332,6 +348,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // Get all of the player stars and what the next upgrade cost will be.
         return this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
             .filter(s => {
+                if (this.starService.isDeadStar(s)) {
+                    return false;
+                }
+
                 if (includeIgnored) {
                     return true;
                 }
@@ -534,13 +554,21 @@ module.exports = class StarUpgradeService extends EventEmitter {
         const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
 
         // Calculate upgrade costs for the star.
-        star.upgradeCosts = { };
+        star.upgradeCosts = { 
+            economy: null,
+            industry: null,
+            science: null,
+            warpGate: null,
+            carriers: null
+        };
 
-        star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
-        star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
-        star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
-        star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
-        star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
+        if (!this.starService.isDeadStar(star)) {
+            star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
+            star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
+            star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
+            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
+            star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
+        }
 
         return star.upgradeCosts;
     }

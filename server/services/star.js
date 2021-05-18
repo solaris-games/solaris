@@ -313,17 +313,29 @@ module.exports = class StarService extends EventEmitter {
                         }
 
                         if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
-                            star.naturalResources -= specialist.modifiers.special.deductNaturalResourcesOnTick;
-
-                            // Retire the specialist if there are no longer any natural resources.
-                            if (star.naturalResources < 0) {
-                                star.naturalResources = 0;
-                                star.specialistId = null;
-                            }
+                            this.deductNaturalResources(star, specialist.modifiers.special.deductNaturalResourcesOnTick);
                         }
                     }
                 }
             }
+        }
+    }
+
+    isDeadStar(star) {
+        return star.naturalResources <= 0;
+    }
+
+    deductNaturalResources(star, amount) {
+        star.naturalResources -= amount;
+
+        // if the star reaches 0 resources then reduce the star to a dead hunk.
+        if (star.naturalResources < 0) {
+            star.naturalResources = 0;
+            star.specialistId = null;
+            star.warpGate = false;
+            star.infrastructure.economy = 0;
+            star.infrastructure.industry = 0;
+            star.infrastructure.science = 0;
         }
     }
 

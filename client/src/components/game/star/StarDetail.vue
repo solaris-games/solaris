@@ -7,7 +7,7 @@
       <button @click="toggleBulkIgnore" class="btn btn-sm ml-1" 
         title="Toggle Bulk Ignore"
         :class="{'btn-danger':star.ignoreBulkUpgrade,'btn-success':!star.ignoreBulkUpgrade}"
-        v-if="!$isHistoricalMode() && userPlayer && star.ownedByPlayerId == userPlayer._id">
+        v-if="!$isHistoricalMode() && userPlayer && star.ownedByPlayerId == userPlayer._id && !isDeadStar">
         <i class="fas" :class="{'fa-ban':star.ignoreBulkUpgrade,'fa-check-square':!star.ignoreBulkUpgrade}"></i>
       </button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
@@ -18,11 +18,12 @@
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
+        <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
       </div>
     </div>
     
     <div v-if="isCompactUIStyle && star.infrastructure">
-      <div class="row mt-2">
+      <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
           <span title="Natural Resources / Terraformed Resources">
             <i class="fas fa-globe"></i>
@@ -39,13 +40,13 @@
       
       <div class="row mt-2 pb-2">
         <div class="col">
-          <span v-if="star.infrastructure" title="Economic Infrastructure">
+          <span v-if="star.infrastructure && !isDeadStar" title="Economic Infrastructure">
               <i class="fas fa-money-bill-wave text-success"></i> {{star.infrastructure.economy}}
           </span>
-          <span v-if="star.infrastructure" title="Industrial Infrastructure" class="ml-2">
+          <span v-if="star.infrastructure && !isDeadStar" title="Industrial Infrastructure" class="ml-2">
               <i class="fas fa-tools text-warning"></i> {{star.infrastructure.industry}}
           </span>
-          <span v-if="star.infrastructure" title="Scientific Infrastructure" class="ml-2">
+          <span v-if="star.infrastructure && !isDeadStar" title="Scientific Infrastructure" class="ml-2">
               <i class="fas fa-flask text-info"></i> {{star.infrastructure.science}}
           </span>
         </div>
@@ -70,13 +71,11 @@
             <span v-if="star.specialist">
               {{star.specialist.name}}
             </span>
-            <span v-if="!star.specialist">
-              No Specialist
-            </span>
+            <span v-if="!star.specialist">No Specialist</span>
           </span>
         </div>
         <div class="col-auto">
-          <span v-if="star.ownedByPlayerId && star.manufacturing != null" title="Ship Production">
+          <span v-if="star.ownedByPlayerId && star.manufacturing != null && !isDeadStar" title="Ship Production">
             {{star.manufacturing}} <i class="fas fa-wrench ml-1"></i>
           </span>
         </div>
@@ -88,7 +87,7 @@
         </div>
       </div>
 
-      <div class="mb-0">
+      <div class="mb-0" v-if="!isDeadStar">
         <infrastructureUpgradeCompact 
           v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
           :star="star"
@@ -111,7 +110,7 @@
           </div>
       </div>
 
-      <div class="row pt-1 pb-1 bg-secondary" v-if="star.infrastructure">
+      <div class="row pt-1 pb-1 bg-secondary" v-if="star.infrastructure && !isDeadStar">
           <div class="col">
               Natural Resources
           </div>
@@ -120,7 +119,7 @@
           </div>
       </div>
 
-      <div v-if="star.ownedByPlayerId && star.infrastructure" class="row mb-2 pt-1 pb-1 bg-secondary">
+      <div v-if="star.ownedByPlayerId && star.infrastructure && !isDeadStar" class="row mb-2 pt-1 pb-1 bg-secondary">
           <div class="col">
               Terraformed Resources
           </div>
@@ -160,7 +159,7 @@
       </div>
     </div>
 
-    <div v-if="isStandardUIStyle">
+    <div v-if="isStandardUIStyle && !isDeadStar">
       <div v-if="star.infrastructure">
         <h4 class="pt-2">Infrastructure</h4>
 
@@ -418,10 +417,10 @@ export default {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
     },
     canShowSpecialist: function () {
-      return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer)
+      return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.canShowSpecialist && !GameHelper.isGameFinished(this.$store.state.game) && !this.isDeadStar
     },
     isOwnedByUserPlayer: function() {
       let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
@@ -430,6 +429,9 @@ export default {
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    isDeadStar: function () {
+      return GameHelper.isDeadStar(this.star)
     }
   }
 }

@@ -730,6 +730,10 @@ class GameHelper {
 
     return star
   }
+
+  isDeadStar(star) {
+    return star.naturalResources != null && star.naturalResources <= 0
+  }
 }
 
 export default new GameHelper()

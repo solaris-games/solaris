@@ -2,12 +2,13 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class SpecialistHireService {
 
-    constructor(gameModel, specialistService, achievementService, waypointService, playerService) {
+    constructor(gameModel, specialistService, achievementService, waypointService, playerService, starService) {
         this.gameModel = gameModel;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
         this.playerService = playerService;
+        this.starService = starService;
     }
 
     async hireCarrierSpecialist(game, player, carrierId, specialistId) {
@@ -23,6 +24,12 @@ module.exports = class SpecialistHireService {
 
         if (!carrier.orbiting) {
             throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);
+        }
+
+        let star = this.starService.getByObjectId(game, carrier.orbiting);
+
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
         }
 
         const specialist = this.specialistService.getByIdCarrier(specialistId);
@@ -88,6 +95,10 @@ module.exports = class SpecialistHireService {
 
         if (!star) {
             throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);
+        }
+
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot hire a specialist on a dead star.');
         }
 
         const specialist = this.specialistService.getByIdStar(specialistId);
