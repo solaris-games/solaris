@@ -5,6 +5,10 @@ import TextureService from './texture'
 class Star extends EventEmitter {
 
   static culling_margin = 16
+  static nameSize = 4
+  static garrisonSmallSize = 6
+  static garrisonBigSize = 10
+  static maxLod = 4
 
   /*
     Defines what zoompercentage correspond to what
@@ -26,6 +30,7 @@ class Star extends EventEmitter {
     this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
+    this.container.interactiveChildren = false
     this.container.buttonMode = true
 
     this.graphics_shape_part = new PIXI.Graphics()
@@ -33,12 +38,12 @@ class Star extends EventEmitter {
     this.graphics_shape_part_warp = new PIXI.Graphics()
     this.graphics_shape_full_warp = new PIXI.Graphics()
     this.graphics_hyperspaceRange = new PIXI.Graphics()
-    this.graphics_natural_resources_ring = new PIXI.Graphics()
+    this.graphics_natural_resources_ring = new Array(Star.maxLod)
     this.graphics_scanningRange = new PIXI.Graphics()
     this.graphics_star = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
-    this.container.addChild(this.graphics_natural_resources_ring)
+    //this.container.addChild(this.graphics_natural_resources_ring)
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
     this.container.addChild(this.graphics_shape_part_warp)
@@ -54,7 +59,7 @@ class Star extends EventEmitter {
     this.isSelected = false
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
-    this.zoomPercent = 0
+    this.zoomPercent = 100
 
     /**
       Zoomdepth
@@ -249,19 +254,31 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
-    this.graphics_natural_resources_ring.clear()
+    for(let lod = 0; lod<Star.maxLod; lod+=1) {
+      if(!this.graphics_natural_resources_ring[lod]) {
+        this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
+      }
+      this.graphics_natural_resources_ring[lod].clear()
 
-    if (this.userSettings.map.naturalResources !== 'single-ring') {
-      return
+      if (this.userSettings.map.naturalResources !== 'single-ring') {
+        return
+      }
+
+      // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
+      // TODO: Experimental:
+      let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
+
+      ringRadius /= 8.0
+      let lineWidht = 1.0/8.0
+      ringRadius *= lod+1
+      lineWidht *= lod+1
+      this.graphics_natural_resources_ring[lod].clear()
+      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, 0.1)
+      this.graphics_natural_resources_ring[lod].drawCircle(0, 0, ringRadius * 0.75)
+      this.graphics_natural_resources_ring[lod].scale.x = 1.0/( (1.0/8.0)*(lod+1) )
+      this.graphics_natural_resources_ring[lod].scale.y = 1.0/( (1.0/8.0)*(lod+1) )
+      this.container.addChild(this.graphics_natural_resources_ring[lod])
     }
-
-    // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
-    // TODO: Experimental:
-    let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
-
-    this.graphics_natural_resources_ring.clear()
-    this.graphics_natural_resources_ring.lineStyle(1, 0xFFFFFF, 0.1)
-    this.graphics_natural_resources_ring.drawCircle(0, 0, ringRadius * 0.75)
   }
 
   _getPlanetsCount () {
@@ -402,12 +419,9 @@ class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let style = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
-      style.fontSize = 4
-
-      this.text_name = new PIXI.Text(this.data.name, style)
+      let bitmapFont = {fontName: "space-mono", fontSize: Star.nameSize}
+      this.text_name = new PIXI.BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
-      this.text_name.resolution = 15
 
       this.container.addChild(this.text_name)
     }
@@ -415,7 +429,7 @@ class Star extends EventEmitter {
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
     if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
-      this.text_name.y = 0
+      this.text_name.y = ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
     }
@@ -423,21 +437,13 @@ class Star extends EventEmitter {
 
   drawGarrison () {
     if (this.text_garrison_small) {
-      this.text_garrison_small.texture.destroy(true)
       this.container.removeChild(this.text_garrison_small)
       this.text_garrison_small = null
     }
-
     if (this.text_garrison_big) {
-      this.text_garrison_big.texture.destroy(true)
       this.container.removeChild(this.text_garrison_big)
       this.text_garrison_big = null
     }
-
-    let style_small = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
-    let style_big = Object.assign({}, TextureService.DEFAULT_FONT_STYLE)
-    style_small.fontSize = 4
-    style_big.fontSize = 7
 
     let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
 
@@ -464,42 +470,40 @@ class Star extends EventEmitter {
       garrisonText += carrierCount.toString()
     }
 
-    function make_garrison_text(small) {
-      let text_garrison = new PIXI.Text(garrisonText, small ? style_small : style_big)
-      text_garrison.scale.x = 1.5
-      text_garrison.scale.y = 1.5
-      text_garrison.resolution = 10
-
-      text_garrison.x = 5
-      text_garrison.y = -text_garrison.height + (small ? 1.5 : 6)
-      return text_garrison
-    }
-
     if (garrisonText) {
-      this.text_garrison_small = make_garrison_text(true)
-      this.text_garrison_big = make_garrison_text(false)
-      this.container.addChild(this.text_garrison_small)
-      this.container.addChild(this.text_garrison_big)
+      if (!this.text_garrison_small) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonSmallSize}
+        this.text_garrison_small = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_garrison_small)
+        this.text_garrison_small.x = 5
+        this.text_garrison_small.y = (-this.text_garrison_small.height) +( ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize )
+      }
+
+      if (!this.text_garrison_big) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonBigSize}
+        this.text_garrison_big = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_garrison_big)
+        this.text_garrison_big.x = 5
+        this.text_garrison_big.y = -this.text_garrison_big.height/2.0
+      }
+      this.text_garrison_small.text = garrisonText
+      this.text_garrison_big.text = garrisonText
     }
   }
 
   drawInfrastructure () {
     if ( this.text_infrastructure ) {
-      this.text_infrastructure.texture.destroy(true)
       this.container.removeChild(this.text_infrastructure)
       this.text_infrastructure = null
     }
 
     if (!this.text_infrastructure) {
       if (this.data.ownedByPlayerId && this._isInScanningRange()) {
-        let style = TextureService.DEFAULT_FONT_STYLE
-        style.fontSize = 4
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
-        this.text_infrastructure = new PIXI.Text(displayInfrastructure, style)
-        this.text_infrastructure.resolution = 10
-
-        this.text_infrastructure.x = -(this.text_infrastructure.width / 2)
+        let bitmapFont = {fontName: "space-mono", fontSize: 4}
+        this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+        this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
 
         this.container.addChild(this.text_infrastructure)
@@ -571,30 +575,10 @@ class Star extends EventEmitter {
   }
 
 
-  onTick( deltaTime, zoomPercent, viewportData ) {
-   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Star.culling_margin
-   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Star.culling_margin
-
-   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
-     //cannot set parent container visibility, since scannrange and hyperrange circles stretch away from star location
-     // maybe put them on their own container, since this piece of code should remain as small as possible
-     this.graphics_star.visible = false
-     this.graphics_shape_part.visible = false
-     this.graphics_shape_full.visible = false
-     this.graphics_shape_part_warp.visible = false
-     this.graphics_shape_full_warp.visible = false
-     this.graphics_natural_resources_ring.visible = false
-
-     if (this.text_name) this.text_name.visible = false
-     if (this.container_planets) this.container_planets.visible = false
-     if (this.text_infrastructure) this.text_infrastructure.visible = false
-     if (this.text_garrison_small) this.text_garrison_small.visible = false
-     if (this.text_garrison_big) this.text_garrison_big.visible = false
-   }
-   else {
-     this.updateVisibility()
-     this.setScale(zoomPercent)
-   }
+  onZoomChanging(zoomPercent) {
+    this.zoomPercent = zoomPercent
+    this.setScale(zoomPercent)
+    this.updateVisibility()
   }
 
   setScale( zoomPercent ) {
@@ -641,10 +625,17 @@ class Star extends EventEmitter {
   }
 
   updateVisibility() {
+    //TODO compute on the map tick
+    let aparentScale = this.container.scale.x * (this.zoomPercent/100.0)
+    let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
+    for(let l = 0; l<Star.maxLod; l+= 1) {
+      this.graphics_natural_resources_ring[l].visible = false
+    }
+
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
-    this.graphics_natural_resources_ring.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources

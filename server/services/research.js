@@ -86,14 +86,17 @@ module.exports = class ResearchService extends EventEmitter {
             tech.level++;
             tech.progress -= requiredProgress;
 
+            this._setNextResearch(game, player);
+
             this.emit('onPlayerResearchCompleted', {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                player,
-                technology: {name:techKey,level:tech.level}
+                playerId: player._id,
+                technologyKey: techKey,
+                technologyLevel: tech.level,
+                technologyKeyNext: player.researchingNow,
+                technologyLevelNext: player.research[player.researchingNow].level + 1
             });
-
-            this._setNextResearch(game, player);
 
             levelUp = true
         }

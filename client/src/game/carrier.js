@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import gameHelper from '../services/gameHelper'
 
 class Carrier extends EventEmitter {
 
@@ -15,6 +14,7 @@ class Carrier extends EventEmitter {
     this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
     this.container.interactive = true
+    this.container.interactiveChildren = false
     this.container.buttonMode = true
 
     this.graphics_colour = new PIXI.Graphics()
@@ -33,7 +33,7 @@ class Carrier extends EventEmitter {
     this.uniquePaths = Array()
 
     this.isMouseOver = false
-    this.zoomPercent = 0
+    this.zoomPercent = 100
   }
 
   setup (data, userSettings, stars, player, lightYearDistance) {
@@ -56,6 +56,8 @@ class Carrier extends EventEmitter {
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
+
+    this.clearPaths() // clear on setup since this is used to reset waypoints
   }
 
   draw () {
@@ -124,31 +126,36 @@ class Carrier extends EventEmitter {
 
   drawGarrison () {
     if (this.text_garrison) {
-      this.text_garrison.texture.destroy(true)
       this.container.removeChild(this.text_garrison)
       this.text_garrison = null
     }
 
     if (!this.text_garrison) {
-      let style = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
-        fill: 0xFFFFFF,
-        padding: 3,
-        fontSize: 5,
-        fontWeight: 'bold'
-      })
-
       let totalGarrison = this.data.ships == null ? '???' : this.data.ships
 
-      let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
+      let garrisonText = totalGarrison.toString()
 
-      this.text_garrison = new PIXI.Text(garrisonText, style)
-      this.text_garrison.resolution = 10
+      let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
+      this.text_garrison = new PIXI.BitmapText(garrisonText, bitmapFont)
 
-      this.text_garrison.x = -(this.text_garrison.width / 2)
+      this.text_garrison.x = -(this.text_garrison.width / 2.0)
       this.text_garrison.y = 5
 
       this.container.addChild(this.text_garrison)
+      if( this.data.isGift ) {
+        let style = new PIXI.TextStyle({
+          fontFamily: `'Space Mono', monospace`,
+          fill: 0xFFFFFF,
+          padding: 3,
+          fontSize: 4,
+          fontWeight: 'bold'
+        })
+        let giftText = new PIXI.Text('🎁', style)
+        giftText.resolution = 12
+        giftText.position.x = this.text_garrison.width
+        giftText.position.y = -1
+        this.text_garrison.addChild(giftText)
+      }
     }
   }
 
@@ -299,23 +306,10 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = false
   }
 
-  onTick( deltaTime, zoomPercent, viewportData) {
-   let deltax = Math.abs(viewportData.center.x - this.data.location.x) - Carrier.culling_margin
-   let deltay = Math.abs(viewportData.center.y - this.data.location.y) - Carrier.culling_margin
-
-   if ((deltax > viewportData.xradius) || (deltay > viewportData.yradius)) {
-     //cannot set parent container visibility, since waypoints lines stretch away from carrier location
-     // maybe put waypoints on its own container, since this piece of code should remain as small as possible
-     this.graphics_colour.visible = false
-     this.graphics_ship.visible = false
-     if (this.text_garrison) this.text_garrison.visible = false
-   }
-   else {
-     this.graphics_colour.visible = true
-     if (this.text_garrison) this.text_garrison.visible = true
-     this.updateVisibility()
-   }
+  onZoomChanging(zoomPercent) {
+   this.zoomPercent = zoomPercent
    this.setScale(zoomPercent)
+   this.updateVisibility()//TODO see how this behaves on mobile - does it updated when pinching or only when pinching stops?
   }
 
   setScale( zoomPercent ) {
@@ -357,7 +351,6 @@ class Carrier extends EventEmitter {
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
     if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
-
 
   deselectAllText () {
     if (window.getSelection) {window.getSelection().removeAllRanges();}

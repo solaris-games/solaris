@@ -93,6 +93,10 @@ export default {
     userOwnsObject (mapObject) {
       let userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
 
+      if (!userPlayer) {
+        return false
+      }
+
       let owningPlayer
 
       switch (mapObject.type) {

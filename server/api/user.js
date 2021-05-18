@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('./middleware')(container);
 
-    router.get('/api/user/leaderboard', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/leaderboard', async (req, res, next) => {
         try {
             const limit = +req.query.limit || null;
             const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey);
@@ -99,7 +99,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/:id', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/:id', async (req, res, next) => {
         try {
             let user = await container.userService.getInfoByIdLean(req.params.id);
 
@@ -109,7 +109,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/achievements/:id', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/achievements/:id', async (req, res, next) => {
         try {
             let achievements = await container.achievementService.getAchievements(req.params.id);
 

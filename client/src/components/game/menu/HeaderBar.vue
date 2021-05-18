@@ -19,7 +19,7 @@
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <span v-if="isSpecialistsTechnologyEnabled" title="Specialist Tokens">
+            <span v-if="isSpecialistsCurrencyCreditsSpecialists" title="Specialist Tokens">
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
@@ -102,7 +102,6 @@ export default {
     this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
-
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
     this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
@@ -113,9 +112,11 @@ export default {
     clearInterval(this.intervalFunction)
 
     this.sockets.unsubscribe('gameStarted')
+    this.sockets.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('gameConversationRead')
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
-    this.sockets.unsubscribe('gameConversationRead')
+    this.sockets.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     gameStarted () {
@@ -195,6 +196,10 @@ export default {
       }
     },
     recalculateTimeRemaining () {
+      if (!this.$store.state.game) {
+        return
+      }
+      
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
@@ -334,8 +339,8 @@ export default {
     isTimeMachineEnabled () {
       return this.$store.state.game.settings.general.timeMachine === 'enabled'
     },
-    isSpecialistsTechnologyEnabled () {
-      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+    isSpecialistsCurrencyCreditsSpecialists () {
+      return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
     }
   }
 }

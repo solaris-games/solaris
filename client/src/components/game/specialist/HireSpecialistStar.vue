@@ -94,6 +94,9 @@ export default {
                 this.star.specialist = specialist
                 this.userPlayer[currency] -= specialist.cost[currency]
 
+                this.userPlayer.stats.totalStarSpecialists++
+                this.userPlayer.stats.totalSpecialists++
+
                 GameContainer.reloadStar(this.star)
             }
         } catch (err) {
