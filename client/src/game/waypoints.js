@@ -87,6 +87,7 @@ class Waypoints extends EventEmitter {
 
   drawHyperspaceRange () {
     let graphics = new PIXI.Graphics()
+    // TODO: This is causing errors when a star is revealed in dark mode.
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 

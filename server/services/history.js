@@ -1,15 +1,23 @@
 const cache = require('memory-cache');
+const ValidationError = require('../errors/validation');
 
 const MIN_HISTORY_TICK_OFFSET = 24;
 
 module.exports = class HistoryService {
 
-    constructor(historyModel, playerService) {
+    constructor(historyModel, playerService, gameService) {
         this.historyModel = historyModel;
         this.playerService = playerService;
+        this.gameService = gameService;
     }
 
     async listIntel(gameId, startTick, endTick) {
+        let settings = await this.gameService.getGameSettings(gameId);
+
+        if (settings.specialGalaxy.darkGalaxy === 'extra') {
+            throw new ValidationError('Intel is not available in this game mode.');
+        }
+
         startTick = startTick || 0;
         endTick = endTick || Number.MAX_VALUE;;
 

@@ -346,6 +346,10 @@ class GameHelper {
     return game.state.endDate != null
   }
 
+  isDarkModeExtra (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
