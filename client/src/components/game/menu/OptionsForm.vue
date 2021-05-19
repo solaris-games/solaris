@@ -161,28 +161,28 @@
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-frequency" class="col col-form-label">Nebula Frequency</label>
         <div class="col">
-            <input type="range" min="0" max="16" step="1" class="form-range" style="width:100%" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
+            <input type="range" min="0" max="16" step="1" class="form-range w-100" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-density" class="col col-form-label">Nebula Density</label>
         <div class="col">
-          <input type="range" min="0" max="8" class="form-range form-control" style="width:100%" id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
+          <input type="range" min="0" max="8" step="1" class="form-range w-100"  id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-opacity" class="col col-form-label">Nebula Opacity</label>
         <div class="col">
-          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range" style="width:100%" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
+          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range w-100" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="stars-opacity" class="col col-form-label">Stars Opacity</label>
         <div class="col">
-          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range" style="width:100%" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
+          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range w-100" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
         </div>
       </div>
 
@@ -222,7 +222,7 @@
           <div class="row bg-secondary pt-1 pb-1 ml-1">
             <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
             <div class="col">
-              <input type="range" min="0.0" max="2.0" step="0.125" class="form-range" style="width:100%" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
+              <input type="range" min="0.0" max="2.0" step="0.125" class="form-range w-100" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
             </div>
           </div>
         </div>
