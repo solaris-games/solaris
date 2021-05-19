@@ -61,13 +61,13 @@ module.exports = class IrregularMapService {
     _getStarCountInRings( ringCount ) {
         let starCount = 0;
         let ringIndex = 0;
-        let lastLayerPruning = 0;
+        let lastRingPruning = 0;
         while(ringIndex<ringCount) {
-            starCount += lastLayerPruning;
+            starCount += lastRingPruning; // refill the last ring with the pruned stars since this ring is no longer the last one
             starCount += 6+(ringIndex*6); // each ring on a hexagonal grid will have this amount of stars, this is not tweakable
-            // last layer will actually have less stars. this is to ensure a perfect hexagonal tiling withouth any stars overlapping, values are not tweakable
-            lastLayerPruning = 4 + ( (ringIndex*6)/2 );
-            starCount -= lastLayerPruning;
+            // last ring(outer ring) will actually have less stars. this is to ensure a perfect hexagonal tiling withouth any stars overlapping, values are not tweakable
+            lastRingPruning = 4 + ( (ringIndex*6)/2 );
+            starCount -= lastRingPruning;
             ringIndex += 1;
         }
         return starCount;
@@ -77,12 +77,12 @@ module.exports = class IrregularMapService {
     _getNecessaryRingCount( starsPerPlayer ) {
         let starCount = 0;
         let ringIndex = 0;
-        let lastLayerPruning = 0;
+        let lastRingPruning = 0;
         while(starCount<starsPerPlayer) {
-            starCount += lastLayerPruning;
+            starCount += lastRingPruning;
             starCount += 6+(ringIndex*6);
-            lastLayerPruning = 4 + ( (ringIndex*6)/2 );
-            starCount -= lastLayerPruning;
+            lastRingPruning = 4 + ( (ringIndex*6)/2 );
+            starCount -= lastRingPruning;
             ringIndex += 1;
         }
         return ringIndex;
