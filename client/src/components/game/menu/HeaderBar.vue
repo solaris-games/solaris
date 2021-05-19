@@ -196,6 +196,10 @@ export default {
       }
     },
     recalculateTimeRemaining () {
+      if (!this.$store.state.game) {
+        return
+      }
+      
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {

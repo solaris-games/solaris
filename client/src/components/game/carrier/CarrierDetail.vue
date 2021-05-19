@@ -48,9 +48,7 @@
             <span v-if="carrier.specialist">
               {{carrier.specialist.name}}
             </span>
-            <span v-if="!carrier.specialist">
-              No Specialist
-            </span>
+            <span v-if="!carrier.specialist">No Specialist</span>
           </span>
         </div>
         <div class="col-auto">
@@ -418,12 +416,15 @@ export default {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && this.carrier.orbiting && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.canShowSpecialist && this.carrier.orbiting && !GameHelper.isGameFinished(this.$store.state.game) && !this.isDeadStar
     },
     isOwnedByUserPlayer: function () {
       let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
 
       return owner && this.userPlayer && owner._id === this.userPlayer._id
+    },
+    isDeadStar: function () {
+      return GameHelper.isDeadStar(this.getCarrierOrbitingStar())
     }
   }
 }
