@@ -5,6 +5,3 @@ db.games.updateMany({
 		'settings.specialGalaxy.darkGalaxy': 'standard'
 	}
 });
-
-TODO: Trade with all setting?
-TODO: Leaderboard star counts?
