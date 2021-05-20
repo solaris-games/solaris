@@ -273,7 +273,8 @@
       </p>
 
       <p>
-        Carriers can also be gifted to other players. When a gifted carrier arrives at its destination the player who owns the star will gain control of the carrier and its ships. 
+        Carriers can also be gifted to other players. When a gifted carrier arrives at its destination the player who owns the star will gain control of the carrier and its ships. Note
+        that if a carrier has a specialist, that specialist will be retired.
       </p>
     </div>
 
