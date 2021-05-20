@@ -15,7 +15,7 @@
                   <i class="fas fa-envelope"></i>
                   <span v-if="conversation && conversation.unreadCount" class="ml-1">{{conversation.unreadCount}}</span>
                 </button>
-                <button class="btn btn-info" :disabled="!userPlayer || !gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
+                <button class="btn btn-info" v-if="!isDarkModeExtra" :disabled="!userPlayer || !gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
                   <i class="fas fa-chart-line"></i>
                 </button>
               </div>
@@ -91,6 +91,11 @@ export default {
           console.error(err)
         }
       }
+    }
+  },
+  computed: {
+    isDarkModeExtra () {
+      return gameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

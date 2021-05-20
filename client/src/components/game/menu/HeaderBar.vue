@@ -254,7 +254,7 @@ export default {
       let keyCode = e.keyCode || e.which
 
       // Check for modifier keys and ignore the keypress if there is one.
-      if (e.altKey || e.shiftKey || e.ctrlKey) {
+      if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
         return
       }
 
@@ -279,6 +279,11 @@ export default {
 
       let menuArguments = menuState.split('|')[1]
       menuState = menuState.split('|')[0]
+
+      // Special case for intel, which is not accessible for dark mode extra games.
+      if (menuState === MENU_STATES.INTEL && GameHelper.isDarkModeExtra(this.$store.state.game)) {
+        return
+      }
       
       switch (menuState) {
         case null:

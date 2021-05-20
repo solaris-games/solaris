@@ -140,6 +140,9 @@ module.exports = class GameListService {
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
         })
+        .sort({
+            'state.startDate': -1
+        })
         .select({
             _id: 1,
             state: 1,

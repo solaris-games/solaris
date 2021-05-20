@@ -366,7 +366,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     calculateTotalShips(ownedStars, ownedCarriers) {
-        return ownedStars.reduce((sum, s) => sum + Math.floor(s.garrisonActual), 0) 
+        return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
     }
 

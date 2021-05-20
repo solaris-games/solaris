@@ -147,10 +147,11 @@ class Star extends EventEmitter {
     let alpha = isInScanningRange ? 1 : 0.5
     let starPoints = 6
 
-    this.graphics_star.lineStyle(0.5, 0xFFFFFF, alpha)
-
     let isDeadStar = this.data.naturalResources != null && this.data.naturalResources <= 0
     let fillStar = isInScanningRange && !isDeadStar
+    let lineWidth = isDeadStar ? 0.5 : 1
+
+    this.graphics_star.lineStyle(lineWidth, 0xFFFFFF, alpha)
 
     if (fillStar) {
       this.graphics_star.beginFill(0xFFFFFF, alpha)
@@ -261,6 +262,7 @@ class Star extends EventEmitter {
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
+        this.graphics_natural_resources_ring[lod].alpha = 0.3
       }
       this.graphics_natural_resources_ring[lod].clear()
 

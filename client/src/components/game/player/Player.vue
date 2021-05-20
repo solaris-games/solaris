@@ -25,9 +25,9 @@
                     :industry="userPlayer.stats.totalIndustry"
                     :science="userPlayer.stats.totalScience"/>
 
-    <h4 v-if="player" class="mt-2">Technology</h4>
+    <h4 v-if="player && player.research" class="mt-2">Technology</h4>
     
-    <research v-if="player" :playerId="player._id"/>
+    <research v-if="player && player.research" :playerId="player._id"/>
 
     <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
       <h4 class="mt-2">Trade</h4>
