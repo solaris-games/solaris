@@ -228,7 +228,7 @@ module.exports = class GameGalaxyService {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
                 
-                let canSeeStarGarrison = this.starService.canPlayerSeeStarGarrison(player, s);
+                let canSeeStarGarrison = isFinished || (player && this.starService.canPlayerSeeStarGarrison(player, s));
 
                 if (!canSeeStarGarrison) {
                     s.garrison = null;
