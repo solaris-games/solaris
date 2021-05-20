@@ -43,7 +43,7 @@ module.exports = class AIService {
     }
 
     async _playLastTick(game, player) {
-        if (!player.credits || player.credits < 0) {
+        if (!player.credits || player.credits <= 0) {
             return
         }
 
