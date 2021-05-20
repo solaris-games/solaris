@@ -39,15 +39,22 @@ export default {
       && this.userPlayer._id === this.carrier.ownedByPlayerId
       && this.carrier.orbiting
       && !this.carrier.isGift
+      && !this.isDeadStar
   },
   methods: {
     onViewHireCarrierSpecialistRequested() {
         this.$emit('onViewHireCarrierSpecialistRequested', this.carrierId)
+    },
+    getCarrierOrbitingStar () {
+      return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
     }
   },
   computed: {
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
+    },
+    isDeadStar: function () {
+      return GameHelper.isDeadStar(this.getCarrierOrbitingStar())
     }
   }
 }

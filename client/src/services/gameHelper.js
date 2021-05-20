@@ -346,6 +346,10 @@ class GameHelper {
     return game.state.endDate != null
   }
 
+  isDarkModeExtra (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
@@ -367,9 +371,11 @@ class GameHelper {
   }
 
   playerHasLowestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
+    const levels = [...new Set(game.galaxy.players
+      .filter(p => p.research != null)
+      .map(p => {
+        return p.research[techKey].level
+      }))]
 
     // If all players have the same level then nobody has the lowest.
     if (levels.length === 1) {
@@ -382,9 +388,11 @@ class GameHelper {
   }
 
   playerHasHighestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
+    const levels = [...new Set(game.galaxy.players
+      .filter(p => p.research != null)
+      .map(p => {
+        return p.research[techKey].level
+      }))]
 
     // If all players have the same level then nobody has the highest.
     if (levels.length === 1) {
@@ -729,6 +737,10 @@ class GameHelper {
     }
 
     return star
+  }
+
+  isDeadStar(star) {
+    return star.naturalResources != null && star.naturalResources <= 0
   }
 }
 

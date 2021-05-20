@@ -303,6 +303,7 @@ export default {
   max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
+  scrollbar-width: none;
 }
 
 ::-webkit-scrollbar {

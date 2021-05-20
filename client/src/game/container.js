@@ -33,18 +33,36 @@ class GameContainer {
 
     let fps = 1000.0/elapsed
     if( fps < this.lowest ) { this.lowest = fps }
-    this.fpsNowText.text = ( 'fps: ' + fps.toFixed(0) )
+    if (this.fpsNowText) {
+      this.fpsNowText.text = ( 'fps: ' + fps.toFixed(0) )
+    }
 
     if(this.frames==31) {
       let ma32FPS = 1000.0/ma32DT
-      this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
-      this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
-      this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
-      this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(0) )
+      
+      if (this.fpsMAText) {
+        this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
+      }
+      
+      if (this.fpsMA32Text) {
+        this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
+      }
+      
+      if (this.jitterText) {
+        this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
+      }
+
+      if (this.lowestText) {
+        this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(0) )
+      }
+
+      if (this.zoomText) {
+        this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
+      }
+
       this.frames = 0
       this.lowest = 1000
       this.ma32accum = 0
-      this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
     }
   }
 

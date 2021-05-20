@@ -147,16 +147,20 @@ class Star extends EventEmitter {
     let alpha = isInScanningRange ? 1 : 0.5
     let starPoints = 6
 
-    this.graphics_star.lineStyle(1, 0xFFFFFF, alpha)
+    this.graphics_star.lineStyle(0.5, 0xFFFFFF, alpha)
 
-    if (isInScanningRange) {
+    let isDeadStar = this.data.naturalResources != null && this.data.naturalResources <= 0
+    let fillStar = isInScanningRange && !isDeadStar
+
+    if (fillStar) {
       this.graphics_star.beginFill(0xFFFFFF, alpha)
     }
+
     this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 2)
-    if (isInScanningRange) {
+
+    if (fillStar) {
       this.graphics_star.endFill()
     }
-
   }
 
   drawSpecialist () {
@@ -257,6 +261,7 @@ class Star extends EventEmitter {
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
+        this.graphics_natural_resources_ring[lod].alpha = 0.3
       }
       this.graphics_natural_resources_ring[lod].clear()
 
@@ -629,13 +634,18 @@ class Star extends EventEmitter {
     let aparentScale = this.container.scale.x * (this.zoomPercent/100.0)
     let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
     for(let l = 0; l<Star.maxLod; l+= 1) {
-      this.graphics_natural_resources_ring[l].visible = false
+      if (this.graphics_natural_resources) {
+        this.graphics_natural_resources_ring[l].visible = false
+      }
     }
 
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
-    this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+
+    if (this.graphics_natural_resources_ring[lod]) {
+      this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    }
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
