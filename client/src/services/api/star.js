@@ -23,16 +23,18 @@ class StarService extends BaseApiService {
     { withCredentials: true })
   }
 
-  bulkInfrastructureUpgrade (gameId, infrastructure, amount) {
+  bulkInfrastructureUpgrade (gameId, upgradeStrategy, infrastructure, amount) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/bulk', {
+      upgradeStrategy,
       infrastructure,
       amount
     },
     { withCredentials: true })
   }
 
-  checkBulkUpgradedAmount (gameId, infrastructure, amount) {
+  checkBulkUpgradedAmount (gameId, upgradeStrategy, infrastructure, amount) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/bulkCheck', {
+        upgradeStrategy,  
         infrastructure,
         amount
       },

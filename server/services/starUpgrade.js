@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const ValidationError = require('../errors/validation');
+const Heap = require('qheap');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
@@ -372,13 +373,17 @@ module.exports = class StarUpgradeService extends EventEmitter {
             });
     }
 
-    async upgradeBulk(game, player, infrastructureType, amount, writeToDB = true) {
-        // Check that the amount the player wants to spend isn't more than the amount he has
-        if (player.credits < amount) {
-            throw new ValidationError(`The player does not own enough credits to afford to bulk upgrade.`);
+    async upgradeBulk(game, player, upgradeStrategy, infrastructureType, amount, writeToDB = true) {
+        if (!amount || amount <= 0) {
+            throw new ValidationError(`Invalid upgrade amount given`);
         }
 
-        let upgradeSummary = await this.generateUpgradeBulkReport(game, player, infrastructureType, amount);
+        const upgradeSummary = await this.generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, amount);
+
+        // Check that the amount the player wants to spend isn't more than the amount he has
+        if (player.credits < upgradeSummary.cost) {
+            throw new ValidationError(`The player does not own enough credits to afford to bulk upgrade.`);
+        }
 
         if (writeToDB) {
             // Generate the DB writes for all the stars to upgrade, including deducting the credits
@@ -458,8 +463,133 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    async generateUpgradeBulkReport(game, player, infrastructureType, budget) {
+    async generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, amount) {
+        if (!amount || amount <= 0) {
+            throw new ValidationError(`Invalid upgrade amount given`);
+        }
+
         // Get all of the player stars and what the next upgrade cost will be.
+        if (upgradeStrategy === 'totalCredits') {
+            return await this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount)
+        } else if (upgradeStrategy === 'infrastructureAmount') {
+            return await this.generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount)
+        } else if (upgradeStrategy === 'belowPrice') {
+            return await this.generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount)
+        }
+    }
+
+    _createUpgradeQueue(size) {
+        return new Heap({
+            comparBefore: (s1, s2) => s1.infrastructureCost < s2.infrastructureCost,
+            compar: (s1, s2) => s1.infrastructureCost - s2.infrastructureCost,
+            freeSpace: false,
+            size
+        })
+    }
+
+    async _upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType) {
+        let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
+
+        if (!summaryStar) {
+            summaryStar = {
+                starId: upgradeStar.star._id,
+                naturalResources: upgradeStar.star.naturalResources,
+                infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
+                infrastructureCostTotal: 0
+            }
+    
+            upgradeSummary.stars.push(summaryStar);
+        }
+
+        const upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
+
+        upgradeSummary.upgraded++;
+        upgradeSummary.cost += upgradeReport.cost;
+        summaryStar.infrastructureCostTotal += upgradeReport.cost;
+
+        // Update the stars next infrastructure cost so next time
+        // we loop we will have the most up to date info.
+        upgradeStar.infrastructureCost = upgradeReport.nextCost;
+
+        summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
+        summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
+
+        return upgradeReport.cost;
+    }
+
+    async generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount) {
+        const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
+        const stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
+
+        const upgradeSummary = {
+            budget: amount,
+            stars: [],
+            cost: 0,
+            upgraded: 0,
+            infrastructureType,
+            ignoredCount
+        };
+
+        const affordableStars = stars.filter(s => s.infrastructureCost <= amount);
+        const upgradeQueue = this._createUpgradeQueue(stars.length);
+        affordableStars.forEach(star => {
+            upgradeQueue.insert(star)
+        });
+
+        // Make sure we are not spending enormous amounts of time on this
+        while (upgradeSummary.upgraded <= 200) {
+            const nextStar = upgradeQueue.dequeue();
+            if (!nextStar) {
+                break;
+            }
+
+            await this._upgradeStarAndSummary(game, player, upgradeSummary, nextStar, infrastructureType);
+
+            if (nextStar.infrastructureCost <= amount) {
+                upgradeQueue.insert(nextStar);
+            }
+        }
+
+        return upgradeSummary
+    }
+
+    async generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount) {
+        //Enforce some max size constraint
+        amount = Math.min(amount, 200);
+        const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
+        const stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
+
+        const upgradeSummary = {
+            budget: amount,
+            stars: [],
+            cost: 0,
+            upgraded: 0,
+            infrastructureType,
+            ignoredCount
+        };
+
+        const upgradeQueue = this._createUpgradeQueue(stars.length);
+        stars.forEach(star => {
+            upgradeQueue.insert(star);
+        });
+
+        for (let i = 0; i < amount; i++) {
+            let upgradeStar = upgradeQueue.dequeue();
+
+            // If no stars can be upgraded then break out here.
+            if (!upgradeStar) {
+                break;
+            }
+
+            await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType);
+
+            upgradeQueue.insert(upgradeStar)
+        }
+
+        return upgradeSummary;
+    }
+
+    async generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, budget) {
         let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
         let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
@@ -474,45 +604,22 @@ module.exports = class StarUpgradeService extends EventEmitter {
             ignoredCount
         };
 
+        const upgradeStars = this._createUpgradeQueue(stars.length);
+        stars.forEach(star => {
+            upgradeStars.insert(star)
+        });
+
         while (budget) {
             // Get the next star that can be upgraded, cheapest first.
-            let upgradeStar = stars
-                .filter(s => s.infrastructureCost <= budget)
-                .sort((a, b) => a.infrastructureCost - b.infrastructureCost)[0];
+            let upgradeStar = upgradeStars.dequeue();
 
             // If no stars can be upgraded then break out here.
-            if (!upgradeStar) {
+            if (!upgradeStar || upgradeStar.infrastructureCost > budget) {
                 break;
             }
 
-            // Add the star that we upgraded to the summary result.
-            let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
-
-            if (!summaryStar) {
-                summaryStar = {
-                    starId: upgradeStar.star._id,
-                    naturalResources: upgradeStar.star.naturalResources,
-                    infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
-                    infrastructureCostTotal: 0
-                }
-
-                upgradeSummary.stars.push(summaryStar);
-            }
-
-            let upgradeReport = await upgradeStar.upgrade(game, player, upgradeStar.star._id, false);
-
-            budget -= upgradeReport.cost;
-
-            upgradeSummary.upgraded++;
-            upgradeSummary.cost += upgradeReport.cost;
-            summaryStar.infrastructureCostTotal += upgradeReport.cost;
-
-            // Update the stars next infrastructure cost so next time
-            // we loop we will have the most up to date info.
-            upgradeStar.infrastructureCost = upgradeReport.nextCost;
-
-            summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
-            summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
+            budget -= await this._upgradeStarAndSummary(game, player, upgradeSummary, upgradeStar, infrastructureType);
+            upgradeStars.insert(upgradeStar)
         }
 
         return upgradeSummary;
