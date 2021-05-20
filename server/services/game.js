@@ -133,15 +133,19 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async join(game, userId, playerId, alias, avatar, password) {
+        // The player cannot join the game if:
+        // 1. The game has finished.
+        // 2. They quit the game before the game started.
+        // 3. They are already playing the game as an undefeated non-afk player.
+        // 4. They are trying to play in a different slot if they have been afk'd.
+        // 5. The password entered is invalid.
+        // 6. The player does not own any stars.
+        // 7. The alias is already taken.
+        // 8. The alias (username) is already taken.
+
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
             throw new ValidationError('The game has already finished.');
-        }
-
-        // The user cannot rejoin if they quit early or were afk.
-        if (game.quitters.find(x => x.equals(userId))
-            || game.afkers.find(x => x.equals(userId))) {
-            throw new ValidationError('You cannot rejoin this game.');
         }
 
         if (game.settings.general.password) {
@@ -152,11 +156,18 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
+        let isQuitter = game.quitters.find(x => x.equals(userId));
+
+        // The user cannot rejoin if they quit early.
+        if (isQuitter) {
+            throw new ValidationError('You cannot rejoin this game.');
+        }
+
         // Disallow if they are already in the game as another player.
         // If the player they are in the game as is afk then that's fine.
         let existing = game.galaxy.players.find(x => x.userId === userId.toString());
 
-        if (existing) {
+        if (existing && !existing.afk) {
             throw new ValidationError('You are already participating in this game.');
         }
 
@@ -165,6 +176,16 @@ module.exports = class GameService extends EventEmitter {
 
         if (!player) {
             throw new ValidationError('The player is not participating in this game.');
+        }
+
+        // If the user was an afk-er then they are only allowed to join
+        // their slot.
+        let isAfker = game.afkers.find(x => x.equals(userId));
+        let isRejoiningAfkSlot = isAfker && player.afk && player.userId === userId;
+
+        // If they have been afk'd then they are only allowed to join their slot again.
+        if (player.afk && isAfker && player.userId !== userId) {
+            throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 
         let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
@@ -181,7 +202,7 @@ module.exports = class GameService extends EventEmitter {
 
         let aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
 
-        if (aliasCheckPlayer) {
+        if (aliasCheckPlayer && !isRejoiningAfkSlot) {
             throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
         }
 
