@@ -49,8 +49,7 @@ module.exports = class IrregularMapService {
     // get how many rings of stars will be necessary to have at least starPerPlayerMin stars per player
     // then try to use as many rings as possible without going over starPerPlayerMax amount of stars per player
     _getRingCount( starsPerPlayerMin, starsPerPlayerMax ) {
-      let ringCount = this._getNecessaryRingCount(starsPerPlayerMin)
-      ringCount += 1 
+      let ringCount = this._getNecessaryRingCount(starsPerPlayerMin) + 1
       while(this._getStarCountInRings(ringCount)<starsPerPlayerMax) {
         ringCount += 1 
       }
