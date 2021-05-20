@@ -1,6 +1,6 @@
 <template>
 <div class="table-responsive mb-0" v-if="player">
-  <table class="table table-sm bg-secondary">
+  <table class="table table-sm bg-secondary mb-1">
       <thead>
           <tr>
               <th></th>
@@ -46,6 +46,8 @@
           </tr>
       </tbody>
   </table>
+
+  <p class="text-warning text-center mb-2" v-if="isDarkModeExtra && userIsInGame() && !isUserPlayer()"><small>Based on your scanning range.</small></p>
 </div>
 </template>
 
@@ -76,6 +78,9 @@ export default {
     },
     isSpecialistsEnabled () {
       return GameHelper.isSpecialistsEnabled(this.$store.state.game)
+    },
+    isDarkModeExtra () {
+      return GameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

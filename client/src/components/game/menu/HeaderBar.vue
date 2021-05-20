@@ -279,6 +279,11 @@ export default {
 
       let menuArguments = menuState.split('|')[1]
       menuState = menuState.split('|')[0]
+
+      // Special case for intel, which is not accessible for dark mode extra games.
+      if (menuState === MENU_STATES.INTEL && GameHelper.isDarkModeExtra(this.$store.state.game)) {
+        return
+      }
       
       switch (menuState) {
         case null:

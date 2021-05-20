@@ -24,7 +24,7 @@
             <i class="fas fa-sun"></i>
           </button>
         </div>
-        <div class="col" v-if="isLoggedIn">
+        <div class="col" v-if="isLoggedIn && !isDarkModeExtra">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.INTEL)">
             <i class="fas fa-chart-line"></i>
           </button>
@@ -91,6 +91,9 @@ export default {
     },
     isLoggedIn () {
       return this.$store.state.userId != null
+    },
+    isDarkModeExtra () {
+      return GameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }
