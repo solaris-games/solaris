@@ -43,7 +43,6 @@ class Star extends EventEmitter {
     this.graphics_star = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
-    //this.container.addChild(this.graphics_natural_resources_ring)
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
     this.container.addChild(this.graphics_shape_part_warp)
@@ -635,18 +634,19 @@ class Star extends EventEmitter {
     let aparentScale = this.container.scale.x * (this.zoomPercent/100.0)
     let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
     for(let l = 0; l<Star.maxLod; l+= 1) {
-      if (this.graphics_natural_resources) {
-        this.graphics_natural_resources_ring[l].visible = false
-      }
+      this.graphics_natural_resources_ring[l].visible = false
     }
 
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
 
-    if (this.graphics_natural_resources_ring[lod]) {
-      this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    if (this.userSettings.map.naturalResources !== 'planets') {
+      if (this.graphics_natural_resources_ring[lod]) {
+        this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+      }
     }
+
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
