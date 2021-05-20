@@ -70,6 +70,7 @@ ul {
   overflow: visible;
   white-space: nowrap;
   overflow-x: auto;
+  scrollbar-color: #375a7f #303030;
 }
 
 li {
