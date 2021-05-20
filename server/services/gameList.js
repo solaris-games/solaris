@@ -67,6 +67,19 @@ module.exports = class GameListService {
         .exec();
     }
 
+    async listFinishedGames() {
+        return await this.gameModel.find({
+            'state.endDate': { $ne: null }
+        })
+        .select({
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        })
+        .lean({ defaults: true })
+        .exec();
+    }
+
     async listCompletedGames(userId) {
         let games = await this.gameModel.find({
             'galaxy.players': { $elemMatch: { userId } },   // User is in game
@@ -126,6 +139,9 @@ module.exports = class GameListService {
             'state.startDate': { $lte: moment().utc().toDate() },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
+        })
+        .sort({
+            'state.startDate': -1
         })
         .select({
             _id: 1,

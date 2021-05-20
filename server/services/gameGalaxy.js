@@ -63,7 +63,8 @@ module.exports = class GameGalaxyService {
 
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like garrisons.
-        if (!player) {
+        // If the game has finished then everyone should be able to view the full game.
+        if (!player && !this.gameService.isFinished(game)) {
             this._setStarInfoBasic(game);
 
             // Also remove all carriers from players.
@@ -77,6 +78,15 @@ module.exports = class GameGalaxyService {
             this._setCarrierInfoDetailed(game, player);
             this._setStarInfoDetailed(game, player);
             await this._setPlayerInfoBasic(game, player);
+        }
+
+        // For extra dark mode games, overwrite the player stats as by this stage
+        // scanning range will have kicked in and filtered out stars and carriers the player
+        // can't see and therefore global stats should display what the current player can see
+        // instead of their actual values.
+        // TODO: Better to not overwrite, but just not do it above in the first place.
+        if (this.gameService.isDarkModeExtra(game)) {
+            this._setPlayerStats(game);
         }
 
         if (isHistorical && cached) {
@@ -116,17 +126,6 @@ module.exports = class GameGalaxyService {
         };
     }
 
-    _isDarkStart(doc) {
-        // Work out whether we are in dark galaxy mode.
-        // This is true if the dark galaxy setting is enabled,
-        // OR if its "start only" and the game has not yet started.
-        return doc.settings.specialGalaxy.darkGalaxy === 'start'
-    }
-    
-    _isDarkMode(doc) {
-        return doc.settings.specialGalaxy.darkGalaxy === 'enabled';
-    }
-
     _getUserPlayer(doc, userId) {
         if (!userId) {
             return null;
@@ -146,8 +145,8 @@ module.exports = class GameGalaxyService {
         // Work out whether we are in dark galaxy mode.
         // This is true if the dark galaxy setting is enabled,
         // OR if its "start only" and the game has not yet started.
-        const isDarkStart = this._isDarkStart(doc);
-        const isDarkMode = this._isDarkMode(doc);
+        const isDarkStart = this.gameService.isDarkStart(doc);
+        const isDarkMode = this.gameService.isDarkMode(doc);
 
         // If its a dark galaxy start then return no stars.
         if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
@@ -168,8 +167,8 @@ module.exports = class GameGalaxyService {
 
     _setStarInfoDetailed(doc, player) { 
         const isFinished = this.gameService.isFinished(doc);
-        const isDarkStart = this._isDarkStart(doc);
-        const isDarkMode = this._isDarkMode(doc);
+        const isDarkStart = this.gameService.isDarkStart(doc);
+        const isDarkMode = this.gameService.isDarkMode(doc);
 
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
@@ -182,7 +181,11 @@ module.exports = class GameGalaxyService {
         }
 
         // Get all of the player's stars.
-        let playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+        let playerStars = [];
+
+        if (player) {
+            playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+        }
 
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = doc.galaxy.stars
@@ -263,13 +266,16 @@ module.exports = class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                if (!this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                if (player && !this.carrierService.canPlayerSeeCarrierShips(player, c)) {
                     c.ships = null;
                 }
             });
     }
 
     async _setPlayerInfoBasic(doc, player) {
+        const isFinished = this.gameService.isFinished(doc);
+        const isDarkModeExtra = this.gameService.isDarkModeExtra(doc);
+
         let onlinePlayers = this.broadcastService.getOnlinePlayers(doc); // Need this for later.
 
         // Get the list of all guilds associated to players, we'll need this later.
@@ -294,6 +300,8 @@ module.exports = class GameGalaxyService {
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
+            let isCurrentUserPlayer = player && p._id.equals(player._id);
+
             // Append the guild tag to the player alias.
             let playerGuild = null;
 
@@ -314,7 +322,7 @@ module.exports = class GameGalaxyService {
 
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
-            if (player && p._id == player._id) {
+            if (isCurrentUserPlayer) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
 
                 delete p.notes; // Don't need to send this back.
@@ -323,13 +331,14 @@ module.exports = class GameGalaxyService {
                 return p;
             }
 
+            // NOTE: From this point onwards, the player is NOT the current user.
+
             if (!displayOnlineStatus) {
                 p.lastSeen = null;
                 p.isOnline = null;
             } else {
                 // Work out whether the player is online.
-                p.isOnline = (player && p._id == player._id) 
-                    || onlinePlayers.find(op => op._id.equals(p._id)) != null;
+                p.isOnline = isCurrentUserPlayer || onlinePlayers.find(op => op._id.equals(p._id)) != null;
             }
 
             let reputation = null;
@@ -338,38 +347,46 @@ module.exports = class GameGalaxyService {
                 reputation = this.reputationService.getReputation(p, player);
             }
 
+            let research = {
+                scanning: { 
+                    level: p.research.scanning.level
+                },
+                hyperspace: { 
+                    level: p.research.hyperspace.level
+                },
+                terraforming: { 
+                    level: p.research.terraforming.level
+                },
+                experimentation: { 
+                    level: p.research.experimentation.level
+                },
+                weapons: { 
+                    level: p.research.weapons.level
+                },
+                banking: { 
+                    level: p.research.banking.level
+                },
+                manufacturing: { 
+                    level: p.research.manufacturing.level
+                },
+                specialists: { 
+                    level: p.research.specialists.level
+                }
+            };
+
+            // In ultra dark mode games, research is visible 
+            // only to players who are within scanning range.
+            if (!isFinished && isDarkModeExtra && !p.isInScanningRange) {
+                research = null;
+            }
+
             // Return a subset of the user, key info only.
             return {
                 _id: p._id,
                 homeStarId: p.homeStarId,
                 colour: p.colour,
                 shape: p.shape,
-                research: {
-                    scanning: { 
-                        level: p.research.scanning.level
-                    },
-                    hyperspace: { 
-                        level: p.research.hyperspace.level
-                    },
-                    terraforming: { 
-                        level: p.research.terraforming.level
-                    },
-                    experimentation: { 
-                        level: p.research.experimentation.level
-                    },
-                    weapons: { 
-                        level: p.research.weapons.level
-                    },
-                    banking: { 
-                        level: p.research.banking.level
-                    },
-                    manufacturing: { 
-                        level: p.research.manufacturing.level
-                    },
-                    specialists: { 
-                        level: p.research.specialists.level
-                    }
-                },
+                research,
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,

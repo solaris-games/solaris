@@ -30,7 +30,7 @@
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
             </div>
-            <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+            <a v-if="isLoggedIn && !isDarkModeExtra" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
             <router-link to="/codex" class="dropdown-item"><i class="fas fa-question mr-2"></i>Help</router-link>
             <!-- <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.HELP)"><i class="fas fa-question mr-2"></i>Help</a> -->
@@ -110,6 +110,9 @@ export default {
     },
     isLoggedIn () {
       return this.$store.state.userId != null
+    },
+    isDarkModeExtra () {
+      return GameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

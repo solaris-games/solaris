@@ -160,8 +160,12 @@
             "text": "Disabled"
             },
             {
-            "value": "enabled",
-            "text": "Enabled"
+            "value": "standard",
+            "text": "Standard"
+            },
+            {
+            "value": "extra",
+            "text": "Extra"
             },
             {
             "value": "start",

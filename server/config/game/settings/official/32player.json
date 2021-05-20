@@ -23,7 +23,7 @@
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
     "randomGates": "rare",
-    "darkGalaxy": "enabled",
+    "darkGalaxy": "standard",
     "giftCarriers": "enabled",
     "defenderBonus": "disabled",
     "carrierToCarrierCombat": "enabled",

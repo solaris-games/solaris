@@ -287,7 +287,7 @@ export default {
 }
 
 .footer-bar {
-  position:absolute;
+  position: fixed;
   height: 52px;
   bottom: 0px;
   z-index: 1;
@@ -303,6 +303,7 @@ export default {
   max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
+  scrollbar-width: none;
 }
 
 ::-webkit-scrollbar {

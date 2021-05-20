@@ -1,6 +1,6 @@
 <template>
 <div class="table-responsive mb-0" v-if="player">
-  <table class="table table-sm bg-secondary">
+  <table class="table table-sm bg-secondary mb-1">
       <thead>
           <tr>
               <th></th>
@@ -10,21 +10,28 @@
       </thead>
       <tbody>
           <tr>
-              <td>Total Stars</td>
+              <td>Stars</td>
               <td class="text-right">{{player.stats.totalStars}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalStars > userPlayer.stats.totalStars,
                           'text-success': player.stats.totalStars < userPlayer.stats.totalStars}">{{userPlayer.stats.totalStars}}</td>
           </tr>
           <tr>
-              <td>Total Carriers</td>
+              <td>Carriers</td>
               <td class="text-right">{{player.stats.totalCarriers}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalCarriers > userPlayer.stats.totalCarriers,
                           'text-success': player.stats.totalCarriers < userPlayer.stats.totalCarriers}">{{userPlayer.stats.totalCarriers}}</td>
           </tr>
+          <tr v-if="isSpecialistsEnabled">
+              <td>Specialists</td>
+              <td class="text-right">{{player.stats.totalSpecialists}}</td>
+              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+                :class="{'text-danger': player.stats.totalSpecialists > userPlayer.stats.totalSpecialists,
+                          'text-success': player.stats.totalSpecialists < userPlayer.stats.totalSpecialists}">{{userPlayer.stats.totalSpecialists}}</td>
+          </tr>
           <tr>
-              <td>Total Ships</td>
+              <td>Ships</td>
               <td class="text-right">{{player.stats.totalShips}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalShips > userPlayer.stats.totalShips,
@@ -39,6 +46,8 @@
           </tr>
       </tbody>
   </table>
+
+  <p class="text-warning text-center mb-2" v-if="isDarkModeExtra && userIsInGame() && !isUserPlayer()"><small>Based on your scanning range.</small></p>
 </div>
 </template>
 
@@ -66,6 +75,12 @@ export default {
     },
     userPlayer () {
         return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    isSpecialistsEnabled () {
+      return GameHelper.isSpecialistsEnabled(this.$store.state.game)
+    },
+    isDarkModeExtra () {
+      return GameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

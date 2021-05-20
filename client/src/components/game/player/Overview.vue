@@ -10,12 +10,12 @@
           </div>
           <div class="row bg-primary">
               <div class="col pt-2 pb-2">
-                <button class="btn btn-success mr-1" :disabled="!gameHasStarted || player.userId" @click="onViewConversationRequested"
+                <button class="btn btn-success mr-1" :disabled="!userPlayer || !gameHasStarted || player.userId" @click="onViewConversationRequested"
                   :class="{'btn-warning': conversation && conversation.unreadCount}">
                   <i class="fas fa-envelope"></i>
                   <span v-if="conversation && conversation.unreadCount" class="ml-1">{{conversation.unreadCount}}</span>
                 </button>
-                <button class="btn btn-info" :disabled="!gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
+                <button class="btn btn-info" v-if="!isDarkModeExtra" :disabled="!userPlayer || !gameHasStarted || player.userId" @click="onViewCompareIntelRequested">
                   <i class="fas fa-chart-line"></i>
                 </button>
               </div>
@@ -91,6 +91,11 @@ export default {
           console.error(err)
         }
       }
+    }
+  },
+  computed: {
+    isDarkModeExtra () {
+      return gameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

@@ -63,6 +63,8 @@ export default {
     this.gameContainer.map.off('onCarrierRightClicked', this.onCarrierRightClickedHandler)
     this.gameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
     this.gameContainer.map.off('onObjectsClicked', this.onObjectsClickedHandler)
+
+    this.gameContainer.destroy()
   },
 
   beforeDestroy () {

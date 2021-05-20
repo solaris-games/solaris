@@ -12,6 +12,7 @@
         <div class="col text-center pt-2">
             <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
             <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
+            <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
         </div>
     </div>
 
@@ -133,7 +134,7 @@ export default {
 
     this.recalculateTimeRemaining()
 
-    if (GameHelper.isGameInProgress(this.$store.state.game)) {
+    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
       this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
       this.recalculateTimeRemaining()
     }
@@ -268,6 +269,9 @@ export default {
     },
     isTurnBasedGame () {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
+    isDarkModeExtra () {
+      return gameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

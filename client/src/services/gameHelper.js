@@ -346,6 +346,10 @@ class GameHelper {
     return game.state.endDate != null
   }
 
+  isDarkModeExtra (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
@@ -367,9 +371,11 @@ class GameHelper {
   }
 
   playerHasLowestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
+    const levels = [...new Set(game.galaxy.players
+      .filter(p => p.research != null)
+      .map(p => {
+        return p.research[techKey].level
+      }))]
 
     // If all players have the same level then nobody has the lowest.
     if (levels.length === 1) {
@@ -382,9 +388,11 @@ class GameHelper {
   }
 
   playerHasHighestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
+    const levels = [...new Set(game.galaxy.players
+      .filter(p => p.research != null)
+      .map(p => {
+        return p.research[techKey].level
+      }))]
 
     // If all players have the same level then nobody has the highest.
     if (levels.length === 1) {
@@ -508,6 +516,46 @@ class GameHelper {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+
+  calculateMinCarrierX (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => a.location.x - b.location.x)[0].location.x
+  }
+
+  calculateMinCarrierY (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => a.location.y - b.location.y)[0].location.y
+  }
+
+  calculateMaxCarrierX (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => b.location.x - a.location.x)[0].location.x
+  }
+
+  calculateMaxCarrierY (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+  
+  isSpecialistsEnabled (game) {
+    return game.settings.specialGalaxy.specialistCost !== 'none'
+  }
+
+  isSpecialistsTechnologyEnabled (game) {
+    return game.settings.technology.researchCosts.specialists !== 'none'
+  }
+
+  isSpecialistsCurrencyCredits (game) {
+    return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'credits'
+  }
+
+  isSpecialistsCurrencyCreditsSpecialists (game) {
+    return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
   }
 
   getSpecialistName (type, specialistId) {
@@ -689,6 +737,10 @@ class GameHelper {
     }
 
     return star
+  }
+
+  isDeadStar(star) {
+    return star.naturalResources != null && star.naturalResources <= 0
   }
 }
 
