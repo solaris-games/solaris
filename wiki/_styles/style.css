@@ -57,3 +57,9 @@ a.icon-home:hover {
 	background: var(--text);
 }
 
+img {
+	max-height: 20rem;
+	max-width: 70% !important;
+	display: block;
+	margin: 0 auto;
+}
