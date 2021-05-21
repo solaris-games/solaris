@@ -1,3 +1,4 @@
+/* === COLORS === */
 :root {
 	--bg-01: hsl(0, 0%, 13%);
 	--bg-02: hsl(0, 0%, 19%);
@@ -15,6 +16,8 @@
 	--accent-blue-light-dark: #2384c6;
 }
 
+
+/* === BACKGROUNS === */
 .wy-body-for-nav, .wy-side-scroll, .wy-nav-side {
 	background: var(--bg-01);
 }
@@ -26,27 +29,15 @@
 	background: var(--bg-02);
 }
 
-html {
-	scrollbar-color: var(--bg-02) var(--bg-01);
-}
-
-p, li, h1, h2, h3, h4, h5, h6 {
-	color: var(--text);
-}
-
-a, a:visited {
-	color: var(--accent-green);
-}
-
-a:hover {
-	color: var(--accent-green-dark);
-	text-decoration: underline;
-}
-
 .wy-side-nav-search {
 	background: var(--accent-blue);
 }
 
+html {
+	scrollbar-color: var(--bg-02) var(--bg-01);
+}
+
+/* icon & search bar */
 a.icon-home {
 	color: white;
 	background: var(--accent-blue-light);
@@ -62,11 +53,19 @@ a.icon-home:hover {
 	background: var(--text);
 }
 
-img {
-	max-height: 20rem;
-	max-width: 70% !important;
-	display: block;
-	margin: 0 auto;
+
+/* === TEXTS === */
+p, li, h1, h2, h3, h4, h5, h6 {
+	color: var(--text);
+}
+
+a, a:visited {
+	color: var(--accent-green);
+}
+
+a:hover {
+	color: var(--accent-green-dark);
+	text-decoration: underline;
 }
 
 
@@ -116,5 +115,16 @@ img {
 .wy-menu-vertical li.on a:hover span.toctree-expand,
 .wy-menu-vertical li.current > a:hover span.toctree-expand {
 	color: var(--text);
-
 }
+
+
+/* === MISC === */
+
+/* images */
+img {
+	max-height: 20rem;
+	max-width: 70% !important;
+	display: block;
+	margin: 0 auto;
+}
+
