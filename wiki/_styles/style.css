@@ -38,7 +38,7 @@ html {
 }
 
 /* icon & search bar */
-a.icon-home {
+a.icon-home, a.icon-home:visited {
 	color: white;
 	background: var(--accent-blue-light);
 	border-radius: .25rem;
