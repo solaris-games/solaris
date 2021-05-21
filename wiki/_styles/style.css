@@ -128,3 +128,20 @@ img {
 	margin: 0 auto;
 }
 
+/* code blocks */
+.rst-content code {
+	background: var(--bg-03);
+	border-color: var(--bg-04);
+}
+
+/* navigation buttons */
+a.btn-neutral, a.btn-neutral:visited {
+	background: var(--text-dim) !important;
+	color: var(--bg-01) !important;
+	box-shadow: none;
+	text-decoration: none;
+	vertical-align: text-top;
+}
+a.btn-neutral:hover {
+	background: var(--text) !important;
+}
