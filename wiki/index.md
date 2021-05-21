@@ -76,11 +76,11 @@ Economy, Industry and Science infrastructure respectively.
 Click on the star to view it in detail.
 
 ![A star with 95 garrison, no carriers, and 5 Economic, 4 Industry and 1 Science
-infrastructure](assets/star-closeup.png)
+infrastructure](_assets/star-closeup.png)
 
 If star has a warp gate then it will be displayed with an additional halo.
 
-![A star with its scanning and hyperspace range](assets/star-large.png)
+![A star with its scanning and hyperspace range](_assets/star-large.png)
 
 ### Carriers
 
@@ -88,7 +88,7 @@ Carriers are displayed as small ship icons with a circular coloured halo, much
 like stars. The number of ships that a carrier has will be displayed when zoomed
 in. Click on the carrier to view it in detail.
 
-![Two carriers flying on the map](assets/carriers.png)
+![Two carriers flying on the map](_assets/carriers.png)
 
 Carriers that have waypoints will have a line drawn to their destination.
 If those waypoints are looped then the line will be slightly thinner.
@@ -109,7 +109,7 @@ able to identify strong areas and weak points that are cut off from the rest of
 a player's stars. There are two different styles of territory appearance,
 which can be accessed from the in-game options menu.
 
-![The galaxy map showing 5 (more or less) large empires](assets/galaxy.png)
+![The galaxy map showing 5 (more or less) large empires](_assets/galaxy.png)
 
 
 ## Stars
@@ -132,7 +132,7 @@ manufactures every tick. Below that are the buttons to purchase more economy,
 industry, and science, as well as a button for creating a carrier at the star
 and a button for purchasing a warpgate at the star.
 
-![The menu of a star](assets/star-menu.png)
+![The menu of a star](_assets/star-menu.png)
 
 A star's natural resources determines how many credits it will cost to build
 infrastructure. The higher the natural resources, the cheaper it costs to
@@ -156,7 +156,7 @@ boost from a specialist. Therefore, if the carrier has a times 2 speed boost
 from a specialist, then when that carrier is traveling between two warp gates it
 will travel at times 6 speed.
 
-![A star with a warp gate](assets/warp-gate.png)
+![A star with a warp gate](_assets/warp-gate.png)
 
 You may choose to **abandon a star**, in which case all Carriers and Ships at
 the star will be destroyed and all infrastructure will remain intact, including
@@ -176,7 +176,7 @@ There are 3 types of infrastructure that can be built at stars:
    one research point per tick for the chosen current technology that is being
    researched.
 
-![The menu to build infrastructure on a star](assets/infrastructure-menu.png)
+![The menu to build infrastructure on a star](_assets/infrastructure-menu.png)
 
 When you select a star its Hyperspace Range and Scanning Range will become
 visible. Hyperspace Range is displayed as a ridged ring centered on the star and
@@ -195,7 +195,7 @@ They can only be built at Stars and must hold a minimum of 1 Ship.
  - Send a Carrier to intercept an incoming enemy Carrier.
  - Purchase a specialist on a carrier to grant special abilities.
 
-![The menu of a carrier](assets/carrier-menu.png)
+![The menu of a carrier](_assets/carrier-menu.png)
 
 Carriers are displayed as small ship icons with a coloured shape, matching its
 owner's stars.
@@ -232,7 +232,7 @@ Combat occurs when a Carrier arrives at an enemy Star or when a Carrier
 intercepts an enemy Carrier in hyperspace. The combat summary can be viewed in
 the event log.
 
-![Summary of a combat in the event log](assets/combat-summary.png)
+![Summary of a combat in the event log](_assets/combat-summary.png)
 
 When 2 opposing Carriers arrive at a Star on the same tick, the Carrier that
 travelled the least distance in the current tick will arrive at the Star first
@@ -271,7 +271,7 @@ researched.
 Open the Research screen to view the current research and set the next research.
 The types of technologies are as follows:
 
-![The Research menu](assets/research-menu.png)
+![The Research menu](_assets/research-menu.png)
 
  - **Scanning** - Improves the visible area star a star can see.
    The higher your scanning, the further you can see.
