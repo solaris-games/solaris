@@ -1,0 +1,59 @@
+:root {
+	--bg-dark: hsl(0, 0%, 13%);
+	--bg-bright: hsl(0, 0%, 19%);
+	--bg-ultrabright: hsl(0, 0%, 25%);
+	--text: hsl(0, 0%, 80%);
+
+	--accent-green: #00bc8c;
+	--accent-green-dark: #007053;
+
+	--accent-blue: #375A7F;
+	--accent-blue-light: #3498db;
+	--accent-blue-light-dark: #2384c6;
+}
+
+.wy-body-for-nav, .wy-side-scroll, .wy-nav-side {
+	background: var(--bg-dark);
+}
+.rst-versions, .rst-current-version {
+	background: unset !important;
+}
+
+.wy-nav-content {
+	background: var(--bg-bright);
+}
+
+html {
+	scrollbar-color: var(--bg-bright) var(--bg-dark);
+}
+
+p, li, h1, h2, h3, h4, h5, h6 {
+	color: var(--text);
+}
+
+a {
+	color: var(--accent-green);
+}
+
+a:hover, a:visited {
+	color: var(--accent-green-dark);
+}
+
+.wy-side-nav-search {
+	background: var(--accent-blue);
+}
+
+a.icon-home {
+	color: white;
+	background: var(--accent-blue-light);
+	border-radius: .25rem;
+}
+
+a.icon-home:hover {
+	background: var(--accent-blue-light-dark);
+}
+
+.wy-form input {
+	background: var(--text);
+}
+
