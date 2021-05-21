@@ -8,7 +8,7 @@
 	--text-dim: hsl(0, 0%, 50%);
 
 	--accent-green: #00bc8c;
-	--accent-green-dark: #007053;
+	--accent-green-dark: #009073;
 
 	--accent-blue: #375A7F;
 	--accent-blue-light: #3498db;
@@ -34,12 +34,13 @@ p, li, h1, h2, h3, h4, h5, h6 {
 	color: var(--text);
 }
 
-a {
+a, a:visited {
 	color: var(--accent-green);
 }
 
-a:hover, a:visited {
+a:hover {
 	color: var(--accent-green-dark);
+	text-decoration: underline;
 }
 
 .wy-side-nav-search {
@@ -54,6 +55,7 @@ a.icon-home {
 
 a.icon-home:hover {
 	background: var(--accent-blue-light-dark);
+	text-decoration: none;
 }
 
 .wy-form input {
