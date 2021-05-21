@@ -1,7 +1,8 @@
 :root {
-	--bg-dark: hsl(0, 0%, 13%);
-	--bg-bright: hsl(0, 0%, 19%);
-	--bg-ultrabright: hsl(0, 0%, 25%);
+	--bg-01: hsl(0, 0%, 13%);
+	--bg-02: hsl(0, 0%, 19%);
+	--bg-03: hsl(0, 0%, 25%);
+	--bg-04: hsl(0, 0%, 31%);
 	--text: hsl(0, 0%, 80%);
 
 	--accent-green: #00bc8c;
@@ -13,18 +14,18 @@
 }
 
 .wy-body-for-nav, .wy-side-scroll, .wy-nav-side {
-	background: var(--bg-dark);
+	background: var(--bg-01);
 }
 .rst-versions, .rst-current-version {
 	background: unset !important;
 }
 
 .wy-nav-content {
-	background: var(--bg-bright);
+	background: var(--bg-02);
 }
 
 html {
-	scrollbar-color: var(--bg-bright) var(--bg-dark);
+	scrollbar-color: var(--bg-02) var(--bg-01);
 }
 
 p, li, h1, h2, h3, h4, h5, h6 {
@@ -62,4 +63,28 @@ img {
 	max-width: 70% !important;
 	display: block;
 	margin: 0 auto;
+}
+
+
+/* === TOC === */
+.wy-menu-vertical {
+	color: var(--text);
+}
+
+.wy-menu-vertical li.current a {
+	background: var(--bg-02);
+}
+.wy-menu-vertical li.current a:hover {
+	background: var(--bg-03);
+}
+
+.wy-menu-vertical li.toctree-l2.current > a {
+	background: var(--bg-04);
+}
+
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a {
+	background: var(--bg-03);
+}
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 > a:hover {
+	background: var(--bg-04);
 }
