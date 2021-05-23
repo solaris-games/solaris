@@ -156,8 +156,6 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-                    
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
                         gameName,
                         gameUrl
@@ -178,8 +176,6 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-                    
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_FINISHED, [
                         gameName,
                         gameUrl
@@ -221,8 +217,6 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
                         gameName,
                         gameUrl,
@@ -290,8 +284,6 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-                    
                     await this.sendTemplate(user.email, this.TEMPLATES.CUSTOM_GAME_REMOVED, [
                         gameName
                     ]);
