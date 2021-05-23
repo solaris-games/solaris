@@ -634,7 +634,11 @@ class Star extends EventEmitter {
     let aparentScale = this.container.scale.x * (this.zoomPercent/100.0)
     let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
     for(let l = 0; l<Star.maxLod; l+= 1) {
-      this.graphics_natural_resources_ring[l].visible = false
+      let ring = this.graphics_natural_resources_ring[l]
+      
+      if (ring) {
+        ring.visible = false
+      }
     }
 
     this.graphics_star.visible = !this.hasSpecialist()
