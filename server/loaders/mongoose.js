@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const config = require('../config');
 
+const EventModel = require('../models/Event');
+const GameModel = require('../models/Game');
+const GuildModel = require('../models/Guild');
+const HistoryModel = require('../models/History');
+const UserModel = require('../models/User');
+
 async function unlockAgendaJobs(db) {
     try {
         const collection = await db.connection.db.collection('agendaJobs');
@@ -23,6 +29,16 @@ async function unlockAgendaJobs(db) {
     }
 }
 
+async function syncIndexes() {
+    console.log('Syncing indexes...');
+    await EventModel.syncIndexes();
+    await GameModel.syncIndexes();
+    await GuildModel.syncIndexes();
+    await HistoryModel.syncIndexes();
+    await UserModel.syncIndexes();
+    console.log('Indexes synced.');
+}
+
 module.exports = async (options) => {
     const dbConnection = mongoose.connection;
 
@@ -30,6 +46,7 @@ module.exports = async (options) => {
 
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
+    options.syncIndexes = options.syncIndexes == null ? false : options.syncIndexes;
 
     console.log(`Connecting to database: ${options.connectionString}`);
 
@@ -40,6 +57,10 @@ module.exports = async (options) => {
     });
 
     await unlockAgendaJobs(db);
+
+    if (options.syncIndexes) {
+        await syncIndexes();
+    }
 
     return db;
 };

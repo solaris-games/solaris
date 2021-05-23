@@ -8,7 +8,9 @@ let mongo;
 module.exports = {
   
   async init(expressApp, expressServer) {
-    mongo = await mongooseLoader();
+    mongo = await mongooseLoader({
+      syncIndexes: false
+    });
     console.log('MongoDB Intialized');
     
     const io = socketLoader(expressServer);

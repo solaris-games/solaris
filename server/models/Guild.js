@@ -7,6 +7,4 @@ schema.plugin(mongooseLeanDefaults);
 
 const model = mongoose.model('guild', schema);
 
-model.syncIndexes();
-
 module.exports = model;

@@ -8,7 +8,10 @@ let mongo;
 async function startup() {
     const container = containerLoader(null);
 
-    mongo = await mongooseLoader();
+    mongo = await mongooseLoader({
+        syncIndexes: true
+    });
+    
     console.log('MongoDB Intialized');
 
     const gameTickJob = require('./gameTick')(container);
