@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService) {
         super();
             
         this.distanceService = distanceService;
@@ -24,6 +24,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.starUpgradeService = starUpgradeService;
         this.reputationService = reputationService;
         this.aiService = aiService;
+        this.emailService = emailService;
     }
 
     async tick(gameId) {
@@ -73,7 +74,7 @@ module.exports = class GameTickService extends EventEmitter {
             await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
 
-            this._endOfGalacticCycleCheck(game);
+            await this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
 
             await this._gameLoseCheck(game, gameUsers);
@@ -728,7 +729,7 @@ module.exports = class GameTickService extends EventEmitter {
         return false;
     }
 
-    _endOfGalacticCycleCheck(game) {
+    async _endOfGalacticCycleCheck(game) {
         // Check if we have reached the production tick.
         if (game.state.tick % game.settings.galaxy.productionTicks === 0) {
             game.state.productionTick++;
@@ -757,10 +758,7 @@ module.exports = class GameTickService extends EventEmitter {
                 });
             }
 
-            this.emit('onGameGalacticCycleTicked', {
-                gameId: game._id,
-                gameTick: game.state.tick
-            });
+            await this.emailService.sendGameCycleSummaryEmail(game);
         }
     }
 
@@ -829,6 +827,8 @@ module.exports = class GameTickService extends EventEmitter {
     
                 await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
+
+            await this.emailService.sendGameFinishedEmail(game);
 
             this.emit('onGameEnded', {
                 gameId: game._id,

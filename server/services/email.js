@@ -61,17 +61,14 @@ module.exports = class EmailService {
         }
     };
 
-    constructor(config, gameService, gameTickService, userService, leaderboardService, playerService) {
+    constructor(config, gameService, userService, leaderboardService, playerService) {
         this.config = config;
         this.gameService = gameService;
-        this.gameTickService = gameTickService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
-        this.gameTickService.on('onGameEnded', (data) => this.sendGameFinishedEmail(data.gameId));
-        this.gameTickService.on('onGameGalacticCycleTicked', (data) => this.sendGameCycleSummaryEmail(data.gameId));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
         this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
     }
@@ -172,8 +169,7 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameFinishedEmail(gameId) {
-        let game = await this.gameService.getById(gameId);
+    async sendGameFinishedEmail(game) {
         let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
@@ -195,8 +191,7 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameCycleSummaryEmail(gameId) {      
-        let game = await this.gameService.getById(gameId);  
+    async sendGameCycleSummaryEmail(game) {      
         let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
         let leaderboardHtml = '';
