@@ -167,10 +167,12 @@ module.exports = class CarrierService {
                 let wp = waypoints[0];
 
                 if (wp) {
-                    wp.action = 'collectAll';
+                    wp.action = 'nothing';
                     wp.actionShips = 0;
                     wp.delayTicks = 0;
                 }
+
+                carrier.waypointsLooped = false;
             }
         }
 
