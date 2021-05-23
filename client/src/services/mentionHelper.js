@@ -79,7 +79,13 @@ class MentionHelper {
   }
 
   replaceMentionsWithNames(message) {
-    return message.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, _type, _id, name) => name)
+    try {
+      return message.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, _type, _id, name) => name)
+    } catch (e) {
+      // Just in case things go wrong, render the raw message
+      console.error(e)
+      return message
+    }
   }
 
   renderTextWithLinks(element, text) {
@@ -109,26 +115,34 @@ class MentionHelper {
   }
 
   renderMessageWithMentionsAndLinks(element, message, onStarClickedCallback, onPlayerClickedCallback) {
-    let lastMentionEnd = 0
+    try {
+      let lastMentionEnd = 0
 
-    for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
-      const text = message.substring(lastMentionEnd, match.index)
+      for (const match of message.matchAll(MentionHelper.INTERNAL_MENTION_REGEX)) {
+        const text = message.substring(lastMentionEnd, match.index)
 
-      if (text) {
-        this.renderTextWithLinks(element, text)
+        if (text) {
+          this.renderTextWithLinks(element, text)
+        }
+
+        lastMentionEnd = match.index + match[0].length
+
+        const linkElement = this.createMentionLinkElement(match[1], match[2], match[3], onStarClickedCallback, onPlayerClickedCallback)
+
+        element.appendChild(linkElement)
       }
 
-      lastMentionEnd = match.index + match[0].length
+      const lastText = message.substring(lastMentionEnd)
 
-      const linkElement = this.createMentionLinkElement(match[1], match[2], match[3], onStarClickedCallback, onPlayerClickedCallback)
+      if (lastText) {
+        this.renderTextWithLinks(element, lastText)
+      }
+    } catch (e) {
+      console.error(e)
 
-      element.appendChild(linkElement)
-    }
-
-    const lastText = message.substring(lastMentionEnd)
-
-    if (lastText) {
-      this.renderTextWithLinks(element, lastText)
+      // Just in case things go wrong, render the message as raw text.
+      const node = document.createTextNode(message)
+      element.appendChild(node)
     }
   }
 
