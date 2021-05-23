@@ -199,16 +199,21 @@ module.exports = class EmailService {
         let game = await this.gameService.getById(gameId);  
         let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
 
-        let leaderboardHtml = leaderboard.map(l => {
-            return `
-                <tr>
-                    <td><span style="color:#F39C12">${l.player.alias}</span></td>
-                    <td>${l.stats.totalStars} Stars</td>
-                    <td>${l.stats.totalShips} Ships in ${l.stats.totalCarriers} Carriers</td>
-                </tr>
-            `;
-        })
-        .join('');
+        let leaderboardHtml = '';
+
+        // Leaderboard is hidden for ultra dark mode games.
+        if (!this.gameService.isDarkModeExtra(game)) {
+            leaderboardHtml = leaderboard.map(l => {
+                return `
+                    <tr>
+                        <td><span style="color:#F39C12">${l.player.alias}</span></td>
+                        <td>${l.stats.totalStars} Stars</td>
+                        <td>${l.stats.totalShips} Ships in ${l.stats.totalCarriers} Carriers</td>
+                    </tr>
+                `;
+            })
+            .join('');
+        }
 
         let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
