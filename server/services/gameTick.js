@@ -811,6 +811,8 @@ module.exports = class GameTickService extends EventEmitter {
                 }
             }
         }
+
+        this.gameService.updateStatePlayerCount(game);
     }
 
     async _gameWinCheck(game, gameUsers) {

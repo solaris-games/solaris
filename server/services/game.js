@@ -228,8 +228,8 @@ module.exports = class GameService extends EventEmitter {
         player.hasSentTurnReminder = false;
 
         // If the max player count is reached then start the game.
-        game.state.players = game.galaxy.players.filter(p => p.userId).length;
-
+        this.updateStatePlayerCount(game);
+        
         let gameIsFull = false;
 
         // If the game hasn't started yet then check if the game is full
@@ -278,6 +278,10 @@ module.exports = class GameService extends EventEmitter {
         return gameIsFull; // Return whether the game is now full, the calling API endpoint can broadcast it.
     }
 
+    updateStatePlayerCount(game) {
+        game.state.players = game.galaxy.players.filter(p => p.userId && !p.defeated && !p.afk).length;
+    }
+
     async quit(game, player) {    
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
@@ -297,8 +301,8 @@ module.exports = class GameService extends EventEmitter {
         // This is to prevent the next player joining this slot from being screwed over.
         this.playerService.resetPlayerForGameStart(game, player);
 
-        game.state.players = game.galaxy.players.filter(p => p.userId).length;
-
+        this.updateStatePlayerCount(game);
+        
         await game.save();
 
         this.emit('onPlayerQuit', {
