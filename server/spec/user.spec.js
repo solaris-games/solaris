@@ -17,6 +17,9 @@ const fakeUserModel = {
     },
     findOne(user) {
         return userList.find(x => x.email == user.email);
+    },
+    updateOne(user) {
+        return user;
     }
 };
 
@@ -85,43 +88,6 @@ describe('user', () => {
         let result = await service.userExists('fffff');
 
         expect(result).toBeFalsy();
-
-        done();
-    });
-
-    it('should update the email preference of a user', async (done) => {
-        let result = await service.updateEmailPreference(1, true);
-
-        expect(result).toBeTruthy();
-        expect(userList[0].emailEnabled).toBeTruthy();
-
-        done();
-    });
-
-    it('should update the email address of a user', async (done) => {
-        let email = 'test@test123.com';
-
-        let result = await service.updateEmailAddress(1, email);
-
-        let user = userList[0];
-
-        expect(result).toBeTruthy();
-        expect(user.email).toBe(email);
-
-        done();
-    });
-
-    it('should update the password of a user', async (done) => {
-        let userId = 1;
-        let oldPassword = 'test';
-        let newPassword = 'xxxx';
-
-        let result = await service.updatePassword(userId, oldPassword, newPassword);
-
-        let user = userList[0];
-
-        expect(result).toBeTruthy();
-        expect(user.password).toBe(newPassword);
 
         done();
     });
