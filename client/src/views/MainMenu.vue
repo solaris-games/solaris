@@ -7,7 +7,7 @@
       </div>
       <div class="col-auto">
         <router-link v-if="user" :to="{ name: 'account-achievements', params: { userId: user._id }}"><i class="fas fa-medal mr-1"></i>Achievements</router-link>
-        <router-link to="/codex" class="ml-3"><i class="fas fa-question mr-1"></i>Help</router-link>
+        <a :href="documentationUrl" target="_blank" class="ml-3"><i class="fas fa-question mr-1"></i>Help</a>
         <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
       </div>
     </div>
@@ -149,6 +149,11 @@ export default {
     },
     routeToPath(path) {
       router.push(path)
+    }
+  },
+  computed: {
+    documentationUrl () {
+      return process.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }

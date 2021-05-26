@@ -9,7 +9,6 @@ import AccountResetUsername from './views/AccountResetUsername.vue'
 import AccountResetPassword from './views/AccountResetPassword.vue'
 import AccountExternalResetPassword from './views/AccountExternalResetPassword.vue'
 import AccountSettings from './views/AccountSettings.vue'
-import Codex from './views/Codex.vue'
 import Game from './views/Game.vue'
 import GameActiveGames from './views/GameActiveGames.vue'
 import GameCreation from './views/GameCreation.vue'
@@ -71,11 +70,6 @@ export default new Router({
       path: '/account/settings',
       name: 'account-settings',
       component: AccountSettings
-    },
-    {
-      path: '/codex',
-      name: 'codex',
-      component: Codex
     },
     {
       path: '/game',

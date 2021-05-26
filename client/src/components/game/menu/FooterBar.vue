@@ -6,9 +6,6 @@
             <i class="fas fa-handshake"></i>
           </button>
         </div>
-        <!-- <div class="col" v-if="!userPlayer">
-          <router-link to="/codex" class="btn"><i class="fas fa-question"></i></router-link>
-        </div> -->
         <div class="col" v-if="userPlayer">
           <button class="btn" @click="panToHomeStar()">
             <i class="fas fa-home"></i>
