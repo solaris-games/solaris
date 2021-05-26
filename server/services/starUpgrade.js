@@ -360,9 +360,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 return !s.ignoreBulkUpgrade;
             })
             .map(s => {
-                // NOTE: Do not need to do calculations for effective tech level here as it is unnecessary because
-                // the resources will scale in the same way for all stars.
-                let terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, player.research.terraforming.level)
+                const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
+                const terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, effectiveTechs.terraforming);
 
                 return {
                     star: s,
@@ -512,7 +511,6 @@ module.exports = class StarUpgradeService extends EventEmitter {
         upgradeStar.infrastructureCost = upgradeReport.nextCost;
 
         summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
-        summaryStar.infrastructureCost = upgradeStar.infrastructureCost;
 
         return upgradeReport.cost;
     }
@@ -609,7 +607,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             upgradeStars.insert(star)
         });
 
-        while (budget) {
+        while (budget > 0) {
             // Get the next star that can be upgraded, cheapest first.
             let upgradeStar = upgradeStars.dequeue();
 
