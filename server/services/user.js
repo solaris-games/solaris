@@ -61,8 +61,8 @@ module.exports = class UserService extends EventEmitter {
         });
     }
 
-    async getInfoByIdLean(id) {
-        return await this.userModel.findById(id, {
+    async getInfoByIdLean(id, select) {
+        select = select || {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
@@ -75,7 +75,9 @@ module.exports = class UserService extends EventEmitter {
             gameSettings: 0,
             lastSeen: 0,
             lastSeenIP: 0
-        })
+        };
+
+        return await this.userModel.findById(id, select)
         .lean({ defaults: true })
         .exec();
     }

@@ -52,6 +52,10 @@ class CarrierService extends BaseApiService {
       },
       { withCredentials: true })
   }
+  
+  scuttle (gameId, carrierId) {
+    return axios.delete(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/scuttle', { withCredentials: true })
+  }
 }
 
 export default new CarrierService()

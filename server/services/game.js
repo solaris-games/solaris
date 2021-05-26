@@ -387,7 +387,12 @@ module.exports = class GameService extends EventEmitter {
         
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
 
-        return await this.userService.getInfoByIdLean(player.userId);
+        return await this.userService.getInfoByIdLean(player.userId, {
+            'achievements.rank': 1,
+            'achievements.renown': 1,
+            'achievements.victories': 1,
+            roles: 1
+        });
     }
 
     isLocked(game) {

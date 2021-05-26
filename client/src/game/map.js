@@ -290,6 +290,17 @@ class Map extends EventEmitter {
     if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
+  removeMapObjectFromChunks (mapObject, chunks) {
+    for (let chunkX of chunks) {
+      for (let chunkY of chunkX) {
+        if (chunkY.mapObjects.indexOf(mapObject) > -1) {
+          chunkY.mapObjects.splice(chunkY.mapObjects.indexOf(mapObject), 1)
+          chunkY.removeChild(mapObject.container)
+        }
+      }
+    }
+  }
+
   reloadGame (game, userSettings) {
     this.game = game
 
@@ -427,7 +438,11 @@ class Map extends EventEmitter {
 
     this.starContainer.removeChild(star.fixedContainer)
 
+    this.removeMapObjectFromChunks(star, this.chunks)
+
     this.stars.splice(this.stars.indexOf(star), 1)
+
+    star.destroy()
   }
 
   drawCarriers () {
@@ -444,17 +459,17 @@ class Map extends EventEmitter {
   }
 
   _undrawCarrier (carrier) {
-    carrier.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-    carrier.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-    carrier.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-    carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
-
+    carrier.removeAllListeners()
+    carrier.cleanup()
     carrier.clearPaths()
-
-    this.carrierContainer.removeChild(carrier.container)
+    
     this.carrierContainer.removeChild(carrier.fixedContainer)
 
+    this.removeMapObjectFromChunks(carrier, this.chunks)
+
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
+
+    carrier.destroy()
   }
 
   undrawCarrier (carrierData) {

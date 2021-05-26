@@ -1,7 +1,8 @@
 <template>
 	<div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
+      <span class="mr-2" title="Hyperspace Technology Level" v-if="userPlayer"><i class="fas fa-gas-pump mr-1"></i>{{userPlayer.research.hyperspace.level}}</span>
+      <span class="mr-2"><i class="fas fa-rocket mr-1"></i>{{carrier.ships == null ? '???' : carrier.ships}}</span>
     	<button class="btn btn-sm btn-info" @click="toggleCarrierWaypointsDisplay" title="Toggle Waypoints Display">
         <i class="fas" :class="{'fa-eye-slash':!display,'fa-eye':display}"></i>
       </button>

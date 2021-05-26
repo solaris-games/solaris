@@ -317,6 +317,31 @@ module.exports = class CarrierService {
         carrier.isGift = false;
     }
 
+    async scuttle(game, player, carrierId) {
+        let carrier = this.getById(game, carrierId);
+
+        if (!carrier) {
+            throw new ValidationError('Carrier does not exist');
+        }
+
+        if (!carrier.ownedByPlayerId.equals(player._id)) {
+            throw new ValidationError(`Cannot scuttle carrier, you are not its owner.`);
+        }
+
+        await this.gameModel.updateOne({
+            _id: game._id
+        }, {
+            $pull: {
+                'galaxy.carriers': {
+                    _id: carrierId
+                }
+            }
+        })
+        .exec();
+
+        // TODO: Event?
+    }
+
     canPlayerSeeCarrierShips(player, carrier) {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);

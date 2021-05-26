@@ -358,6 +358,16 @@
         <input type="number" class="form-control" id="carrierDefaultAmount" v-model="settings.carrier.defaultAmount" :disabled="isSavingSettings">
       </div>
     </div>
+    
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="confirmBuildCarrier" class="col-12 col-sm-6 col-form-label">Confirm Build Carrier</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildCarrier" v-model="settings.carrier.confirmBuildCarrier" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
+      </div>
+    </div>
 
     <form-error-list v-bind:errors="errors"/>
 

@@ -244,6 +244,25 @@ export default new Vuex.Store({
       // Redraw the star
       GameContainer.reloadStar(star)
     },
+    gameCarrierScuttled (state, data) {
+      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
+      let star = GameHelper.getStarById(state.game, carrier.orbiting)
+      let player = GameHelper.getPlayerById(state.game, carrier.ownedByPlayerId)
+
+      player.stats.totalCarriers--
+
+      if (carrier.specialistId) {
+        player.stats.totalSpecialists--
+      }
+
+      GameContainer.undrawCarrier(carrier)
+
+      state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
+
+      if (star) {
+        GameContainer.reloadStar(star)
+      }
+    },
     playerDebtSettled (state, data) {
       let player = GameHelper.getUserPlayer(state.game)
 

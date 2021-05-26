@@ -2,7 +2,8 @@
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
       <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-warning"><i class="fas fa-calculator"></i></button>
-      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
+      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress" classText="btn btn-sm btn-secondary ml-1"><i class="fas fa-trash"></i></modalButton>
+      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer && isGameInProgress" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
@@ -169,6 +170,11 @@
 
       <gift-carrier v-if="canGiftCarrier" :carrierId="carrier._id"/>
     </div>
+
+    <!-- Modals -->
+    <dialogModal modalName="scuttleCarrierModal" titleText="Scuttle Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmScuttleCarrier">
+      <p>Are you sure you want to scuttle <b>{{carrier.name}}</b>?</p>
+    </dialogModal>
 </div>
 </template>
 
@@ -181,6 +187,9 @@ import WaypointTable from './WaypointTable'
 import CarrierSpecialistVue from './CarrierSpecialist'
 import GiftCarrierVue from './GiftCarrier'
 import SpecialistIconVue from '../specialist/SpecialistIcon'
+import ModalButton from '../../modal/ModalButton'
+import DialogModal from '../../modal/DialogModal'
+import AudioService from '../../../game/audio'
 
 export default {
   components: {
@@ -188,7 +197,9 @@ export default {
     'waypointTable': WaypointTable,
     'carrier-specialist': CarrierSpecialistVue,
     'gift-carrier': GiftCarrierVue,
-    'specialist-icon': SpecialistIconVue
+    'specialist-icon': SpecialistIconVue,
+    'modalButton': ModalButton,
+    'dialogModal': DialogModal
   },
   props: {
     carrierId: String
@@ -391,6 +402,25 @@ export default {
       if (this.carrier.ticksEtaTotal) {
         this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal)
       }
+    },
+    async confirmScuttleCarrier (e) {
+      try {
+        let response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`${this.carrier.name} has been scuttled.`)
+
+          this.$store.commit('gameCarrierScuttled', {
+            carrierId: this.carrier._id
+          })
+
+          AudioService.leave()
+
+          this.onCloseRequested()
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   },
   computed: {
@@ -425,6 +455,9 @@ export default {
     },
     isDeadStar: function () {
       return GameHelper.isDeadStar(this.getCarrierOrbitingStar())
+    },
+    isGameInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
     }
   }
 }

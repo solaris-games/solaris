@@ -23,7 +23,6 @@ class Carrier extends EventEmitter {
     this.container.addChild(this.graphics_colour)
     this.container.addChild(this.graphics_ship)
 
-    // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
@@ -378,6 +377,17 @@ class Carrier extends EventEmitter {
 
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
+  }
+
+  cleanup () {
+    this.container.off('pointerup', this.onClicked.bind(this))
+    this.container.off('mouseover', this.onMouseOver.bind(this))
+    this.container.off('mouseout', this.onMouseOut.bind(this))
+  }
+
+  destroy () {
+    this.container.destroy()
+    this.fixedContainer.destroy()
   }
 }
 

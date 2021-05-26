@@ -711,6 +711,11 @@ class Star extends EventEmitter {
     //Update everything
     if (this.zoomDepth != old) this.updateVisibility()
   }
+
+  destroy () {
+    this.container.destroy()
+    this.fixedContainer.destroy()
+  }
 }
 
 export default Star

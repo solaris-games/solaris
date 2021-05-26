@@ -116,6 +116,19 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.delete('/api/game/:gameId/carrier/:carrierId/scuttle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.carrierService.scuttle(
+                req.game,
+                req.player,
+                req.params.carrierId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, (req, res, next) => {
         let errors = [];
 

@@ -2,7 +2,7 @@
 <div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
       <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-secondary">
-        <i class="fas fa-sign-out-alt"></i>
+        <i class="fas fa-trash"></i>
       </modalButton>
       <button @click="toggleBulkIgnore" class="btn btn-sm ml-1" 
         title="Toggle Bulk Ignore"

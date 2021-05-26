@@ -92,6 +92,8 @@ module.exports = class GameGalaxyService {
         if (isHistorical && cached) {
             cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
+
+        this._topSecretFeature(game);
         
         return game;
     }
@@ -554,6 +556,24 @@ module.exports = class GameGalaxyService {
         if (isHistorical) {
             game.state.tick = history.tick
             game.state.productionTick = history.productionTick
+        }
+    }
+
+    _topSecretFeature(game) {
+        if (false) {
+            return;
+        }
+
+        let rnd = Math.floor(Math.random() * 100);
+
+        if (rnd === 0) {
+            let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+            let colours = require('../config/game/colours.json');
+    
+            for (let player of game.galaxy.players) {
+                player.shape = shapes[Math.floor(Math.random() * shapes.length)];
+                player.colour = colours[Math.floor(Math.random() * colours.length)];
+            }
         }
     }
 

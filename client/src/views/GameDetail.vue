@@ -175,7 +175,7 @@
             </tr>
             <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
               <td>Trade Specialist Tokens</td>
-              <td class="text-right" v-if="game.settings.player.tradeCreditsSpecialists">
+              <td class="text-right" v-if="game.settings.player.tradeCreditsSpecialists != null">
                 <span v-if="game.settings.player.tradeCreditsSpecialists">Enabled</span>
                 <span v-if="!game.settings.player.tradeCreditsSpecialists">Disabled</span>
               </td>
