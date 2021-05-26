@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Solaris is a slow paced browser game based on diplomacy, strategy and intrigue.
+[Solaris](https://solaris.games) is a slow paced browser game based on diplomacy, strategy and intrigue.
 To win the game, you must capture stars.
 
 You will not be alone, other players will also be trying to achieve the same
@@ -17,7 +17,7 @@ fight other players to capture theirs.
 
 ## Diplomacy
 
-Diplomacy plays a huge role in Solaris, the key to victory is not only galactic
+Diplomacy plays a huge role in [Solaris](https://solaris.games), the key to victory is not only galactic
 conquest, but also building relations with allies. You may first want to
 establish an alliance early on in the game to gain an advantage.
 
@@ -313,7 +313,7 @@ resigned.
 
 ## Achievements
 
-Your game statistics are tracked whilst playing Solaris and you can view a
+Your game statistics are tracked whilst playing [Solaris](https://solaris.games) and you can view a
 breakdown of your achievements on the Achievements page.
 You can also view other player’s achievements by selecting their name on the
 leaderboard.
