@@ -1,18 +1,5 @@
 <template>
 <div>
-  <div class="container col-xs-12 col-sm-10 col-md-10 col-lg-6 pr-1 pl-1">
-    <div class="row no-gutters pb-0 pt-1" v-if="user">
-      <div class="col">
-        <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{user.username}}</router-link>
-      </div>
-      <div class="col-auto">
-        <router-link v-if="user" :to="{ name: 'account-achievements', params: { userId: user._id }}"><i class="fas fa-medal mr-1"></i>Achievements</router-link>
-        <a :href="documentationUrl" target="_blank" class="ml-3"><i class="fas fa-question mr-1"></i>Help</a>
-        <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
-      </div>
-    </div>
-  </div>
-
   <view-container>
     <view-title title="Main Menu" :hideHomeButton="true"></view-title>
 
@@ -123,6 +110,7 @@ export default {
       await authService.logout()
 
       this.$store.commit('clearUserId')
+      this.$store.commit('clearUsername')
 
       this.isLoggingOut = false
 

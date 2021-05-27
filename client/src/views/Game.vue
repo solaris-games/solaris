@@ -126,8 +126,9 @@ export default {
         let response = await authService.verify()
 
         if (response.status === 200) {
-          if (response.data.id) {
-            this.$store.commit('setUserId', response.data.id)
+          if (response.data._id) {
+            this.$store.commit('setUserId', response.data._id)
+            this.$store.commit('setUsername', response.data.username)
           }
         }
       } catch (err) {
