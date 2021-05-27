@@ -25,7 +25,22 @@
         <div v-if="guildLeaderboard">
           <h4 class="mb-1">Top 10 Guilds</h4>
           <small class="text-warning">Total Guilds: {{totalGuilds}}</small>
-          <leaderboard-guild-table class="mt-2" :leaderboard="guildLeaderboard"></leaderboard-guild-table>
+          <sortable-leaderboard :leaderboard="guildLeaderboard" defaultSortingKey="rank" :header="GUILD_HEADERS">
+            <template v-slot:header>
+              <th>#</th>
+              <th>Guild</th>
+              <th class="text-right" title="Members"><i class="fas fa-user text-info"></i></th>
+              <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
+            </template>
+            <template v-slot:row="guild">
+                <td>{{guild.position}}</td>
+                <td>
+                    {{guild.name}} [{{guild.tag}}]
+                </td>
+                <td align="right">{{guild.memberCount}}</td>
+                <td align="right">{{guild.totalRank}}</td>
+            </template>
+          </sortable-leaderboard>
         </div>
       </div>
     </div>
@@ -41,12 +56,14 @@ import UserApiService from '../services/api/user'
 import GuildApiService from '../services/api/guild'
 import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
 import LeaderboardGuildTable from '../components/game/menu/LeaderboardGuildTable'
+import SortableLeaderboard from '../components/game/menu/SortableLeaderboard'
 
 export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'loading-spinner': LoadingSpinner,
+    'sortable-leaderboard': SortableLeaderboard,
     'leaderboard-user-table': LeaderboardUserTable,
     'leaderboard-guild-table': LeaderboardGuildTable
   },
@@ -58,6 +75,15 @@ export default {
       totalPlayers: 0,
       guildLeaderboard: null,
       totalGuilds: 0
+    }
+  },
+  created () {
+    this.GUILD_HEADERS = {
+      position: "#",
+      name: "Name",
+      tag: "Tag",
+      memberCount: <i class="fas fa-user text-info"></i>,
+      rank: <i class="fas fa-star text-info"></i>
     }
   },
   async mounted () {
