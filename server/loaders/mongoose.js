@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const config = require('../config');
 
 const EventModel = require('../models/Event');
 const GameModel = require('../models/Game');
@@ -39,7 +38,7 @@ async function syncIndexes() {
     console.log('Indexes synced.');
 }
 
-module.exports = async (options) => {
+module.exports = async (config, options) => {
     const dbConnection = mongoose.connection;
 
     dbConnection.on('error', console.error.bind(console, 'connection error:'));

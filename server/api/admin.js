@@ -77,6 +77,7 @@ module.exports = (router, io, container) => {
     router.post('/api/admin/user/:userId/impersonate', middleware.authenticateAdmin, (req, res, next) => {
         try {
             req.session.userId = req.params.userId;
+            req.session.username = req.body.username;
             req.session.isImpersonating = true;
 
             return res.sendStatus(200);

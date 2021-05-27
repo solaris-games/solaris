@@ -45,8 +45,10 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
-  impersonate (userId) {
-    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {},
+  impersonate (userId, username) {
+    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {
+      username
+    },
     { withCredentials: true })
   }
 

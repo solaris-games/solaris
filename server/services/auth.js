@@ -14,7 +14,13 @@ module.exports = class AuthService {
         // Try to find the user by email
         let user = await this.userModel.findOne({
             email
-        });
+        }, {
+            username: 1,
+            password: 1,
+            banned: 1
+        })
+        .lean()
+        .exec();
         
         if (!user) {
             throw new ValidationError('The email address or password is incorrect.');
@@ -32,7 +38,7 @@ module.exports = class AuthService {
         let result = await this.passwordService.compare(password, user.password);
 
         if (result) {
-            return user._id;
+            return user;
         } else {
             throw new ValidationError('The email address or password is incorrect.');
         }

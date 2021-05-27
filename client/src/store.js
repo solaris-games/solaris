@@ -40,6 +40,13 @@ export default new Vuex.Store({
       state.userId = null
     },
 
+    setUsername (state, username) {
+      state.username = username
+    },
+    clearUsername (state) {
+      state.username = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },

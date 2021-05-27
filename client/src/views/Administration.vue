@@ -211,9 +211,10 @@ export default {
     },
     async impersonate (user) {
       try {
-        await AdminApiService.impersonate(user._id)
-
+        await AdminApiService.impersonate(user._id, user.username)
+        
         this.$store.commit('setUserId', user._id)
+        this.$store.commit('setUsername', user.username)
 
         router.push({ name: 'home' })
       } catch (err) {
