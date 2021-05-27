@@ -537,6 +537,7 @@ module.exports = class GuildService {
             let usersInGuild = users.filter(x => x.guildId.equals(guild._id));
 
             guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+            guild.memberCount = usersInGuild.length;
         }
 
         let leaderboard = guilds
