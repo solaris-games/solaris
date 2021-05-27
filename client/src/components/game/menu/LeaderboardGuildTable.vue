@@ -4,13 +4,13 @@
 
     <sortable-leaderboard class="mt-2" :leaderboard="leaderboard" :sortingKey="sortingKey" @sortingRequested="sortLeaderboard" v-if="!isLoading">
       <template v-slot:header="actions">
-        <th>#</th>
-        <th>Guild</th>
-        <th class="text-right" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
+        <th style="width: 10%">#</th>
+        <th style="width: 50%">Guild</th>
+        <th style="width: 20%" class="text-right" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
           <i class="fas fa-user text-info"></i>
           <i v-if="actions.isActive('memberCount')" class="fas fa-chevron-down ml-2"></i>
         </th>
-        <th class="text-right" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
+        <th style="width: 20%" class="text-right" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
           <i class="fas fa-star text-info"></i>
           <i v-if="actions.isActive('totalRank')" class="fas fa-chevron-down ml-2"></i>
         </th>
