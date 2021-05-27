@@ -1,6 +1,6 @@
 <template>
 <div>
-    <view-container-top-bar/>
+    <view-container-top-bar v-if="!hideTopBar"/>
     <logo></logo>
     <div class="container bg-dark pb-3 col-xs-12 col-sm-10 col-md-10 col-lg-6">
         <slot></slot>
@@ -35,6 +35,9 @@ import LogoVue from '../components/Logo'
 import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
 
 export default {
+  props: {
+    hideTopBar: Boolean
+  },
   components: {
     'logo': LogoVue,
     'view-container-top-bar': ViewContainerTopBarVue
