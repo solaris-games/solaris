@@ -6,9 +6,9 @@ const containerLoader = require('../loaders/container');
 let mongo;
 
 async function startup() {
-    const container = containerLoader(null);
+    const container = containerLoader(config, null);
 
-    mongo = await mongooseLoader({
+    mongo = await mongooseLoader(config, {
         syncIndexes: true
     });
     

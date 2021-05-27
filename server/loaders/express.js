@@ -4,9 +4,8 @@ const session = require('express-session');
 const compression = require('compression');
 const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
-const config = require('../config');
 
-module.exports = async (app, io, container) => {
+module.exports = async (config, app, io, container) => {
     app.use(require('body-parser').json());
 
     // ---------------

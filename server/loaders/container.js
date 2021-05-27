@@ -52,11 +52,10 @@ const SpiralMapService = require('../services/maps/spiral');
 const DoughnutMapService = require('../services/maps/doughnut');
 const IrregularMapService = require('../services/maps/irregular');
 
-const config = require('../config');
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
-module.exports = (io) => {
+module.exports = (config, io) => {
     // Poor man's dependency injection.
 
     const passwordService = new PasswordService(bcrypt);
