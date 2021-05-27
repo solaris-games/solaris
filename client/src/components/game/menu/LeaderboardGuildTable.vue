@@ -1,29 +1,27 @@
 <template>
-<div class="table-responsive">
-    <table class="table table-striped table-hover" v-if="leaderboard">
-        <thead>
-            <th>#</th>
-            <th>Guild</th>
-            <th class="text-right" title="Members"><i class="fas fa-user text-info"></i></th>
-            <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
-        </thead>
-        <tbody>
-            <tr v-for="guild in leaderboard" :key="guild._id">
-                <td>{{guild.position}}</td>
-                <td>
-                    {{guild.name}} [{{guild.tag}}]
-                </td>
-                <td align="right">{{guild.memberCount}}</td>
-                <td align="right">{{guild.totalRank}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+  <sortable-leaderboard class="mt-2" :leaderboard="leaderboard" defaultSortingKey="rank">
+    <template v-slot:header>
+      <th>#</th>
+      <th>Guild</th>
+      <th class="text-right" title="Members"><i class="fas fa-user text-info"></i></th>
+      <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
+    </template>
+    <template v-slot:row="guild">
+        <td>{{guild.position}}</td>
+        <td>
+            {{guild.name}} [{{guild.tag}}]
+        </td>
+        <td align="right">{{guild.memberCount}}</td>
+        <td align="right">{{guild.totalRank}}</td>
+    </template>
+  </sortable-leaderboard>
 </template>
 
 <script>
+import SortableLeaderboard from './SortableLeaderboard'
 export default {
   components: {
+    'sortable-leaderboard': SortableLeaderboard
   },
   props: {
     leaderboard: Array
