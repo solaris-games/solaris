@@ -1,10 +1,10 @@
 <template>
-  <sortable-leaderboard class="mt-2" :leaderboard="leaderboard" defaultSortingKey="rank">
-    <template v-slot:header>
+  <sortable-leaderboard class="mt-2" :leaderboard="leaderboard" defaultSortingKey="totalRank" @sortingRequested="sortLeaderboard">
+    <template v-slot:header="actions">
       <th>#</th>
       <th>Guild</th>
-      <th class="text-right" title="Members"><i class="fas fa-user text-info"></i></th>
-      <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
+      <th class="text-right" title="Members" @click="actions.sort('memberCount')"><i class="fas fa-user text-info"></i></th>
+      <th class="text-right" title="Rank" @click="actions.sort('totalRank')"><i class="fas fa-star text-info"></i></th>
     </template>
     <template v-slot:row="guild">
         <td>{{guild.position}}</td>
@@ -25,6 +25,11 @@ export default {
   },
   props: {
     leaderboard: Array
+  },
+  methods: {
+    sortLeaderboard (key) {
+      console.log("Sort: " + key);
+    }
   }
 }
 </script>
