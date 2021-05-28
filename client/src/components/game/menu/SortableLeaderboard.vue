@@ -6,7 +6,7 @@
       </thead>
       <tbody>
         <tr v-for="value in leaderboard" :key="value._id">
-          <slot name="row" v-bind="value"></slot>
+          <slot name="row" v-bind="{ value, getColumnClass }"></slot>
         </tr>
       </tbody>
     </table>
@@ -34,4 +34,13 @@ export default {
 </script>
 
 <style scoped>
+th {
+  border-radius: 8px 8px 0 0;
+}
+tr:last-of-type td {
+  border-radius: 0 0 8px 8px;
+}
+.sortable-header {
+  cursor: pointer;
+}
 </style>

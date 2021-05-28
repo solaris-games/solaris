@@ -10,22 +10,22 @@
         <template v-slot:header="actions">
           <th style="width: 10%">#</th>
           <th style="width: 50%">Guild</th>
-          <th style="width: 20%" class="text-right" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
+          <th style="width: 20%" class="text-right sortable-header" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
             <i class="fas fa-user text-info"></i>
             <i v-if="actions.isActive('memberCount')" class="fas fa-chevron-down ml-2"></i>
           </th>
-          <th style="width: 20%" class="text-right" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
+          <th style="width: 20%" class="text-right sortable-header" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
             <i class="fas fa-star text-info"></i>
             <i v-if="actions.isActive('totalRank')" class="fas fa-chevron-down ml-2"></i>
           </th>
         </template>
-        <template v-slot:row="guild">
-            <td>{{guild.position}}</td>
+        <template v-slot:row="{ value, getColumnClass }">
+            <td>{{value.position}}</td>
             <td>
-                {{guild.name}} [{{guild.tag}}]
+                {{value.name}} [{{value.tag}}]
             </td>
-            <td align="right">{{guild.memberCount}}</td>
-            <td align="right">{{guild.totalRank}}</td>
+            <td :class="getColumnClass('memberCount')" align="right">{{value.memberCount}}</td>
+            <td :class="getColumnClass('totalRank')" align="right">{{value.totalRank}}</td>
         </template>
       </sortable-leaderboard>
     </div>
