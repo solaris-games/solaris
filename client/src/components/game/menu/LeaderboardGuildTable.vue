@@ -53,7 +53,7 @@ export default {
   async mounted () {
     this.loading = true;
     try {
-      const response = await GuildApiService.getLeaderboard(100);
+      const response = await GuildApiService.getLeaderboard(100, this.sortingKey);
       if (response.status === 200) {
         this.leaderboard = response.data.leaderboard;
         this.totalGuilds = response.data.totalGuilds;
@@ -65,10 +65,14 @@ export default {
     this.loading = false;
   },
   methods: {
-    sortLeaderboard (key) {
+    async sortLeaderboard (key) {
       this.isLoading = true;
-      console.log("Sort: " + key);
       this.sortingKey = key;
+      const response = await GuildApiService.getLeaderboard(100, this.sortingKey);
+      if (response.status === 200) {
+        this.leaderboard = response.data.leaderboard;
+        this.totalGuilds = response.data.totalGuilds;
+      }
       this.isLoading = false;
     }
   }

@@ -17,7 +17,8 @@ module.exports = (router, io, container) => {
     router.get('/api/guild/leaderboard', middleware.authenticate, async (req, res, next) => {
         try {
             let limit = +req.query.limit || null;
-            let result = await container.guildService.getLeaderboard(limit);
+            let sortingKey = req.query.sortingKey || null;
+            let result = await container.guildService.getLeaderboard(limit, sortingKey);
                 
             return res.status(200).json(result);
         } catch (err) {

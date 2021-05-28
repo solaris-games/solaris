@@ -6,6 +6,7 @@ function toProperCase(string) {
 };
 
 module.exports = class GuildService {
+    static SORTERS = ['totalRank', 'memberCount']
 
     MAX_MEMBER_COUNT = 100
     MAX_INVITE_COUNT = 100
@@ -517,8 +518,9 @@ module.exports = class GuildService {
         .exec();
     }
 
-    async getLeaderboard(limit) {
-        limit = limit || 10;
+    async getLeaderboard(limit, sortingKey) {
+        limit = limit || 100;
+        sortingKey = GuildService.SORTERS.includes(sortingKey) ? sortingKey : 'totalRank';
 
         let guilds = await this.guildModel.find({}, {
             name: 1,
@@ -541,7 +543,7 @@ module.exports = class GuildService {
         }
 
         let leaderboard = guilds
-                        .sort((a, b) => b.totalRank - a.totalRank)
+                        .sort((a, b) => b[sortingKey] - a[sortingKey])
                         .slice(0, limit);
 
         for (let i = 0; i < leaderboard.length; i++) {
