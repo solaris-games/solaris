@@ -18,7 +18,7 @@ import Home from './views/Home.vue'
 import MainMenu from './views/MainMenu.vue'
 import PremiumStore from './views/PremiumStore.vue'
 import Leaderboard from './views/Leaderboard.vue'
-import Guild from './views/guild/Guild.vue'
+import OwnGuild from './views/guild/OwnGuild.vue'
 import GuildCreate from './views/guild/GuildCreate.vue'
 import Administration from './views/Administration.vue'
 
@@ -124,7 +124,7 @@ export default new Router({
     {
       path: '/guild',
       name: 'guild',
-      component: Guild
+      component: OwnGuild
     },
     {
       path: '/administration',
