@@ -201,13 +201,12 @@ export default {
 
       try {
         let response = await CarrierApiService.calculateCombat(this.$store.state.game._id, {
-          weaponsLevel: +this.defender.weaponsLevel,
+          weaponsLevel: +this.defender.weaponsLevel + (this.includeDefenderBonus ? 1 : 0),
           ships: +this.defender.ships
         }, {
           weaponsLevel: +this.attacker.weaponsLevel,
           ships: +this.attacker.ships
-        },
-        this.includeDefenderBonus)
+        })
 
         if (response.status === 200) {
           this.result = response.data
