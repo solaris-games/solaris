@@ -165,7 +165,7 @@ export default {
       return `${this.guild.name} [${this.guild.tag}]`
     },
     isLeader () {
-      return this.guild.leader._id === this.$store.state.userId
+      return this.guild.leader != null && this.guild.leader._id === this.$store.state.userId
     },
     isOfficer () {
       return this.guild.officers.find(x => x._id === this.$store.state.userId) != null

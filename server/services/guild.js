@@ -282,16 +282,7 @@ module.exports = class GuildService {
         }
 
         // Remove all invites to this user for any guild.
-        await this.guildModel.updateMany({
-            invitees: {
-                $in: [userId]
-            }
-        }, {
-            $pull: {
-                invitees: userId
-            }
-        })
-        .exec();
+        await this.declineAllInvitations(userId);
 
         // Add the user to the chosen guild.
         await this.guildModel.updateOne({
@@ -345,11 +336,32 @@ module.exports = class GuildService {
         .exec();
     }
 
+    async declineAllInvitations(userId) {
+        await this.guildModel.updateMany({
+            invitees: {
+                $in: [userId]
+            }
+        }, {
+            $pull: {
+                invitees: userId
+            }
+        })
+        .exec();
+    }
+
+    async tryLeaveGuild(userId) {
+        let guild = await this.detailMyGuild(userId, false);
+
+        if (guild) {
+            await this.leave(userId, guild._id);
+        }
+    }
+
     async leave(userId, guildId) {
         let guild = await this.detail(guildId);
 
         if (this._isLeader(guild, userId)) {
-            throw new ValidationError(`Cannot leave the guild if you are the leader, promote a new guild leader first.`);
+            throw new ValidationError(`Cannot leave your guild if you are the leader, promote a new guild leader first.`);
         }
 
         await this._removeUser(guild, userId);
