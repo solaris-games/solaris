@@ -44,36 +44,40 @@ export default {
   },
   data () {
     return {
-      leaderboard: [],
-      isLoading: false,
+      leaderboards: {},
+      isLoading: true,
       sortingKey: 'totalRank',
       totalGuilds: 0
     }
   },
   async mounted () {
-    this.loading = true;
-    try {
-      const response = await GuildApiService.getLeaderboard(100, this.sortingKey);
-      if (response.status === 200) {
-        this.leaderboard = response.data.leaderboard;
-        this.totalGuilds = response.data.totalGuilds;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-
-    this.loading = false;
+    await this.loadLeaderboard(this.sortingKey);
   },
   methods: {
     async sortLeaderboard (key) {
-      this.isLoading = true;
       this.sortingKey = key;
-      const response = await GuildApiService.getLeaderboard(100, this.sortingKey);
-      if (response.status === 200) {
-        this.leaderboard = response.data.leaderboard;
-        this.totalGuilds = response.data.totalGuilds;
+      await this.loadLeaderboard(key);
+    },
+    async loadLeaderboard (key) {
+      if (this.leaderboards[key]) {
+        return;
+      }
+      this.isLoading = true;
+      try {
+        const response = await GuildApiService.getLeaderboard(100, key);
+        if (response.status === 200) {
+          this.$set(this.leaderboards, key, response.data.leaderboard);
+          this.totalGuilds = response.data.totalGuilds;
+        }
+      } catch (err) {
+        console.error(err);
       }
       this.isLoading = false;
+    }
+  },
+  computed: {
+    leaderboard () {
+      return this.leaderboards[this.sortingKey];
     }
   }
 }
