@@ -1,34 +1,31 @@
 <template>
   <div class="tab-pane fade" id="guilds">
     <loading-spinner :loading="isLoading"/>
-    <div id="guilds" >
+    <h4 class="mb-1">Top 100 Guilds</h4>
+    <small class="text-warning">Total Guilds: {{totalGuilds}}</small>
 
-      <h4 class="mb-1">Top 100 Guilds</h4>
-      <small class="text-warning">Total Guilds: {{totalGuilds}}</small>
-
-      <sortable-leaderboard v-if="leaderboard && !isLoading" class="mt-2" :leaderboard="leaderboard" :sortingKey="sortingKey" @sortingRequested="sortLeaderboard">
-        <template v-slot:header="actions">
-          <th style="width: 10%">#</th>
-          <th style="width: 50%">Guild</th>
-          <th style="width: 20%" class="text-right sortable-header" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
-            <i class="fas fa-user text-info"></i>
-            <i v-if="actions.isActive('memberCount')" class="fas fa-chevron-down ml-2"></i>
-          </th>
-          <th style="width: 20%" class="text-right sortable-header" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
-            <i class="fas fa-star text-info"></i>
-            <i v-if="actions.isActive('totalRank')" class="fas fa-chevron-down ml-2"></i>
-          </th>
-        </template>
-        <template v-slot:row="{ value, getColumnClass }">
-            <td>{{value.position}}</td>
-            <td>
-                {{value.name}} [{{value.tag}}]
-            </td>
-            <td :class="getColumnClass('memberCount')" align="right">{{value.memberCount}}</td>
-            <td :class="getColumnClass('totalRank')" align="right">{{value.totalRank}}</td>
-        </template>
-      </sortable-leaderboard>
-    </div>
+    <sortable-leaderboard v-if="leaderboard && !isLoading" class="mt-2" :leaderboard="leaderboard" :sortingKey="sortingKey" @sortingRequested="sortLeaderboard">
+      <template v-slot:header="actions">
+        <th style="width: 10%">#</th>
+        <th style="width: 50%">Guild</th>
+        <th style="width: 20%" class="text-right sortable-header" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
+          <i class="fas fa-user text-info"></i>
+          <i v-if="actions.isActive('memberCount')" class="fas fa-chevron-down ml-2"></i>
+        </th>
+        <th style="width: 20%" class="text-right sortable-header" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
+          <i class="fas fa-star text-info"></i>
+          <i v-if="actions.isActive('totalRank')" class="fas fa-chevron-down ml-2"></i>
+        </th>
+      </template>
+      <template v-slot:row="{ value, getColumnClass }">
+          <td>{{value.position}}</td>
+          <td>
+              {{value.name}} [{{value.tag}}]
+          </td>
+          <td :class="getColumnClass('memberCount')" align="right">{{value.memberCount}}</td>
+          <td :class="getColumnClass('totalRank')" align="right">{{value.totalRank}}</td>
+      </template>
+    </sortable-leaderboard>
   </div>
 </template>
 

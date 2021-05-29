@@ -11,16 +11,8 @@
       </li>
     </ul>
 
-    <loading-spinner :loading="isLoading"/>
-
-    <div class="tab-content pt-2" v-if="!isLoading">
-      <div class="tab-pane fade show active" id="players">
-        <div v-if="currentLeaderboard">
-          <h4 class="mb-1">Top 100 Players</h4>
-          <small class="text-warning">Total Players: {{totalPlayers}}</small>
-          <leaderboard-user-table class="mt-2" :leaderboard="currentLeaderboard" :sortingKey="userSortingKey" @sortingRequested="switchToLeaderboard"></leaderboard-user-table>
-        </div>
-      </div>
+    <div class="tab-content pt-2">
+      <leaderboard-user-table></leaderboard-user-table>
       <leaderboard-guild-table></leaderboard-guild-table>
     </div>
 
@@ -31,7 +23,6 @@
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
-import UserApiService from '../services/api/user'
 import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
 import LeaderboardGuildTable from '../components/game/menu/LeaderboardGuildTable'
 
@@ -42,58 +33,6 @@ export default {
     'loading-spinner': LoadingSpinner,
     'leaderboard-user-table': LeaderboardUserTable,
     'leaderboard-guild-table': LeaderboardGuildTable
-  },
-  data () {
-    return {
-      isLoading: false,
-      userLeaderboards: {},
-      userSortingKey: 'rank',
-      totalPlayers: 0
-    }
-  },
-  async mounted () {
-    this.isLoading = true
-
-    try {
-      let requests = [
-        await UserApiService.getLeaderboard(100, this.userSortingKey),
-      ]
-
-      let responses = await Promise.all(requests)
-      
-      if (responses[0].status === 200) {
-        const result = responses[0].data
-        this.userLeaderboards = result.leaderboard
-        this.$set(this.userLeaderboards, this.userSortingKey, result.leaderboard)
-        this.totalPlayers = result.totalPlayers
-      }
-    } catch (err) {
-      console.error(err)
-    }
-
-    this.isLoading = false
-  },
-  methods: {
-    async switchToLeaderboard(sortingKey) {
-      try {
-        this.userSortingKey = sortingKey
-        if (this.userLeaderboards[sortingKey]) {
-          return
-        }
-        this.isLoading = true
-        const result = await UserApiService.getLeaderboard(100, sortingKey)
-        this.$set(this.userLeaderboards, sortingKey, result.data.leaderboard)
-        this.isLoading = false
-        this.totalPlayers = result.data.totalPlayers
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  },
-  computed: {
-    currentLeaderboard () {
-      return this.userLeaderboards[this.userSortingKey]
-    }
   }
 }
 </script>
