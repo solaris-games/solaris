@@ -18,7 +18,7 @@
         <div v-if="currentLeaderboard">
           <h4 class="mb-1">Top 100 Players</h4>
           <small class="text-warning">Total Players: {{totalPlayers}}</small>
-          <leaderboard-user-table class="mt-2" :leaderboard="currentLeaderboard" :activeSortingKey="userSortingKey" @sortingRequested="switchToLeaderboard"></leaderboard-user-table>
+          <leaderboard-user-table class="mt-2" :leaderboard="currentLeaderboard" :sortingKey="userSortingKey" @sortingRequested="switchToLeaderboard"></leaderboard-user-table>
         </div>
       </div>
       <leaderboard-guild-table></leaderboard-guild-table>
