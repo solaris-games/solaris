@@ -9,7 +9,7 @@
         <th style="width: 10%">#</th>
         <th style="width: 50%">Guild</th>
         <th style="width: 20%" class="text-right sortable-header" title="Members" @click="actions.sort('memberCount')" :class="actions.getColumnClass('memberCount')">
-          <i class="fas fa-user text-info"></i>
+          <i class="fas fa-user"></i>
           <i v-if="actions.isActive('memberCount')" class="fas fa-chevron-down ml-2"></i>
         </th>
         <th style="width: 20%" class="text-right sortable-header" title="Rank" @click="actions.sort('totalRank')" :class="actions.getColumnClass('totalRank')">
