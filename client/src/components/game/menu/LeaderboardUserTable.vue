@@ -23,22 +23,24 @@
         </th>
       </template>
       <template v-slot:row="{ value: player, getColumnClass }">
-        <td>{{player.position}}</td>
-        <td>
-            <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">
-                <span>{{player.username}}</span>
-                <span v-if="player.guild" class="d-md-none" :title="player.guild.name">[{{player.guild.tag}}]</span>
-            </router-link>
-            <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
-            <i class="fas fa-code ml-1" title="This player is a developer" v-if="player.roles && player.roles.developer"></i>
-            <i class="fas fa-user-friends ml-1" title="This player is a community manager" v-if="player.roles && player.roles.communityManager"></i>
-        </td>
-        <td class="d-none d-md-table-cell">
-            {{player.guild ? player.guild.name + ' [' + player.guild.tag + ']' : ''}}
-        </td>
-        <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
-        <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
-        <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
+        <tr>
+          <td>{{player.position}}</td>
+          <td>
+              <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">
+                  <span>{{player.username}}</span>
+                  <span v-if="player.guild" class="d-md-none" :title="player.guild.name">[{{player.guild.tag}}]</span>
+              </router-link>
+              <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
+              <i class="fas fa-code ml-1" title="This player is a developer" v-if="player.roles && player.roles.developer"></i>
+              <i class="fas fa-user-friends ml-1" title="This player is a community manager" v-if="player.roles && player.roles.communityManager"></i>
+          </td>
+          <td class="d-none d-md-table-cell">
+              {{player.guild ? player.guild.name + ' [' + player.guild.tag + ']' : ''}}
+          </td>
+          <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
+          <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
+          <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
+        </tr>
       </template>
     </sortable-leaderboard>
   </div>

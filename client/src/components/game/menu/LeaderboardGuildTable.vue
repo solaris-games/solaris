@@ -18,6 +18,7 @@
         </th>
       </template>
       <template v-slot:row="{ value, getColumnClass }">
+        <tr>
           <td>{{value.position}}</td>
           <td>
             <router-link :to="{ name: 'guild-details', params: { guildId: value._id }}">
@@ -26,6 +27,7 @@
           </td>
           <td :class="getColumnClass('memberCount')" align="right">{{value.memberCount}}</td>
           <td :class="getColumnClass('totalRank')" align="right">{{value.totalRank}}</td>
+        </tr>
       </template>
     </sortable-leaderboard>
   </div>

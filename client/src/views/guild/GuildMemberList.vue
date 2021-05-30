@@ -61,8 +61,6 @@ export default {
         this.members.push(invitee);
       });
     }
-
-    console.log(this.members);
   },
 };
 </script>

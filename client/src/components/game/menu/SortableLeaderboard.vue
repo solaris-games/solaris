@@ -5,9 +5,7 @@
         <slot name="header" v-bind:sort="sortBy" v-bind:getColumnClass="getColumnClass" v-bind:isActive="isActiveSorting"></slot>
       </thead>
       <tbody>
-        <tr v-for="value in leaderboard" :key="value._id">
-          <slot name="row" v-bind="{ value, getColumnClass }"></slot>
-        </tr>
+        <slot v-for="value in leaderboard" name="row" v-bind="{ value, getColumnClass }"></slot>
       </tbody>
     </table>
   </div>
