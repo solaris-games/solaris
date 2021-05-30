@@ -21,6 +21,10 @@ class GuildService extends BaseApiService {
     return axios.get(this.BASE_URL + 'guild/invites', { withCredentials: true })
   }
 
+  details (guildId) {
+    return null; //TODO
+  }
+
   detailMyGuild () {
     return axios.get(this.BASE_URL + 'guild/mine', { withCredentials: true })
   }
