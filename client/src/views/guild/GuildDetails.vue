@@ -8,6 +8,14 @@
       <p class="float-right">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5>Members</h5>
+
+      <guild-member-list :guild="guild">
+        <template v-slot:default="{ value, getColumnClass }">
+          <tr>
+            <td>{{value.username}}</td>
+          </tr>
+        </template>
+      </guild-member-list>
     </div>
   </view-container>
 </template>
@@ -15,13 +23,15 @@
 import ViewContainer from '../../components/ViewContainer';
 import ViewTitle from '../../components/ViewTitle';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import GuildApiService from '../../services/api/guild'
+import GuildApiService from '../../services/api/guild';
+import GuildMemberList from './GuildMemberList';
 
 export default {
   components: {
     'view-container': ViewContainer,
     'loading-spinner': LoadingSpinner,
-    'view-title': ViewTitle
+    'view-title': ViewTitle,
+    'guild-member-list': GuildMemberList
   },
   data () {
     return {
@@ -37,11 +47,11 @@ export default {
     async loadGuild (guildId) {
       this.isLoading = true;
       try {
-        const response = GuildApiService.details(guildId);
+        const response = await GuildApiService.details(guildId);
 
-        //if (response.status === 200) {
-        //  this.guild = response.data;
-        //}
+        if (response.status === 200) {
+          this.guild = response.data;
+        }
       } catch (err) {
         console.error(err)
       }
