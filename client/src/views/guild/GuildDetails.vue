@@ -13,13 +13,15 @@
 </template>
 <script>
 import ViewContainer from '../../components/ViewContainer';
+import ViewTitle from '../../components/ViewTitle';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import GuildApiService from '../../services/api/guild'
 
 export default {
   components: {
     'view-container': ViewContainer,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'view-title': ViewTitle
   },
   data () {
     return {
@@ -33,18 +35,18 @@ export default {
   },
   methods: {
     async loadGuild (guildId) {
-      this.loading = true;
+      this.isLoading = true;
       try {
         const response = GuildApiService.details(guildId);
 
-        if (response.status === 200) {
-          this.guild = response.data;
-        }
+        //if (response.status === 200) {
+        //  this.guild = response.data;
+        //}
       } catch (err) {
         console.error(err)
       }
 
-      this.loading = false;
+      this.isLoading = false;
     }
   },
   computed: {

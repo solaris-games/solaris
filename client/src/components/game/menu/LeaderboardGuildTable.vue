@@ -20,7 +20,9 @@
       <template v-slot:row="{ value, getColumnClass }">
           <td>{{value.position}}</td>
           <td>
-              {{value.name}} [{{value.tag}}]
+            <router-link :to="{ name: 'guild-details', params: { guildId: value._id }}">
+              <span>{{value.name}} [{{value.tag}}]</span>
+            </router-link>
           </td>
           <td :class="getColumnClass('memberCount')" align="right">{{value.memberCount}}</td>
           <td :class="getColumnClass('totalRank')" align="right">{{value.totalRank}}</td>
