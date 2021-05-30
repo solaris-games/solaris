@@ -12,7 +12,13 @@
       <guild-member-list :guild="guild">
         <template v-slot:default="{ value, getColumnClass }">
           <tr>
-            <td>{{value.username}}</td>
+            <td>
+                <router-link :to="{ name: 'account-achievements', params: { userId: value._id }}">{{value.username}}</router-link>
+            </td>
+            <td :class="getRoleClass(value.role, getColumnClass)">{{getRoleName(value.role)}}</td>
+            <td align="right" :class="getColumnClass('rank')">{{value.achievements.rank}}</td>
+            <td align="right" :class="getColumnClass('victories')">{{value.achievements.victories}}</td>
+            <td align="right" :class="getColumnClass('renown')">{{value.achievements.renown}}</td>
           </tr>
         </template>
       </guild-member-list>
@@ -57,6 +63,17 @@ export default {
       }
 
       this.isLoading = false;
+    },
+    getRoleName (role) {
+      return role.charAt(0).toUpperCase() + role.slice(1);
+    },
+    getRoleClass (role, getColumnClass) {
+      return {
+        'text-warning': role === 'leader',
+        'text-info': role === 'officer',
+        'text-danger': role === 'invitee',
+        ...getColumnClass('role')
+      }
     }
   },
   computed: {
