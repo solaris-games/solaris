@@ -1,21 +1,27 @@
 <template>
-  <sortable-leaderboard :leaderboard="members" :sortingKey="sortingKey">
+  <sortable-leaderboard :leaderboard="members" :sortingKey="sortingKey" @sortingRequested="sortMemberList">
     <template v-slot:header="actions">
-      <th>Player</th>
-      <th>Role</th>
-      <th class="text-right" title="Rank">
+      <th style="width: 50%">Player</th>
+      <th style="width: 20%" class="sortable-header" title="Role" @click="actions.sort('role')" :class="actions.getColumnClass('role')">
+        Role
+        <i v-if="actions.isActive('role')" class="fas fa-chevron-down ml-2"></i>
+      </th>
+      <th style="width: 10%" class="text-right sortable-header" title="Rank" @click="actions.sort('rank')" :class="actions.getColumnClass('rank')">
         <i class="fas fa-star text-info"></i>
+        <i v-if="actions.isActive('rank')" class="fas fa-chevron-down ml-2"></i>
       </th>
-      <th class="text-right" title="Victories">
+      <th style="width: 10%" class="text-right sortable-header" title="Victories" @click="actions.sort('victories')" :class="actions.getColumnClass('victories')">
         <i class="fas fa-trophy text-warning"></i>
+        <i v-if="actions.isActive('victories')" class="fas fa-chevron-down ml-2"></i>
       </th>
-      <th class="text-right" title="Renown">
+      <th style="width: 10%" class="text-right sortable-header" title="Renown" @click="actions.sort('renown')" :class="actions.getColumnClass('renown')">
         <i class="fas fa-heart text-danger"></i>
+        <i v-if="actions.isActive('renown')" class="fas fa-chevron-down ml-2"></i>
       </th>
       <th></th>
     </template>
     <template v-slot:row="{ value, getColumnClass }">
-      <slot v-bind="{ value, getColumnClass }"></slot>
+      <slot v-bind="{ value, getColumnClass, sortingKey }"></slot>
     </template>
   </sortable-leaderboard>
 </template>
@@ -62,6 +68,37 @@ export default {
       });
     }
   },
+  methods: {
+    sortMemberList (key) {
+      this.sortingKey = key;
+      const comparer = this.getComparer(key);
+      this.members.sort(comparer);
+    },
+    getComparer (key) {
+      if (key === 'role') {
+        return (u1, u2) => this.roleToValue(u1.role) - this.roleToValue(u2.role);
+      } else if (key === 'rank') {
+        return (u1, u2) => u1.achievements.rank - u2.achievements.rank;
+      } else if (key === 'victories') {
+        return (u1, u2) => u1.achievements.victories - u2.achievements.victories;
+      } else if (key === 'renown') {
+        return (u1, u2) => u1.achievements.renown - u2.achievements.renown;
+      } else {
+        return (a, b) => 0;
+      }
+    },
+    roleToValue (role) {
+      if (role === 'leader') {
+        return 3;
+      } else if (role === 'officer') {
+        return 2;
+      } else if (role === 'member') {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  }
 };
 </script>
 <style scoped>

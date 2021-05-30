@@ -11,7 +11,7 @@
 
       <guild-member-list :guild="guild">
         <template v-slot:default="{ value, getColumnClass }">
-          <guild-member :guild="guild" :player="value" :role="value.role"
+          <guild-member :guild="guild" :player="value" :role="value.role" :getColumnClass="getColumnClass"
             @onPlayerPromoted="onPlayerPromoted"
             @onPlayerKicked="onPlayerKicked"
             @onPlayerUninvited="onPlayerUninvited"></guild-member>
