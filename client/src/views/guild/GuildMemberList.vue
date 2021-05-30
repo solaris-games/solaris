@@ -1,7 +1,7 @@
 <template>
   <sortable-leaderboard :leaderboard="members" :sortingKey="sortingKey" @sortingRequested="sortMemberList">
     <template v-slot:header="actions">
-      <th style="width: 50%">Player</th>
+      <th style="width: 40%">Player</th>
       <th style="width: 20%" class="sortable-header" title="Role" @click="actions.sort('role')" :class="actions.getColumnClass('role')">
         Role
         <i v-if="actions.isActive('role')" class="fas fa-chevron-down ml-2"></i>
@@ -76,13 +76,13 @@ export default {
     },
     getComparer (key) {
       if (key === 'role') {
-        return (u1, u2) => this.roleToValue(u1.role) - this.roleToValue(u2.role);
+        return (u1, u2) => this.roleToValue(u2.role) - this.roleToValue(u1.role);
       } else if (key === 'rank') {
-        return (u1, u2) => u1.achievements.rank - u2.achievements.rank;
+        return (u1, u2) => u2.achievements.rank - u1.achievements.rank;
       } else if (key === 'victories') {
-        return (u1, u2) => u1.achievements.victories - u2.achievements.victories;
+        return (u1, u2) => u2.achievements.victories - u1.achievements.victories;
       } else if (key === 'renown') {
-        return (u1, u2) => u1.achievements.renown - u2.achievements.renown;
+        return (u1, u2) => u2.achievements.renown - u1.achievements.renown;
       } else {
         return (a, b) => 0;
       }
