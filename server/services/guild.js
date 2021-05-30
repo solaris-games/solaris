@@ -70,7 +70,11 @@ module.exports = class GuildService {
         return guilds;
     }
 
-    async detail(guildId, withUserInfo = false) {
+    async detail(guildId, withUserInfo = false, withInvitations = false) {
+        if (!guildId) {
+            throw new ValidationError("Tried to get guild details, but guildId was not present")
+        }
+
         let guild = await this.guildModel.findOne({
             _id: guildId
         })
@@ -90,19 +94,20 @@ module.exports = class GuildService {
             }, userSelectObject)
             .lean()
             .exec();
-
-            let usersInvited = await this.userModel.find({
-                _id: {
-                    $in: guild.invitees
-                }
-            }, userSelectObject)
-            .lean()
-            .exec();
     
             guild.leader = usersInGuild.find(x => x._id.equals(guild.leader));
             guild.officers = usersInGuild.filter(x => this._isOfficer(guild, x._id));
             guild.members = usersInGuild.filter(x => this._isMember(guild, x._id));
-            guild.invitees = usersInvited;
+
+            if (withInvitations) {
+                guild.invitees = await this.userModel.find({
+                    _id: {
+                        $in: guild.invitees
+                    }
+                }, userSelectObject)
+                .lean()
+                .exec();
+            }
 
             guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
         }
@@ -123,7 +128,7 @@ module.exports = class GuildService {
             return null;
         }
 
-        return await this.detail(user.guildId, withUserInfo);
+        return await this.detail(user.guildId, withUserInfo, true);
     }
 
     async create(userId, name, tag) {

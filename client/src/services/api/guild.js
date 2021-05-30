@@ -22,7 +22,12 @@ class GuildService extends BaseApiService {
   }
 
   details (guildId) {
-    return null; //TODO
+    return axios.get(this.BASE_URL + 'guild/details', {
+      withCredentials: true,
+      params: {
+        guildId
+      }
+    });
   }
 
   detailMyGuild () {
