@@ -408,7 +408,7 @@ export default {
         let response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`${this.carrier.name} has been scuttled.`)
+          this.$toasted.show(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
 
           this.$store.commit('gameCarrierScuttled', {
             carrierId: this.carrier._id

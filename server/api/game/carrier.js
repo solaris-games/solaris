@@ -129,7 +129,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, (req, res, next) => {
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
         let errors = [];
 
         if (req.body.defender.ships == null) {
@@ -164,20 +164,14 @@ module.exports = (router, io, container) => {
             errors.push('attacker.weaponsLevel must be greater than 0.');
         }
 
-        if (req.body.includeDefenderBonus == null) {
-            req.body.includeDefenderBonus = true;
-        }
-
         if (errors.length) {
             throw new ValidationError(errors);
         }
 
         try {
             let result = container.combatService.calculate(
-                req.game,
                 req.body.defender,
                 req.body.attacker,
-                req.body.includeDefenderBonus,
                 true);
 
             return res.status(200).json(result);

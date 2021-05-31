@@ -249,6 +249,8 @@ module.exports = (router, io, container) => {
     router.delete('/api/user/closeaccount', middleware.authenticate, async (req, res, next) => {
         try {
             await container.gameService.quitAllActiveGames(req.session.userId);
+            await container.guildService.tryLeaveGuild(req.session.userId);
+            await container.guildService.declineAllInvitations(req.session.userId);
             await container.userService.closeAccount(req.session.userId);
 
             // Delete the session object.

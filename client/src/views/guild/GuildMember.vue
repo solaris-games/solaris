@@ -189,13 +189,13 @@ export default {
       return this.player._id === this.$store.state.userId
     },
     currentUserIsLeader () {
-      return this.guild.leader._id === this.$store.state.userId
+      return this.guild.leader != null && this.guild.leader._id === this.$store.state.userId
     },
     currentUserIsOfficer () {
       return this.guild.officers.find(x => x._id === this.$store.state.userId) != null
     },
     playerIsLeader () {
-      return this.guild.leader._id === this.player._id
+      return this.guild.leader != null && this.guild.leader._id === this.player._id
     },
     playerIsOfficer () {
       return this.guild.officers.find(x => x._id === this.player._id) != null
