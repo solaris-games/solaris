@@ -64,9 +64,7 @@
 
     <div class="row pb-0">
       <div class="col d-none d-md-block">
-        <h4>Top 10 Players</h4>
-        <leaderboard-user-table if="leaderboard" :leaderboard="leaderboard"></leaderboard-user-table>
-        <loading-spinner :loading="!leaderboard"></loading-spinner>
+        <leaderboard-user-table :limit="10"></leaderboard-user-table>
       </div>
     </div>
   </view-container>
@@ -95,13 +93,11 @@ export default {
     return {
       user: null,
       achievements: null,
-      leaderboard: null,
       isLoggingOut: false
     }
   },
   mounted () {
     this.loadAchievements()
-    this.loadLeaderboard()
   },
   methods: {
     async logout () {
@@ -122,15 +118,6 @@ export default {
 
         this.user = response.data
         this.achievements = response.data.achievements
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async loadLeaderboard () {
-      try {
-        let response = await userService.getLeaderboard(10, 'rank')
-
-        this.leaderboard = response.data.leaderboard
       } catch (err) {
         console.error(err)
       }

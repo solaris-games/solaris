@@ -12,7 +12,7 @@
     </ul>
 
     <div class="tab-content pt-2">
-      <leaderboard-user-table></leaderboard-user-table>
+      <leaderboard-user-table :limit="100"></leaderboard-user-table>
       <leaderboard-guild-table></leaderboard-guild-table>
     </div>
 

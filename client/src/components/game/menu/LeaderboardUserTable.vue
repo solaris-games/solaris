@@ -1,7 +1,7 @@
 <template>
 <div class="tab-pane fade show active" id="players">
   <loading-spinner :loading="isLoading"/>
-  <h4 class="mb-1">Top 100 Players</h4>
+  <h4 class="mb-1">Top {{limit}} Players</h4>
   <small class="text-warning">Total Players: {{totalPlayers}}</small>
   <div class="table-responsive">
     <sortable-leaderboard v-if="leaderboard && !isLoading" class="mt-2" :leaderboard="leaderboard" :sortingKey="sortingKey" @sortingRequested="sortLeaderboard">
@@ -58,6 +58,9 @@ export default {
     'sortable-leaderboard': SortableLeaderboard,
     'loading-spinner': LoadingSpinner
   },
+  props: {
+    limit: Number
+  },
   data () {
     return {
       isLoading: false,
@@ -80,7 +83,7 @@ export default {
       }
       this.isLoading = true;
       try {
-        const response = await UserApiService.getLeaderboard(100, key);
+        const response = await UserApiService.getLeaderboard(this.limit, key);
         if (response.status === 200) {
           this.$set(this.leaderboards, key, response.data.leaderboard);
           this.totalPlayers = response.data.totalPlayers;
