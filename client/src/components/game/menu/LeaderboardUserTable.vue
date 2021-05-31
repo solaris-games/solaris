@@ -100,13 +100,4 @@ export default {
 </script>
 
 <style scoped>
-th {
-  border-radius: 8px 8px 0 0;
-}
-tr:last-of-type td {
-  border-radius: 0 0 8px 8px;
-}
-.sortable-header {
-  cursor: pointer;
-}
 </style>

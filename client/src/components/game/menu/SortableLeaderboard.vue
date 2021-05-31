@@ -1,6 +1,6 @@
 <template>
   <div class="table-responsive">
-    <table class="table table-striped table-hover" v-if="leaderboard">
+    <table class="table table-striped table-hover leaderboard-table" v-if="leaderboard">
       <thead>
         <slot name="header" v-bind:sort="sortBy" v-bind:getColumnClass="getColumnClass" v-bind:isActive="isActiveSorting"></slot>
       </thead>
@@ -31,14 +31,15 @@ export default {
 };
 </script>
 
-<style scoped>
-th {
+<!-- This is deliberately not scoped, scoping is done by using the .leaderboard-table selector. Scoping would break the styling for nested components. -->
+<style>
+.leaderboard-table th {
   border-radius: 8px 8px 0 0;
 }
-tr:last-of-type td {
+.leaderboard-table tr:last-of-type td {
   border-radius: 0 0 8px 8px;
 }
-.sortable-header {
+.leaderboard-table .sortable-header {
   cursor: pointer;
 }
 </style>
