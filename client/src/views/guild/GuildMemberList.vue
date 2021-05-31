@@ -2,7 +2,7 @@
   <sortable-leaderboard :leaderboard="members" :sortingKey="sortingKey" @sortingRequested="sortMemberList">
     <template v-slot:header="actions">
       <th style="width: 40%">Player</th>
-      <th style="width: 20%" class="sortable-header" title="Role" @click="actions.sort('role')" :class="actions.getColumnClass('role')">
+      <th style="width: 15%" class="sortable-header" title="Role" @click="actions.sort('role')" :class="actions.getColumnClass('role')">
         Role
         <i v-if="actions.isActive('role')" class="fas fa-chevron-down ml-2"></i>
       </th>
