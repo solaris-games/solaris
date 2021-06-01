@@ -18,7 +18,7 @@
         <i class="fas fa-heart text-danger"></i>
         <i v-if="actions.isActive('renown')" class="fas fa-chevron-down ml-2"></i>
       </th>
-      <th></th>
+      <th v-if="isInGuild"></th>
     </template>
     <template v-slot:row="{ value, getColumnClass }">
       <slot v-bind="{ value, getColumnClass, sortingKey }"></slot>
@@ -27,6 +27,7 @@
 </template>
 <script>
 import SortableLeaderboard from '../../components/game/menu/SortableLeaderboard';
+import GameHelper from '../../services/gameHelper';
 
 export default {
   components: {
@@ -97,6 +98,11 @@ export default {
       } else {
         return 0;
       }
+    }
+  },
+  computed: {
+    isInGuild () {
+      return GameHelper.isInGuild(this.guild, this.$store.state.userId)
     }
   }
 };

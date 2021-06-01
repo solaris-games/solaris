@@ -107,6 +107,8 @@ module.exports = class GuildService {
                 }, userSelectObject)
                 .lean()
                 .exec();
+            } else {
+                delete guild.invitees;
             }
 
             guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);

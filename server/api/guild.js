@@ -26,7 +26,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
         try {
-            const result = await container.guildService.detail(req.params.guildId, true);
+            const result = await container.guildService.detail(req.params.guildId, true, false);
 
             return res.status(200).json(result);
         } catch (err) {

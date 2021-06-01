@@ -742,6 +742,12 @@ class GameHelper {
   isDeadStar(star) {
     return star.naturalResources != null && star.naturalResources <= 0
   }
+
+  isInGuild (guild, userId) {
+    return guild.members.find(m => m._id === userId)
+      || guild.officers.find(m => m._id === userId)
+      || (guild.leader && guild.leader._id === userId)
+  }
 }
 
 export default new GameHelper()
