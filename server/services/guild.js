@@ -71,8 +71,8 @@ module.exports = class GuildService {
     }
 
     async detail(guildId, withUserInfo = false, withInvitations = false) {
-        if (!guildId) {
-            throw new ValidationError("Tried to get guild details, but guildId was not present")
+        if (guildId == null) {
+            throw new ValidationError("Guild ID is required.");
         }
 
         let guild = await this.guildModel.findOne({
@@ -80,6 +80,10 @@ module.exports = class GuildService {
         })
         .lean({ defaults: true })
         .exec();
+
+        if (!guild) {
+            throw new ValidationError("Guild not found.");
+        }
 
         if (withUserInfo) {
             let userSelectObject = {
