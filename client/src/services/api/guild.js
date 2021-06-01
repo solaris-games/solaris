@@ -3,7 +3,7 @@ import BaseApiService from './base'
 
 class GuildService extends BaseApiService {
   list () {
-    return axios.get(this.BASE_URL + 'guild', { withCredentials: true })
+    return axios.get(this.BASE_URL + 'guild/list', { withCredentials: true })
   }
 
   getLeaderboard (limit, sortingKey) {
@@ -22,16 +22,13 @@ class GuildService extends BaseApiService {
   }
 
   details (guildId) {
-    return axios.get(this.BASE_URL + 'guild/details', {
-      withCredentials: true,
-      params: {
-        guildId
-      }
+    return axios.get(this.BASE_URL + 'guild/' + guildId, {
+      withCredentials: true
     });
   }
 
   detailMyGuild () {
-    return axios.get(this.BASE_URL + 'guild/mine', { withCredentials: true })
+    return axios.get(this.BASE_URL + 'guild', { withCredentials: true })
   }
 
   create (name, tag) {
