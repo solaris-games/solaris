@@ -50,11 +50,11 @@
                 <div class="card-img-overlay">
                   <h5 class="card-title featured-card-title">
                     <i class="fas fa-user-graduate"></i>
-                    <span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span>
+                    <strong><span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span></strong>
                   </h5>
                   <h6 class="card-title card-subtitle">
-                    {{getGameTypeFriendlyText(games.newPlayerRT)}}
-                    ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
+                    <strong>{{getGameTypeFriendlyText(games.newPlayerRT)}}
+                    ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})</strong>
                   </h6>
                 </div>
               </div>
