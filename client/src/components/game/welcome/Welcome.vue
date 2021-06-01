@@ -12,7 +12,7 @@
 
     <select-colour v-if="!isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-    <share-link/>
+    <share-link message="Invite your friends and take on the Galaxy together!"/>
 </div>
 </template>
 

@@ -373,15 +373,20 @@ module.exports = class PlayerService extends EventEmitter {
     calculateTotalEconomy(playerStars) {
         let totalEconomy = playerStars.reduce((sum, s) => {
             let multiplier = this.specialistService.getEconomyInfrastructureMultiplier(s);
+            let eco = s.infrastructure?.economy ?? 0;
 
-            return sum + (s.infrastructure.economy * multiplier)
+            return sum + (eco * multiplier)
         }, 0);
 
         return totalEconomy;
     }
 
     calculateTotalIndustry(playerStars) {
-        let totalIndustry = playerStars.reduce((sum, s) => sum + s.infrastructure.industry, 0);
+        let totalIndustry = playerStars.reduce((sum, s) => {
+            let ind = s.infrastructure?.industry ?? 0;
+
+            return sum + ind;
+        }, 0);
 
         return totalIndustry;
     }
@@ -389,8 +394,9 @@ module.exports = class PlayerService extends EventEmitter {
     calculateTotalScience(playerStars) {
         let totalScience = playerStars.reduce((sum, s) => {
             let multiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
+            let sci = s.infrastructure?.science ?? 0;
 
-            return sum + (s.infrastructure.science * multiplier)
+            return sum + (sci * multiplier)
         }, 0);
 
         return totalScience;
@@ -400,8 +406,9 @@ module.exports = class PlayerService extends EventEmitter {
         // Calculate the manufacturing level for all of the stars the player owns.
         playerStars.forEach(s => {
             let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
+            let ind = s.infrastructure?.industry ?? 0;
 
-            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, s.infrastructure.industry, 1, game.settings.galaxy.productionTicks)
+            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks)
         });
 
         let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
