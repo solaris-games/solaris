@@ -146,7 +146,7 @@ class Star extends EventEmitter {
     let alpha = isInScanningRange ? 1 : 0.5
     let starPoints = 6
 
-    let isDeadStar = this.data.naturalResources != null && this.data.naturalResources <= 0
+    let isDeadStar = this._isDeadStar()
     let fillStar = isInScanningRange && !isDeadStar
     let lineWidth = isDeadStar ? 0.5 : 1
 
@@ -315,10 +315,18 @@ class Star extends EventEmitter {
       return
     }
 
-    this.graphics_shape_part.lineStyle(3, player.colour.value)
-    this.graphics_shape_full.lineStyle(3, player.colour.value)
-    this.graphics_shape_part_warp.lineStyle(2, player.colour.value)
-    this.graphics_shape_full_warp.lineStyle(2, player.colour.value)
+    let lineWidthInner = 3
+    let lineWidthOuter = 2
+
+    if (this._isDeadStar()) {
+      lineWidthInner--
+      lineWidthOuter--
+    }
+
+    this.graphics_shape_part.lineStyle(lineWidthInner, player.colour.value)
+    this.graphics_shape_full.lineStyle(lineWidthInner, player.colour.value)
+    this.graphics_shape_part_warp.lineStyle(lineWidthOuter, player.colour.value)
+    this.graphics_shape_full_warp.lineStyle(lineWidthOuter, player.colour.value)
 
     switch (player.shape) {
       case 'circle':
@@ -500,6 +508,10 @@ class Star extends EventEmitter {
     if ( this.text_infrastructure ) {
       this.container.removeChild(this.text_infrastructure)
       this.text_infrastructure = null
+    }
+
+    if (this.data.infrastructure && (this.data.infrastructure.economy == null || this.data.infrastructure.industry == null || this.data.infrastructure.science == null)) {
+      return
     }
 
     if (!this.text_infrastructure) {
@@ -715,6 +727,10 @@ class Star extends EventEmitter {
   destroy () {
     this.container.destroy()
     this.fixedContainer.destroy()
+  }
+
+  _isDeadStar () {
+    return this.data.naturalResources != null && this.data.naturalResources <= 0
   }
 }
 

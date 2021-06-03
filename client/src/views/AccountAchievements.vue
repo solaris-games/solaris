@@ -13,7 +13,7 @@
     <div class="row bg-warning mb-2" v-if="user && user.roles.developer">
       <div class="col text-center">
         <p class="mt-1 mb-1">
-          This player is a developer <i class="fas fa-code"></i>
+          This player is an active developer <i class="fas fa-code"></i>
         </p>
       </div>
     </div>
@@ -21,7 +21,7 @@
     <div class="row bg-info mb-2" v-if="user && user.roles.communityManager">
       <div class="col text-center">
         <p class="mt-1 mb-1">
-          This player is a community manager <i class="fas fa-user-friends"></i>
+          This player is an active community manager <i class="fas fa-user-friends"></i>
         </p>
       </div>
     </div>

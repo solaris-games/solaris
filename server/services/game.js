@@ -494,4 +494,20 @@ module.exports = class GameService extends EventEmitter {
         }
     }
 
+    async userHasCompletedAGame(userId) {
+        let games = await this.gameModel.count({
+            'galaxy.players': {
+                $elemMatch: { 
+                    userId,             // User is in game
+                    afk: false          // User has not been afk'd
+                }
+            },
+            $and: [
+                { 'state.endDate': { $ne: null } } // The game has finished
+            ]
+        });
+
+        return games > 0;
+    }
+
 };

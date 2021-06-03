@@ -19,7 +19,7 @@
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <span v-if="isSpecialistsCurrencyCreditsSpecialists" title="Specialist Tokens">
+            <span class="pointer" v-if="isSpecialistsCurrencyCreditsSpecialists" title="Specialist Tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 

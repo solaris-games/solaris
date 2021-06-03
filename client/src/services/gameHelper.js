@@ -711,6 +711,10 @@ class GameHelper {
       userPlayer.currentResearchTicksEta = data.currentResearchTicksEta
     }
 
+    if (data.nextResearchTicksEta != null) {
+      userPlayer.nextResearchTicksEta = data.nextResearchTicksEta
+    }
+
     let star = this.getStarById(game, data.starId)
 
     star.upgradeCosts[data.type] = data.nextCost

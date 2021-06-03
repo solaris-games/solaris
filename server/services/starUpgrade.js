@@ -315,6 +315,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this), writeToDB);
 
         report.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(game, player);
+        report.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(game, player);
 
         return report;
     }
