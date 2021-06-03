@@ -132,10 +132,6 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
-    _isNewPlayerGame(game) {
-        return game.settings.general.type === 'new_player_rt';
-    }
-
     async join(game, userId, playerId, alias, avatar, password) {
         // The player cannot join the game if:
         // 1. The game has finished.
@@ -146,7 +142,6 @@ module.exports = class GameService extends EventEmitter {
         // 6. The player does not own any stars.
         // 7. The alias is already taken.
         // 8. The alias (username) is already taken.
-        // 9. The user must have completed at least 1 new player game if this game isn't a new player game type.
 
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
@@ -159,11 +154,6 @@ module.exports = class GameService extends EventEmitter {
             if (!passwordMatch) {
                 throw new ValidationError('The password is invalid.');
             }
-        }
-
-        // Disallow new players from joining any other games apart from the new player ones.
-        if (!this._isNewPlayerGame(game) && !(await this.userHasCompletedAGame(userId))) {
-            throw new ValidationError(`You must complete at least one [New Player Game] in order to join another game type. Please play through the dedicated new player game first.`);
         }
 
         let isQuitter = game.quitters.find(x => x.equals(userId));

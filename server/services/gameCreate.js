@@ -4,7 +4,7 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, gameService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService) {
         this.gameModel = gameModel;
         this.gameListService = gameListService;
         this.nameService = nameService;
@@ -13,7 +13,7 @@ module.exports = class GameCreateService {
         this.passwordService = passwordService;
         this.conversationService = conversationService;
         this.historyService = historyService;
-        this.gameService = gameService;
+        this.achievementService = achievementService;
     }
 
     async create(settings) {
@@ -33,9 +33,11 @@ module.exports = class GameCreateService {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games only.`);
             }
 
+            let userAchievements = await this.achievementService.getAchievements(settings.general.createdByUserId);
+
             // Disallow new players from creating games if they haven't completed a game yet.
-            if (!(await this.gameService.userHasCompletedAGame(settings.general.createdByUserId))) {
-                throw new ValidationError(`You must complete at least one game in order to create a custom game. Please play through the dedicated new player game first.`);
+            if (userAchievements.achievements.completed === 0) {
+                throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }
         
