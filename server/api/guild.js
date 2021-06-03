@@ -4,7 +4,7 @@ module.exports = (router, io, container) => {
 
     const middleware = require('./middleware')(container);
 
-    router.get('/api/guild', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/list', middleware.authenticate, async (req, res, next) => {
         try {
             let result = await container.guildService.list();
                 
@@ -14,10 +14,31 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/guild', middleware.authenticate, async (req, res, next) => {
+        try {
+            let result = await container.guildService.detailMyGuild(req.session.userId, true);
+                
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
+        try {
+            const result = await container.guildService.detail(req.params.guildId, true, false);
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/guild/leaderboard', middleware.authenticate, async (req, res, next) => {
         try {
             let limit = +req.query.limit || null;
-            let result = await container.guildService.getLeaderboard(limit);
+            let sortingKey = req.query.sortingKey || null;
+            let result = await container.guildService.getLeaderboard(limit, sortingKey);
                 
             return res.status(200).json(result);
         } catch (err) {
@@ -28,16 +49,6 @@ module.exports = (router, io, container) => {
     router.get('/api/guild/invites', middleware.authenticate, async (req, res, next) => {
         try {
             let result = await container.guildService.listInvitations(req.session.userId);
-                
-            return res.status(200).json(result);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
-    router.get('/api/guild/mine', middleware.authenticate, async (req, res, next) => {
-        try {
-            let result = await container.guildService.detailMyGuild(req.session.userId, true);
                 
             return res.status(200).json(result);
         } catch (err) {

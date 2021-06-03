@@ -6,11 +6,12 @@
     <td :class="{
       'text-warning': playerIsLeader,
       'text-info': playerIsOfficer,
-      'text-danger': playerIsInvitee
-    }">{{role}}</td>
-    <td align="right">{{player.achievements.rank}}</td>
-    <td align="right">{{player.achievements.victories}}</td>
-    <td align="right">{{player.achievements.renown}}</td>
+      'text-danger': playerIsInvitee,
+      ...getColumnClass('role')
+    }">{{roleName}}</td>
+    <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
+    <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
+    <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
     <td class="text-right">
       <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="disband()" v-if="isCurrentUser && playerIsLeader" title="Disband Guild">
         <i class="fas fa-trash"></i>
@@ -42,7 +43,8 @@ export default {
   props: {
     guild: Object,
     role: String,
-    player: Object
+    player: Object,
+    getColumnClass: Function
   },
   data () {
     return {
@@ -180,6 +182,9 @@ export default {
     }
   },
   computed: {
+    roleName () {
+      return this.role.charAt(0).toUpperCase() + this.role.slice(1);
+    },
     isCurrentUser () {
       return this.player._id === this.$store.state.userId
     },

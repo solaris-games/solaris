@@ -9,43 +9,14 @@
 
       <h5>Guild Roster</h5>
 
-      <div class="table-responsive">
-          <table class="table table-striped table-hover">
-              <thead>
-                  <th>Player</th>
-                  <th>Role</th>
-                  <th class="text-right" title="Rank"><i class="fas fa-star text-info"></i></th>
-                  <th class="text-right" title="Victories"><i class="fas fa-trophy text-warning"></i></th>
-                  <th class="text-right" title="Renown"><i class="fas fa-heart text-danger"></i></th>
-                  <th></th>
-              </thead>
-              <tbody> 
-                <guild-member :guild="guild" :player="guild.leader" role="Leader"
-                  @onPlayerPromoted="onPlayerPromoted"
-                  @onPlayerKicked="onPlayerKicked"
-                  @onPlayerUninvited="onPlayerUninvited"/>
-
-                <guild-member :guild="guild" :player="officer" role="Officer"
-                  v-for="officer in guild.officers" :key="officer._id"
-                  @onPlayerPromoted="onPlayerPromoted"
-                  @onPlayerDemoted="onPlayerDemoted"
-                  @onPlayerKicked="onPlayerKicked"
-                  @onPlayerUninvited="onPlayerUninvited"/>
-
-                <guild-member :guild="guild" :player="member" role="Member"
-                  v-for="member in guild.members" :key="member._id"
-                  @onPlayerPromoted="onPlayerPromoted"
-                  @onPlayerKicked="onPlayerKicked"
-                  @onPlayerUninvited="onPlayerUninvited"/>
-
-                <guild-member :guild="guild" :player="invitee" role="Invitee"
-                  v-for="invitee in guild.invitees" :key="invitee._id"
-                  @onPlayerPromoted="onPlayerPromoted"
-                  @onPlayerKicked="onPlayerKicked"
-                  @onPlayerUninvited="onPlayerUninvited"/>
-              </tbody>
-          </table>
-      </div>
+      <guild-member-list :guild="guild">
+        <template v-slot:default="{ value, getColumnClass }">
+          <guild-member :guild="guild" :player="value" :role="value.role" :getColumnClass="getColumnClass"
+            @onPlayerPromoted="onPlayerPromoted"
+            @onPlayerKicked="onPlayerKicked"
+            @onPlayerUninvited="onPlayerUninvited"></guild-member>
+        </template>
+      </guild-member-list>
 
       <guild-new-invite v-if="isLeader || isOfficer"
         :guildId="this.guild._id"
@@ -87,6 +58,7 @@ import GuildApiService from '../../services/api/guild'
 import GuildNewInvite from './GuildNewInvite'
 import GuildInvite from './GuildInvite'
 import GuildMember from './GuildMember'
+import GuildMemberList from './GuildMemberList'
 
 export default {
   components: {
@@ -95,7 +67,8 @@ export default {
     'loading-spinner': LoadingSpinner,
     'guild-new-invite': GuildNewInvite,
     'guild-invite': GuildInvite,
-    'guild-member': GuildMember
+    'guild-member': GuildMember,
+    'guild-member-list': GuildMemberList
   },
   data () {
     return {
@@ -175,5 +148,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

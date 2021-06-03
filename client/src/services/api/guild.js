@@ -3,15 +3,16 @@ import BaseApiService from './base'
 
 class GuildService extends BaseApiService {
   list () {
-    return axios.get(this.BASE_URL + 'guild', { withCredentials: true })
+    return axios.get(this.BASE_URL + 'guild/list', { withCredentials: true })
   }
 
-  getLeaderboard (limit) {
+  getLeaderboard (limit, sortingKey) {
     return axios.get(this.BASE_URL + 'guild/leaderboard', 
       {
         withCredentials: true,
         params: {
-          limit
+          limit,
+          sortingKey
         }
       })
   }
@@ -20,8 +21,14 @@ class GuildService extends BaseApiService {
     return axios.get(this.BASE_URL + 'guild/invites', { withCredentials: true })
   }
 
+  details (guildId) {
+    return axios.get(this.BASE_URL + 'guild/' + guildId, {
+      withCredentials: true
+    });
+  }
+
   detailMyGuild () {
-    return axios.get(this.BASE_URL + 'guild/mine', { withCredentials: true })
+    return axios.get(this.BASE_URL + 'guild', { withCredentials: true })
   }
 
   create (name, tag) {

@@ -1,6 +1,10 @@
 <template>
   <tr>
-    <td>{{invite.name}}[{{invite.tag}}]</td>
+    <td>
+      <router-link :to="{ name: 'guild-details', params: { guildId: invite._id }}">
+        <span>{{invite.name}} [{{invite.tag}}]</span>
+      </router-link>
+    </td>
     <td class="text-right">
       <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" title="Accept Invitation">
         <i class="fas fa-check"></i>
