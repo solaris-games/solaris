@@ -333,6 +333,7 @@ module.exports = class GameGalaxyService {
             // player we are looking at then return everything.
             if (isCurrentUserPlayer) {
                 player.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player);
+                player.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(doc, player);
 
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.

@@ -34,9 +34,11 @@ module.exports = class ResearchService extends EventEmitter {
         });
 
         let ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
+        let ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
         
         return {
-            ticksEta
+            ticksEta,
+            ticksNextEta
         };
     }
 
@@ -59,6 +61,14 @@ module.exports = class ResearchService extends EventEmitter {
                 'galaxy.players.$.researchingNext': preference
             }
         });
+
+        let ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
+        let ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
+        
+        return {
+            ticksEta,
+            ticksNextEta
+        };
     }
 
     async conductResearch(game, user, player) {
@@ -102,13 +112,15 @@ module.exports = class ResearchService extends EventEmitter {
         }
 
         let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
+        let nextResearchTicksEta = this.calculateNextResearchETAInTicks(game, player);
 
         let report = {
             name: techKey,
             level: tech.level,
             progress: tech.progress,
             levelUp,
-            currentResearchTicksEta
+            currentResearchTicksEta,
+            nextResearchTicksEta
         }
         
         return report;
@@ -226,8 +238,24 @@ module.exports = class ResearchService extends EventEmitter {
     }
 
     calculateCurrentResearchETAInTicks(game, player) {
-        let tech = player.research[player.researchingNow];
-        
+        return this._calculateResearchETAInTicks(game, player, player.researchingNow);
+    }
+
+    calculateNextResearchETAInTicks(game, player) {
+        if (player.researchingNext === 'random') {
+            return null;
+        }
+
+        return this.calculateCurrentResearchETAInTicks(game, player) + this._calculateResearchETAInTicks(game, player, player.researchingNext);
+    }
+
+    _calculateResearchETAInTicks(game, player, researchKey) {
+        if (researchKey === 'random') {
+            return null;
+        }
+
+        let tech = player.research[researchKey];
+
         let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level);
         let remainingPoints = requiredProgress - tech.progress;
 
