@@ -201,6 +201,13 @@ module.exports = class GameGalaxyService {
                 s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayerEffectiveTechs.terraforming);
             }
 
+            // If the star is dead then it has no infrastructure.
+            if (this.starService.isDeadStar(s)) {
+                s.infrastructure.economy = null;
+                s.infrastructure.industry = null;
+                s.infrastructure.science = null;
+            }
+
             // Ignore stars the player owns, they will always be visible.
             let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
 
