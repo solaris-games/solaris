@@ -24,22 +24,22 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
-        try {
-            const result = await container.guildService.detail(req.params.guildId, true, false);
-
-            return res.status(200).json(result);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
     router.get('/api/guild/leaderboard', middleware.authenticate, async (req, res, next) => {
         try {
             let limit = +req.query.limit || null;
             let sortingKey = req.query.sortingKey || null;
             let result = await container.guildService.getLeaderboard(limit, sortingKey);
                 
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
+        try {
+            const result = await container.guildService.detail(req.params.guildId, true, false);
+
             return res.status(200).json(result);
         } catch (err) {
             return next(err);
