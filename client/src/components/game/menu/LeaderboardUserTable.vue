@@ -33,7 +33,7 @@
               <i class="fas fa-code ml-1" title="This player is a developer" v-if="player.roles && player.roles.developer"></i>
               <i class="fas fa-user-friends ml-1" title="This player is a community manager" v-if="player.roles && player.roles.communityManager"></i>
           </td>
-          <td class="d-md-table-cell">
+          <td class="d-none d-md-table-cell">
             <router-link v-if="player.guild" :to="{ name: 'guild-details', params: { guildId: player.guild._id }}">
               <span>{{player.guild.name}} [{{player.guild.tag}}]</span>
             </router-link>
