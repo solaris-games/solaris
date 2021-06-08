@@ -11,7 +11,8 @@ module.exports = class AchievementService {
             username: 1,
             'roles.contributor': 1,
             'roles.developer': 1,
-            'roles.communityManager': 1
+            'roles.communityManager': 1,
+            'roles.gameMaster': 1
         })
         .lean({ defaults: true })
         .exec();

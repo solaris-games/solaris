@@ -57,6 +57,14 @@ module.exports = class AdminService {
         }).exec();
     }
 
+    async setRoleGameMaster(userId, enabled = true) {
+        await this.userModel.updateOne({
+            _id: userId
+        }, {
+            'roles.gameMaster': enabled
+        }).exec();
+    }
+
     async ban(userId) {
         await this.userModel.updateOne({
             _id: userId

@@ -86,8 +86,8 @@ module.exports = class CombatService {
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, true);
 
         // Check for deductions to weapons.
-        let defenderWeaponsDeduction = this.getWeaponsDeduction(attackerCarriers, defenderCarriers);
-        let attackerWeaponsDeduction = this.getWeaponsDeduction(defenderCarriers, attackerCarriers);
+        let defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
+        let attackerWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(defenderCarriers);
 
         // Note: Must fight with a minimum of 1.
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
@@ -112,12 +112,9 @@ module.exports = class CombatService {
         let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, [defender], defenderCarriers, false);
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, false);
         
-        // Add the defender bonus if applicable.
-        defenderWeaponsTechLevel += this.getDefenderBonus(game);
-        
         // Check for deductions to weapons.
-        let defenderWeaponsDeduction = this.getWeaponsDeduction(attackerCarriers, defenderCarriers);
-        let attackerWeaponsDeduction = this.getWeaponsDeduction(defenderCarriers, attackerCarriers);
+        let defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
+        let attackerWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(defenderCarriers);
 
         // Note: Must fight with a minimum of 1.
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
@@ -136,29 +133,6 @@ module.exports = class CombatService {
 
     getDefenderBonus(game) {
         return game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
-    }
-
-    getWeaponsDeduction(carriersToCheck) {
-        let deduction = 0;
-        
-        if (!carriersToCheck.length) {
-            return 0;
-        }
-        
-        // If any of the carriers have a specialist which deducts enemy weapons
-        // then find the one that has the highest deduction.
-        deduction = carriersToCheck.map(c => {
-            let specialist = this.specialistService.getByIdCarrier(c.specialistId);
-
-            if (specialist && specialist.modifiers.special && specialist.modifiers.special.deductEnemyWeapons) {
-                return specialist.modifiers.special.deductEnemyWeapons;
-            }
-
-            return 0;
-        })
-        .sort((a, b) => b - a)[0];
-
-        return deduction;
     }
     
 }

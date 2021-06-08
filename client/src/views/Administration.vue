@@ -38,6 +38,7 @@
                   <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}" @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
                   <i class="fas fa-code ml-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
                   <i class="fas fa-user-friends ml-1 clickable" :class="{'disabled-role':!user.roles.communityManager}" @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
+                  <i class="fas fa-dice ml-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}" @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
                 </td>
                 <td>
                   <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)" title="Deduct Credits"></i>
@@ -179,6 +180,9 @@ export default {
             break
           case 'communityManager':
             request = AdminApiService.setRoleCommunityManager(user._id, user.roles.communityManager)
+            break
+          case 'gameMaster':
+            request = AdminApiService.setRoleGameMaster(user._id, user.roles.gameMaster)
             break
         }
 

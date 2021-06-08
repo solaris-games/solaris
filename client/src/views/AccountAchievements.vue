@@ -26,6 +26,14 @@
       </div>
     </div>
 
+    <div class="row bg-info mb-2" v-if="user && user.roles.gameMaster">
+      <div class="col text-center">
+        <p class="mt-1 mb-1">
+          This player is an active game master <i class="fas fa-dice"></i>
+        </p>
+      </div>
+    </div>
+
     <loading-spinner :loading="!user"/>
 
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>

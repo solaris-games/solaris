@@ -28,6 +28,13 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  setRoleGameMaster (userId, enabled) {
+    return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/gameMaster', {
+      enabled
+    },
+    { withCredentials: true })
+  }
+
   setCredits (userId, credits) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/credits', {
       credits

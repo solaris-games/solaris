@@ -129,6 +129,29 @@ module.exports = class TechnologyService {
         return 0;
     }
 
+    getCarriersWeaponsDebuff(carriersToCheck) {
+        let deduction = 0;
+        
+        if (!carriersToCheck.length) {
+            return 0;
+        }
+        
+        // If any of the carriers have a specialist which deducts enemy weapons
+        // then find the one that has the highest deduction.
+        deduction = carriersToCheck.map(c => {
+            let specialist = this.specialistService.getByIdCarrier(c.specialistId);
+
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.deductEnemyWeapons) {
+                return specialist.modifiers.special.deductEnemyWeapons;
+            }
+
+            return 0;
+        })
+        .sort((a, b) => b - a)[0];
+
+        return deduction;
+    }
+
     getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit) {
         let weapons = player.research.weapons.level;
 

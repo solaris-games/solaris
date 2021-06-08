@@ -18,7 +18,8 @@ const schema = new Schema({
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
         developer: { type: Types.Boolean, default: false },
-        communityManager: { type: Types.Boolean, default: false }
+        communityManager: { type: Types.Boolean, default: false },
+        gameMaster: { type: Types.Boolean, default: false }
     },
     achievements: {
         victories: { type: Types.Number, default: 0 },

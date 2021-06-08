@@ -6,6 +6,7 @@
         <i class="fas fa-hands-helping" v-if="user.roles.contributor" title="This player is a contributor"></i>
         <i class="fas fa-code ml-1" v-if="user.roles.developer" title="This player is an active developer"></i>
         <i class="fas fa-user-friends ml-1" v-if="user.roles.communityManager" title="This player is an active community manager"></i>
+        <i class="fas fa-dice ml-1" v-if="user.roles.gameMaster" title="This player is an active game master"></i>
       </span>
       <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-sm btn-info"><i class="fas fa-chevron-left"></i></button>
       <button @click="onOpenNextPlayerDetailRequested" class="btn btn-sm btn-info ml-1"><i class="fas fa-chevron-right"></i></button>

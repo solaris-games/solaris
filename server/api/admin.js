@@ -44,6 +44,16 @@ module.exports = (router, io, container) => {
         }
     });
 
+    router.patch('/api/admin/user/:userId/gameMaster', middleware.authenticateAdmin, async (req, res, next) => {
+        try {
+            await container.adminService.setRoleGameMaster(req.params.userId, req.body.enabled);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    });
+
     router.patch('/api/admin/user/:userId/credits', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setCredits(req.params.userId, +req.body.credits);
