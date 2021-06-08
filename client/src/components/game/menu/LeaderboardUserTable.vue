@@ -34,7 +34,7 @@
               <i class="fas fa-user-friends ml-1" title="This player is an active community manager" v-if="player.roles && player.roles.communityManager"></i>
               <i class="fas fa-dice ml-1" title="This player is an active game master" v-if="player.roles && player.roles.gameMaster"></i>
           </td>
-          <td class="d-md-table-cell">
+          <td class="d-none d-md-table-cell">
             <router-link v-if="player.guild" :to="{ name: 'guild-details', params: { guildId: player.guild._id }}">
               <span>{{player.guild.name}} [{{player.guild.tag}}]</span>
             </router-link>
