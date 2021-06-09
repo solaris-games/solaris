@@ -25,8 +25,8 @@ module.exports = class ShipTransferService {
             }
         }
 
-        star.garrisonActual += shipsToTransfer;
-        star.garrison = Math.floor(star.garrisonActual);
+        star.shipsActual += shipsToTransfer;
+        star.ships = Math.floor(star.shipsActual);
 
         // Generate an array of all requires DB updates.
         let dbWrites = carriersAtStar.map(c => {
@@ -50,8 +50,8 @@ module.exports = class ShipTransferService {
                     'galaxy.stars._id': star._id
                 },
                 update: {
-                    'galaxy.stars.$.garrisonActual': star.garrisonActual,
-                    'galaxy.stars.$.garrison': star.garrison
+                    'galaxy.stars.$.shipsActual': star.shipsActual,
+                    'galaxy.stars.$.ships': star.ships
                 }
             }
         });
@@ -62,7 +62,7 @@ module.exports = class ShipTransferService {
         return {
             star: {
                 _id: star._id,
-                garrison: star.garrison
+                ships: star.ships
             },
             carriers: carriersAtStar.map(c => {
                 return {
@@ -94,7 +94,7 @@ module.exports = class ShipTransferService {
         }
 
         let totalTransferShips = carrierShips + starShips;
-        let totalShips = carrier.ships + star.garrison;
+        let totalShips = carrier.ships + star.ships;
 
         if (totalTransferShips != totalShips) {
             throw new ValidationError('The total number of ships in the tranfer does not equal to the total number of ships garrisoned');
@@ -110,10 +110,10 @@ module.exports = class ShipTransferService {
 
         carrier.ships = carrierShips;
 
-        let garrisonFraction = star.garrisonActual - star.garrison; // Keep hold of the fractional amount of garrison so we can add it back later.
+        let shipsFraction = star.shipsActual - star.ships; // Keep hold of the fractional amount of ships so we can add it back later.
         
-        star.garrisonActual = starShips + garrisonFraction;
-        star.garrison = Math.floor(star.garrisonActual);
+        star.shipsActual = starShips + shipsFraction;
+        star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
         await this.gameModel.bulkWrite([
@@ -124,8 +124,8 @@ module.exports = class ShipTransferService {
                         'galaxy.stars._id': star._id
                     },
                     update: {
-                        'galaxy.stars.$.garrisonActual': star.garrisonActual,
-                        'galaxy.stars.$.garrison': star.garrison
+                        'galaxy.stars.$.shipsActual': star.shipsActual,
+                        'galaxy.stars.$.ships': star.ships
                     }
                 }
             },

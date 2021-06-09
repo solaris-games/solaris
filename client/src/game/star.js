@@ -6,8 +6,8 @@ class Star extends EventEmitter {
 
   static culling_margin = 16
   static nameSize = 4
-  static garrisonSmallSize = 6
-  static garrisonBigSize = 10
+  static shipsSmallSize = 6
+  static shipsBigSize = 10
   static maxLod = 4
 
   /*
@@ -86,7 +86,7 @@ class Star extends EventEmitter {
     return carriersAtStar
   }
 
-  _getStarCarrierGarrison () {
+  _getStarCarrierShips () {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
@@ -131,7 +131,7 @@ class Star extends EventEmitter {
     this.drawScanningRange()
     this.drawHyperspaceRange()
     this.drawName()
-    this.drawGarrison()
+    this.drawShips()
     this.drawInfrastructure()
 
     this.isInScanningRange = this._isInScanningRange()
@@ -426,7 +426,7 @@ class Star extends EventEmitter {
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-      let scrambler = this.data.garrison == null
+      let scrambler = this.data.ships == null
       return ( (scramblers || scrambler) && this._isInScanningRange() )
   }
 
@@ -439,68 +439,68 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_name)
     }
 
-    let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
-    if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
-      this.text_name.y = ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize
+    if ((totalKnownShips > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
+      this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
     }
   }
 
-  drawGarrison () {
-    if (this.text_garrison_small) {
-      this.container.removeChild(this.text_garrison_small)
-      this.text_garrison_small = null
+  drawShips () {
+    if (this.text_ships_small) {
+      this.container.removeChild(this.text_ships_small)
+      this.text_ships_small = null
     }
-    if (this.text_garrison_big) {
-      this.container.removeChild(this.text_garrison_big)
-      this.text_garrison_big = null
+    if (this.text_ships_big) {
+      this.container.removeChild(this.text_ships_big)
+      this.text_ships_big = null
     }
 
-    let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
     let carriersOrbiting = this._getStarCarriers()
     let carrierCount = carriersOrbiting.length
 
-    let garrisonText = ''
+    let shipsText = ''
     let scramblers = 0
     if (carriersOrbiting) {
       scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
     }
-    if ( (scramblers == carrierCount) && (this.data.garrison == null) ) {
-      garrisonText = '???'
+    if ( (scramblers == carrierCount) && (this.data.ships == null) ) {
+      shipsText = '???'
     }
     else {
-      garrisonText = totalKnownGarrison
-      if( (scramblers > 0) || (this.data.garrison == null) ) {
-        garrisonText += '*'
+      shipsText = totalKnownShips
+      if( (scramblers > 0) || (this.data.ships == null) ) {
+        shipsText += '*'
       }
     }
 
     if (carrierCount) {
-      garrisonText += '/'
-      garrisonText += carrierCount.toString()
+      shipsText += '/'
+      shipsText += carrierCount.toString()
     }
 
-    if (garrisonText) {
-      if (!this.text_garrison_small) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonSmallSize}
-        this.text_garrison_small = new PIXI.BitmapText(this.data.name, bitmapFont)
-        this.container.addChild(this.text_garrison_small)
-        this.text_garrison_small.x = 5
-        this.text_garrison_small.y = (-this.text_garrison_small.height) +( ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize )
+    if (shipsText) {
+      if (!this.text_ships_small) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsSmallSize}
+        this.text_ships_small = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_ships_small)
+        this.text_ships_small.x = 5
+        this.text_ships_small.y = (-this.text_ships_small.height) +( ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize )
       }
 
-      if (!this.text_garrison_big) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonBigSize}
-        this.text_garrison_big = new PIXI.BitmapText(this.data.name, bitmapFont)
-        this.container.addChild(this.text_garrison_big)
-        this.text_garrison_big.x = 5
-        this.text_garrison_big.y = -this.text_garrison_big.height/2.0
+      if (!this.text_ships_big) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsBigSize}
+        this.text_ships_big = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_ships_big)
+        this.text_ships_big.x = 5
+        this.text_ships_big.y = -this.text_ships_big.height/2.0
       }
-      this.text_garrison_small.text = garrisonText
-      this.text_garrison_big.text = garrisonText
+      this.text_ships_small.text = shipsText
+      this.text_ships_big.text = shipsText
     }
   }
 
@@ -668,14 +668,14 @@ class Star extends EventEmitter {
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
 
-    let small_garrison = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
-    let visible_garrison = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
+    let small_ships = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
+    let visible_ships = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
 
-    if (this.text_garrison_small) this.text_garrison_small.visible = small_garrison && visible_garrison
-    if (this.text_garrison_big) this.text_garrison_big.visible = !small_garrison && visible_garrison
+    if (this.text_ships_small) this.text_ships_small.visible = small_ships && visible_ships
+    if (this.text_ships_big) this.text_ships_big.visible = !small_ships && visible_ships
 
-    let partial_ring = (this.text_garrison_big && this.text_garrison_big.visible)
-      || (this.text_garrison_small && this.text_garrison_small.visible)
+    let partial_ring = (this.text_ships_big && this.text_ships_big.visible)
+      || (this.text_ships_small && this.text_ships_small.visible)
       || (this.text_name && this.text_name.visible)
 
     this.graphics_shape_part.visible = partial_ring

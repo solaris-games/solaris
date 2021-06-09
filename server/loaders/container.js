@@ -78,7 +78,6 @@ module.exports = (config, io) => {
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(GameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
     const carrierService = new CarrierService(GameModel, achievementService, distanceService, starService, technologyService, specialistService);
-    const combatService = new CombatService(technologyService, specialistService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService);
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService);
@@ -91,6 +90,7 @@ module.exports = (config, io) => {
     const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService, achievementService);
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, starService, userService);
     const reputationService = new ReputationService(GameModel, playerService);
+    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService);
     const tradeService = new TradeService(GameModel, userService, playerService, ledgerService, achievementService, reputationService);
     const waypointService = new WaypointService(GameModel, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService, playerService, starService);
@@ -106,7 +106,7 @@ module.exports = (config, io) => {
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);
     
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService);
+        ledgerService, conversationService, combatService);
 
     return {
         adminService,

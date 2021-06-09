@@ -62,7 +62,7 @@ module.exports = class GameGalaxyService {
         this._setPlayerStats(game);
 
         // if the user isn't playing this game, then only return
-        // basic data about the stars, exclude any important info like garrisons.
+        // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
         if (!player && !this.gameService.isFinished(game)) {
             this._setStarInfoBasic(game);
@@ -192,7 +192,7 @@ module.exports = class GameGalaxyService {
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = doc.galaxy.stars
         .map(s => {
-            delete s.garrisonActual; // Don't need to send this back.
+            delete s.shipsActual; // Don't need to send this back.
 
             // Calculate the star's terraformed resources.
             if (s.ownedByPlayerId) {
@@ -237,10 +237,10 @@ module.exports = class GameGalaxyService {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
                 
-                let canSeeStarGarrison = isFinished || (player && this.starService.canPlayerSeeStarGarrison(player, s));
+                let canSeeStarShips = isFinished || (player && this.starService.canPlayerSeeStarShips(player, s));
 
-                if (!canSeeStarGarrison) {
-                    s.garrison = null;
+                if (!canSeeStarShips) {
+                    s.ships = null;
                 }
 
                 return s;
@@ -438,7 +438,7 @@ module.exports = class GameGalaxyService {
 
             The following logic will be applied to the galaxy:
             1. Apply previous tick's data to all STARS the player does not own.
-                - Garrison, specialist, warp gate and infrastructure needs to be reset.
+                - Ships, specialist, warp gate and infrastructure needs to be reset.
             2. Apply previous tick's data to all CARRIERS the player does not own.
                 - Remove any carriers that exist in the current tick but not in the previous tick.
                 - Ships, specialist and gift status needs to be reset.
@@ -509,8 +509,8 @@ module.exports = class GameGalaxyService {
 
                 gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
                 gameStar.naturalResources = historyStar.naturalResources;
-                gameStar.garrison = historyStar.garrison;
-                gameStar.garrisonActual = historyStar.garrisonActual;
+                gameStar.ships = historyStar.ships;
+                gameStar.shipsActual = historyStar.shipsActual;
                 gameStar.specialistId = historyStar.specialistId;
                 gameStar.warpGate = historyStar.warpGate;
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;

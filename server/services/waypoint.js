@@ -320,23 +320,23 @@ module.exports = class WaypointService {
     }
 
     _performWaypointActionDropAll(carrier, star, waypoint) {
-        star.garrisonActual += (carrier.ships - 1)
-        star.garrison = Math.floor(star.garrisonActual);
+        star.shipsActual += (carrier.ships - 1)
+        star.ships = Math.floor(star.shipsActual);
         carrier.ships = 1;
     }
 
     _performWaypointActionCollectAll(carrier, star, waypoint) {
-        carrier.ships += star.garrison;
-        star.garrisonActual -= star.garrison;
-        star.garrison = Math.floor(star.garrisonActual);
+        carrier.ships += star.ships;
+        star.shipsActual -= star.ships;
+        star.ships = Math.floor(star.shipsActual);
     }
 
     _performWaypointActionDrop(carrier, star, waypoint) {
         // If the carrier has more ships than needs to be dropped, then drop
         // however many are configured in the waypoint.
         if (carrier.ships - 1 >= waypoint.actionShips) {
-            star.garrisonActual += waypoint.actionShips;
-            star.garrison = Math.floor(star.garrisonActual);
+            star.shipsActual += waypoint.actionShips;
+            star.ships = Math.floor(star.shipsActual);
             carrier.ships -= waypoint.actionShips;
         }
         else {
@@ -352,9 +352,9 @@ module.exports = class WaypointService {
     _performWaypointActionCollect(carrier, star, waypoint) {
         // If the star has more ships than needs to be collected, then collect
         // however many are configured in the waypoint.
-        if (star.garrison >= waypoint.actionShips) {
-            star.garrisonActual -= waypoint.actionShips;
-            star.garrison = Math.floor(star.garrisonActual);
+        if (star.ships >= waypoint.actionShips) {
+            star.shipsActual -= waypoint.actionShips;
+            star.ships = Math.floor(star.shipsActual);
             carrier.ships += waypoint.actionShips;
         }
         else {
@@ -371,8 +371,8 @@ module.exports = class WaypointService {
         const toDrop = Math.floor(carrier.ships * (waypoint.actionShips * 0.01))
 
         if (toDrop >= 1 && carrier.ships - toDrop >= 1) {
-            star.garrisonActual += toDrop
-            star.garrison = Math.floor(star.garrisonActual)
+            star.shipsActual += toDrop
+            star.ships = Math.floor(star.shipsActual)
             carrier.ships -= toDrop
         }
     }
@@ -385,18 +385,18 @@ module.exports = class WaypointService {
         // If we have more than enough ships to transfer, then transfer
         // the desired amount. Otherwise do not drop anything.
         if (difference > 0 && difference <= carrier.ships - 1) {
-            star.garrisonActual += difference;
-            star.garrison = Math.floor(star.garrisonActual);
+            star.shipsActual += difference;
+            star.ships = Math.floor(star.shipsActual);
             carrier.ships -= difference;
         }
     }
 
     _performWaypointActionCollectPercentage(carrier, star, waypoint) {
-        const toTransfer = Math.floor(star.garrison * (waypoint.actionShips * 0.01))
+        const toTransfer = Math.floor(star.ships * (waypoint.actionShips * 0.01))
 
-        if (toTransfer >= 1 && star.garrison - toTransfer >= 0) {
-            star.garrisonActual -= toTransfer
-            star.garrison = Math.floor(star.garrisonActual)
+        if (toTransfer >= 1 && star.ships - toTransfer >= 0) {
+            star.shipsActual -= toTransfer
+            star.ships = Math.floor(star.shipsActual)
             carrier.ships += toTransfer
         }
     }
@@ -404,13 +404,13 @@ module.exports = class WaypointService {
     _performWaypointActionCollectAllBut(carrier, star, waypoint) {
         // Calculate the difference between how many ships we currently have
         // and how many need to remain after.
-        let difference = star.garrison - waypoint.actionShips;
+        let difference = star.ships - waypoint.actionShips;
 
         // If we have more than enough ships to transfer, then transfer
         // the desired amount. Otherwise do not drop anything.
-        if (difference > 0 && difference <= star.garrison) {
-            star.garrisonActual -= difference;
-            star.garrison = Math.floor(star.garrisonActual);
+        if (difference > 0 && difference <= star.ships) {
+            star.shipsActual -= difference;
+            star.ships = Math.floor(star.shipsActual);
             carrier.ships += difference;
         }
     }
@@ -418,23 +418,23 @@ module.exports = class WaypointService {
     _performWaypointActionGarrison(carrier, star, waypoint) {
         // Calculate how many ships need to be dropped or collected
         // in order to garrison the star.
-        let difference = star.garrison - waypoint.actionShips;
+        let difference = star.ships - waypoint.actionShips;
 
         // If the difference is above 0 then move ships
         // from the star to the carrier, otherwise do the opposite.
         if (difference > 0) {
-            let allowed = Math.abs(Math.min(difference, star.garrison));
+            let allowed = Math.abs(Math.min(difference, star.ships));
 
-            star.garrisonActual -= allowed;
+            star.shipsActual -= allowed;
             carrier.ships += allowed;
         } else {
             let allowed = Math.min(Math.abs(difference), carrier.ships - 1);
 
-            star.garrisonActual += allowed;
+            star.shipsActual += allowed;
             carrier.ships -= allowed;
         }
 
-        star.garrison = Math.floor(star.garrisonActual);
+        star.ships = Math.floor(star.shipsActual);
     }
 
     performWaypointActionsGarrisons(game, waypoints) {

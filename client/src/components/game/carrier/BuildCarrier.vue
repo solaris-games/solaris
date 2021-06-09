@@ -97,27 +97,27 @@ export default {
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
     this.starShips = 0
-    this.carrierShips = this.star.garrison
+    this.carrierShips = this.star.ships
   },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
     onStarShipsChanged (e) {
-      let difference = parseInt(this.starShips) - this.star.garrison
+      let difference = parseInt(this.starShips) - this.star.ships
       this.carrierShips = Math.abs(difference)
     },
     onCarrierShipsChanged (e) {
       let difference = parseInt(this.carrierShips)
-      this.starShips = this.star.garrison - difference
+      this.starShips = this.star.ships - difference
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
-      this.starShips = this.star.garrison - 1
+      this.starShips = this.star.ships - 1
     },
     onMaxShipsClicked (e) {
       this.starShips = 0
-      this.carrierShips = this.star.garrison
+      this.carrierShips = this.star.ships
     },
     onTransferLeftClicked (e) {
       this.starShips+=e
