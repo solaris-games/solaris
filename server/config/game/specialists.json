@@ -240,12 +240,12 @@
         {
             "id": 3,
             "name": "Atmosphere Processor",
-            "description": "Grants +2 Terraforming, -1 Scanning to the Star.",
+            "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
             "modifiers": {
                 "local": {
-                    "terraforming": 2,
+                    "terraforming": 3,
                     "scanning": -1
                 }
             }
