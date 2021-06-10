@@ -92,11 +92,11 @@ module.exports = class ResearchService extends EventEmitter {
 
         let levelUp = false;
 
-        if (tech.progress >= requiredProgress) {
+        while (tech.progress >= requiredProgress) {
             tech.level++;
             tech.progress -= requiredProgress;
-
-            this._setNextResearch(game, player);
+            
+            requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
 
             this.emit('onPlayerResearchCompleted', {
                 gameId: game._id,
@@ -109,6 +109,10 @@ module.exports = class ResearchService extends EventEmitter {
             });
 
             levelUp = true
+        }
+
+        if (levelUp) {
+            this._setNextResearch(game, player);
         }
 
         let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
