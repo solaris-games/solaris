@@ -12,7 +12,8 @@ module.exports = class UserGuildService {
             }
         }, {
             username: 1,
-            guildId: 1
+            guildId: 1,
+            'gameSettings.guild.displayGuildTag': 1
         })
         .lean()
         .exec();
@@ -25,6 +26,7 @@ module.exports = class UserGuildService {
             return {
                 _id: u._id,
                 username: u.username,
+                displayGuildTag: u.gameSettings.guild.displayGuildTag,
                 guild: guilds.find(g => g._id.equals(u.guildId))
             };
         });

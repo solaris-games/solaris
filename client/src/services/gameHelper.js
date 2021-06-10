@@ -346,6 +346,10 @@ class GameHelper {
     return game.state.endDate != null
   }
 
+  isDarkModeStandard (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'standard'
+  }
+
   isDarkModeExtra (game) {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
   }
@@ -751,6 +755,10 @@ class GameHelper {
     return guild.members.find(m => m._id === userId)
       || guild.officers.find(m => m._id === userId)
       || (guild.leader && guild.leader._id === userId)
+  }
+
+  isUserSpectatingGame (game) {
+    return this.isGameInProgress(game) && !this.getUserPlayer(game)
   }
 }
 

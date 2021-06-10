@@ -8,6 +8,7 @@
     <div class="header-buffer"></div>
 
     <not-logged-in-bar v-if="!isLoggedIn"/>
+    <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
 
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
@@ -160,6 +161,7 @@ import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 import FooterBarVue from './FooterBar.vue'
 import NotLoggedInBarVue from './NotLoggedInBar'
+import DarkModeWarningBarVue from './DarkModeWarningBar.vue'
 
 export default {
   components: {
@@ -191,7 +193,8 @@ export default {
     'options': OptionsVue,
     'create-conversation': ConversationCreateVue,
     'conversation': ConversationDetailVue,
-    'not-logged-in-bar': NotLoggedInBarVue
+    'not-logged-in-bar': NotLoggedInBarVue,
+    'dark-mode-warning-bar': DarkModeWarningBarVue
   },
   props: {
     menuState: String,
@@ -274,6 +277,10 @@ export default {
     },
     isLoggedIn () {
       return this.$store.state.userId != null
+    },
+    isSpectatingDarkMode () {
+      return GameHelper.isUserSpectatingGame(this.game)
+        && (GameHelper.isDarkModeStandard(this.game) || GameHelper.isDarkModeExtra(this.game))
     }
   }
 }

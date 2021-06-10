@@ -45,6 +45,18 @@
       </div>
     </div>
 
+    <h5 class="pt-2">Guild</h5>
+    
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="displayGuildTag" class="col-12 col-sm-6 col-form-label">Display Guild Tag</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="displayGuildTag" v-model="settings.guild.displayGuildTag" :disabled="isSavingSettings">
+          <option value="visible">Visible</option>
+          <option value="hidden">Hidden</option>
+        </select>
+      </div>
+    </div>
+
     <h5 class="pt-2">Map</h5>
 
     <div class="mb-1 pb-1">
