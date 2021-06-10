@@ -316,8 +316,8 @@ module.exports = class GameGalaxyService {
 
             if (p.userId) {
                 let guildUser = guildUsers.find(u => u._id.toString() === p.userId.toString());
-
-                if (guildUser) {
+                
+                if (guildUser && guildUser.displayGuildTag === 'visible') {
                     playerGuild = guildUser.guild;
     
                     if (playerGuild) {

@@ -1,7 +1,7 @@
-db.games.updateMany({
-	'settings.specialGalaxy.darkGalaxy': 'enabled'
-}, {
+db.users.updateMany({}, {
 	$set: {
-		'settings.specialGalaxy.darkGalaxy': 'standard'
+		'gameSettings.guild': {
+			displayGuildTag: 'visible'
+		}
 	}
 });

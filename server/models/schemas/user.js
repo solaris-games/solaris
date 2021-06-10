@@ -102,6 +102,9 @@ const schema = new Schema({
             uiStyle: { type: Types.String, required: false, enum: ['standard', 'compact'], default: 'standard' },
             suggestMentions: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' }
         },
+        guild: {
+            displayGuildTag: { type: Types.String, required: false, enum: ['visible', 'hidden'], default: 'visible' },
+        },
         map: {
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
             carrierLoopStyle: { type: Types.String, required: false, enum: ['solid', 'dashed'], default: 'dashed' },
