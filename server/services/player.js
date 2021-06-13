@@ -667,6 +667,11 @@ module.exports = class PlayerService extends EventEmitter {
         player.defeated = true;
         player.researchingNext = 'random'; // Set up the AI for random research.
 
+        // Auto-ready the player so they don't hold up the game.
+        if (game.settings.gameTime.gameType === 'turnBased') {
+            player.ready = true;
+        }
+
         // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
