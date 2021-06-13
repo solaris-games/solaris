@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Welcome" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Welcome" @onCloseRequested="onCloseRequested">
+      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" title="View Settings" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i></router-link>
+    </menu-title>
 
     <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged"/>
 
@@ -103,6 +105,11 @@ export default {
       }
 
       this.isJoiningGame = false
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
     }
   }
 }

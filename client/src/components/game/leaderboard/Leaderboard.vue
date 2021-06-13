@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container pb-2">
-    <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
+      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" title="View Settings" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i></router-link>
+    </menu-title>
 
     <div class="row bg-primary">
         <div class="col">
@@ -74,17 +76,14 @@
     <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!"/>
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
-      <div class="col">
-        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
+      <div class="col text-right pr-2">
+          <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Quit Game
+          </modalButton>
+          <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
+            <i class="fas fa-skull-crossbones"></i> Concede Defeat
+          </modalButton>
       </div>
-        <div class="col text-right pr-2">
-            <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
-              <i class="fas fa-sign-out-alt"></i> Quit Game
-            </modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
-              <i class="fas fa-skull-crossbones"></i> Concede Defeat
-            </modalButton>
-        </div>
     </div>
 
     <!-- Modals -->
