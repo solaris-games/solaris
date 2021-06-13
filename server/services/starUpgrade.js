@@ -129,7 +129,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`The player does not own enough credits to afford to build a carrier.`);
         }
 
-        if (Math.floor(star.garrisonActual) < ships) {
+        if (Math.floor(star.shipsActual) < ships) {
             throw new ValidationError(`The star does not have enough ships garrisoned (${ships}) to build the carrier.`);
         }
 
@@ -151,8 +151,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
                         'galaxy.stars._id': star._id
                     },
                     update: {
-                        'galaxy.stars.$.garrisonActual': star.garrisonActual,
-                        'galaxy.stars.$.garrison': star.garrison
+                        'galaxy.stars.$.shipsActual': star.shipsActual,
+                        'galaxy.stars.$.ships': star.ships
                     }
                 }
             },
@@ -176,7 +176,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         return {
             carrier,
-            starGarrison: star.garrison
+            starShips: star.ships
         };
     }
 

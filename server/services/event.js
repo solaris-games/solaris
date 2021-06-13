@@ -39,7 +39,7 @@ module.exports = class EventService {
 
     constructor(eventModel, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService) {
+        ledgerService, conversationService, combatService) {
         this.eventModel = eventModel;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
@@ -50,6 +50,7 @@ module.exports = class EventService {
         this.tradeService = tradeService;
         this.ledgerService = ledgerService;
         this.conversationService = conversationService;
+        this.combatService = combatService;
 
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
         this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.gameId, args.gameTick));
@@ -57,11 +58,11 @@ module.exports = class EventService {
         this.gameService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick));
         this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
         
-        this.gameTickService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
+        this.combatService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
             args.gameId, args.gameTick, args.defender, args.attackers, args.star, args.combatResult));
-        this.gameTickService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
+        this.combatService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
             args.gameId, args.gameTick, args.defender, args.attackers, args.combatResult));
-        this.gameTickService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.gameId, args.gameTick, args.player, args.star, args.capturedBy, args.captureReward));
+        
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
             args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
             
@@ -71,6 +72,7 @@ module.exports = class EventService {
         
         this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
+        this.starService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.gameId, args.gameTick, args.player, args.star, args.capturedBy, args.captureReward));
         this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
         
         this.starUpgradeService.on('onPlayerWarpGateBuilt', (args) => this.createWarpGateBuiltEvent(args.gameId, args.gameTick, args.player, args.star));

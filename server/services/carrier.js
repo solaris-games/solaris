@@ -25,8 +25,8 @@ module.exports = class CarrierService {
     }
 
     createAtStar(star, carriers, ships = 1) {
-        if (!Math.floor(star.garrisonActual)) {
-            throw new ValidationError('Star must have a garrison to build a carrier.');
+        if (!Math.floor(star.shipsActual)) {
+            throw new ValidationError('Star must have at least 1 ship to build a carrier.');
         }
 
         // Generate a name for the new carrier based on the star name but make sure
@@ -44,9 +44,9 @@ module.exports = class CarrierService {
             waypointsLooped: false
         };
 
-        // Reduce the star garrison by how many we have added to the carrier.
-        star.garrisonActual -= ships;
-        star.garrison -= ships;
+        // Reduce the star ships by how many we have added to the carrier.
+        star.shipsActual -= ships;
+        star.ships -= ships;
 
         return carrier;
     }

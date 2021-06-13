@@ -15,8 +15,8 @@ describe('carrier', () => {
                 y: 15
             },
             name: 'Super star',
-            garrison: 10,
-            garrisonActual: 10
+            ships: 10,
+            shipsActual: 10
         };
 
         const ships = 1;
@@ -37,15 +37,15 @@ describe('carrier', () => {
                 y: 15
             },
             name: 'Super star',
-            garrison: 10,
-            garrisonActual: 10
+            ships: 10,
+            shipsActual: 10
         };
 
         const ships = 5;
         const newCarrier = carrierService.createAtStar(star, [], ships);
 
         expect(newCarrier.ships).toEqual(ships);
-        expect(star.garrison).toEqual(5);
+        expect(star.ships).toEqual(5);
     });
 
 });

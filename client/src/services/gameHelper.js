@@ -64,10 +64,10 @@ class GameHelper {
     return carrier.waypoints.indexOf(waypoint) === 0 && this.isCarrierInTransit(carrier)
   }
 
-  getStarTotalKnownGarrison (game, star) {
+  getStarTotalKnownShips (game, star) {
     let carriers = this.getCarriersOrbitingStar(game, star)
 
-    return (star.garrison || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
+    return (star.ships || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
   getHyperspaceDistance (game, player, carrier) {

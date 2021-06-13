@@ -160,7 +160,7 @@ export default {
 
           if (this.defender.star) { // May be out of scanning range.
             this.defender.player = GameHelper.getStarOwningPlayer(game, this.defender.star)
-            let defenderShips = GameHelper.getStarTotalKnownGarrison(game, this.defender.star)
+            let defenderShips = GameHelper.getStarTotalKnownShips(game, this.defender.star)
 
             this.defender.ships = defenderShips
 

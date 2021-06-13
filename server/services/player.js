@@ -224,8 +224,8 @@ module.exports = class PlayerService extends EventEmitter {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
-            star.garrisonActual = game.settings.player.startingShips;
-            star.garrison = star.garrisonActual;
+            star.shipsActual = game.settings.player.startingShips;
+            star.ships = star.shipsActual;
             star.warpGate = false;
             star.ignoreBulkUpgrade = false;
             star.specialistId = null;
@@ -366,7 +366,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     calculateTotalShips(ownedStars, ownedCarriers) {
-        return ownedStars.reduce((sum, s) => sum + s.garrison, 0) 
+        return ownedStars.reduce((sum, s) => sum + s.ships, 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
     }
 

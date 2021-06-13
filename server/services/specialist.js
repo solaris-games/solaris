@@ -155,9 +155,5 @@ module.exports = class SpecialistService {
     getScienceInfrastructureMultiplier(star) {
         return this._getStarSpecialValue(star, 'scienceInfrastructureMultiplier', 1);
     }
-
-    getStarCombatAttackingRedirectIfDefeated(carrier) {
-        return this._getCarrierSpecialValue(carrier, 'starCombatAttackingRedirectIfDefeated', false);
-    }
     
 };

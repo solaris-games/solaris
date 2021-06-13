@@ -61,14 +61,14 @@ class Carrier extends EventEmitter {
 
   draw () {
     this.drawColour()
-    this.drawShip()
-    this.drawGarrison()
+    this.drawCarrier()
+    this.drawShips()
     this.drawSpecialist()
     this.drawCarrierWaypoints()
   }
 
   drawActive () {
-    this.drawGarrison()
+    this.drawShips()
   }
 
   drawShape() {
@@ -99,7 +99,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  drawShip () {
+  drawCarrier () {
     this.graphics_ship.clear()
 
     // this.graphics_ship.lineStyle(0.3, 0x000000)
@@ -123,24 +123,24 @@ class Carrier extends EventEmitter {
     this._rotateCarrierTowardsWaypoint(this.graphics_ship)
   }
 
-  drawGarrison () {
-    if (this.text_garrison) {
-      this.container.removeChild(this.text_garrison)
-      this.text_garrison = null
+  drawShips () {
+    if (this.text_ships) {
+      this.container.removeChild(this.text_ships)
+      this.text_ships = null
     }
 
-    if (!this.text_garrison) {
-      let totalGarrison = this.data.ships == null ? '???' : this.data.ships
+    if (!this.text_ships) {
+      let totalShips = this.data.ships == null ? '???' : this.data.ships
 
-      let garrisonText = totalGarrison.toString()
+      let shipsText = totalShips.toString()
 
       let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
-      this.text_garrison = new PIXI.BitmapText(garrisonText, bitmapFont)
+      this.text_ships = new PIXI.BitmapText(shipsText, bitmapFont)
 
-      this.text_garrison.x = -(this.text_garrison.width / 2.0)
-      this.text_garrison.y = 5
+      this.text_ships.x = -(this.text_ships.width / 2.0)
+      this.text_ships.y = 5
 
-      this.container.addChild(this.text_garrison)
+      this.container.addChild(this.text_ships)
       if( this.data.isGift ) {
         let style = new PIXI.TextStyle({
           fontFamily: `'Space Mono', monospace`,
@@ -151,9 +151,9 @@ class Carrier extends EventEmitter {
         })
         let giftText = new PIXI.Text('🎁', style)
         giftText.resolution = 12
-        giftText.position.x = this.text_garrison.width
+        giftText.position.x = this.text_ships.width
         giftText.position.y = -1
-        this.text_garrison.addChild(giftText)
+        this.text_ships.addChild(giftText)
       }
     }
   }
@@ -348,7 +348,7 @@ class Carrier extends EventEmitter {
   updateVisibility() {
 
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
+    if (this.text_ships) this.text_ships.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
 
   deselectAllText () {

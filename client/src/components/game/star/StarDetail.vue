@@ -52,7 +52,7 @@
         </div>
         <div class="col-auto">
           <span title="Total Known Garrison" v-if="star.ownedByPlayerId && star.infrastructure">
-            {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
+            {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ml-1"></i>
           </span>
         </div>
       </div>
@@ -106,7 +106,7 @@
               Ships
           </div>
           <div class="col text-right">
-              {{star.garrison == null ? '???' : star.garrison}} <i class="fas fa-rocket ml-1"></i>
+              {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ml-1"></i>
           </div>
       </div>
 
@@ -186,7 +186,7 @@
             <p class="mb-2">Build a carrier to transport ships through hyperspace.</p>
           </div>
           <div class="col-4">
-            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.garrison < 1 || isGameFinished" class="btn btn-block btn-primary mb-2" @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
+            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-block btn-primary mb-2" @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
           </div>
         </div>
 

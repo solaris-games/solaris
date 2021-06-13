@@ -202,7 +202,7 @@ export default new Vuex.Store({
       }
 
       let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
-      star.garrison = data.starGarrison
+      star.ships = data.starShips
 
       let userPlayer = GameHelper.getUserPlayer(state.game)
       userPlayer.credits -= star.upgradeCosts.carriers
@@ -215,7 +215,7 @@ export default new Vuex.Store({
       let star = GameHelper.getStarById(state.game, data.starId)
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
 
-      star.garrison = data.starShips
+      star.ships = data.starShips
       carrier.ships = data.carrierShips
 
       GameContainer.reloadStar(star)
@@ -224,7 +224,7 @@ export default new Vuex.Store({
     gameStarAllShipsTransferred (state, data) {
       let star = GameHelper.getStarById(state.game, data.star._id)
 
-      star.garrison = data.star.garrison
+      star.ships = data.star.ships
 
       data.carriers.forEach(carrier => {
         let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id) 
@@ -239,7 +239,7 @@ export default new Vuex.Store({
       player.stats.totalStars--
 
       star.ownedByPlayerId = null
-      star.garrison = 0
+      star.ships = 0
 
       // Redraw and remove carriers
       let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)

@@ -93,7 +93,7 @@ export default {
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
 
-    this.starShips = this.star.garrison
+    this.starShips = this.star.ships
     this.carrierShips = this.carrier.ships
   },
   methods: {
@@ -102,17 +102,17 @@ export default {
     },
     onGameReloaded (data) {
       // When the game ticks there may have been ships built at the star.
-      // Find the star in the tick report and compare the garrison, then add
+      // Find the star in the tick report and compare the ships, then add
       // the difference to the star ships side on the transfer.
 
-      // NOTE: At this stage the star will have the latest data for its garrison
+      // NOTE: At this stage the star will have the latest data for its ships
       // as the store deals with updating the star.
       this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
       this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
 
       // If the game ticks then check to see if any ships have been built at the star.
       let totalInTransfer = this.starShips + this.carrierShips
-      let totalOriginal = this.star.garrison + this.carrier.ships
+      let totalOriginal = this.star.ships + this.carrier.ships
       let difference = totalOriginal - totalInTransfer
 
       // If there is a difference then this means that ship(s) have been built at the star
@@ -123,20 +123,20 @@ export default {
       }
     },
     onStarShipsChanged (e) {
-      let difference = parseInt(this.starShips) - this.star.garrison
+      let difference = parseInt(this.starShips) - this.star.ships
       this.carrierShips = this.carrier.ships - difference
     },
     onCarrierShipsChanged (e) {
       let difference = parseInt(this.carrierShips) - this.carrier.ships
-      this.starShips = this.star.garrison - difference
+      this.starShips = this.star.ships - difference
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
-      this.starShips = this.carrier.ships + this.star.garrison - 1
+      this.starShips = this.carrier.ships + this.star.ships - 1
     },
     onMaxShipsClicked (e) {
       this.starShips = 0
-      this.carrierShips = this.carrier.ships + this.star.garrison
+      this.carrierShips = this.carrier.ships + this.star.ships
     },
     onTransferLeftClicked (e) {
       this.starShips+=e
@@ -186,7 +186,7 @@ export default {
             carrierShips: cShips
           })
 
-          this.star.garrison = sShips
+          this.star.ships = sShips
           this.carrier.ships = cShips
 
           transferred = true

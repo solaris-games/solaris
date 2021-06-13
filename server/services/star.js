@@ -47,8 +47,8 @@ module.exports = class StarService extends EventEmitter {
         // Set up the home star
         player.homeStarId = homeStar._id;
         homeStar.ownedByPlayerId = player._id;
-        homeStar.garrisonActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 star at the home star so that a carrier can be built there.
-        homeStar.garrison = homeStar.garrisonActual;
+        homeStar.shipsActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 star at the home star so that a carrier can be built there.
+        homeStar.ships = homeStar.shipsActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.warpGate = false;
         homeStar.ignoreBulkUpgrade = false;
@@ -191,8 +191,8 @@ module.exports = class StarService extends EventEmitter {
         }
 
         star.ownedByPlayerId = null;
-        star.garrisonActual = 0;
-        star.garrison = star.garrisonActual;
+        star.shipsActual = 0;
+        star.ships = star.shipsActual;
         star.ignoreBulkUpgrade = false;
         
         game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
@@ -263,13 +263,13 @@ module.exports = class StarService extends EventEmitter {
         return false;
     }
 
-    canPlayerSeeStarGarrison(player, star) {
+    canPlayerSeeStarShips(player, star) {
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-            // If the star has a hideStarGarrison spec and is not owned by the given player
+            // If the star has a hideStarShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideStarGarrison
+            if (specialist.modifiers.special && specialist.modifiers.special.hideStarShips
                 && (star.ownedByPlayerId || '').toString() !== player._id.toString()) {
                 return false;
             }
@@ -349,8 +349,8 @@ module.exports = class StarService extends EventEmitter {
                 let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
     
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.garrisonActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
-                star.garrison = Math.floor(star.garrisonActual);
+                star.shipsActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
+                star.ships = Math.floor(star.shipsActual);
             }
         }
     }
@@ -369,6 +369,67 @@ module.exports = class StarService extends EventEmitter {
             $set: {
                 'galaxy.stars.$.ignoreBulkUpgrade': star.ignoreBulkUpgrade ? false : true
             }
+        });
+    }
+
+    captureStar(game, star, defender, defenderUser, attackers, attackerUsers, attackerCarriers) {
+        let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+        // If the star had a specialist that destroys infrastructure then perform demolition.
+        if (specialist && specialist.modifiers.special && specialist.modifiers.special.destroyInfrastructureOnLoss) {
+            star.specialistId = null;
+            star.infrastructure.economy = 0;
+            star.infrastructure.industry = 0;
+            star.infrastructure.science = 0;
+            star.warpGate = false;
+        }
+
+        let closestPlayerId = attackerCarriers.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].ownedByPlayerId;
+
+        // Capture the star.
+        let newStarPlayer = attackers.find(p => p._id.equals(closestPlayerId));
+        let newStarUser = attackerUsers.find(u => u._id.toString() === newStarPlayer.userId.toString());
+        let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId.equals(newStarPlayer._id));
+
+        let captureReward = star.infrastructure.economy * 10; // Attacker gets 10 credits for every eco destroyed.
+
+        // Check to see whether to double the capture reward.
+        let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
+
+        captureReward *= captureRewardMultiplier;
+
+        star.ownedByPlayerId = newStarPlayer._id;
+        newStarPlayer.credits += captureReward;
+        star.infrastructure.economy = 0;
+        star.ignoreBulkUpgrade = false; // Reset this as it has been captured by a new player.
+
+        // TODO: If the home star is captured, find a new one?
+        // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
+
+        if (defenderUser && !defender.defeated) {
+            defenderUser.achievements.combat.stars.lost++;
+        }
+        
+        if (newStarUser && !newStarPlayer.defeated) {
+            newStarUser.achievements.combat.stars.captured++;
+        }
+
+        this.emit('onStarCaptured', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            player: newStarPlayer,
+            star,
+            capturedBy: newStarPlayer,
+            captureReward
+        });
+        
+        this.emit('onStarCaptured', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            player: defender,
+            star,
+            capturedBy: newStarPlayer,
+            captureReward
         });
     }
 

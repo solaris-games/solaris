@@ -71,13 +71,13 @@ export default {
       let sorter = (a, b) => a.name.localeCompare(b.name)
 
       let starShips = this.$store.state.game.galaxy.stars
-        .filter(s => s.garrison)
+        .filter(s => s.ships)
         .map(s => {
           return {
             _id: s._id,
             ownedByPlayerId: s.ownedByPlayerId,
             name: s.name,
-            ships: s.garrison,
+            ships: s.ships,
             type: 0,
             location: s.location,
             specialist: s.specialist

@@ -154,12 +154,16 @@
         {
             "id": 12,
             "name": "Coward",
-            "description": "When attacking a Star, if the Carrier loses in combat it is redirected to the nearest friendly Star within its Hyperspace Range.",
-            "baseCostCredits": 15,
-            "baseCostCreditsSpecialists": 1,
+            "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed, +1 Weapons.",
+            "baseCostCredits": 1000,
+            "baseCostCreditsSpecialists": 10,
             "modifiers": {
+                "local": {
+                    "speed": 2,
+                    "weapons": 1
+                },
                 "special": {
-                    "starCombatAttackingRedirectIfDefeated": true
+                    "avoidCombatCarrierToCarrier": true
                 }
             }
         },
@@ -319,7 +323,7 @@
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
                 "special": {
-                    "hideStarGarrison": true
+                    "hideStarShips": true
                 },
                 "local": {
                     "weapons": -1
