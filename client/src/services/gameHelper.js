@@ -620,6 +620,8 @@ class GameHelper {
           return 'ringed-planet'
         case 11:
           return 'observatory'
+        case 12:
+          return 'double-ringed-orb'
       }
     }
   }

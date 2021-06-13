@@ -89,6 +89,9 @@ module.exports = class GameTickService extends EventEmitter {
             await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
 
+            this._awardCreditsPerTick(game);
+            logTime('Award tick credits from specialists');
+
             await this._logHistory(game);
             logTime('Log history');
 
@@ -485,6 +488,19 @@ module.exports = class GameTickService extends EventEmitter {
     _resetPlayersReadyStatus(game) {
         for (let player of game.galaxy.players) {
             player.ready = false;
+        }
+    }
+
+    _awardCreditsPerTick(game) {
+        for (let player of game.galaxy.players) {
+            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
+                                .filter(s => !this.starService.isDeadStar(s));
+
+            for (let star of playerStars) {
+                let creditsByScience = this.specialistService.getCreditsPerTickByScience(star);
+
+                player.credits += creditsByScience * star.infrastructure.science;
+            }
         }
     }
 }

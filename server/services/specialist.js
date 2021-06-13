@@ -155,5 +155,9 @@ module.exports = class SpecialistService {
     getScienceInfrastructureMultiplier(star) {
         return this._getStarSpecialValue(star, 'scienceInfrastructureMultiplier', 1);
     }
+
+    getCreditsPerTickByScience(star) {
+        return this._getStarSpecialValue(star, 'creditsPerTickByScience', 0);
+    }
     
 };
