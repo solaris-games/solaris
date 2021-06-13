@@ -96,28 +96,28 @@ export default {
 
 @media screen and (max-width: 576px) { 
   .player-icon, img {
-      height: 45px;
-      width: 45px;
+      height: 35px;
+      width: 35px;
   }
 
   .player-icon .userIcon {
     position: absolute;
-    left: 3px;
-    top: 32px;
+    left: 1px;
+    top: 22px;
     font-size:10px;
   }
 
   .player-icon .shapeIcon {
     position: absolute;
-    left: 32px;
-    top: 3px;
+    left: 22px;
+    top: 1px;
     font-size:10px;
   }
 
   .player-icon .medalIcon {
     position: absolute;
-    left: 32px;
-    top: 32px;
+    left: 22px;
+    top: 22px;
     font-size:10px;
   }
 
