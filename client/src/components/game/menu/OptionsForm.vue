@@ -67,7 +67,14 @@
           <select class="form-control" id="territory-style" v-model="settings.map.territoryStyle" :disabled="isSavingSettings">
             <option value="marching-square">Marching Square</option>
             <option value="voronoi">Voronoi</option>
+            <option value="disabled">Disabled</option>
           </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle!=='disabled'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <div class="col">
+          <p class="text-warning mb-0"><small>Warning: Map territories will degrade performance when loading the game, especially in very large galaxies.</small></p>
         </div>
       </div>
 

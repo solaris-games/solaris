@@ -110,7 +110,7 @@ const schema = new Schema({
             carrierLoopStyle: { type: Types.String, required: false, enum: ['solid', 'dashed'], default: 'dashed' },
             carrierPathWidth: { type: Types.Number, required: false, default: 1, min: 1, max: 8 },
             carrierPathDashLength: { type: Types.Number, required: false, default: 6, min: 4, max: 16 },
-            territoryStyle: { type: Types.String, required: false, enum: ['marching-square', 'voronoi'], default: 'marching-square' },
+            territoryStyle: { type: Types.String, required: false, enum: ['disabled', 'marching-square', 'voronoi'], default: 'marching-square' },
             marchingSquareGridSize: { type: Types.Number, required: false, default: 6, min: 2, max: 32 },
             marchingSquareTerritorySize:{ type: Types.Number, required: false, default: 5, min: 2, max: 32 },
             marchingSquareBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 8 },
