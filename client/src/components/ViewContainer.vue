@@ -7,14 +7,19 @@
         <footer class="mt-3">
           <div class="row">
             <div class="col">
-                <a href="https://github.com/mike-eason/solaris" target="_blank">
+                <a href="https://github.com/mike-eason/solaris" target="_blank" title="Source Code">
                   <i class="fab fa-github"></i>
-                  Source Code
+                  <span class="d-none d-md-inline-block ml-1">Source Code</span>
                 </a>
                 |
-                <a href="https://discord.com/invite/v7PD33d" target="_blank">
+                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
                   <i class="fab fa-discord"></i>
-                  Discord
+                  <span class="d-none d-md-inline-block ml-1">Discord</span>
+                </a>
+                |
+                <a href="https://forum.solaris.games" target="_blank" title="Forum">
+                  <i class="far fa-comments"></i>
+                  <span class="d-none d-md-inline-block ml-1">Forum</span>
                 </a>
             </div>
             <div class="col-auto">
