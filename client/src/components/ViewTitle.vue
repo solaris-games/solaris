@@ -3,8 +3,9 @@
     <div class="col">
         <h3 class="mb-0">{{ title }}</h3>
     </div>
-    <div class="col-1" v-if="!hideHomeButton">
-        <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
+    <div class="col-auto" v-if="!hideHomeButton">
+        <slot></slot>
+        <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info ml-1"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
 </div>
 </template>

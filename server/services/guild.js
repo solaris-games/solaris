@@ -58,7 +58,7 @@ module.exports = class GuildService {
     async listInvitations(userId) {
         let guilds = await this.guildModel.find({
             invitees: {
-                $in: [userId]
+                $in: [mongoose.Types.ObjectId(userId)]
             }
         }, {
             name: 1,

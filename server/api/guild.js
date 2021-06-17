@@ -36,20 +36,20 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/invites', middleware.authenticate, async (req, res, next) => {
         try {
-            const result = await container.guildService.detail(req.params.guildId, true, false);
-
+            let result = await container.guildService.listInvitations(req.session.userId);
+                
             return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/invites', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
         try {
-            let result = await container.guildService.listInvitations(req.session.userId);
-                
+            const result = await container.guildService.detail(req.params.guildId, true, false);
+
             return res.status(200).json(result);
         } catch (err) {
             return next(err);

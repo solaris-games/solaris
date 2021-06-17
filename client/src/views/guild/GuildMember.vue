@@ -158,10 +158,12 @@ export default {
       this.isLoading = false
     },
     async disband () {
-      if (await this.$confirm('Disband guild', `Are you sure you want to disband the guild?`)) {
-        if (!await this.$confirm('Disband guild', `Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`)) {
-          return
-        }
+      if (!await this.$confirm('Disband guild', `Are you sure you want to disband the guild?`)) {
+        return
+      }
+      
+      if (!await this.$confirm('Disband guild', `Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`)) {
+        return
       }
 
       this.isLoading = true

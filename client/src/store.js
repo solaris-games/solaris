@@ -332,8 +332,9 @@ export default new Vuex.Store({
     },
     async confirm ({ commit, state }, data) {
       const modal = window.$('#confirmModal')
-      const close = () => {
+      const close = async () => {
         modal.modal('toggle')
+        await new Promise(r => setTimeout(r, 400));
       }
       return new Promise((resolve, _reject) => {
         const settings = {
@@ -342,12 +343,12 @@ export default new Vuex.Store({
           hideCancelButton: Boolean(data.hideCancelButton),
           titleText: data.titleText,
           text: data.text,
-          onConfirm: () => {
-            close()
+          onConfirm: async () => {
+            await close()
             resolve(true)
           },
-          onCancel: () => {
-            close()
+          onCancel: async () => {
+            await close()
             resolve(false)
           }
         }
