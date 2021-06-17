@@ -149,6 +149,8 @@ export default new Vuex.Store({
     },
 
     gameStarBulkUpgraded (state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
+
       data.stars.forEach(s => {
         let star = GameHelper.getStarById(state.game, s.starId)
 
@@ -158,11 +160,15 @@ export default new Vuex.Store({
           star.upgradeCosts[data.infrastructureType] = s.infrastructureCost
         }
 
+        if (s.manufacturing != null) {
+          star.manufacturing = s.manufacturing
+          player.stats.newShips += s.manufacturing
+        }
+
         GameContainer.reloadStar(star)
       })
       
       // Update player total stats.
-      let player = GameHelper.getUserPlayer(state.game)
 
       player.credits -= data.cost
 

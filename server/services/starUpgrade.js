@@ -512,6 +512,10 @@ module.exports = class StarUpgradeService extends EventEmitter {
         upgradeStar.infrastructureCost = upgradeReport.nextCost;
         summaryStar.infrastructureCost = upgradeReport.nextCost;
 
+        if (upgradeReport.manufacturing != null) {
+            summaryStar.manufacturing = upgradeReport.manufacturing;
+        }
+
         summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
 
         return upgradeReport.cost;
