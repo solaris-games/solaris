@@ -510,6 +510,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // Update the stars next infrastructure cost so next time
         // we loop we will have the most up to date info.
         upgradeStar.infrastructureCost = upgradeReport.nextCost;
+        summaryStar.infrastructureCost = upgradeReport.nextCost;
 
         summaryStar.infrastructure = upgradeStar.star.infrastructure[infrastructureType];
 
