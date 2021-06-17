@@ -25,6 +25,16 @@
                         <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
                     </div>
                 </div>
+                <div class="form-group row">
+                  <div class="col-8">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" v-model="isTurnBased" id="chkIsTurnBased">
+                      <label class="form-check-label" for="chkIsTurnBased">
+                        Carrier-to-Star Combat
+                      </label>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-group row" v-if="hasDefenderBonus">
                   <div class="col-8">
                     <div class="form-check">
@@ -105,6 +115,7 @@ export default {
       errors: [],
       hasDefenderBonus: false,
       includeDefenderBonus: true,
+      isTurnBased: true,
       defender: {
         ships: 0,
         weaponsLevel: 1,
@@ -206,7 +217,7 @@ export default {
         }, {
           weaponsLevel: +this.attacker.weaponsLevel,
           ships: +this.attacker.ships
-        })
+        }, this.isTurnBased)
 
         if (response.status === 200) {
           this.result = response.data

@@ -12,12 +12,13 @@ module.exports = class CombatService extends EventEmitter {
         this.reputationService = reputationService;
     }
 
-    calculate(defender, attacker, calculateNeeded = false) {    
+    calculate(defender, attacker, isTurnBased = true, calculateNeeded = false) {    
         let defenderShipsRemaining = defender.ships;
         let attackerShipsRemaining = attacker.ships;
 
         const defendPower = defender.weaponsLevel;
         const attackPower = attacker.weaponsLevel;
+        const defenderAdditionalTurns = isTurnBased ? 1 : 0;
         
         const defenderTurns = Math.ceil(attacker.ships / defendPower);
         const attackerTurns = Math.ceil(defender.ships / attackPower);
@@ -26,7 +27,7 @@ module.exports = class CombatService extends EventEmitter {
 
         if (defenderTurns <= attackerTurns)  {
             attackerShipsRemaining = 0;
-            defenderShipsRemaining = defender.ships - (defenderTurns - 1) * attackPower;
+            defenderShipsRemaining = defender.ships - (defenderTurns - defenderAdditionalTurns) * attackPower;
 
             if (calculateNeeded) {
                 needed = {
@@ -41,7 +42,7 @@ module.exports = class CombatService extends EventEmitter {
             if (calculateNeeded) {
                 needed = {
                     attacker: 0,
-                    defender: (defenderTurns - 1) * attackPower + 1
+                    defender: (defenderTurns - defenderAdditionalTurns) * attackPower + defenderAdditionalTurns
                 };
             }
         }
@@ -104,7 +105,7 @@ module.exports = class CombatService extends EventEmitter {
         }, {
             weaponsLevel: attackerWeaponsTechLevel,
             ships: totalAttackers
-        });
+        }, true);
 
         return combatResult;
     }
@@ -131,7 +132,7 @@ module.exports = class CombatService extends EventEmitter {
         }, {
             weaponsLevel: attackerWeaponsTechLevel,
             ships: totalAttackers
-        });
+        }, false);
 
         return combatResult;
     }
@@ -244,6 +245,8 @@ module.exports = class CombatService extends EventEmitter {
             }
         }
 
+        // If the defender has been eliminated at the star then the attacker who travelled the shortest distance in the last tick
+        // captures the star. Repeat star combat until there is only one player remaining.
         if (star) {
             this._starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers);
         }
@@ -292,11 +295,10 @@ module.exports = class CombatService extends EventEmitter {
     }
 
     _starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers) {
-        // If the defender has been eliminated at the star then the attacker who travelled the shortest distance in the last tick
-        // captures the star. Repeat star combat until there is only one player remaining.
         let starDefenderDefeated = star && !Math.floor(star.shipsActual) && !defenderCarriers.length;
+        let hasAttackersRemaining = attackerCarriers.reduce((sum, c) => sum + c.ships, 0) > 0;
 
-        if (starDefenderDefeated) {
+        if (starDefenderDefeated && hasAttackersRemaining) {
             this.starService.captureStar(game, star, defender, defenderUser, attackers, attackerUsers, attackerCarriers);
         }
     }

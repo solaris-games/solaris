@@ -172,6 +172,7 @@ module.exports = (router, io, container) => {
             let result = container.combatService.calculate(
                 req.body.defender,
                 req.body.attacker,
+                req.body.isTurnBased,
                 true);
 
             return res.status(200).json(result);
