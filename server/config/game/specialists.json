@@ -154,13 +154,12 @@
         {
             "id": 12,
             "name": "Coward",
-            "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed, +1 Weapons.",
+            "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "modifiers": {
                 "local": {
-                    "speed": 2,
-                    "weapons": 1
+                    "speed": 2
                 },
                 "special": {
                     "avoidCombatCarrierToCarrier": true
@@ -379,7 +378,7 @@
         {
             "id": 12,
             "name": "Financial Analyst",
-            "description": "This star produces 1 credit per tick for each point of science on the star.",
+            "description": "The star produces 1 credit per tick for each point of science on the star.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "modifiers": {
