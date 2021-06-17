@@ -8,14 +8,22 @@ const fakeBcrypt = {
 
 const fakeUserModel = {
     findOne(user) {
-        return [
-            {
-                _id: 1,
-                email: 'test@test.com',
-                username: 'hello',
-                password: 'test'
+        return {
+            lean() {
+                return {
+                    exec() {
+                        return [
+                            {
+                                _id: 1,
+                                email: 'test@test.com',
+                                username: 'hello',
+                                password: 'test'
+                            }
+                        ].find(x => x.email == user.email);
+                    }
+                }
             }
-        ].find(x => x.email == user.email);
+        }
     }
 };
 
@@ -29,7 +37,7 @@ describe('auth', () => {
     it('should compare passwords of a user', async (done) => {
         let result = await service.login('test@test.com', 'test');
 
-        expect(result).toBe(1);
+        expect(result._id).toBe(1);
 
         done();
     });
