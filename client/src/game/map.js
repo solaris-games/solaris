@@ -365,6 +365,8 @@ class Map extends EventEmitter {
     this.background.setup(game, userSettings)
     this.background.draw(game, userSettings)
 
+    this.waypoints.setup(game)
+
     this._setupChunks()
   }
 
