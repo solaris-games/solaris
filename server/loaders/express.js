@@ -84,6 +84,7 @@ module.exports = async (config, app, io, container) => {
     const auth = require('../api/auth')(router, io, container);
     const user = require('../api/user')(router, io, container);
     const guild = require('../api/guild')(router, io, container);
+    const event = require('../api/game/event')(router, io, container);
 
     app.use(auth);
     app.use(admin);
@@ -97,6 +98,7 @@ module.exports = async (config, app, io, container) => {
     app.use(ledger);
     app.use(specialist);
     app.use(guild);
+    app.use(event);
 
     return app;
 };

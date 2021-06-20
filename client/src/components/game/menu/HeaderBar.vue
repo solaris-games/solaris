@@ -45,8 +45,8 @@
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
-                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
+            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': !hasUnread, 'btn-warning': hasUnread}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
+                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="hasUnread">{{this.unreadMessages + this.unreadEvents}}</span>
             </button>
 
             <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
@@ -60,9 +60,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { setInterval } from 'timers'
 import GameHelper from '../../../services/gameHelper'
 import router from '../../../router'
-import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../data/keyboardShortcuts'
 import GameContainer from '../../../game/container'
@@ -70,6 +71,7 @@ import ServerConnectionStatusVue from './ServerConnectionStatus'
 import ResearchProgressVue from './ResearchProgress'
 import AudioService from '../../../game/audio'
 import ConversationApiService from '../../../services/api/conversation'
+import EventApiService from '../../../services/api/event'
 import GameApiService from '../../../services/api/game'
 import HamburgerMenuVue from './HamburgerMenu'
 import TickSelectorVue from './TickSelector'
@@ -88,13 +90,15 @@ export default {
       MENU_STATES: MENU_STATES,
       timeRemaining: null,
       intervalFunction: null,
-      unreadMessages: 0
+      unreadMessages: 0,
+      unreadEvents: 0
     }
   },
-  mounted () {
+  async mounted () {
     this.setupTimer()
 
-    this.checkForUnreadMessages()
+    await this.checkForUnreadMessages()
+    await this.checkForUnreadEvents()
   },
   created () {
     document.addEventListener('keydown', this.handleKeyDown)
@@ -102,6 +106,8 @@ export default {
     this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
+    this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
+    this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
     this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
@@ -114,6 +120,8 @@ export default {
     this.sockets.unsubscribe('gameStarted')
     this.sockets.unsubscribe('gameMessageSent')
     this.sockets.unsubscribe('gameConversationRead')
+    this.sockets.unsubscribe('playerEventRead')
+    this.sockets.unsubscribe('playerAllEventsRead')
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
@@ -218,6 +226,21 @@ export default {
 
         if (response.status === 200) {
           this.unreadMessages = response.data.unread
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async checkForUnreadEvents () {
+      if (!this.userPlayer) {
+        return
+      }
+
+      try {
+        let response = await EventApiService.getUnreadCount(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.unreadEvents = response.data.unread
         }
       } catch (err) {
         console.error(err)
@@ -346,6 +369,15 @@ export default {
     },
     isSpecialistsCurrencyCreditsSpecialists () {
       return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
+    },
+    hasUnread () {
+      return this.unreadMessages > 0 || this.unreadEvents > 0
+    },
+    gameState: mapState(['game'])
+  },
+  watch: {
+    game (newGame, oldGame) {
+      this.checkForUnreadEvents()
     }
   }
 }

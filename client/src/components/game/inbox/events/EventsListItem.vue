@@ -1,8 +1,8 @@
 <template>
-<div class="bg-primary pt-2 pb-1 mb-2">
+<div class="bg-primary pt-2 pb-1 mb-2 pointer" :class="{'unread':!isRead}" @click="markAsRead">
     <div v-if="event.tick">
         <div class="col text-right">
-            <span class="badge badge-success">Tick {{event.tick}}</span>
+            <span class="badge" :class="{'badge-success':isRead,'badge-warning':!isRead}">Tick {{event.tick}}</span>
         </div>
     </div>
     <div class="col mt-2">
@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import EventApiService from '../../../../services/api/event'
 import GameEndedVue from './GameEnded'
 import GamePausedVue from './GamePaused'
 import GamePlayerAFKVue from './GamePlayerAFK'
@@ -144,10 +145,36 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
       this.$emit('onOpenCarrierDetailRequested', e)
+    },
+    async markAsRead () {
+        if (this.isRead) {
+            return
+        }
+        
+      try {
+        this.event.read = true
+
+        await EventApiService.markEventAsRead(this.$store.state.game._id, this.event._id)
+      } catch (e) {
+        console.error(e)
+        this.event.read = false
+      }
     }
+  },
+  computed: {
+      isRead () {
+          return this.event.read || this.event.read == null
+      }
   }
 }
 </script>
 
 <style scoped>
+.pointer {
+  cursor: pointer;
+}
+
+.unread {
+    border: 3px solid #f39c12;
+}
 </style>

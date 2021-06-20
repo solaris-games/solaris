@@ -6,8 +6,9 @@
     <div class="row">
       <div class="col">
         <button class="btn btn-sm btn-primary" @click="loadEvents">Refresh <i class="fas fa-sync"></i></button>
+        <button class="btn btn-sm btn-success ml-1" @click="markAllRead">Read All <i class="fas fa-check"></i></button>
       </div>
-      <div class="col">
+      <div class="col-auto">
         <select class="form-control form-control-sm" v-model="selectedFilter" @change="onSelectedFilterChanged">
           <option value="all">All Events</option>
           <option value="trade">Trade</option>
@@ -15,10 +16,12 @@
         </select>
       </div>
     </div>
+    <div class="row">
+      <div class="col">
+        <p class="mb-0"><small>Click on an event to mark it as read.</small></p>
+      </div>
+    </div>
   </div>
-
-  <!-- <button class="btn btn-primary float-right">Mark All Read</button>
-  <span class="ml-2">Click on an event to mark is as read.</span> -->
 
   <div class="mt-2 events-container container" v-if="filteredEvents && filteredEvents.length">
       <events-list-item v-for="event in filteredEvents" :key="event._id" :event="event"
@@ -34,7 +37,7 @@
 </template>
 
 <script>
-import GameApiService from '../../../../services/api/game'
+import EventApiService from '../../../../services/api/event'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
 import EventsListItemVue from './EventsListItem'
 
@@ -63,12 +66,25 @@ export default {
         // 10 cycles ago
         let startTick = Math.max(0, this.$store.state.tick - (game.settings.galaxy.productionTicks * 10))
 
-        let response = await GameApiService.getEvents(this.$store.state.game._id, startTick)
+        let response = await EventApiService.getEvents(game._id, startTick)
 
         if (response.status === 200) {
           this.events = response.data
 
           this.onSelectedFilterChanged()
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async markAllRead () {
+      try {
+        let response = await EventApiService.markAllEventsAsRead(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          for (let e of this.events) {
+            e.read = true
+          }
         }
       } catch (err) {
         console.error(err)

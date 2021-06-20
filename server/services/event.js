@@ -103,26 +103,28 @@ module.exports = class EventService {
             playerId: null,
             tick: gameTick,
             type,
-            data
+            data,
+            read: null
         });
 
         await event.save();
     }
 
-    async createPlayerEvent(gameId, gameTick, playerId, type, data) {
+    async createPlayerEvent(gameId, gameTick, playerId, type, data, isRead = false) {
         let event = new this.eventModel({
             gameId,
             playerId,
             tick: gameTick,
             type,
-            data
+            data,
+            read: isRead
         });
 
         await event.save();
     }
 
     async getPlayerEvents(gameId, player, startTick = 0) {
-        return this.eventModel.find({
+        let events = await this.eventModel.find({
             gameId: gameId,
             tick: { $gte: startTick },
             playerId: {
@@ -138,6 +140,8 @@ module.exports = class EventService {
         })
         .lean({ defaults: true })
         .exec();
+
+        return events;
     }
 
     async getPlayerTradeEvents(gameId, gameTick, player, startTick = 0) {
@@ -177,6 +181,43 @@ module.exports = class EventService {
         });
 
         return tradeEvents;
+    }
+
+    async markAllEventsAsRead(game, playerId) {
+        await this.eventModel.updateMany({
+            gameId: game._id,
+            playerId: playerId,
+            read: false
+        }, {
+            $set: {
+                read: true
+            }
+        }).exec();
+
+        this.broadcastService.playerAllEventsRead(game, playerId);
+    }
+
+    async markEventAsRead(game, playerId, eventId) {
+        await this.eventModel.updateOne({
+            _id: eventId,
+            gameId: game._id,
+            playerId: playerId,
+            read: false
+        }, {
+            $set: {
+                read: true
+            }
+        }).exec();
+
+        this.broadcastService.playerEventRead(game, playerId, eventId);
+    }
+
+    async getUnreadCount(game, playerId) {
+        return await this.eventModel.count({
+            gameId: game._id,
+            playerId: playerId,
+            read: false
+        }).exec();
     }
 
     /* GLOBAL EVENTS */
@@ -296,7 +337,7 @@ module.exports = class EventService {
             starId: star._id
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_BUILT, data);
+        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_BUILT, data, true);
     }
 
     async createWarpGateDestroyedEvent(gameId, gameTick, player, star) {
@@ -304,7 +345,7 @@ module.exports = class EventService {
             starId: star._id
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_DESTROYED, data);
+        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_DESTROYED, data, true);
     }
 
     async createTechnologyReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, technology) {
@@ -322,7 +363,7 @@ module.exports = class EventService {
             technology
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data, true);
     }
 
     async createCreditsReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, credits) {
@@ -340,7 +381,7 @@ module.exports = class EventService {
             credits
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data, true);
     }
 
     async createCreditsSpecialistsReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, creditsSpecialists) {
@@ -358,7 +399,7 @@ module.exports = class EventService {
             creditsSpecialists
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data, true);
     }
 
     async createRenownReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, renown) {
@@ -376,7 +417,7 @@ module.exports = class EventService {
             renown
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
     }
 
     async createStarAbandonedEvent(gameId, gameTick, player, star) {
@@ -384,7 +425,7 @@ module.exports = class EventService {
             starId: star._id
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data);
+        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
     }
 
     async createStarCapturedEvent(gameId, gameTick, player, star, capturedBy, creditsReward) {
@@ -402,7 +443,7 @@ module.exports = class EventService {
             upgradeReport
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data);
+        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data, true);
     }
 
     async createDebtAddedEvent(gameId, gameTick, debtorPlayerId, creditorPlayerId, amount) {
@@ -419,8 +460,8 @@ module.exports = class EventService {
             amount
         };
 
-        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data);
-        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data);
+        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, true);
+        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, false);
 
         this.broadcastService.gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount);
     }
@@ -432,8 +473,8 @@ module.exports = class EventService {
             amount
         };
 
-        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
-        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data);
+        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, false);
+        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, true);
 
         this.broadcastService.gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount);
     }
@@ -447,7 +488,7 @@ module.exports = class EventService {
             specialistDescription: specialist.description
         }
 
-        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data);
+        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data, true);
     }
 
     async createPlayerCarrierSpecialistHired(gameId, gameTick, player, carrier, specialist) {
@@ -460,7 +501,7 @@ module.exports = class EventService {
             specialistDescription: specialist.description
         }
 
-        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data);
+        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data, true);
     }
 
     async createPlayerConversationCreated(gameId, gameTick, convo) {
@@ -471,7 +512,7 @@ module.exports = class EventService {
             participants: convo.participants
         };
 
-        await this.createPlayerEvent(gameId, gameTick, convo.createdBy, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data);
+        await this.createPlayerEvent(gameId, gameTick, convo.createdBy, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data, true);
     }
 
     async createPlayerConversationInvited(gameId, gameTick, convo, playerId) {
@@ -491,7 +532,7 @@ module.exports = class EventService {
             playerId
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data);
+        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
     }
 
 };

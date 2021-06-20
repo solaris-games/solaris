@@ -254,38 +254,6 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
-        let startTick = +req.query.startTick || 0;
-        
-        try {
-            let events = await container.eventService.getPlayerEvents(
-                req.game._id,
-                req.player,
-                startTick
-            );
-
-            return res.status(200).json(events);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
-    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
-        let startTick = +req.query.startTick || 0;
-        
-        try {
-            let events = await container.eventService.getPlayerTradeEvents(
-                req.game,
-                req.player,
-                startTick
-            );
-
-            return res.status(200).json(events);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
     router.patch('/api/game/:gameId/player/touch', middleware.authenticate, async (req, res, next) => {
         try {
             let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
