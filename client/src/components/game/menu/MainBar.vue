@@ -13,9 +13,6 @@
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="menu-content bg-dark" v-if="menuState">
-      <!-- <div v-if="menuState == MENU_STATES.OPTIONS">OPTIONS</div>
-      <div v-if="menuState == MENU_STATES.HELP">HELP</div> -->
-
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"

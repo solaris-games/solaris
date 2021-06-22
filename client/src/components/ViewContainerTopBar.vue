@@ -9,10 +9,6 @@
         <i class="fas fa-medal"></i>
         <span class="d-none d-md-inline-block ml-1">Achievements</span>
       </router-link>
-      <a :href="documentationUrl" target="_blank" class="ml-3">
-        <i class="fas fa-question"></i>
-        <span class="d-none d-md-inline-block ml-1">Help</span>
-      </a>
       <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3">
         <i class="fas fa-sign-out-alt"></i>
         <span class="ml-1">Log Out</span>
@@ -55,9 +51,6 @@ export default {
     },
     username () {
       return this.$store.state.username
-    },
-    documentationUrl () {
-      return process.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }

@@ -5,13 +5,17 @@
     </div>
     <div class="col-auto">
         <slot></slot>
-        <a v-if="showSocialLinks" class="btn btn-secondary" href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
+        <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
           <i class="fab fa-discord"></i>
           <span class="d-none d-md-inline-block ml-1">Discord</span>
         </a>
         <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://forum.solaris.games" target="_blank" title="Forum">
           <i class="far fa-comments"></i>
           <span class="d-none d-md-inline-block ml-1">Forum</span>
+        </a>
+        <a class="btn btn-secondary ml-1" :href="documentationUrl" target="_blank" title="Wiki">
+          <i class="far fa-question-circle"></i>
+          <span class="d-none d-md-inline-block ml-1">Wiki</span>
         </a>
         <button v-if="navigation && !hideHomeButton" @click="navigate" id="btnHome" class="btn btn-info ml-1"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
@@ -41,6 +45,9 @@ export default {
   computed: {
     isLoggedIn () {
       return this.$store.state.userId != null
+    },
+    documentationUrl () {
+      return process.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }

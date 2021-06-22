@@ -386,7 +386,7 @@
 
       <div class="row mb-3">
         <div class="col-12">
-          <h1><i class="fas fa-question"></i></h1>
+          <h1><i class="far fa-question-circle"></i></h1>
         </div>
         <div class="col">
           <h5>Strange One: <span class="text-success">{{ achievements.badges.strangeOne }}</span></h5>
