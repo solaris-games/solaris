@@ -1,9 +1,12 @@
 const moment = require('moment');
+const ConversationService = require('./conversation');
 
 module.exports = class GameListService {
     
-    constructor(gameModel) {
+    constructor(gameModel, conversationService, eventService) {
         this.gameModel = gameModel;
+        this.conversationService = conversationService;
+        this.eventService = eventService;
     }
 
     async listOfficialGames() {
@@ -41,7 +44,7 @@ module.exports = class GameListService {
     }
 
     async listActiveGames(userId) {
-        return await this.gameModel.find({
+        const games = await this.gameModel.find({
             'galaxy.players': { $elemMatch: { userId } },   // User is in game
             $and: [                                         // and (game is in progress AND user's player is not defeated)
                 { 'state.endDate': { $eq: null } },
@@ -61,10 +64,24 @@ module.exports = class GameListService {
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'galaxy.players': 1,
+            conversations: 1,
             state: 1
         })
         .lean({ defaults: true })
         .exec();
+
+        return await Promise.all(games.map(async game => {
+            const playerId = game.galaxy.players.find(p => p.userId === userId.toString())._id;
+            const unreadConversations = this.conversationService.getUnreadCount(game, playerId);
+            const unreadEvents = await this.eventService.getUnreadCount(game, playerId);
+
+            return {
+                settings: game.settings,
+                state: game.state,
+                unread: unreadConversations + unreadEvents
+            }
+        }))
     }
 
     async listFinishedGames() {
@@ -74,7 +91,7 @@ module.exports = class GameListService {
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
-            state: 1
+            state: $filter
         })
         .lean({ defaults: true })
         .exec();
