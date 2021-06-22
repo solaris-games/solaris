@@ -106,7 +106,7 @@ module.exports = (config, io) => {
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService);
 
-    const gameListService = new GameListService(GameModel, conversationService, eventService);
+    const gameListService = new GameListService(GameModel, gameService, conversationService, eventService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
 
 

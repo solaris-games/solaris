@@ -3,8 +3,9 @@ const ConversationService = require('./conversation');
 
 module.exports = class GameListService {
     
-    constructor(gameModel, conversationService, eventService) {
+    constructor(gameModel, gameService, conversationService, eventService) {
         this.gameModel = gameModel;
+        this.gameService = gameService;
         this.conversationService = conversationService;
         this.eventService = eventService;
     }
@@ -64,6 +65,7 @@ module.exports = class GameListService {
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.gameTime': 1,
             'galaxy.players': 1,
             conversations: 1,
             state: 1
@@ -72,15 +74,19 @@ module.exports = class GameListService {
         .exec();
 
         return await Promise.all(games.map(async game => {
-            const playerId = game.galaxy.players.find(p => p.userId === userId.toString())._id;
+            const player = game.galaxy.players.find(p => p.userId === userId.toString());
+            const playerId = player._id;
             const unreadConversations = this.conversationService.getUnreadCount(game, playerId);
             const unreadEvents = await this.eventService.getUnreadCount(game, playerId);
+
+            const turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
 
             return {
                 _id: game._id,
                 settings: game.settings,
                 state: game.state,
-                unread: unreadConversations + unreadEvents
+                unread: unreadConversations + unreadEvents,
+                turnWaiting
             }
         }))
     }
