@@ -1,6 +1,6 @@
 <template>
   <view-container>
-    <view-title title="Game Detail" navigation="main-menu"/>
+    <view-title title="Game Settings" navigation="main-menu"/>
 
     <loading-spinner :loading="isLoadingGame"/>
 

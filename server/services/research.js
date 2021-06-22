@@ -247,11 +247,15 @@ module.exports = class ResearchService extends EventEmitter {
 
     calculateNextResearchETAInTicks(game, player) {
         if (player.researchingNext === 'random') {
-            return null;
+          return null;
         }
 
-        return this.calculateCurrentResearchETAInTicks(game, player) + this._calculateResearchETAInTicks(game, player, player.researchingNext);
-    }
+        if (player.researchingNow !== player.researchingNext) {
+          return this.calculateCurrentResearchETAInTicks(game, player) + this._calculateResearchETAInTicks(game, player, player.researchingNext);
+        } else {
+          return this.calculateDoubleIdenticalResearchETAInTicks(game, player)
+        }
+      }
 
     _calculateResearchETAInTicks(game, player, researchKey) {
         if (researchKey === 'random') {
@@ -263,16 +267,28 @@ module.exports = class ResearchService extends EventEmitter {
         let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level);
         let remainingPoints = requiredProgress - tech.progress;
 
+        return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);
+    }
+
+    calculateDoubleIdenticalResearchETAInTicks(game, player)  {        
+        let tech = player.research[player.researchingNow];
+        
+        let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level) 
+                             + this.getRequiredResearchProgress(game, player.researchingNow, tech.level + 1);
+        let remainingPoints = requiredProgress - tech.progress;
+
+        return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);
+    }
+
+    _calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints) {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
         let totalScience = this.playerService.calculateTotalScience(playerStars);
-
+        
         // If there is no science then there cannot be an end date to the research.
         if (totalScience === 0) {
             return null;
         }
-
+        
         return Math.ceil(remainingPoints / totalScience);
     }
-
 };
