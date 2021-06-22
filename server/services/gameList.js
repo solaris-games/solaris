@@ -2,8 +2,11 @@ const moment = require('moment');
 
 module.exports = class GameListService {
     
-    constructor(gameModel) {
+    constructor(gameModel, gameService, conversationService, eventService) {
         this.gameModel = gameModel;
+        this.gameService = gameService;
+        this.conversationService = conversationService;
+        this.eventService = eventService;
     }
 
     async listOfficialGames() {
@@ -41,7 +44,7 @@ module.exports = class GameListService {
     }
 
     async listActiveGames(userId) {
-        return await this.gameModel.find({
+        const games = await this.gameModel.find({
             'galaxy.players': { $elemMatch: { userId } },   // User is in game
             $and: [                                         // and (game is in progress AND user's player is not defeated)
                 { 'state.endDate': { $eq: null } },
@@ -61,10 +64,30 @@ module.exports = class GameListService {
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.gameTime': 1,
+            'galaxy.players': 1,
+            conversations: 1,
             state: 1
         })
         .lean({ defaults: true })
         .exec();
+
+        return await Promise.all(games.map(async game => {
+            const player = game.galaxy.players.find(p => p.userId === userId.toString());
+            const playerId = player._id;
+            const unreadConversations = this.conversationService.getUnreadCount(game, playerId);
+            const unreadEvents = await this.eventService.getUnreadCount(game, playerId);
+
+            const turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
+
+            return {
+                _id: game._id,
+                settings: game.settings,
+                state: game.state,
+                unread: unreadConversations + unreadEvents,
+                turnWaiting
+            }
+        }))
     }
 
     async listFinishedGames() {
