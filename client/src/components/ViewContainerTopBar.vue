@@ -5,9 +5,18 @@
       <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{username || 'My account'}}</router-link>
     </div>
     <div class="col-auto">
-      <router-link :to="{ name: 'account-achievements', params: { userId: userId }}"><i class="fas fa-medal mr-1"></i>Achievements</router-link>
-      <a :href="documentationUrl" target="_blank" class="ml-3"><i class="fas fa-question mr-1"></i>Help</a>
-      <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
+      <router-link :to="{ name: 'account-achievements', params: { userId: userId }}">
+        <i class="fas fa-medal"></i>
+        <span class="d-none d-md-inline-block ml-1">Achievements</span>
+      </router-link>
+      <a :href="documentationUrl" target="_blank" class="ml-3">
+        <i class="fas fa-question"></i>
+        <span class="d-none d-md-inline-block ml-1">Help</span>
+      </a>
+      <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="ml-1">Log Out</span>
+      </a>
     </div>
   </div>
 </div>

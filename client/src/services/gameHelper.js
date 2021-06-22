@@ -192,6 +192,10 @@ class GameHelper {
   }
 
   getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
+    if (game == null) {
+      return ''
+    }
+    
     if (game.settings.gameTime.gameType === 'realTime') {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 

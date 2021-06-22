@@ -14,18 +14,18 @@
       <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
           <thead>
               <tr class="bg-primary">
-                  <td>Name</td>
-                  <td class="text-center">Players</td>
-                  <td class="d-none d-md-table-cell">Status</td>
-                  <td></td>
+                  <td class="col">Name</td>
+                  <td class="col text-center">Players</td>
+                  <td class="col d-none d-md-table-cell">Status</td>
+                  <td class="col-auto"></td>
               </tr>
           </thead>
           <tbody>
               <tr v-for="game in activeGames" v-bind:key="game._id">
-                  <td class="col-2">{{game.settings.general.name}}</td>
-                  <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
-                  <td class="d-none d-md-table-cell">{{getGameStatusText(game)}}</td>
-                  <td class="btn-group">
+                  <td class="col">{{game.settings.general.name}}</td>
+                  <td class="col text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                  <td class="col d-none d-md-table-cell">{{getGameStatusText(game)}}</td>
+                  <td class="col-auto btn-group">
                       <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
                       <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">Play</router-link>
                   </td>

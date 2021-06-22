@@ -1,7 +1,7 @@
 <template>
 <div>
   <view-container>
-    <view-title title="Main Menu" :hideHomeButton="true"></view-title>
+    <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
     <div class="row pb-0">
       <div class="col-sm-12 col-md-6 col-lg-5">
