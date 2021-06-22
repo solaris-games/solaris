@@ -30,9 +30,10 @@
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
                           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
                             Play
-                            <span v-if="game.unread" class="ml-1 badge badge-warning">{{game.unread}}</span>
                           </router-link>
                       </div>
+                      <span v-if="game.unread" class="ml-2 badge badge-warning">{{game.unread}}</span>
+                      <span v-if="game.turnWaiting" class="ml-1 badge badge-info">Turn Waiting</span>
                   </td>
               </tr>
           </tbody>
