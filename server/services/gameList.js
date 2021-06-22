@@ -1,5 +1,4 @@
 const moment = require('moment');
-const ConversationService = require('./conversation');
 
 module.exports = class GameListService {
     
