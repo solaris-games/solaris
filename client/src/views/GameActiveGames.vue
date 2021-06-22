@@ -25,9 +25,14 @@
                   <td class="col-2">{{game.settings.general.name}}</td>
                   <td class="text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                   <td class="d-none d-md-table-cell">{{getGameStatusText(game)}}</td>
-                  <td class="btn-group">
-                      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
-                      <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">Play</router-link>
+                  <td>
+                      <div class="btn-group">
+                          <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
+                          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
+                            Play
+                            <span v-if="game.unread" class="ml-1 badge badge-warning">{{game.unread}}</span>
+                          </router-link>
+                      </div>
                   </td>
               </tr>
           </tbody>
