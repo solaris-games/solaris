@@ -22,18 +22,18 @@
           </thead>
           <tbody>
               <tr v-for="game in activeGames" v-bind:key="game._id">
-                  <td class="col">{{game.settings.general.name}}</td>
+                  <td class="col">
+                    {{game.settings.general.name}}
+                    <span v-if="game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
+                    <span v-if="game.unread" class="ml-2 badge badge-info">{{game.unread}} Notifications</span>
+                  </td>
                   <td class="col text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                   <td class="col d-none d-md-table-cell">{{getGameStatusText(game)}}</td>
-                  <td class="col-auto">
-                      <div class="btn-group">
-                          <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
-                          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
-                            Play
-                          </router-link>
-                      </div>
-                      <span v-if="game.unread" class="ml-2 badge badge-warning">{{game.unread}}</span>
-                      <span v-if="game.turnWaiting" class="ml-1 badge badge-info">Turn Waiting</span>
+                  <td class="col-auto btn-group">
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
+                    <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
+                      Play
+                    </router-link>
                   </td>
               </tr>
           </tbody>
