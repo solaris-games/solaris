@@ -1,28 +1,32 @@
 <template>
 <div class="row bg-primary pt-2 pb-2" v-if="selectedTechnology">
-    <div class="col">
-        <p class="mb-2">Give this player Technology. (Costs <span class="text-warning">${{getTradeCost()}}</span> per tech level)</p>
+  <div class="col-12">
+    <form-error-list v-bind:errors="errors"/>
+  </div>
 
-        <form>
-            <div class="form-row">
-                <div class="col-7">
-                    <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
-                        <option v-for="opt in availableTechnologies" v-bind:key="opt.name + opt.level" v-bind:value="opt">
-                            {{ getTechnologyFriendlyName(opt.name) }} {{opt.level}} (${{opt.cost}})
-                        </option>
-                    </select>
-                </div>
-                <div class="col-5">
-                    <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
-                      :disabled="$isHistoricalMode() || isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
-                </div>
-            </div>
-        </form>
-    </div>
+  <div class="col-12">
+    <p class="mb-2">Give this player Technology. (Costs <span class="text-warning">${{getTradeCost()}}</span> per tech level)</p>
 
-    <dialogModal modalName="shareTechnologyModal" titleText="Share Technology" cancelText="No" confirmText="Yes" @onConfirm="confirmSendTechnology">
-      <p>Are you sure you want to share <b>{{selectedTechnology.name}}</b> (level {{selectedTechnology.level}}) with <b>{{player.alias}}</b>?</p>
-    </dialogModal>
+    <form>
+      <div class="form-row">
+        <div class="col-7">
+          <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
+            <option v-for="opt in availableTechnologies" v-bind:key="opt.name + opt.level" v-bind:value="opt">
+              {{ getTechnologyFriendlyName(opt.name) }} {{opt.level}} (${{opt.cost}})
+            </option>
+          </select>
+        </div>
+        <div class="col-5">
+          <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
+            :disabled="$isHistoricalMode() || isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <dialogModal modalName="shareTechnologyModal" titleText="Share Technology" cancelText="No" confirmText="Yes" @onConfirm="confirmSendTechnology">
+    <p>Are you sure you want to share <b>{{selectedTechnology.name}}</b> (level {{selectedTechnology.level}}) with <b>{{player.alias}}</b>?</p>
+  </dialogModal>
 </div>
 </template>
 
@@ -32,6 +36,7 @@ import DialogModal from '../../modal/DialogModal'
 import TradeApiService from '../../../services/api/trade'
 import TechnologyHelper from '../../../services/technologyHelper'
 import gameHelper from '../../../services/gameHelper'
+import FormErrorList from '../../FormErrorList.vue'
 
 export default {
   props: {
@@ -39,10 +44,12 @@ export default {
   },
   components: {
     'modalButton': ModalButton,
-    'dialogModal': DialogModal
+    'dialogModal': DialogModal,
+    'form-error-list': FormErrorList
   },
   data () {
     return {
+      errors: [],
       isSendingTech: false,
       player: null,
       userPlayer: null,
@@ -79,6 +86,7 @@ export default {
       }
     },
     async confirmSendTechnology () {
+      this.errors = []
       this.isSendingTech = true
 
       try {
@@ -98,7 +106,7 @@ export default {
           this.getTradeableTechnologies()
         }
       } catch (err) {
-        console.error(err)
+        this.errors = err.response.data.errors || []
       }
 
       this.isSendingTech = false

@@ -3,9 +3,17 @@
     <div class="col">
         <h3 class="mb-0">{{ title }}</h3>
     </div>
-    <div class="col-auto" v-if="!hideHomeButton">
+    <div class="col-auto">
         <slot></slot>
-        <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info ml-1"><i v-bind:class="'fas fa-' + icon"></i></button>
+        <a v-if="showSocialLinks" class="btn btn-secondary" href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
+          <i class="fab fa-discord"></i>
+          <span class="d-none d-md-inline-block ml-1">Discord</span>
+        </a>
+        <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://forum.solaris.games" target="_blank" title="Forum">
+          <i class="far fa-comments"></i>
+          <span class="d-none d-md-inline-block ml-1">Forum</span>
+        </a>
+        <button v-if="navigation && !hideHomeButton" @click="navigate" id="btnHome" class="btn btn-info ml-1"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
 </div>
 </template>
@@ -18,7 +26,8 @@ export default {
     title: String,
     navigation: { type: String, default: 'main-menu' },
     icon: { type: String, default: 'home' },
-    hideHomeButton: Boolean
+    hideHomeButton: Boolean,
+    showSocialLinks: Boolean
   },
   methods: {
     navigate () {

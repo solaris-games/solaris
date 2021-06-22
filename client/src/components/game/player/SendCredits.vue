@@ -1,26 +1,30 @@
 <template>
 <div class="row bg-secondary pt-2 pb-2">
-    <div class="col">
-        <p class="mb-2">Give this player <strong>Credits</strong>. (You have <span class="text-warning">${{userPlayer.credits}}</span>)</p>
+  <div class="col-12">
+    <form-error-list v-bind:errors="errors"/>
+  </div>
 
-        <form>
-            <div class="form-row">
-                <div class="col-7 input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">$</span>
-                  </div>
-                  <input type="number" class="form-control" v-model="amount"/>
-                </div>
-                <div class="col-5">
-                    <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits"><i class="fas fa-paper-plane"></i> Send</modalButton>
-                </div>
-            </div>
-        </form>
-    </div>
+  <div class="col-12">
+    <p class="mb-2">Give this player <strong>Credits</strong>. (You have <span class="text-warning">${{userPlayer.credits}}</span>)</p>
 
-    <dialogModal modalName="sendCreditsModal" titleText="Send Credits" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
-      <p>Are you sure you want to send <b>${{amount}}</b> to <b>{{player.alias}}</b>?</p>
-    </dialogModal>
+    <form>
+      <div class="form-row">
+        <div class="col-7 input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">$</span>
+          </div>
+          <input type="number" class="form-control" v-model="amount"/>
+        </div>
+        <div class="col-5">
+          <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits"><i class="fas fa-paper-plane"></i> Send</modalButton>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <dialogModal modalName="sendCreditsModal" titleText="Send Credits" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
+    <p>Are you sure you want to send <b>${{amount}}</b> to <b>{{player.alias}}</b>?</p>
+  </dialogModal>
 </div>
 </template>
 
@@ -28,6 +32,7 @@
 import tradeService from '../../../services/api/trade'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
+import FormErrorList from '../../FormErrorList.vue'
 
 export default {
   props: {
@@ -36,16 +41,19 @@ export default {
   },
   components: {
     'modalButton': ModalButton,
-    'dialogModal': DialogModal
+    'dialogModal': DialogModal,
+    'form-error-list': FormErrorList
   },
   data () {
     return {
+      errors: [],
       isSendingCredits: false,
       amount: 0
     }
   },
   methods: {
     async confirmSendCredits () {
+      this.errors = []
       this.isSendingCredits = true
 
       try {
@@ -62,7 +70,7 @@ export default {
           this.player.reputation = response.data.reputation
         }
       } catch (err) {
-        console.error(err)
+        this.errors = err.response.data.errors || []
       }
 
       this.isSendingCredits = false

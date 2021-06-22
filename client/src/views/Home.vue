@@ -1,10 +1,6 @@
 <template>
   <view-container :hideTopBar="true">
-    <div class="row bg-primary pt-3 pb-2 mb-2">
-      <div class="col">
-          <h3>Welcome to Solaris</h3>
-      </div>
-    </div>
+    <view-title title="Welcome to Solaris" :hideHomeButton="true" :showSocialLinks="true" />
 
     <div class="row">
       <div class="col-sm-12 col-md-6 pb-3">
@@ -30,6 +26,7 @@
 
 <script>
 import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle'
 import AccountLoginVue from './AccountLogin'
 import ApiAuthService from '../services/api/auth'
 import router from '../router'
@@ -38,6 +35,7 @@ import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 export default {
   components: {
     'view-container': ViewContainer,
+    'view-title': ViewTitle,
     'account-login': AccountLoginVue,
     'loading-spinner': LoadingSpinnerVue
   },
