@@ -77,6 +77,7 @@ module.exports = class GameListService {
             const unreadEvents = await this.eventService.getUnreadCount(game, playerId);
 
             return {
+                _id: game._id,
                 settings: game.settings,
                 state: game.state,
                 unread: unreadConversations + unreadEvents
