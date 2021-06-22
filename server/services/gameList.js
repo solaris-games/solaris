@@ -97,7 +97,7 @@ module.exports = class GameListService {
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
-            state: $filter
+            state: 1
         })
         .lean({ defaults: true })
         .exec();
