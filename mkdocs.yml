@@ -10,6 +10,7 @@ repo_url: 'https://github.com/mike-eason/solaris'
 
 nav:
   - Welcome: 'index.md'
+  - 'guide.md'
   - 'overview.md'
   - 'infrastructure.md'
   - 'technologies.md'
