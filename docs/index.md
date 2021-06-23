@@ -1,4 +1,4 @@
-# Welcome
+# The Solaris Wiki
 
 This is the official wiki for Solaris.
 

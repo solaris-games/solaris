@@ -7,3 +7,9 @@ extra_css: [
 ]
 
 repo_url: 'https://github.com/mike-eason/solaris'
+
+nav:
+  - Welcome: 'index.md'
+  - 'overview.md'
+  - 'infrastructure.md'
+  - 'technologies.md'
