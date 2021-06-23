@@ -1,7 +1,5 @@
 site_name: Solaris Wiki
 
-docs_dir: wiki/
-
 theme: readthedocs
 
 extra_css: [
