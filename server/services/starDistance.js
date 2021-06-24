@@ -148,11 +148,11 @@ module.exports = class StarDistanceService {
     getClosestStarsFromLocation(loc, stars, amount){
         let sorted = stars
         .sort((a, b) => {
-            return this.getDistanceBetweenStarAndLocation(b, loc)
-                - this.getDistanceBetweenStarAndLocation(a, loc);
+            return this.getDistanceBetweenStarAndLocation(a, loc)
+                - this.getDistanceBetweenStarAndLocation(b, loc);
         });
     
-    return sorted.slice(0, amount); 
+        return sorted.slice(0, amount); 
     }
 
     getFurthestStarFromLocation(loc, stars){
@@ -162,11 +162,11 @@ module.exports = class StarDistanceService {
     getFurthestStarsFromLocation(loc, stars, amount){
         let sorted = stars
         .sort((a, b) => {
-            return this.getDistanceBetweenStarAndLocation(a, loc)
-                - this.getDistanceBetweenStarAndLocation(b, loc);
+            return this.getDistanceBetweenStarAndLocation(b, loc)
+                - this.getDistanceBetweenStarAndLocation(a, loc);
         });
     
-    return sorted.slice(0, amount);
+        return sorted.slice(0, amount);
     }
     
 };

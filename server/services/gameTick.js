@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, starDistanceService) {
         super();
             
         this.distanceService = distanceService;
@@ -25,6 +25,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.reputationService = reputationService;
         this.aiService = aiService;
         this.emailService = emailService;
+        this.starDistanceService = starDistanceService;
     }
 
     async tick(gameId) {
@@ -394,7 +395,27 @@ module.exports = class GameTickService extends EventEmitter {
                 });
             }
 
+            // Destroy stars for battle royale mode.
+            if (game.settings.general.mode === 'battleRoyale') {
+                this._battleRoyaleKillStars(game);
+            }
+
             await this.emailService.sendGameCycleSummaryEmail(game);
+        }
+    }
+
+    _battleRoyaleKillStars(game) {
+        let aliveStars = game.galaxy.stars.filter(s => !this.starService.isDeadStar(s));
+
+        // Let players battle it out on last remaining stars.
+        if (aliveStars.length <= game.galaxy.players.length) {
+            return;
+        }
+
+        let starsToKill = this.starDistanceService.getFurthestStarsFromLocation({x: 0, y: 0}, aliveStars, game.galaxy.players.length);
+
+        for (let star of starsToKill) {
+            this.starService.killStar(star);
         }
     }
 

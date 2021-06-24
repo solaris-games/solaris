@@ -339,6 +339,14 @@ module.exports = class StarService extends EventEmitter {
         }
     }
 
+    killStar(star) {
+        if (this.isDeadStar(star)) {
+            throw new Error('The star has already been destroyed.');
+        }
+
+        star.naturalResources = 0;
+    }
+
     produceShips(game) {
         let starsToProduce = game.galaxy.stars.filter(s => s.infrastructure.industry > 0);
 
