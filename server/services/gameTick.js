@@ -407,12 +407,17 @@ module.exports = class GameTickService extends EventEmitter {
     _battleRoyaleKillStars(game) {
         let aliveStars = game.galaxy.stars.filter(s => !this.starService.isDeadStar(s));
 
-        // Let players battle it out on last remaining stars.
-        if (aliveStars.length <= game.galaxy.players.length) {
+        // Let players battle it out on last remaining stars or wait with removing them untill Peace Time has passed.
+        var PeaceTime = 3;
+        if (aliveStars.length <= game.galaxy.players.length || game.state.productionTick - PeaceTime - 1 <= 0) {
             return;
         }
 
-        let starsToKill = this.starDistanceService.getFurthestStarsFromLocation({x: 0, y: 0}, aliveStars, game.galaxy.players.length);
+        let starCountToKill = Math.ceil(0.1*(game.settings.galaxy.starsPerPlayer-1)*(1.5-(game.state.productionTick - PeaceTime - 1)/(game.settings.general.playerLimit*10)));
+        if(starCountToKill >= game.settings.general.playerLimit - aliveStars.length){
+            starCountToKill = game.settings.general.playerLimit - aliveStars.length;
+        }
+        let starsToKill = this.starDistanceService.getFurthestStarsFromLocation({x: 0, y: 0}, starCountToKill);
 
         for (let star of starsToKill) {
             this.starService.killStar(star);
