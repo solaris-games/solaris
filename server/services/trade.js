@@ -49,7 +49,7 @@ module.exports = class TradeService extends EventEmitter {
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.credits < amount) {
-            throw new ValidationError(`The player does not own ${amount} credits.`);
+            throw new ValidationError(`You not own ${amount} credits.`);
         }
 
         let dbWrites = [
@@ -106,8 +106,8 @@ module.exports = class TradeService extends EventEmitter {
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
-        if (fromPlayer.credits < amount) {
-            throw new ValidationError(`The player does not own ${amount} specialist tokens.`);
+        if (fromPlayer.creditsSpecialists < amount) {
+            throw new ValidationError(`You not own ${amount} specialist tokens.`);
         }
 
         let dbWrites = [
@@ -162,7 +162,7 @@ module.exports = class TradeService extends EventEmitter {
         }
 
         if (fromPlayer.renownToGive < amount) {
-            throw new ValidationError(`The player does not own ${amount} renown to award.`);
+            throw new ValidationError(`You do not have ${amount} renown to award.`);
         }
 
         if (!toPlayer.userId) {
@@ -231,11 +231,11 @@ module.exports = class TradeService extends EventEmitter {
         let toPlayerTech = toPlayer.research[tradeTech.name];
 
         if (toPlayerTech.level >= tradeTech.level) {
-            throw new ValidationError(`The player already owns technology ${technology} level ${tradeTech.level} or greater.`);
+            throw new ValidationError(`The recipient already owns technology ${technology} level ${tradeTech.level} or greater.`);
         }
 
         if (fromPlayer.credits < tradeTech.cost) {
-            throw new ValidationError('The player cannot afford to trade this technology.');
+            throw new ValidationError('You cannot afford to trade this technology.');
         }
 
         let levelDifference = tradeTech.level - toPlayerTech.level;
