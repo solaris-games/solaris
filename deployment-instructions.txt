@@ -1,0 +1,5 @@
+db.games.updateMany({}, {
+    $set: {
+        'settings.general.mode': 'conquest'
+    }
+});

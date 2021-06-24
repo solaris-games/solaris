@@ -22,6 +22,15 @@
       </div>
 
       <div class="form-group">
+        <label for="mode" class="col-form-label">Mode</label>
+        <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame">
+          <option v-for="opt in options.general.mode" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.general.mode === 'conquest'">
         <label for="starsForVictory" class="col-form-label">Stars For Victory</label>
         <select class="form-control" id="starsForVictory" v-model="settings.general.starVictoryPercentage" :disabled="isCreatingGame">
           <option v-for="opt in options.general.starVictoryPercentage" v-bind:key="opt" v-bind:value="opt">

@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Learn with other new players how to play the game. When you're ready, join a standard game to test your mettle.",
     "type": "new_player_rt",
+    "mode": "conquest",
     "password": null,
     "starVictoryPercentage": 66,
     "playerLimit": 4,

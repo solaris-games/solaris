@@ -16,6 +16,9 @@ const schema = new Schema({
 			type: { type: Types.String, required: true, enum: [
 				'custom', 'standard_rt', 'standard_tb', 'standard_dark_rt', 'standard_dark_tb', '1v1_rt', '1v1_tb', 'new_player_rt', 'new_player_tb', '32_player_rt'
 			], default: 'custom' },
+			mode: { type: Types.String, required: true, enum: [
+				'conquest', 'battleRoyale'
+			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
