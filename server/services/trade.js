@@ -6,7 +6,7 @@ module.exports = class TradeService extends EventEmitter {
 
     constructor(gameModel, userService, playerService, ledgerService, achievementService, reputationService) {
         super();
-        
+
         this.gameModel = gameModel;
         this.userService = userService;
         this.playerService = playerService;
@@ -16,11 +16,11 @@ module.exports = class TradeService extends EventEmitter {
     }
 
     // TODO: Specialist token trading
-    
+
     isTradingCreditsDisabled(game) {
         return game.settings.player.tradeCredits === false;
     }
-    
+
     isTradingCreditsSpecialistsDisabled(game) {
         return game.settings.player.tradeCreditsSpecialists === false;
     }
@@ -38,7 +38,7 @@ module.exports = class TradeService extends EventEmitter {
         if (!game.state.startDate) {
             throw new ValidationError(`Cannot trade credits, the game has not started yet.`);
         }
-        
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
@@ -68,7 +68,7 @@ module.exports = class TradeService extends EventEmitter {
         if (!toPlayer.defeated && toPlayer.userId) {
             await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
         }
-        
+
         let reputation = await this.reputationService.tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount);
 
         let eventObject = {
@@ -96,7 +96,7 @@ module.exports = class TradeService extends EventEmitter {
         if (!game.state.startDate) {
             throw new ValidationError(`Cannot trade specialist tokens, the game has not started yet.`);
         }
-        
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
@@ -107,7 +107,11 @@ module.exports = class TradeService extends EventEmitter {
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.creditsSpecialists < amount) {
+<<<<<<< HEAD
             throw new ValidationError(`You not own ${amount} specialist tokens.`);
+=======
+            throw new ValidationError(`You do not own ${amount} specialist tokens.`);
+>>>>>>> e07bcf38bca795db11bc17dc8a27a76917e01208
         }
 
         let dbWrites = [
@@ -124,7 +128,7 @@ module.exports = class TradeService extends EventEmitter {
         if (!toPlayer.defeated && toPlayer.userId) {
             await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
         }
-        
+
         let reputation = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount);
 
         let eventObject = {
@@ -227,7 +231,7 @@ module.exports = class TradeService extends EventEmitter {
         if (!tradeTech) {
             throw new ValidationError(`The technology ${technology} cannot be traded with this player.`);
         }
-        
+
         let toPlayerTech = toPlayer.research[tradeTech.name];
 
         if (toPlayerTech.level >= tradeTech.level) {
@@ -243,7 +247,7 @@ module.exports = class TradeService extends EventEmitter {
         // toPlayerTech.level = tradeTech.level;
         // toPlayerTech.progress = 0;
         // fromPlayer.credits -= tradeTech.cost;
-        
+
         let updateResearchQuery = {};
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.level'] = tradeTech.level;
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
@@ -310,7 +314,7 @@ module.exports = class TradeService extends EventEmitter {
         if (fromPlayer._id.equals(toPlayer._id)) {
             throw new ValidationError('Cannot trade with the same player');
         }
-        
+
         // Get all of the technologies that the from player has that have a higher
         // level than the to player.
         let techKeys = Object.keys(fromPlayer.research)
@@ -344,7 +348,7 @@ module.exports = class TradeService extends EventEmitter {
     _tradeScanningCheck(game, fromPlayer, toPlayer) {
         if (game.settings.player.tradeScanning === 'scanned') {
             let isInRange = this.playerService.isInScanningRangeOfPlayer(game, fromPlayer, toPlayer);
-    
+
             if (!isInRange) {
                 throw new ValidationError(`You cannot trade with this player, they are not within scanning range.`);
             }
