@@ -159,10 +159,12 @@ module.exports = class LeaderboardService {
     }
 
     getGameWinner(game) {
-        let starWinner = this.getStarCountWinner(game);
-
-        if (starWinner) {
-            return starWinner;
+        if (game.settings.general.mode === 'conquest') {
+            let starWinner = this.getStarCountWinner(game);
+    
+            if (starWinner) {
+                return starWinner;
+            }
         }
 
         let lastManStanding = this.getLastManStanding(game);

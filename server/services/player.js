@@ -441,8 +441,15 @@ module.exports = class PlayerService extends EventEmitter {
         let totalStarSpecialists = this.calculateTotalStarSpecialists(playerStars);
         let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
+        let totalStars = playerStars.length;
+
+        // In BR mode, the player star count is based on living stars only.
+        if (game.settings.general.mode === 'battleRoyale') {
+            totalStars = playerStars.filter(s => !this.starService.isDeadStar(s)).length;
+        }
+
         return {
-            totalStars: playerStars.length,
+            totalStars: totalStars,
             totalCarriers: playerCarriers.length,
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
             totalEconomy: this.calculateTotalEconomy(playerStars),
