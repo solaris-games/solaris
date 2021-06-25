@@ -39,6 +39,10 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot trade credits, the game has not started yet.`);
         }
 
+        if (amount <= 0) {
+            throw new ValidationError(`Amount must be greater than 0.`);
+        }
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
@@ -97,6 +101,10 @@ module.exports = class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot trade specialist tokens, the game has not started yet.`);
         }
 
+        if (amount <= 0) {
+            throw new ValidationError(`Amount must be greater than 0.`);
+        }
+
         // Get the players.
         let toPlayer = this.playerService.getById(game, toPlayerId);
 
@@ -107,11 +115,7 @@ module.exports = class TradeService extends EventEmitter {
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.creditsSpecialists < amount) {
-<<<<<<< HEAD
-            throw new ValidationError(`You not own ${amount} specialist tokens.`);
-=======
             throw new ValidationError(`You do not own ${amount} specialist tokens.`);
->>>>>>> e07bcf38bca795db11bc17dc8a27a76917e01208
         }
 
         let dbWrites = [
@@ -151,6 +155,10 @@ module.exports = class TradeService extends EventEmitter {
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.state.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
+        }
+
+        if (amount <= 0) {
+            throw new ValidationError(`Amount must be greater than 0.`);
         }
 
         // If its a anonymous game, then do not allow renown to be sent until the game ends.
