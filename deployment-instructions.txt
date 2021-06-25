@@ -3,3 +3,45 @@ db.games.updateMany({}, {
         'settings.general.mode': 'conquest'
     }
 });
+
+// TODO: All this needs testing:
+
+let stars = {};
+
+let games = db.games.find({}, {
+    'galaxy.stars._id': 1,
+    'galaxy.stars.name': 1
+});
+
+games.forEach(function(game) {
+    game.galaxy.stars.forEach(function(star) {
+        stars[star._id.toString()] = star.name;
+    });
+});
+
+db.gameevents.find({
+    'data.starId': { $ne: null },
+    'data.starName': { $eq: null }
+}).forEach(function(gameEvent) {
+    let star = stars[gameEvent.data.starId.toString()];
+
+    if (star) {
+        gameEvent.data.starName = star.name;
+
+        db.gameevents.save(gameEvent);
+    }
+});
+
+db.gameevents.find({
+    'type': 'playerBulkInfrastructureUpgraded'
+}).forEach(function(gameEvent) {
+    gameEvent.data.upgradeReport.stars.forEach(function(upgradeStar) {
+        let star = stars[upgradeStar.starId.toString()];
+
+        if (star) {
+            upgradeStar.starName = star.name;
+        }
+    });
+
+    db.gameevents.save(gameEvent);
+});

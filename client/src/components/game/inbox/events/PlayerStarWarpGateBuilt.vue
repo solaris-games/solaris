@@ -1,14 +1,12 @@
 <template>
 <div v-if="star">
   <p>
-      A warp gate has been built at <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
+      A warp gate has been built at <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
   </p>
 </div>
 </template>
 
 <script>
-import GameHelper from '../../../../services/gameHelper'
-
 export default {
   components: {
 
@@ -16,17 +14,9 @@ export default {
   props: {
     event: Object
   },
-  data () {
-    return {
-      star: null
-    }
-  },
-  mounted () {
-    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
-  },
   methods: {
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star._id)
+      this.$emit('onOpenStarDetailRequested', this.event.data.starId)
     }
   }
 }

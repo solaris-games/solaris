@@ -6,7 +6,7 @@ module.exports = class GameGalaxyService {
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService, historyService) {
+        guildUserService, historyService, battleRoyaleService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -23,6 +23,7 @@ module.exports = class GameGalaxyService {
         this.reputationService = reputationService;
         this.guildUserService = guildUserService;
         this.historyService = historyService;
+        this.battleRoyaleService = battleRoyaleService;
     }
 
     async getGalaxy(gameId, userId, tick) {
@@ -87,6 +88,10 @@ module.exports = class GameGalaxyService {
         // TODO: Better to not overwrite, but just not do it above in the first place.
         if (this.gameService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
+        }
+
+        if (this.gameService.isBattleRoyaleMode(game)) {
+            this._appendStarsPendingDestructionFlag(game);
         }
 
         if (isHistorical && cached) {
@@ -564,6 +569,14 @@ module.exports = class GameGalaxyService {
         if (isHistorical) {
             game.state.tick = history.tick
             game.state.productionTick = history.productionTick
+        }
+    }
+
+    _appendStarsPendingDestructionFlag(game) {
+        let pendingStars = this.battleRoyaleService.getStarsToDestroy(game);
+
+        for (let pendingStar of pendingStars) {
+            pendingStar.targeted = true;
         }
     }
 

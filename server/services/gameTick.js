@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, starDistanceService, mapService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService) {
         super();
             
         this.distanceService = distanceService;
@@ -25,8 +25,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.reputationService = reputationService;
         this.aiService = aiService;
         this.emailService = emailService;
-        this.starDistanceService = starDistanceService;
-        this.mapService = mapService;
+        this.battleRoyaleService = battleRoyaleService;
     }
 
     async tick(gameId) {
@@ -398,33 +397,10 @@ module.exports = class GameTickService extends EventEmitter {
 
             // Destroy stars for battle royale mode.
             if (game.settings.general.mode === 'battleRoyale') {
-                this._battleRoyaleKillStars(game);
+                this.battleRoyaleService.performBattleRoyaleTick(game);
             }
 
             await this.emailService.sendGameCycleSummaryEmail(game);
-        }
-    }
-
-    _battleRoyaleKillStars(game) {
-        let aliveStars = game.galaxy.stars.filter(s => !this.starService.isDeadStar(s));
-
-        // Let players battle it out on last remaining stars or wait with removing them until peace time has passed.
-        const peaceCycles = 3;
-
-        if (aliveStars.length <= game.galaxy.players.length || game.state.productionTick < peaceCycles - 1) {
-            return;
-        }
-
-        // Calculate which stars need to be killed.
-        let galaxyCenter = this.mapService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
-        let starCountToKill = Math.ceil(0.1 * (game.settings.galaxy.starsPerPlayer - 1) * (1.5 - (game.state.productionTick - peaceCycles - 1) / (game.settings.general.playerLimit * 10)));
-
-        starCountToKill = Math.min(starCountToKill, game.settings.general.playerLimit - aliveStars.length);
-        
-        let starsToKill = this.starDistanceService.getFurthestStarsFromLocation(galaxyCenter, starCountToKill);
-
-        for (let star of starsToKill) {
-            this.starService.killStar(star);
         }
     }
 

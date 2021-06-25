@@ -19,6 +19,7 @@
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
+        <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
       </div>
     </div>
     

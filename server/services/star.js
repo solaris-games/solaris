@@ -339,12 +339,15 @@ module.exports = class StarService extends EventEmitter {
         }
     }
 
-    killStar(star) {
-        if (this.isDeadStar(star)) {
-            throw new Error('The star has already been destroyed.');
-        }
+    destroyStar(game, star) {
+        game.galaxy.stars.splice(game.galaxy.stars.indexOf(star), 1);
 
-        star.naturalResources = 0;
+        game.state.stars--;
+
+        // Recalculate how many stars are needed for victory in conquest mode.
+        if (game.settings.general.mode === 'conquest') {
+            game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+        }
     }
 
     produceShips(game) {

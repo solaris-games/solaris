@@ -493,6 +493,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         if (!summaryStar) {
             summaryStar = {
                 starId: upgradeStar.star._id,
+                starName: upgradeStar.star.name,
                 naturalResources: upgradeStar.star.naturalResources,
                 infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
                 infrastructureCostTotal: 0

@@ -458,5 +458,12 @@ module.exports = class CarrierService {
     isLaunching(carrier) {
         return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
     }
+
+    destroyCarrier(game, carrier) {
+        game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
+    }
     
+    getCarriersEnRouteToStar(game, star) {
+        return game.galaxy.carriers.filter(c => this.isInTransit(c) && c.waypoints[0].destination.equals(star._id));
+    }
 };

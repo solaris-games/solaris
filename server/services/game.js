@@ -466,6 +466,10 @@ module.exports = class GameService extends EventEmitter {
     isDarkModeExtra(game) {
         return game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
+
+    isBattleRoyaleMode(game) {
+        return game.settings.general.mode === 'battleRoyale';
+    }
     
     async quitAllActiveGames(userId) {
         let allGames = await this.gameModel.find({
