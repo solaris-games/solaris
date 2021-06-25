@@ -99,7 +99,7 @@ module.exports = (config, io) => {
     const historyService = new HistoryService(HistoryModel, playerService, gameService);
     const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, starDistanceService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, starDistanceService, mapService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);
     
