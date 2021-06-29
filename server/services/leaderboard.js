@@ -83,6 +83,12 @@ module.exports = class LeaderboardService {
             if (a.stats.totalCarriers > b.stats.totalCarriers) return -1;
             if (a.stats.totalCarriers < b.stats.totalCarriers) return 1;
 
+            // Then by defeated date descending
+            if (a.defeated && b.defeated) {
+                if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1;
+                if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1;
+            }
+
             return 0; // Both are equal
         }
 
@@ -159,10 +165,12 @@ module.exports = class LeaderboardService {
     }
 
     getGameWinner(game) {
-        let starWinner = this.getStarCountWinner(game);
-
-        if (starWinner) {
-            return starWinner;
+        if (game.settings.general.mode === 'conquest') {
+            let starWinner = this.getStarCountWinner(game);
+    
+            if (starWinner) {
+                return starWinner;
+            }
         }
 
         let lastManStanding = this.getLastManStanding(game);

@@ -3,7 +3,7 @@
         {
             "id": 1,
             "name": "Admiral",
-            "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the Carrier.",
+            "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
@@ -17,7 +17,7 @@
         {
             "id": 2,
             "name": "Lieutenant",
-            "description": "Grants +1 Weapons, -1 Hyperspace Range to the Carrier.",
+            "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
             "modifiers": {
@@ -30,7 +30,7 @@
         {
             "id": 3,
             "name": "Colonel",
-            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the Carrier.",
+            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
@@ -44,7 +44,7 @@
         {
             "id": 4,
             "name": "General",
-            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the Carrier.",
+            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "modifiers": {
@@ -58,7 +58,7 @@
         {
             "id": 5,
             "name": "Smuggler",
-            "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the Carrier.",
+            "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "modifiers": {
@@ -72,7 +72,7 @@
         {
             "id": 6,
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -3 Weapons to the Carrier.",
+            "description": "Grants +3 Hyperspace Range, -3 Weapons to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
@@ -85,7 +85,7 @@
         {
             "id": 7,
             "name": "Destroyer",
-            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the Carrier.",
+            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the carrier.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "modifiers": {
@@ -99,7 +99,7 @@
         {
             "id": 8,
             "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships the Carrier has. -1 Weapons.",
+            "description": "Prevents other players from seeing how many ships the carrier has. -1 Weapons.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
@@ -169,7 +169,7 @@
         {
             "id": 13,
             "name": "Pirate",
-            "description": "Grants +3 Weapons in Carrier-to-Carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
+            "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "modifiers": {
@@ -187,7 +187,7 @@
         {
             "id": 14,
             "name": "Pathfinder",
-            "description": "Grants +1 Hyperspace Range to the Carrier.",
+            "description": "Grants +1 Hyperspace Range to the carrier.",
             "baseCostCredits": 50,
             "baseCostCreditsSpecialists": 1,
             "modifiers": {
@@ -210,6 +210,22 @@
                 },
                 "special": {
                     "avoidCombatCarrierToCarrier": true
+                }
+            }
+        },
+        {
+            "id": 16,
+            "name": "Stellar Bomb",
+            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed to the carrier.",
+            "baseCostCredits": 500,
+            "baseCostCreditsSpecialists": 5,
+            "modifiers": {
+                "local": {
+                    "speed": 0.5
+                },
+                "special": {
+                    "reigniteDeadStar": true,
+                    "reigniteDeadStarNaturalResources": 10
                 }
             }
         }

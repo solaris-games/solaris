@@ -3,6 +3,7 @@
         "name": null,
         "description": null,
         "type": "custom",
+        "mode": "conquest",
         "password": null,
         "starVictoryPercentage": 50,
         "playerLimit": 8,

@@ -223,6 +223,7 @@ module.exports = class GameService extends EventEmitter {
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
         player.defeated = false;
+        player.defeatedDate = null;
         player.afk = false;
         player.missedTurns = 0;
         player.hasSentTurnReminder = false;
@@ -465,6 +466,10 @@ module.exports = class GameService extends EventEmitter {
 
     isDarkModeExtra(game) {
         return game.settings.specialGalaxy.darkGalaxy === 'extra';
+    }
+
+    isBattleRoyaleMode(game) {
+        return game.settings.general.mode === 'battleRoyale';
     }
     
     async quitAllActiveGames(userId) {

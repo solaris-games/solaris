@@ -386,6 +386,15 @@ module.exports = class CarrierService {
             await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
         }
 
+        // Reignite dead stars if applicable
+        if (this.starService.isDeadStar(destinationStar) && !carrier.isGift && this.specialistService.getReigniteDeadStar(carrier)) {
+            let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
+
+            this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
+
+            carrier.specialistId = null;
+        }
+
         // If the star is owned by another player, then perform combat.
         if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
             // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
@@ -458,5 +467,12 @@ module.exports = class CarrierService {
     isLaunching(carrier) {
         return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
     }
+
+    destroyCarrier(game, carrier) {
+        game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
+    }
     
+    getCarriersEnRouteToStar(game, star) {
+        return game.galaxy.carriers.filter(c => this.isInTransit(c) && c.waypoints[0].destination.equals(star._id));
+    }
 };

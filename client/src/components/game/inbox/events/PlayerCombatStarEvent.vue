@@ -1,8 +1,8 @@
 <template>
-    <div v-if="star">
+    <div>
         <p>
             Your forces have engaged the enemy in <span class="text-warning">carrier-to-star</span> combat at
-            <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
+            <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
         </p>
         <div class="table-responsive mt-2">
             <table class="table table-sm" v-if="event">
@@ -22,9 +22,9 @@
                     <tr>
                         <td>
                             <i class="fas fa-star mr-2"></i>
-                            <span :style="{ 'color': getStarColour() }" v-if="star" class="name-and-icon">
+                            <span :style="{ 'color': getStarColour() }" class="name-and-icon">
                               <player-icon-shape :filled="true" :shape="getStarShape()" :iconColour="getStarColour()" />
-                              {{star.name}}
+                              {{event.data.starName}}
                             </span>
                             <span v-if="event.data.combatResult.star.specialist" :title="event.data.combatResult.star.specialist.description"> ({{event.data.combatResult.star.specialist.name}})</span>
                         </td>
@@ -85,7 +85,6 @@ export default {
     return {
       defender: null,
       attackers: [],
-      star: null,
       defenderCarriers: [],
       attackerCarriers: []
     }
@@ -93,14 +92,13 @@ export default {
   mounted () {
     this.defender = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender)
     this.attackers = this.event.data.playerIdAttackers.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
-    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
 
     this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId === this.event.data.playerIdDefender)
     this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId !== this.event.data.playerIdDefender)
   },
   methods: {
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star._id)
+      this.$emit('onOpenStarDetailRequested', this.event.data.starId)
     },
     getCarrierColour (carrier) {
       return GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)
@@ -108,7 +106,7 @@ export default {
     getCarrierShape (carrier) {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
     },
-    getStarColour (starId) {
+    getStarColour () {
       return GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdDefender)
     },
     getStarShape () {

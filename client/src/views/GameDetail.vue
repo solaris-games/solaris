@@ -19,6 +19,10 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
+              <td>Mode</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
+            </tr>
+            <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Stars For Victory</td>
               <td class="text-right">{{ game.settings.general.starVictoryPercentage }}%</td>
             </tr>
@@ -400,7 +404,9 @@ export default {
         'visible': 'Visible',
         'experimental': 'Experimental',
         'credits': 'Credits',
-        'creditsSpecialists': 'Specialist Tokens'
+        'creditsSpecialists': 'Specialist Tokens',
+        'conquest': 'Conquest',
+        'battleRoyale': 'Battle Royale'
       }[option]
 
       return text || option

@@ -23,10 +23,10 @@
                 </a>
             </div>
             <div class="col-auto">
-                <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="text-warning">
+                <!-- <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="text-warning">
                   <i class="fas fa-coffee"></i>
                   Donate
-                </a>
+                </a> -->
             </div>
           </div>
         </footer>

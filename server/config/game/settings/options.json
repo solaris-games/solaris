@@ -1,5 +1,15 @@
 {
     "general": {
+        "mode": [
+            {
+                "value": "conquest",
+                "text": "Conquest"
+            },
+            {
+                "value": "battleRoyale",
+                "text": "Battle Royale"
+            }
+        ],
         "starVictoryPercentage": [
             25,
             33,

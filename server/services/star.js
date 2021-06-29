@@ -339,6 +339,25 @@ module.exports = class StarService extends EventEmitter {
         }
     }
 
+    reigniteDeadStar(star, naturalResources) {
+        if (!this.isDeadStar(star)) {
+            throw new Error('The star cannot be reignited, it is not dead.');
+        }
+
+        star.naturalResources = naturalResources || 1;
+    }
+
+    destroyStar(game, star) {
+        game.galaxy.stars.splice(game.galaxy.stars.indexOf(star), 1);
+
+        game.state.stars--;
+
+        // Recalculate how many stars are needed for victory in conquest mode.
+        if (game.settings.general.mode === 'conquest') {
+            game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+        }
+    }
+
     produceShips(game) {
         let starsToProduce = game.galaxy.stars.filter(s => s.infrastructure.industry > 0);
 

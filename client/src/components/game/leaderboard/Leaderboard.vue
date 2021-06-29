@@ -12,7 +12,8 @@
 
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
-            <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="game.settings.general.mode === 'conquest'">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale</p>
             <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
             <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
         </div>

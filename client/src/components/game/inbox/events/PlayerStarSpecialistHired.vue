@@ -1,7 +1,7 @@
 <template>
-<div v-if="star">
+<div>
   <p>
-      You hired the specialist <span class="text-warning">{{event.data.specialistName}}</span> at the star <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a>.
+      You hired the specialist <span class="text-warning">{{event.data.specialistName}}</span> at the star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
   </p>
   <p>
     <small><em>{{event.data.specialistDescription}}</em></small>
@@ -10,23 +10,13 @@
 </template>
 
 <script>
-import GameHelper from '../../../../services/gameHelper'
-
 export default {
   props: {
     event: Object
   },
-  data () {
-    return {
-      star: null
-    }
-  },
-  mounted () {
-    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
-  },
   methods: {
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star._id)
+      this.$emit('onOpenStarDetailRequested', this.event.data.starId)
     }
   }
 }

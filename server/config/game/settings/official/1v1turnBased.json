@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Go head to head against a single opponent, this game will be down to pure skill.",
     "type": "1v1_tb",
+    "mode": "conquest",
     "password": null,
     "starVictoryPercentage": 66,
     "playerLimit": 2,

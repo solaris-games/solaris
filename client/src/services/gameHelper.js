@@ -453,8 +453,13 @@ class GameHelper {
         if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
         if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
 
-        // Then by defeated descending
-        return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
+        // Then by defeated date descending
+        if (a.defeated && b.defeated) {
+          if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1;
+          if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1;
+        }
+
+        return 0; // Both are equal
       })
   }
 
@@ -599,6 +604,8 @@ class GameHelper {
           return 'spoutnik'
         case 15:
           return 'starfighter'
+        case 16:
+          return 'rocket'
       }
     } else {
       switch (specialistId) {

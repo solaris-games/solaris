@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService) {
         super();
             
         this.distanceService = distanceService;
@@ -25,6 +25,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.reputationService = reputationService;
         this.aiService = aiService;
         this.emailService = emailService;
+        this.battleRoyaleService = battleRoyaleService;
     }
 
     async tick(gameId) {
@@ -392,6 +393,11 @@ module.exports = class GameTickService extends EventEmitter {
                     experimentAmount: experimentResult.amount,
                     carrierUpkeep: carrierUpkeepResult
                 });
+            }
+
+            // Destroy stars for battle royale mode.
+            if (game.settings.general.mode === 'battleRoyale') {
+                this.battleRoyaleService.performBattleRoyaleTick(game);
             }
 
             await this.emailService.sendGameCycleSummaryEmail(game);
