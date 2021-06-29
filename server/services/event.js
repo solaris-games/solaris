@@ -435,6 +435,8 @@ module.exports = class EventService {
             creditsReward
         };
 
+        // TODO: Need to save the alias for the player who captured the star as it could change.
+
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_CAPTURED, data);
     }
 

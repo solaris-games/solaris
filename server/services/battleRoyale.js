@@ -18,7 +18,7 @@ module.exports = class BattleRoyaleService {
 
     getStarsToDestroy(game) {
         // Don't do anything for X number of turns for peace time.
-        const peaceCycles = 0;
+        const peaceCycles = 3;
 
         if (game.state.productionTick < peaceCycles) {
             return [];
@@ -26,7 +26,7 @@ module.exports = class BattleRoyaleService {
 
         // Calculate which stars need to be destroyed.
         let galaxyCenter = this.mapService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
-        let starCountToDestroy = Math.ceil(0.1 * (game.settings.galaxy.starsPerPlayer - 1) * (1.5 - (game.state.productionTick - peaceCycles - 1) / (game.settings.general.playerLimit * 10)));
+        let starCountToDestroy = Math.ceil(0.25 * (game.settings.galaxy.starsPerPlayer - 1) * (1.5 - (game.state.productionTick - peaceCycles - 1) / (game.settings.general.playerLimit * 10)));
 
         // There must be at least 1 star left in the galaxy.
         if (game.galaxy.stars.length - starCountToDestroy < 1) {
@@ -41,6 +41,13 @@ module.exports = class BattleRoyaleService {
     destroyStar(game, star) {
         // Destroy any carriers enroute to the star.
         let carriers = this.carrierService.getCarriersEnRouteToStar(game, star);
+
+        for (let carrier of carriers) {
+            this.carrierService.destroyCarrier(game, carrier);
+        }
+
+        // Destroy any carriers stationed at the star.
+        carriers = this.carrierService.getCarriersAtStar(game, star._id);
 
         for (let carrier of carriers) {
             this.carrierService.destroyCarrier(game, carrier);

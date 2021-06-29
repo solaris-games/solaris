@@ -672,6 +672,7 @@ module.exports = class PlayerService extends EventEmitter {
 
     setPlayerAsDefeated(game, player) {
         player.defeated = true;
+        player.defeatedDate = moment().utc();
         player.researchingNext = 'random'; // Set up the AI for random research.
 
         // Auto-ready the player so they don't hold up the game.

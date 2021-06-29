@@ -1,5 +1,5 @@
 <template>
-<div v-if="star">
+<div>
   <p>
       The warp gate at <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a> has been destroyed.
   </p>

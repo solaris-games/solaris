@@ -117,6 +117,7 @@ module.exports = class HistoryService {
                 credits: player.credits,
                 creditsSpecialists: player.creditsSpecialists,
                 defeated: player.defeated,
+                defeatedDate: player.defeatedDate,
                 afk: player.afk,
                 ready: player.ready,
                 research: player.research
@@ -193,6 +194,7 @@ module.exports = class HistoryService {
                 'players.$[].credits': '',
                 'players.$[].creditsSpecialists': '',
                 'players.$[].defeated': '',
+                'players.$[].defeatedDate': '',
                 'players.$[].afk': '',
                 'players.$[].ready': '',
                 'players.$[].alias': '',

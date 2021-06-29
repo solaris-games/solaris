@@ -8,6 +8,11 @@ module.exports = (container) => {
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
 
+                // Do not delete featured games.
+                if (game.settings.general.featured) {
+                    continue;
+                }
+
                 try {
                     await container.emailService.sendCustomGameRemovedEmail(game);
                     await container.gameService.delete(game);

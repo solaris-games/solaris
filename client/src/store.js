@@ -125,6 +125,7 @@ export default new Vuex.Store({
       player.alias = data.alias
       player.avatar = data.avatar
       player.defeated = false
+      player.defeatedDate = null
       player.afk = false
     },
 

@@ -159,5 +159,13 @@ module.exports = class SpecialistService {
     getCreditsPerTickByScience(star) {
         return this._getStarSpecialValue(star, 'creditsPerTickByScience', 0);
     }
+
+    getReigniteDeadStar(carrier) {
+        return this._getCarrierSpecialValue(carrier, 'reigniteDeadStar', false);
+    }
+
+    getReigniteDeadStarNaturalResources(carrier) {
+        return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', 1);
+    }
     
 };

@@ -223,6 +223,7 @@ module.exports = class GameService extends EventEmitter {
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
         player.defeated = false;
+        player.defeatedDate = null;
         player.afk = false;
         player.missedTurns = 0;
         player.hasSentTurnReminder = false;

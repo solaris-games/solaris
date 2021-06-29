@@ -23,7 +23,7 @@
             There are no official games available.
           </p>
           
-          <div class="row" v-if="!isLoading">
+          <div class="row no-gutters" v-if="!isLoading">
             <!-- Featured -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.featured">
               <div class="card featured-card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.featured._id })">
@@ -44,7 +44,7 @@
             </div>
 
             <!-- New Player -->
-            <div class="col-sm-12 col-md-4 col-lg-4" v-if="games.newPlayerRT">
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1" v-if="games.newPlayerRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
@@ -61,7 +61,7 @@
             </div>
 
             <!-- Standard -->
-            <div class="col-sm-12 col-md-8 col-lg-8" v-if="games.standardRT">
+            <div class="col-sm-12 col-md-8 col-lg-8 pl-1" v-if="games.standardRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/standard_rt.png')" alt="Standard Game">
                 <div class="card-img-overlay">
@@ -78,7 +78,7 @@
             </div>
 
             <!-- Standard TB -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1" v-if="games.standardTB">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
                 <img class="card-img" :src="require('../assets/screenshots/standard_tb.png')" alt="Standard Turn Based Game">
                 <div class="card-img-overlay">
@@ -95,7 +95,7 @@
             </div>
 
             <!-- Dark -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardDarkRT">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.standardDarkRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardDarkRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/standard_dark_rt.png')" alt="Dark Mode Game">
                 <div class="card-img-overlay">
@@ -112,7 +112,7 @@
             </div>
 
             <!-- 1v1 -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.oneVsOneRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/1v1_rt.png')" alt="1 vs. 1 Game">
                 <div class="card-img-overlay">
@@ -129,7 +129,7 @@
             </div>
 
             <!-- 1v1 TB -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.oneVsOneTB">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
                 <img class="card-img" :src="require('../assets/screenshots/1v1_tb.png')" alt="1 vs. 1 Turn Based Game">
                 <div class="card-img-overlay">

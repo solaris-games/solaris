@@ -90,7 +90,7 @@ module.exports = class GameGalaxyService {
             this._setPlayerStats(game);
         }
 
-        if (this.gameService.isBattleRoyaleMode(game)) {
+        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
             this._appendStarsPendingDestructionFlag(game);
         }
 
@@ -405,6 +405,7 @@ module.exports = class GameGalaxyService {
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
+                defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
                 alias: p.alias,
@@ -486,6 +487,7 @@ module.exports = class GameGalaxyService {
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
                     gamePlayer.defeated = historyPlayer.defeated;
+                    gamePlayer.defeatedDate = historyPlayer.defeatedDate;
                     gamePlayer.afk = historyPlayer.afk;
                     gamePlayer.research = historyPlayer.research;
                     gamePlayer.ready = historyPlayer.ready;

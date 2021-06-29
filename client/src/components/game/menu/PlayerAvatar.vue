@@ -1,15 +1,15 @@
 <template>
-    <div @click="onClick" class="player-icon text-center">
-        <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
-        <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2"></i>
-        <span v-if="canShowShapeIcon()" class="shapeIcon">
-          <player-icon :playerId="player._id"/>
-        </span>
-        <i v-if="player.userId" class="userIcon fas fa-user"></i>
-        <i v-if="showMedals && isFirstPlace()" class="medalIcon gold fas fa-medal"></i>
-        <i v-if="showMedals && isSecondPlace()" class="medalIcon silver fas fa-medal"></i>
-        <i v-if="showMedals && isThirdPlace()" class="medalIcon bronze fas fa-medal"></i>
-    </div>
+  <div @click="onClick" class="player-icon text-center">
+    <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
+    <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2"></i>
+    <span v-if="canShowShapeIcon()" class="shapeIcon">
+      <player-icon :playerId="player._id"/>
+    </span>
+    <i v-if="player.userId" class="userIcon fas fa-user"></i>
+    <i v-if="showMedals && isFirstPlace()" class="medalIcon gold fas fa-medal"></i>
+    <i v-if="showMedals && isSecondPlace()" class="medalIcon silver fas fa-medal"></i>
+    <i v-if="showMedals && isThirdPlace()" class="medalIcon bronze fas fa-medal"></i>
+  </div>
 </template>
 
 <script>
@@ -94,6 +94,10 @@ export default {
   font-size: 44px;
 }
 
+.defeated-player {
+  opacity: 0.3;
+}
+
 @media screen and (max-width: 576px) { 
   .player-icon, img {
       height: 35px;
@@ -136,9 +140,5 @@ export default {
 
 .bronze {
   color: #b08d57;
-}
-
-.defeated-player {
-  opacity: 0.3;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="star">
+    <div>
         <p>
             Your forces have engaged the enemy in <span class="text-warning">carrier-to-star</span> combat at
             <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
@@ -22,7 +22,7 @@
                     <tr>
                         <td>
                             <i class="fas fa-star mr-2"></i>
-                            <span :style="{ 'color': getStarColour() }" v-if="star" class="name-and-icon">
+                            <span :style="{ 'color': getStarColour() }" class="name-and-icon">
                               <player-icon-shape :filled="true" :shape="getStarShape()" :iconColour="getStarColour()" />
                               {{event.data.starName}}
                             </span>
@@ -85,7 +85,6 @@ export default {
     return {
       defender: null,
       attackers: [],
-      star: null,
       defenderCarriers: [],
       attackerCarriers: []
     }

@@ -1,5 +1,5 @@
 <template>
-<div v-if="star">
+<div>
   <p>
       You hired the specialist <span class="text-warning">{{event.data.specialistName}}</span> at the star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
   </p>

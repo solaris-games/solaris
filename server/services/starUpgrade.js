@@ -385,6 +385,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`The player does not own enough credits to afford to bulk upgrade.`);
         }
 
+        // Double check that the bulk upgrade report actually upgraded something.
+        if (upgradeSummary.cost <= 0) {
+            return upgradeSummary;
+        }
+
         if (writeToDB) {
             // Generate the DB writes for all the stars to upgrade, including deducting the credits
             // for the player and also updating the player's achievement statistics.

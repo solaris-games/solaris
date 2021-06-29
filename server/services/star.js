@@ -339,6 +339,14 @@ module.exports = class StarService extends EventEmitter {
         }
     }
 
+    reigniteDeadStar(star, naturalResources) {
+        if (!this.isDeadStar(star)) {
+            throw new Error('The star cannot be reignited, it is not dead.');
+        }
+
+        star.naturalResources = naturalResources || 1;
+    }
+
     destroyStar(game, star) {
         game.galaxy.stars.splice(game.galaxy.stars.indexOf(star), 1);
 

@@ -1,5 +1,5 @@
 <template>
-<div v-if="star && player">
+<div v-if="player">
   <p>
       The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a> has been captured
       by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
