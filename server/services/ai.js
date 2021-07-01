@@ -6,9 +6,10 @@ const Delaunator = require('delaunator');
 
 module.exports = class AIService {
 
-    constructor(starUpgradeService, carrierService) {
+    constructor(starUpgradeService, carrierService, starService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
+        this.starService = starService;
     }
 
     async play(game, player) {
