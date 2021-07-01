@@ -289,6 +289,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return {
             playerId: player._id,
             starId: star._id,
+            starName: star.name,
             infrastructure: star.infrastructure[economyType],
             cost,
             nextCost

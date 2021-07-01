@@ -377,6 +377,10 @@ module.exports = class GameService extends EventEmitter {
         }
 
         await this.gameModel.deleteOne({ _id: game._id });
+
+        // TODO: Delete game events
+        // TODO: Delete game history
+        // TODO: Cleanup any orphaned docs
     }
 
     async getPlayerUser(game, playerId) {

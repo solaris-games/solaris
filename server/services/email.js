@@ -215,7 +215,7 @@ module.exports = class EmailService {
 
         switch (game.settings.general.mode) {
             case 'conquest':
-                winConditionText = 'Winner will be the first to <span style="color:#3498DB;">capture [{2}] of [{3}] stars</span>.';
+                winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} of ${game.state.stars} stars</span>.`;
                 break;
             case 'battleRoyale':
                 winConditionText = 'Winner will be the <span style="color:#3498DB;">last man standing</span>.';

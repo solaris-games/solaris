@@ -6,6 +6,30 @@ db.games.updateMany({}, {
     }
 });
 
+// Add seed data for defeatedDate to all players who have been defeated.
+let utcnow = new Date();
+
+db.games.updateMany({
+    'galaxy.players.defeated': true
+}, {
+    $set: {
+        'galaxy.players.$.defeatedDate': utcnow
+    }
+});
+
+db.gamehistories.updateMany({
+    'players.defeated': true
+}, {
+    $set: {
+        'players.$.defeatedDate': utcnow
+    }
+});
+
+
+
+
+
+
 // Append the star name on all events that contain a starId.
 let stars = {};
 
@@ -34,7 +58,14 @@ db.gameevents.find({
 });
 
 db.gameevents.find({
-    'type': 'playerBulkInfrastructureUpgraded'
+    'type': 'playerBulkInfrastructureUpgraded',
+    'data.upgradeReport.stars': {
+        $elemMatch: {
+            'starName': {
+                $eq: null
+            }
+        }
+    }
 }).forEach(function(gameEvent) {
     gameEvent.data.upgradeReport.stars.forEach(function(upgradeStar) {
         if (upgradeStar.starName == null) {
@@ -47,23 +78,4 @@ db.gameevents.find({
     });
 
     db.gameevents.save(gameEvent);
-});
-
-// Add seed data for defeatedDate to all players who have been defeated.
-let utcnow = new Date();
-
-db.games.updateMany({
-    'galaxy.players.defeated': true
-}, {
-    $set: {
-        'galaxy.players.$.defeatedDate': utcnow
-    }
-});
-
-db.gamehistories.updateMany({
-    'players.defeated': true
-}, {
-    $set: {
-        'players.$.defeatedDate': utcnow
-    }
 });
