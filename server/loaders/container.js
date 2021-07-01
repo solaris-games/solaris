@@ -96,7 +96,7 @@ module.exports = (config, io) => {
     const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService, playerService, starService);
     const conversationService = new ConversationService(GameModel, EventModel);
     const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService, playerService);
-    const aiService = new AIService(starUpgradeService);
+    const aiService = new AIService(starUpgradeService, carrierService);
     const historyService = new HistoryService(HistoryModel, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService);
     const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService);

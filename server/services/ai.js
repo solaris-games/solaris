@@ -4,8 +4,9 @@ const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 module.exports = class AIService {
 
-    constructor(starUpgradeService) {
+    constructor(starUpgradeService, carrierService) {
         this.starUpgradeService = starUpgradeService;
+        this.carrierService = carrierService;
     }
 
     async play(game, player) {
@@ -34,7 +35,15 @@ module.exports = class AIService {
     }
 
     async _setupAi(game, player) {
-        //TODO: Setup AI for first game
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
+        player.researchingNext = 'random'; // Set up the AI for random research.
+        
+        // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        for (let star of playerStars) {
+            star.ignoreBulkUpgrade = false;
+        }
     }
 
     async _playFirstTick(game, player) {
