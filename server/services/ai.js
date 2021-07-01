@@ -13,6 +13,11 @@ module.exports = class AIService {
             throw new Error('The player is not under AI control.');
         }
 
+        if (!player.ai) {
+            player.ai = true;
+            await this._setupAi(game, player);
+        }
+
         let isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
         let isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
 
@@ -26,6 +31,10 @@ module.exports = class AIService {
         // where the player credits amount was less than 0, I assume its the AI spending too much somehow
         // so adding this here just in case but need to investigate.
         player.credits = Math.max(0, player.credits);
+    }
+
+    async _setupAi(game, player) {
+        //TODO: Setup AI for first game
     }
 
     async _playFirstTick(game, player) {
