@@ -483,7 +483,7 @@ module.exports = class CarrierService {
     }
 
     isEnRouteToDestroyedStar(game, carrier) {
-        return this.isInTransit(carrier)
+        return (this.isInTransit(carrier) || this.isLaunching(carrier))
             && game.galaxy.stars.find(s => s._id.equals(carrier.waypoints[0].destination)) == null;
     }
 };
