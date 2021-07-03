@@ -17,18 +17,24 @@ module.exports = class AIService {
             throw new Error('The player is not under AI control.');
         }
 
-        if (!player.ai) {
-            player.ai = true;
-            await this._setupAi(game, player);
-        }
-
-        let isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
-        let isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
-
-        if (isFirstTick) {
-            await this._playFirstTick(game, player);
-        } else if (isLastTick) {
-            await this._playLastTick(game, player);
+        // Considering the growing complexity of AI logic, 
+        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
+        try {
+            if (!player.ai) {
+                player.ai = true;
+                await this._setupAi(game, player);
+            }
+    
+            let isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
+            let isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
+    
+            if (isFirstTick) {
+                await this._playFirstTick(game, player);
+            } else if (isLastTick) {
+                await this._playLastTick(game, player);
+            }
+        } catch (e) {
+            console.error(e);
         }
 
         // TODO: Not sure if this is an issue but there was an occassion during debugging
