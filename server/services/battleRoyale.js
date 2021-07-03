@@ -1,10 +1,11 @@
 module.exports = class BattleRoyaleService {
 
-    constructor(starService, carrierService, mapService, starDistanceService) {
+    constructor(starService, carrierService, mapService, starDistanceService, waypointService) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.mapService = mapService;
         this.starDistanceService = starDistanceService;
+        this.waypointService = waypointService;
     }
 
     performBattleRoyaleTick(game) {
