@@ -157,10 +157,10 @@ module.exports = class GameTickService extends EventEmitter {
 
     _sanitiseCarrierWaypoints(game) {
         for (let carrier of game.galaxy.carriers) {
-            if (this.carrierService.isEnRouteToDestroyedStar(game, carrier)) {
+            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+
+            if (this.carrierService.isLostInSpace(game, carrier)) {
                 this.carrierService.destroyCarrier(game, carrier);
-            } else {
-                this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
             }
         }
     }
