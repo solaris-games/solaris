@@ -483,7 +483,18 @@ module.exports = class CarrierService {
     }
 
     isLostInSpace(game, carrier) {
-        return this.isInTransit(carrier)
-            && game.galaxy.stars.find(s => s._id.equals(carrier.waypoints[0].destination)) == null;
+        // If not in transit then it obviously isn't lost in space
+        if (!this.isInTransit(carrier)) {
+            return false;
+        }
+
+        // If the carrier has a waypoint then check if the
+        // current destination exists.
+        if (carrier.waypoints.length) {
+            return game.galaxy.stars.find(s => s._id.equals(carrier.waypoints[0].destination)) == null;
+        }
+
+        // If there are no waypoints and they are in transit then must be lost.
+        return carrier.waypoints.length === 0;
     }
 };
