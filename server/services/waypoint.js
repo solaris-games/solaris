@@ -156,7 +156,10 @@ module.exports = class WaypointService {
         // if any of them are not valid then remove it and all subsequent waypoints.
         let waypointsCulled = false;
 
-        for (let i = 0; i < carrier.waypoints.length; i++) {
+        // If in transit, then cull starting from the 2nd waypoint.
+        let startingWaypointIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
+
+        for (let i = startingWaypointIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];
 
             if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
