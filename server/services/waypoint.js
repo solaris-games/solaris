@@ -116,18 +116,40 @@ module.exports = class WaypointService {
     }
 
     _waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint) {
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
         let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        if (sourceStar == null || destinationStar == null) {
+            return false;
+        }
+
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
 
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    async cullWaypointsByHyperspaceRange(game, carrier) {
+    async cullWaypointsByHyperspaceRangeDB(game, carrier) {
+        let cullResult = this.cullWaypointsByHyperspaceRange(game, carrier);
+
+        if (cullResult) {
+            await this.gameModel.updateOne({
+                _id: game._id,
+                'galaxy.carriers._id': carrier._id
+            }, {
+                $set: {
+                    'galaxy.carriers.$.waypoints': cullResult.waypoints,
+                    'galaxy.carriers.$.waypointsLooped': cullResult.waypointsLooped,
+                }
+            });
+        }
+
+        return cullResult;
+    }
+
+    cullWaypointsByHyperspaceRange(game, carrier) {
         let player = this.playerService.getById(game, carrier.ownedByPlayerId);
 
         // Iterate through all waypoints the carrier has one by one and
@@ -151,16 +173,6 @@ module.exports = class WaypointService {
         }
 
         if (waypointsCulled) {
-            await this.gameModel.updateOne({
-                _id: game._id,
-                'galaxy.carriers._id': carrier._id
-            }, {
-                $set: {
-                    'galaxy.carriers.$.waypoints': carrier.waypoints,
-                    'galaxy.carriers.$.waypointsLooped': carrier.waypointsLooped,
-                }
-            });
-
             return {
                 waypoints: carrier.waypoints,
                 waypointsLooped: carrier.waypointsLooped

@@ -26,7 +26,7 @@ module.exports = class BattleRoyaleService {
 
         // Calculate which stars need to be destroyed.
         let galaxyCenter = this.mapService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
-        let starCountToDestroy = Math.ceil(0.25 * (game.settings.galaxy.starsPerPlayer - 1) * (1.5 - (game.state.productionTick - peaceCycles - 1) / (game.settings.general.playerLimit * 10)));
+        let starCountToDestroy = game.settings.general.playerLimit;
 
         // There must be at least 1 star left in the galaxy.
         if (game.galaxy.stars.length - starCountToDestroy < 1) {
@@ -43,7 +43,15 @@ module.exports = class BattleRoyaleService {
         let carriers = this.carrierService.getCarriersEnRouteToStar(game, star);
 
         for (let carrier of carriers) {
-            this.carrierService.destroyCarrier(game, carrier);
+            // If the star is in transit to the star that is being destroyed
+            // then destroy the carrier too.
+            // Otherwise sanitize the carrier's waypoints so that the star being
+            // destroyed is culled.
+            if (this.carrierService.isInTransitTo(carrier, star)) {
+                this.carrierService.destroyCarrier(game, carrier);
+            } else {
+                this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+            }
         }
 
         // Destroy any carriers stationed at the star.
