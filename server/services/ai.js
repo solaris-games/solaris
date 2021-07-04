@@ -3,14 +3,15 @@ const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Delaunator = require('delaunator');
-const { intersectionOfSets } = require('../utils.js')
+const { intersectionOfSets, maxBy } = require('../utils.js')
 
 module.exports = class AIService {
 
-    constructor(starUpgradeService, carrierService, starService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
+        this.distanceService;
     }
 
     async play(game, player) {
@@ -131,21 +132,21 @@ module.exports = class AIService {
             }
         }
 
+        const highestHyperspaceLevel = maxBy(player => player.research.hyperspace.level, game.galaxy.players);
+        const highestHyperspaceDistance = this.distanceService.getHyperspaceDistance(game, highestHyperspaceLevel);
+
         const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && star.ownedByPlayerId !== player._id);
         const borderStarScores = new Map();
         for (let borderVertex of borderVertices) {
             const borderStar = playerStars[borderVertex];
-            let lastScore = Number.MAX_SAFE_INTEGER;
-            for (let es of enemyStars) {
-                const dx = borderStar.location.x - es.location.x;
-                const dy = borderStar.location.y - es.location.y;
-                const diff = Math.sqrt((dx * dx) + (dy * dy));
-                if (diff < lastScore) {
-                    lastScore = diff;
-                }
+            const distanceToClosesEnemyStar = minBy(es => distanceService.getDistanceBetweenLocations(es.location, borderStar.location), enemyStars);
+            const distanceRelative = distanceToClosesEnemyStar / highestHyperspaceDistance;
+            // if the star is far from any enemy, there's no need to fortify it now.
+            if (distanceRelative < 2.5) {
+                // give highest priority to stars closest to the enemy
+                const score = 1 / distanceRelative;
+                borderStarScores.set(borderVertex, score);
             }
-            const score = 1000 / lastScore;
-            borderStarScores.set(borderVertex, score);
         }
     }
 
