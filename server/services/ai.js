@@ -3,6 +3,7 @@ const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Delaunator = require('delaunator');
+const { intersectionOfSets } = require('../utils.js')
 
 module.exports = class AIService {
 
@@ -103,7 +104,7 @@ module.exports = class AIService {
             
             const trianglesWithTwoSharedVertices = Array.from(triangleCandidates).map(triangleCandidate => {
                 const verticesOfCandidate = triangleIndexToVertexIndices.get(triangleCandidate);
-                const sharedVertices = this._intersectionOfSets(verticesOfCandidate, vertexIndices);
+                const sharedVertices = intersectionOfSets(verticesOfCandidate, vertexIndices);
                 return {
                     sharedVertices,
                     triangleCandidate
@@ -123,7 +124,7 @@ module.exports = class AIService {
             const trianglesWithSharedVertices = borderTrianglesToTrianglesWithSharedVertices.get(borderTriangle);
             const sharedBorderTriangles = Array.from(trianglesWithSharedVertices).filter(tr => borderTriangles.has(tr));
             for (let sharedBorderTriangle of sharedBorderTriangles) {
-                const commonVertices = this._intersectionOfSets(triangleIndexToVertexIndices.get(borderTriangle), triangleIndexToVertexIndices.get(sharedBorderTriangle));
+                const commonVertices = intersectionOfSets(triangleIndexToVertexIndices.get(borderTriangle), triangleIndexToVertexIndices.get(sharedBorderTriangle));
                 for (let commonVertex of commonVertices) {
                     borderVertices.add(commonVertex);
                 }
@@ -146,10 +147,6 @@ module.exports = class AIService {
             const score = 1000 / lastScore;
             borderStarScores.set(borderVertex, score);
         }
-    }
-
-    _intersectionOfSets(a, b) {
-        return new Set(Array.from(a).filter(x => b.has(x)));
     }
 
     async _playFirstTick(game, player) {
