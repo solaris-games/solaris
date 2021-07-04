@@ -134,7 +134,7 @@ module.exports = class AIService {
         const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && star.ownedByPlayerId !== player._id);
         const borderStarScores = new Map();
         for (let borderVertex of borderVertices) {
-            const borderStar = playerStars[borderStarScores];
+            const borderStar = playerStars[borderVertex];
             let lastScore = Number.MAX_SAFE_INTEGER;
             for (let es of enemyStars) {
                 const dx = borderStar.location.x - es.location.x;
