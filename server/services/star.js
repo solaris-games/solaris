@@ -218,6 +218,11 @@ module.exports = class StarService extends EventEmitter {
     }
 
     canTravelAtWarpSpeed(player, carrier, sourceStar, destinationStar) {
+        // Double check for destroyed stars.
+        if (sourceStar == null || destinationStar == null) {
+            return false;
+        }
+
         // If both stars have warp gates and they are both owned by players...
         if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
             // If both stars are owned by the player then carriers can always move at warp.

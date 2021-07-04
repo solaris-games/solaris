@@ -40,18 +40,17 @@ module.exports = class BattleRoyaleService {
     }
 
     destroyStar(game, star) {
-        // Destroy any carriers enroute to the star.
+        this.starService.destroyStar(game, star);
+
         let carriers = this.carrierService.getCarriersEnRouteToStar(game, star);
 
+        // Cull the waypoints of carriers that have the given star in its
+        // waypoint queue and destroy those that are lost in space.
         for (let carrier of carriers) {
-            // If the star is in transit to the star that is being destroyed
-            // then destroy the carrier too.
-            // Otherwise sanitize the carrier's waypoints so that the star being
-            // destroyed is culled.
-            if (this.carrierService.isInTransitTo(carrier, star)) {
+            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+
+            if (this.carrierService.isLostInSpace(game, carrier)) {
                 this.carrierService.destroyCarrier(game, carrier);
-            } else {
-                this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
             }
         }
 
@@ -61,9 +60,6 @@ module.exports = class BattleRoyaleService {
         for (let carrier of carriers) {
             this.carrierService.destroyCarrier(game, carrier);
         }
-
-        // Destroy the star itself.
-        this.starService.destroyStar(game, star);
     }
 
 };

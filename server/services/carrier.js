@@ -452,12 +452,18 @@ module.exports = class CarrierService {
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+
         let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
         let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
-
         let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 
-        return nextLocation;
+        return {
+            location: nextLocation,
+            distance: distancePerTick,
+            warpSpeed,
+            sourceStar,
+            destinationStar
+        };
     }
 
     isInTransit(carrier) {
@@ -494,7 +500,7 @@ module.exports = class CarrierService {
             return game.galaxy.stars.find(s => s._id.equals(carrier.waypoints[0].destination)) == null;
         }
 
-        // If there are no waypoints and they are in transit then must be lost.
+        // If there are no waypoints and they are in transit then must be lost, otherwise all good.
         return carrier.waypoints.length === 0;
     }
 };

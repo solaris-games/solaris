@@ -119,6 +119,7 @@ module.exports = class WaypointService {
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
         let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
+        // Stars may have been destroyed.
         if (sourceStar == null || destinationStar == null) {
             return false;
         }
@@ -157,7 +158,7 @@ module.exports = class WaypointService {
         let waypointsCulled = false;
 
         // If in transit, then cull starting from the 2nd waypoint.
-        let startingWaypointIndex = this.carrierService.isInTransit(carrier) ? 0 : 0;
+        let startingWaypointIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
 
         for (let i = startingWaypointIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];
