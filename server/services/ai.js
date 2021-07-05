@@ -3,6 +3,7 @@ const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Delaunator = require('delaunator');
+const Heap = require('qheap');
 const { intersectionOfSets, maxBy } = require('../utils.js')
 
 module.exports = class AIService {
@@ -137,6 +138,11 @@ module.exports = class AIService {
 
         const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && star.ownedByPlayerId !== player._id);
         const borderStarScores = new Map();
+        const borderStarQueue = new Heap({
+            comparBefore: (b1, b2) => b1.score < b2.score,
+            compar: (b1, b2) => b1.score - b2.score
+        });
+
         for (let borderVertex of borderVertices) {
             const borderStar = playerStars[borderVertex];
             const distanceToClosesEnemyStar = minBy(es => distanceService.getDistanceBetweenLocations(es.location, borderStar.location), enemyStars);
@@ -146,7 +152,28 @@ module.exports = class AIService {
                 // give highest priority to stars closest to the enemy
                 const score = 1 / distanceRelative;
                 borderStarScores.set(borderVertex, score);
+                borderStarQueue.insert({
+                    score,
+                    vertex: borderVertex
+                })
             }
+        }
+
+        const unmarkedVertices = new Set();
+        for (let vertexIndex of vertexIndexToConnectedVertexIndices) {
+            if (!borderVertices.has(vertexIndex)) {
+                unmarkedVertices.add(vertexIndex);
+            }
+        }
+
+        const logisticsGraph = new Map();
+        while (unmarkedVertices.size != 0) {
+            const item = borderStarQueue.dequeue();
+            const borderVertex = item.vertex;
+            const oldScore = score;
+            //TODO: Find another star to add logistics from
+            //TODO: Mark other star
+            //TODO: Reinsert with reduced score
         }
     }
 
