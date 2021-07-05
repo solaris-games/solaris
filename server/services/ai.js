@@ -78,6 +78,19 @@ module.exports = class AIService {
 
         // Map VertexIndex -> VertexIndex set
         // Represents the vertex/triangle graph
+        const vertexIndexToConnectedVertexIndices = this._computeVertexGraph(vertexIndexToTriangleIndices, triangleIndexToVertexIndices);
+
+        // Star systems (as vertices/indices) at the empires border
+        const borderVertices = this._computeBorderVertices(triangleIndexToVertexIndices, vertexIndexToTriangleIndices);
+
+        // Border star systems with computed score based on distance to enemy
+        const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars);
+
+        // Graph of carrier movements for logistics
+        const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue);
+    }
+
+    _computeVertexGraph(vertexIndexToTriangleIndices, triangleIndexToVertexIndices) {
         const vertexIndexToConnectedVertexIndices = new Map();
         for (let [ vertexIndex, triangleIndices ] of vertexIndexToTriangleIndices) {
             const otherVertices = new Set();
@@ -90,6 +103,10 @@ module.exports = class AIService {
             vertexIndexToConnectedVertexIndices.set(vertexIndex, otherVertices);
         }
 
+        return vertexIndexToConnectedVertexIndices;
+    }
+
+    _computeBorderVertices(triangleIndexToVertexIndices, vertexIndexToTriangleIndices) {
         // borderTriangles: All triangles that have less than 3 triangles they share two vertices with
         const borderTriangles = new Set();
         // borderTrianglesToTrianglesWithSharedVertices: border triangles mapped to ALL triangles they share vertices with, regardless of the number.
@@ -112,13 +129,13 @@ module.exports = class AIService {
                     triangleCandidate
                 }
             }).filter(cand => cand.sharedVertices.size == 2);
-
+    
             if (trianglesWithTwoSharedVertices.length < 3) {
                 borderTriangles.add(triangleIndex);
                 borderTrianglesToTrianglesWithSharedVertices.set(triangleIndex, triangleCandidates);
             }
         }
-
+    
         // border vertices are vertices of border triangles that are shared with other border triangles
         // therefore, they correspond to stars at the edge of the empire
         const borderVertices = new Set();
@@ -133,11 +150,14 @@ module.exports = class AIService {
             }
         }
 
+        return borderVertices;
+    }
+
+    _computeBorderStarQueue(game, borderVertices, playerStars) {
         const highestHyperspaceLevel = maxBy(player => player.research.hyperspace.level, game.galaxy.players);
         const highestHyperspaceDistance = this.distanceService.getHyperspaceDistance(game, highestHyperspaceLevel);
 
         const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && star.ownedByPlayerId !== player._id);
-        const borderStarScores = new Map();
         const borderStarQueue = new Heap({
             comparBefore: (b1, b2) => b1.score < b2.score,
             compar: (b1, b2) => b1.score - b2.score
@@ -145,13 +165,12 @@ module.exports = class AIService {
 
         for (let borderVertex of borderVertices) {
             const borderStar = playerStars[borderVertex];
-            const distanceToClosesEnemyStar = minBy(es => distanceService.getDistanceBetweenLocations(es.location, borderStar.location), enemyStars);
+            const distanceToClosesEnemyStar = minBy(es => this.distanceService.getDistanceBetweenLocations(es.location, borderStar.location), enemyStars);
             const distanceRelative = distanceToClosesEnemyStar / highestHyperspaceDistance;
             // if the star is far from any enemy, there's no need to fortify it now.
             if (distanceRelative < 2.5) {
                 // give highest priority to stars closest to the enemy
                 const score = 1 / distanceRelative;
-                borderStarScores.set(borderVertex, score);
                 borderStarQueue.insert({
                     score,
                     vertex: borderVertex
@@ -159,6 +178,10 @@ module.exports = class AIService {
             }
         }
 
+        return borderStarQueue;
+    }
+
+    _createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue) {
         const unmarkedVertices = new Set();
         for (let vertexIndex of vertexIndexToConnectedVertexIndices) {
             if (!borderVertices.has(vertexIndex)) {
@@ -175,6 +198,8 @@ module.exports = class AIService {
             //TODO: Mark other star
             //TODO: Reinsert with reduced score
         }
+
+        return logisticsGraph;
     }
 
     async _playFirstTick(game, player) {
