@@ -53,6 +53,8 @@ module.exports = class WaypointService {
             let sourceStar = this.starService.getByObjectId(game, waypoint.source);
             let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
+            let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
+
             // Make sure the user isn't being a dumbass.
             waypoint.actionShips = waypoint.actionShips || 0;
 
@@ -69,7 +71,7 @@ module.exports = class WaypointService {
 
             // Make sure delay ticks isn't a decimal.
             if (+waypoint.delayTicks % 1 != 0) {
-                throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} delay cannot be a decimal.`);
+                throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} delay cannot be a decimal.`);
             }
 
             // Make sure the user isn't being a dumbass.
@@ -77,8 +79,8 @@ module.exports = class WaypointService {
                 waypoint.delayTicks = 0;
             }
 
-            if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
-                throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} exceeds hyperspace range.`);
+            if (sourceStar && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
+                throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
             }
         }
         
