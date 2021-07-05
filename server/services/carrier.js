@@ -453,7 +453,12 @@ module.exports = class CarrierService {
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+        let warpSpeed = false;
+        
+        if (sourceStar) {
+            warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+        }
+
         let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
         let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 

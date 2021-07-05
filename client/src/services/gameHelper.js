@@ -257,16 +257,16 @@ class GameHelper {
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
   calculateWaypointTicks (game, carrier, waypoint) {
-    let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
-    let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
-
     // if the waypoint is going to the same star then it is at least 1
     // tick, plus any delay ticks.
-    if (sourceStar._id === destinationStar._id) {
+    if (waypoint.source === waypoint.destination) {
       return 1 + (waypoint.delayTicks || 0);
     }
 
-    let source = sourceStar.location
+    let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
+    let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
+
+    let source = sourceStar == null ? carrier.location : sourceStar.location
     let destination = destinationStar.location
 
     // If the carrier is already en-route, then the number of ticks will be relative
@@ -277,7 +277,7 @@ class GameHelper {
 
     let ticks
 
-    if (sourceStar.warpGate && destinationStar.warpGate &&
+    if (sourceStar && sourceStar.warpGate && destinationStar.warpGate &&
       sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
       ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], game.constants.distances.warpSpeedMultiplier)
     } else {
@@ -327,6 +327,10 @@ class GameHelper {
 
     let firstWaypointStar = this.getStarById(game, firstWaypoint.source)
     let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
+
+    if (firstWaypointStar == null || lastWaypointStar == null) {
+      return false
+    }
 
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
     let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)

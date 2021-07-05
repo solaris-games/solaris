@@ -232,6 +232,10 @@ module.exports = class WaypointService {
         let firstWaypointStar = this.starService.getByObjectId(game, firstWaypoint.source);
         let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.source);
 
+        if (firstWaypointStar == null || lastWaypointStar == null) {
+            return false;
+        }
+
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
@@ -241,17 +245,17 @@ module.exports = class WaypointService {
     calculateWaypointTicks(game, carrier, waypoint) {
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
-        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
-
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
-        if (sourceStar._id.equals(destinationStar._id)) {
+        if (waypoint.source.equals(waypoint.destination)) {
             return 1 + (waypoint.delayTicks || 0);
         }
 
-        let source = sourceStar.location
-        let destination = destinationStar.location
+        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
+        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        let source = sourceStar == null ? carrier.location : sourceStar.location;
+        let destination = destinationStar.location;
 
         // If the carrier is already en-route, then the number of ticks will be relative
         // to where the carrier is currently positioned.
