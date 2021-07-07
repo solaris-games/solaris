@@ -190,16 +190,43 @@ module.exports = class AIService {
         }
 
         const logisticsGraph = new Map();
-        while (unmarkedVertices.size != 0) {
+        while (unmarkedVertices.size != 0 && borderStarQueue.length != 0) {
             const item = borderStarQueue.dequeue();
             const borderVertex = item.vertex;
             const oldScore = score;
-            //TODO: Find another star to add logistics from
-            //TODO: Mark other star
-            //TODO: Reinsert with reduced score
+            const nextConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, borderVertex);
+            if (nextConnection) {
+                const fromConnections = logisticsGraph.get(nextConnection.from) || new Set();
+                fromConnections.add(nextConnection.to);
+                logisticsGraph.set(nextConnection.from, fromConnections);
+                borderStarQueue.insert({
+                    score: oldScore * 0.5,
+                    vertex: borderVertex
+                });
+            }
         }
 
         return logisticsGraph;
+    }
+
+    _findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, startingVertex) {
+        const possibleConnections = vertexIndexToConnectedVertexIndices.get(startingVertex);
+        const direct = Array.from(possibleConnections).find(v => unmarkedVertices.has(v));
+        if (direct) {
+            unmarkedVertices.delete(direct);
+            return {
+                from: startingVertex,
+                to: direct
+            };
+        }
+        const connected = logisticsGraph.get(startingVertex);
+        for (let c of connected) {
+            const newConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, c);
+            if (newConnection) {
+                return newConnection;
+            }
+        }
+        return null;
     }
 
     async _playFirstTick(game, player) {
