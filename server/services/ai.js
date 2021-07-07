@@ -28,7 +28,13 @@ module.exports = class AIService {
                 player.ai = true;
                 await this._setupAi(game, player);
             }
-    
+            await this.orderService.processOrdersForPlayer(game, player);
+        } catch (e) {
+            console.error(e);
+        }
+
+        // Two separate try statements: If the "advanced" AI logic crashes, at least we can keep upgrading stars
+        try {
             let isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
             let isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
     
