@@ -88,6 +88,23 @@ module.exports = class AIService {
 
         // Graph of carrier movements for logistics
         const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue);
+        
+        const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
+    }
+
+    _computeCarrierLoopsFromGraph(logisticsGraph, playerStars) {
+        const loops = new Array(logisticsGraph.size);
+
+        for (let [ start, connected ] of logisticsGraph) {
+            for (let end of connected) {
+                loops.push({
+                    from: playerStars[start],
+                    to: playerStars[end]
+                })
+            }
+        }
+
+        return loops;
     }
 
     _computeVertexGraph(vertexIndexToTriangleIndices, triangleIndexToVertexIndices) {
