@@ -8,11 +8,12 @@ const { intersectionOfSets, maxBy } = require('../utils.js')
 
 module.exports = class AIService {
 
-    constructor(starUpgradeService, carrierService, starService, distanceService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, orderService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
-        this.distanceService;
+        this.distanceService = distanceService;
+        this.orderService = orderService;
     }
 
     async play(game, player) {

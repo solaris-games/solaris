@@ -74,6 +74,16 @@ const schema = new Schema({
             playerId: { type: Types.ObjectId, required: true },
             score: { type: Types.Number, required: true, default: 0  }
         }
+    ],
+    scheduledOrders: [
+        {
+            type: {
+                orderType: { type: Types.String, required: true },
+                data: { type: Types.Mixed, required: false },
+                retryPolicy: { type: Types.String, required: false }
+            },
+        required: false
+        }
     ]
 });
 
