@@ -5,6 +5,7 @@ const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 const Delaunator = require('delaunator');
 const Heap = require('qheap');
 const { intersectionOfSets, maxBy } = require('../utils.js')
+const OrderService = require('./order.js');
 
 module.exports = class AIService {
 
@@ -97,6 +98,37 @@ module.exports = class AIService {
         const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue);
         
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
+
+        const logisticsOrders = this._createCarrierOrders(carrierLoops);
+
+        player.scheduledOrders = logisticsOrders;
+    }
+
+    _createCarrierOrders(carrierLoops) {
+        return carrierLoops.map(loop => {
+            return {
+                orderType: OrderService.ORDER_BUILD_AND_SEND_CARRIER,
+                data: {
+                    waypoints: [ 
+                        {
+                            source: loop.from._id,
+                            destination: loop.to._id,
+                            action: "collectAll",
+                            actionShips: 0,
+                            delayTicks: 0
+                        }, 
+                        {
+                            source: loop.to._id,
+                            destination: loop.from._id,
+                            action: "dropAll",
+                            actionShips: 0,
+                            delayTicks: 0
+                        }
+                    ],
+                    loop: true
+                }
+            }
+        });
     }
 
     _computeCarrierLoopsFromGraph(logisticsGraph, playerStars) {
