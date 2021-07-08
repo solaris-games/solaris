@@ -251,7 +251,7 @@ module.exports = class AIService {
         while (unmarkedVertices.size != 0 && borderStarQueue.length != 0) {
             const item = borderStarQueue.dequeue();
             const borderVertex = item.vertex;
-            const oldScore = score;
+            const oldScore = item.score;
             const nextConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, borderVertex);
             if (nextConnection) {
                 const fromConnections = logisticsGraph.get(nextConnection.from) || new Set();
@@ -279,10 +279,12 @@ module.exports = class AIService {
             };
         }
         const connected = logisticsGraph.get(startingVertex);
-        for (let c of connected) {
-            const newConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, c);
-            if (newConnection) {
-                return newConnection;
+        if (connected) {
+            for (let c of connected) {
+                const newConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, c);
+                if (newConnection) {
+                    return newConnection;
+                }
             }
         }
         return null;
