@@ -26,8 +26,8 @@ module.exports = class AIService {
         // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
         try {
             if (!player.ai) {
-                player.ai = true;
                 await this._setupAi(game, player);
+                player.ai = true;
             }
             await this.orderService.processOrdersForPlayer(game, player);
         } catch (e) {
@@ -92,7 +92,7 @@ module.exports = class AIService {
         const borderVertices = this._computeBorderVertices(triangleIndexToVertexIndices, vertexIndexToTriangleIndices);
 
         // Border star systems with computed score based on distance to enemy
-        const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars);
+        const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars, player);
 
         // Graph of carrier movements for logistics
         const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue, player, playerStars);
@@ -209,7 +209,7 @@ module.exports = class AIService {
         return borderVertices;
     }
 
-    _computeBorderStarQueue(game, borderVertices, playerStars) {
+    _computeBorderStarQueue(game, borderVertices, playerStars, player) {
         const highestHyperspaceLevel = maxBy(player => player.research.hyperspace.level, game.galaxy.players);
         const highestHyperspaceDistance = this.distanceService.getHyperspaceDistance(game, highestHyperspaceLevel);
 
