@@ -95,7 +95,7 @@ module.exports = class AIService {
         const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars);
 
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue);
+        const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue, player, playerStars);
         
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
 
@@ -237,7 +237,7 @@ module.exports = class AIService {
         return borderStarQueue;
     }
 
-    _createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue) {
+    _createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue, player, playerStars) {
         const unmarkedVertices = new Set();
         for (let vertexIndex of vertexIndexToConnectedVertexIndices) {
             if (!borderVertices.has(vertexIndex)) {
@@ -245,12 +245,14 @@ module.exports = class AIService {
             }
         }
 
+        const playerHyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+
         const logisticsGraph = new Map();
         while (unmarkedVertices.size != 0 && borderStarQueue.length != 0) {
             const item = borderStarQueue.dequeue();
             const borderVertex = item.vertex;
             const oldScore = score;
-            const nextConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, borderVertex);
+            const nextConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, borderVertex);
             if (nextConnection) {
                 const fromConnections = logisticsGraph.get(nextConnection.from) || new Set();
                 fromConnections.add(nextConnection.to);
@@ -265,9 +267,10 @@ module.exports = class AIService {
         return logisticsGraph;
     }
 
-    _findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, startingVertex) {
+    _findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, startingVertex) {
         const possibleConnections = vertexIndexToConnectedVertexIndices.get(startingVertex);
-        const direct = Array.from(possibleConnections).find(v => unmarkedVertices.has(v));
+        const startingStar = playerStars[startingVertex];
+        const direct = Array.from(possibleConnections).filter(v => this.distanceService.getDistanceBetweenLocations(playerStars[v].location, startingStar.location) <= playerHyperspaceRange).find(v => unmarkedVertices.has(v));
         if (direct) {
             unmarkedVertices.delete(direct);
             return {
@@ -277,7 +280,7 @@ module.exports = class AIService {
         }
         const connected = logisticsGraph.get(startingVertex);
         for (let c of connected) {
-            const newConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, c);
+            const newConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, c);
             if (newConnection) {
                 return newConnection;
             }
