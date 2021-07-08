@@ -359,7 +359,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                     return true;
                 }
 
-                return !s.ignoreBulkUpgrade;
+                return !s.ignoreBulkUpgrade[infrastructureType];
             })
             .map(s => {
                 const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
@@ -529,7 +529,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount) {
-        const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
+        const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id, infrastructureType).length;
         const stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
         const upgradeSummary = {
@@ -567,7 +567,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
     async generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount) {
         //Enforce some max size constraint
         amount = Math.min(amount, 200);
-        const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
+        const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id, infrastructureType).length;
         const stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
         const upgradeSummary = {
@@ -601,7 +601,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     async generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, budget) {
-        let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id).length;
+        let ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id, infrastructureType).length;
         let stars = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
 
         budget = Math.min(budget, player.credits + 10000); // Prevent players from generating reports for stupid amounts of credits

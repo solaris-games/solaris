@@ -51,7 +51,8 @@ module.exports = class StarService extends EventEmitter {
         homeStar.ships = homeStar.shipsActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.warpGate = false;
-        homeStar.ignoreBulkUpgrade = false;
+
+        this.resetIgnoreBulkUpgradeStatuses(homeStar);
         
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
@@ -67,9 +68,9 @@ module.exports = class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
-    listStarsOwnedByPlayerBulkIgnored(stars, playerId) {
+    listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
         return this.listStarsOwnedByPlayer(stars, playerId)
-            .filter(s => s.ignoreBulkUpgrade);
+            .filter(s => s.ignoreBulkUpgrade[infrastructureType]);
     }
 
     isStarWithinScanningRangeOfStars(game, star, stars) {
@@ -193,7 +194,8 @@ module.exports = class StarService extends EventEmitter {
         star.ownedByPlayerId = null;
         star.shipsActual = 0;
         star.ships = star.shipsActual;
-        star.ignoreBulkUpgrade = false;
+
+        this.resetIgnoreBulkUpgradeStatuses(star);
         
         game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
 
@@ -289,7 +291,8 @@ module.exports = class StarService extends EventEmitter {
         }
 
         star.ownedByPlayerId = carrier.ownedByPlayerId;
-        star.ignoreBulkUpgrade = false;
+
+        this.resetIgnoreBulkUpgradeStatuses(star);
 
         // Weird scenario, but could happen.
         if (carrier.isGift) {
@@ -379,7 +382,28 @@ module.exports = class StarService extends EventEmitter {
         }
     }
 
-    async toggleIgnoreBulkUpgrade(game, player, starId) {
+    async toggleIgnoreBulkUpgrade(game, player, starId, infrastructureType) {
+        let star = this.getById(game, starId);
+
+        if (!star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
+            throw new ValidationError(`You do not own this star.`);
+        }
+
+        let newValue = star.ignoreBulkUpgrade[infrastructureType] ? false : true;
+
+        let updateObject = {
+            $set: {}
+        };
+
+        updateObject['$set'][`galaxy.stars.$.ignoreBulkUpgrade.${infrastructureType}`] = newValue
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.stars._id': starId
+        }, updateObject);
+    }
+
+    async toggleIgnoreBulkUpgradeAll(game, player, starId, ignoreStatus) {
         let star = this.getById(game, starId);
 
         if (!star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
@@ -391,7 +415,9 @@ module.exports = class StarService extends EventEmitter {
             'galaxy.stars._id': starId
         }, {
             $set: {
-                'galaxy.stars.$.ignoreBulkUpgrade': star.ignoreBulkUpgrade ? false : true
+                'galaxy.stars.$.ignoreBulkUpgrade.economy': ignoreStatus,
+                'galaxy.stars.$.ignoreBulkUpgrade.industry': ignoreStatus,
+                'galaxy.stars.$.ignoreBulkUpgrade.science': ignoreStatus
             }
         });
     }
@@ -425,7 +451,9 @@ module.exports = class StarService extends EventEmitter {
         star.ownedByPlayerId = newStarPlayer._id;
         newStarPlayer.credits += captureReward;
         star.infrastructure.economy = 0;
-        star.ignoreBulkUpgrade = false; // Reset this as it has been captured by a new player.
+
+        // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
+        this.resetIgnoreBulkUpgradeStatuses(star);
 
         // TODO: If the home star is captured, find a new one?
         // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
@@ -457,4 +485,11 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
+    resetIgnoreBulkUpgradeStatuses(star) {
+        star.ignoreBulkUpgrade = {
+            economy: false,
+            industry: false,
+            science: false
+        }
+    }
 }

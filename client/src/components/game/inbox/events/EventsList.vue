@@ -111,8 +111,7 @@ export default {
           'playerRenownReceived',
           'playerRenownSent',
           'playerDebtSettled',
-          'playerDebtForgiven',
-          'playerResearchComplete'
+          'playerDebtForgiven'
         ],
         combat: [
           'playerCombatStar',

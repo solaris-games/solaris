@@ -224,7 +224,7 @@ module.exports = class GameGalaxyService {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
 
-                s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || false; // TODO: For some reason this isn't being set in the mongoose defaults?
+                s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || this.starService.resetIgnoreBulkUpgradeStatuses(s);
 
                 return s;
             } else {

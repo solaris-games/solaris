@@ -16,6 +16,8 @@
       </div>
     </form>
 
+    <p class="mt-3">Not receiving emails? Contact a developer on <a href="https://discord.com/invite/v7PD33d">Discord</a>.</p>
+
     <loading-spinner :loading="isLoading"/>
   </view-container>
 </template>

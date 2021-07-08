@@ -77,9 +77,18 @@ class StarService extends BaseApiService {
     { withCredentials: true })
   }
   
-  toggleIgnoreBulkUpgrade(gameId, starId) {
+  toggleIgnoreBulkUpgrade(gameId, starId, infrastructureType) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/toggleignorebulkupgrade', {
-      starId
+      starId,
+      infrastructureType
+    },
+    { withCredentials: true })
+  }
+  
+  toggleIgnoreBulkUpgradeAll(gameId, starId, ignoreStatus) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/toggleignorebulkupgradeall', {
+      starId,
+      ignoreStatus
     },
     { withCredentials: true })
   }
