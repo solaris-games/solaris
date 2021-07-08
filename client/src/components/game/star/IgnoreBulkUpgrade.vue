@@ -1,7 +1,7 @@
 <template>
     <div class="btn-group">
         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas" :class="{'fa-ban':isAllIgnored,'fa-check':!isAllIgnored}"></i>
+            <i class="fas mr-1" :class="{'fa-ban':isAllIgnored,'fa-check':!isAllIgnored}"></i>
         </button>
         <div class="dropdown-menu">
             <h6 class="dropdown-header">Bulk Upgrade</h6>
