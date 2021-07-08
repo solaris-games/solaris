@@ -95,7 +95,7 @@ module.exports = class AIService {
         const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars, player);
 
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue, player, playerStars);
+        const logisticsGraph = this._createLogisticsGraph(game, player, vertexIndexToConnectedVertexIndices, borderVertices, borderStarQueue, playerStars);
         
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
 
@@ -237,7 +237,7 @@ module.exports = class AIService {
         return borderStarQueue;
     }
 
-    _createLogisticsGraph(vertexIndexToConnectedVertexIndices, borderStarQueue, player, playerStars) {
+    _createLogisticsGraph(game, player, vertexIndexToConnectedVertexIndices, borderVertices, borderStarQueue, playerStars) {
         const unmarkedVertices = new Set();
         for (let vertexIndex of vertexIndexToConnectedVertexIndices) {
             if (!borderVertices.has(vertexIndex)) {
