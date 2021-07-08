@@ -1,12 +1,10 @@
 <template>
     <div v-if="isTradeAllowed">
-      <h4 class="mt-2">Trade</h4>
-
       <div v-if="isTradePossible">
         <reputation v-if="player.defeated" :playerId="player._id"/>
-        <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
         <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
         <sendCreditsSpecialists v-if="tradeCreditsSpecialistsIsEnabled" :player="player" :userPlayer="userPlayer"/>
+        <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
       </div>
 
       <p v-if="!isTradePossible" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
@@ -17,13 +15,15 @@
 import SendTechnology from './SendTechnology'
 import SendCredits from './SendCredits'
 import SendCreditsSpecialists from './SendCreditsSpecialists'
+import Reputation from './Reputation'
 import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
     'sendTechnology': SendTechnology,
     'sendCredits': SendCredits,
-    'sendCreditsSpecialists': SendCreditsSpecialists
+    'sendCreditsSpecialists': SendCreditsSpecialists,
+    'reputation': Reputation
   },
   props: {
     playerId: String

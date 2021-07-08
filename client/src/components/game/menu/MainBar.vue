@@ -20,6 +20,11 @@
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onViewConversationRequested="onViewConversationRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenTradeRequested="onOpenTradeRequested"/>
+      <trade v-if="menuState == MENU_STATES.TRADE" 
+        @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
+        @onOpenTradeRequested="onOpenTradeRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
@@ -131,6 +136,7 @@ import MENU_STATES from '../../data/menuStates'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
 import PlayerVue from '../player/Player.vue'
+import TradeVue from '../player/Trade.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
@@ -168,6 +174,7 @@ export default {
     'player-list': PlayerListVue,
     'leaderboard': LeaderboardVue,
     'player': PlayerVue,
+    'trade': TradeVue,
     'research': ResearchVue,
     'star-detail': StarDetailVue,
     'carrier-detail': CarrierDetailVue,
@@ -239,6 +246,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.changeMenuState(MENU_STATES.PLAYER, e)
+    },
+    onOpenTradeRequested (e) {
+      this.changeMenuState(MENU_STATES.TRADE, e)
     },
     onEditWaypointsRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_WAYPOINTS, e)

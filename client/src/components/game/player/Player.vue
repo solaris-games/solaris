@@ -15,7 +15,8 @@
 
     <overview v-if="player" :playerId="player._id"
       @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"
+      @onOpenTradeRequested="onOpenTradeRequested"/>
 
     <h4 v-if="player" class="mt-2">Infrastructure</h4>
 
@@ -29,8 +30,6 @@
     <h4 v-if="player && player.research" class="mt-2">Technology</h4>
     
     <research v-if="player && player.research" :playerId="player._id"/>
-
-    <player-trade :playerId="playerId"/>
 
     <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
 
@@ -122,6 +121,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onOpenTradeRequested (e) {
+      this.$emit('onOpenTradeRequested', this.playerId)
     },
     panToPlayer (e) {
       GameContainer.map.panToPlayer(this.$store.state.game, this.player)
