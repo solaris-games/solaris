@@ -77,12 +77,9 @@ const schema = new Schema({
     ],
     scheduledOrders: [
         {
-            type: {
-                orderType: { type: Types.String, required: true },
-                data: { type: Types.Mixed, required: false },
-                retryPolicy: { type: Types.String, required: false }
-            },
-        required: false
+            orderType: { type: Types.String, required: true },
+            data: { type: Types.Mixed, required: false },
+            retryPolicy: { type: Types.String, required: false }
         }
     ]
 });
