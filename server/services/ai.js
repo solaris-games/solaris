@@ -55,15 +55,17 @@ module.exports = class AIService {
     }
 
     async _setupAi(game, player) {
-        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
         player.researchingNext = 'random'; // Set up the AI for random research.
         
         // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
-        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            star.ignoreBulkUpgrade = false;
+            this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
+
+        // Clear out any carriers that have looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
 
         // This way, vertex indices = indices into coord array = indices into playerStars array
         const coords = playerStars.map(star => [ star.location.x, star.location.y ]);
