@@ -224,7 +224,7 @@ module.exports = class AIService {
             const distanceToClosesEnemyStar = minBy(es => this.distanceService.getDistanceBetweenLocations(es.location, borderStar.location), enemyStars);
             const distanceRelative = distanceToClosesEnemyStar / highestHyperspaceDistance;
             // if the star is far from any enemy, there's no need to fortify it now.
-            if (distanceRelative < 2.5) {
+            if (distanceRelative < 2) {
                 // give highest priority to stars closest to the enemy
                 const score = 1 / distanceRelative;
                 borderStarQueue.insert({
