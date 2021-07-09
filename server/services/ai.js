@@ -213,7 +213,7 @@ module.exports = class AIService {
         const highestHyperspaceLevel = maxBy(player => player.research.hyperspace.level, game.galaxy.players);
         const highestHyperspaceDistance = this.distanceService.getHyperspaceDistance(game, highestHyperspaceLevel);
 
-        const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && star.ownedByPlayerId !== player._id);
+        const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && !star.ownedByPlayerId.equals(player._id));
         const borderStarQueue = new Heap({
             comparBefore: (b1, b2) => b1.score < b2.score,
             compar: (b1, b2) => b1.score - b2.score
