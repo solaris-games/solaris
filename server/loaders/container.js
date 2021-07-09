@@ -100,7 +100,7 @@ module.exports = (config, io) => {
     const orderService = new OrderService(carrierService, waypointService);
     const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, orderService);
     const historyService = new HistoryService(HistoryModel, playerService, gameService);
-    const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService);
+    const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
     const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService);

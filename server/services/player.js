@@ -219,6 +219,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
+    // TODO: Shouldn't this be in the starService?
     setupStarForGameStart(game, star, player) {
         if (player.homeStarId.equals(star._id)) {
             this.starService.setupHomeStar(game, star, player, game.settings);
@@ -227,11 +228,12 @@ module.exports = class PlayerService extends EventEmitter {
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
             star.warpGate = false;
-            star.ignoreBulkUpgrade = false;
             star.specialistId = null;
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
             star.infrastructure.science = 0;
+
+            this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
     }
 

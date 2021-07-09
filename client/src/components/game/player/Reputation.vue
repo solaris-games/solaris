@@ -1,7 +1,7 @@
 <template>
-  <div class="row" v-if="player && player.reputation">
+  <div class="row bg-primary" v-if="player && player.reputation">
     <div class="col">
-      <p>
+      <p class="mb-1">
         <small>
           <i>
             Your reputation with this player is <span :class="{'text-danger':player.reputation.score < 0,'text-success':player.reputation.score > 0}">{{player.reputation.score}}</span>.

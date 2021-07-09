@@ -13,7 +13,7 @@
           <i class="far fa-comments"></i>
           <span class="d-none d-md-inline-block ml-1">Forum</span>
         </a>
-        <a class="btn btn-secondary ml-1" :href="documentationUrl" target="_blank" title="Wiki">
+        <a class="btn btn-info ml-1" :href="documentationUrl" target="_blank" title="Wiki">
           <i class="far fa-question-circle"></i>
           <span class="d-none d-md-inline-block ml-1">Wiki</span>
         </a>

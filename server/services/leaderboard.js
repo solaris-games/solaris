@@ -89,7 +89,8 @@ module.exports = class LeaderboardService {
                 if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1;
             }
 
-            return 0; // Both are equal
+            // Sort defeated players last.
+            return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1;
         }
 
         // Sort the undefeated players first.

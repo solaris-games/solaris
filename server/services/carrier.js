@@ -452,16 +452,31 @@ module.exports = class CarrierService {
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
 
+        let warpSpeed = false;
+        
+        if (sourceStar) {
+            warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+        }
+
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
         let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
 
-        return nextLocation;
+        return {
+            location: nextLocation,
+            distance: distancePerTick,
+            warpSpeed,
+            sourceStar,
+            destinationStar
+        };
     }
 
     isInTransit(carrier) {
         return !carrier.orbiting;
+    }
+
+    isInTransitTo(carrier, star) {
+        return this.isInTransit(carrier) && carrier.waypoints[0].destination.equals(star._id);
     }
 
     isLaunching(carrier) {
@@ -473,6 +488,24 @@ module.exports = class CarrierService {
     }
     
     getCarriersEnRouteToStar(game, star) {
-        return game.galaxy.carriers.filter(c => this.isInTransit(c) && c.waypoints[0].destination.equals(star._id));
+        return game.galaxy.carriers.filter(c => 
+            c.waypoints && c.waypoints.length && c.waypoints.find(w => w.destination.equals(star._id)) != null
+        );
+    }
+
+    isLostInSpace(game, carrier) {
+        // If not in transit then it obviously isn't lost in space
+        if (!this.isInTransit(carrier)) {
+            return false;
+        }
+
+        // If the carrier has a waypoint then check if the
+        // current destination exists.
+        if (carrier.waypoints.length) {
+            return game.galaxy.stars.find(s => s._id.equals(carrier.waypoints[0].destination)) == null;
+        }
+
+        // If there are no waypoints and they are in transit then must be lost, otherwise all good.
+        return carrier.waypoints.length === 0;
     }
 };

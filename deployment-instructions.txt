@@ -1,69 +1,25 @@
-// Set all games to be in conquest mode as that was the only supported
-// mode up until now.
-db.games.updateMany({}, {
-    $set: {
-        'settings.general.mode': 'conquest'
-    }
-});
-
-// Append the star name on all events that contain a starId.
-let stars = {};
-
-let games = db.games.find({}, {
-    'galaxy.stars._id': 1,
-    'galaxy.stars.name': 1
-});
-
-games.forEach(function(game) {
+db.games.find({}).forEach(function(game) {
     game.galaxy.stars.forEach(function(star) {
-        stars[star._id.toString()] = star.name;
-    });
-});
-
-db.gameevents.find({
-    'data.starId': { $ne: null },
-    'data.starName': { $eq: null }
-}).forEach(function(gameEvent) {
-    let starName = stars[gameEvent.data.starId.toString()];
-
-    if (starName) {
-        gameEvent.data.starName = starName;
-
-        db.gameevents.save(gameEvent);
-    }
-});
-
-db.gameevents.find({
-    'type': 'playerBulkInfrastructureUpgraded'
-}).forEach(function(gameEvent) {
-    gameEvent.data.upgradeReport.stars.forEach(function(upgradeStar) {
-        if (upgradeStar.starName == null) {
-            let starName = stars[upgradeStar.starId.toString()];
-
-            if (starName) {
-                upgradeStar.starName = starName;
-            }
-        }
+        star.ignoreBulkUpgrade = {
+            economy: star.ignoreBulkUpgrade,
+            industry: star.ignoreBulkUpgrade,
+            science: star.ignoreBulkUpgrade
+        };
     });
 
-    db.gameevents.save(gameEvent);
+    db.games.save(game);
 });
 
-// Add seed data for defeatedDate to all players who have been defeated.
-let utcnow = new Date();
+db.gamehistories.find({}).forEach(function(gamehistory) {
+    if (gamehistory.stars && gamehistory.stars.length) {
+        gamehistory.stars.forEach(function(star) {
+            star.ignoreBulkUpgrade = {
+                economy: star.ignoreBulkUpgrade,
+                industry: star.ignoreBulkUpgrade,
+                science: star.ignoreBulkUpgrade
+            };
+        });
 
-db.games.updateMany({
-    'galaxy.players.defeated': true
-}, {
-    $set: {
-        'galaxy.players.$.defeatedDate': utcnow
-    }
-});
-
-db.gamehistories.updateMany({
-    'players.defeated': true
-}, {
-    $set: {
-        'players.$.defeatedDate': utcnow
+        db.gamehistories.save(gamehistory);
     }
 });

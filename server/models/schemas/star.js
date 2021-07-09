@@ -10,7 +10,11 @@ const schema = new Schema({
     shipsActual: { type: Types.Number, required: true, default: 0 },
     specialistId: { type: Types.Number, required: false, default: null },
     warpGate: { type: Types.Boolean, required: true, default: false },
-    ignoreBulkUpgrade: { type: Types.Boolean, required: false, default: false },
+    ignoreBulkUpgrade: {
+        economy: { type: Types.Boolean, required: false, default: false },
+        industry: { type: Types.Boolean, required: false, default: false },
+        science: { type: Types.Boolean, required: false, default: false }
+    },
     infrastructure: {
         economy: { type: Types.Number, required: true, default: 0 },
         industry: { type: Types.Number, required: true, default: 0 },

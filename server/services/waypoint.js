@@ -53,6 +53,8 @@ module.exports = class WaypointService {
             let sourceStar = this.starService.getByObjectId(game, waypoint.source);
             let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
+            let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
+
             // Make sure the user isn't being a dumbass.
             waypoint.actionShips = waypoint.actionShips || 0;
 
@@ -69,7 +71,7 @@ module.exports = class WaypointService {
 
             // Make sure delay ticks isn't a decimal.
             if (+waypoint.delayTicks % 1 != 0) {
-                throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} delay cannot be a decimal.`);
+                throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} delay cannot be a decimal.`);
             }
 
             // Make sure the user isn't being a dumbass.
@@ -77,8 +79,8 @@ module.exports = class WaypointService {
                 waypoint.delayTicks = 0;
             }
 
-            if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
-                throw new ValidationError(`The waypoint ${sourceStar.name} -> ${destinationStar.name} exceeds hyperspace range.`);
+            if (sourceStar && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
+                throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
             }
         }
         
@@ -116,25 +118,51 @@ module.exports = class WaypointService {
     }
 
     _waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint) {
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
         let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        // Stars may have been destroyed.
+        if (sourceStar == null || destinationStar == null) {
+            return false;
+        }
+
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
 
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    async cullWaypointsByHyperspaceRange(game, carrier) {
+    async cullWaypointsByHyperspaceRangeDB(game, carrier) {
+        let cullResult = this.cullWaypointsByHyperspaceRange(game, carrier);
+
+        if (cullResult) {
+            await this.gameModel.updateOne({
+                _id: game._id,
+                'galaxy.carriers._id': carrier._id
+            }, {
+                $set: {
+                    'galaxy.carriers.$.waypoints': cullResult.waypoints,
+                    'galaxy.carriers.$.waypointsLooped': cullResult.waypointsLooped,
+                }
+            });
+        }
+
+        return cullResult;
+    }
+
+    cullWaypointsByHyperspaceRange(game, carrier) {
         let player = this.playerService.getById(game, carrier.ownedByPlayerId);
 
         // Iterate through all waypoints the carrier has one by one and
         // if any of them are not valid then remove it and all subsequent waypoints.
         let waypointsCulled = false;
 
-        for (let i = 0; i < carrier.waypoints.length; i++) {
+        // If in transit, then cull starting from the 2nd waypoint.
+        let startingWaypointIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
+
+        for (let i = startingWaypointIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];
 
             if (!this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
@@ -151,16 +179,6 @@ module.exports = class WaypointService {
         }
 
         if (waypointsCulled) {
-            await this.gameModel.updateOne({
-                _id: game._id,
-                'galaxy.carriers._id': carrier._id
-            }, {
-                $set: {
-                    'galaxy.carriers.$.waypoints': carrier.waypoints,
-                    'galaxy.carriers.$.waypointsLooped': carrier.waypointsLooped,
-                }
-            });
-
             return {
                 waypoints: carrier.waypoints,
                 waypointsLooped: carrier.waypointsLooped
@@ -216,6 +234,10 @@ module.exports = class WaypointService {
         let firstWaypointStar = this.starService.getByObjectId(game, firstWaypoint.source);
         let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.source);
 
+        if (firstWaypointStar == null || lastWaypointStar == null) {
+            return false;
+        }
+
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
@@ -225,17 +247,17 @@ module.exports = class WaypointService {
     calculateWaypointTicks(game, carrier, waypoint) {
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
-        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
-
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
-        if (sourceStar._id.equals(destinationStar._id)) {
+        if (waypoint.source.equals(waypoint.destination)) {
             return 1 + (waypoint.delayTicks || 0);
         }
 
-        let source = sourceStar.location
-        let destination = destinationStar.location
+        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
+        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        let source = sourceStar == null ? carrier.location : sourceStar.location;
+        let destination = destinationStar.location;
 
         // If the carrier is already en-route, then the number of ticks will be relative
         // to where the carrier is currently positioned.

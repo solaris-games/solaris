@@ -69,6 +69,9 @@ module.exports = class GameTickService extends EventEmitter {
     
             logTime(`Tick ${game.state.tick}`);
 
+            this._sanitiseCarrierWaypoints(game);
+            logTime('Sanitise carrier waypoints');
+
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
 
@@ -152,6 +155,16 @@ module.exports = class GameTickService extends EventEmitter {
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
+    _sanitiseCarrierWaypoints(game) {
+        for (let carrier of game.galaxy.carriers) {
+            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+
+            if (this.carrierService.isLostInSpace(game, carrier)) {
+                this.carrierService.destroyCarrier(game, carrier);
+            }
+        }
+    }
+
     async _combatCarriers(game, gameUsers) {
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
@@ -170,17 +183,33 @@ module.exports = class GameTickService extends EventEmitter {
 
                 let sourceStar = this.starService.getById(game, waypoint.source);
                 let destinationStar = this.starService.getById(game, waypoint.destination);
-                let distanceToSourceCurrent = this.distanceService.getDistanceBetweenLocations(c.location, sourceStar.location);
+
+                // Note: There should never be a scenario where a carrier is travelling to a
+                // destroyed star.
                 let distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
-                let distanceToSourceNext = this.distanceService.getDistanceBetweenLocations(locationNext, sourceStar.location);
-                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext, destinationStar.location);
+                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, destinationStar.location);
+
+                let distanceToSourceCurrent,
+                    distanceToSourceNext;
+
+                // TODO: BUG: Its possible that a carrier is travelling from a star that has been destroyed
+                // and is no longer in the game, this will cause carrier to carrier combat to be actioned.
+                // RESOLUTION: Ideally store the source and destination locations instead of a reference to the stars
+                // and then we still have a reference to the location of the now destroyed star.
+                if (sourceStar) {
+                    distanceToSourceCurrent = this.distanceService.getDistanceBetweenLocations(c.location, sourceStar.location);
+                    distanceToSourceNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, sourceStar.location);
+                } else {
+                    distanceToSourceCurrent = 0;
+                    distanceToSourceNext = distanceToSourceCurrent + locationNext.distance;
+                }
 
                 return {
                     carrier: c,
                     source: waypoint.source,
                     destination: waypoint.destination,
                     locationCurrent: c.location,
-                    locationNext,
+                    locationNext: locationNext.location,
                     distanceToSourceCurrent,
                     distanceToDestinationCurrent,
                     distanceToSourceNext,

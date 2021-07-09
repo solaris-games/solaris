@@ -7,7 +7,9 @@
     <div v-if="!isLoading && guild" class="mb-4">
       <p class="float-right">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
 
-      <h5>Members</h5>
+      <h5 class="mb-0">Guild Roster</h5>
+
+      <p class="mb-2"><small class="text-warning">Total Members: {{1 + guild.officers.length + guild.members.length}}</small></p>
 
       <guild-member-list :guild="guild">
         <template v-slot:default="{ value, getColumnClass }">

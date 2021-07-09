@@ -167,7 +167,11 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
           </div>
 
-          <h4>User Created Games</h4>
+          <hr/>
+
+          <h4 class="mb-0">User Created Games</h4>
+
+          <p class="mb-2"><small class="text-warning" v-if="userGames.length">Total Games: {{userGames.length}}</small></p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -207,7 +211,9 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p>These games are in progress, you can join games with open slots.</p>
+          <p class="mb-1">These games are in progress, you can join games with open slots.</p>
+
+          <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
           <loading-spinner :loading="isLoading"/>
 

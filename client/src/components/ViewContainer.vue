@@ -12,6 +12,11 @@
                   <span class="d-none d-md-inline-block ml-1">Source Code</span>
                 </a>
                 |
+                <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam">
+                  <i class="fab fa-steam"></i>
+                  <span class="d-none d-md-inline-block ml-1">Steam</span>
+                </a>
+                |
                 <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
                   <i class="fab fa-discord"></i>
                   <span class="d-none d-md-inline-block ml-1">Discord</span>
@@ -23,10 +28,10 @@
                 </a>
             </div>
             <div class="col-auto">
-                <!-- <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="text-warning">
+                <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="text-warning">
                   <i class="fas fa-coffee"></i>
                   Donate
-                </a> -->
+                </a>
             </div>
           </div>
         </footer>

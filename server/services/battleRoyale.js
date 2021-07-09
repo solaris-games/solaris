@@ -1,10 +1,11 @@
 module.exports = class BattleRoyaleService {
 
-    constructor(starService, carrierService, mapService, starDistanceService) {
+    constructor(starService, carrierService, mapService, starDistanceService, waypointService) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.mapService = mapService;
         this.starDistanceService = starDistanceService;
+        this.waypointService = waypointService;
     }
 
     performBattleRoyaleTick(game) {
@@ -26,7 +27,7 @@ module.exports = class BattleRoyaleService {
 
         // Calculate which stars need to be destroyed.
         let galaxyCenter = this.mapService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
-        let starCountToDestroy = Math.ceil(0.25 * (game.settings.galaxy.starsPerPlayer - 1) * (1.5 - (game.state.productionTick - peaceCycles - 1) / (game.settings.general.playerLimit * 10)));
+        let starCountToDestroy = game.settings.general.playerLimit;
 
         // There must be at least 1 star left in the galaxy.
         if (game.galaxy.stars.length - starCountToDestroy < 1) {
@@ -39,11 +40,18 @@ module.exports = class BattleRoyaleService {
     }
 
     destroyStar(game, star) {
-        // Destroy any carriers enroute to the star.
+        this.starService.destroyStar(game, star);
+
         let carriers = this.carrierService.getCarriersEnRouteToStar(game, star);
 
+        // Cull the waypoints of carriers that have the given star in its
+        // waypoint queue and destroy those that are lost in space.
         for (let carrier of carriers) {
-            this.carrierService.destroyCarrier(game, carrier);
+            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+
+            if (this.carrierService.isLostInSpace(game, carrier)) {
+                this.carrierService.destroyCarrier(game, carrier);
+            }
         }
 
         // Destroy any carriers stationed at the star.
@@ -52,9 +60,6 @@ module.exports = class BattleRoyaleService {
         for (let carrier of carriers) {
             this.carrierService.destroyCarrier(game, carrier);
         }
-
-        // Destroy the star itself.
-        this.starService.destroyStar(game, star);
     }
 
 };
