@@ -70,7 +70,7 @@ module.exports = class AIService {
         const starGraph = this._computeStarGraph(game, player, playerStars);
 
         // Border star systems with computed score based on distance to enemy
-        const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars, player);
+        const borderStarQueue = this._computeBorderStarQueue(game, player, playerStars, starGraph);
 
         // Graph of carrier movements for logistics
         const logisticsGraph = this._createLogisticsGraph(game, player, vertexIndexToConnectedVertexIndices, borderVertices, borderStarQueue, playerStars);
@@ -146,29 +146,22 @@ module.exports = class AIService {
         return loops;
     }
 
-    _computeBorderStarQueue(game, borderVertices, playerStars, player) {
-        const highestHyperspaceLevel = maxBy(player => player.research.hyperspace.level, game.galaxy.players);
-        const highestHyperspaceDistance = this.distanceService.getHyperspaceDistance(game, highestHyperspaceLevel);
-
+    _computeBorderStarQueue(game, player, playerStars, starGraph) {
         const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && !star.ownedByPlayerId.equals(player._id));
         const borderStarQueue = new Heap({
             comparBefore: (b1, b2) => b1.score < b2.score,
             compar: (b1, b2) => b1.score - b2.score
         });
 
-        for (let borderVertex of borderVertices) {
-            const borderStar = playerStars[borderVertex];
-            const distanceToClosesEnemyStar = minBy(es => this.distanceService.getDistanceBetweenLocations(es.location, borderStar.location), enemyStars);
-            const distanceRelative = distanceToClosesEnemyStar / highestHyperspaceDistance;
-            // if the star is far from any enemy, there's no need to fortify it now.
-            if (distanceRelative < 2) {
-                // give highest priority to stars closest to the enemy
-                const score = 1 / distanceRelative;
-                borderStarQueue.insert({
-                    score,
-                    vertex: borderVertex
-                })
-            }
+        for (let [ starIndex, _ ] of starGraph) {
+            const star = playerStars[starIndex];
+            const distanceToClosestEnemyStar = minBy(es => this.distanceService.getDistanceBetweenLocations(es.location, star.location), enemyStars);
+            const score = 100 / distanceToClosestEnemyStar;
+
+            borderStarQueue.insert({
+                starIndex,
+                score
+            })    
         }
 
         return borderStarQueue;
