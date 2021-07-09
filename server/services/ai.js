@@ -58,7 +58,7 @@ module.exports = class AIService {
         player.researchingNext = 'random'; // Set up the AI for random research.
         
         // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
@@ -67,31 +67,7 @@ module.exports = class AIService {
         // Clear out any carriers that have looped waypoints.
         this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
 
-        // This way, vertex indices = indices into coord array = indices into playerStars array
-        const coords = playerStars.map(star => [ star.location.x, star.location.y ]);
-        const delaunay = Delaunator.from(coords);
-        // Map VertexIndex -> TriangleIndex set
-        const vertexIndexToTriangleIndices = new Map();
-        // Map TriangleIndex -> VertexIndex set
-        const triangleIndexToVertexIndices = new Map();
-        
-        for (let i = 0; i < delaunay.triangles.length; i++) {
-            const triangleIndex = Math.floor(i / 3);
-            const vertexIndex = delaunay.triangles[i];
-            const triangleIndices = vertexIndexToTriangleIndices.get(vertexIndex) || new Set();
-            triangleIndices.add(triangleIndex);
-            vertexIndexToTriangleIndices.set(vertexIndex, triangleIndices);
-            const vertexIndices = triangleIndexToVertexIndices.get(triangleIndex) || new Set();
-            vertexIndices.add(vertexIndex);
-            triangleIndexToVertexIndices.set(triangleIndex, vertexIndices);
-        }
-
-        // Map VertexIndex -> VertexIndex set
-        // Represents the vertex/triangle graph
-        const vertexIndexToConnectedVertexIndices = this._computeVertexGraph(vertexIndexToTriangleIndices, triangleIndexToVertexIndices);
-
-        // Star systems (as vertices/indices) at the empires border
-        const borderVertices = this._computeBorderVertices(triangleIndexToVertexIndices, vertexIndexToTriangleIndices);
+        const starGraph = this._computeStarGraph(game, player, playerStars);
 
         // Border star systems with computed score based on distance to enemy
         const borderStarQueue = this._computeBorderStarQueue(game, borderVertices, playerStars, player);
@@ -101,9 +77,31 @@ module.exports = class AIService {
         
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
 
+        console.log(carrierLoops);
+
         const logisticsOrders = this._createCarrierOrders(carrierLoops);
 
         player.scheduledOrders = logisticsOrders;
+    }
+
+    _computeStarGraph(game, player, playerStars) {
+        const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+
+        const starGraph = new Map();
+
+        playerStars.forEach((star, starIdx) => {
+            const reachableStars = new Set();
+
+            playerStars.forEach((otherStar, otherStarIdx) => {
+                if (this.distanceService.getDistanceBetweenLocations(star.location, otherStar.location) <= hyperspaceRange) {
+                    reachableStars.add(otherStarIdx);
+                }
+            });
+
+            starGraph.set(starIdx, reachableStars);
+        });
+
+        return starGraph;
     }
 
     _createCarrierOrders(carrierLoops) {
@@ -146,69 +144,6 @@ module.exports = class AIService {
         }
 
         return loops;
-    }
-
-    _computeVertexGraph(vertexIndexToTriangleIndices, triangleIndexToVertexIndices) {
-        const vertexIndexToConnectedVertexIndices = new Map();
-        for (let [ vertexIndex, triangleIndices ] of vertexIndexToTriangleIndices) {
-            const otherVertices = new Set();
-            for (let triangleIndex of triangleIndices) {
-                const verticesForTriangle = triangleIndexToVertexIndices.get(triangleIndex);
-                for (let vidx of verticesForTriangle) {
-                    otherVertices.add(vidx);
-                }
-            }
-            vertexIndexToConnectedVertexIndices.set(vertexIndex, otherVertices);
-        }
-
-        return vertexIndexToConnectedVertexIndices;
-    }
-
-    _computeBorderVertices(triangleIndexToVertexIndices, vertexIndexToTriangleIndices) {
-        // borderTriangles: All triangles that have less than 3 triangles they share two vertices with
-        const borderTriangles = new Set();
-        // borderTrianglesToTrianglesWithSharedVertices: border triangles mapped to ALL triangles they share vertices with, regardless of the number.
-        const borderTrianglesToTrianglesWithSharedVertices = new Map();
-        for (let [ triangleIndex, vertexIndices ] of triangleIndexToVertexIndices) {
-            // All triangles the triangleIndex shares vertices with
-            const triangleCandidates = new Set();
-            for (let vertexIndex of vertexIndices) {
-                const trianglesForVertex = vertexIndexToTriangleIndices.get(vertexIndex);
-                for (let trFV of trianglesForVertex) {
-                    triangleCandidates.add(trFV);
-                }
-            }
-            
-            const trianglesWithTwoSharedVertices = Array.from(triangleCandidates).map(triangleCandidate => {
-                const verticesOfCandidate = triangleIndexToVertexIndices.get(triangleCandidate);
-                const sharedVertices = intersectionOfSets(verticesOfCandidate, vertexIndices);
-                return {
-                    sharedVertices,
-                    triangleCandidate
-                }
-            }).filter(cand => cand.sharedVertices.size == 2);
-    
-            if (trianglesWithTwoSharedVertices.length < 3) {
-                borderTriangles.add(triangleIndex);
-                borderTrianglesToTrianglesWithSharedVertices.set(triangleIndex, triangleCandidates);
-            }
-        }
-    
-        // border vertices are vertices of border triangles that are shared with other border triangles
-        // therefore, they correspond to stars at the edge of the empire
-        const borderVertices = new Set();
-        for (let borderTriangle of borderTriangles) {
-            const trianglesWithSharedVertices = borderTrianglesToTrianglesWithSharedVertices.get(borderTriangle);
-            const sharedBorderTriangles = Array.from(trianglesWithSharedVertices).filter(tr => borderTriangles.has(tr));
-            for (let sharedBorderTriangle of sharedBorderTriangles) {
-                const commonVertices = intersectionOfSets(triangleIndexToVertexIndices.get(borderTriangle), triangleIndexToVertexIndices.get(sharedBorderTriangle));
-                for (let commonVertex of commonVertices) {
-                    borderVertices.add(commonVertex);
-                }
-            }
-        }
-
-        return borderVertices;
     }
 
     _computeBorderStarQueue(game, borderVertices, playerStars, player) {
