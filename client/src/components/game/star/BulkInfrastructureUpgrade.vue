@@ -45,6 +45,7 @@
         </div>
       </div>
     </form>
+
     <div v-if="hasChecked" class="row bg-secondary">
       <div class="col text-center pt-3">
         <p v-if="selectedUpgradeStrategy === 'totalCredits'">
@@ -56,6 +57,7 @@
         <p v-if="ignoredCount"><small>{{ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
       </div>
     </div>
+
     <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
       <!-- TODO: This should be a component -->
       <table class="table table-striped table-hover mb-1">
@@ -87,6 +89,8 @@
         </tbody>
       </table>
     </div>
+    
+    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" />
   </div>
 </template>
 
@@ -97,11 +101,13 @@ import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
 import GameContainer from '../../../game/container'
+import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'form-error-list': FormErrorList
+    'form-error-list': FormErrorList,
+    'star-table': BulkInfrastructureUpgradeStarTableVue
   },
   data () {
     return {
@@ -140,6 +146,9 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
     },
     resetPreview (e) {
       this.hasChecked = false

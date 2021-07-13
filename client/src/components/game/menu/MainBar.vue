@@ -88,7 +88,9 @@
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" @onCloseRequested="onCloseRequested"/>
+      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" 
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" 
         @onCloseRequested="onCloseRequested" 
         :mapObjects="menuArguments" 
