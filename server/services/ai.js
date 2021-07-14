@@ -2,7 +2,6 @@ const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
-const Delaunator = require('delaunator');
 const Heap = require('qheap');
 const { intersectionOfSets, maxBy, minBy } = require('../utils.js')
 const OrderService = require('./order.js');

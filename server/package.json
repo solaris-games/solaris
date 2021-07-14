@@ -27,8 +27,7 @@
     "qheap": "^1.4.0",
     "random-seed": "^0.3.0",
     "simplex-noise": "^2.4.0",
-    "socket.io": "^2.4.1",
-    "delaunator": "^4.0.1"
+    "socket.io": "^2.4.1"
   },
   "devDependencies": {
     "jasmine": "^3.7.0"
