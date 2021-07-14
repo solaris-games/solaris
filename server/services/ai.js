@@ -69,11 +69,11 @@ module.exports = class AIService {
 
         const starGraph = this._computeStarGraph(game, player, playerStars);
 
-        // Border star systems with computed score based on distance to enemy
-        const borderStarQueue = this._computeBorderStarQueue(game, player, playerStars, starGraph);
+        // Star systems with computed score based on distance to enemy
+        const starScores = this._computeStarScores(game, player, playerStars, starGraph);
 
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(game, player, vertexIndexToConnectedVertexIndices, borderVertices, borderStarQueue, playerStars);
+        const logisticsGraph = this._createLogisticsGraph(starGraph, starScores);
         
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
 
@@ -146,78 +146,84 @@ module.exports = class AIService {
         return loops;
     }
 
-    _computeBorderStarQueue(game, player, playerStars, starGraph) {
+    _computeStarScores(game, player, playerStars, starGraph) {
         const enemyStars = game.galaxy.stars.filter(star => star.ownedByPlayerId && !star.ownedByPlayerId.equals(player._id));
-        const borderStarQueue = new Heap({
-            comparBefore: (b1, b2) => b1.score < b2.score,
-            compar: (b1, b2) => b1.score - b2.score
-        });
+
+        const scoreMap = new Map();
 
         for (let [ starIndex, _ ] of starGraph) {
             const star = playerStars[starIndex];
             const distanceToClosestEnemyStar = minBy(es => this.distanceService.getDistanceBetweenLocations(es.location, star.location), enemyStars);
             const score = 100 / distanceToClosestEnemyStar;
 
-            borderStarQueue.insert({
+            scoreMap.set(starIndex, score);
+        }
+
+        return scoreMap;
+    }
+
+    _createStarQueue(scoreMap) {
+        const queue = new Heap({
+            comparBefore: (b1, b2) => b1.score < b2.score,
+            compar: (b1, b2) => b1.score - b2.score
+        });
+
+        for (let [ starIndex, score ] of scoreMap) {
+            queue.insert({
                 starIndex,
                 score
             })    
         }
 
-        return borderStarQueue;
+        return queue;
     }
 
-    _createLogisticsGraph(game, player, vertexIndexToConnectedVertexIndices, borderVertices, borderStarQueue, playerStars) {
-        const unmarkedVertices = new Set();
-        for (let vertexIndex of vertexIndexToConnectedVertexIndices) {
-            if (!borderVertices.has(vertexIndex)) {
-                unmarkedVertices.add(vertexIndex);
-            }
-        }
-
-        const playerHyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
-
+    _createLogisticsGraph(starGraph, starScores) {
+        const starQueue = this._createStarQueue(starScores);
         const logisticsGraph = new Map();
-        while (unmarkedVertices.size != 0 && borderStarQueue.length != 0) {
-            const item = borderStarQueue.dequeue();
-            const borderVertex = item.vertex;
-            const oldScore = item.score;
-            const nextConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, borderVertex);
+        
+        while (starQueue.length != 0) {
+            const highestScoredItem = starQueue.dequeue();
+            const nextConnection = this._findNextConnection(logisticsGraph, starGraph, starScores, highestScoredItem.starIndex);
             if (nextConnection) {
-                const fromConnections = logisticsGraph.get(nextConnection.from) || new Set();
-                fromConnections.add(nextConnection.to);
-                logisticsGraph.set(nextConnection.from, fromConnections);
-                borderStarQueue.insert({
-                    score: oldScore * 0.5,
-                    vertex: borderVertex
-                });
+                const newScore = highestScoredItem.score * 0.5;
+                starScores.set(highestScoredItem.starIndex, newScore);
+                const connections = logisticsGraph.get(nextConnection.from) || new Set();
+                connections.add(nextConnection.to);
+                logisticsGraph.set(nextConnection.from, connections);
             }
         }
 
         return logisticsGraph;
     }
 
-    _findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, startingVertex) {
-        const possibleConnections = vertexIndexToConnectedVertexIndices.get(startingVertex);
-        const startingStar = playerStars[startingVertex];
-        const direct = Array.from(possibleConnections).filter(v => this.distanceService.getDistanceBetweenLocations(playerStars[v].location, startingStar.location) <= playerHyperspaceRange).find(v => unmarkedVertices.has(v));
-        if (direct) {
-            unmarkedVertices.delete(direct);
-            return {
-                from: startingVertex,
-                to: direct
-            };
-        }
-        const connected = logisticsGraph.get(startingVertex);
-        if (connected) {
-            for (let c of connected) {
-                const newConnection = this._findNextLogisticsConnection(vertexIndexToConnectedVertexIndices, logisticsGraph, unmarkedVertices, playerStars, playerHyperspaceRange, c);
-                if (newConnection) {
-                    return newConnection;
+    _findNextConnection(logisticsGraph, starGraph, starScores, starIndex) {
+        const candidates = new Set();
+
+        this._findConnectables(logisticsGraph, starGraph, starIndex, candidates, new Set());
+
+        return minBy((connection) => starScores.get(connection.to), candidates)
+    }
+
+    _findConnectables(logisticsGraph, starGraph, start, connectables, visited) {
+        const inRange = starGraph.get(start);
+        const connected = logisticsGraph.get(start);
+        visited.add(start);
+
+        for (let c of inRange) {
+            if (visited.has(c)) {
+                continue;
+            } else {
+                if (connected.has(c)) {
+                    this._findConnectables(logisticsGraph, starGraph, c, connectables, visited);
+                } else {
+                    found.add({
+                        from: start,
+                        to: c
+                    });
                 }
-            }
+            }            
         }
-        return null;
     }
 
     async _playFirstTick(game, player) {
