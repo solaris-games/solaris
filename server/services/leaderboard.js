@@ -1,19 +1,354 @@
 module.exports = class LeaderboardService {
+    static DEFAULT_SELECT = {
+        username: 1,
+        guildId: 1,
+        'roles.contributor': 1,
+        'roles.developer': 1,
+        'roles.communityManager': 1,
+        'achievements.victories': 1,
+        'achievements.rank': 1,
+        'achievements.renown': 1
+    };
+
     static SORTERS = {
         rank: {
-            'achievements.rank': -1,
-            'achievements.victories': -1,
-            'achievements.renown': -1
+            sort: {
+                'achievements.rank': -1,
+                'achievements.victories': -1,
+                'achievements.renown': -1
+            },
+            select: DEFAULT_SELECT
         },
         victories: {
-            'achievements.victories': -1,
-            'achievements.rank': -1,
-            'achievements.renown': -1
+            sort: {
+                'achievements.victories': -1,
+                'achievements.rank': -1,
+                'achievements.renown': -1
+            },
+            select: DEFAULT_SELECT
         },
         renown: {
-            'achievements.renown': -1,
-            'achievements.rank': -1,
-            'achievements.victories': -1
+            sort: {
+                'achievements.renown': -1,
+                'achievements.rank': -1,
+                'achievements.victories': -1
+            },
+            select: DEFAULT_SELECT
+        },
+        joined: {
+            sort: {
+                'achievements.joined': -1
+            },
+            select: {
+                username: 1,
+                'achievements.joined': 1
+            }
+        },
+        completed: {
+            sort: {
+                'achievements.completed': -1
+            },
+            select: {
+                username: 1,
+                'achievements.completed': 1
+            }
+        },
+        quit: {
+            sort: {
+                'achievements.quit': -1
+            },
+            select: {
+                username: 1,
+                'achievements.quit': 1
+            }
+        },
+        defeated: {
+            sort: {
+                'achievements.defeated': -1
+            },
+            select: {
+                username: 1,
+                'achievements.defeated': 1
+            }
+        },
+        afk: {
+            sort: {
+                'achievements.afk': -1
+            },
+            select: {
+                username: 1,
+                'achievements.afk': 1
+            }
+        },
+        "ships-killed": {
+            sort: {
+                'achievements.combat.kills.ships': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.kills.ships': 1
+            }
+        },
+        "carriers-killed": {
+            sort: {
+                'achievements.combat.kills.carriers': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.kills.carriers': 1
+            }
+        },
+        "specialists-killed": {
+            sort: {
+                'achievements.combat.kills.specialists': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.kills.specialists': 1
+            }
+        },
+        "ships-lost": {
+            sort: {
+                'achievements.combat.losses.ships': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.losses.ships': 1
+            }
+        },
+        "carriers-lost": {
+            sort: {
+                'achievements.combat.losses.carriers': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.losses.carriers': 1
+            }
+        },
+        "specialists-lost": {
+            sort: {
+                'achievements.combat.losses.specialists': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.losses.specialists': 1
+            }
+        },
+        "stars-captured": {
+            sort: {
+                'achievements.combat.stars.captured': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.stars.captured': 1
+            }
+        },
+        "stars-lost": {
+            sort: {
+                'achievements.combat.stars.lost': -1
+            },
+            select: {
+                username: 1,
+                'achievements.combat.stars.lost': 1
+            }
+        },
+        "economy": {
+            sort: {
+                'achievements.infastructure.economy': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.economy': 1
+            }
+        },
+        "industry": {
+            sort: {
+                'achievements.infastructure.industry': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.industry': 1
+            }
+        },
+        "science": {
+            sort: {
+                'achievements.infastructure.science': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.science': 1
+            }
+        },
+        "warpgates-built": {
+            sort: {
+                'achievements.infastructure.warpGates': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.warpGates': 1
+            }
+        },
+        "warpgates-destroyed": {
+            sort: {
+                'achievements.infastructure.warpGatesDestroyed': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.warpGatesDestroyed': 1
+            }
+        },
+        "carriers-built": {
+            sort: {
+                'achievements.infastructure.carriers': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.carriers': 1
+            }
+        },
+        "specialists-hired": {
+            sort: {
+                'achievements.infastructure.specialistsHired': -1
+            },
+            select: {
+                username: 1,
+                'achievements.infastructure.specialistsHired': 1
+            }
+        },
+        "scanning": {
+            sort: {
+                'achievements.research.scanning': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.scanning': 1
+            }
+        },
+        "hyperspace": {
+            sort: {
+                'achievements.research.hyperspace': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.hyperspace': 1
+            }
+        },
+        "terraforming": {
+            sort: {
+                'achievements.research.terraforming': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.terraforming': 1
+            }
+        },
+        "experimentation": {
+            sort: {
+                'achievements.research.experimentation': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.experimentation': 1
+            }
+        },
+        "weapons": {
+            sort: {
+                'achievements.research.weapons': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.weapons': 1
+            }
+        },
+        "banking": {
+            sort: {
+                'achievements.research.banking': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.banking': 1
+            }
+        },
+        "manufacturing": {
+            sort: {
+                'achievements.research.manufacturing': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.manufacturing': 1
+            }
+        },
+        "specialists": {
+            sort: {
+                'achievements.research.specialists': -1
+            },
+            select: {
+                username: 1,
+                'achievements.research.specialists': 1
+            }
+        },
+        "credits-sent": {
+            sort: {
+                'achievements.trade.creditsSent': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.creditsSent': 1
+            }
+        },
+        "credits-received": {
+            sort: {
+                'achievements.trade.creditsReceived': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.creditsReceived': 1
+            }
+        },
+        "technologies-sent": {
+            sort: {
+                'achievements.trade.technologySent': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.technologySent': 1
+            }
+        },
+        "technologies-received": {
+            sort: {
+                'achievements.trade.technologyReceived': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.technologyReceived': 1
+            }
+        },
+        "ships-gifted": {
+            sort: {
+                'achievements.trade.giftsSent': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.giftsSent': 1
+            }
+        },
+        "ships-received": {
+            sort: {
+                'achievements.trade.giftsReceived': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.giftsReceived': 1
+            }
+        },
+        "renown-sent": {
+            sort: {
+                'achievements.trade.renownSent': -1
+            },
+            select: {
+                username: 1,
+                'achievements.trade.renownSent': 1
+            }
         }
     }
 
@@ -27,21 +362,11 @@ module.exports = class LeaderboardService {
     async getLeaderboard(limit, sortingKey) {
         const sorter = LeaderboardService.SORTERS[sortingKey] || LeaderboardService.SORTERS['rank']
         let leaderboard = await this.userModel.find({})
-        .limit(limit)
-        .sort(sorter)
-        .select({
-            username: 1,
-            guildId: 1,
-            'roles.contributor': 1,
-            'roles.developer': 1,
-            'roles.communityManager': 1,
-            'roles.gameMaster': 1,
-            'achievements.victories': 1,
-            'achievements.rank': 1,
-            'achievements.renown': 1,
-        })
-        .lean({ defaults: true })
-        .exec();
+            .limit(limit)
+            .sort(sorter.sort)
+            .select(sorter.select)
+            .lean({ defaults: true })
+            .exec();
 
         let userIds = leaderboard.map(x => x._id);
         let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
