@@ -23,5 +23,18 @@ module.exports = {
         }
 
         return lastScore;
+    },
+    minElementBy (min, list) {
+        let lastScore = Number.MAX_SAFE_INTEGER;
+        let minEl = undefined;
+        for (let el of list) {
+            const elScore = min(el);
+            if (elScore < lastScore) {
+                lastScore = elScore;
+                minEl = el;
+            }
+        }
+
+        return minEl;
     }
 }

@@ -6,7 +6,7 @@ module.exports = class OrderService {
         this.waypointService = waypointService;
         this.starService = starService;
         this.orderHandlers = {
-            ORDER_BUILD_AND_SEND_CARRIER: this._handleBuildAndSendCarrier
+            ORDER_BUILD_AND_SEND_CARRIER: this._handleBuildAndSendCarrier.bind(this)
         }
     }
 

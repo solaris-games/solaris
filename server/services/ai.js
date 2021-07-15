@@ -3,7 +3,7 @@ const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Heap = require('qheap');
-const { intersectionOfSets, maxBy, minBy } = require('../utils.js')
+const { minBy, minElementBy } = require('../utils.js')
 const OrderService = require('./order.js');
 
 module.exports = class AIService {
@@ -201,7 +201,7 @@ module.exports = class AIService {
 
         this._findConnectables(logisticsGraph, starGraph, starIndex, candidates, new Set());
 
-        return minBy((connection) => starScores.get(connection.to), candidates)
+        return minElementBy((connection) => starScores.get(connection.to), candidates)
     }
 
     _findConnectables(logisticsGraph, starGraph, start, connectables, visited) {
