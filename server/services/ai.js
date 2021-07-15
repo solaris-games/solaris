@@ -123,7 +123,8 @@ module.exports = class AIService {
                         }
                     ],
                     loop: true
-                }
+                },
+                retryPolicy: "retry"
             }
         });
     }
