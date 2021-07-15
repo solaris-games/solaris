@@ -7,7 +7,7 @@
         <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
       </div>
 
-      <p v-if="!isTradePossible" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
+      <p v-if="!isTradePossible" class="text-danger pt-2 pb-2">You cannot trade with this player, they are not within scanning range.</p>
     </div>
 </template>
 

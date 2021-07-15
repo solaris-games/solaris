@@ -45,16 +45,16 @@
 
             <!-- New Player -->
             <div class="col-sm-12 col-md-4 col-lg-4 pr-1" v-if="games.newPlayerRT">
-              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
+              <div class="card bg-dark text-white new-player-game" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title featured-card-title">
                     <i class="fas fa-user-graduate"></i>
-                    <strong><span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span></strong>
+                    <span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span>
                   </h5>
                   <h6 class="card-title card-subtitle">
-                    <strong>{{getGameTypeFriendlyText(games.newPlayerRT)}}
-                    ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})</strong>
+                    {{getGameTypeFriendlyText(games.newPlayerRT)}}
+                    ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
                   </h6>
                 </div>
               </div>
@@ -388,5 +388,9 @@ export default {
   left: 0;
   margin: 8px;
   background-color: #3498DB;
+}
+
+.new-player-game {
+  border: solid;
 }
 </style>

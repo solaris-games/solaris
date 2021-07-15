@@ -156,6 +156,13 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
+        let userAchievements = await this.achievementService.getAchievements(userId);
+
+        // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
+        if (userAchievements.achievements.completed === 0 && !['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)) {
+            throw new ValidationError('You must complete a "New Player" game before you can join other game types.');
+        }
+
         let isQuitter = game.quitters.find(x => x.equals(userId));
 
         // The user cannot rejoin if they quit early.
@@ -181,10 +188,10 @@ module.exports = class GameService extends EventEmitter {
         // If the user was an afk-er then they are only allowed to join
         // their slot.
         let isAfker = game.afkers.find(x => x.equals(userId));
-        let isRejoiningAfkSlot = isAfker && player.afk && player.userId === userId;
+        let isRejoiningAfkSlot = isAfker && player.afk && player.userId === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && player.userId !== userId) {
+        if (player.afk && isAfker && player.userId !== userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 
@@ -497,22 +504,6 @@ module.exports = class GameService extends EventEmitter {
                 await this.quit(game, player);
             }
         }
-    }
-
-    async userHasCompletedAGame(userId) {
-        let games = await this.gameModel.count({
-            'galaxy.players': {
-                $elemMatch: { 
-                    userId,             // User is in game
-                    afk: false          // User has not been afk'd
-                }
-            },
-            $and: [
-                { 'state.endDate': { $ne: null } } // The game has finished
-            ]
-        });
-
-        return games > 0;
     }
 
 };
