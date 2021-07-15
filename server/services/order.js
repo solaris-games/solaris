@@ -66,7 +66,8 @@ module.exports = class OrderService {
             carrier = await this.starUpgradeService.buildCarrier(game, player, startingStar._id, 1).carrier;
         }
 
-        // The method below is used deliberately, because game.galaxy.carriers does not contain the newly created carrier
-        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
+        if (carrier) {
+            await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
+        }
     }
 }
