@@ -213,10 +213,10 @@ module.exports = class AIService {
             if (visited.has(c)) {
                 continue;
             } else {
-                if (connected.has(c)) {
+                if (connected && connected.has(c)) {
                     this._findConnectables(logisticsGraph, starGraph, c, connectables, visited);
                 } else {
-                    found.add({
+                    connectables.add({
                         from: start,
                         to: c
                     });
