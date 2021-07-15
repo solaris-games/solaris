@@ -411,7 +411,8 @@ async function leaderboard_global(msg, directions) {
     const response = new Discord.MessageEmbed()
     .setColor(`#2d139d`)
     .setTitle(`Top ${limit} for ${sortingKey}`)
-    .setAuthor(`Solaris`, `https://i.imgur.com/u9fOv2B.png?1`)
+    .setURL(`https://solaris.games/#/game?id=${gameId}`)
+    .setAuthor(`Solaris`, `https://i.imgur.com/u9fOv2B.png?1`, `https://github.com/mike-eason/solaris/graphs/contributors`)
     .setThumbnail(`https://i.imgur.com/INmYa7P.png?1`)
     .addFields(
         {name: "Placing", value: position_list},
@@ -420,6 +421,8 @@ async function leaderboard_global(msg, directions) {
     )
     .setTimestamp()
     .setFooter('Sponsored by Solaris', 'https://i.imgur.com/INmYa7P.png?1');
+
+    msg.channel.send(response);
 }
 
 async function leaderboard_local(msg, directions) {
