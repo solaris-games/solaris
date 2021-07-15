@@ -58,13 +58,251 @@ async function Identify_Command(msg) {
 }
 
 async function gameinfo(msg, directions) {
-    //!gameinfo <galaxy_name> <focus>
-    let gameId = '...'; // TODO: Extract from message
-    let userId = null;
+    //!gameinfo <galaxy_name> <focus> ("ID")
+    let game = [];
+    var focus;
+    let game_name = "";
+    let gameId = "";
+    if(directions[directions.length-1] == "ID"){
+        game = await container.gameService.getByIdAll(directions[0])
+        focus = directions[directions.length-2]
+    } else {
+        var i;
+        for(i=0;i<directions.length-1;i++) {
+        game_name += direction[i] + ' ';
+        }
+        game_name = game_name.slice(0, -1)
+        game = await container.gameService.getByNameAll(game_name);
+        focus = directions[directions.length-1]
+    }
 
-    let info = await container.gameService.getByIdInfo(gameId, userId);
+    var NameUniquenessVar = game.length
+    if(NameUniquenessVar != 1) {
+        if(NameUniquenessVar == 0) {
+            msg.channel.send(`Hey <@${msg.author.id}>,\n`+
+            "No game was found with this name, check if you spelled it correctly")
+            return;
+        } else {
+            msg.channel.send(`Hey <@${msg.author.id},\n`+
+            `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n
+            If you do this, add the word "ID" after the filter, as an extra direction.`)
+            return;
+        }
+    }
 
-    // Send message back to discord
+    game_name = game.settings.general.name;
+    gameId = game._id;
+
+    let response = new Discord.MessageEmbed()
+    .setColor(`#2d139d`)
+    .setURL(`https://solaris.games/#/game?id=${gameId}`)
+    .setAuthor(`Solaris`, `https://i.imgur.com/u9fOv2B.png?1`, `https://github.com/mike-eason/solaris/graphs/contributors`)
+    .setThumbnail(`https://i.imgur.com/INmYa7P.png?1`)
+    .setTimestamp()
+    .setFooter('Sponsored by Solaris', 'https://i.imgur.com/INmYa7P.png?1');
+    if(game.settings.general.description){
+        response = response
+        .setDescription(game.settings.general.description);
+    }
+
+    switch (focus) {
+        case "all":
+            response = response
+            .setTitle(`All settings of ${game_name}`)
+            .addFields(
+                {name: "General", value: "\u200B"},
+                {name: "Type", value: game.settings.general.type, inline: true},
+                {name: "Mode", value: game.settings.general.mode, inline: true},
+                {name: "Featured", value: game.settings.general.featured ? "true":"false", inline: true},//next line
+                {name: "Star % for Victory", value: game.settings.general.starVictoryPercentage, inline: true},
+                {name: "Maximum Players", value: game.settings.general.playerLimit, inline: true},
+                {name: "Anonymity", value: game.settings.general.anonymity, inline: true},//next line
+                {name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true},
+                {name: "Time Machine", value: game.settings.general.timeMachine, inline: true},
+                {name: "\u200B", value: "\u200B"},
+                {name: "Galaxy", value: "\u200B"},
+                {name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true},
+                {name: "Stars per Player", value: game.settings.galaxy.starsPerPlayer, inline: true},
+                {name: "Ticks per Cycle", value: game.settings.galaxy.productionTicks, inline: true}, //next line
+                {name: "Carrier Cost", value: game.settings.specialGalaxy.carrierCost, inline: true},
+                {name: "Carrier Upkeep", value: game.settings.specialGalaxy.carrierUpkeepCost, inline: true},
+                {name: "Carrier Speed", value: game.settings.specialGalaxy.carrierSpeed, inline: true},//next line
+                {name: "Warpgate Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true},
+                {name: "Random Warpgates", value: game.settings.specialGalaxy.randomGates, inline: true},
+                {name: "Specialist Cost", value: game.settings.specialGalaxy.specialistCost, inline: true},//next line
+                {name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true},
+                {name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true},
+                {name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true},//next line
+                {name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true},
+                {name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true},
+                {name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true},
+                {name: "\u200B", value: "\u200B"},
+                {name: "Player", value: "\u200B"},
+                {name: "Starting Stars", value: game.settings.player.startingStars, inline: true},
+                {name: "Starting Ships", value: game.settings.player.startingShips, inline: true},
+                {name: "\u200B", value: "\u200B", inline: true},//next line
+                {name: "Starting Economy", value: game.settings.player.startingInfrastructure.economy, inline: true},
+                {name: "Starting Industry", value: game.settings.player.startingInfrastructure.industry, inline: true},
+                {name: "Starting Science", value: game.settings.player.startingInfrastructure.science, inline: true},//next line
+                {name: "Economy Cost", value: game.settings.player.developmentCost.economy, inline: true},
+                {name: "Industry Cost", value: game.settings.player.developmentCost.industry, inline: true},
+                {name: "Science Cost", value: game.settings.player.developmentCost.science, inline: true},//next line
+                {name: "Starting Credits", value: game.settings.player.startingCredits, inline: true},
+                {name: "Starting Specialist Tokens", value: game.settings.player.startingCreditsSpecialists, inline: true},
+                {name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true},//next line
+                {name: "Trade Credits", value: game.settings.player.tradeCredits ? "true":"false", inline: true},
+                {name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true":"false", inline: true},
+                {name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true},
+                {name: "\u200B", value: "\u200B"},
+                {name: "Technology", value: "\u200B"},
+                {name: "Scanning", value: game.settings.technology.startingTechnologyLevel.scanning, inline: true},
+                {name: "Hyperspace Range", value: game.settings.technology.startingTechnologyLevel.hyperspace, inline: true},
+                {name: "Terraforming", value: game.settings.technology.startingTechnologyLevel.terraforming, inline: true},//next line
+                {name: "Experimentation", value: game.settings.technology.startingTechnologyLevel.experimentation, inline: true},
+                {name: "Weapons", value: game.settings.technology.startingTechnologyLevel.weapons, inline: true},
+                {name: "Banking", value: game.settings.technology.startingTechnologyLevel.banking, inline: true},//next line
+                {name: "Manufacturing", value: game.settings.technology.startingTechnologyLevel.manufacturing, inline: true},
+                {name: "Specialists", value: game.settings.technology.startingTechnologyLevel.specialists, inline: true},
+                {name: "\u200B", value: "\u200B", inline: true},//next line
+                {name: "Scanning", value: game.settings.technology.researchCosts.scanning, inline: true},
+                {name: "Hyperspace Range", value: game.settings.technology.researchCosts.hyperspace, inline: true},
+                {name: "Terraforming", value: game.settings.technology.researchCosts.terraforming, inline: true},//next line
+                {name: "Experimentation", value: game.settings.technology.researchCosts.experimentation, inline: true},
+                {name: "Weapons", value: game.settings.technology.researchCosts.weapons, inline: true},
+                {name: "Banking", value: game.settings.technology.researchCosts.banking, inline: true},//next line
+                {name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true},
+                {name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true},
+                {name: "\u200B", value: "\u200B", inline: true},//next line
+                {name: "Banking Reward", value: game.settings.technology.bankingReward},
+                {name: "\u200B", value: "\u200B"},
+                {name: "Time", value: "\u200B"},
+                {name: "Time Type", value: game.settings.gameTime.gameType, inline: true},
+                {name: "Start Delay", value: game.settings.gameTime.startDelay, inline: true}
+            );
+            if(game.settings.gameTime.gameType == 'realTime') {
+                response = response.addFields(
+                    {name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true},
+                );
+            } else {
+                response = response.addFields(
+                    {name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true},
+                    {name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true},
+                    {name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true}
+                );
+            }
+            break;
+        case "general":
+            response = response
+            .setTitle(`General Settings of ${game_name}`)
+            .setFields(
+                {name: "General", value: "\u200B"},
+                {name: "Type", value: game.settings.general.type, inline: true},
+                {name: "Mode", value: game.settings.general.mode, inline: true},
+                {name: "Featured", value: game.settings.general.featured ? "true":"false", inline: true},//next line
+                {name: "Star % for Victory", value: game.settings.general.starVictoryPercentage, inline: true},
+                {name: "Maximum Players", value: game.settings.general.playerLimit, inline: true},
+                {name: "Anonymity", value: game.settings.general.anonymity, inline: true},//next line
+                {name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true},
+                {name: "Time Machine", value: game.settings.general.timeMachine, inline: true}
+            );
+            break;
+        case "galaxy":
+            response = response
+            .setTitle(`Galaxy Settings of ${game_name}`)
+            .setFields(
+                {name: "Galaxy", value: "\u200B"},
+                {name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true},
+                {name: "Stars per Player", value: game.settings.galaxy.starsPerPlayer, inline: true},
+                {name: "Ticks per Cycle", value: game.settings.galaxy.productionTicks, inline: true}, //next line
+                {name: "Carrier Cost", value: game.settings.specialGalaxy.carrierCost, inline: true},
+                {name: "Carrier Upkeep", value: game.settings.specialGalaxy.carrierUpkeepCost, inline: true},
+                {name: "Carrier Speed", value: game.settings.specialGalaxy.carrierSpeed, inline: true},//next line
+                {name: "Warpgate Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true},
+                {name: "Random Warpgates", value: game.settings.specialGalaxy.randomGates, inline: true},
+                {name: "Specialist Cost", value: game.settings.specialGalaxy.specialistCost, inline: true},//next line
+                {name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true},
+                {name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true},
+                {name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true},//next line
+                {name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true},
+                {name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true},
+                {name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true},
+            );
+            break;
+        case "player":
+            response = response
+            .setTitle(`Player Settings of ${game_name}`)
+            .setFields(
+                {name: "Player", value: "\u200B"},
+                {name: "Starting Stars", value: game.settings.player.startingStars, inline: true},
+                {name: "Starting Ships", value: game.settings.player.startingShips, inline: true},
+                {name: "\u200B", value: "\u200B", inline: true},//next line
+                {name: "Starting Economy", value: game.settings.player.startingInfrastructure.economy, inline: true},
+                {name: "Starting Industry", value: game.settings.player.startingInfrastructure.industry, inline: true},
+                {name: "Starting Science", value: game.settings.player.startingInfrastructure.science, inline: true},//next line
+                {name: "Economy Cost", value: game.settings.player.developmentCost.economy, inline: true},
+                {name: "Industry Cost", value: game.settings.player.developmentCost.industry, inline: true},
+                {name: "Science Cost", value: game.settings.player.developmentCost.science, inline: true},//next line
+                {name: "Starting Credits", value: game.settings.player.startingCredits, inline: true},
+                {name: "Starting Specialist Tokens", value: game.settings.player.startingCreditsSpecialists, inline: true},
+                {name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true},//next line
+                {name: "Trade Credits", value: game.settings.player.tradeCredits ? "true":"false", inline: true},
+                {name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true":"false", inline: true},
+                {name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true},
+            );
+            break;
+        case "technology": 
+            response = response
+            .setTitle(`Technology Settings of ${game_name}`)
+            .setFields(
+                {name: "Technology", value: "\u200B"},
+                {name: "Scanning", value: game.settings.technology.startingTechnologyLevel.scanning, inline: true},
+                {name: "Hyperspace Range", value: game.settings.technology.startingTechnologyLevel.hyperspace, inline: true},
+                {name: "Terraforming", value: game.settings.technology.startingTechnologyLevel.terraforming, inline: true},//next line
+                {name: "Experimentation", value: game.settings.technology.startingTechnologyLevel.experimentation, inline: true},
+                {name: "Weapons", value: game.settings.technology.startingTechnologyLevel.weapons, inline: true},
+                {name: "Banking", value: game.settings.technology.startingTechnologyLevel.banking, inline: true},//next line
+                {name: "Manufacturing", value: game.settings.technology.startingTechnologyLevel.manufacturing, inline: true},
+                {name: "Specialists", value: game.settings.technology.startingTechnologyLevel.specialists, inline: true},
+                {name: "\u200B", value: "\u200B", inline: true},//next line
+                {name: "Scanning", value: game.settings.technology.researchCosts.scanning, inline: true},
+                {name: "Hyperspace Range", value: game.settings.technology.researchCosts.hyperspace, inline: true},
+                {name: "Terraforming", value: game.settings.technology.researchCosts.terraforming, inline: true},//next line
+                {name: "Experimentation", value: game.settings.technology.researchCosts.experimentation, inline: true},
+                {name: "Weapons", value: game.settings.technology.researchCosts.weapons, inline: true},
+                {name: "Banking", value: game.settings.technology.researchCosts.banking, inline: true},//next line
+                {name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true},
+                {name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true},
+                {name: "\u200B", value: "\u200B", inline: true},//next line
+                {name: "Banking Reward", value: game.settings.technology.bankingReward},
+            );
+            break;
+        case "time":
+            response = response
+            .setTitle(`Time Settings of ${game_name}`)
+            .setFields(
+                {name: "Time", value: "\u200B"},
+                {name: "Time Type", value: game.settings.gameTime.gameType, inline: true},
+                {name: "Start Delay", value: game.settings.gameTime.startDelay, inline: true}
+            );
+            if(game.settings.gameTime.gameType == 'realTime') {
+                response = response.addFields(
+                    {name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true},
+                );
+            } else {
+                response = response.addFields(
+                    {name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true},
+                    {name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true},
+                    {name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true}
+                );
+            }
+            break;
+        default:
+            response = `Hey <@${msg.author.id},\n
+            It looks like the focus you specified is not in the list, you can choose between "all", "general", "galaxy", "player", "technology" and "time". If you belief this is a bug, contact @Tristanvds#9505.`
+    }
+
+    msg.channel.send(response)
+
 }
 
 async function help(msg, directions) {
@@ -170,10 +408,6 @@ async function leaderboard_global(msg, directions) {
         sortingKey_list = sortingKey_list + leaderboard[i][DesiredKey] + "\n"
     }
 
-
-
-
-    
     const response = new Discord.MessageEmbed()
     .setColor(`#2d139d`)
     .setTitle(`Top ${limit} for ${sortingKey}`)

@@ -26,6 +26,23 @@ module.exports = class GameService extends EventEmitter {
             .exec();
     }
 
+    async getByNameAll(name) {
+        return await this.gameModel.find({
+            'settings.general.name': name
+        })
+        .exec();
+        //Realise that does not necessarily return a single game, as multiple games can share the same name.
+    }
+
+    async getByName(name, select) {
+        return await this.gameModel.find({
+            'settings.general.name': name
+        })
+        .select(select)
+        .exec();
+        //Realise that does not necessarily return a single game, as multiple games can share the same name.
+    }
+
     async getByIdLean(id, select) {
         return await this.gameModel.findById(id)
             .select(select)
