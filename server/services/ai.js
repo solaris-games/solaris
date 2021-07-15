@@ -76,8 +76,6 @@ module.exports = class AIService {
         
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
 
-        console.log(carrierLoops);
-
         const logisticsOrders = this._createCarrierOrders(carrierLoops);
 
         player.scheduledOrders = logisticsOrders;
