@@ -1,10 +1,11 @@
 module.exports = class OrderService {
     static ORDER_BUILD_AND_SEND_CARRIER = "ORDER_BUILD_AND_SEND_CARRIER";
 
-    constructor(carrierService, waypointService, starService) {
+    constructor(carrierService, waypointService, starService, starUpgradeService) {
         this.carrierService = carrierService;
         this.waypointService = waypointService;
         this.starService = starService;
+        this.starUpgradeService = starUpgradeService;
         this.orderHandlers = {
             ORDER_BUILD_AND_SEND_CARRIER: this._handleBuildAndSendCarrier.bind(this)
         }
@@ -48,7 +49,7 @@ module.exports = class OrderService {
             return false;
         }
 
-        const startingStar = this.starService.getById(data.waypoints[0].source);
+        const startingStar = this.starService.getById(game, data.waypoints[0].source);
         
         if (!Math.floor(startingStar.shipsActual)) {
             return false;
@@ -62,9 +63,10 @@ module.exports = class OrderService {
         if (availableCarriers.length != 0) {
             carrier = availableCarriers[0];
         } else {
-            carrier = await this.carrierService.createAtStar(startingStar, game.carriers, 1);
+            carrier = await this.starUpgradeService.buildCarrier(game, player, startingStar._id, 1).carrier;
         }
 
-        this.waypointService.saveWaypoints(game, player, carrier._id, data.waypoints, Boolean(data.loop))
+        // The method below is used deliberately, because game.galaxy.carriers does not contain the newly created carrier
+        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
     }
 }

@@ -15,11 +15,14 @@ module.exports = class WaypointService {
     }
 
     async saveWaypoints(game, player, carrierId, waypoints, looped) {
+        let carrier = this.carrierService.getById(game, carrierId);
+        return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
+    }
+
+    async saveWaypointsForCarrier(game, player, carrier, waypoints, looped) {
         if (looped == null) {
             looped = false;
         }
-        
-        let carrier = this.carrierService.getById(game, carrierId);
         
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
