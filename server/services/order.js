@@ -76,6 +76,7 @@ module.exports = class OrderService {
 
         if (carrier) {
             await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
+            return true; //Success
         }
     }
 }
