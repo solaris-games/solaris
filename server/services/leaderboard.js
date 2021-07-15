@@ -1,15 +1,4 @@
 module.exports = class LeaderboardService {
-    static DEFAULT_SELECT = {
-        username: 1,
-        guildId: 1,
-        'roles.contributor': 1,
-        'roles.developer': 1,
-        'roles.communityManager': 1,
-        'achievements.victories': 1,
-        'achievements.rank': 1,
-        'achievements.renown': 1
-    };
-
     static SORTERS = {
         rank: {
             sort: {
@@ -17,7 +6,16 @@ module.exports = class LeaderboardService {
                 'achievements.victories': -1,
                 'achievements.renown': -1
             },
-            select: DEFAULT_SELECT
+            select: {
+                username: 1,
+                guildId: 1,
+                'roles.contributor': 1,
+                'roles.developer': 1,
+                'roles.communityManager': 1,
+                'achievements.rank': 1,
+                'achievements.victories': 1,
+                'achievements.renown': 1
+            }
         },
         victories: {
             sort: {
@@ -25,7 +23,16 @@ module.exports = class LeaderboardService {
                 'achievements.rank': -1,
                 'achievements.renown': -1
             },
-            select: DEFAULT_SELECT
+            select: {
+                username: 1,
+                guildId: 1,
+                'roles.contributor': 1,
+                'roles.developer': 1,
+                'roles.communityManager': 1,
+                'achievements.victories': 1,
+                'achievements.rank': 1,
+                'achievements.renown': 1
+            }
         },
         renown: {
             sort: {
@@ -33,7 +40,16 @@ module.exports = class LeaderboardService {
                 'achievements.rank': -1,
                 'achievements.victories': -1
             },
-            select: DEFAULT_SELECT
+            select: {
+                username: 1,
+                guildId: 1,
+                'roles.contributor': 1,
+                'roles.developer': 1,
+                'roles.communityManager': 1,
+                'achievements.renown': 1,
+                'achievements.rank': 1,
+                'achievements.victories': 1
+            }
         },
         joined: {
             sort: {

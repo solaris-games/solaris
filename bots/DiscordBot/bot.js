@@ -76,7 +76,7 @@ async function help(msg, directions) {
             "You can use the following commands in this discord:\n" +
             "``!gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
             "``!help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
-            "``!leaderboard_global <filter>`` - rank all players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
+            "``!leaderboard_global <filter> <limit>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
             "``!leaderboard_local <galaxy_name> <filter>`` - rank players in a galaxy based on a certain criteria, like stars, economy, ships and more.\n" +
             "``!userinfo <username> <focus>`` - get information about a user, like rank, renown or made economy.\n" +
             "I hope this automated response has helped you in understanding commands for the bot. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.")
@@ -105,8 +105,9 @@ async function help(msg, directions) {
                 break;
             case leaderboard_global:
                 msg.channel.send(`Hey <@${id}>,\n` +
-                    "the ``!leaderboard_global <filter> command gives you the top 50 within a certain filter.\n" +
-                    "These filters can be almost anything, the full list of possible filters is: ``victories``, ``rank``, ``renown``, games ``joined``, games ``completed``, games ``quit``, games ``defeated``, games ``afk``, " +
+                    "the ``!leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
+                    "The limit has to be a value between 1 and 50, the leaderboard will return the top x players, where x is that number.\n" +
+                    "The filters can be almost anything, the full list of possible filters is: ``victories``, ``rank``, ``renown``, games ``joined``, games ``completed``, games ``quit``, games ``defeated``, games ``afk``, " +
                     "``ships-killed``, ``carriers-killed``, ``specialists-killed``, ``ships-lost``, ``carriers-lost``, ``specialists-lost``, ``stars-captured``, ``stars-lost``, " +
                     "``economy`` built, ``industry`` built, ``science`` built, ``warpgates-built``, ``warpgates-destroyed``, ``carriers-built``, ``specialists-hired``, ``scanning`` researched, ``hyperspace`` range researched, ``terraforming`` researched, " +
                     "``experimentation`` researched, ``weapons`` researched, ``banking`` researched, ``manufacturing`` researched, ``specialists`` researched, ``credits-sent``, ``credits-received``, ``technologies-sent``, ``technologies-received``, " +
@@ -146,13 +147,45 @@ async function help(msg, directions) {
 }
 
 async function leaderboard_global(msg, directions) {
-    //!leaderboard_global <filter>
-    let limit = 10;
-    let sortingKey = directions[0]; // Extract from message somehow
+    //!leaderboard_global <filter> <limit>
+    let limit = directions[1];
+    let sortingKey = directions[0];
+    if(!(limit >= 1 && limit <= 50)){
+        limit = 10;
+    };
 
+    // Calculating how the leaderboard looks,
     let leaderboard = await container.leaderboardService.getLeaderboard(limit, sortingKey);
 
-    // Send message back to discord.
+    var position_list = "";
+    var username_list = "";
+    var sample = Object.keys(leaderboard[0]);
+    var nonDesirables = ["username","position", "guild", "guildId", "roles.contributor","roles.developer","roles.communitymanager"]
+    var DesiredKey = sample.filter(x => !nonDesirables.includes(x))[0];
+    var sortingKey_list = "";
+
+    for(i=0; i<leaderboard.length;i++){
+        position_list = position_list + (i+1) + "\n";
+        username_list = username_list + leaderboard[i].username + "\n";
+        sortingKey_list = sortingKey_list + leaderboard[i][DesiredKey] + "\n"
+    }
+
+
+
+
+    
+    const response = new Discord.MessageEmbed()
+    .setColor(`#2d139d`)
+    .setTitle(`Top ${limit} for ${sortingKey}`)
+    .setAuthor(`Solaris`, `https://i.imgur.com/u9fOv2B.png?1`)
+    .setThumbnail(`https://i.imgur.com/INmYa7P.png?1`)
+    .addFields(
+        {name: "Placing", value: position_list},
+        {name: "Name", value: username_list},
+        {name: `${sortingKey}`, value: sortingKey_list}
+    )
+    .setTimestamp()
+    .setFooter('Sponsored by Solaris', 'https://i.imgur.com/INmYa7P.png?1');
 }
 
 async function leaderboard_local(msg, directions) {
