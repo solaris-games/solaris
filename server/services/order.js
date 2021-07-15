@@ -19,11 +19,15 @@ module.exports = class OrderService {
         const newOrders = [];
 
         for (let order of player.scheduledOrders) {
-            const success = await this._performOrder(game, player, order.orderType, order.data);
-            const retryPolicy = order.retryPolicy || "delete";
-            if (!success) {
-                if (retryPolicy === "retry") {
-                    newOrders.push(order);
+            let success = false;
+            try {
+                success = await this._performOrder(game, player, order.orderType, order.data);
+            } finally {
+                if (!success) {
+                    const retryPolicy = order.retryPolicy || "delete";
+                    if (retryPolicy === "retry") {
+                        newOrders.push(order);
+                    }
                 }
             }
         }
@@ -49,11 +53,10 @@ module.exports = class OrderService {
             return false;
         }
 
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
+        const carrierCost = this.starUpgradeService.calculateCarrierCost(game, expenseConfig);
+
         const startingStar = this.starService.getById(game, data.waypoints[0].source);
-        
-        if (!Math.floor(startingStar.shipsActual)) {
-            return false;
-        }
         
         const carriersAtStar = this.carrierService.getCarriersAtStar(game, startingStar._id);
         const carriersOfPlayer = this.carrierService.listCarriersOwnedByPlayer(carriersAtStar, player._id);
@@ -63,6 +66,11 @@ module.exports = class OrderService {
         if (availableCarriers.length != 0) {
             carrier = availableCarriers[0];
         } else {
+            if (!Math.floor(startingStar.shipsActual) || player.credits < carrierCost) {
+                //Returning false means we either skip this order or retry next time
+                return false;
+            }
+            
             carrier = await this.starUpgradeService.buildCarrier(game, player, startingStar._id, 1).carrier;
         }
 
