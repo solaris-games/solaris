@@ -200,7 +200,9 @@ module.exports = class AIService {
 
         this._findConnectables(logisticsGraph, starGraph, starIndex, candidates, new Set());
 
-        return minElementBy((connection) => starScores.get(connection.to), candidates)
+        const starScore = starScores.get(starIndex);
+        const lowerConnections = Array.from(candidates).filter(c => starScores.get(c.to) < starScore);
+        return minElementBy((connection) => starScores.get(connection.to), lowerConnections)
     }
 
     _findConnectables(logisticsGraph, starGraph, start, connectables, visited) {
