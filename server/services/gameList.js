@@ -175,6 +175,25 @@ module.exports = class GameListService {
         .exec();
     }
 
+    async listInProgressGamesGameTick() {
+        return await this.gameModel.find({
+            'state.startDate': { $lte: moment().utc().toDate() },
+            'state.endDate': { $eq: null },
+            'state.paused': { $eq: false },
+            'state.locked': { $eq: false }
+        })
+        .sort({
+            'settings.gameTime.speed': 1    // Prioritise faster games first.
+        })
+        .select({
+            _id: 1,
+            state: 1,
+            settings: 1,
+            'galaxy.players': 1
+        })
+        .exec();
+    }
+
     async listOpenGamesCreatedByUser(userId) {
         return await this.gameModel.find({
             'settings.general.createdByUserId': { $eq: userId },

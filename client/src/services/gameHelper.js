@@ -303,14 +303,14 @@ class GameHelper {
     return totalTicks
   }
 
-  calculateTimeByTicks (ticks, speedInMins, relativeTo = null) {
+  calculateTimeByTicks (ticks, speedInSeconds, relativeTo = null) {
     if (relativeTo == null) {
       relativeTo = moment().utc()
     } else {
       relativeTo = moment(relativeTo).utc()
     }
 
-    return relativeTo.add(ticks * speedInMins, 'm')
+    return relativeTo.add(ticks * speedInSeconds, 'seconds')
   }
 
   canLoop (game, player, carrier) {
@@ -705,8 +705,9 @@ class GameHelper {
     let nextTick;
 
     if (this.isRealTimeGame(game)) {
+      debugger
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
         // If in turn based mode, then check if all undefeated players are ready.
         // OR the max time wait limit has been reached.

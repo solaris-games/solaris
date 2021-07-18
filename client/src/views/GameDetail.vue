@@ -283,7 +283,8 @@
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Game Time</td>
-              <td class="text-right">{{ game.settings.gameTime.speed }} minute(s)/tick</td>
+              <td class="text-right" v-if="game.settings.gameTime.speed >= 60">{{ game.settings.gameTime.speed/60 }} minute(s)/tick</td>
+              <td class="text-right" v-if="game.settings.gameTime.speed < 60">{{ game.settings.gameTime.speed }} second(s)/tick</td>
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Start Delay</td>
