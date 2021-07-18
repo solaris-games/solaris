@@ -157,9 +157,10 @@ module.exports = class GameService extends EventEmitter {
         }
 
         let userAchievements = await this.achievementService.getAchievements(userId);
-
+        let isNewPlayer = userAchievements.achievements.completed === 0;
+        
         // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
-        if (userAchievements.achievements.completed === 0 && !['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)) {
+        if (isNewPlayer && !this.isNewPlayerGame(game)) {
             throw new ValidationError('You must complete a "New Player" game before you can join other game types.');
         }
 
@@ -301,7 +302,9 @@ module.exports = class GameService extends EventEmitter {
         
         let alias = player.alias;
 
-        game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
+        if (!this.isNewPlayerGame(game)) {
+            game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
+        }
 
         await this.achievementService.incrementQuit(player.userId);
 
@@ -481,6 +484,10 @@ module.exports = class GameService extends EventEmitter {
 
     isBattleRoyaleMode(game) {
         return game.settings.general.mode === 'battleRoyale';
+    }
+
+    isNewPlayerGame(game) {
+        return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
     }
     
     async quitAllActiveGames(userId) {
