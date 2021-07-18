@@ -48,11 +48,11 @@
               <div class="card bg-dark text-white new-player-game" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
-                  <h5 class="card-title featured-card-title">
+                  <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
                     <span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle">
+                  <h6 class="card-title card-subtitle new-player-card-subtitle">
                     {{getGameTypeFriendlyText(games.newPlayerRT)}}
                     ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
                   </h6>
@@ -381,6 +381,10 @@ export default {
   background-color: #00bc8c;
 }
 
+.new-player-card-title {
+  background-color: #f39c12;
+}
+
 .card-subtitle {
   font-size: 12px;
   position: absolute;
@@ -390,7 +394,11 @@ export default {
   background-color: #3498DB;
 }
 
+.new-player-card-subtitle {
+  background-color: #f39c12;
+}
+
 .new-player-game {
-  border: solid;
+  border: 3px solid #f39c12;
 }
 </style>
