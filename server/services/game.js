@@ -157,10 +157,10 @@ module.exports = class GameService extends EventEmitter {
         }
 
         let userAchievements = await this.achievementService.getAchievements(userId);
-        let isNewPlayer = userAchievements.achievements.rank === 0;
+        let isEstablishedPlayer = userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
         
         // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
-        if (isNewPlayer && !this.isNewPlayerGame(game)) {
+        if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
             throw new ValidationError('You must complete a "New Player" game before you can join other game types.');
         }
 
