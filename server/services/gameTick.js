@@ -69,9 +69,6 @@ module.exports = class GameTickService extends EventEmitter {
     
             logTime(`Tick ${game.state.tick}`);
 
-            this._sanitiseCarrierWaypoints(game);
-            logTime('Sanitise carrier waypoints');
-
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
 
@@ -122,8 +119,8 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     canTick(game) {
-        // Cannot perform a game tick on a paused or completed game.
-        if (game.state.paused || game.state.endDate) {
+        // Cannot perform a game tick on a locked, paused or completed game.
+        if (game.state.locked || game.state.paused || game.state.endDate) {
             return false;
         }
 
@@ -137,7 +134,7 @@ module.exports = class GameTickService extends EventEmitter {
         
         if (this.gameService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
         } else if (this.gameService.isTurnBasedGame(game)) {
             // If in turn based mode, then check if all undefeated players are ready.
             // OR the max time wait limit has been reached.
@@ -153,16 +150,6 @@ module.exports = class GameTickService extends EventEmitter {
         }
     
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
-    }
-
-    _sanitiseCarrierWaypoints(game) {
-        for (let carrier of game.galaxy.carriers) {
-            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
-
-            if (this.carrierService.isLostInSpace(game, carrier)) {
-                this.carrierService.destroyCarrier(game, carrier);
-            }
-        }
     }
 
     async _combatCarriers(game, gameUsers) {
