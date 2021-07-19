@@ -548,10 +548,6 @@
         ],
         "speed": [
             {
-                "value": 10,
-                "text": "Hyper Fast (1 tick = 10 seconds)"
-            },
-            {
                 "value": 30,
                 "text": "Ultra Fast (1 tick = 30 seconds)"
             },

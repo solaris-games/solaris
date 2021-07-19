@@ -91,7 +91,7 @@ export default {
       }
     }
 
-    let reloadGameCheckInterval = this.$store.state.game.settings.gameTime.speed === 10 ? 2500 : 10000
+    let reloadGameCheckInterval = this.$store.state.game.settings.gameTime.speed < 60 ? 5000 : 10000
 
     this.polling = setInterval(this.reloadGameCheck, reloadGameCheckInterval)
 
@@ -341,7 +341,7 @@ export default {
 
       // Check if the next tick date has passed, if so check if the server has finished the game tick.
       // Alternatively if the game is set to 10s ticks then always check.
-      let canTick = this.$store.state.game.settings.gameTime.speed === 10 || gameHelper.canTick(this.$store.state.game)
+      let canTick = this.$store.state.game.settings.gameTime.speed <= 10 || gameHelper.canTick(this.$store.state.game)
 
       if (canTick) {
         try {

@@ -705,7 +705,6 @@ class GameHelper {
     let nextTick;
 
     if (this.isRealTimeGame(game)) {
-      debugger
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
