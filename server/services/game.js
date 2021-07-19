@@ -157,7 +157,7 @@ module.exports = class GameService extends EventEmitter {
         }
 
         let userAchievements = await this.achievementService.getAchievements(userId);
-        let isNewPlayer = userAchievements.achievements.completed === 0;
+        let isNewPlayer = userAchievements.achievements.rank === 0;
         
         // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
         if (isNewPlayer && !this.isNewPlayerGame(game)) {
