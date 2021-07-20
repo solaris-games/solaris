@@ -21,19 +21,12 @@ module.exports = class AIService {
             throw new Error('The player is not under AI control.');
         }
 
-        // Considering the growing complexity of AI logic, 
-        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
-        try {
-            if (!player.ai) {
-                await this._setupAi(game, player);
-                player.ai = true;
-            }
-            await this.aiOrderService.processOrdersForPlayer(game, player);
-        } catch (e) {
-            console.error(e);
-        }
+        await this._doAdvancedLogic(game, player);
 
-        // Two separate try statements: If the "advanced" AI logic crashes, at least we can keep upgrading stars
+        await this._doBasicLogic(game, player);
+    }
+
+    async _doBasicLogic(game, player) {
         try {
             let isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
             let isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
@@ -53,19 +46,21 @@ module.exports = class AIService {
         player.credits = Math.max(0, player.credits);
     }
 
-    async _setupAi(game, player) {
-        player.researchingNext = 'random'; // Set up the AI for random research.
-        
-        // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
-        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
-        for (let star of playerStars) {
-            this.starService.resetIgnoreBulkUpgradeStatuses(star);
+    async _doAdvancedLogic(game, player) {
+        // Considering the growing complexity of AI logic, 
+        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
+        try {
+            if (!player.ai) {
+                await this._setupAi(game, player);
+                player.ai = true;
+            }
+            await this.aiOrderService.processOrdersForPlayer(game, player);
+        } catch (e) {
+            console.error(e);
         }
+    }
 
-        // Clear out any carriers that have looped waypoints.
-        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
-
+    async _setupAi(game, player) {
         const starGraph = this._computeStarGraph(game, player, playerStars);
 
         // Star systems with computed score based on distance to enemy

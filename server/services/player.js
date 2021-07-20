@@ -680,6 +680,18 @@ module.exports = class PlayerService extends EventEmitter {
         if (game.settings.gameTime.gameType === 'turnBased') {
             player.ready = true;
         }
+
+        player.researchingNext = 'random'; // Set up the AI for random research.
+        
+        // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        for (let star of playerStars) {
+            this.starService.resetIgnoreBulkUpgradeStatuses(star);
+        }
+
+        // Clear out any carriers that have looped waypoints.
+        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
     }
 
     setPlayerAsAfk(game, player) {
