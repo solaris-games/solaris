@@ -61,6 +61,8 @@ module.exports = class AIService {
     }
 
     async _setupAi(game, player) {
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
         const starGraph = this._computeStarGraph(game, player, playerStars);
 
         // Star systems with computed score based on distance to enemy
@@ -106,14 +108,14 @@ module.exports = class AIService {
                         {
                             source: loop.from._id,
                             destination: loop.to._id,
-                            action: "collectAll",
+                            action: "dropAll",
                             actionShips: 0,
                             delayTicks: 0
                         }, 
                         {
                             source: loop.to._id,
                             destination: loop.from._id,
-                            action: "dropAll",
+                            action: "collectAll",
                             actionShips: 0,
                             delayTicks: 0
                         }
@@ -128,11 +130,11 @@ module.exports = class AIService {
     _computeCarrierLoopsFromGraph(logisticsGraph, playerStars) {
         const loops = new Array(logisticsGraph.size);
 
-        for (let [ start, connected ] of logisticsGraph) {
-            for (let end of connected) {
+        for (let [ destination, connected ] of logisticsGraph) {
+            for (let source of connected) {
                 loops.push({
-                    from: playerStars[start],
-                    to: playerStars[end]
+                    from: playerStars[source],
+                    to: playerStars[destination]
                 })
             }
         }
