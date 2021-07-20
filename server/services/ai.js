@@ -83,6 +83,7 @@ module.exports = class AIService {
 
     _computeStarGraph(game, player, playerStars) {
         const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
 
         const starGraph = new Map();
 
@@ -90,7 +91,7 @@ module.exports = class AIService {
             const reachableStars = new Set();
 
             playerStars.forEach((otherStar, otherStarIdx) => {
-                if (this.distanceService.getDistanceBetweenLocations(star.location, otherStar.location) <= hyperspaceRange) {
+                if (this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
                     reachableStars.add(otherStarIdx);
                 }
             });
@@ -151,7 +152,7 @@ module.exports = class AIService {
 
         for (let [ starIndex, _ ] of starGraph) {
             const star = playerStars[starIndex];
-            const distanceToClosestEnemyStar = minBy(es => this.distanceService.getDistanceBetweenLocations(es.location, star.location), enemyStars);
+            const distanceToClosestEnemyStar = minBy(es => this.distanceService.getDistanceSquaredBetweenLocations(es.location, star.location), enemyStars);
             const score = 100 / distanceToClosestEnemyStar;
 
             scoreMap.set(starIndex, score);
