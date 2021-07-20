@@ -44,6 +44,7 @@ const ConversationService = require('../services/conversation');
 const ReputationService = require('../services/reputation');
 const AIService = require('../services/ai');
 const AITradeService = require('../services/aiTrade');
+const AIOrderService = require('../services/aiOrder');
 const GuildService = require('../services/guild');
 const GuildUserService = require('../services/guildUser');
 
@@ -55,7 +56,6 @@ const IrregularMapService = require('../services/maps/irregular');
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
-const OrderService = require('../services/order');
 
 module.exports = (config, io) => {
     // Poor man's dependency injection.
@@ -97,8 +97,8 @@ module.exports = (config, io) => {
     const specialistHireService = new SpecialistHireService(GameModel, specialistService, achievementService, waypointService, playerService, starService);
     const conversationService = new ConversationService(GameModel, EventModel);
     const starUpgradeService = new StarUpgradeService(GameModel, starService, carrierService, achievementService, researchService, technologyService, playerService);
-    const orderService = new OrderService(carrierService, waypointService, starService, starUpgradeService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, orderService);
+    const aiOrderService = new AIOrderService(carrierService, waypointService, starService, starUpgradeService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, aiOrderService);
     const historyService = new HistoryService(HistoryModel, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
     const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService);

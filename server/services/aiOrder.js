@@ -1,4 +1,4 @@
-module.exports = class OrderService {
+module.exports = class AIOrderService {
     static ORDER_BUILD_AND_SEND_CARRIER = "ORDER_BUILD_AND_SEND_CARRIER";
 
     constructor(carrierService, waypointService, starService, starUpgradeService) {
@@ -24,10 +24,7 @@ module.exports = class OrderService {
                 success = await this._performOrder(game, player, order.orderType, order.data);
             } finally {
                 if (!success) {
-                    const retryPolicy = order.retryPolicy || "delete";
-                    if (retryPolicy === "retry") {
-                        newOrders.push(order);
-                    }
+                    newOrders.push(order);
                 }
             }
         }
@@ -71,12 +68,12 @@ module.exports = class OrderService {
                 return false;
             }
             
-            carrier = await this.starUpgradeService.buildCarrier(game, player, startingStar._id, 1).carrier;
+            carrier = await this.starUpgradeService.buildCarrier(game, player, startingStar._id, startingStar.ships).carrier;
         }
 
         if (carrier) {
             await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
-            return true; //Success
+            return true;
         }
     }
 }

@@ -233,7 +233,6 @@ module.exports = class GameService extends EventEmitter {
         player.defeatedDate = null;
         player.afk = false;
         player.ai = false;
-        player.reputations = [];
         player.missedTurns = 0;
         player.hasSentTurnReminder = false;
 

@@ -4,16 +4,16 @@ const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Heap = require('qheap');
 const { minBy, minElementBy } = require('../utils.js')
-const OrderService = require('./order.js');
+const AIOrderService = require('./aiOrder.js');
 
 module.exports = class AIService {
 
-    constructor(starUpgradeService, carrierService, starService, distanceService, orderService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, aiOrderService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
-        this.orderService = orderService;
+        this.aiOrderService = aiOrderService;
     }
 
     async play(game, player) {
@@ -28,7 +28,7 @@ module.exports = class AIService {
                 await this._setupAi(game, player);
                 player.ai = true;
             }
-            await this.orderService.processOrdersForPlayer(game, player);
+            await this.aiOrderService.processOrdersForPlayer(game, player);
         } catch (e) {
             console.error(e);
         }
@@ -104,7 +104,7 @@ module.exports = class AIService {
     _createCarrierOrders(carrierLoops) {
         return carrierLoops.map(loop => {
             return {
-                orderType: OrderService.ORDER_BUILD_AND_SEND_CARRIER,
+                orderType: AIOrderService.ORDER_BUILD_AND_SEND_CARRIER,
                 data: {
                     waypoints: [ 
                         {
