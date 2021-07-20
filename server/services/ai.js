@@ -86,7 +86,7 @@ module.exports = class AIService {
             const reachableStars = new Set();
 
             playerStars.forEach((otherStar, otherStarIdx) => {
-                if (this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
+                if (starIdx !== otherStarIdx && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
                     reachableStars.add(otherStarIdx);
                 }
             });
