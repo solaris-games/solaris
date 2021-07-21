@@ -62,6 +62,9 @@ module.exports = class GameTickService extends EventEmitter {
         // If we are in turn based mode, we need to repeat the tick X number of times.
         if (this.gameService.isTurnBasedGame(game)) {
             iterations = game.settings.gameTime.turnJumps;
+
+            // Increment missed turns for players so that they can be kicked for being AFK later.
+            this.playerService.incrementMissedTurns(game);
         }
 
         while (iterations--) {
@@ -101,7 +104,7 @@ module.exports = class GameTickService extends EventEmitter {
             }
         }
 
-        this._resetPlayersReadyStatus(game);
+        this.playerService.resetReadyStatuses(game);
 
         await game.save();
         logTime('Save game');
@@ -504,12 +507,6 @@ module.exports = class GameTickService extends EventEmitter {
     async _playAI(game) {
         for (let player of game.galaxy.players.filter(p => p.defeated)) {
             await this.aiService.play(game, player);
-        }
-    }
-
-    _resetPlayersReadyStatus(game) {
-        for (let player of game.galaxy.players) {
-            player.ready = false;
         }
     }
 
