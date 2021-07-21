@@ -26,7 +26,7 @@
                     {{game.settings.general.name}}
                     <span v-if="game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
                     <span v-if="isRealTimeGame(game)" class="ml-1 badge badge-danger">
-                      Next cycle: <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                      {{getNextCycleText(game)}} <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
                     </span>
                     <span v-if="game.unread" class="ml-2 badge badge-info">{{game.unread}} Notifications</span>
                   </td>
@@ -143,6 +143,12 @@ export default {
       const ticksToProduction = GameHelper.getTicksToProduction(game, game.state.tick, game.state.productionTick);
       const endDate = GameHelper.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, moment().utc());
       return endDate;
+    },
+    getNextCycleText (game) {
+      if (GameHelper.isGamePendingStart(game)) {
+        return "Starting in: ";
+      }
+      return "Next cycle: ";
     }
   }
 }

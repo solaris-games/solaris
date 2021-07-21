@@ -39,7 +39,6 @@ export default {
             } else {
                 this.currentText = GameHelper.getDateToString(delta);
             }
-            console.log("RECALCULATED: " + this.currentText);
         }
     }
 }
