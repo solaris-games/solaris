@@ -47,8 +47,8 @@
                           <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
-                              <i v-if="player.afk" class="fas fa-user-clock"></i>
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
                             </span>
                           </h5>
                       </td>

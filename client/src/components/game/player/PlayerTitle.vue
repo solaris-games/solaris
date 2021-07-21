@@ -4,18 +4,18 @@
       <div class="col">
           <h4 class="pt-2">
             <player-icon :playerId="player._id"/>
-            {{player.alias}}
+            {{player.alias}}<i class="fas fa-robot ml-1" v-if="player.defeated" title="AI Controlled"></i>
           </h4>
       </div>
       <div class="col-auto">
         <h4 class="pt-2">
           <span v-if="player.defeated" :title="getPlayerStatus(player)">
-              <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
-              <i v-if="player.afk" class="fas fa-user-clock"></i>
-            </span>
-            <span class="ml-2" v-if="player.hasDuplicateIP" title="Warning: This player shares the same IP address as another player in this game.">
-              <i class="fas fa-exclamation-triangle"></i>
-            </span>
+            <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
+            <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
+          </span>
+          <span class="ml-2" v-if="player.hasDuplicateIP" title="Warning: This player shares the same IP address as another player in this game.">
+            <i class="fas fa-exclamation-triangle"></i>
+          </span>
         </h4>
       </div>
   </div>
