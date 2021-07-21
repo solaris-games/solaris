@@ -530,8 +530,8 @@
                     "text": "Standard"
                 },
                 {
-                    "value": "experimental",
-                    "text": "Experimental"
+                    "value": "legacy",
+                    "text": "Legacy"
                 }
             ]
         },

@@ -73,7 +73,7 @@
       "weapons": "standard",
       "specialists": "standard"
     },
-    "bankingReward": "experimental"
+    "bankingReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",

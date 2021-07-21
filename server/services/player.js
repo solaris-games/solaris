@@ -513,9 +513,9 @@ module.exports = class PlayerService extends EventEmitter {
 
         switch (game.settings.technology.bankingReward) {
             case 'standard':
-                return banking * 75;
-            case 'experimental':
                 return Math.round((banking * 75) + (0.15 * banking * totalEco));
+            case 'legacy':
+                return banking * 75;
         }
 
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
