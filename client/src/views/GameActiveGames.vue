@@ -25,6 +25,9 @@
                   <td class="col">
                     {{game.settings.general.name}}
                     <span v-if="game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
+                    <span v-if="isRealTimeGame(game)" class="ml-1 badge badge-danger">
+                      Next cycle: <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                    </span>
                     <span v-if="game.unread" class="ml-2 badge badge-info">{{game.unread}} Notifications</span>
                   </td>
                   <td class="col text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
@@ -89,12 +92,14 @@ import ViewTitle from '../components/ViewTitle'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import moment from 'moment'
+import CountdownTimer from '../components/CountdownTimer.vue'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
-    'view-title': ViewTitle
+    'view-title': ViewTitle,
+    'countdown-timer': CountdownTimer
   },
   data () {
     return {
@@ -130,6 +135,14 @@ export default {
       }
 
       return moment(game.state.endDate).fromNow()
+    },
+    isRealTimeGame (game) {
+      return GameHelper.isRealTimeGame(game);
+    },
+    getNextCycleDate (game) {
+      const ticksToProduction = GameHelper.getTicksToProduction(game, game.state.tick, game.state.productionTick);
+      const endDate = GameHelper.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, moment().utc());
+      return endDate;
     }
   }
 }
