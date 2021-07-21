@@ -372,8 +372,7 @@ export default {
     },
     hasUnread () {
       return this.unreadMessages > 0 || this.unreadEvents > 0
-    },
-    gameState: mapState(['game'])
+    }
   },
   watch: {
     game (newGame, oldGame) {
