@@ -296,7 +296,8 @@
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Max Turn Wait</td>
-              <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Missed Turn Limit</td>

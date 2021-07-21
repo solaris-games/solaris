@@ -144,7 +144,7 @@ module.exports = class GameTickService extends EventEmitter {
                 return true;
             }
 
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
         } else {
             throw new Error(`Unsupported game type.`);
         }

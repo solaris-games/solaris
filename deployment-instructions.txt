@@ -1,5 +1,5 @@
 db.games.find({}).forEach(function(game) {
-    game.settings.gameTime.speed *= 60;
+    game.settings.gameTime.maxTurnWait *= 60;
 
     db.games.save(game);
 });
