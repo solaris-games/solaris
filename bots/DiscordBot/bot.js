@@ -3,15 +3,8 @@ const client = new Discord.Client();
 
 const config = require('dotenv').config();
 
-const prefix = '!'
-const publicCommands = {
-    // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
-    "gameinfo": container.publicCommandService.gameinfo,
-    "help": container.publicCommandService.help,
-    "leaderboard_global": container.publicCommandService.leaderboard_global,
-    "leaderboard_local": container.publicCommandService.leaderboard_local,
-    "userinfo": container.publicCommandService.userinfo
-};
+const prefix = '$'
+let publicCommands = null;
 const privateCommands = {
     // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
 }
@@ -21,7 +14,6 @@ client.once('ready', () => {
 });
 
 client.on('message', async (msg) => {
-
     //checking if the message isn't sent by another/the same bot, because the bot may not respond or react to a bot
     if (msg.author.bot) return;
 
@@ -37,13 +29,12 @@ client.on('message', async (msg) => {
 
     //Now that we know for certain the player desires to write a command, we can activate the function to figure out which command the player is using to then decide what the proper response is
     await Identify_Command(msg);
-
-})
+});
 
 client.on('messageReactionAdd', (MessageReaction, User) =>{
     var msg = MessageReaction.message
-    if(!msg.author.bot || User.bot) return;
 
+    if(!msg.author.bot || User.bot) return;
 });
 
 async function Specialist_Suggestion(msg) {
@@ -58,12 +49,13 @@ async function Identify_Command(msg) {
     const directions = msg.content.slice(prefix.length).split(' ');
     const cmd = directions[0];
     directions.shift();
-    if(msg.channel.type == 'dm'){
-        if (!publicCommands.keys().includes(cmd)) return;
+    if(msg.channel.type !== 'dm'){
         // Now that the command exists, we can execute the function, which so happens to be named exactly like the command
-        await publicCommands[cmd](msg, directions);
+        if (container.publicCommandService[cmd]) {
+            await container.publicCommandService[cmd](msg, directions);
+        }
     } else {
-        if (!privateCommands.keys().includes(cmd)) return;
+        if (!privateCommands[cmd]) return;
         // Now that the command exists, we can execute the function, which so happens to be named exactly like the command
         await privateCommands[cmd](msg, directions);
     }
@@ -81,10 +73,19 @@ async function startup() {
     mongo = await mongooseLoader({
         connectionString: process.env.connectionString
     }, {
-        syncIndexes: true
+        syncIndexes: false
     });
 
     console.log('MongoDB Intialized');
+
+    publicCommands = {
+        // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
+        "gameinfo": container.publicCommandService.gameinfo,
+        "help": container.publicCommandService.help,
+        "leaderboard_global": container.publicCommandService.leaderboard_global,
+        "leaderboard_local": container.publicCommandService.leaderboard_local,
+        "userinfo": container.publicCommandService.userinfo
+    }
 }
 
 process.on('SIGINT', async () => {

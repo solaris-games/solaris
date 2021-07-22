@@ -14,6 +14,15 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoAll(game) {
+        var game_name = game.settings.general.name;
+        var gameId = game._id;
+        var response = await this.baseResponse();
+        response = response
+            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+        if (game.settings.general.description) {
+            response = response
+                .setDescription(game.settings.general.description);
+        }
         response = response
             .setTitle(`All settings of ${game_name}`)
             .addFields(
@@ -112,7 +121,7 @@ module.exports = class BotReponseService {
         }
         response = response
             .setTitle(`General Settings of ${game_name}`)
-            .setFields(
+            .addFields(
                 { name: "General", value: "\u200B" },
                 { name: "Type", value: game.settings.general.type, inline: true },
                 { name: "Mode", value: game.settings.general.mode, inline: true },
@@ -138,7 +147,7 @@ module.exports = class BotReponseService {
         }
         response = response
             .setTitle(`Galaxy Settings of ${game_name}`)
-            .setFields(
+            .addFields(
                 { name: "Galaxy", value: "\u200B" },
                 { name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true },
                 { name: "Stars per Player", value: game.settings.galaxy.starsPerPlayer, inline: true },
@@ -171,7 +180,7 @@ module.exports = class BotReponseService {
         }
         response = response
             .setTitle(`Player Settings of ${game_name}`)
-            .setFields(
+            .addFields(
                 { name: "Player", value: "\u200B" },
                 { name: "Starting Stars", value: game.settings.player.startingStars, inline: true },
                 { name: "Starting Ships", value: game.settings.player.startingShips, inline: true },
@@ -204,7 +213,7 @@ module.exports = class BotReponseService {
         }
         response = response
             .setTitle(`Technology Settings of ${game_name}`)
-            .setFields(
+            .addFields(
                 { name: "Technology", value: "\u200B" },
                 { name: "Scanning", value: game.settings.technology.startingTechnologyLevel.scanning, inline: true },
                 { name: "Hyperspace Range", value: game.settings.technology.startingTechnologyLevel.hyperspace, inline: true },
@@ -241,7 +250,7 @@ module.exports = class BotReponseService {
         }
         response = response
             .setTitle(`Time Settings of ${game_name}`)
-            .setFields(
+            .addFields(
                 { name: "Time", value: "\u200B" },
                 { name: "Time Type", value: game.settings.gameTime.gameType, inline: true },
                 { name: "Start Delay", value: game.settings.gameTime.startDelay, inline: true }
@@ -283,7 +292,7 @@ module.exports = class BotReponseService {
 
     }
 
-    static helpMain = "You can use the following commands in this discord:\n" +
+    helpMain = "You can use the following commands in this discord:\n" +
         "``!gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
         "``!help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
         "``!leaderboard_global <filter> <limit>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
@@ -291,7 +300,7 @@ module.exports = class BotReponseService {
         "``!userinfo <username> <focus>`` - get information about a user, like rank, renown or made economy.\n" +
         "I hope this automated response has helped you in understanding commands for the bot. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    static helpGameinfo = "The ``!gameinfo <galaxy_name> <focus>`` command gives you information about the settings of a completed, in progress or waiting game.\n" +
+    helpGameinfo = "The ``!gameinfo <galaxy_name> <focus>`` command gives you information about the settings of a completed, in progress or waiting game.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
         "The second direction, the <focus>, asks what kind of settings you want to know of. There are five kinds of settings.\n" +
         "If you want to see all settings, use ``all``.\n" +
@@ -302,13 +311,13 @@ module.exports = class BotReponseService {
         "If you want to see the time settings, such as the tick/turn duration or whether or not a game is real time, use ``time``.\n" +
         "I hope this automated response has helped you in understanding the gameinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    static helpHelp = "The ``!help <command>`` command gives you information about the commands you can give this bot. " +
+    helpHelp = "The ``!help <command>`` command gives you information about the commands you can give this bot. " +
         "Using just the command without a direction will give you a list of all commands with a short explanation of what they do. " +
         "Using the command with a direction, the ``<command>`` gets you a more detailed explanation of a command and its directions.\n" +
         "But you probably already knew that, since you used the ``!help help`` command.\n" +
         "I hope this automated response has helped you in understanding the help command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    static helpLeaderboard_global = "the ``!leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
+    helpLeaderboard_global = "the ``!leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
         "The limit has to be a value between 1 and 50, the leaderboard will return the top x players, where x is that number.\n" +
         "The filters can be almost anything, the full list of possible filters is: ``victories``, ``rank``, ``renown``, games ``joined``, games ``completed``, games ``quit``, games ``defeated``, games ``afk``, " +
         "``ships-killed``, ``carriers-killed``, ``specialists-killed``, ``ships-lost``, ``carriers-lost``, ``specialists-lost``, ``stars-captured``, ``stars-lost``, " +
@@ -318,7 +327,7 @@ module.exports = class BotReponseService {
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_global command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    static helpLeaderboard_local = "The ``!leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
+    helpLeaderboard_local = "The ``!leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
         "The second direction, the <filter>, is what the leaderboard will be sorted on. The full list of possible filters is: total ``stars``, total ``carriers``, total ``ships``, total ``economy``, total ``industry``, " +
         "total ``science``, ``new-ship`` production, total ``warpgates``, ``scanning`` level, ``hyperspace`` range level, ``terraforming`` level, ``experimentation`` level, ``weapons`` level, ``banking`` level, " +
@@ -326,7 +335,7 @@ module.exports = class BotReponseService {
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    static helpUserinfo = "The ``!userinfo <username> gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
+    helpUserinfo = "The ``!userinfo <username> gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
         "The first direction, the <username>, is the name of a user, like The Last Hero, or LimitingFactor, the username is case-sensitive, so make sure to spell it properly.\n" +
         "The second direction, the <focus>, is the category you want information on. There are five categories:\n" +
         "If you want to see all information about someone, use ``all``.\n" +
@@ -337,7 +346,7 @@ module.exports = class BotReponseService {
         "If you want to see information about someone's trade history, such as credits sent, technologies sent, ships gifted or even renown gifted, use ``trade``.\n" +
         "I hope this automated response has helped you in understanding the userinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    static helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``!help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
+    helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``!help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
 
     async leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list) {
         var response = await this.baseResponse()
@@ -349,5 +358,6 @@ module.exports = class BotReponseService {
                 { name: "Name", value: username_list, inline: true },
                 { name: `${sortingKey}`, value: sortingKey_list, inline: true }
             )
+        return response
     }
 }

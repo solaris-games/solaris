@@ -88,6 +88,7 @@ module.exports = class LeaderboardService {
             }
         },
         afk: {
+            fullKey: 'achievements.afk',
             sort: {
                 'achievements.afk': -1
             },
@@ -399,7 +400,8 @@ module.exports = class LeaderboardService {
 
         return {
             totalPlayers,
-            leaderboard
+            leaderboard,
+            sorter
         };
     }
 

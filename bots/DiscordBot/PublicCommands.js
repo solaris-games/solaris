@@ -20,8 +20,11 @@ module.exports = class PublicCommandService {
             focus = directions[directions.length - 2]
         } else {
             var i;
+            if (directions.length === 1) {
+                directions.push('general');
+            }
             for (i = 0; i < directions.length - 1; i++) {
-                game_name += direction[i] + ' ';
+                game_name += directions[i] + ' ';
             }
             game_name = game_name.slice(0, -1)
             game = await this.gameService.getByNameAll(game_name);
@@ -41,6 +44,8 @@ module.exports = class PublicCommandService {
                 return;
             }
         }
+
+        game = game[0];
 
         switch (focus) {
             case 'all':
@@ -67,30 +72,30 @@ module.exports = class PublicCommandService {
 
     async help(msg, directions) {
         //!help <command>
-        id = msg.author.id;
+        let id = msg.author.id;
         var response = `Hey <@${id}>,\n`;
         if (directions.length == 0) {
             response += this.botResponseService.helpMain;
             msg.channel.send(response);
         } else {
             switch (directions[0]) {
-                case gameinfo:
+                case 'gameinfo':
                     response += this.botResponseService.helpGameinfo;
                     msg.channel.send(response);
                     break;
-                case help:
+                case 'help':
                     response += this.botResponseService.helpHelp;
                     msg.channel.send(response);
                     break;
-                case leaderboard_global:
-                    response += this.botReponseService.helpLeaderboard_global
+                case 'leaderboard_global':
+                    response += this.botResponseService.helpLeaderboard_global
                     msg.channel.send(response);
                     break;
-                case leaderboard_local:
+                case 'leaderboard_local':
                     response += this.botResponseService.helpLeaderboard_local
                     msg.channel.send(response);
                     break;
-                case userinfo:
+                case 'userinfo':
                     response += this.botResponseService.helpUserinfo
                     msg.channel.send(response);
                     break;
@@ -104,28 +109,33 @@ module.exports = class PublicCommandService {
     async leaderboard_global(msg, directions) {
         //!leaderboard_global <filter> <limit>
         let limit = directions[1];
+        limit = +limit;
         let sortingKey = directions[0];
         if (!(limit >= 1 && limit <= 50)) {
             limit = 10;
         };
 
         // Calculating how the leaderboard looks,
-        let leaderboard = await this.leaderboardService.getLeaderboard(limit, sortingKey);
+        let result = await this.leaderboardService.getLeaderboard(limit, sortingKey);
+        let leaderboard = result.leaderboard;
+
+        // here be dragons
+        const getNestedObject = (nestedObj, pathArr) => {
+            return pathArr.reduce((obj, key) =>
+            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+        }
 
         var position_list = "";
         var username_list = "";
-        var sample = Object.keys(leaderboard[0]);
-        var nonDesirables = ["username", "position", "guild", "guildId", "roles.contributor", "roles.developer", "roles.communitymanager"]
-        var DesiredKey = sample.filter(x => !nonDesirables.includes(x))[0];
         var sortingKey_list = "";
 
-        for (i = 0; i < leaderboard.length; i++) {
+        for (let i = 0; i < leaderboard.length; i++) {
             position_list = position_list + (i + 1) + "\n";
             username_list = username_list + leaderboard[i].username + "\n";
-            sortingKey_list = sortingKey_list + leaderboard[i][DesiredKey] + "\n"
+            sortingKey_list = sortingKey_list + getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
         }
 
-        var response = this.botResponseService.leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list)
+        var response = await this.botResponseService.leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list)
 
         msg.channel.send(response);
     }
