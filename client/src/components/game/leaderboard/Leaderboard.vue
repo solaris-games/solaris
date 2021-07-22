@@ -323,12 +323,12 @@ table tr {
 }
 
 .pulse {
-  animation: blinker 1s linear infinite;
+  animation: blinker 1.5s linear infinite;
 }
 
 @keyframes blinker {
   50% {
-    opacity: 0.25;
+    opacity: 0.3;
   }
 }
 </style>
