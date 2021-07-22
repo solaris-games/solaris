@@ -53,7 +53,9 @@ class GameHelper {
   }
 
   getCarriersOrbitingStar (game, star) {
-    return game.galaxy.carriers.filter(x => x.orbiting === star._id)
+    return game.galaxy.carriers
+      .filter(x => x.orbiting === star._id)
+      .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0))
   }
 
   isCarrierInTransit (carrier) {
@@ -257,16 +259,16 @@ class GameHelper {
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
   calculateWaypointTicks (game, carrier, waypoint) {
-    let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
-    let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
-
     // if the waypoint is going to the same star then it is at least 1
     // tick, plus any delay ticks.
-    if (sourceStar._id === destinationStar._id) {
+    if (waypoint.source === waypoint.destination) {
       return 1 + (waypoint.delayTicks || 0);
     }
 
-    let source = sourceStar.location
+    let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
+    let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
+
+    let source = sourceStar == null ? carrier.location : sourceStar.location
     let destination = destinationStar.location
 
     // If the carrier is already en-route, then the number of ticks will be relative
@@ -277,7 +279,7 @@ class GameHelper {
 
     let ticks
 
-    if (sourceStar.warpGate && destinationStar.warpGate &&
+    if (sourceStar && sourceStar.warpGate && destinationStar.warpGate &&
       sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
       ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], game.constants.distances.warpSpeedMultiplier)
     } else {
@@ -303,14 +305,14 @@ class GameHelper {
     return totalTicks
   }
 
-  calculateTimeByTicks (ticks, speedInMins, relativeTo = null) {
+  calculateTimeByTicks (ticks, speedInSeconds, relativeTo = null) {
     if (relativeTo == null) {
       relativeTo = moment().utc()
     } else {
       relativeTo = moment(relativeTo).utc()
     }
 
-    return relativeTo.add(ticks * speedInMins, 'm')
+    return relativeTo.add(ticks * speedInSeconds, 'seconds')
   }
 
   canLoop (game, player, carrier) {
@@ -327,6 +329,10 @@ class GameHelper {
 
     let firstWaypointStar = this.getStarById(game, firstWaypoint.source)
     let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
+
+    if (firstWaypointStar == null || lastWaypointStar == null) {
+      return false
+    }
 
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
     let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)
@@ -453,7 +459,13 @@ class GameHelper {
         if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
         if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
 
-        // Then by defeated descending
+        // Then by defeated date descending
+        if (a.defeated && b.defeated) {
+          if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1
+          if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1
+        }
+
+        // Sort defeated players last.
         return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
       })
   }
@@ -599,6 +611,8 @@ class GameHelper {
           return 'spoutnik'
         case 15:
           return 'starfighter'
+        case 16:
+          return 'rocket'
       }
     } else {
       switch (specialistId) {
@@ -694,7 +708,7 @@ class GameHelper {
 
     if (this.isRealTimeGame(game)) {
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
         // If in turn based mode, then check if all undefeated players are ready.
         // OR the max time wait limit has been reached.
@@ -704,7 +718,7 @@ class GameHelper {
             return true;
         }
 
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
         throw new Error(`Unsupported game type.`);
     }

@@ -132,11 +132,14 @@ module.exports = class GameListService {
         return inProgress.concat(completed);
     }
 
-    async listOldCompletedGames(months = 3) {
+    async listOldCompletedGames(months = 1) {
         let date = moment().subtract(months, 'month');
 
         return await this.gameModel.find({
-            'state.endDate': { $lt: date }
+            $and: [
+                { 'state.winner': { $ne: null } },
+                { 'state.endDate': { $lt: date } }
+            ]
         }, {
             _id: 1
         })
@@ -165,6 +168,25 @@ module.exports = class GameListService {
         })
         .sort({
             'state.startDate': -1
+        })
+        .select({
+            _id: 1,
+            state: 1,
+            settings: 1,
+            'galaxy.players': 1
+        })
+        .exec();
+    }
+
+    async listInProgressGamesGameTick() {
+        return await this.gameModel.find({
+            'state.startDate': { $lte: moment().utc().toDate() },
+            'state.endDate': { $eq: null },
+            'state.paused': { $eq: false },
+            'state.locked': { $eq: false }
+        })
+        .sort({
+            'settings.gameTime.speed': 1    // Prioritise faster games first.
         })
         .select({
             _id: 1,

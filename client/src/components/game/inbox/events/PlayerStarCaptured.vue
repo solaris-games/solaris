@@ -1,7 +1,7 @@
 <template>
-<div v-if="star && player">
+<div v-if="player">
   <p>
-      The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{star.name}}</a> has been captured
+      The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a> has been captured
       by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
   <p v-if="event.data.creditsReward">
@@ -23,17 +23,15 @@ export default {
   },
   data () {
     return {
-      star: null,
       player: null
     }
   },
   mounted () {
-    this.star = GameHelper.getStarById(this.$store.state.game, this.event.data.starId)
     this.player = GameHelper.getPlayerById(this.$store.state.game, this.event.data.capturedBy)
   },
   methods: {
     onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.star._id)
+      this.$emit('onOpenStarDetailRequested', this.event.data.starId)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.player._id)

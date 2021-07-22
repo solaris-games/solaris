@@ -1,15 +1,10 @@
 <template>
 <div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
+      <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade" :starId="star._id" class="mr-1"/>
       <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-secondary">
         <i class="fas fa-trash"></i>
       </modalButton>
-      <button @click="toggleBulkIgnore" class="btn btn-sm ml-1" 
-        title="Toggle Bulk Ignore"
-        :class="{'btn-danger':star.ignoreBulkUpgrade,'btn-success':!star.ignoreBulkUpgrade}"
-        v-if="!$isHistoricalMode() && userPlayer && star.ownedByPlayerId == userPlayer._id && !isDeadStar">
-        <i class="fas" :class="{'fa-ban':star.ignoreBulkUpgrade,'fa-check-square':!star.ignoreBulkUpgrade}"></i>
-      </button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
@@ -19,6 +14,7 @@
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
+        <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
       </div>
     </div>
     
@@ -247,6 +243,7 @@ import StarSpecialistVue from './StarSpecialist'
 import SpecialistIconVue from '../specialist/SpecialistIcon'
 import GameContainer from '../../../game/container'
 import gameHelper from '../../../services/gameHelper'
+import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
 
 export default {
   components: {
@@ -257,7 +254,8 @@ export default {
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
     'star-specialist': StarSpecialistVue,
-    'specialist-icon': SpecialistIconVue
+    'specialist-icon': SpecialistIconVue,
+    'ignore-bulk-upgrade': IgnoreBulkUpgradeVue
   },
   props: {
     starId: String
@@ -386,23 +384,6 @@ export default {
           })
 
           this.$toasted.show(`All ships transfered to ${this.star.name}.`)
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async toggleBulkIgnore () {
-      try {
-        let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id)
-        
-        if (response.status === 200) {
-          this.star.ignoreBulkUpgrade = !this.star.ignoreBulkUpgrade
-
-          if (this.star.ignoreBulkUpgrade) {
-            this.$toasted.show(`${this.star.name} is now ignored by Bulk Upgrade.`)
-          } else {
-            this.$toasted.show(`${this.star.name} is included in Bulk Upgrade.`)
-          }
         }
       } catch (err) {
         console.log(err)

@@ -19,6 +19,10 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
+              <td>Mode</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
+            </tr>
+            <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Stars For Victory</td>
               <td class="text-right">{{ game.settings.general.starVictoryPercentage }}%</td>
             </tr>
@@ -279,7 +283,8 @@
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Game Time</td>
-              <td class="text-right">{{ game.settings.gameTime.speed }} minute(s)/tick</td>
+              <td class="text-right" v-if="game.settings.gameTime.speed >= 60">{{ game.settings.gameTime.speed/60 }} minute(s)/tick</td>
+              <td class="text-right" v-if="game.settings.gameTime.speed < 60">{{ game.settings.gameTime.speed }} second(s)/tick</td>
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'realTime'">
               <td>Start Delay</td>
@@ -291,7 +296,8 @@
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Max Turn Wait</td>
-              <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Missed Turn Limit</td>
@@ -400,7 +406,9 @@ export default {
         'visible': 'Visible',
         'experimental': 'Experimental',
         'credits': 'Credits',
-        'creditsSpecialists': 'Specialist Tokens'
+        'creditsSpecialists': 'Specialist Tokens',
+        'conquest': 'Conquest',
+        'battleRoyale': 'Battle Royale'
       }[option]
 
       return text || option

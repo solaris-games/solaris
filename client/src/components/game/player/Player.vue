@@ -15,7 +15,8 @@
 
     <overview v-if="player" :playerId="player._id"
       @onViewConversationRequested="onViewConversationRequested"
-      @onViewCompareIntelRequested="onViewCompareIntelRequested"/>
+      @onViewCompareIntelRequested="onViewCompareIntelRequested"
+      @onOpenTradeRequested="onOpenTradeRequested"/>
 
     <h4 v-if="player" class="mt-2">Infrastructure</h4>
 
@@ -29,19 +30,6 @@
     <h4 v-if="player && player.research" class="mt-2">Technology</h4>
     
     <research v-if="player && player.research" :playerId="player._id"/>
-
-    <div v-if="game.state.startDate && userPlayer && player != userPlayer && !userPlayer.defeated && !isGameFinished && (tradeTechnologyIsEnabled || tradeCreditsIsEnabled)">
-      <h4 class="mt-2">Trade</h4>
-
-      <div v-if="canTradeWithPlayer">
-        <reputation v-if="player.defeated" :playerId="player._id"/>
-        <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
-        <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
-        <sendCreditsSpecialists v-if="tradeCreditsSpecialistsIsEnabled" :player="player" :userPlayer="userPlayer"/>
-      </div>
-
-      <p v-if="!canTradeWithPlayer" class="text-danger">You cannot trade with this player, they are not within scanning range.</p>
-    </div>
 
     <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
 
@@ -69,13 +57,11 @@ import Overview from './Overview'
 import Infrastructure from '../shared/Infrastructure'
 import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
-import SendTechnology from './SendTechnology'
-import SendCredits from './SendCredits'
-import SendCreditsSpecialists from './SendCreditsSpecialists'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import Badges from './Badges'
 import Reputation from './Reputation'
+import PlayerTradeVue from './PlayerTrade'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
@@ -88,13 +74,11 @@ export default {
     'infrastructure': Infrastructure,
     'yourInfrastructure': YourInfrastructure,
     'research': Research,
-    'sendTechnology': SendTechnology,
-    'sendCredits': SendCredits,
-    'sendCreditsSpecialists': SendCreditsSpecialists,
     'achievements': Achievements,
     'sendRenown': SendRenown,
     'badges': Badges,
-    'reputation': Reputation
+    'reputation': Reputation,
+    'player-trade': PlayerTradeVue
   },
   props: {
     playerId: String
@@ -138,6 +122,9 @@ export default {
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
     },
+    onOpenTradeRequested (e) {
+      this.$emit('onOpenTradeRequested', this.playerId)
+    },
     panToPlayer (e) {
       GameContainer.map.panToPlayer(this.$store.state.game, this.player)
     },
@@ -177,21 +164,8 @@ export default {
     isValidUser () {
       return this.user && this.user.achievements
     },
-    canTradeWithPlayer: function () {
-      return this.player.stats.totalStars > 0 && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
-    },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    tradeCreditsIsEnabled () {
-      return this.game.settings.player.tradeCredits
-    },
-    tradeCreditsSpecialistsIsEnabled () {
-      return this.game.settings.player.tradeCreditsSpecialists
-        && this.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
-    },
-    tradeTechnologyIsEnabled () {
-      return this.game.settings.player.tradeCost > 0
     },
     isAnonymousGame () {
       return this.game.settings.general.anonymity === 'extra'

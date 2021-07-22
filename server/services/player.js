@@ -219,6 +219,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
+    // TODO: Shouldn't this be in the starService?
     setupStarForGameStart(game, star, player) {
         if (player.homeStarId.equals(star._id)) {
             this.starService.setupHomeStar(game, star, player, game.settings);
@@ -227,11 +228,12 @@ module.exports = class PlayerService extends EventEmitter {
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
             star.warpGate = false;
-            star.ignoreBulkUpgrade = false;
             star.specialistId = null;
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
             star.infrastructure.science = 0;
+
+            this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
     }
 
@@ -441,8 +443,15 @@ module.exports = class PlayerService extends EventEmitter {
         let totalStarSpecialists = this.calculateTotalStarSpecialists(playerStars);
         let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
+        let totalStars = playerStars.length;
+
+        // In BR mode, the player star count is based on living stars only.
+        if (game.settings.general.mode === 'battleRoyale') {
+            totalStars = playerStars.filter(s => !this.starService.isDeadStar(s)).length;
+        }
+
         return {
-            totalStars: playerStars.length,
+            totalStars: totalStars,
             totalCarriers: playerCarriers.length,
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
             totalEconomy: this.calculateTotalEconomy(playerStars),
@@ -504,9 +513,9 @@ module.exports = class PlayerService extends EventEmitter {
 
         switch (game.settings.technology.bankingReward) {
             case 'standard':
-                return banking * 75;
-            case 'experimental':
                 return Math.round((banking * 75) + (0.15 * banking * totalEco));
+            case 'legacy':
+                return banking * 75;
         }
 
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
@@ -597,20 +606,6 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     performDefeatedOrAfkCheck(game, player, isTurnBasedGame) {
-        if (isTurnBasedGame) {
-            // Reset whether we have sent the player a turn reminder.
-            player.hasSentTurnReminder = false;
-
-            // If the player wasn't ready when the game ticked, increase their number of missed turns.
-            if (!player.ready) {
-                player.missedTurns++;
-                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
-            }
-            else {
-                player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
-            }
-        }
-
         // Check if the player has been AFK.
         let isAfk = this.isAfk(game, player, isTurnBasedGame);
 
@@ -633,12 +628,37 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
+    incrementMissedTurns(game) {
+        for (let player of game.galaxy.players) {
+            // If the player isn't ready, increase their number of missed turns.
+            if (!player.ready) {
+                player.missedTurns++;
+            }
+            else {
+                // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
+                player.missedTurns = 0;
+            }
+        }
+    }
+
+    resetReadyStatuses(game) {
+        for (let player of game.galaxy.players) {
+            // Reset whether we have sent the player a turn reminder.
+            player.hasSentTurnReminder = false;
+
+            player.ready = false;
+        }
+    }
+
     isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
         // 1. The afk threshold date is less than the last seen date
         // 2. The number of missed turns is greater or equal to the missed turn liimt
         // 3. The game is RT and the first cycle has completed and the player has not been seen since the start of the game
         // 4. The game is TB and the first turn has been missed.
+
+        let seconds3Cycles = 3 * game.settings.galaxy.productionTicks * game.settings.gameTime.speed;
+        let lastSeenMoreThan3CyclesAgo = moment(player.lastSeen).utc() < moment().utc().subtract(seconds3Cycles, 'seconds');
 
         if (isTurnBasedGame) {
             // Calculate what turn this is.
@@ -647,8 +667,7 @@ module.exports = class PlayerService extends EventEmitter {
             if (isFirstTurn) {
                 return player.missedTurns > 0; // Missed the first turn
             } else {
-                return player.missedTurns >= game.settings.gameTime.missedTurnLimit
-                    || moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached turn limit or 72 hours
+                return player.missedTurns >= game.settings.gameTime.missedTurnLimit || lastSeenMoreThan3CyclesAgo; // Reached turn limit or 3 cycles
             }
         } else {
             // If we have reached the first production tick then check here to see if
@@ -658,13 +677,14 @@ module.exports = class PlayerService extends EventEmitter {
             if (isWithinCycle) {
                 return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc(); // Not seen for 2 cycles
             } else {
-                return moment(player.lastSeen).utc() < moment().utc().subtract(3, 'days'); // Reached 72 hours
+                return lastSeenMoreThan3CyclesAgo; // Reached 3 cycles
             }
         }
     }
 
     setPlayerAsDefeated(game, player) {
         player.defeated = true;
+        player.defeatedDate = moment().utc();
         player.researchingNext = 'random'; // Set up the AI for random research.
 
         // Auto-ready the player so they don't hold up the game.
@@ -676,7 +696,7 @@ module.exports = class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            star.ignoreBulkUpgrade = false;
+            this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
 
         // Clear out any carriers that have looped waypoints.

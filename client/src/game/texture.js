@@ -85,6 +85,7 @@ class TextureService {
       this._loadSpecialistTexture('spoutnik')
       this._loadSpecialistTexture('starfighter')
       this._loadSpecialistTexture('double-ringed-orb')
+      this._loadSpecialistTexture('rocket')
     }
 
     _loadSpecialistTexture(name) {

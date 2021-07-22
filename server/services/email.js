@@ -211,6 +211,16 @@ module.exports = class EmailService {
 
         // Send the email only to undefeated players.
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+        let winConditionText = '';
+
+        switch (game.settings.general.mode) {
+            case 'conquest':
+                winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} of ${game.state.stars} stars</span>.`;
+                break;
+            case 'battleRoyale':
+                winConditionText = 'Winner will be the <span style="color:#3498DB;">last man standing</span>.';
+                break;
+        }
 
         for (let player of undefeatedPlayers) {
             let user = await this.userService.getEmailById(player.userId);
@@ -220,8 +230,7 @@ module.exports = class EmailService {
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
                         gameName,
                         gameUrl,
-                        game.state.starsForVictory.toString(),
-                        game.state.stars.toString(),
+                        winConditionText,
                         leaderboardHtml
                     ]);
                 } catch (err) {

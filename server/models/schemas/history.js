@@ -30,6 +30,7 @@ const schema = new Schema({
             credits: { type: Types.Number, required: true },
             creditsSpecialists: { type: Types.Number, required: true },
             defeated: { type: Types.Boolean, required: true },
+            defeatedDate: { type: Types.Date, required: false, default: null },
             afk: { type: Types.Boolean, required: true },
             ready: { type: Types.Boolean, required: false, default: false },
             research: {
@@ -77,7 +78,11 @@ const schema = new Schema({
             shipsActual: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },
             warpGate: { type: Types.Boolean, required: true },
-            ignoreBulkUpgrade: { type: Types.Boolean, required: true },
+            ignoreBulkUpgrade: {
+                economy: { type: Types.Boolean, required: false, default: false },
+                industry: { type: Types.Boolean, required: false, default: false },
+                science: { type: Types.Boolean, required: false, default: false }
+            },
             infrastructure: {
                 economy: { type: Types.Number, required: true },
                 industry: { type: Types.Number, required: true },

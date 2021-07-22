@@ -41,12 +41,14 @@ class Star extends EventEmitter {
     this.graphics_natural_resources_ring = new Array(Star.maxLod)
     this.graphics_scanningRange = new PIXI.Graphics()
     this.graphics_star = new PIXI.Graphics()
+    this.graphics_targeted = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
     this.container.addChild(this.graphics_shape_part_warp)
     this.container.addChild(this.graphics_shape_full_warp)
+    this.container.addChild(this.graphics_targeted)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -123,6 +125,7 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawTarget()
     this.drawStar()
     this.drawSpecialist()
     this.drawPlanets()
@@ -181,6 +184,7 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
+    this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
   }
@@ -589,6 +593,19 @@ class Star extends EventEmitter {
     this.container.zIndex = -1
 
     this.graphics_hyperspaceRange.visible = this.isSelected
+  }
+
+  drawTarget () {
+    this.graphics_targeted.clear()
+
+    if (this.data.targeted) {
+      this.graphics_targeted.lineStyle(2, 0xFF0000)
+      this.graphics_targeted.moveTo(9, -9)
+      this.graphics_targeted.lineTo(-9, 9)
+      this.graphics_targeted.moveTo(-9, -9)
+      this.graphics_targeted.lineTo(9, 9)
+      this.graphics_targeted.closePath()
+    }
   }
 
 

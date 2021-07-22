@@ -184,7 +184,7 @@ class GameContainer {
   draw () {
     this.map.draw()
 
-    if ( process.env.NODE_ENV == 'development') {
+    if ( process.env.NODE_ENV == 'development' && true) {
       let bitmapFont = { fontName: "space-mono", fontSize: 16 }
 
       this.fpsNowText = new PIXI.BitmapText("", bitmapFont)

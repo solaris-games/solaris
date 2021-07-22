@@ -85,7 +85,12 @@ module.exports = class GameCreateService {
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
-        game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+
+        if (game.settings.general.mode === 'conquest') {
+            game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+        } else {
+            game.state.starsForVictory = game.galaxy.stars.length;
+        }
 
         this.conversationService.createConversationAllPlayers(game);
 

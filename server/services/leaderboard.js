@@ -424,7 +424,14 @@ module.exports = class LeaderboardService {
             if (a.stats.totalCarriers > b.stats.totalCarriers) return -1;
             if (a.stats.totalCarriers < b.stats.totalCarriers) return 1;
 
-            return 0; // Both are equal
+            // Then by defeated date descending
+            if (a.defeated && b.defeated) {
+                if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1;
+                if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1;
+            }
+
+            // Sort defeated players last.
+            return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1;
         }
 
         // Sort the undefeated players first.
@@ -479,12 +486,8 @@ module.exports = class LeaderboardService {
                     user.achievements.victories++; // Increase the winner's victory count
                     user.credits++; // Give the winner a galactic credit.
                     user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
-
-                    // Break out here if the rank is awarded to the winner only.
-                    if (game.settings.general.awardRankTo === 'winner') {
-                        break;
-                    }
-                } else {
+                }
+                else if (game.settings.general.awardRankTo === 'all') {
                     user.achievements.rank += leaderboard.length / 2 - i;
                     user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
                 }
@@ -500,10 +503,12 @@ module.exports = class LeaderboardService {
     }
 
     getGameWinner(game) {
-        let starWinner = this.getStarCountWinner(game);
-
-        if (starWinner) {
-            return starWinner;
+        if (game.settings.general.mode === 'conquest') {
+            let starWinner = this.getStarCountWinner(game);
+    
+            if (starWinner) {
+                return starWinner;
+            }
         }
 
         let lastManStanding = this.getLastManStanding(game);

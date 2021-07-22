@@ -1,0 +1,21 @@
+db.games.find({}).forEach(function(game) {
+    game.settings.gameTime.maxTurnWait *= 60;
+
+    db.games.save(game);
+});
+
+db.games.updateMany({
+    'settings.technology.bankingReward': 'standard'
+}, {
+    $set: {
+        'settings.technology.bankingReward': 'legacy'
+    }
+});
+
+db.games.updateMany({
+    'settings.technology.bankingReward': 'experimental'
+}, {
+    $set: {
+        'settings.technology.bankingReward': 'standard'
+    }
+});

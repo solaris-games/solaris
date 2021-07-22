@@ -6,7 +6,7 @@ module.exports = class GameGalaxyService {
     constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService, historyService) {
+        guildUserService, historyService, battleRoyaleService) {
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -23,6 +23,7 @@ module.exports = class GameGalaxyService {
         this.reputationService = reputationService;
         this.guildUserService = guildUserService;
         this.historyService = historyService;
+        this.battleRoyaleService = battleRoyaleService;
     }
 
     async getGalaxy(gameId, userId, tick) {
@@ -89,12 +90,14 @@ module.exports = class GameGalaxyService {
             this._setPlayerStats(game);
         }
 
+        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
+            this._appendStarsPendingDestructionFlag(game);
+        }
+
         if (isHistorical && cached) {
             cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
 
-        this._topSecretFeature(game);
-        
         return game;
     }
 
@@ -219,7 +222,7 @@ module.exports = class GameGalaxyService {
                     s.specialist = this.specialistService.getByIdStar(s.specialistId);
                 }
 
-                s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || false; // TODO: For some reason this isn't being set in the mongoose defaults?
+                s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || this.starService.resetIgnoreBulkUpgradeStatuses(s);
 
                 return s;
             } else {
@@ -400,8 +403,10 @@ module.exports = class GameGalaxyService {
                 isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
                 isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
+                defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
+                missedTurns: p.missedTurns,
                 alias: p.alias,
                 avatar: p.avatar,
                 stats: p.stats,
@@ -481,6 +486,7 @@ module.exports = class GameGalaxyService {
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
                     gamePlayer.defeated = historyPlayer.defeated;
+                    gamePlayer.defeatedDate = historyPlayer.defeatedDate;
                     gamePlayer.afk = historyPlayer.afk;
                     gamePlayer.research = historyPlayer.research;
                     gamePlayer.ready = historyPlayer.ready;
@@ -567,21 +573,11 @@ module.exports = class GameGalaxyService {
         }
     }
 
-    _topSecretFeature(game) {
-        if (false) {
-            return;
-        }
+    _appendStarsPendingDestructionFlag(game) {
+        let pendingStars = this.battleRoyaleService.getStarsToDestroy(game);
 
-        let rnd = Math.floor(Math.random() * 100);
-
-        if (rnd === 0) {
-            let shapes = ['circle', 'square', 'diamond', 'hexagon'];
-            let colours = require('../config/game/colours.json');
-    
-            for (let player of game.galaxy.players) {
-                player.shape = shapes[Math.floor(Math.random() * shapes.length)];
-                player.colour = colours[Math.floor(Math.random() * colours.length)];
-            }
+        for (let pendingStar of pendingStars) {
+            pendingStar.targeted = true;
         }
     }
 

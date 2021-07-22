@@ -97,6 +97,13 @@ module.exports = class EventService {
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
     }
 
+    async deleteByGameId(gameId) {
+        await this.eventModel.deleteMany({
+            gameId
+        })
+        .exec();
+    }
+
     async createGameEvent(gameId, gameTick, type, data) {
         let event = new this.eventModel({
             gameId,
@@ -297,6 +304,7 @@ module.exports = class EventService {
             playerIdDefender: defender._id,
             playerIdAttackers: attackers.map(p => p._id),
             starId: star._id,
+            starName: star.name,
             combatResult
         };
 
@@ -334,7 +342,8 @@ module.exports = class EventService {
 
     async createWarpGateBuiltEvent(gameId, gameTick, player, star) {
         let data = {
-            starId: star._id
+            starId: star._id,
+            starName: star.name
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_BUILT, data, true);
@@ -342,7 +351,8 @@ module.exports = class EventService {
 
     async createWarpGateDestroyedEvent(gameId, gameTick, player, star) {
         let data = {
-            starId: star._id
+            starId: star._id,
+            starName: star.name
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_DESTROYED, data, true);
@@ -422,7 +432,8 @@ module.exports = class EventService {
 
     async createStarAbandonedEvent(gameId, gameTick, player, star) {
         let data = {
-            starId: star._id
+            starId: star._id,
+            starName: star.name
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
@@ -431,9 +442,12 @@ module.exports = class EventService {
     async createStarCapturedEvent(gameId, gameTick, player, star, capturedBy, creditsReward) {
         let data = {
             starId: star._id,
+            starName: star.name,
             capturedBy: capturedBy._id,
             creditsReward
         };
+
+        // TODO: Need to save the alias for the player who captured the star as it could change.
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_CAPTURED, data);
     }
@@ -482,6 +496,7 @@ module.exports = class EventService {
     async createPlayerStarSpecialistHired(gameId, gameTick, player, star, specialist) {
         let data = {
             starId: star._id,
+            starName: star.name,
             specialistId: specialist.id,
             // Need to keep these values just in case specs are changed in future.
             specialistName: specialist.name,

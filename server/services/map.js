@@ -116,6 +116,13 @@ module.exports = class MapService {
     }
 
     getGalaxyCenter(starLocations) {
+        if (!starLocations.length) {
+            return {
+                x: 0,
+                y: 0
+            };
+        }
+
         let maxX = starLocations.sort((a, b) => b.x - a.x)[0].x;
         let maxY = starLocations.sort((a, b) => b.y - a.y)[0].y;
         let minX = starLocations.sort((a, b) => a.x - b.x)[0].x;
@@ -128,6 +135,13 @@ module.exports = class MapService {
     }
 
     getGalaxyCenterOfMass(starLocations) {
+        if (!starLocations.length) {
+            return {
+                x: 0,
+                y: 0
+            };
+        }
+        
         let totalX = starLocations.reduce((total, s) => total += s.x, 0);
         let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 

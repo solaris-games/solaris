@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
     "type": "32_player_rt",
+    "mode": "conquest",
     "password": null,
     "starVictoryPercentage": 33,
     "playerLimit": 32,
@@ -72,11 +73,11 @@
       "weapons": "standard",
       "specialists": "standard"
     },
-    "bankingReward": "experimental"
+    "bankingReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 60,
+    "speed": 3600,
     "startDelay": 120
   }
 }

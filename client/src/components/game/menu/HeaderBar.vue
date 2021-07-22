@@ -40,7 +40,7 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success pulse': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
@@ -386,5 +386,15 @@ export default {
 <style scoped>
 .pointer {
   cursor:pointer;
+}
+
+.pulse {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
+  }
 }
 </style>

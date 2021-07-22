@@ -13,6 +13,7 @@ export default {
   NEW_MESSAGE: 'newMessage',
   MESSAGE: 'message',
   PLAYER: 'player',
+  TRADE: 'trade',
   SEND_TECHNOLOGY: 'sendTechnology',
   SEND_MONEY: 'sendMoney',
   STAR: 'star',

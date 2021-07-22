@@ -73,7 +73,7 @@ module.exports = class SpecialistHireService {
 
         // TODO: Need to consider local and global effects and update the UI accordingly.
 
-        let waypoints = await this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+        let waypoints = await this.waypointService.cullWaypointsByHyperspaceRangeDB(game, carrier);
 
         let result = {
             game,

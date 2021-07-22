@@ -16,6 +16,9 @@ const schema = new Schema({
 			type: { type: Types.String, required: true, enum: [
 				'custom', 'standard_rt', 'standard_tb', 'standard_dark_rt', 'standard_dark_tb', '1v1_rt', '1v1_tb', 'new_player_rt', 'new_player_tb', '32_player_rt'
 			], default: 'custom' },
+			mode: { type: Types.String, required: true, enum: [
+				'conquest', 'battleRoyale'
+			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
@@ -88,15 +91,15 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
-			bankingReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
+			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' }
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 30 },
-			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
+			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600], default: 1800 }, // Time in seconds
+			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240], default: 30 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 },
-			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5], default: 3 }
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 }
 		}
     },
     galaxy: {

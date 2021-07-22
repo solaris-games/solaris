@@ -23,7 +23,7 @@
             There are no official games available.
           </p>
           
-          <div class="row" v-if="!isLoading">
+          <div class="row no-gutters" v-if="!isLoading">
             <!-- Featured -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.featured">
               <div class="card featured-card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.featured._id })">
@@ -44,24 +44,24 @@
             </div>
 
             <!-- New Player -->
-            <div class="col-sm-12 col-md-4 col-lg-4" v-if="games.newPlayerRT">
-              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1" v-if="games.newPlayerRT">
+              <div class="card bg-dark text-white new-player-game" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
-                  <h5 class="card-title featured-card-title">
+                  <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
-                    <strong><span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span></strong>
+                    <span class="ml-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle">
-                    <strong>{{getGameTypeFriendlyText(games.newPlayerRT)}}
-                    ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})</strong>
+                  <h6 class="card-title card-subtitle new-player-card-subtitle">
+                    {{games.newPlayerRT.settings.general.name}}
+                    ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
                   </h6>
                 </div>
               </div>
             </div>
 
             <!-- Standard -->
-            <div class="col-sm-12 col-md-8 col-lg-8" v-if="games.standardRT">
+            <div class="col-sm-12 col-md-8 col-lg-8 pl-1" v-if="games.standardRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/standard_rt.png')" alt="Standard Game">
                 <div class="card-img-overlay">
@@ -78,7 +78,7 @@
             </div>
 
             <!-- Standard TB -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1" v-if="games.standardTB">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
                 <img class="card-img" :src="require('../assets/screenshots/standard_tb.png')" alt="Standard Turn Based Game">
                 <div class="card-img-overlay">
@@ -95,7 +95,7 @@
             </div>
 
             <!-- Dark -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardDarkRT">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.standardDarkRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardDarkRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/standard_dark_rt.png')" alt="Dark Mode Game">
                 <div class="card-img-overlay">
@@ -112,7 +112,7 @@
             </div>
 
             <!-- 1v1 -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.oneVsOneRT">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/1v1_rt.png')" alt="1 vs. 1 Game">
                 <div class="card-img-overlay">
@@ -129,7 +129,7 @@
             </div>
 
             <!-- 1v1 TB -->
-            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
+            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.oneVsOneTB">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
                 <img class="card-img" :src="require('../assets/screenshots/1v1_tb.png')" alt="1 vs. 1 Turn Based Game">
                 <div class="card-img-overlay">
@@ -167,7 +167,11 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
           </div>
 
-          <h4>User Created Games</h4>
+          <hr/>
+
+          <h4 class="mb-0">User Created Games</h4>
+
+          <p class="mb-2"><small class="text-warning" v-if="userGames.length">Total Games: {{userGames.length}}</small></p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -204,10 +208,13 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
         </div>
+        
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p>These games are in progress, you can join games with open slots.</p>
+          <p class="mb-1">These games are in progress, you can join games with open slots.</p>
+
+          <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -326,7 +333,7 @@ export default {
     },
     getGameTypeFriendlyText (game) {
       return {     
-        'new_player_rt': 'New Players',
+        'new_player_rt': 'New Player Game',
         'standard_rt': 'Standard',
         'standard_tb': 'Standard - TB',
         'standard_dark_rt': 'Dark Galaxy',
@@ -375,6 +382,10 @@ export default {
   background-color: #00bc8c;
 }
 
+.new-player-card-title {
+  background-color: #f39c12;
+}
+
 .card-subtitle {
   font-size: 12px;
   position: absolute;
@@ -382,5 +393,13 @@ export default {
   left: 0;
   margin: 8px;
   background-color: #3498DB;
+}
+
+.new-player-card-subtitle {
+  background-color: #f39c12;
+}
+
+.new-player-game {
+  border: 3px solid #f39c12;
 }
 </style>

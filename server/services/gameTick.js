@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService) {
         super();
             
         this.distanceService = distanceService;
@@ -25,6 +25,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.reputationService = reputationService;
         this.aiService = aiService;
         this.emailService = emailService;
+        this.battleRoyaleService = battleRoyaleService;
     }
 
     async tick(gameId) {
@@ -61,6 +62,9 @@ module.exports = class GameTickService extends EventEmitter {
         // If we are in turn based mode, we need to repeat the tick X number of times.
         if (this.gameService.isTurnBasedGame(game)) {
             iterations = game.settings.gameTime.turnJumps;
+
+            // Increment missed turns for players so that they can be kicked for being AFK later.
+            this.playerService.incrementMissedTurns(game);
         }
 
         while (iterations--) {
@@ -100,7 +104,7 @@ module.exports = class GameTickService extends EventEmitter {
             }
         }
 
-        this._resetPlayersReadyStatus(game);
+        this.playerService.resetReadyStatuses(game);
 
         await game.save();
         logTime('Save game');
@@ -118,8 +122,8 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     canTick(game) {
-        // Cannot perform a game tick on a paused or completed game.
-        if (game.state.paused || game.state.endDate) {
+        // Cannot perform a game tick on a locked, paused or completed game.
+        if (game.state.locked || game.state.paused || game.state.endDate) {
             return false;
         }
 
@@ -133,7 +137,7 @@ module.exports = class GameTickService extends EventEmitter {
         
         if (this.gameService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
         } else if (this.gameService.isTurnBasedGame(game)) {
             // If in turn based mode, then check if all undefeated players are ready.
             // OR the max time wait limit has been reached.
@@ -143,7 +147,7 @@ module.exports = class GameTickService extends EventEmitter {
                 return true;
             }
 
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
         } else {
             throw new Error(`Unsupported game type.`);
         }
@@ -169,17 +173,33 @@ module.exports = class GameTickService extends EventEmitter {
 
                 let sourceStar = this.starService.getById(game, waypoint.source);
                 let destinationStar = this.starService.getById(game, waypoint.destination);
-                let distanceToSourceCurrent = this.distanceService.getDistanceBetweenLocations(c.location, sourceStar.location);
+
+                // Note: There should never be a scenario where a carrier is travelling to a
+                // destroyed star.
                 let distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
-                let distanceToSourceNext = this.distanceService.getDistanceBetweenLocations(locationNext, sourceStar.location);
-                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext, destinationStar.location);
+                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, destinationStar.location);
+
+                let distanceToSourceCurrent,
+                    distanceToSourceNext;
+
+                // TODO: BUG: Its possible that a carrier is travelling from a star that has been destroyed
+                // and is no longer in the game, this will cause carrier to carrier combat to be actioned.
+                // RESOLUTION: Ideally store the source and destination locations instead of a reference to the stars
+                // and then we still have a reference to the location of the now destroyed star.
+                if (sourceStar) {
+                    distanceToSourceCurrent = this.distanceService.getDistanceBetweenLocations(c.location, sourceStar.location);
+                    distanceToSourceNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, sourceStar.location);
+                } else {
+                    distanceToSourceCurrent = 0;
+                    distanceToSourceNext = distanceToSourceCurrent + locationNext.distance;
+                }
 
                 return {
                     carrier: c,
                     source: waypoint.source,
                     destination: waypoint.destination,
                     locationCurrent: c.location,
-                    locationNext,
+                    locationNext: locationNext.location,
                     distanceToSourceCurrent,
                     distanceToDestinationCurrent,
                     distanceToSourceNext,
@@ -394,6 +414,11 @@ module.exports = class GameTickService extends EventEmitter {
                 });
             }
 
+            // Destroy stars for battle royale mode.
+            if (game.settings.general.mode === 'battleRoyale') {
+                this.battleRoyaleService.performBattleRoyaleTick(game);
+            }
+
             await this.emailService.sendGameCycleSummaryEmail(game);
         }
     }
@@ -482,12 +507,6 @@ module.exports = class GameTickService extends EventEmitter {
     async _playAI(game) {
         for (let player of game.galaxy.players.filter(p => p.defeated)) {
             await this.aiService.play(game, player);
-        }
-    }
-
-    _resetPlayersReadyStatus(game) {
-        for (let player of game.galaxy.players) {
-            player.ready = false;
         }
     }
 

@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "The galaxy is ripe for the taking, will it be you who dominates and comes out on top? Forge alliances, set up trade, gather your ships and prove that you are the best.",
     "type": "standard_tb",
+    "mode": "conquest",
     "password": null,
     "starVictoryPercentage": 50,
     "playerLimit": 8,
@@ -77,7 +78,7 @@
   "gameTime": {
     "gameType": "turnBased",
     "tickJumps": 6,
-    "maxTurnWait": 24,
+    "maxTurnWait": 1440,
     "missedTurnLimit": 3
   }
 }

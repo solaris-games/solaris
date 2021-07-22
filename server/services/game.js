@@ -173,6 +173,14 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
+        let userAchievements = await this.achievementService.getAchievements(userId);
+        let isEstablishedPlayer = userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
+        
+        // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
+        if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
+            throw new ValidationError('You must complete a "New Player" game before you can join other game types.');
+        }
+
         let isQuitter = game.quitters.find(x => x.equals(userId));
 
         // The user cannot rejoin if they quit early.
@@ -198,10 +206,10 @@ module.exports = class GameService extends EventEmitter {
         // If the user was an afk-er then they are only allowed to join
         // their slot.
         let isAfker = game.afkers.find(x => x.equals(userId));
-        let isRejoiningAfkSlot = isAfker && player.afk && player.userId === userId;
+        let isRejoiningAfkSlot = isAfker && player.afk && player.userId === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && player.userId !== userId) {
+        if (player.afk && isAfker && player.userId !== userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 
@@ -240,6 +248,7 @@ module.exports = class GameService extends EventEmitter {
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
         player.defeated = false;
+        player.defeatedDate = null;
         player.afk = false;
         player.missedTurns = 0;
         player.hasSentTurnReminder = false;
@@ -310,7 +319,9 @@ module.exports = class GameService extends EventEmitter {
         
         let alias = player.alias;
 
-        game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
+        if (!this.isNewPlayerGame(game)) {
+            game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
+        }
 
         await this.achievementService.incrementQuit(player.userId);
 
@@ -393,6 +404,10 @@ module.exports = class GameService extends EventEmitter {
         }
 
         await this.gameModel.deleteOne({ _id: game._id });
+
+        // TODO: Delete game events
+        // TODO: Delete game history
+        // TODO: Cleanup any orphaned docs
     }
 
     async getPlayerUser(game, playerId) {
@@ -483,6 +498,14 @@ module.exports = class GameService extends EventEmitter {
     isDarkModeExtra(game) {
         return game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
+
+    isBattleRoyaleMode(game) {
+        return game.settings.general.mode === 'battleRoyale';
+    }
+
+    isNewPlayerGame(game) {
+        return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
+    }
     
     async quitAllActiveGames(userId) {
         let allGames = await this.gameModel.find({
@@ -509,22 +532,6 @@ module.exports = class GameService extends EventEmitter {
                 await this.quit(game, player);
             }
         }
-    }
-
-    async userHasCompletedAGame(userId) {
-        let games = await this.gameModel.count({
-            'galaxy.players': {
-                $elemMatch: { 
-                    userId,             // User is in game
-                    afk: false          // User has not been afk'd
-                }
-            },
-            $and: [
-                { 'state.endDate': { $ne: null } } // The game has finished
-            ]
-        });
-
-        return games > 0;
     }
 
 };

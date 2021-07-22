@@ -3,6 +3,7 @@
         "name": null,
         "description": null,
         "type": "custom",
+        "mode": "conquest",
         "password": null,
         "starVictoryPercentage": 50,
         "playerLimit": 8,
@@ -76,10 +77,10 @@
     },
     "gameTime": {
         "gameType": "realTime",
-        "speed": 30,
+        "speed": 1800,
         "startDelay": 30,
         "turnJumps": 6,
-        "maxTurnWait": 24,
+        "maxTurnWait": 1440,
         "missedTurnLimit": 3
     }
 }

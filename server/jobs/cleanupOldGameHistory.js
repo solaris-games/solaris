@@ -13,10 +13,13 @@ module.exports = (container) => {
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
 
+                console.log(`Deleting history for old game: ${game._id}`);
+
                 try {
                     await container.historyService.deleteByGameId(game._id);
-                    
-                    // TODO: Cleanup events too.
+                    await container.eventService.deleteByGameId(game._id);
+
+                    // TODO: Figure out how to ignore games that have already been cleaned up.
                 } catch (e) {
                     console.error(e);
                 }
