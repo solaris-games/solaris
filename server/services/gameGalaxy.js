@@ -406,6 +406,7 @@ module.exports = class GameGalaxyService {
                 defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
+                missedTurns: p.missedTurns,
                 alias: p.alias,
                 avatar: p.avatar,
                 stats: p.stats,

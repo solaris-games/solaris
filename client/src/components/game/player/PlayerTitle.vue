@@ -4,12 +4,13 @@
       <div class="col">
           <h4 class="pt-2">
             <player-icon :playerId="player._id"/>
-            {{player.alias}}<i class="fas fa-robot ml-1" v-if="player.defeated" title="AI Controlled"></i>
+            {{player.alias}}
           </h4>
       </div>
       <div class="col-auto">
         <h4 class="pt-2">
           <span v-if="player.defeated" :title="getPlayerStatus(player)">
+            <i class="fas fa-robot mr-2" v-if="player.defeated" title="AI Controlled"></i>
             <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
             <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
           </span>
@@ -20,6 +21,7 @@
       </div>
   </div>
   <player-online-status :player="player"/>
+  <player-missed-turns :player="player"/>
 </div>
 </template>
 
@@ -27,11 +29,13 @@
 import GameHelper from '../../../services/gameHelper'
 import PlayerIconVue from '../player/PlayerIcon'
 import PlayerOnlineStatusVue from './PlayerOnlineStatus'
+import PlayerMissedTurnsVue from './PlayerMissedTurns'
 
 export default {
   components: {
     'player-icon': PlayerIconVue,
-    'player-online-status': PlayerOnlineStatusVue
+    'player-online-status': PlayerOnlineStatusVue,
+    'player-missed-turns': PlayerMissedTurnsVue
   },
   props: {
     player: Object
