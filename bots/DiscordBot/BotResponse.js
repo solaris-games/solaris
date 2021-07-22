@@ -334,7 +334,7 @@ module.exports = class BotReponseService {
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpUserinfo = "The ``!userinfo <username> gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
+    helpUserinfo = "The ``!userinfo <username>`` gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
         "The first direction, the <username>, is the name of a user, like The Last Hero, or LimitingFactor, the username is case-sensitive, so make sure to spell it properly.\n" +
         "The second direction, the <focus>, is the category you want information on. There are five categories:\n" +
         "If you want to see all information about someone, use ``all``.\n" +
