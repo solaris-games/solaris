@@ -1,6 +1,7 @@
 module.exports = class LeaderboardService {
     static SORTERS = {
         rank: {
+            fullKey: 'achievements.rank',
             sort: {
                 'achievements.rank': -1,
                 'achievements.victories': -1,
@@ -18,6 +19,7 @@ module.exports = class LeaderboardService {
             }
         },
         victories: {
+            fullKey: 'achievements.victories',
             sort: {
                 'achievements.victories': -1,
                 'achievements.rank': -1,
@@ -35,6 +37,7 @@ module.exports = class LeaderboardService {
             }
         },
         renown: {
+            fullKey: 'achievements.renown',
             sort: {
                 'achievements.renown': -1,
                 'achievements.rank': -1,
@@ -52,6 +55,7 @@ module.exports = class LeaderboardService {
             }
         },
         joined: {
+            fullKey: 'achievements.joined',
             sort: {
                 'achievements.joined': -1
             },
@@ -61,6 +65,7 @@ module.exports = class LeaderboardService {
             }
         },
         completed: {
+            fullKey: 'achievements.completed',
             sort: {
                 'achievements.completed': -1
             },
@@ -70,6 +75,7 @@ module.exports = class LeaderboardService {
             }
         },
         quit: {
+            fullKey: 'achievements.quit',
             sort: {
                 'achievements.quit': -1
             },
@@ -79,6 +85,7 @@ module.exports = class LeaderboardService {
             }
         },
         defeated: {
+            fullKey: 'achievements.defeated',
             sort: {
                 'achievements.defeated': -1
             },
@@ -98,6 +105,7 @@ module.exports = class LeaderboardService {
             }
         },
         "ships-killed": {
+            fullKey: 'achievements.combat.kills.ships',
             sort: {
                 'achievements.combat.kills.ships': -1
             },
@@ -107,6 +115,7 @@ module.exports = class LeaderboardService {
             }
         },
         "carriers-killed": {
+            fullKey: 'achievements.combat.kills.carriers',
             sort: {
                 'achievements.combat.kills.carriers': -1
             },
@@ -116,6 +125,7 @@ module.exports = class LeaderboardService {
             }
         },
         "specialists-killed": {
+            fullKey: 'achievements.combat.kills.specialists',
             sort: {
                 'achievements.combat.kills.specialists': -1
             },
@@ -125,6 +135,7 @@ module.exports = class LeaderboardService {
             }
         },
         "ships-lost": {
+            fullKey: 'achievements.combat.losses.ships',
             sort: {
                 'achievements.combat.losses.ships': -1
             },
@@ -134,6 +145,7 @@ module.exports = class LeaderboardService {
             }
         },
         "carriers-lost": {
+            fullKey: 'achievements.combat.losses.carriers',
             sort: {
                 'achievements.combat.losses.carriers': -1
             },
@@ -143,6 +155,7 @@ module.exports = class LeaderboardService {
             }
         },
         "specialists-lost": {
+            fullKey: 'achievements.combat.losses.specialists',
             sort: {
                 'achievements.combat.losses.specialists': -1
             },
@@ -152,6 +165,7 @@ module.exports = class LeaderboardService {
             }
         },
         "stars-captured": {
+            fullKey: 'achievements.combat.stars.captured',
             sort: {
                 'achievements.combat.stars.captured': -1
             },
@@ -161,6 +175,7 @@ module.exports = class LeaderboardService {
             }
         },
         "stars-lost": {
+            fullKey: 'achievements.combat.stars.lost',
             sort: {
                 'achievements.combat.stars.lost': -1
             },
@@ -170,6 +185,7 @@ module.exports = class LeaderboardService {
             }
         },
         "economy": {
+            fullKey: 'achievements.infastructure.economy',
             sort: {
                 'achievements.infastructure.economy': -1
             },
@@ -179,6 +195,7 @@ module.exports = class LeaderboardService {
             }
         },
         "industry": {
+            fullKey: 'achievements.infastructure.industry',
             sort: {
                 'achievements.infastructure.industry': -1
             },
@@ -188,6 +205,7 @@ module.exports = class LeaderboardService {
             }
         },
         "science": {
+            fullKey: 'achievements.infastructure.science',
             sort: {
                 'achievements.infastructure.science': -1
             },
@@ -197,6 +215,7 @@ module.exports = class LeaderboardService {
             }
         },
         "warpgates-built": {
+            fullKey: 'achievements.infastructure.warpGates',
             sort: {
                 'achievements.infastructure.warpGates': -1
             },
@@ -206,6 +225,7 @@ module.exports = class LeaderboardService {
             }
         },
         "warpgates-destroyed": {
+            fullKey: 'achievements.infastructure.warpGatesDestroyed',
             sort: {
                 'achievements.infastructure.warpGatesDestroyed': -1
             },
@@ -215,6 +235,7 @@ module.exports = class LeaderboardService {
             }
         },
         "carriers-built": {
+            fullKey: 'achievements.infastructure.carriers',
             sort: {
                 'achievements.infastructure.carriers': -1
             },
@@ -224,6 +245,7 @@ module.exports = class LeaderboardService {
             }
         },
         "specialists-hired": {
+            fullKey: 'achievements.infastructure.specialistsHired',
             sort: {
                 'achievements.infastructure.specialistsHired': -1
             },
@@ -233,6 +255,7 @@ module.exports = class LeaderboardService {
             }
         },
         "scanning": {
+            fullKey: 'achievements.research.scanning',
             sort: {
                 'achievements.research.scanning': -1
             },
@@ -242,6 +265,7 @@ module.exports = class LeaderboardService {
             }
         },
         "hyperspace": {
+            fullKey: 'achievements.research.hyperspace',
             sort: {
                 'achievements.research.hyperspace': -1
             },
@@ -251,6 +275,7 @@ module.exports = class LeaderboardService {
             }
         },
         "terraforming": {
+            fullKey: 'achievements.research.terraforming',
             sort: {
                 'achievements.research.terraforming': -1
             },
@@ -260,6 +285,7 @@ module.exports = class LeaderboardService {
             }
         },
         "experimentation": {
+            fullKey: 'achievements.research.experimentation',
             sort: {
                 'achievements.research.experimentation': -1
             },
@@ -269,6 +295,7 @@ module.exports = class LeaderboardService {
             }
         },
         "weapons": {
+            fullKey: 'achievements.research.weapons',
             sort: {
                 'achievements.research.weapons': -1
             },
@@ -278,6 +305,7 @@ module.exports = class LeaderboardService {
             }
         },
         "banking": {
+            fullKey: 'achievements.research.banking',
             sort: {
                 'achievements.research.banking': -1
             },
@@ -287,6 +315,7 @@ module.exports = class LeaderboardService {
             }
         },
         "manufacturing": {
+            fullKey: 'achievements.research.manufacturing',
             sort: {
                 'achievements.research.manufacturing': -1
             },
@@ -296,6 +325,7 @@ module.exports = class LeaderboardService {
             }
         },
         "specialists": {
+            fullKey: 'achievements.research.specialists',
             sort: {
                 'achievements.research.specialists': -1
             },
@@ -305,6 +335,7 @@ module.exports = class LeaderboardService {
             }
         },
         "credits-sent": {
+            fullKey: 'achievements.trade.creditsSent',
             sort: {
                 'achievements.trade.creditsSent': -1
             },
@@ -314,6 +345,7 @@ module.exports = class LeaderboardService {
             }
         },
         "credits-received": {
+            fullKey: 'achievements.trade.creditsReceived',
             sort: {
                 'achievements.trade.creditsReceived': -1
             },
@@ -323,6 +355,7 @@ module.exports = class LeaderboardService {
             }
         },
         "technologies-sent": {
+            fullKey: 'achievements.trade.technologySent',
             sort: {
                 'achievements.trade.technologySent': -1
             },
@@ -332,6 +365,7 @@ module.exports = class LeaderboardService {
             }
         },
         "technologies-received": {
+            fullKey: 'achievements.trade.technologyReceived',
             sort: {
                 'achievements.trade.technologyReceived': -1
             },
@@ -341,6 +375,7 @@ module.exports = class LeaderboardService {
             }
         },
         "ships-gifted": {
+            fullKey: 'achievements.trade.giftsSent',
             sort: {
                 'achievements.trade.giftsSent': -1
             },
@@ -350,6 +385,7 @@ module.exports = class LeaderboardService {
             }
         },
         "ships-received": {
+            fullKey: 'achievements.trade.giftsReceived',
             sort: {
                 'achievements.trade.giftsReceived': -1
             },
@@ -359,6 +395,7 @@ module.exports = class LeaderboardService {
             }
         },
         "renown-sent": {
+            fullKey: 'achievements.trade.renownSent',
             sort: {
                 'achievements.trade.renownSent': -1
             },

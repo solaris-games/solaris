@@ -36,6 +36,13 @@ module.exports = class UserService extends EventEmitter {
         return await this.userModel.findById(id);
     }
 
+    async getByUsername(username) {
+        return await this.userModel.find({
+            username: username
+        })
+        .exec();
+    }
+
     async getGameUsers(game) {
         return await this.userModel.find({
             _id: {

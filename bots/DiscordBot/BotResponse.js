@@ -289,7 +289,6 @@ module.exports = class BotReponseService {
             //this will never happen, could just as well replace the multipleGames, but this looks a bit nicer in my opinion
         }
         return response;
-
     }
 
     helpMain = "You can use the following commands in this discord:\n" +
@@ -359,5 +358,10 @@ module.exports = class BotReponseService {
                 { name: `${sortingKey}`, value: sortingKey_list, inline: true }
             )
         return response
+    }
+
+    async userinfo(user) {
+        let response = this.baseResponse();
+        
     }
 }

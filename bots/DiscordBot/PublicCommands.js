@@ -26,7 +26,7 @@ module.exports = class PublicCommandService {
             for (i = 0; i < directions.length - 1; i++) {
                 game_name += directions[i] + ' ';
             }
-            game_name = game_name.slice(0, -1)
+            game_name = game_name.trim()
             game = await this.gameService.getByNameAll(game_name);
             focus = directions[directions.length - 1]
         }
@@ -147,9 +147,18 @@ module.exports = class PublicCommandService {
 
     async userinfo(msg, directions) {
         //!userinfo <username>
-        let userId = ''; // Extract from message
+        let username = "";
+        var i;
+        for (i=0;i<directions.length;i++) {
+            username += directions[i] + ' ';
+        }
+        username = username.trim();
 
-        let user = this.userService.getInfoByIdLean(req.params.id);
+        if(!(await this.userService.usernameExists(username))) return;
+        
+        let user = this.userService.getByUsername(username);
+
+        const response = await this.botResponseService.userinfo(user)
 
         // Send message back to discord
     }
