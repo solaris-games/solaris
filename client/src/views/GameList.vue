@@ -50,10 +50,10 @@
                 <div class="card-img-overlay">
                   <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
-                    <span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span>
+                    <span class="ml-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
                   </h5>
                   <h6 class="card-title card-subtitle new-player-card-subtitle">
-                    {{getGameTypeFriendlyText(games.newPlayerRT)}}
+                    {{games.newPlayerRT.settings.general.name}}
                     ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
                   </h6>
                 </div>
@@ -208,6 +208,7 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
         </div>
+        
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
@@ -332,7 +333,7 @@ export default {
     },
     getGameTypeFriendlyText (game) {
       return {     
-        'new_player_rt': 'New Players',
+        'new_player_rt': 'New Player Game',
         'standard_rt': 'Standard',
         'standard_tb': 'Standard - TB',
         'standard_dark_rt': 'Dark Galaxy',
