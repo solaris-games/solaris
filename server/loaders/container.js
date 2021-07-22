@@ -52,6 +52,7 @@ const SpiralMapService = require('../services/maps/spiral');
 const DoughnutMapService = require('../services/maps/doughnut');
 const IrregularMapService = require('../services/maps/irregular');
 
+const BotResponseService = require('../../bots/DiscordBot/BotResponse.js')
 const PublicCommandService = require('../../bots/DiscordBot/PublicCommands.js')
 const PrivateCommandService = require('../../bots/DiscordBot/PrivateCommands.js')
 
@@ -62,7 +63,7 @@ module.exports = (config, io) => {
     // Poor man's dependency injection.
 
     const passwordService = new PasswordService(bcrypt);
-    
+
     const authService = new AuthService(UserModel, passwordService);
     const userService = new UserService(UserModel, passwordService);
     const adminService = new AdminService(UserModel, GameModel);
@@ -105,14 +106,15 @@ module.exports = (config, io) => {
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);
-    
+
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService);
 
     const gameListService = new GameListService(GameModel, gameService, conversationService, eventService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
 
-    const publicCommandService = new PublicCommandService(gameService, leaderboardService, userService);
+    const botResponseService = new BotResponseService();
+    const publicCommandService = new PublicCommandService(botResponseService, gameService, leaderboardService, userService);
     const privateCommandService = new PrivateCommandService();
 
     return {
@@ -155,6 +157,7 @@ module.exports = (config, io) => {
         reputationService,
         aiService,
         aiTradeService,
+        botResponseService,
         publicCommandService,
         privateCommandService,
     };
