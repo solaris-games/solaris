@@ -292,14 +292,14 @@ module.exports = class BotReponseService {
     }
 
     helpMain = "You can use the following commands in this discord:\n" +
-        "``!gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
-        "``!help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
-        "``!leaderboard_global <filter> <limit>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
-        "``!leaderboard_local <galaxy_name> <filter>`` - rank players in a galaxy based on a certain criteria, like stars, economy, ships and more.\n" +
-        "``!userinfo <username> <focus>`` - get information about a user, like rank, renown or made economy.\n" +
+        "``$gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
+        "``$help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
+        "``$leaderboard_global <filter> <limit>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
+        "``$leaderboard_local <galaxy_name> <filter>`` - rank players in a galaxy based on a certain criteria, like stars, economy, ships and more.\n" +
+        "``$userinfo <username> <focus>`` - get information about a user, like rank, renown or made economy.\n" +
         "I hope this automated response has helped you in understanding commands for the bot. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpGameinfo = "The ``!gameinfo <galaxy_name> <focus>`` command gives you information about the settings of a completed, in progress or waiting game.\n" +
+    helpGameinfo = "The ``$gameinfo <galaxy_name> <focus>`` command gives you information about the settings of a completed, in progress or waiting game.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
         "The second direction, the <focus>, asks what kind of settings you want to know of. There are five kinds of settings.\n" +
         "If you want to see all settings, use ``all``.\n" +
@@ -310,13 +310,13 @@ module.exports = class BotReponseService {
         "If you want to see the time settings, such as the tick/turn duration or whether or not a game is real time, use ``time``.\n" +
         "I hope this automated response has helped you in understanding the gameinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpHelp = "The ``!help <command>`` command gives you information about the commands you can give this bot. " +
+    helpHelp = "The ``$help <command>`` command gives you information about the commands you can give this bot. " +
         "Using just the command without a direction will give you a list of all commands with a short explanation of what they do. " +
         "Using the command with a direction, the ``<command>`` gets you a more detailed explanation of a command and its directions.\n" +
-        "But you probably already knew that, since you used the ``!help help`` command.\n" +
+        "But you probably already knew that, since you used the ``$help help`` command.\n" +
         "I hope this automated response has helped you in understanding the help command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpLeaderboard_global = "the ``!leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
+    helpLeaderboard_global = "the ``$leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
         "The limit has to be a value between 1 and 50, the leaderboard will return the top x players, where x is that number.\n" +
         "The filters can be almost anything, the full list of possible filters is: ``victories``, ``rank``, ``renown``, games ``joined``, games ``completed``, games ``quit``, games ``defeated``, games ``afk``, " +
         "``ships-killed``, ``carriers-killed``, ``specialists-killed``, ``ships-lost``, ``carriers-lost``, ``specialists-lost``, ``stars-captured``, ``stars-lost``, " +
@@ -326,7 +326,7 @@ module.exports = class BotReponseService {
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_global command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpLeaderboard_local = "The ``!leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
+    helpLeaderboard_local = "The ``$leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
         "The second direction, the <filter>, is what the leaderboard will be sorted on. The full list of possible filters is: total ``stars``, total ``carriers``, total ``ships``, total ``economy``, total ``industry``, " +
         "total ``science``, ``new-ship`` production, total ``warpgates``, ``scanning`` level, ``hyperspace`` range level, ``terraforming`` level, ``experimentation`` level, ``weapons`` level, ``banking`` level, " +
@@ -334,7 +334,7 @@ module.exports = class BotReponseService {
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpUserinfo = "The ``!userinfo <username>`` gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
+    helpUserinfo = "The ``$userinfo <username>`` gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
         "The first direction, the <username>, is the name of a user, like The Last Hero, or LimitingFactor, the username is case-sensitive, so make sure to spell it properly.\n" +
         "The second direction, the <focus>, is the category you want information on. There are five categories:\n" +
         "If you want to see all information about someone, use ``all``.\n" +
@@ -345,7 +345,7 @@ module.exports = class BotReponseService {
         "If you want to see information about someone's trade history, such as credits sent, technologies sent, ships gifted or even renown gifted, use ``trade``.\n" +
         "I hope this automated response has helped you in understanding the userinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``!help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
+    helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``$help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
 
     async leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list) {
         var response = await this.baseResponse()
@@ -362,6 +362,65 @@ module.exports = class BotReponseService {
 
     async userinfo(user) {
         let response = this.baseResponse();
-        
+        response = response
+        .setTitle(`Userinfo of ${user.username}`)
+        .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
+        .addFields(
+            { name: "General achievements", value: "\u200B" },
+            { name: "Victories", value: user.achievements.victories, inline: true},
+            { name: "Rank", value: user.achievements.rank, inline: true},
+            { name: "Renown", value: user.achievements.renown, inline: true},//next line
+            { name: "Games Joined", value: user.achievements.joined, inline: true},
+            { name: "Games Completed", value: user.achievements.completed, inline: true},
+            { name: "Games Defeated", value: user.achievements.defeated, inline: true},//next line
+            { name: "Games Quit", value: user.achievements.quit, inline: true},
+            { name: "Games AFK", value: user.achievements.afk, inline: true},
+            { name: "\u200B", value: "\u200B", inline: true},//next line
+            { name: "\u200B", value: "\u200B"},
+            { name: "Combat", value: "\u200B"},
+            { name: "Ships Killed", value: user.achievements.combat.kills.ships, inline: true},
+            { name: "Carriers Killed", value: user.achievements.combat.kills.carriers, inline: true},
+            { name: "Specialists Killed", value: user.achievements.combat.kills.specialists, inline: true},//next line
+            { name: "Ships Lost", value: user.achievements.combat.losses.ships, inline: true},
+            { name: "Carriers Lost", value: user.achievements.combat.losses.carriers, inline: true},
+            { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true},//next line
+            { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true},
+            { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true},
+            { name: "\u200B", value: "\u200B", inline: true},//next line
+            { name: "\u200B", value: "\u200B"},
+            { name: "Infrastructure", value: "\u200B"},
+            { name: "Economy", value: user.achievements.infrastructure.economy, inline: true},
+            { name: "Industry", value: user.achievements.infrastructure.industry, inline: true},
+            { name: "Science", value: user.achievements.infrastructure.science, inline: true},//next line
+            { name: "Warp Gates built", value: user.achievements.infrastructure.warpGates, inline: true},
+            { name: "Carriers built", value: user.achievements.infrastructure.carriers, inline: true},
+            { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true},//next line
+            { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed  , inline: true},
+            { name: "\u200B", value: "\u200B", inline: true},
+            { name: "\u200B", value: "\u200B", inline: true},//next line
+            { name: "\u200B", value: "\u200B"},
+            { name: "Research", value: "\u200B"},
+            { name: "Scanning", value: user.achievements.research.scanning, inline: true},
+            { name: "Hyperspace Range", value: user.achievements.research.hyperspace, inline: true},
+            { name: "Terraforming", value: user.achievements.research.terraforming, inline: true},//next line
+            { name: "Experimentation", value: user.achievements.research.experimentation, inline: true},
+            { name: "Weapons", value: user.achievements.research.weapons, inline: true},
+            { name: "Banking", value: user.achievements.research.banking, inline: true},//next line
+            { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true},
+            { name: "Specialists", value: user.achievements.research.specialists, inline: true},
+            { name: "\u200B", value: "\u200B", inline: true},//next line
+            { name: "\u200B", value: "\u200B"},
+            { name: "Trade", value: "\u200B"},
+            { name: "Credits Sent", value: user.achievements.trade.creditsSent, inline: true},
+            { name: "Specialist Tokens Sent", value: user.achievements.trade.creditsSpecialistsSent, inline: true},
+            { name: "Technologies Sent", value: user.achievements.trade.technologySent, inline: true},//next line
+            { name: "Credits Received", value: user.achievements.trade.creditsReceived, inline: true},
+            { name: "Specialists Tokens Received", value: user.achievements.trade.creditsSpecialistsReceived, inline: true},
+            { name: "Technologies Received", value: user.achievements.trade.technologyReceived, inline: true},//next line
+            { name: "Ships Gifted", value: user.achievements.trade.giftsSent, inline: true},
+            { name: "Ships Recieved", value: user.achievements.trade.giftsReceived, inline: true},
+            { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true},
+        );
+        return response;
     }
 }

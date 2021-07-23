@@ -148,8 +148,7 @@ module.exports = class PublicCommandService {
     async userinfo(msg, directions) {
         //!userinfo <username>
         let username = "";
-        var i;
-        for (i=0;i<directions.length;i++) {
+        for (let i=0;i<directions.length;i++) {
             username += directions[i] + ' ';
         }
         username = username.trim();
@@ -160,6 +159,7 @@ module.exports = class PublicCommandService {
 
         const response = await this.botResponseService.userinfo(user)
 
+        msg.channel.send(response);
         // Send message back to discord
     }
 }
