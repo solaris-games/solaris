@@ -317,20 +317,20 @@ module.exports = class BotReponseService {
         "I hope this automated response has helped you in understanding the help command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
     helpLeaderboard_global = "the ``$leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
-        "The limit has to be a value between 1 and 50, the leaderboard will return the top x players, where x is that number.\n" +
-        "The filters can be almost anything, the full list of possible filters is: ``victories``, ``rank``, ``renown``, games ``joined``, games ``completed``, games ``quit``, games ``defeated``, games ``afk``, " +
-        "``ships-killed``, ``carriers-killed``, ``specialists-killed``, ``ships-lost``, ``carriers-lost``, ``specialists-lost``, ``stars-captured``, ``stars-lost``, " +
-        "``economy`` built, ``industry`` built, ``science`` built, ``warpgates-built``, ``warpgates-destroyed``, ``carriers-built``, ``specialists-hired``, ``scanning`` researched, ``hyperspace`` range researched, ``terraforming`` researched, " +
-        "``experimentation`` researched, ``weapons`` researched, ``banking`` researched, ``manufacturing`` researched, ``specialists`` researched, ``credits-sent``, ``credits-received``, ``technologies-sent``, ``technologies-received``, " +
-        "``ships-gifted``, ``ships-received`` and ``renown-sent``.\n" +
+        "The limit has to be a value between 1 and 20, the leaderboard will return the top x players, where x is that number.\n" +
+        "The filters can be almost anything, the full list of possible filters is: \n``victories``\n``rank``\n``renown``\ngames ``joined``\ngames ``completed``\ngames ``quit``\ngames ``defeated``\ngames ``afk``\n" +
+        "``ships-killed``\n``carriers-killed``\n``specialists-killed``\n``ships-lost``\n``carriers-lost``\n``specialists-lost``\n``stars-captured``\n``stars-lost``\n" +
+        "``economy`` built\n``industry`` built\n``science`` built\n``warpgates-built``\n``warpgates-destroyed``\n``carriers-built``\n``specialists-hired``\n``scanning`` researched\n``hyperspace`` range researched\n``terraforming`` researched\n" +
+        "``experimentation`` researched\n``weapons`` researched\n``banking`` researched\n``manufacturing`` researched\n``specialists`` researched\n``credits-sent``\n``credits-received``\n``technologies-sent``\n``technologies-received``\n" +
+        "``ships-gifted``\n``ships-received``\n``renown-sent``.\n" +
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_global command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
     helpLeaderboard_local = "The ``$leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
-        "The second direction, the <filter>, is what the leaderboard will be sorted on. The full list of possible filters is: total ``stars``, total ``carriers``, total ``ships``, total ``economy``, total ``industry``, " +
-        "total ``science``, ``new-ship`` production, total ``warpgates``, ``scanning`` level, ``hyperspace`` range level, ``terraforming`` level, ``experimentation`` level, ``weapons`` level, ``banking`` level, " +
-        "``manufacturing`` level and ``specialists`` level.\n" +
+        "The second direction, the <filter>, is what the leaderboard will be sorted on. The full list of possible filters is: \ntotal ``stars``\ntotal ``carriers``\ntotal ``ships``\ntotal ``economy``\ntotal ``industry``\n" +
+        "total ``science``\n``new-ship`` production\ntotal ``warpgates``\n``scanning`` level\n``hyperspace`` range level\n``terraforming`` level\n``experimentation`` level\n``weapons`` level\n``banking`` level\n" +
+        "``manufacturing`` level\n``specialists`` level.\n" +
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
@@ -353,7 +353,7 @@ module.exports = class BotReponseService {
             .setTitle(`Top ${limit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
             .addFields(
-                { name: "Placing", value: position_list, inline: true },
+                { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
                 { name: `${sortingKey}`, value: sortingKey_list, inline: true }
             )

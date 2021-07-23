@@ -48,9 +48,10 @@ module.exports = class PublicCommandService {
         game = game[0];
 
         switch (focus) {
-            case 'all':
+            /*case 'all':
                 response = await this.botResponseService.gameinfoAll(game);
                 break;
+            Temporarily removed this option because it is too much of a pain, too big of a message. Has to be solved in the future by making this a multipage response. */
             case 'general':
                 response = await this.botResponseService.gameinfoGeneral(game);
                 break;
@@ -111,7 +112,7 @@ module.exports = class PublicCommandService {
         let limit = directions[1];
         limit = +limit;
         let sortingKey = directions[0];
-        if (!(limit >= 1 && limit <= 50)) {
+        if (!(limit >= 1 && limit <= 20)) {
             limit = 10;
         };
 
@@ -147,6 +148,10 @@ module.exports = class PublicCommandService {
 
     async userinfo(msg, directions) {
         //!userinfo <username>
+
+        //Very important here to temporarily take down the userinfo function, because the response is too big. Has to be cut down using multipage responses combined with a focus.
+        return;
+
         let username = "";
         for (let i=0;i<directions.length;i++) {
             username += directions[i] + ' ';
@@ -160,6 +165,5 @@ module.exports = class PublicCommandService {
         const response = await this.botResponseService.userinfo(user)
 
         msg.channel.send(response);
-        // Send message back to discord
     }
 }
