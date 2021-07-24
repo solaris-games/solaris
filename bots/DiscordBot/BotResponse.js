@@ -34,7 +34,8 @@ module.exports = class BotReponseService {
                 { name: "Maximum Players", value: game.settings.general.playerLimit, inline: true },
                 { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
                 { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },
-                { name: "Time Machine", value: game.settings.general.timeMachine, inline: true }
+                { name: "Time Machine", value: game.settings.general.timeMachine, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -137,7 +138,9 @@ module.exports = class BotReponseService {
                 { name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true },
                 { name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Banking Reward", value: game.settings.technology.bankingReward },
+                { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -161,13 +164,14 @@ module.exports = class BotReponseService {
             );
         if (game.settings.gameTime.gameType == 'realTime') {
             response = response.addFields(
-                { name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true },
+                { name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true }
             );
         } else {
             response = response.addFields(
-                { name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true },
+                { name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true },//next line
                 { name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true },
-                { name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true }
+                { name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         }
         return response;
@@ -188,9 +192,6 @@ module.exports = class BotReponseService {
                 response = `Hey <@${msg.author.id},\n
                     Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n
                     If you do this, add the word "ID" after the filter, as an extra direction.`
-                break;
-            default:
-            //this will never happen, could just as well replace the multipleGames, but this looks a bit nicer in my opinion
         }
         return response;
     }
@@ -198,7 +199,7 @@ module.exports = class BotReponseService {
     helpMain = "You can use the following commands in this discord:\n" +
         "``$gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
         "``$help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
-        "``$leaderboard_global <filter> <limit>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
+        "``$leaderboard_global <filter>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
         "``$leaderboard_local <galaxy_name> <filter>`` - rank players in a galaxy based on a certain criteria, like stars, economy, ships and more.\n" +
         "``$userinfo <username> <focus>`` - get information about a user, like rank, renown or made economy.\n" +
         "I hope this automated response has helped you in understanding commands for the bot. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
@@ -206,7 +207,6 @@ module.exports = class BotReponseService {
     helpGameinfo = "The ``$gameinfo <galaxy_name> <focus>`` command gives you information about the settings of a completed, in progress or waiting game.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
         "The second direction, the <focus>, asks what kind of settings you want to know of. There are five kinds of settings.\n" +
-        "If you want to see all settings, use ``all``.\n" +
         "If you want to see the general settings, such as the stars required for victory, playerLimit, anonymity and more, use ``general``.\n" +
         "If you want to see the galaxy settings, such as carrier cost, warpgate cost, specialist cost and more, use ``galaxy``.\n" +
         "If you want to see the player settings, such as the starting conditions and trading conditions, use ``player``.\n" +
@@ -298,9 +298,6 @@ module.exports = class BotReponseService {
             case 'notStarted':
                 response = `Hey <@${authorId}>,\n
                     The game you looked up has not started yet, we can't tell you anything about it now...`;
-                break;
-            default:
-            //this will never happen
         }
         return response;
     }

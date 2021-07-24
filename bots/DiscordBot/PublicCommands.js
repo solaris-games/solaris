@@ -277,7 +277,6 @@ module.exports = class PublicCommandService {
             sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n"
         }
 
-
         let response = await this.botResponseService.leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list);
 
         msg.channel.send(response);
