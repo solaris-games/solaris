@@ -13,102 +13,6 @@ module.exports = class BotReponseService {
         return response;
     }
 
-    async gameinfoAll(game) {
-        let game_name = game.settings.general.name;
-        let gameId = game._id;
-        let response = await this.baseResponse();
-        response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
-        if (game.settings.general.description) {
-            response = response
-                .setDescription(game.settings.general.description);
-        }
-        response = response
-            .setTitle(`All settings of ${game_name}`)
-            .addFields(
-                { name: "General", value: "\u200B" },
-                { name: "Type", value: game.settings.general.type, inline: true },
-                { name: "Mode", value: game.settings.general.mode, inline: true },
-                { name: "Featured", value: game.settings.general.featured ? "true" : "false", inline: true },//next line
-                { name: "Star % for Victory", value: game.settings.general.starVictoryPercentage, inline: true },
-                { name: "Maximum Players", value: game.settings.general.playerLimit, inline: true },
-                { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
-                { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },
-                { name: "Time Machine", value: game.settings.general.timeMachine, inline: true },
-                { name: "\u200B", value: "\u200B" },
-                { name: "Galaxy", value: "\u200B" },
-                { name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true },
-                { name: "Stars per Player", value: game.settings.galaxy.starsPerPlayer, inline: true },
-                { name: "Ticks per Cycle", value: game.settings.galaxy.productionTicks, inline: true }, //next line
-                { name: "Carrier Cost", value: game.settings.specialGalaxy.carrierCost, inline: true },
-                { name: "Carrier Upkeep", value: game.settings.specialGalaxy.carrierUpkeepCost, inline: true },
-                { name: "Carrier Speed", value: game.settings.specialGalaxy.carrierSpeed, inline: true },//next line
-                { name: "Warpgate Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true },
-                { name: "Random Warpgates", value: game.settings.specialGalaxy.randomGates, inline: true },
-                { name: "Specialist Cost", value: game.settings.specialGalaxy.specialistCost, inline: true },//next line
-                { name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true },
-                { name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true },
-                { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
-                { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
-                { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },
-                { name: "\u200B", value: "\u200B" },
-                { name: "Player", value: "\u200B" },
-                { name: "Starting Stars", value: game.settings.player.startingStars, inline: true },
-                { name: "Starting Ships", value: game.settings.player.startingShips, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Starting Economy", value: game.settings.player.startingInfrastructure.economy, inline: true },
-                { name: "Starting Industry", value: game.settings.player.startingInfrastructure.industry, inline: true },
-                { name: "Starting Science", value: game.settings.player.startingInfrastructure.science, inline: true },//next line
-                { name: "Economy Cost", value: game.settings.player.developmentCost.economy, inline: true },
-                { name: "Industry Cost", value: game.settings.player.developmentCost.industry, inline: true },
-                { name: "Science Cost", value: game.settings.player.developmentCost.science, inline: true },//next line
-                { name: "Starting Credits", value: game.settings.player.startingCredits, inline: true },
-                { name: "Starting Specialist Tokens", value: game.settings.player.startingCreditsSpecialists, inline: true },
-                { name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true },//next line
-                { name: "Trade Credits", value: game.settings.player.tradeCredits ? "true" : "false", inline: true },
-                { name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true" : "false", inline: true },
-                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true },
-                { name: "\u200B", value: "\u200B" },
-                { name: "Technology", value: "\u200B" },
-                { name: "Scanning", value: game.settings.technology.startingTechnologyLevel.scanning, inline: true },
-                { name: "Hyperspace Range", value: game.settings.technology.startingTechnologyLevel.hyperspace, inline: true },
-                { name: "Terraforming", value: game.settings.technology.startingTechnologyLevel.terraforming, inline: true },//next line
-                { name: "Experimentation", value: game.settings.technology.startingTechnologyLevel.experimentation, inline: true },
-                { name: "Weapons", value: game.settings.technology.startingTechnologyLevel.weapons, inline: true },
-                { name: "Banking", value: game.settings.technology.startingTechnologyLevel.banking, inline: true },//next line
-                { name: "Manufacturing", value: game.settings.technology.startingTechnologyLevel.manufacturing, inline: true },
-                { name: "Specialists", value: game.settings.technology.startingTechnologyLevel.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Scanning", value: game.settings.technology.researchCosts.scanning, inline: true },
-                { name: "Hyperspace Range", value: game.settings.technology.researchCosts.hyperspace, inline: true },
-                { name: "Terraforming", value: game.settings.technology.researchCosts.terraforming, inline: true },//next line
-                { name: "Experimentation", value: game.settings.technology.researchCosts.experimentation, inline: true },
-                { name: "Weapons", value: game.settings.technology.researchCosts.weapons, inline: true },
-                { name: "Banking", value: game.settings.technology.researchCosts.banking, inline: true },//next line
-                { name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true },
-                { name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Banking Reward", value: game.settings.technology.bankingReward },
-                { name: "\u200B", value: "\u200B" },
-                { name: "Time", value: "\u200B" },
-                { name: "Time Type", value: game.settings.gameTime.gameType, inline: true },
-                { name: "Start Delay", value: game.settings.gameTime.startDelay, inline: true }
-            );
-        if (game.settings.gameTime.gameType == 'realTime') {
-            response = response.addFields(
-                { name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true },
-            );
-        } else {
-            response = response.addFields(
-                { name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true },
-                { name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true },
-                { name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true }
-            );
-        }
-        return response;
-    }
-
     async gameinfoGeneral(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
@@ -348,8 +252,8 @@ module.exports = class BotReponseService {
     helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``$help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
 
     async leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
-        let lowerLimit = (page-1)*20+1
-        let upperLimit = page*20
+        let lowerLimit = (page - 1) * 20 + 1
+        let upperLimit = page * 20
         let response = await this.baseResponse()
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
@@ -362,7 +266,7 @@ module.exports = class BotReponseService {
         return response;
     }
 
-    async leaderboard_local (gameId, sortingKey, position_list, username_list, sortingKey_list) {
+    async leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list) {
         let response = await this.baseResponse()
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
@@ -377,7 +281,7 @@ module.exports = class BotReponseService {
 
     async leaderboard_localError(authorId, reason) {
         let response;
-        switch(reason){
+        switch (reason) {
             case 'noGame':
                 response = `Hey <@${authorId}>,\n
                     No game was found with this name, check if you spelled it correctly`;
@@ -396,7 +300,7 @@ module.exports = class BotReponseService {
                     The game you looked up has not started yet, we can't tell you anything about it now...`;
                 break;
             default:
-                //this will never happen
+            //this will never happen
         }
         return response;
     }
@@ -404,64 +308,64 @@ module.exports = class BotReponseService {
     async userinfo(user) {
         let response = await this.baseResponse();
         response = response
-        .setTitle(`Userinfo of ${user.username}`)
-        .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
-        .addFields(
-            { name: "General achievements", value: "\u200B" },
-            { name: "Victories", value: user.achievements.victories, inline: true},
-            { name: "Rank", value: user.achievements.rank, inline: true},
-            { name: "Renown", value: user.achievements.renown, inline: true},//next line
-            { name: "Games Joined", value: user.achievements.joined, inline: true},
-            { name: "Games Completed", value: user.achievements.completed, inline: true},
-            { name: "Games Defeated", value: user.achievements.defeated, inline: true},//next line
-            { name: "Games Quit", value: user.achievements.quit, inline: true},
-            { name: "Games AFK", value: user.achievements.afk, inline: true},
-            { name: "\u200B", value: "\u200B", inline: true},//next line
-            { name: "\u200B", value: "\u200B"},
-            { name: "Combat", value: "\u200B"},
-            { name: "Ships Killed", value: user.achievements.combat.kills.ships, inline: true},
-            { name: "Carriers Killed", value: user.achievements.combat.kills.carriers, inline: true},
-            { name: "Specialists Killed", value: user.achievements.combat.kills.specialists, inline: true},//next line
-            { name: "Ships Lost", value: user.achievements.combat.losses.ships, inline: true},
-            { name: "Carriers Lost", value: user.achievements.combat.losses.carriers, inline: true},
-            { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true},//next line
-            { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true},
-            { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true},
-            { name: "\u200B", value: "\u200B", inline: true},//next line
-            { name: "\u200B", value: "\u200B"},
-            { name: "Infrastructure", value: "\u200B"},
-            { name: "Economy", value: user.achievements.infrastructure.economy, inline: true},
-            { name: "Industry", value: user.achievements.infrastructure.industry, inline: true},
-            { name: "Science", value: user.achievements.infrastructure.science, inline: true},//next line
-            { name: "Warp Gates built", value: user.achievements.infrastructure.warpGates, inline: true},
-            { name: "Carriers built", value: user.achievements.infrastructure.carriers, inline: true},
-            { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true},//next line
-            { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed  , inline: true},
-            { name: "\u200B", value: "\u200B", inline: true},
-            { name: "\u200B", value: "\u200B", inline: true},//next line
-            { name: "\u200B", value: "\u200B"},
-            { name: "Research", value: "\u200B"},
-            { name: "Scanning", value: user.achievements.research.scanning, inline: true},
-            { name: "Hyperspace Range", value: user.achievements.research.hyperspace, inline: true},
-            { name: "Terraforming", value: user.achievements.research.terraforming, inline: true},//next line
-            { name: "Experimentation", value: user.achievements.research.experimentation, inline: true},
-            { name: "Weapons", value: user.achievements.research.weapons, inline: true},
-            { name: "Banking", value: user.achievements.research.banking, inline: true},//next line
-            { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true},
-            { name: "Specialists", value: user.achievements.research.specialists, inline: true},
-            { name: "\u200B", value: "\u200B", inline: true},//next line
-            { name: "\u200B", value: "\u200B"},
-            { name: "Trade", value: "\u200B"},
-            { name: "Credits Sent", value: user.achievements.trade.creditsSent, inline: true},
-            { name: "Specialist Tokens Sent", value: user.achievements.trade.creditsSpecialistsSent, inline: true},
-            { name: "Technologies Sent", value: user.achievements.trade.technologySent, inline: true},//next line
-            { name: "Credits Received", value: user.achievements.trade.creditsReceived, inline: true},
-            { name: "Specialists Tokens Received", value: user.achievements.trade.creditsSpecialistsReceived, inline: true},
-            { name: "Technologies Received", value: user.achievements.trade.technologyReceived, inline: true},//next line
-            { name: "Ships Gifted", value: user.achievements.trade.giftsSent, inline: true},
-            { name: "Ships Recieved", value: user.achievements.trade.giftsReceived, inline: true},
-            { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true},
-        );
+            .setTitle(`Userinfo of ${user.username}`)
+            .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
+            .addFields(
+                { name: "General achievements", value: "\u200B" },
+                { name: "Victories", value: user.achievements.victories, inline: true },
+                { name: "Rank", value: user.achievements.rank, inline: true },
+                { name: "Renown", value: user.achievements.renown, inline: true },//next line
+                { name: "Games Joined", value: user.achievements.joined, inline: true },
+                { name: "Games Completed", value: user.achievements.completed, inline: true },
+                { name: "Games Defeated", value: user.achievements.defeated, inline: true },//next line
+                { name: "Games Quit", value: user.achievements.quit, inline: true },
+                { name: "Games AFK", value: user.achievements.afk, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "\u200B", value: "\u200B" },
+                { name: "Combat", value: "\u200B" },
+                { name: "Ships Killed", value: user.achievements.combat.kills.ships, inline: true },
+                { name: "Carriers Killed", value: user.achievements.combat.kills.carriers, inline: true },
+                { name: "Specialists Killed", value: user.achievements.combat.kills.specialists, inline: true },//next line
+                { name: "Ships Lost", value: user.achievements.combat.losses.ships, inline: true },
+                { name: "Carriers Lost", value: user.achievements.combat.losses.carriers, inline: true },
+                { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true },//next line
+                { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true },
+                { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "\u200B", value: "\u200B" },
+                { name: "Infrastructure", value: "\u200B" },
+                { name: "Economy", value: user.achievements.infrastructure.economy, inline: true },
+                { name: "Industry", value: user.achievements.infrastructure.industry, inline: true },
+                { name: "Science", value: user.achievements.infrastructure.science, inline: true },//next line
+                { name: "Warp Gates built", value: user.achievements.infrastructure.warpGates, inline: true },
+                { name: "Carriers built", value: user.achievements.infrastructure.carriers, inline: true },
+                { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true },//next line
+                { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "\u200B", value: "\u200B" },
+                { name: "Research", value: "\u200B" },
+                { name: "Scanning", value: user.achievements.research.scanning, inline: true },
+                { name: "Hyperspace Range", value: user.achievements.research.hyperspace, inline: true },
+                { name: "Terraforming", value: user.achievements.research.terraforming, inline: true },//next line
+                { name: "Experimentation", value: user.achievements.research.experimentation, inline: true },
+                { name: "Weapons", value: user.achievements.research.weapons, inline: true },
+                { name: "Banking", value: user.achievements.research.banking, inline: true },//next line
+                { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true },
+                { name: "Specialists", value: user.achievements.research.specialists, inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "\u200B", value: "\u200B" },
+                { name: "Trade", value: "\u200B" },
+                { name: "Credits Sent", value: user.achievements.trade.creditsSent, inline: true },
+                { name: "Specialist Tokens Sent", value: user.achievements.trade.creditsSpecialistsSent, inline: true },
+                { name: "Technologies Sent", value: user.achievements.trade.technologySent, inline: true },//next line
+                { name: "Credits Received", value: user.achievements.trade.creditsReceived, inline: true },
+                { name: "Specialists Tokens Received", value: user.achievements.trade.creditsSpecialistsReceived, inline: true },
+                { name: "Technologies Received", value: user.achievements.trade.technologyReceived, inline: true },//next line
+                { name: "Ships Gifted", value: user.achievements.trade.giftsSent, inline: true },
+                { name: "Ships Recieved", value: user.achievements.trade.giftsReceived, inline: true },
+                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true },
+            );
         return response;
     }
 }

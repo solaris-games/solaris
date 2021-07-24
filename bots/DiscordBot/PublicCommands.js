@@ -31,9 +31,9 @@ module.exports = class PublicCommandService {
             focus = directions[directions.length - 1]
         }
 
-        let response;
         let NameUniquenessVar = game.length;
         if (NameUniquenessVar != 1) {
+            let response;
             if (NameUniquenessVar == 0) {
                 response = await this.botResponseService.gameinfoError(msg.author.id, 'noGame');
                 msg.channel.send(response);
@@ -47,28 +47,60 @@ module.exports = class PublicCommandService {
 
         game = game[0];
 
-        switch (focus) {
-            /*case 'all':
-                response = await this.botResponseService.gameinfoAll(game);
-                break;
-            Temporarily removed this option because it is too much of a pain, too big of a message. Has to be solved in the future by making this a multipage response. */
-            case 'general':
-                response = await this.botResponseService.gameinfoGeneral(game);
-                break;
-            case 'galaxy':
-                response = await this.botResponseService.gameinfoGalaxy(game);
-            case 'player':
-                response = await this.botResponseService.gameinfoPlayer(game);
-            case 'technology':
-                response = await this.botResponseService.gameinfoTechnology(game);
-            case 'time':
-                response = await this.botResponseService.gameinfoTime(game);
-            default:
-                response = await this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
+        let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
+        if (!focusArray.includes(focus)) {
+            let response = await this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
+            msg.channel.send(response);
         }
 
-        msg.channel.send(response)
+        const generateResponse = start => {
+            let response;
+            switch (start) {
+                case 'general':
+                    response = await this.botResponseService.gameinfoGeneral(game);
+                    break;
+                case 'galaxy':
+                    response = await this.botResponseService.gameinfoGalaxy(game);
+                    break;
+                case 'player':
+                    response = await this.botResponseService.gameinfoPlayer(game);
+                    break;
+                case 'technology':
+                    response = await this.botResponseService.gameinfoTechnology(game);
+                    break;
+                case 'time':
+                    response = await this.botResponseService.gameinfoTime(game);
+            }
+            return response;
+        }
 
+        msg.channel.send(generateResponse(focus)).then(message => {
+            try {
+                await message.react('⬅️')
+                await message.react('➡️')
+            } catch (error) {
+                console.log('One of the emojis failed to react:', error);
+            }
+            const collector = message.createReactionCollector(
+                (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === msg.author.id, { time: 60000 }
+            );
+
+            let currentPage = focusArray.indexOf(focus);
+            collector.on('collect', reaction => {
+                message.reactions.removeAll().then(async () => {
+                    reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
+                    if (currentPage < 0) currentPage = 4;
+                    if (currentPage > 4) currentPage = 0;
+                    message.edit(generateResponse(focusArray[currentPage]));
+                    try {
+                        await message.react('⬅️')
+                        await message.react('➡️')
+                    } catch (error) {
+                        console.log('One of the emojis failed to react:', error);
+                    }
+                });
+            });
+        });
     }
 
     async help(msg, directions) {
@@ -120,17 +152,17 @@ module.exports = class PublicCommandService {
         // here be dragons
         const getNestedObject = (nestedObj, pathArr) => {
             return pathArr.reduce((obj, key) =>
-            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
         const generateLeaderboard = page => {
             let position_list = "";
             let username_list = "";
             let sortingKey_list = "";
-            let lowerLimit = (page-1)*20+1
-            let upperLimit = page*20
+            let lowerLimit = (page - 1) * 20 + 1
+            let upperLimit = page * 20
             for (let i = lowerLimit; i < upperLimit; i++) {
-                if(!leaderboard[i]) {break;}
+                if (!leaderboard[i]) { break; }
                 position_list += leaderboard[i].position + "\n";
                 username_list += leaderboard[i].username + "\n";
                 sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
@@ -143,48 +175,49 @@ module.exports = class PublicCommandService {
             try {
                 await message.react('➡️')
                 await message.react('⏩')
-            } catch(error) {
+            } catch (error) {
                 console.log('One of the emojis failed to react:', error);
             }
             const collector = message.createReactionCollector(
-                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩'].includes(reaction.emoji.name) && user.id == msg.author.id, {time: 60000}
+                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩'].includes(reaction.emoji.name) && user.id == msg.author.id, { time: 60000 }
             )
-        });
 
-        let currentPage = 1
-        collector.on('collect', reaction => {
-            message.reactions.removeAll().then(async () => {
-                switch(reaction.emoji.name) {
-                    case '⏪':
-                        currentPage -= 5
-                        break;
-                    case '⬅️':
-                        currentPage -= 1
-                        break;
-                    case '➡️':
-                        currentPage += 1
-                        break;
-                    default:
-                        //⏩
-                        currentPage += 5
-                }
-                if(currentPage < 0) currentPage = 0;
-                if(currentPage > pageCount) currentPage = pageCount;
-                message.edit(generateLeaderboard(currentPage));
-                if (currentIndex > 1) await message.react('⏪');
-                if (currentIndex != 0) await message.react('⬅️');
-                if (currentIndex != pageCount) await message.react('➡️');
-                if (currentIndex < pageCount-1) message.react('⏩');
+
+            let currentPage = 1
+            collector.on('collect', reaction => {
+                message.reactions.removeAll().then(async () => {
+                    switch (reaction.emoji.name) {
+                        case '⏪':
+                            currentPage -= 5
+                            break;
+                        case '⬅️':
+                            currentPage -= 1
+                            break;
+                        case '➡️':
+                            currentPage += 1
+                            break;
+                        default:
+                            //⏩
+                            currentPage += 5
+                    }
+                    if (currentPage < 1) currentPage = 1;
+                    if (currentPage > pageCount) currentPage = pageCount;
+                    message.edit(generateLeaderboard(currentPage));
+                    if (currentPage > 2) await message.react('⏪');
+                    if (currentPage != 1) await message.react('⬅️');
+                    if (currentPage != pageCount) await message.react('➡️');
+                    if (currentPage < pageCount - 1) message.react('⏩');
+                });
             });
         });
     }
 
     async leaderboard_local(msg, directions) {
         //!leaderboard_local <galaxy_name> <filter> ("ID")
-        
+
         let filter;
         let game = [];
-        
+
         if (directions[directions.length - 1] == "ID") {
             game = await this.gameService.getByIdAll(directions[0])
             filter = directions[directions.length - 2]
@@ -219,12 +252,12 @@ module.exports = class PublicCommandService {
         let gameTick = game[0].galaxy.state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
-        if(game.setting.specialGalaxy.darkGalaxy == 'extra' || game.galaxy.state.endDate) {
+        if (game.setting.specialGalaxy.darkGalaxy == 'extra' || game.galaxy.state.endDate) {
             response = await this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark');
             msg.channel.send(response)
             return;
         }
-        if(!game.galaxy.state.startDate){
+        if (!game.galaxy.state.startDate) {
             response = await this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted');
             msg.channel.send(response)
             return;
@@ -244,7 +277,7 @@ module.exports = class PublicCommandService {
             sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n"
         }
 
-        
+
         let response = await this.botResponseService.leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list);
 
         msg.channel.send(response);
@@ -257,13 +290,13 @@ module.exports = class PublicCommandService {
         return;
 
         let username = "";
-        for (let i=0;i<directions.length;i++) {
+        for (let i = 0; i < directions.length; i++) {
             username += directions[i] + ' ';
         }
         username = username.trim();
 
-        if(!(await this.userService.usernameExists(username))) return;
-        
+        if (!(await this.userService.usernameExists(username))) return;
+
         let user = await this.userService.getByUsername(username);
 
         const response = await this.botResponseService.userinfo(user)

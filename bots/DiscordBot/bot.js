@@ -31,10 +31,10 @@ client.on('message', async (msg) => {
     await Identify_Command(msg);
 });
 
-client.on('messageReactionAdd', (MessageReaction, User) =>{
+client.on('messageReactionAdd', (MessageReaction, User) => {
     let msg = MessageReaction.message
 
-    if(!msg.author.bot || User.bot) return;
+    if (!msg.author.bot || User.bot) return;
 });
 
 async function Specialist_Suggestion(msg) {
@@ -49,7 +49,7 @@ async function Identify_Command(msg) {
     const directions = msg.content.slice(prefix.length).split(' ');
     const cmd = directions[0];
     directions.shift();
-    if(msg.channel.type !== 'dm'){
+    if (msg.channel.type !== 'dm') {
         // Now that the command exists, we can execute the function, which so happens to be named exactly like the command
         if (container.publicCommandService[cmd]) {
             await container.publicCommandService[cmd](msg, directions);
@@ -82,6 +82,7 @@ async function startup() {
         // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
         "gameinfo": container.publicCommandService.gameinfo,
         "help": container.publicCommandService.help,
+        //invite (with the settings: Mode, Players, Anonymity, TB/RT, Galaxy type, SPP, (time per tick/turn), ticks per cycle, specialist currency, Dark Galaxy, Trade credits, Trade Scanning)
         "leaderboard_global": container.publicCommandService.leaderboard_global,
         "leaderboard_local": container.publicCommandService.leaderboard_local,
         "userinfo": container.publicCommandService.userinfo
