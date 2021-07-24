@@ -108,17 +108,14 @@ module.exports = class PublicCommandService {
     }
 
     async leaderboard_global(msg, directions) {
-        //!leaderboard_global <filter> <limit>
-        let limit = directions[1];
-        limit = +limit;
-        let sortingKey = directions[0];
-        if (!(limit >= 1 && limit <= 20)) {
-            limit = 10;
-        };
+        //!leaderboard_global <filter> (<page>)
 
-        // Calculating how the leaderboard looks,
+        // Calculating how the leaderboard looks
+        let sortingKey = directions[0];
+        let limit = await this.userService.getUserCount();
         let result = await this.leaderboardService.getLeaderboard(limit, sortingKey);
         let leaderboard = result.leaderboard;
+        let pageCount = Math.ceil(leaderboard.length / 20)
 
         // here be dragons
         const getNestedObject = (nestedObj, pathArr) => {
@@ -126,19 +123,60 @@ module.exports = class PublicCommandService {
             (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
-        let position_list = "";
-        let username_list = "";
-        let sortingKey_list = "";
-
-        for (let i = 0; i < leaderboard.length; i++) {
-            position_list = position_list + (i + 1) + "\n";
-            username_list = username_list + leaderboard[i].username + "\n";
-            sortingKey_list = sortingKey_list + getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+        const generateLeaderboard = page => {
+            let position_list = "";
+            let username_list = "";
+            let sortingKey_list = "";
+            let lowerLimit = (page-1)*20+1
+            let upperLimit = page*20
+            for (let i = lowerLimit; i < upperLimit; i++) {
+                if(!leaderboard[i]) {break;}
+                position_list += leaderboard[i].position + "\n";
+                username_list += leaderboard[i].username + "\n";
+                sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+            }
+            let response = await this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
+            return response;
         }
 
-        let response = await this.botResponseService.leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list)
+        msg.channel.send(generateLeaderboard(1)).then(message => {
+            try {
+                await message.react('➡️')
+                await message.react('⏩')
+            } catch(error) {
+                console.log('One of the emojis failed to react:', error);
+            }
+            const collector = message.createReactionCollector(
+                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩'].includes(reaction.emoji.name) && user.id == msg.author.id, {time: 60000}
+            )
+        });
 
-        msg.channel.send(response);
+        let currentPage = 1
+        collector.on('collect', reaction => {
+            message.reactions.removeAll().then(async () => {
+                switch(reaction.emoji.name) {
+                    case '⏪':
+                        currentPage -= 5
+                        break;
+                    case '⬅️':
+                        currentPage -= 1
+                        break;
+                    case '➡️':
+                        currentPage += 1
+                        break;
+                    default:
+                        //⏩
+                        currentPage += 5
+                }
+                if(currentPage < 0) currentPage = 0;
+                if(currentPage > pageCount) currentPage = pageCount;
+                message.edit(generateLeaderboard(currentPage));
+                if (currentIndex > 1) await message.react('⏪');
+                if (currentIndex != 0) await message.react('⬅️');
+                if (currentIndex != pageCount) await message.react('➡️');
+                if (currentIndex < pageCount-1) message.react('⏩');
+            });
+        });
     }
 
     async leaderboard_local(msg, directions) {

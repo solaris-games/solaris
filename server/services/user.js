@@ -43,6 +43,10 @@ module.exports = class UserService extends EventEmitter {
         .exec();
     }
 
+    async getUserCount() {
+        return this.userModel.estimatedDocumentCount();
+    }
+
     async getGameUsers(game) {
         return await this.userModel.find({
             _id: {

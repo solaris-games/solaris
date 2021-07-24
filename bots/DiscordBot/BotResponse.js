@@ -347,10 +347,12 @@ module.exports = class BotReponseService {
 
     helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``$help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
 
-    async leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list) {
+    async leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
+        let lowerLimit = (page-1)*20+1
+        let upperLimit = page*20
         let response = await this.baseResponse()
         response = response
-            .setTitle(`Top ${limit} for ${sortingKey}`)
+            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
             .addFields(
                 { name: "Position", value: position_list, inline: true },
@@ -358,7 +360,6 @@ module.exports = class BotReponseService {
                 { name: `${sortingKey}`, value: sortingKey_list, inline: true }
             );
         return response;
-
     }
 
     async leaderboard_local (gameId, sortingKey, position_list, username_list, sortingKey_list) {
