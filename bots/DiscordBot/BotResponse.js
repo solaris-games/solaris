@@ -238,13 +238,12 @@ module.exports = class BotReponseService {
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
 
-    helpUserinfo = "The ``$userinfo <username>`` gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
+    helpUserinfo = "The ``$userinfo <username> <focus>`` gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
         "The first direction, the <username>, is the name of a user, like The Last Hero, or LimitingFactor, the username is case-sensitive, so make sure to spell it properly.\n" +
         "The second direction, the <focus>, is the category you want information on. There are five categories:\n" +
-        "If you want to see all information about someone, use ``all``.\n" +
         "If you want to see information about someone's played games, such as victories, completed games or how often he went afk, use ``games``.\n" +
-        "If you want to see information about someone's military accomplishments, such as ships killed, ships lost or stars killed, use ``military``.\n" +
-        "If you want to see information about someone's infastructure, such as built economy, industry, science and warpgates, use ``infastructure``.\n" +
+        "If you want to see information about someone's military accomplishments, such as ships killed, ships lost or stars killed, use ``combat``.\n" +
+        "If you want to see information about someone's infrastructure, such as built economy, industry, science and warpgates, use ``infrastructure``.\n" +
         "If you want to see information about someone's research, such as points spent in scanning, hyperspace, terraforming, use ``research``.\n" +
         "If you want to see information about someone's trade history, such as credits sent, technologies sent, ships gifted or even renown gifted, use ``trade``.\n" +
         "I hope this automated response has helped you in understanding the userinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
@@ -302,13 +301,13 @@ module.exports = class BotReponseService {
         return response;
     }
 
-    async userinfo(user) {
+    async userinfoGames (user) {
         let response = await this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
             .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
             .addFields(
-                { name: "General achievements", value: "\u200B" },
+                { name: "Games", value: "\u200B" },
                 { name: "Victories", value: user.achievements.victories, inline: true },
                 { name: "Rank", value: user.achievements.rank, inline: true },
                 { name: "Renown", value: user.achievements.renown, inline: true },//next line
@@ -317,8 +316,17 @@ module.exports = class BotReponseService {
                 { name: "Games Defeated", value: user.achievements.defeated, inline: true },//next line
                 { name: "Games Quit", value: user.achievements.quit, inline: true },
                 { name: "Games AFK", value: user.achievements.afk, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "\u200B", value: "\u200B" },
+                { name: "\u200B", value: "\u200B", inline: true }//next line
+            );
+        return response;
+    }
+
+    async userinfoCombat (user) {
+        let response = await this.baseResponse();
+        response = response
+            .setTitle(`Userinfo of ${user.username}`)
+            .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
+            .addFields(
                 { name: "Combat", value: "\u200B" },
                 { name: "Ships Killed", value: user.achievements.combat.kills.ships, inline: true },
                 { name: "Carriers Killed", value: user.achievements.combat.kills.carriers, inline: true },
@@ -328,8 +336,17 @@ module.exports = class BotReponseService {
                 { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true },//next line
                 { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true },
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "\u200B", value: "\u200B" },
+                { name: "\u200B", value: "\u200B", inline: true }//next line
+            );
+        return response;
+    }
+
+    async userinfoInfrastructure (user) {
+        let response = await this.baseResponse();
+        response = response
+            .setTitle(`Userinfo of ${user.username}`)
+            .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
+            .addFields(
                 { name: "Infrastructure", value: "\u200B" },
                 { name: "Economy", value: user.achievements.infrastructure.economy, inline: true },
                 { name: "Industry", value: user.achievements.infrastructure.industry, inline: true },
@@ -339,8 +356,17 @@ module.exports = class BotReponseService {
                 { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true },//next line
                 { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "\u200B", value: "\u200B" },
+                { name: "\u200B", value: "\u200B", inline: true }//next line
+            );
+        return response;
+    }
+
+    async userinfoResearch (user) {
+        let response = await this.baseResponse();
+        response = response
+            .setTitle(`Userinfo of ${user.username}`)
+            .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
+            .addFields(
                 { name: "Research", value: "\u200B" },
                 { name: "Scanning", value: user.achievements.research.scanning, inline: true },
                 { name: "Hyperspace Range", value: user.achievements.research.hyperspace, inline: true },
@@ -350,8 +376,17 @@ module.exports = class BotReponseService {
                 { name: "Banking", value: user.achievements.research.banking, inline: true },//next line
                 { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true },
                 { name: "Specialists", value: user.achievements.research.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "\u200B", value: "\u200B" },
+                { name: "\u200B", value: "\u200B", inline: true }//next line
+            );
+        return response;
+    }
+
+    async userinfoTrade (user) {
+        let response = await this.baseResponse();
+        response = response
+            .setTitle(`Userinfo of ${user.username}`)
+            .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
+            .addFields(
                 { name: "Trade", value: "\u200B" },
                 { name: "Credits Sent", value: user.achievements.trade.creditsSent, inline: true },
                 { name: "Specialist Tokens Sent", value: user.achievements.trade.creditsSpecialistsSent, inline: true },

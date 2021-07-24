@@ -283,23 +283,75 @@ module.exports = class PublicCommandService {
     }
 
     async userinfo(msg, directions) {
-        //!userinfo <username>
+        //!userinfo <username> <focus>
 
-        //Very important here to temporarily take down the userinfo function, because the response is too big. Has to be cut down using multipage responses combined with a focus.
-        return;
-
+        let focus = directions[directions.length - 1];
         let username = "";
-        for (let i = 0; i < directions.length; i++) {
+        for (let i = 0; i < directions.length - 1; i++) {
             username += directions[i] + ' ';
         }
         username = username.trim();
 
-        if (!(await this.userService.usernameExists(username))) return;
+        if (!(await this.userService.usernameExists(username))){
+            //Send error message
+            return;
+        }
 
         let user = await this.userService.getByUsername(username);
 
-        const response = await this.botResponseService.userinfo(user)
+        let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
+        if (!focusArray.includes(focus)) {
+            let response = await this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
+            msg.channel.send(response);
+        }
 
-        msg.channel.send(response);
+        const generateResponse = start => {
+            let response;
+            switch (start) {
+                case 'games':
+                    response = await this.botResponseService.userinfoGames(user);
+                    break;
+                case 'combat':
+                    response = await this.botResponseService.userinfoCombat(user);
+                    break;
+                case 'infrastructure':
+                    response = await this.botResponseService.userinfoInfrastructure(user);
+                    break;
+                case 'research':
+                    response = await this.botResponseService.userinfoResearch(user);
+                    break;
+                case 'trade':
+                    response = await this.botResponseService.userinfoTrade(user);
+            }
+            return response;
+        }
+
+        msg.channel.send(generateResponse(focus)).then(message => {
+            try {
+                await message.react('⬅️')
+                await message.react('➡️')
+            } catch (error) {
+                console.log('One of the emojis failed to react:', error);
+            }
+            const collector = message.createReactionCollector(
+                (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === msg.author.id, { time: 60000 }
+            );
+
+            let currentPage = focusArray.indexOf(focus);
+            collector.on('collect', reaction => {
+                message.reactions.removeAll().then(async () => {
+                    reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
+                    if (currentPage < 0) currentPage = 4;
+                    if (currentPage > 4) currentPage = 0;
+                    message.edit(generateResponse(focusArray[currentPage]));
+                    try {
+                        await message.react('⬅️')
+                        await message.react('➡️')
+                    } catch (error) {
+                        console.log('One of the emojis failed to react:', error);
+                    }
+                });
+            });
+        });
     }
 }
