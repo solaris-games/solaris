@@ -14,9 +14,9 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoAll(game) {
-        var game_name = game.settings.general.name;
-        var gameId = game._id;
-        var response = await this.baseResponse();
+        let game_name = game.settings.general.name;
+        let gameId = game._id;
+        let response = await this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -110,9 +110,9 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoGeneral(game) {
-        var game_name = game.settings.general.name;
-        var gameId = game._id;
-        var response = await this.baseResponse();
+        let game_name = game.settings.general.name;
+        let gameId = game._id;
+        let response = await this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -136,9 +136,9 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoGalaxy(game) {
-        var game_name = game.settings.general.name;
-        var gameId = game._id;
-        var response = await this.baseResponse();
+        let game_name = game.settings.general.name;
+        let gameId = game._id;
+        let response = await this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -169,9 +169,9 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoPlayer(game) {
-        var game_name = game.settings.general.name;
-        var gameId = game._id;
-        var response = await this.baseResponse();
+        let game_name = game.settings.general.name;
+        let gameId = game._id;
+        let response = await this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -202,9 +202,9 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoTechnology(game) {
-        var game_name = game.settings.general.name;
-        var gameId = game._id;
-        var response = await this.baseResponse();
+        let game_name = game.settings.general.name;
+        let gameId = game._id;
+        let response = await this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -239,9 +239,9 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoTime(game) {
-        var game_name = game.settings.general.name;
-        var gameId = game._id;
-        var response = await this.baseResponse();
+        let game_name = game.settings.general.name;
+        let gameId = game._id;
+        let response = await this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -270,7 +270,7 @@ module.exports = class BotReponseService {
     }
 
     async gameinfoError(authorId, reason) {
-        var response;
+        let response;
         switch (reason) {
             case 'noFocus':
                 response = `Hey <@${authorId},\n
@@ -329,7 +329,7 @@ module.exports = class BotReponseService {
     helpLeaderboard_local = "The ``$leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
         "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
         "The second direction, the <filter>, is what the leaderboard will be sorted on. The full list of possible filters is: \ntotal ``stars``\ntotal ``carriers``\ntotal ``ships``\ntotal ``economy``\ntotal ``industry``\n" +
-        "total ``science``\n``new-ship`` production\ntotal ``warpgates``\n``scanning`` level\n``hyperspace`` range level\n``terraforming`` level\n``experimentation`` level\n``weapons`` level\n``banking`` level\n" +
+        "total ``science``\n``newShip`` production\ntotal ``warpgates``\ntotal ``starSpecialists``\ntotal ``carrierSpecialists``\n``totalSpecialists``\n``scanning`` level\n``hyperspace`` range level\n``terraforming`` level\n``experimentation`` level\n``weapons`` level\n``banking`` level\n" +
         "``manufacturing`` level\n``specialists`` level.\n" +
         "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
         "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
@@ -348,7 +348,7 @@ module.exports = class BotReponseService {
     helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``$help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
 
     async leaderboard_global(limit, sortingKey, position_list, username_list, sortingKey_list) {
-        var response = await this.baseResponse()
+        let response = await this.baseResponse()
         response = response
             .setTitle(`Top ${limit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
@@ -356,12 +356,52 @@ module.exports = class BotReponseService {
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
                 { name: `${sortingKey}`, value: sortingKey_list, inline: true }
-            )
-        return response
+            );
+        return response;
+
+    }
+
+    async leaderboard_local (gameId, sortingKey, position_list, username_list, sortingKey_list) {
+        let response = await this.baseResponse()
+        response = response
+            .setTitle(`Leaderboard for ${sortingKey}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .addFields(
+                { name: "Position", value: position_list, inline: true },
+                { name: "Name", value: username_list, inline: true },
+                { name: `${sortingKey}`, value: sortingKey_list, inline: true }
+            );
+        return response;
+    }
+
+    async leaderboard_localError(authorId, reason) {
+        let response;
+        switch(reason){
+            case 'noGame':
+                response = `Hey <@${authorId}>,\n
+                    No game was found with this name, check if you spelled it correctly`;
+                break;
+            case 'multipleGames':
+                response = `Hey <@${msg.author.id},\n
+                    Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n
+                    If you do this, add the word "ID" after the filter, as an extra direction.`
+                break;
+            case 'extraDark':
+                response = `Hey <@${authorId}>,\n
+                    The game you looked up is an extra Dark Galaxy, we can't spill you the secrets of those games`;
+                break;
+            case 'notStarted':
+                response = `Hey <@${authorId}>,\n
+                    The game you looked up has not started yet, we can't tell you anything about it now...`;
+                break;
+            default:
+                //this will never happen
+        }
+        return response;
     }
 
     async userinfo(user) {
-        let response = this.baseResponse();
+        let response = await this.baseResponse();
         response = response
         .setTitle(`Userinfo of ${user.username}`)
         .setURL(`https://solaris.games/#/account/achievements/${user._id}`)

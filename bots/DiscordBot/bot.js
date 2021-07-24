@@ -32,7 +32,7 @@ client.on('message', async (msg) => {
 });
 
 client.on('messageReactionAdd', (MessageReaction, User) =>{
-    var msg = MessageReaction.message
+    let msg = MessageReaction.message
 
     if(!msg.author.bot || User.bot) return;
 });

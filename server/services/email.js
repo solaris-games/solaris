@@ -188,7 +188,8 @@ module.exports = class EmailService {
     }
 
     async sendGameCycleSummaryEmail(game) {      
-        let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
+        let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, 'stars');
+        let leaderboard = leaderboardReturn.leaderboard;
 
         let leaderboardHtml = '';
 

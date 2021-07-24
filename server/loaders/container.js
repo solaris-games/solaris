@@ -116,7 +116,7 @@ module.exports = (config, io) => {
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
 
     const botResponseService = new BotResponseService();
-    const publicCommandService = new PublicCommandService(botResponseService, gameService, leaderboardService, userService);
+    const publicCommandService = new PublicCommandService(botResponseService, gameGalaxyService, gameService, leaderboardService, userService);
     const privateCommandService = new PrivateCommandService();
 
     return {
