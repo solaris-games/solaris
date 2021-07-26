@@ -274,7 +274,7 @@ export default {
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
-      let keyCode = e.keyCode || e.which
+      let key = e.key
 
       // Check for modifier keys and ignore the keypress if there is one.
       if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
@@ -284,16 +284,16 @@ export default {
       let isLoggedIn = this.$store.state.userId != null
       let isInGame = this.userPlayer != null
 
-      let menuState = KEYBOARD_SHORTCUTS.all[keyCode.toString()]
+      let menuState = KEYBOARD_SHORTCUTS.all[key]
 
       if (isLoggedIn) {
-        menuState = menuState || KEYBOARD_SHORTCUTS.user[keyCode.toString()]
+        menuState = menuState || KEYBOARD_SHORTCUTS.user[key]
       }
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
       if (isInGame) {
-        menuState = menuState || KEYBOARD_SHORTCUTS.player[keyCode.toString()]
+        menuState = menuState || KEYBOARD_SHORTCUTS.player[key]
       }
 
       if (!menuState) {
