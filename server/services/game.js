@@ -156,12 +156,16 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
-        let userAchievements = await this.achievementService.getAchievements(userId);
-        let isEstablishedPlayer = userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
-        
-        // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
-        if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
-            throw new ValidationError('You must complete a "New Player" game before you can join other game types.');
+        // Perform a new player check if the game is for established players only.
+        // If the player is new then they cannot join.
+        if (this.isForEstablishedPlayersOnly(game)) {
+            let userAchievements = await this.achievementService.getAchievements(userId);
+            let isEstablishedPlayer = userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
+            
+            // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
+            if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
+                throw new ValidationError('You must complete a "New Player" game before you can join other game types.');
+            }
         }
 
         let isQuitter = game.quitters.find(x => x.equals(userId));
@@ -488,6 +492,14 @@ module.exports = class GameService extends EventEmitter {
 
     isNewPlayerGame(game) {
         return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
+    }
+    
+    isForEstablishedPlayersOnly(game) {
+        return game.settings.general.playerType === 'establishedPlayers'
+    }
+    
+    isForAllPlayersOnly(game) {
+        return game.settings.general.playerType === 'all'
     }
     
     async quitAllActiveGames(userId) {

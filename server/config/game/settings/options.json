@@ -42,8 +42,8 @@
             "text": "All Players"
             },
             {
-            "value": "premium",
-            "text": "Premium Players Only"
+            "value": "establishedPlayers",
+            "text": "Established Players Only"
             }
         ],
         "anonymity": [

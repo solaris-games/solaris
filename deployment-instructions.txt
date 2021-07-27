@@ -1,0 +1,15 @@
+db.games.updateMany({}, {
+    $set: {
+        'settings.general.playerType': 'establishedPlayers'
+    }
+});
+
+db.games.updateMany({
+    'settings.general.type': {
+        $in: ['new_player_rt', 'new_player_tb']
+    }
+}, {
+    $set: {
+        'settings.general.playerType': 'all'
+    }
+});

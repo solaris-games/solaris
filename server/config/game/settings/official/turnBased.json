@@ -7,7 +7,7 @@
     "password": null,
     "starVictoryPercentage": 50,
     "playerLimit": 8,
-    "playerType": "all",
+    "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "visible",
     "timeMachine": "enabled"
