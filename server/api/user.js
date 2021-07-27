@@ -7,7 +7,7 @@ module.exports = (router, io, container) => {
     router.get('/api/user/leaderboard', async (req, res, next) => {
         try {
             const limit = +req.query.limit || null;
-            const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey);
+            const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey, 0);
                 
             return res.status(200).json(result);
         } catch (err) {

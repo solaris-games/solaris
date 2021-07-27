@@ -103,65 +103,71 @@ module.exports = class PublicCommandService {
         });
     }
 
+    async invite(msg, directions) {
+        //$invite <gamelink>
+        let gamelink = directions[0];
+        let gameId = gamelink.split('?id=');
+        let game = this.gameService.getByIdAll(gameId)
+        let response = this.botResponseService.invite(game);
+        msg.channel.send(response);
+    }
+
     async help(msg, directions) {
-        //!help <command>
+        //$help <command>
         let id = msg.author.id;
         let response = `Hey <@${id}>,\n`;
         if (directions.length == 0) {
             response += this.botResponseService.helpMain;
-            msg.channel.send(response);
         } else {
             switch (directions[0]) {
                 case 'gameinfo':
                     response += this.botResponseService.helpGameinfo;
-                    msg.channel.send(response);
+                    break;
+                case 'invite':
+                    response += this.botResponseService.helpInvite
                     break;
                 case 'help':
                     response += this.botResponseService.helpHelp;
-                    msg.channel.send(response);
                     break;
                 case 'leaderboard_global':
                     response += this.botResponseService.helpLeaderboard_global
-                    msg.channel.send(response);
                     break;
                 case 'leaderboard_local':
                     response += this.botResponseService.helpLeaderboard_local
-                    msg.channel.send(response);
                     break;
                 case 'userinfo':
                     response += this.botResponseService.helpUserinfo
-                    msg.channel.send(response);
                     break;
                 default:
                     response += this.botResponseService.helpUnidentified
-                    msg.channel.send(response);
             }
         }
+        msg.channel.send(response);
     }
 
     async leaderboard_global(msg, directions) {
-        //!leaderboard_global <filter> (<page>)
+        //$leaderboard_global <filter> (<page>)
 
         // Calculating how the leaderboard looks
         let sortingKey = directions[0];
-        let limit = await this.userService.getUserCount();
-        let result = await this.leaderboardService.getLeaderboard(limit, sortingKey);
-        let leaderboard = result.leaderboard;
-        let pageCount = Math.ceil(leaderboard.length / 20)
+        let leaderboardSize = await this.userService.getUserCount();
+        let pageCount = Math.ceil(leaderboardSize / 20)
 
-        // here be dragons
+        //Here be dragons
         const getNestedObject = (nestedObj, pathArr) => {
             return pathArr.reduce((obj, key) =>
                 (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
         const generateLeaderboard = page => {
+            let limit = 20
+            let skip = 20 * (page - 1)
+            let result = await this.leaderboardService.getLeaderboard(limit, sortingKey, skip);
+            let leaderboard = result.leaderboard;
             let position_list = "";
             let username_list = "";
             let sortingKey_list = "";
-            let lowerLimit = (page - 1) * 20 + 1
-            let upperLimit = page * 20
-            for (let i = lowerLimit; i < upperLimit; i++) {
+            for (let i = 0; i < leaderboard.length; i++) {
                 if (!leaderboard[i]) { break; }
                 position_list += leaderboard[i].position + "\n";
                 username_list += leaderboard[i].username + "\n";
@@ -171,6 +177,7 @@ module.exports = class PublicCommandService {
             return response;
         }
 
+        //Here be demons
         msg.channel.send(generateLeaderboard(1)).then(message => {
             try {
                 await message.react('➡️')
@@ -213,7 +220,7 @@ module.exports = class PublicCommandService {
     }
 
     async leaderboard_local(msg, directions) {
-        //!leaderboard_local <galaxy_name> <filter> ("ID")
+        //$leaderboard_local <galaxy_name> <filter> ("ID")
 
         let filter;
         let game = [];
@@ -283,7 +290,7 @@ module.exports = class PublicCommandService {
     }
 
     async userinfo(msg, directions) {
-        //!userinfo <username> <focus>
+        //$userinfo <username> <focus>
 
         let focus = directions[directions.length - 1];
         let username = "";
@@ -292,7 +299,7 @@ module.exports = class PublicCommandService {
         }
         username = username.trim();
 
-        if (!(await this.userService.usernameExists(username))){
+        if (!(await this.userService.usernameExists(username))) {
             //Send error message
             return;
         }

@@ -435,9 +435,10 @@ module.exports = class LeaderboardService {
         this.guildUserService = guildUserService;
     }
 
-    async getLeaderboard(limit, sortingKey) {
+    async getLeaderboard(limit, sortingKey, skip) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank']
         let leaderboard = await this.userModel.find({})
+            .skip(skip)
             .limit(limit)
             .sort(sorter.sort)
             .select(sorter.select)
@@ -476,7 +477,7 @@ module.exports = class LeaderboardService {
         function sortPlayers(a, b) {
             const getNestedObject = (nestedObj, pathArr) => {
                 return pathArr.reduce((obj, key) =>
-                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+                    (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
             }
             if (getNestedObject(a, SORTERS[sortingKey].split('.')) > getNestedObject(b, SORTERS[sortingKey].split('.'))) return -1;
             if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
@@ -549,7 +550,7 @@ module.exports = class LeaderboardService {
 
             // TODO: Maybe a better ranking system would be to simply award players
             // rank equal to the number of stars they have at the end of the game?
-        
+
             // Official games are either not user created or featured (featured games can be user created)
             let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
 
@@ -564,7 +565,7 @@ module.exports = class LeaderboardService {
                     user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
                 }
 
-                user.achievements.rank = Math.round(user.achievements.rank);    
+                user.achievements.rank = Math.round(user.achievements.rank);
             }
 
             // If the player hasn't been defeated then add completed stats.
@@ -577,7 +578,7 @@ module.exports = class LeaderboardService {
     getGameWinner(game) {
         if (game.settings.general.mode === 'conquest') {
             let starWinner = this.getStarCountWinner(game);
-    
+
             if (starWinner) {
                 return starWinner;
             }

@@ -35,7 +35,10 @@ module.exports = class BotReponseService {
                 { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
                 { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },
                 { name: "Time Machine", value: game.settings.general.timeMachine, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "Time", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Galaxy", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
@@ -68,7 +71,10 @@ module.exports = class BotReponseService {
                 { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
                 { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
                 { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },
+                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },//next line
+                { name: "General", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Player", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
@@ -101,7 +107,10 @@ module.exports = class BotReponseService {
                 { name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true },//next line
                 { name: "Trade Credits", value: game.settings.player.tradeCredits ? "true" : "false", inline: true },
                 { name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true" : "false", inline: true },
-                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true },
+                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true },//next line
+                { name: "Galaxy", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Technology", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
@@ -140,7 +149,10 @@ module.exports = class BotReponseService {
                 { name: "\u200B", value: "\u200B", inline: true },//next line
                 { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "Player", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Time", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
@@ -164,16 +176,21 @@ module.exports = class BotReponseService {
             );
         if (game.settings.gameTime.gameType == 'realTime') {
             response = response.addFields(
-                { name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true }
+                { name: "Minutes per Tick", value: game.settings.gameTime.speed, inline: true }//next line
             );
         } else {
             response = response.addFields(
                 { name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true },//next line
                 { name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true },
                 { name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }//next line
             );
         }
+        response = response.addFields(
+            { name: "Technology", value: "⬅️⬅️⬅️", inline: true },
+            { name: "\u200B", value: "\u200B", inline: true },
+            { name: "General", value: "➡️➡️➡️", inline: true }
+        );
         return response;
     }
 
@@ -196,6 +213,36 @@ module.exports = class BotReponseService {
         return response;
     }
 
+    async invite(game) {
+        let response = await this.baseResponse();
+        response = response
+            .setTitle(`Everyone join ${game.settings.general.name}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .addFields(
+                { name: "Gamemode", value: game.settings.general.mode, inline: true },
+                { name: "Anonymity", value: game.settings.general.anonymity, inline: true },
+                { name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true },//next line
+                { name: "Player count", value: game.settings.general.playerLimit, inline: true },
+                { name: "Stars Per Player", value: game.settings.galaxy.starsPerPlayer, inline: true },
+                { name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true },//next line
+                { name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true },
+                { name: "Trade Credits", value: game.settings.player.tradeCredits, inline: true },
+                { name: "Trade Technologies", value: game.settings.player.tradeScanning, inline: true },//next line
+                { name: "Time Setting", value: game.settings.gameTime.gameType, inline: true },
+                { name: "Ticks per Cycle", value: game.settings.galaxy.productionTicks, inline: true }
+            );
+        if (game.settings.gameTime.gameType == 'realTime') {
+            response = response.addFields(
+                { name: "Time per Tick", value: game.settings.gameTime.speed / 60 + "minutes", inline: true }//next line
+            );
+        } else {
+            response = response.addFields(
+                { name: "Time per Turn", value: game.settings.gameTime.turnJumps + "hours", inline: true }//next line
+            );
+        }
+        return response;
+    }
+
     helpMain = "You can use the following commands in this discord:\n" +
         "``$gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
         "``$help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
@@ -213,6 +260,11 @@ module.exports = class BotReponseService {
         "If you want to see the technology settings, such as the starting technologies and their cost, use ``technology``.\n" +
         "If you want to see the time settings, such as the tick/turn duration or whether or not a game is real time, use ``time``.\n" +
         "I hope this automated response has helped you in understanding the gameinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
+
+    helpInvite = "The ``$invite <game_link>`` creates an embed message from the game you want promoted. This message contains a summary of the most important settings of a game.\n" +
+        "This summary consists of, the gamemode, the anonimity, the dark settings, the maximum amount of players, the amount of stars per player, the galaxy type, the specialist currency, whether trading credits and technology is enabled and what kind of time settings are going on in the game.\n" +
+        "For more info on a game, you can use the gameinfo command.\n" +
+        "I hope this automated response has helped you in understanding the gameinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505."
 
     helpHelp = "The ``$help <command>`` command gives you information about the commands you can give this bot. " +
         "Using just the command without a direction will give you a list of all commands with a short explanation of what they do. " +
@@ -301,7 +353,7 @@ module.exports = class BotReponseService {
         return response;
     }
 
-    async userinfoGames (user) {
+    async userinfoGames(user) {
         let response = await this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -316,12 +368,15 @@ module.exports = class BotReponseService {
                 { name: "Games Defeated", value: user.achievements.defeated, inline: true },//next line
                 { name: "Games Quit", value: user.achievements.quit, inline: true },
                 { name: "Games AFK", value: user.achievements.afk, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }//next line
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "Trade", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Combat", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
 
-    async userinfoCombat (user) {
+    async userinfoCombat(user) {
         let response = await this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -336,12 +391,15 @@ module.exports = class BotReponseService {
                 { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true },//next line
                 { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true },
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }//next line
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "Games", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Infrastructure", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
 
-    async userinfoInfrastructure (user) {
+    async userinfoInfrastructure(user) {
         let response = await this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -356,12 +414,15 @@ module.exports = class BotReponseService {
                 { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true },//next line
                 { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }//next line
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "Combat", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Research", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
 
-    async userinfoResearch (user) {
+    async userinfoResearch(user) {
         let response = await this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -376,12 +437,15 @@ module.exports = class BotReponseService {
                 { name: "Banking", value: user.achievements.research.banking, inline: true },//next line
                 { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true },
                 { name: "Specialists", value: user.achievements.research.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }//next line
+                { name: "\u200B", value: "\u200B", inline: true },//next line
+                { name: "Infrastructure", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Trade", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }
 
-    async userinfoTrade (user) {
+    async userinfoTrade(user) {
         let response = await this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -396,7 +460,10 @@ module.exports = class BotReponseService {
                 { name: "Technologies Received", value: user.achievements.trade.technologyReceived, inline: true },//next line
                 { name: "Ships Gifted", value: user.achievements.trade.giftsSent, inline: true },
                 { name: "Ships Recieved", value: user.achievements.trade.giftsReceived, inline: true },
-                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true },
+                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true },//next line
+                { name: "Research", value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "Games", value: "➡️➡️➡️", inline: true }
             );
         return response;
     }

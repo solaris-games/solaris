@@ -82,7 +82,7 @@ async function startup() {
         // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
         "gameinfo": container.publicCommandService.gameinfo,
         "help": container.publicCommandService.help,
-        //invite (with the settings: Mode, Players, Anonymity, TB/RT, Galaxy type, SPP, (time per tick/turn), ticks per cycle, specialist currency, Dark Galaxy, Trade credits, Trade Scanning)
+        "invite": container.publicCommandService.invite,
         "leaderboard_global": container.publicCommandService.leaderboard_global,
         "leaderboard_local": container.publicCommandService.leaderboard_local,
         "userinfo": container.publicCommandService.userinfo
