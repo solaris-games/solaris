@@ -14,23 +14,15 @@ module.exports = class CommandService {
         return msg.author.bot;
     }
 
-    identify(msg) {
-        //Splitting the command into the different parts, the command and directions. After that checking if the command exists
+    identify(msg, directions) {
+        const directions = msg.content.slice(prefix.length).split(/\s+/);
         const cmd = directions[0];
         directions.shift();
 
         return {
-            directions: msg.content.slice(prefix.length).split(' '),
+            directions,
             cmd,
             type: msg.channel.type
         };
-    }
-
-    reactThumbsUp(msg) {
-        msg.react('👍');
-    }
-
-    reactThumbsDown(msg) {
-        msg.react('👎');
     }
 };

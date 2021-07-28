@@ -28,6 +28,12 @@ module.exports = class PublicCommandService {
             focus = directions[directions.length - 1]
         }
 
+        let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
+
+        if (!focusArray.includes(focus)) {
+            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noFocus'));
+        }
+
         if (!game.length) {
             return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
         } else if (game.length > 1) {
@@ -35,12 +41,6 @@ module.exports = class PublicCommandService {
         }
 
         game = game[0];
-
-        let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
-        if (!focusArray.includes(focus)) {
-            let response = this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
-            msg.channel.send(response);
-        }
 
         let response = this.botResponseService.gameinfo(game, focus);
 
@@ -205,15 +205,11 @@ module.exports = class PublicCommandService {
         let gameTick = game[0].galaxy.state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
-        if (game.setting.specialGalaxy.darkGalaxy == 'extra' || game.galaxy.state.endDate) {
-            response = this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark');
-            msg.channel.send(response)
-            return;
+        if (game.setting.specialGalaxy.darkGalaxy == 'extra' && !game.galaxy.state.endDate) {
+            return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark'))
         }
         if (!game.galaxy.state.startDate) {
-            response = this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted');
-            msg.channel.send(response)
-            return;
+            return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted'))
         }
 
         let leaderboardReturn = await this.leaderboardService.getLeaderboardRankings(game, filter);
@@ -239,6 +235,13 @@ module.exports = class PublicCommandService {
         //$userinfo <username> <focus>
 
         let focus = directions[directions.length - 1];
+
+        let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
+
+        if (!focusArray.includes(focus)) {
+            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noFocus'));
+        }
+
         let username = "";
         for (let i = 0; i < directions.length - 1; i++) {
             username += directions[i] + ' ';
@@ -246,17 +249,11 @@ module.exports = class PublicCommandService {
         username = username.trim();
 
         if (!(await this.userService.usernameExists(username))) {
-            //Send error message
+            //TODO: Send error message
             return;
         }
 
         let user = await this.userService.getByUsername(username);
-
-        let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
-        if (!focusArray.includes(focus)) {
-            let response = this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
-            msg.channel.send(response);
-        }
 
         let response = this.botResponseService.userinfo(user, focus);
 

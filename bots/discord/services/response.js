@@ -442,4 +442,12 @@ module.exports = class ReponseService {
             );
         return response;
     }
+
+    reactThumbsUp(msg) {
+        msg.react('👍');
+    }
+
+    reactThumbsDown(msg) {
+        msg.react('👎');
+    }
 }
