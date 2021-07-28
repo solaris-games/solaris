@@ -435,8 +435,9 @@ module.exports = class LeaderboardService {
         this.guildUserService = guildUserService;
     }
 
-    async getLeaderboard(limit, sortingKey, skip) {
-        const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank']
+    async getLeaderboard(limit, sortingKey, skip = 0) {
+        const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
+        
         let leaderboard = await this.userModel.find({})
             .skip(skip)
             .limit(limit)

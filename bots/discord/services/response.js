@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 
 module.exports = class ReponseService {
 
-    async baseResponse() {
+    baseResponse() {
         const response = new Discord.MessageEmbed()
             .setColor(`#2d139d`)
             .setURL(`https://solaris.games/`)
@@ -13,27 +13,27 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async gameinfo(game, type) {
+    gameinfo(game, type) {
         switch (type) {
             case 'general':
-                return await this.gameinfoGeneral(game);
+                return this.gameinfoGeneral(game);
             case 'galaxy':
-                return await this.gameinfoGalaxy(game);
+                return this.gameinfoGalaxy(game);
             case 'player':
-                return await this.gameinfoPlayer(game);
+                return this.gameinfoPlayer(game);
             case 'technology':
-                return await this.gameinfoTechnology(game);
+                return this.gameinfoTechnology(game);
             case 'time':
-                return await this.gameinfoTime(game);
+                return this.gameinfoTime(game);
             default:
                 throw new Error('Unknown type: ' + type);
         }
     }
 
-    async gameinfoGeneral(game) {
+    gameinfoGeneral(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
-        let response = await this.baseResponse();
+        let response = this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -60,10 +60,10 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async gameinfoGalaxy(game) {
+    gameinfoGalaxy(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
-        let response = await this.baseResponse();
+        let response = this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -96,10 +96,10 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async gameinfoPlayer(game) {
+    gameinfoPlayer(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
-        let response = await this.baseResponse();
+        let response = this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -132,10 +132,10 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async gameinfoTechnology(game) {
+    gameinfoTechnology(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
-        let response = await this.baseResponse();
+        let response = this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -174,10 +174,10 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async gameinfoTime(game) {
+    gameinfoTime(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
-        let response = await this.baseResponse();
+        let response = this.baseResponse();
         response = response
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
         if (game.settings.general.description) {
@@ -211,7 +211,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async gameinfoError(authorId, reason) {
+    gameinfoError(authorId, reason) {
         let response;
         switch (reason) {
             case 'noFocus':
@@ -230,8 +230,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async invite(game) {
-        let response = await this.baseResponse();
+    invite(game) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Please join ${game.settings.general.name}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
@@ -260,10 +260,10 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
+    leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
         let lowerLimit = (page - 1) * 20 + 1
         let upperLimit = page * 20
-        let response = await this.baseResponse()
+        let response = this.baseResponse()
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
@@ -275,8 +275,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list) {
-        let response = await this.baseResponse()
+    leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list) {
+        let response = this.baseResponse()
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
@@ -288,7 +288,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async leaderboard_localError(authorId, reason) {
+    leaderboard_localError(authorId, reason) {
         let response;
         switch (reason) {
             case 'noGame':
@@ -311,25 +311,25 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async userinfo(user, type) {
+    userinfo(user, type) {
         switch (type) {
             case 'games':
-                return await this.userinfoGames(user);
+                return this.userinfoGames(user);
             case 'combat':
-                return await this.userinfoCombat(user);
+                return this.userinfoCombat(user);
             case 'infrastructure':
-                return await this.userinfoInfrastructure(user);
+                return this.userinfoInfrastructure(user);
             case 'research':
-                return await this.userinfoResearch(user);
+                return this.userinfoResearch(user);
             case 'trade':
-                return await this.userinfoTrade(user);
+                return this.userinfoTrade(user);
             default:
                 throw new Error('Unknown type: ' + type);
         }
     }
 
-    async userinfoGames(user) {
-        let response = await this.baseResponse();
+    userinfoGames(user) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
             .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
@@ -351,8 +351,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async userinfoCombat(user) {
-        let response = await this.baseResponse();
+    userinfoCombat(user) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
             .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
@@ -374,8 +374,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async userinfoInfrastructure(user) {
-        let response = await this.baseResponse();
+    userinfoInfrastructure(user) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
             .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
@@ -397,8 +397,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async userinfoResearch(user) {
-        let response = await this.baseResponse();
+    userinfoResearch(user) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
             .setURL(`https://solaris.games/#/account/achievements/${user._id}`)
@@ -420,8 +420,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async userinfoTrade(user) {
-        let response = await this.baseResponse();
+    userinfoTrade(user) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
             .setURL(`https://solaris.games/#/account/achievements/${user._id}`)

@@ -24,33 +24,25 @@ module.exports = class PublicCommandService {
                 game_name += directions[i] + ' ';
             }
             game_name = game_name.trim()
-            game = await this.gameService.getByNameAll(game_name);
+            game = await this.gameService.getByNameAll(game_name); // TODO: The game name is not indexed in this DB so this is going to be slow as shit.
             focus = directions[directions.length - 1]
         }
 
-        let NameUniquenessVar = game.length;
-        if (NameUniquenessVar != 1) {
-            let response;
-            if (NameUniquenessVar == 0) {
-                response = await this.botResponseService.gameinfoError(msg.author.id, 'noGame');
-                msg.channel.send(response);
-                return;
-            } else {
-                response = await this.botResponseService.gameinfoError(msg.author.id, 'multipleGames');
-                msg.channel.send(response)
-                return;
-            }
+        if (!game.length) {
+            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+        } else if (game.length > 1) {
+            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
         }
 
         game = game[0];
 
         let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
         if (!focusArray.includes(focus)) {
-            let response = await this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
+            let response = this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
             msg.channel.send(response);
         }
 
-        let response = await this.botResponseService.gameinfo(game, focus);
+        let response = this.botResponseService.gameinfo(game, focus);
 
         msg.channel.send(response).then(message => {
             try {
@@ -70,7 +62,7 @@ module.exports = class PublicCommandService {
                     if (currentPage < 0) currentPage = 4;
                     if (currentPage > 4) currentPage = 0;
 
-                    let editedResponse = await this.botResponseService.gameinfo(game, focusArray[currentPage]);
+                    let editedResponse = this.botResponseService.gameinfo(game, focusArray[currentPage]);
 
                     message.edit(editedResponse);
                     try {
@@ -87,10 +79,15 @@ module.exports = class PublicCommandService {
     async invite(msg, directions) {
         //$invite <gamelink>
         let gamelink = directions[0];
-        let gameId = gamelink.split('?id=');
-        let game = this.gameService.getByIdAll(gameId)
-        let response = this.botResponseService.invite(game);
-        msg.channel.send(response);
+        let gameId = gamelink.split('?id=')[1];
+
+        if (gameId) {
+            let game = this.gameService.getByIdAll(gameId)
+            let response = this.botResponseService.invite(game);
+            msg.channel.send(response);
+        } else {
+            // TODO: Return an error to the chat.
+        }
     }
 
     async help(msg, directions) {
@@ -128,7 +125,7 @@ module.exports = class PublicCommandService {
                 username_list += leaderboard[i].username + "\n";
                 sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
             }
-            let response = await this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
+            let response = this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
             return response;
         }
 
@@ -150,7 +147,7 @@ module.exports = class PublicCommandService {
                 message.reactions.removeAll().then(async () => {
                     switch (reaction.emoji.name) {
                         case '⏪':
-                            currentPage -= 5
+                            currentPage -= 5 // TODO: This should go to page 1?
                             break;
                         case '⬅️':
                             currentPage -= 1
@@ -160,7 +157,7 @@ module.exports = class PublicCommandService {
                             break;
                         default:
                             //⏩
-                            currentPage += 5
+                            currentPage += 5 // TODO: This should go to the last page?
                     }
                     if (currentPage < 1) currentPage = 1;
                     if (currentPage > pageCount) currentPage = pageCount;
@@ -197,17 +194,11 @@ module.exports = class PublicCommandService {
         }
 
         let response;
-        let NameUniquenessVar = game.length;
-        if (NameUniquenessVar != 1) {
-            if (NameUniquenessVar == 0) {
-                response = await this.botResponseService.leaderboard_localError(msg.author.id, 'noGame');
-                msg.channel.send(response);
-                return;
-            } else {
-                response = await this.botResponseService.leaderboard_localError(msg.author.id, 'multipleGames');
-                msg.channel.send(response)
-                return;
-            }
+        
+        if (!game.length) {
+            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+        } else if (game.length > 1) {
+            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
         }
 
         let gameId = game[0]._id;
@@ -215,12 +206,12 @@ module.exports = class PublicCommandService {
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
         if (game.setting.specialGalaxy.darkGalaxy == 'extra' || game.galaxy.state.endDate) {
-            response = await this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark');
+            response = this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark');
             msg.channel.send(response)
             return;
         }
         if (!game.galaxy.state.startDate) {
-            response = await this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted');
+            response = this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted');
             msg.channel.send(response)
             return;
         }
@@ -239,7 +230,7 @@ module.exports = class PublicCommandService {
             sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n"
         }
 
-        let response = await this.botResponseService.leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list);
+        let response = this.botResponseService.leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list);
 
         msg.channel.send(response);
     }
@@ -263,11 +254,11 @@ module.exports = class PublicCommandService {
 
         let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
         if (!focusArray.includes(focus)) {
-            let response = await this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
+            let response = this.botResponseService.gameinfoError(msg.author.id, 'noFocus');
             msg.channel.send(response);
         }
 
-        let response = await this.botResponseService.userinfo(user, focus);
+        let response = this.botResponseService.userinfo(user, focus);
 
         msg.channel.send(response).then(message => {
             try {
@@ -287,7 +278,7 @@ module.exports = class PublicCommandService {
                     if (currentPage < 0) currentPage = 4;
                     if (currentPage > 4) currentPage = 0;
 
-                    let editedResponse = await this.botResponseService.userinfo(user, focusArray[currentPage]);
+                    let editedResponse = this.botResponseService.userinfo(user, focusArray[currentPage]);
 
                     message.edit(editedResponse);
 
