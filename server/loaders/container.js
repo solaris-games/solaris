@@ -53,10 +53,6 @@ const SpiralMapService = require('../services/maps/spiral');
 const DoughnutMapService = require('../services/maps/doughnut');
 const IrregularMapService = require('../services/maps/irregular');
 
-const BotResponseService = require('../../bots/DiscordBot/BotResponse.js')
-const PublicCommandService = require('../../bots/DiscordBot/PublicCommands.js')
-const PrivateCommandService = require('../../bots/DiscordBot/PrivateCommands.js')
-
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
@@ -115,10 +111,6 @@ module.exports = (config, io) => {
     const gameListService = new GameListService(GameModel, gameService, conversationService, eventService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
 
-    const botResponseService = new BotResponseService();
-    const publicCommandService = new PublicCommandService(botResponseService, gameGalaxyService, gameService, leaderboardService, userService);
-    const privateCommandService = new PrivateCommandService();
-
     return {
         adminService,
         passwordService,
@@ -160,8 +152,5 @@ module.exports = (config, io) => {
         aiService,
         aiTradeService,
         battleRoyaleService,
-        botResponseService,
-        publicCommandService,
-        privateCommandService,
     };
 };

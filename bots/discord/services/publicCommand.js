@@ -1,6 +1,3 @@
-const Discord = require('discord.js')
-
-
 module.exports = class PublicCommandService {
 
     constructor(botResponseService, gameGalaxyService, gameService, leaderboardService, userService) {

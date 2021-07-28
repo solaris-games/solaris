@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 
-module.exports = class BotReponseService {
+module.exports = class ReponseService {
 
     async baseResponse() {
         const response = new Discord.MessageEmbed()
@@ -216,7 +216,7 @@ module.exports = class BotReponseService {
     async invite(game) {
         let response = await this.baseResponse();
         response = response
-            .setTitle(`Everyone join ${game.settings.general.name}`)
+            .setTitle(`Please join ${game.settings.general.name}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
             .addFields(
                 { name: "Gamemode", value: game.settings.general.mode, inline: true },
