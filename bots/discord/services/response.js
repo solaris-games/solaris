@@ -243,65 +243,6 @@ module.exports = class ReponseService {
         return response;
     }
 
-    helpMain = "You can use the following commands in this discord:\n" +
-        "``$gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
-        "``$help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
-        "``$leaderboard_global <filter>`` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.\n" +
-        "``$leaderboard_local <galaxy_name> <filter>`` - rank players in a galaxy based on a certain criteria, like stars, economy, ships and more.\n" +
-        "``$userinfo <username> <focus>`` - get information about a user, like rank, renown or made economy.\n" +
-        "I hope this automated response has helped you in understanding commands for the bot. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
-
-    helpGameinfo = "The ``$gameinfo <galaxy_name> <focus>`` command gives you information about the settings of a completed, in progress or waiting game.\n" +
-        "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
-        "The second direction, the <focus>, asks what kind of settings you want to know of. There are five kinds of settings.\n" +
-        "If you want to see the general settings, such as the stars required for victory, playerLimit, anonymity and more, use ``general``.\n" +
-        "If you want to see the galaxy settings, such as carrier cost, warpgate cost, specialist cost and more, use ``galaxy``.\n" +
-        "If you want to see the player settings, such as the starting conditions and trading conditions, use ``player``.\n" +
-        "If you want to see the technology settings, such as the starting technologies and their cost, use ``technology``.\n" +
-        "If you want to see the time settings, such as the tick/turn duration or whether or not a game is real time, use ``time``.\n" +
-        "I hope this automated response has helped you in understanding the gameinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
-
-    helpInvite = "The ``$invite <game_link>`` creates an embed message from the game you want promoted. This message contains a summary of the most important settings of a game.\n" +
-        "This summary consists of, the gamemode, the anonimity, the dark settings, the maximum amount of players, the amount of stars per player, the galaxy type, the specialist currency, whether trading credits and technology is enabled and what kind of time settings are going on in the game.\n" +
-        "For more info on a game, you can use the gameinfo command.\n" +
-        "I hope this automated response has helped you in understanding the gameinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505."
-
-    helpHelp = "The ``$help <command>`` command gives you information about the commands you can give this bot. " +
-        "Using just the command without a direction will give you a list of all commands with a short explanation of what they do. " +
-        "Using the command with a direction, the ``<command>`` gets you a more detailed explanation of a command and its directions.\n" +
-        "But you probably already knew that, since you used the ``$help help`` command.\n" +
-        "I hope this automated response has helped you in understanding the help command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
-
-    helpLeaderboard_global = "the ``$leaderboard_global <filter> <limit>`` command gives you the top ``<limit>`` within a certain filter.\n" +
-        "The limit has to be a value between 1 and 20, the leaderboard will return the top x players, where x is that number.\n" +
-        "The filters can be almost anything, the full list of possible filters is: \n``victories``\n``rank``\n``renown``\ngames ``joined``\ngames ``completed``\ngames ``quit``\ngames ``defeated``\ngames ``afk``\n" +
-        "``ships-killed``\n``carriers-killed``\n``specialists-killed``\n``ships-lost``\n``carriers-lost``\n``specialists-lost``\n``stars-captured``\n``stars-lost``\n" +
-        "``economy`` built\n``industry`` built\n``science`` built\n``warpgates-built``\n``warpgates-destroyed``\n``carriers-built``\n``specialists-hired``\n``scanning`` researched\n``hyperspace`` range researched\n``terraforming`` researched\n" +
-        "``experimentation`` researched\n``weapons`` researched\n``banking`` researched\n``manufacturing`` researched\n``specialists`` researched\n``credits-sent``\n``credits-received``\n``technologies-sent``\n``technologies-received``\n" +
-        "``ships-gifted``\n``ships-received``\n``renown-sent``.\n" +
-        "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
-        "I hope this automated response has helped you in understanding the leaderboard_global command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
-
-    helpLeaderboard_local = "The ``$leaderboard_local <galaxy_name> <filter>`` gives you a leaderboard of the game you name based on a filter you supplied.\n" +
-        "The first direction, the <galaxy_name>, is the name of the game you want to know the settings of. You can find this name in the top left of the screen when you are in the game. If however the galaxy name is not unique, you will be asked to use the galaxy-id instead, this is a unique code that can be found at the end of the url when you are in the game.\n" +
-        "The second direction, the <filter>, is what the leaderboard will be sorted on. The full list of possible filters is: \ntotal ``stars``\ntotal ``carriers``\ntotal ``ships``\ntotal ``economy``\ntotal ``industry``\n" +
-        "total ``science``\n``newShip`` production\ntotal ``warpgates``\ntotal ``starSpecialists``\ntotal ``carrierSpecialists``\n``totalSpecialists``\n``scanning`` level\n``hyperspace`` range level\n``terraforming`` level\n``experimentation`` level\n``weapons`` level\n``banking`` level\n" +
-        "``manufacturing`` level\n``specialists`` level.\n" +
-        "Remember to use the word in the ``code-block`` as the word for the filter.\n" +
-        "I hope this automated response has helped you in understanding the leaderboard_local command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
-
-    helpUserinfo = "The ``$userinfo <username> <focus>`` gives you a profile of the player with lot's of information. This information can also be found at https://solaris.games/#/account/achievements/<user_ID>.\n" +
-        "The first direction, the <username>, is the name of a user, like The Last Hero, or LimitingFactor, the username is case-sensitive, so make sure to spell it properly.\n" +
-        "The second direction, the <focus>, is the category you want information on. There are five categories:\n" +
-        "If you want to see information about someone's played games, such as victories, completed games or how often he went afk, use ``games``.\n" +
-        "If you want to see information about someone's military accomplishments, such as ships killed, ships lost or stars killed, use ``combat``.\n" +
-        "If you want to see information about someone's infrastructure, such as built economy, industry, science and warpgates, use ``infrastructure``.\n" +
-        "If you want to see information about someone's research, such as points spent in scanning, hyperspace, terraforming, use ``research``.\n" +
-        "If you want to see information about someone's trade history, such as credits sent, technologies sent, ships gifted or even renown gifted, use ``trade``.\n" +
-        "I hope this automated response has helped you in understanding the userinfo command. If you have a suggestion in how this response or the bot in general can be improved, send it to @Tristanvds#9505.";
-
-    helpUnidentified = "It seems like the command you are looking up isn't registered in our list. Do ``$help`` to get a full list of all commands.\nIf you belief that this is a bug, please contact @Tristanvds#9505.";
-
     async leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
         let lowerLimit = (page - 1) * 20 + 1
         let upperLimit = page * 20

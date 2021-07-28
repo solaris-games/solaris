@@ -110,35 +110,9 @@ module.exports = class PublicCommandService {
     }
 
     async help(msg, directions) {
-        //$help <command>
+        //$help
         let id = msg.author.id;
-        let response = `Hey <@${id}>,\n`;
-        if (directions.length == 0) {
-            response += this.botResponseService.helpMain;
-        } else {
-            switch (directions[0]) {
-                case 'gameinfo':
-                    response += this.botResponseService.helpGameinfo;
-                    break;
-                case 'invite':
-                    response += this.botResponseService.helpInvite
-                    break;
-                case 'help':
-                    response += this.botResponseService.helpHelp;
-                    break;
-                case 'leaderboard_global':
-                    response += this.botResponseService.helpLeaderboard_global
-                    break;
-                case 'leaderboard_local':
-                    response += this.botResponseService.helpLeaderboard_local
-                    break;
-                case 'userinfo':
-                    response += this.botResponseService.helpUserinfo
-                    break;
-                default:
-                    response += this.botResponseService.helpUnidentified
-            }
-        }
+        let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/bots/discord/README.md for help on how to interact with me.`;
         msg.channel.send(response);
     }
 
