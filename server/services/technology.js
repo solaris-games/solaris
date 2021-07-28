@@ -158,7 +158,7 @@ module.exports = class TechnologyService {
         let buffs = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, false));
+            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true));
         }
 
         buffs.push(this.getStarWeaponsBuff(star));
