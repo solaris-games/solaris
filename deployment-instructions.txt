@@ -1,21 +1,15 @@
-db.games.find({}).forEach(function(game) {
-    game.settings.gameTime.maxTurnWait *= 60;
-
-    db.games.save(game);
-});
-
-db.games.updateMany({
-    'settings.technology.bankingReward': 'standard'
-}, {
+db.games.updateMany({}, {
     $set: {
-        'settings.technology.bankingReward': 'legacy'
+        'settings.general.playerType': 'establishedPlayers'
     }
 });
 
 db.games.updateMany({
-    'settings.technology.bankingReward': 'experimental'
+    'settings.general.type': {
+        $in: ['new_player_rt', 'new_player_tb']
+    }
 }, {
     $set: {
-        'settings.technology.bankingReward': 'standard'
+        'settings.general.playerType': 'all'
     }
 });

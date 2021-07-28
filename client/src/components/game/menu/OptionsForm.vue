@@ -26,7 +26,7 @@
     </div>
 
     <div class="row bg-secondary pt-1 pb-1">
-      <label for="suggestMentions" class="col-12 col-sm-6 col-form-label">Suggestions for player and star names</label>
+      <label for="suggestMentions" class="col-12 col-sm-6 col-form-label">Autofill chat mentions</label>
       <div class="col-12 col-sm-6">
         <select class="form-control" id="suggestMentions" v-model="settings.interface.suggestMentions" :disabled="isSavingSettings">
           <option value="disabled">Disabled</option>

@@ -48,14 +48,14 @@
         </select>
       </div>
 
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label for="playerType" class="col-form-label">Player Type</label>
         <select class="form-control" id="playerType" v-model="settings.general.playerType" :disabled="isCreatingGame">
           <option v-for="opt in options.general.playerType" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
-      </div> -->
+      </div>
 
       <div class="form-group">
         <label for="anonymity" class="col-form-label">Anonymity</label>

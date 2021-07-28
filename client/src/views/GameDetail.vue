@@ -30,10 +30,10 @@
               <td>Players</td>
               <td class="text-right">{{ game.settings.general.playerLimit }}</td>
             </tr>
-            <!-- <tr>
+            <tr>
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
-            </tr> -->
+            </tr>
             <tr>
               <td>Anonymity</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
@@ -408,7 +408,8 @@ export default {
         'credits': 'Credits',
         'creditsSpecialists': 'Specialist Tokens',
         'conquest': 'Conquest',
-        'battleRoyale': 'Battle Royale'
+        'battleRoyale': 'Battle Royale',
+        'establishedPlayers': 'Established Players Only'
       }[option]
 
       return text || option
