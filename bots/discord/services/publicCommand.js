@@ -50,28 +50,9 @@ module.exports = class PublicCommandService {
             msg.channel.send(response);
         }
 
-        const generateResponse = start => {
-            let response;
-            switch (start) {
-                case 'general':
-                    response = await this.botResponseService.gameinfoGeneral(game);
-                    break;
-                case 'galaxy':
-                    response = await this.botResponseService.gameinfoGalaxy(game);
-                    break;
-                case 'player':
-                    response = await this.botResponseService.gameinfoPlayer(game);
-                    break;
-                case 'technology':
-                    response = await this.botResponseService.gameinfoTechnology(game);
-                    break;
-                case 'time':
-                    response = await this.botResponseService.gameinfoTime(game);
-            }
-            return response;
-        }
+        let response = await this.botResponseService.gameinfo(game, focus);
 
-        msg.channel.send(generateResponse(focus)).then(message => {
+        msg.channel.send(response).then(message => {
             try {
                 await message.react('⬅️')
                 await message.react('➡️')
@@ -88,7 +69,10 @@ module.exports = class PublicCommandService {
                     reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
                     if (currentPage < 0) currentPage = 4;
                     if (currentPage > 4) currentPage = 0;
-                    message.edit(generateResponse(focusArray[currentPage]));
+
+                    let editedResponse = await this.botResponseService.gameinfo(game, focusArray[currentPage]);
+
+                    message.edit(editedResponse);
                     try {
                         await message.react('⬅️')
                         await message.react('➡️')
@@ -283,28 +267,9 @@ module.exports = class PublicCommandService {
             msg.channel.send(response);
         }
 
-        const generateResponse = start => {
-            let response;
-            switch (start) {
-                case 'games':
-                    response = await this.botResponseService.userinfoGames(user);
-                    break;
-                case 'combat':
-                    response = await this.botResponseService.userinfoCombat(user);
-                    break;
-                case 'infrastructure':
-                    response = await this.botResponseService.userinfoInfrastructure(user);
-                    break;
-                case 'research':
-                    response = await this.botResponseService.userinfoResearch(user);
-                    break;
-                case 'trade':
-                    response = await this.botResponseService.userinfoTrade(user);
-            }
-            return response;
-        }
+        let response = await this.botResponseService.userinfo(user, focus);
 
-        msg.channel.send(generateResponse(focus)).then(message => {
+        msg.channel.send(response).then(message => {
             try {
                 await message.react('⬅️')
                 await message.react('➡️')
@@ -321,7 +286,11 @@ module.exports = class PublicCommandService {
                     reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
                     if (currentPage < 0) currentPage = 4;
                     if (currentPage > 4) currentPage = 0;
-                    message.edit(generateResponse(focusArray[currentPage]));
+
+                    let editedResponse = await this.botResponseService.userinfo(user, focusArray[currentPage]);
+
+                    message.edit(editedResponse);
+
                     try {
                         await message.react('⬅️')
                         await message.react('➡️')

@@ -13,6 +13,23 @@ module.exports = class ReponseService {
         return response;
     }
 
+    async gameinfo(game, type) {
+        switch (type) {
+            case 'general':
+                return await this.gameinfoGeneral(game);
+            case 'galaxy':
+                return await this.gameinfoGalaxy(game);
+            case 'player':
+                return await this.gameinfoPlayer(game);
+            case 'technology':
+                return await this.gameinfoTechnology(game);
+            case 'time':
+                return await this.gameinfoTime(game);
+            default:
+                throw new Error('Unknown type: ' + type);
+        }
+    }
+
     async gameinfoGeneral(game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
@@ -292,6 +309,23 @@ module.exports = class ReponseService {
                     The game you looked up has not started yet, we can't tell you anything about it now...`;
         }
         return response;
+    }
+
+    async userinfo(user, type) {
+        switch (type) {
+            case 'games':
+                return await this.userinfoGames(user);
+            case 'combat':
+                return await this.userinfoCombat(user);
+            case 'infrastructure':
+                return await this.userinfoInfrastructure(user);
+            case 'research':
+                return await this.userinfoResearch(user);
+            case 'trade':
+                return await this.userinfoTrade(user);
+            default:
+                throw new Error('Unknown type: ' + type);
+        }
     }
 
     async userinfoGames(user) {
