@@ -4,12 +4,15 @@ const client = new Discord.Client();
 const config = require('dotenv').config();
 
 const prefix = '$'
+
+//readying the public and private commands for later specification, so they can be compared to what the player gives
 let publicCommands = null;
 const privateCommands = {
     // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
 }
 
 client.once('ready', () => {
+    //signalling that the bot is ready to go
     console.log('-----------------------\nBanning Hyperi0n!\n-----------------------');
 });
 
@@ -32,6 +35,8 @@ client.on('message', async (msg) => {
 });
 
 client.on('messageReactionAdd', (MessageReaction, User) => {
+    //in the future, the bot could respond in case you might add a reaction to a certain message, like a message that gives you a role when you react.
+    //this piece of code prepares for this future instance where we might want it, though it is not used now.
     let msg = MessageReaction.message
 
     if (!msg.author.bot || User.bot) return;
@@ -39,7 +44,6 @@ client.on('messageReactionAdd', (MessageReaction, User) => {
 
 async function Specialist_Suggestion(msg) {
     // The function that places the appropriate reactions to the specialists that can be voted upon.
-    //Later this can be improved by also checking if the specialist suggestions actually has the right format, if not, delete it after sending a copy to the specific player in DMs 
     msg.react('👍');
     msg.react('👎');
 }
@@ -50,17 +54,20 @@ async function Identify_Command(msg) {
     const cmd = directions[0];
     directions.shift();
     if (msg.channel.type !== 'dm') {
+        //the check in the if statement is there so we can see if we want to check the private or the public commands, one side of the if statement for each.
+
         // Now that the command exists, we can execute the function, which so happens to be named exactly like the command
         if (container.publicCommandService[cmd]) {
             await container.publicCommandService[cmd](msg, directions);
         }
     } else {
-        if (!privateCommands[cmd]) return;
+        if (!container.privateCommandService[cmd]) return;
         // Now that the command exists, we can execute the function, which so happens to be named exactly like the command
-        await privateCommands[cmd](msg, directions);
+        await container.privateCommandsService[cmd](msg, directions);
     }
 }
 
+//creating the connection with the mongoose databases and the container with all other programs that we will need
 const mongooseLoader = require('../../server/loaders/mongoose.js');
 const containerLoader = require('../../server/loaders/container.js');
 
@@ -79,13 +86,17 @@ async function startup() {
     console.log('MongoDB Intialized');
 
     publicCommands = {
-        // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
+        //These are all commands, so it can be checked whether they exist and what redirect is required.
         "gameinfo": container.publicCommandService.gameinfo,
         "help": container.publicCommandService.help,
         "invite": container.publicCommandService.invite,
         "leaderboard_global": container.publicCommandService.leaderboard_global,
         "leaderboard_local": container.publicCommandService.leaderboard_local,
         "userinfo": container.publicCommandService.userinfo
+    }
+
+    privateCommands = {
+        //To be expanded when required;
     }
 }
 
