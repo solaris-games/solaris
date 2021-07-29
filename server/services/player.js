@@ -461,7 +461,7 @@ module.exports = class PlayerService extends EventEmitter {
             warpgates: this.calculateWarpgates(playerStars),
             totalStarSpecialists,
             totalCarrierSpecialists,
-            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
+            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists,
         };
     }
 

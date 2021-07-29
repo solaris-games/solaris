@@ -71,7 +71,7 @@ async function startup() {
     agendajs.every('10 seconds', 'game-tick');
     agendajs.every('5 minutes', 'new-player-game-check');
     agendajs.every('1 hour', 'cleanup-old-custom-games');
-    agendajs.every('10 seconds', 'cleanup-old-game-history');
+    agendajs.every('1 day', 'cleanup-old-game-history');
 }
 
 process.on('SIGINT', async () => {
