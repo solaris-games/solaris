@@ -8,7 +8,7 @@ module.exports = (container) => {
     return {
 
         async handler(job, done) {
-            let games = await container.gameListService.listOldCompletedGames(months);
+            let games = await container.gameListService.listOldCompletedGames(months, false);
 
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
@@ -18,8 +18,7 @@ module.exports = (container) => {
                 try {
                     await container.historyService.deleteByGameId(game._id);
                     await container.eventService.deleteByGameId(game._id);
-
-                    // TODO: Figure out how to ignore games that have already been cleaned up.
+                    await container.gameService.markAsCleaned(game._id);
                 } catch (e) {
                     console.error(e);
                 }

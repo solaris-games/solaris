@@ -529,4 +529,15 @@ module.exports = class GameService extends EventEmitter {
         }
     }
 
+    async markAsCleaned(gameId) {
+        await this.gameModel.updateOne({
+            _id: gameId
+        }, {
+            $set: {
+                'state.cleaned': true
+            }
+        })
+        .exec();
+    }
+
 };
