@@ -1,4 +1,5 @@
 const ValidationError = require('../errors/validation');
+const fetch = require('node-fetch');
 
 module.exports = (router, io, container) => {
 
@@ -56,6 +57,50 @@ module.exports = (router, io, container) => {
             _id: req.session.userId,
             username: req.session.username
         });
+    });
+
+    router.get('/api/auth/discord', async (req, res, next) => {
+        const code = req.query.code;
+
+        if (code) {
+            try {
+                const oauthResult = await fetch('https://discord.com/api/oauth2/token', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        client_id: clientID,
+                        client_secret: clientSecret,
+                        code,
+                        grant_type: 'authorization_code',
+                        redirect_uri: `http://localhost:${process.env.PORT}/api/auth/discord/token`,
+                        scope: 'identify',
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                });
+
+                const oauthData = await oauthResult.json();
+                console.log(oauthData);
+            } catch (error) {
+                // NOTE: An unauthorized token will not throw an error;
+                // it will return a 401 Unauthorized response in the try block above
+                console.error(error);
+            }
+        }
+
+        return res.sendStatus(200);
+    });
+
+    router.get('/api/auth/discord/token', async (req, res, next) => {
+        const userResult = await fetch('https://discord.com/api/users/@me', {
+            headers: {
+                authorization: `${req.body.token_type} ${req.body.access_token}`,
+            },
+        });
+
+        console.log(await userResult.json());
+
+        res.sendStatus(200);
     });
 
     return router;

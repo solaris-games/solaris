@@ -23,6 +23,7 @@
     "moment": "^2.29.1",
     "mongoose": "^5.12.5",
     "mongoose-lean-defaults": "^0.4.1",
+    "node-fetch": "^2.6.1",
     "nodemailer": "^6.5.0",
     "qheap": "^1.4.0",
     "random-seed": "^0.3.0",
