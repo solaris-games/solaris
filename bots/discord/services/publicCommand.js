@@ -112,7 +112,7 @@ module.exports = class PublicCommandService {
     async help(msg, directions) {
         //$help
         let id = msg.author.id;
-        let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/bots/discord/README.md for help on how to interact with me.`;
+        let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/bots/discord/README.md for help on how to interact with me.`;
         msg.channel.send(response);
     }
 
