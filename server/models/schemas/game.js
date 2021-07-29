@@ -119,7 +119,8 @@ const schema = new Schema({
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
-		winner: { type: Types.ObjectId, required: false }
+		winner: { type: Types.ObjectId, required: false },
+		cleaned: { type: Types.Boolean, required: false }, // Represents if the events and history have been deleted.
 	},
 	constants: {
 		distances: {

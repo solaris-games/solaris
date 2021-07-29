@@ -18,7 +18,7 @@ async function startup() {
     const officialGamesCheckJob = require('./officialGamesCheck')(container);
     const cleanupCustomGamesJob = require('./cleanupCustomGames')(container);
     // const cleanupOldGamesJob = require('./cleanupOldGames')(container);
-    // const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
+    const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
 
     // Set up the agenda instance.
     const agendajs = new Agenda()
@@ -55,11 +55,11 @@ async function startup() {
     // },
     // cleanupOldGamesJob.handler);
 
-    // Cleanup old games history // TODO: Do we really need this?
-    // agendajs.define('cleanup-old-game-history', {
-    //     priority: 'high', concurrency: 1
-    // },
-    // cleanupOldGameHistory.handler);
+    // Cleanup old game history
+    agendajs.define('cleanup-old-game-history', {
+        priority: 'high', concurrency: 1
+    },
+    cleanupOldGameHistory.handler);
 
     // ...
 
@@ -71,7 +71,7 @@ async function startup() {
     agendajs.every('10 seconds', 'game-tick');
     agendajs.every('5 minutes', 'new-player-game-check');
     agendajs.every('1 hour', 'cleanup-old-custom-games');
-    // agendajs.every('1 day', 'cleanup-old-game-history');
+    agendajs.every('10 seconds', 'cleanup-old-game-history');
 }
 
 process.on('SIGINT', async () => {

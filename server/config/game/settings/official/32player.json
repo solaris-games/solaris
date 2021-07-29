@@ -26,7 +26,7 @@
     "randomGates": "rare",
     "darkGalaxy": "standard",
     "giftCarriers": "enabled",
-    "defenderBonus": "disabled",
+    "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
@@ -40,7 +40,7 @@
     "startingInfrastructure": {
       "economy": 10,
       "industry": 10,
-      "science": 2
+      "science": 3
     },
     "developmentCost": {
       "economy": "standard",

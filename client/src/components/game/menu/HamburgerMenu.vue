@@ -30,7 +30,7 @@
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
             </div>
-            <a v-if="isLoggedIn && !isDarkModeExtra" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
+            <a v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
             <a :href="documentationUrl" class="dropdown-item" target="_blank"><i class="far fa-question-circle mr-2"></i>Wiki</a>
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
@@ -112,6 +112,9 @@ export default {
     },
     isDarkModeExtra () {
       return GameHelper.isDarkModeExtra(this.$store.state.game)
+    },
+    isDataCleaned () {
+      return this.$store.state.game.state.cleaned
     },
     documentationUrl () {
       return process.env.VUE_APP_DOCUMENTATION_URL

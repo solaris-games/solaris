@@ -132,15 +132,23 @@ module.exports = class GameListService {
         return inProgress.concat(completed);
     }
 
-    async listOldCompletedGames(months = 1) {
+    async listOldCompletedGames(months = 1, cleaned = null) {
         let date = moment().subtract(months, 'month');
 
-        return await this.gameModel.find({
+        let query = {
             $and: [
                 { 'state.winner': { $ne: null } },
                 { 'state.endDate': { $lt: date } }
             ]
-        }, {
+        };
+        
+        if (cleaned != null) {
+            query['$and'].push({
+                'state.cleaned': cleaned
+            });
+        }
+
+        return await this.gameModel.find(query, {
             _id: 1
         })
         .lean()
