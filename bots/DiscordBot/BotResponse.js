@@ -243,6 +243,16 @@ module.exports = class BotReponseService {
         return response;
     }
 
+    async inviteError(authorId, reason) {
+        let response = `Hey @<${authorId}>,`
+        switch (reason) {
+            case 'noUser':
+                response += "It seems like the user you tried to look up does not exist, check if you spelled it correctly, and used capitalised letters at the right places." +
+                    "If you belief this is a bug, please contact @Tristanvds#9505"
+        }
+        return response;
+    }
+
     helpMain = "You can use the following commands in this discord:\n" +
         "``$gameinfo <galaxy_name> <focus>`` - get information about the settings of a galaxy.\n" +
         "``$help <command>`` - get a list of all commands, or more specific information about a command when you add a <command>.\n" +
@@ -466,5 +476,16 @@ module.exports = class BotReponseService {
                 { name: "Games", value: "➡️➡️➡️", inline: true }
             );
         return response;
+    }
+
+    async userinfoError (authorId, reason) {
+        let response = `Hey @<${authorId},`
+        switch (reason) {
+            case 'noUser':
+                response += 'No user was found with this name, check if you spelled it correctly.'
+                break;
+            case 'noFocus':
+                response += 'No focus was specified, make sure to add it to your command.'
+        }
     }
 }
