@@ -418,14 +418,14 @@ module.exports = class LeaderboardService {
         starSpecialists: 'stats.totalStarSpecialists',
         carrierSpecialists: 'stats.totalCarrierSpecialists',
         totalSpecialists: 'stats.totalSpecialists',
-        scanning: 'stats.research.scanning.level',
-        hyperspace: 'stats.research.hyperspace.level',
-        terraforming: 'stats.research.terraforming.level',
-        experimentation: 'stats.research.experimentation.level',
-        weapons: 'stats.research.weapons.level',
-        banking: 'stats.research.banking.level',
-        manufacturing: 'stats.research.manufacturing.level',
-        specialists: 'stats.research.specialists.level'
+        scanning: 'player.research.scanning.level',
+        hyperspace: 'player.research.hyperspace.level',
+        terraforming: 'player.research.terraforming.level',
+        experimentation: 'player.research.experimentation.level',
+        weapons: 'player.research.weapons.level',
+        banking: 'player.research.banking.level',
+        manufacturing: 'player.research.manufacturing.level',
+        specialists: 'player.research.specialists.level'
     }
 
     constructor(userModel, userService, playerService, guildUserService) {
@@ -473,7 +473,7 @@ module.exports = class LeaderboardService {
             return {
                 player: p,
                 stats: this.playerService.getStats(game, p)
-            }
+            };
         });
 
         const getNestedObject = (nestedObj, pathArr) => {
@@ -603,7 +603,7 @@ module.exports = class LeaderboardService {
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
         // If that's equal, then pick the player who has the most carriers.
-        let leaderboard = this.getLeaderboardRankings(game);
+        let leaderboard = this.getLeaderboardRankings(game).leaderboard;
 
         let starWinners = leaderboard
             .filter(p => !p.player.defeated && p.stats.totalStars >= game.state.starsForVictory)
@@ -628,8 +628,7 @@ module.exports = class LeaderboardService {
         let defeatedPlayers = game.galaxy.players.filter(p => p.defeated);
 
         if (defeatedPlayers.length === game.settings.general.playerLimit) {
-            let leaderboardReturn = this.getLeaderboardRankings(game);
-            let leaderboard = leaderboardReturn.leaderboard;
+            let leaderboard = this.getLeaderboardRankings(game).leaderboard;
 
             return leaderboard[0].player;
         }

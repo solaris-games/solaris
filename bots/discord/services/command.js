@@ -1,10 +1,4 @@
-
-
 module.exports = class CommandService {
-
-    constructor() {
-
-    }
 
     isCommand(msg, prefix) {
         return msg.content.startsWith(prefix);

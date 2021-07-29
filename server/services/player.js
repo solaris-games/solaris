@@ -462,7 +462,6 @@ module.exports = class PlayerService extends EventEmitter {
             totalStarSpecialists,
             totalCarrierSpecialists,
             totalSpecialists: totalStarSpecialists + totalCarrierSpecialists,
-            research: player.research
         };
     }
 

@@ -250,7 +250,7 @@ module.exports = class PublicCommandService {
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
         //getting the local leaderboards for our chosen sortingkey
-        let leaderboardReturn = await this.leaderboardService.getLeaderboardRankings(game, filter);
+        let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
         let leaderboard = leaderboardReturn.leaderboard;
         let fullKey = leaderboardReturn.fullKey;
 
@@ -284,7 +284,7 @@ module.exports = class PublicCommandService {
         let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
 
         if (!focusArray.includes(focus)) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noFocus'));
+            return msg.channel.send(this.botResponseService.userinfoError(msg.author.id, 'noFocus'));
         }
 
         let username = "";
@@ -294,7 +294,7 @@ module.exports = class PublicCommandService {
         username = username.trim();
 
         if (!(await this.userService.usernameExists(username))) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noUser'));
+            return msg.channel.send(this.botResponseService.userinfoError(msg.author.id, 'noUser'));
         }
 
         let user = await this.userService.getByUsernameAchievementsLean(username);
