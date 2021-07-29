@@ -260,6 +260,16 @@ module.exports = class ReponseService {
         return response;
     }
 
+    async inviteError(authorId, reason) {
+        let response = `Hey @<${authorId}>,`
+        switch (reason) {
+            case 'noUser':
+                response += "It seems like the user you tried to look up does not exist, check if you spelled it correctly, and used capitalised letters at the right places." +
+                    "If you belief this is a bug, please contact @Tristanvds#9505"
+        }
+        return response;
+    }
+
     leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
         let lowerLimit = (page - 1) * 20 + 1
         let upperLimit = page * 20
@@ -272,6 +282,16 @@ module.exports = class ReponseService {
                 { name: "Name", value: username_list, inline: true },
                 { name: `${sortingKey}`, value: sortingKey_list, inline: true }
             );
+        return response;
+    }
+
+    async leaderboard_globalError(authorId, reason) {
+        let response = `Hey @<${authorId},`
+        switch (reason) {
+            case 'invalidSorter':
+                response += 'The filter you specified is not on the list, make sure to check your sorter.\n' +
+                    'If you belief this is a bug, contact Tristanvds#9505'
+        }
         return response;
     }
 
@@ -440,6 +460,18 @@ module.exports = class ReponseService {
                 { name: "\u200B", value: "\u200B", inline: true },
                 { name: "Games", value: "➡️➡️➡️", inline: true }
             );
+        return response;
+    }
+    
+    async userinfoError (authorId, reason) {
+        let response = `Hey @<${authorId},`
+        switch (reason) {
+            case 'noUser':
+                response += 'No user was found with this name, check if you spelled it correctly.'
+                break;
+            case 'noFocus':
+                response += 'No focus was specified, make sure to add it to your command.'
+        }
         return response;
     }
 
