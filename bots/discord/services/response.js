@@ -215,17 +215,17 @@ module.exports = class ReponseService {
         let response;
         switch (reason) {
             case 'noFocus':
-                response = `Hey <@${authorId},\n
-                    It looks like the focus you specified is not in the list, you can choose between "all", "general", "galaxy", "player", "technology" and "time". If you belief this is a bug, contact @Tristanvds#9505.`
+                response = `Hey <@${authorId}>,\n` +
+                    `It looks like the focus you specified is not in the list, you can choose between "all", "general", "galaxy", "player", "technology" and "time". If you belief this is a bug, contact @Tristanvds#9505.`
                 break;
             case 'noGame':
-                response = `Hey <@${authorId}>,\n
-                    No game was found with this name, check if you spelled it correctly`;
+                response = `Hey <@${authorId}>,\n` +
+                    `No game was found with this name, check if you spelt it correctly`;
                 break;
             case 'multipleGames':
-                response = `Hey <@${msg.author.id},\n
-                    Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n
-                    If you do this, add the word "ID" after the filter, as an extra direction.`
+                response = `Hey <@${authorId}>,\n` +
+                    `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n` +
+                    `If you do this, add the word "ID" after the filter, as an extra direction.`
         }
         return response;
     }
@@ -234,7 +234,7 @@ module.exports = class ReponseService {
         let response = this.baseResponse();
         response = response
             .setTitle(`Please join ${game.settings.general.name}`)
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${game._id}`)
             .addFields(
                 { name: "Gamemode", value: game.settings.general.mode, inline: true },
                 { name: "Anonymity", value: game.settings.general.anonymity, inline: true },
@@ -286,7 +286,7 @@ module.exports = class ReponseService {
     }
 
     async leaderboard_globalError(authorId, reason) {
-        let response = `Hey @<${authorId},`
+        let response = `Hey @<${authorId}>,`
         switch (reason) {
             case 'invalidSorter':
                 response += 'The filter you specified is not on the list, make sure to check your sorter.\n' +
@@ -312,21 +312,21 @@ module.exports = class ReponseService {
         let response;
         switch (reason) {
             case 'noGame':
-                response = `Hey <@${authorId}>,\n
-                    No game was found with this name, check if you spelled it correctly`;
+                response = `Hey <@${authorId}>,\n` +
+                `No game was found with this name, check if you spelled it correctly`;
                 break;
             case 'multipleGames':
-                response = `Hey <@${msg.author.id},\n
-                    Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n
-                    If you do this, add the word "ID" after the filter, as an extra direction.`
+                response = `Hey <@${authorId}>,\n` +
+                    `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n` +
+                    `If you do this, add the word "ID" after the filter, as an extra direction.`
                 break;
             case 'extraDark':
-                response = `Hey <@${authorId}>,\n
-                    The game you looked up is an extra Dark Galaxy, we can't spill you the secrets of those games`;
+                response = `Hey <@${authorId}>,\n` +
+                    `The game you looked up is an extra Dark Galaxy, we can't spill you the secrets of those games`;
                 break;
             case 'notStarted':
-                response = `Hey <@${authorId}>,\n
-                    The game you looked up has not started yet, we can't tell you anything about it now...`;
+                response = `Hey <@${authorId}>,\n` +
+                    `The game you looked up has not started yet, we can't tell you anything about it now...`;
         }
         return response;
     }
@@ -464,7 +464,7 @@ module.exports = class ReponseService {
     }
     
     async userinfoError (authorId, reason) {
-        let response = `Hey @<${authorId},`
+        let response = `Hey @<${authorId}>,\n`
         switch (reason) {
             case 'noUser':
                 response += 'No user was found with this name, check if you spelled it correctly.'

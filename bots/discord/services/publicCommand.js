@@ -16,7 +16,12 @@ module.exports = class PublicCommandService {
         let focus;
         let game_name = "";
         if (directions[directions.length - 1] == "ID") {
-            game = await this.gameService.getByIdAll(directions[0])
+            try {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } catch (err) {
+                return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+            }
+
             focus = directions[directions.length - 2]
         } else {
             if (directions.length === 1) {
@@ -26,7 +31,7 @@ module.exports = class PublicCommandService {
                 game_name += directions[i] + ' ';
             }
             game_name = game_name.trim()
-            game = await this.gameService.getByNameAll(game_name); // TODO: The game name is not indexed in this DB so this is going to be slow as shit.
+            game = await this.gameService.getByNameSettingsLean(game_name); // TODO: The game name is not indexed in this DB so this is going to be slow as shit.
             focus = directions[directions.length - 1]
         }
 
@@ -36,17 +41,19 @@ module.exports = class PublicCommandService {
             return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noFocus'));
         }
 
-        if (!game.length) {
+        if (!game || (Array.isArray(game) && !game.length)) {
             return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
-        } else if (game.length > 1) {
+        } else if (Array.isArray(game) && game.length > 1) {
             return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
         }
 
-        game = game[0];
+        if (Array.isArray(game)) {
+            game = game[0];
+        }
 
         let response = this.botResponseService.gameinfo(game, focus);
 
-        msg.channel.send(response).then(message => {
+        msg.channel.send(response).then(async message => {
             try {
                 await message.react('⬅️')
                 await message.react('➡️')
@@ -89,7 +96,7 @@ module.exports = class PublicCommandService {
         let gameId = gamelink.split('?id=')[1];
 
         if (gameId) {
-            let game = this.gameService.getByIdAll(gameId)
+            let game = await this.gameService.getByIdSettingsLean(gameId)
 
             if (!game) {
                 return msg.channel.send(this.botResponseService.inviteError(msg.author.id, 'noGame'));
@@ -98,7 +105,7 @@ module.exports = class PublicCommandService {
             let response = this.botResponseService.invite(game);
             msg.channel.send(response);
         } else {
-            // TODO: Return an error to the chat.
+            return msg.channel.send(this.botResponseService.inviteError(msg.author.id, 'noGame'));
         }
     }
 
@@ -130,7 +137,7 @@ module.exports = class PublicCommandService {
                 (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
-        const generateLeaderboard = page => {
+        const generateLeaderboard = async page => {
             //determining the message that has to be sent with the given input
             let limit = 20
             let skip = 20 * (page - 1)
@@ -141,7 +148,7 @@ module.exports = class PublicCommandService {
             let sortingKey_list = "";
             for (let i = 0; i < leaderboard.length; i++) {
                 if (!leaderboard[i]) { break; }
-                position_list += leaderboard[i].position + "\n";
+                position_list += (leaderboard[i].position + (page - 1) * 20) + "\n";
                 username_list += leaderboard[i].username + "\n";
                 sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
             }
@@ -149,7 +156,7 @@ module.exports = class PublicCommandService {
             return response;
         }
 
-        msg.channel.send(generateLeaderboard(1)).then(message => {
+        msg.channel.send(await generateLeaderboard(1)).then(async message => {
             //reacting with the appropriate reactions so a player can move to the next page
             try {
                 await message.react('➡️')
@@ -185,7 +192,7 @@ module.exports = class PublicCommandService {
                     if (currentPage < 1) currentPage = 1;
                     if (currentPage > pageCount) currentPage = pageCount;
                     //editing the existing message so the new page is displayed for the discord user
-                    message.edit(generateLeaderboard(currentPage));
+                    message.edit(await generateLeaderboard(currentPage));
                     //adding the reactions so the player can go to another page from here
                     if (currentPage > 2) await message.react('⏪');
                     if (currentPage != 1) await message.react('⬅️');
@@ -204,7 +211,7 @@ module.exports = class PublicCommandService {
 
         //checking if the <galaxy_name> is actually the name or just the ID of a game
         if (directions[directions.length - 1] == "ID") {
-            game = await this.gameService.getByIdAll(directions[0])
+            game = await this.gameService.getByIdAllLean(directions[0])
             filter = directions[directions.length - 2]
         } else {
             if (directions.length === 1) {
@@ -215,7 +222,7 @@ module.exports = class PublicCommandService {
                 game_name += directions[i] + ' ';
             }
             game_name = game_name.trim()
-            game = await this.gameService.getByNameAll(game_name);
+            game = await this.gameService.getByNameStateSettingsLean(game_name);
             filter = directions[directions.length - 1]
         }
 
@@ -228,17 +235,19 @@ module.exports = class PublicCommandService {
             return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
         }
 
-        //getting the info from a game that may be public for sure, so we cant accidently spill all the secrets
-        let gameId = game[0]._id;
-        let gameTick = game[0].galaxy.state.tick;
-        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
+        game = game[0];
 
-        if (game.setting.specialGalaxy.darkGalaxy == 'extra' && !game.galaxy.state.endDate) {
+        if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
             return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark'))
         }
-        if (!game.galaxy.state.startDate) {
+        if (!game.state.startDate) {
             return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted'))
         }
+
+        //getting the info from a game that may be public for sure, so we cant accidently spill all the secrets
+        let gameId = game._id;
+        let gameTick = game.state.tick;
+        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
         //getting the local leaderboards for our chosen sortingkey
         let leaderboardReturn = await this.leaderboardService.getLeaderboardRankings(game, filter);
@@ -249,6 +258,11 @@ module.exports = class PublicCommandService {
         let username_list = "";
         let sortingKey_list = "";
 
+        const getNestedObject = (nestedObj, pathArr) => {
+            return pathArr.reduce((obj, key) =>
+                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+        }
+
         //creating the rankings so it fits in one message
         for (let i = 0; i < leaderboard.length; i++) {
             position_list += (i + 1) + "\n";
@@ -256,7 +270,7 @@ module.exports = class PublicCommandService {
             sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n"
         }
 
-        let response = this.botResponseService.leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list);
+        response = this.botResponseService.leaderboard_local(gameId, filter, position_list, username_list, sortingKey_list);
 
         msg.channel.send(response);
     }
@@ -283,11 +297,11 @@ module.exports = class PublicCommandService {
             return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noUser'));
         }
 
-        let user = await this.userService.getByUsername(username);
+        let user = await this.userService.getByUsernameAchievementsLean(username);
 
         let response = this.botResponseService.userinfo(user, focus);
 
-        msg.channel.send(response).then(message => {
+        msg.channel.send(response).then(async message => {
             try {
                 await message.react('⬅️')
                 await message.react('➡️')

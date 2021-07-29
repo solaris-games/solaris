@@ -36,10 +36,15 @@ module.exports = class UserService extends EventEmitter {
         return await this.userModel.findById(id);
     }
 
-    async getByUsername(username) {
-        return await this.userModel.find({
+    async getByUsernameAchievementsLean(username) {
+        return await this.userModel.findOne({
             username: username
         })
+        .select({
+            username: 1,
+            achievements: 1
+        })
+        .lean()
         .exec();
     }
 

@@ -14,7 +14,7 @@ module.exports = class CommandService {
         return msg.author.bot;
     }
 
-    identify(msg, directions) {
+    identify(msg, prefix) {
         const directions = msg.content.slice(prefix.length).split(/\s+/);
         const cmd = directions[0];
         directions.shift();

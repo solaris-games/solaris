@@ -6,10 +6,10 @@ const client = new Discord.Client();
 const mongooseLoader = require('../../server/loaders/mongoose.js');
 const containerLoader = require('../../server/loaders/container.js');
 
-const BotResponseService = require('../services/response.js')
-const CommandService = require('../services/command.js')
-const PublicCommandService = require('../services/publicCommand.js')
-const PrivateCommandService = require('../services/privateCommand.js')
+const BotResponseService = require('./services/response.js')
+const CommandService = require('./services/command.js')
+const PublicCommandService = require('./services/publicCommand.js')
+const PrivateCommandService = require('./services/privateCommand.js')
 
 const prefix = process.env.BOT_PREFIX || '$';
 
@@ -49,7 +49,7 @@ client.on('message', async (msg) => {
 });
 
 async function executeCommand(msg) {
-    const command = commandService.identify(msg);
+    const command = commandService.identify(msg, prefix);
     
     if (command.type !== 'dm') {
         if (publicCommandService[command.cmd]) {
@@ -75,7 +75,7 @@ async function startup() {
     console.log('Container Initialized');
 
     mongo = await mongooseLoader({
-        connectionString: process.env.connectionString
+        connectionString: process.env.CONNECTION_STRING
     }, {
         syncIndexes: false
     });

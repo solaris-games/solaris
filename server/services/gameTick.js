@@ -486,7 +486,7 @@ module.exports = class GameTickService extends EventEmitter {
             // rankings to be added to players. This is to slow down players
             // should they wish to cheat the system.
             if (game.state.productionTick > 0) {
-                let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, 'stars');
+                let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game);
                 let leaderboard = leaderboardReturn.leaderboard;
                 
                 await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
