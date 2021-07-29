@@ -327,6 +327,16 @@ module.exports = class BotReponseService {
         return response;
     }
 
+    async leaderboard_globalError(authorId, reason) {
+        let response = `Hey @<${authorId},`
+        switch (reason) {
+            case 'invalidSorter':
+                response += 'The filter you specified is not on the list, make sure to check your sorter.\n' +
+                    'If you belief this is a bug, contact Tristanvds#9505'
+        }
+        return response;
+    }
+
     async leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list) {
         let response = await this.baseResponse()
         response = response
@@ -487,5 +497,6 @@ module.exports = class BotReponseService {
             case 'noFocus':
                 response += 'No focus was specified, make sure to add it to your command.'
         }
+        return response;
     }
 }

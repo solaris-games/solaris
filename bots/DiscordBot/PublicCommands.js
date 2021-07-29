@@ -122,6 +122,7 @@ module.exports = class PublicCommandService {
         let gameId = gamelink.split('?id=');
         let game = this.gameService.getByIdAll(gameId);
         let response;
+        //check if user exists
         if(!game.settings.general.name) {
             response = await this.botResponseService.inviteError(msg.author.id, 'noUser');
             msg.channel.send(response);
@@ -177,6 +178,14 @@ module.exports = class PublicCommandService {
         let leaderboardSize = await this.userService.getUserCount();
         let pageCount = Math.ceil(leaderboardSize / 20)
 
+        let response;
+        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed', 'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed', 'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received', 'ships gifted', 'ships-received', 'renown-sent'];
+        if(!sorterArray.includes(sortingKey)){
+            response = await this.botResponseService.leaderboard_globalError(msg.author.id, 'invalidSorter');
+            msg.channel.send(response);
+            return;
+        }
+
         //Here be dragons
         const getNestedObject = (nestedObj, pathArr) => {
             return pathArr.reduce((obj, key) =>
@@ -198,7 +207,7 @@ module.exports = class PublicCommandService {
                 username_list += leaderboard[i].username + "\n";
                 sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
             }
-            let response = await this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
+            response = await this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
             return response;
         }
 
@@ -339,6 +348,7 @@ module.exports = class PublicCommandService {
         let response;
         if (!(await this.userService.usernameExists(username))) {
             response = await this.botResponseService.gameinfoError(msg.author.id, 'noUser')
+            msg.channel.send(response);
             return;
         }
 
