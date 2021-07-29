@@ -26,7 +26,8 @@ module.exports = class UserService extends EventEmitter {
             premiumEndDate: 0,
             banned: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            'oauth.discord.token': 0,
         })
         .lean({ defaults: true })
         .exec();
@@ -57,7 +58,8 @@ module.exports = class UserService extends EventEmitter {
             username: 0,
             gameSettings: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            oauth: 0,
         });
     }
 
@@ -74,7 +76,8 @@ module.exports = class UserService extends EventEmitter {
             username: 0,
             gameSettings: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            oauth: 0,
         };
 
         return await this.userModel.findById(id, select)

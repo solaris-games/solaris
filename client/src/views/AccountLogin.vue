@@ -7,7 +7,7 @@
     <div class="form-group" v-if="!isLoading">
         <input type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
     </div>
-<a href="https://discord.com/api/oauth2/authorize?client_id=867842892718800927&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauth%2Fdiscord&response_type=token&scope=identify">Discord auth</a>
+
     <loading-spinner :loading="isLoading"/>
 
     <form-error-list v-bind:errors="errors"/>

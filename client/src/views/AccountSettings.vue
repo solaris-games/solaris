@@ -55,6 +55,28 @@
           </button>
         </div>
       </div>
+
+      <!-- TODO: This should be in a component -->
+      <div class="row pt-3 pb-3 bg-secondary">
+        <div class="col">
+          <p>Discord Integration</p>
+        </div>
+        <div class="col">
+          <p class="text-right">
+            <!-- TODO -->
+            <!-- <button class="btn btn-danger" v-if="isAuthenticatedWithDiscord" @click="unlinkDiscordAccount">
+              Unlink
+              <i class="fas fa-times"></i>
+            </button> -->
+            <a class="btn"
+              :class="{'btn-success':isAuthenticatedWithDiscord,'btn-primary':!isAuthenticatedWithDiscord}"
+              :href="discordOauthURL">
+              {{isAuthenticatedWithDiscord ? 'Linked' : 'Login'}}
+              <i :class="{'fas fa-check':isAuthenticatedWithDiscord,'fab fa-discord':!isAuthenticatedWithDiscord}"></i>
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
 
     <div class="mt-3">
@@ -98,6 +120,14 @@ export default {
     if (response.status === 200) {
       this.info = response.data
     }
+
+    let discordSuccess = this.$route.query.discordSuccess
+    
+    if (discordSuccess === "true") {
+      this.$toasted.show(`Successfully authenticated with Discord!`, { type: 'success' })
+    } else if (discordSuccess === "false") {
+      this.$toasted.show(`There was a problem connecting to Discord, please try again.`, { type: 'error' })
+    }
   },
   methods: {
     async toggleEmailNotifications (enabled) {
@@ -139,6 +169,14 @@ export default {
       }
 
       this.isClosingAccount = false
+    }
+  },
+  computed: {
+    discordOauthURL () {
+      return process.env.VUE_APP_DISCORD_OAUTH_URL
+    },
+    isAuthenticatedWithDiscord () {
+      return this.info.oauth.discord.userId != null
     }
   }
 }

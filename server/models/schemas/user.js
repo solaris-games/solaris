@@ -152,6 +152,18 @@ const schema = new Schema({
             defaultAmount: { type: Types.Number, required: false, default: 0 },
             confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         }
+    },
+    oauth: {
+        discord: {
+            userId: { type: Types.String, required: false },
+            token: {
+                access_token: { type: Types.String, required: false },
+                token_type: { type: Types.String, required: false },
+                expires_in: { type: Types.String, required: false },
+                refresh_token: { type: Types.String, required: false },
+                scope: { type: Types.String, required: false }
+            }
+        }
     }
 });
 

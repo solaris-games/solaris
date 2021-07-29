@@ -1,5 +1,5 @@
 const ValidationError = require('../errors/validation');
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 module.exports = (router, io, container) => {
 
@@ -59,28 +59,42 @@ module.exports = (router, io, container) => {
         });
     });
 
+    // TODO: This should be in another api file. oauth.js?
     router.get('/api/auth/discord', async (req, res, next) => {
         const code = req.query.code;
 
         if (code) {
             try {
-                const oauthResult = await fetch('https://discord.com/api/oauth2/token', {
-                    method: 'POST',
-                    body: new URLSearchParams({
-                        client_id: clientID,
-                        client_secret: clientSecret,
-                        code,
-                        grant_type: 'authorization_code',
-                        redirect_uri: `http://localhost:${process.env.PORT}/api/auth/discord/token`,
-                        scope: 'identify',
-                    }),
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                await container.authService.clearOauthDiscord(req.session.userId);
+
+                const params = new URLSearchParams({
+                    client_id: process.env.DISCORD_CLIENTID,
+                    client_secret: process.env.DISCORD_CLIENT_SECRET,
+                    code,
+                    grant_type: 'authorization_code',
+                    redirect_uri: process.env.DISCORD_OAUTH_REDIRECT_URI,
+                    scope: 'identify',
                 });
 
-                const oauthData = await oauthResult.json();
-                console.log(oauthData);
+                const oauthResult = await axios.post('https://discord.com/api/oauth2/token', params, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                });
+
+                if (oauthResult.status === 200) {
+                    const userResult = await axios.get('https://discord.com/api/users/@me', {
+                        headers: {
+                            authorization: `${oauthResult.data.token_type} ${oauthResult.data.access_token}`,
+                        },
+                    });
+
+                    if (userResult.status === 200) {
+                        await container.authService.updateOauthDiscord(req.session.userId, userResult.data.id, oauthResult.data);
+        
+                        return res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=true`);
+                    }
+                }
             } catch (error) {
                 // NOTE: An unauthorized token will not throw an error;
                 // it will return a 401 Unauthorized response in the try block above
@@ -88,19 +102,7 @@ module.exports = (router, io, container) => {
             }
         }
 
-        return res.sendStatus(200);
-    });
-
-    router.get('/api/auth/discord/token', async (req, res, next) => {
-        const userResult = await fetch('https://discord.com/api/users/@me', {
-            headers: {
-                authorization: `${req.body.token_type} ${req.body.access_token}`,
-            },
-        });
-
-        console.log(await userResult.json());
-
-        res.sendStatus(200);
+        return res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=false`);
     });
 
     return router;
