@@ -48,6 +48,13 @@ module.exports = class TechnologyService {
         // TODO: This is a plaster over a bug where in the gameGalaxy service
         // it sets research to null if its in extra dark galaxy but somehow
         // this function is still being called by getStats. Needs investigating...
+        // TODO: The player in question had 0 stars and 1 carrier, with this
+        // fix the extra dark galaxy loads but there's 1 star that doesn't have a name
+        // that gets returned in the response.
+        // TODO: It probably has something to do with scanning range, maybe it
+        // isn't checking if players have 0 stars? In which case they have no scanning range
+        // and therefore nobody is within scanning range.
+    
         if (!player.research) {
             return {
                 scanning: 1,

@@ -325,6 +325,43 @@
             36
         ]
         },
+        "orbitalMechanics": {
+            "enabled": [
+                {
+                    "value": "enabled",
+                    "text": "Enabled"
+                },
+                {
+                    "value": "disabled",
+                    "text": "Disabled"
+                }
+            ],
+            "orbitSpeed": [
+                {
+                    "value": 5,
+                    "text": "Slow"
+                },
+                {
+                    "value": 10,
+                    "text": "Standard"
+                },
+                {
+                    "value": 25,
+                    "text": "Fast"
+                }
+            ],
+            "orbitOrigin": [
+                {
+                    "value": "galacticCenter",
+                    "text": "Galactic Center"
+                },
+                {
+                    "value": "galacticCenterOfMass",
+                    "text": "Galactic Center of Mass"
+                }
+            ]
+
+        },
         "player": {
         "startingStars": [
             1,

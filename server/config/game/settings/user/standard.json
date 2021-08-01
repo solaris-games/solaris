@@ -32,6 +32,11 @@
         "playerDistribution": "circular",
         "carrierSpeed": 10
     },
+    "orbitalMechanics": {
+        "enabled": "disabled",
+        "orbitSpeed": 10,
+        "orbitOrigin": "galacticCenter"
+    },
     "player": {
         "startingStars": 6,
         "startingCredits": 500,
