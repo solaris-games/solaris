@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService) {
         super();
             
         this.distanceService = distanceService;
@@ -26,6 +26,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.aiService = aiService;
         this.emailService = emailService;
         this.battleRoyaleService = battleRoyaleService;
+        this.orbitalMechanicsService = orbitalMechanicsService;
     }
 
     async tick(gameId) {
@@ -95,6 +96,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             this._awardCreditsPerTick(game);
             logTime('Award tick credits from specialists');
+
+            this._orbitGalaxy(game);
+            logTime('Orbital mechanics')
 
             await this._logHistory(game);
             logTime('Log history');
@@ -519,6 +523,18 @@ module.exports = class GameTickService extends EventEmitter {
                 let creditsByScience = this.specialistService.getCreditsPerTickByScience(star);
 
                 player.credits += creditsByScience * star.infrastructure.science;
+            }
+        }
+    }
+
+    _orbitGalaxy(game) {
+        if (game.settings.orbitalMechanics.enabled === 'enabled') {
+            for (let star of game.galaxy.stars) {
+                this.orbitalMechanicsService.orbitStar(game, star);
+            }
+
+            for (let carrier of game.galaxy.carriers) {
+                this.orbitalMechanicsService.orbitCarrier(game, carrier);
             }
         }
     }
