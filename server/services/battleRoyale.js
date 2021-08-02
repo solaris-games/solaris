@@ -36,7 +36,8 @@ module.exports = class BattleRoyaleService {
         
         let starsToDestroy = this.starDistanceService.getFurthestStarsFromLocation(galaxyCenter, game.galaxy.stars, starCountToDestroy);
 
-        return starsToDestroy;
+        return starsToDestroy
+            .sort((a, b) => a._id.toString().localeCompare(b._id.toString()));
     }
 
     destroyStar(game, star) {

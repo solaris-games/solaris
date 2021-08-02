@@ -62,6 +62,9 @@ module.exports = class GameTickService extends EventEmitter {
         // If we are in turn based mode, we need to repeat the tick X number of times.
         if (this.gameService.isTurnBasedGame(game)) {
             iterations = game.settings.gameTime.turnJumps;
+
+            // Increment missed turns for players so that they can be kicked for being AFK later.
+            this.playerService.incrementMissedTurns(game);
         }
 
         while (iterations--) {
@@ -101,7 +104,7 @@ module.exports = class GameTickService extends EventEmitter {
             }
         }
 
-        this._resetPlayersReadyStatus(game);
+        this.playerService.resetReadyStatuses(game);
 
         await game.save();
         logTime('Save game');
@@ -144,7 +147,7 @@ module.exports = class GameTickService extends EventEmitter {
                 return true;
             }
 
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
         } else {
             throw new Error(`Unsupported game type.`);
         }
@@ -483,8 +486,8 @@ module.exports = class GameTickService extends EventEmitter {
             // rankings to be added to players. This is to slow down players
             // should they wish to cheat the system.
             if (game.state.productionTick > 0) {
-                let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
-    
+                let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+                
                 await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
 
@@ -504,12 +507,6 @@ module.exports = class GameTickService extends EventEmitter {
     async _playAI(game) {
         for (let player of game.galaxy.players.filter(p => p.defeated)) {
             await this.aiService.play(game, player);
-        }
-    }
-
-    _resetPlayersReadyStatus(game) {
-        for (let player of game.galaxy.players) {
-            player.ready = false;
         }
     }
 

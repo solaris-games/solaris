@@ -42,8 +42,8 @@
             "text": "All Players"
             },
             {
-            "value": "premium",
-            "text": "Premium Players Only"
+            "value": "establishedPlayers",
+            "text": "Established Players Only"
             }
         ],
         "anonymity": [
@@ -530,8 +530,8 @@
                     "text": "Standard"
                 },
                 {
-                    "value": "experimental",
-                    "text": "Experimental"
+                    "value": "legacy",
+                    "text": "Legacy"
                 }
             ]
         },
@@ -627,34 +627,50 @@
         "maxTurnWait": [
             {
                 "value": 1,
-                "text": "1 Hour"
+                "text": "1 Minute"
             },
             {
-                "value": 6,
-                "text": "6 Hours"
-            },
-            {
-                "value": 8,
-                "text": "8 Hours"
+                "value": 5,
+                "text": "5 Minutes"
             },
             {
                 "value": 10,
+                "text": "10 Minutes"
+            },
+            {
+                "value": 30,
+                "text": "30 Minutes"
+            },
+            {
+                "value": 60,
+                "text": "1 Hour"
+            },
+            {
+                "value": 360,
+                "text": "6 Hours"
+            },
+            {
+                "value": 480,
+                "text": "8 Hours"
+            },
+            {
+                "value": 600,
                 "text": "10 Hours"
             },
             {
-                "value": 12,
+                "value": 720,
                 "text": "12 Hours"
             },
             {
-                "value": 18,
+                "value": 1080,
                 "text": "18 Hours"
             },
             {
-                "value": 24,
+                "value": 1440,
                 "text": "24 Hours"
             },
             {
-                "value": 48,
+                "value": 2880,
                 "text": "48 Hours"
             }
         ],
@@ -678,6 +694,18 @@
             {
                 "value": 5,
                 "text": "5 Missed Turns"
+            },
+            {
+                "value": 10,
+                "text": "10 Missed Turns"
+            },
+            {
+                "value": 30,
+                "text": "30 Missed Turns"
+            },
+            {
+                "value": 60,
+                "text": "60 Missed Turns"
             }
         ]
     }

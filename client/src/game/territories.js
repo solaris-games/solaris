@@ -21,6 +21,10 @@ class Territories {
   draw (userSettings) {
     this.container.removeChildren()
 
+    if (!this.game.galaxy.stars || !this.game.galaxy.stars.length) {
+      return; //No territories if we have no stars
+    }
+
     switch(userSettings.map.territoryStyle) {
       case 'marching-square':
         this._drawTerritoriesMarchingCube(userSettings)

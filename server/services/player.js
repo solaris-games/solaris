@@ -461,7 +461,7 @@ module.exports = class PlayerService extends EventEmitter {
             warpgates: this.calculateWarpgates(playerStars),
             totalStarSpecialists,
             totalCarrierSpecialists,
-            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
+            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists,
         };
     }
 
@@ -513,9 +513,9 @@ module.exports = class PlayerService extends EventEmitter {
 
         switch (game.settings.technology.bankingReward) {
             case 'standard':
-                return banking * 75;
-            case 'experimental':
                 return Math.round((banking * 75) + (0.15 * banking * totalEco));
+            case 'legacy':
+                return banking * 75;
         }
 
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
@@ -606,20 +606,6 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     performDefeatedOrAfkCheck(game, player, isTurnBasedGame) {
-        if (isTurnBasedGame) {
-            // Reset whether we have sent the player a turn reminder.
-            player.hasSentTurnReminder = false;
-
-            // If the player wasn't ready when the game ticked, increase their number of missed turns.
-            if (!player.ready) {
-                player.missedTurns++;
-                player.ready = true; // Bit of a bodge, this ensures that we don't keep incrementing this value every iteration.
-            }
-            else {
-                player.missedTurns = 0; // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
-            }
-        }
-
         // Check if the player has been AFK.
         let isAfk = this.isAfk(game, player, isTurnBasedGame);
 
@@ -639,6 +625,28 @@ module.exports = class PlayerService extends EventEmitter {
                     this.setPlayerAsDefeated(game, player);
                 }
             }
+        }
+    }
+
+    incrementMissedTurns(game) {
+        for (let player of game.galaxy.players) {
+            // If the player isn't ready, increase their number of missed turns.
+            if (!player.ready) {
+                player.missedTurns++;
+            }
+            else {
+                // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
+                player.missedTurns = 0;
+            }
+        }
+    }
+
+    resetReadyStatuses(game) {
+        for (let player of game.galaxy.players) {
+            // Reset whether we have sent the player a turn reminder.
+            player.hasSentTurnReminder = false;
+
+            player.ready = false;
         }
     }
 

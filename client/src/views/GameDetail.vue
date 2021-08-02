@@ -30,10 +30,10 @@
               <td>Players</td>
               <td class="text-right">{{ game.settings.general.playerLimit }}</td>
             </tr>
-            <!-- <tr>
+            <tr>
               <td>Player Type</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
-            </tr> -->
+            </tr>
             <tr>
               <td>Anonymity</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
@@ -296,7 +296,8 @@
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Max Turn Wait</td>
-              <td class="text-right">{{ game.settings.gameTime.maxTurnWait }} hours</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
             </tr>
             <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
               <td>Missed Turn Limit</td>
@@ -407,7 +408,8 @@ export default {
         'credits': 'Credits',
         'creditsSpecialists': 'Specialist Tokens',
         'conquest': 'Conquest',
-        'battleRoyale': 'Battle Royale'
+        'battleRoyale': 'Battle Royale',
+        'establishedPlayers': 'Established Players Only'
       }[option]
 
       return text || option

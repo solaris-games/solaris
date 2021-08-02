@@ -60,7 +60,7 @@ module.exports = (config, io) => {
     // Poor man's dependency injection.
 
     const passwordService = new PasswordService(bcrypt);
-    
+
     const authService = new AuthService(UserModel, passwordService);
     const userService = new UserService(UserModel, passwordService);
     const adminService = new AdminService(UserModel, GameModel);
@@ -104,13 +104,12 @@ module.exports = (config, io) => {
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);
-    
+
     const eventService = new EventService(EventModel, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService);
 
     const gameListService = new GameListService(GameModel, gameService, conversationService, eventService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
-
 
     return {
         adminService,

@@ -62,6 +62,13 @@ module.exports = class GameGalaxyService {
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
+        // Append the destruction flag before doing any scanning culling because
+        // we need to ensure that the flag is set based on ALL stars in the galaxy instead
+        // of culled stars (for example dark galaxy star culling)
+        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
+            this._appendStarsPendingDestructionFlag(game);
+        }
+
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
@@ -88,10 +95,6 @@ module.exports = class GameGalaxyService {
         // TODO: Better to not overwrite, but just not do it above in the first place.
         if (this.gameService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
-        }
-
-        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
-            this._appendStarsPendingDestructionFlag(game);
         }
 
         if (isHistorical && cached) {
@@ -406,6 +409,7 @@ module.exports = class GameGalaxyService {
                 defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
+                missedTurns: p.missedTurns,
                 alias: p.alias,
                 avatar: p.avatar,
                 stats: p.stats,

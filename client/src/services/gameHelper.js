@@ -53,7 +53,9 @@ class GameHelper {
   }
 
   getCarriersOrbitingStar (game, star) {
-    return game.galaxy.carriers.filter(x => x.orbiting === star._id)
+    return game.galaxy.carriers
+      .filter(x => x.orbiting === star._id)
+      .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0))
   }
 
   isCarrierInTransit (carrier) {
@@ -716,7 +718,7 @@ class GameHelper {
             return true;
         }
 
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
         throw new Error(`Unsupported game type.`);
     }

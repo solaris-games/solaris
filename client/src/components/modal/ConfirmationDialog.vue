@@ -8,7 +8,7 @@
   :titleText="dialogSettings.titleText"
   @onConfirm="onConfirm"
   @onCancel="onCancel">
-    <p>{{dialogSettings.text}}</p>
+    <p style="white-space: pre-wrap">{{dialogSettings.text}}</p>
   </dialog-modal>
 </template>
 

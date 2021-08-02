@@ -11,7 +11,7 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled">
+        <div class="col-auto pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
@@ -274,7 +274,7 @@ export default {
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
-      let keyCode = e.keyCode || e.which
+      let key = e.key
 
       // Check for modifier keys and ignore the keypress if there is one.
       if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
@@ -284,16 +284,16 @@ export default {
       let isLoggedIn = this.$store.state.userId != null
       let isInGame = this.userPlayer != null
 
-      let menuState = KEYBOARD_SHORTCUTS.all[keyCode.toString()]
+      let menuState = KEYBOARD_SHORTCUTS.all[key]
 
       if (isLoggedIn) {
-        menuState = menuState || KEYBOARD_SHORTCUTS.user[keyCode.toString()]
+        menuState = menuState || KEYBOARD_SHORTCUTS.user[key]
       }
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
       if (isInGame) {
-        menuState = menuState || KEYBOARD_SHORTCUTS.player[keyCode.toString()]
+        menuState = menuState || KEYBOARD_SHORTCUTS.player[key]
       }
 
       if (!menuState) {
@@ -373,7 +373,9 @@ export default {
     hasUnread () {
       return this.unreadMessages > 0 || this.unreadEvents > 0
     },
-    gameState: mapState(['game'])
+    isDataCleaned () {
+      return this.$store.state.game.state.cleaned
+    }
   },
   watch: {
     game (newGame, oldGame) {
@@ -389,12 +391,12 @@ export default {
 }
 
 .pulse {
-  animation: blinker 1s linear infinite;
+  animation: blinker 1.5s linear infinite;
 }
 
 @keyframes blinker {
   50% {
-    opacity: 0.25;
+    opacity: 0.3;
   }
 }
 </style>

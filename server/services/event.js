@@ -97,6 +97,13 @@ module.exports = class EventService {
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
     }
 
+    async deleteByGameId(gameId) {
+        await this.eventModel.deleteMany({
+            gameId
+        })
+        .exec();
+    }
+
     async createGameEvent(gameId, gameTick, type, data) {
         let event = new this.eventModel({
             gameId,
