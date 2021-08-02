@@ -24,7 +24,7 @@ const schema = new Schema({
 			passwordRequired: { type: Types.Boolean, required: false },
 			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
-			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
+			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
@@ -91,15 +91,15 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
-			bankingReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
+			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' }
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 30 },
-			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
+			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600], default: 1800 }, // Time in seconds
+			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240], default: 30 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 },
-			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5], default: 3 }
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 }
 		}
     },
     galaxy: {
@@ -119,7 +119,8 @@ const schema = new Schema({
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
-		winner: { type: Types.ObjectId, required: false }
+		winner: { type: Types.ObjectId, required: false },
+		cleaned: { type: Types.Boolean, required: false }, // Represents if the events and history have been deleted.
 	},
 	constants: {
 		distances: {

@@ -84,7 +84,7 @@ export default {
       }
       this.isLoading = true;
       try {
-        const response = await UserApiService.getLeaderboard(this.limit, key);
+        const response = await UserApiService.getLeaderboard(this.limit, key, 0);
         if (response.status === 200) {
           this.$set(this.leaderboards, key, response.data.leaderboard);
           this.totalPlayers = response.data.totalPlayers;

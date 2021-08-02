@@ -62,15 +62,15 @@ module.exports = class GameTickService extends EventEmitter {
         // If we are in turn based mode, we need to repeat the tick X number of times.
         if (this.gameService.isTurnBasedGame(game)) {
             iterations = game.settings.gameTime.turnJumps;
+
+            // Increment missed turns for players so that they can be kicked for being AFK later.
+            this.playerService.incrementMissedTurns(game);
         }
 
         while (iterations--) {
             game.state.tick++;
     
             logTime(`Tick ${game.state.tick}`);
-
-            this._sanitiseCarrierWaypoints(game);
-            logTime('Sanitise carrier waypoints');
 
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
@@ -104,7 +104,7 @@ module.exports = class GameTickService extends EventEmitter {
             }
         }
 
-        this._resetPlayersReadyStatus(game);
+        this.playerService.resetReadyStatuses(game);
 
         await game.save();
         logTime('Save game');
@@ -122,8 +122,8 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     canTick(game) {
-        // Cannot perform a game tick on a paused or completed game.
-        if (game.state.paused || game.state.endDate) {
+        // Cannot perform a game tick on a locked, paused or completed game.
+        if (game.state.locked || game.state.paused || game.state.endDate) {
             return false;
         }
 
@@ -137,7 +137,7 @@ module.exports = class GameTickService extends EventEmitter {
         
         if (this.gameService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
         } else if (this.gameService.isTurnBasedGame(game)) {
             // If in turn based mode, then check if all undefeated players are ready.
             // OR the max time wait limit has been reached.
@@ -147,22 +147,12 @@ module.exports = class GameTickService extends EventEmitter {
                 return true;
             }
 
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
         } else {
             throw new Error(`Unsupported game type.`);
         }
     
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
-    }
-
-    _sanitiseCarrierWaypoints(game) {
-        for (let carrier of game.galaxy.carriers) {
-            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
-
-            if (this.carrierService.isLostInSpace(game, carrier)) {
-                this.carrierService.destroyCarrier(game, carrier);
-            }
-        }
     }
 
     async _combatCarriers(game, gameUsers) {
@@ -496,8 +486,8 @@ module.exports = class GameTickService extends EventEmitter {
             // rankings to be added to players. This is to slow down players
             // should they wish to cheat the system.
             if (game.state.productionTick > 0) {
-                let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
-    
+                let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+                
                 await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
 
@@ -517,12 +507,6 @@ module.exports = class GameTickService extends EventEmitter {
     async _playAI(game) {
         for (let player of game.galaxy.players.filter(p => p.defeated)) {
             await this.aiService.play(game, player);
-        }
-    }
-
-    _resetPlayersReadyStatus(game) {
-        for (let player of game.galaxy.players) {
-            player.ready = false;
         }
     }
 

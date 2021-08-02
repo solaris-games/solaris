@@ -7,7 +7,7 @@
     "password": null,
     "starVictoryPercentage": 33,
     "playerLimit": 32,
-    "playerType": "all",
+    "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "disabled"
@@ -26,7 +26,7 @@
     "randomGates": "rare",
     "darkGalaxy": "standard",
     "giftCarriers": "enabled",
-    "defenderBonus": "disabled",
+    "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
@@ -40,7 +40,7 @@
     "startingInfrastructure": {
       "economy": 10,
       "industry": 10,
-      "science": 2
+      "science": 3
     },
     "developmentCost": {
       "economy": "standard",
@@ -73,11 +73,11 @@
       "weapons": "standard",
       "specialists": "standard"
     },
-    "bankingReward": "experimental"
+    "bankingReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 60,
+    "speed": 3600,
     "startDelay": 120
   }
 }

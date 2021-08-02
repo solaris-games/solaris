@@ -45,6 +45,22 @@ module.exports = class TechnologyService {
     }
 
     getPlayerEffectiveTechnologyLevels(game, player, sanitize = true) {
+        // TODO: This is a plaster over a bug where in the gameGalaxy service
+        // it sets research to null if its in extra dark galaxy but somehow
+        // this function is still being called by getStats. Needs investigating...
+        if (!player.research) {
+            return {
+                scanning: 1,
+                hyperspace: 1,
+                terraforming: 1,
+                experimentation: 1,
+                weapons: 1,
+                banking: 1,
+                manufacturing: 1,
+                specialists: 1
+            };
+        }
+
         let techs = {
             scanning: player.research.scanning.level,
             hyperspace: player.research.hyperspace.level,
@@ -158,7 +174,7 @@ module.exports = class TechnologyService {
         let buffs = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, false));
+            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true));
         }
 
         buffs.push(this.getStarWeaponsBuff(star));

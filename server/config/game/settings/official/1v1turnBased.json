@@ -7,7 +7,7 @@
     "password": null,
     "starVictoryPercentage": 66,
     "playerLimit": 2,
-    "playerType": "all",
+    "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "visible",
     "timeMachine": "enabled"
@@ -78,7 +78,7 @@
   "gameTime": {
     "gameType": "turnBased",
     "tickJumps": 6,
-    "maxTurnWait": 24,
+    "maxTurnWait": 1440,
     "missedTurnLimit": 3
   }
 }

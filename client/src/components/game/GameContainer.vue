@@ -54,6 +54,8 @@ export default {
       this.polling = setInterval(this.touchPlayer, 60000)
       this.touchPlayer()
     }
+
+    this.tryShowDonateModal()
   },
 
   destroyed () {
@@ -115,6 +117,20 @@ export default {
     },
     onObjectsClicked (e) {
       this.$emit('onObjectsClicked', e)
+    },
+    async tryShowDonateModal () {
+      let chance = Math.floor(Math.random() * (20 - 0 + 1) + 0); // 1 in 20
+
+      if (chance === 0 && 
+        await this.$confirm('Support The Project', 
+          `Hello there,
+
+Solaris is free, open source and does not have ads. Please consider donating to support the continued development of the project.
+
+Thank you,
+Hyperi0n`, 'Donate', 'Dismiss')) {
+        window.open("https://www.buymeacoffee.com/hyperi0n", '_blank').focus();
+      }
     }
   },
 

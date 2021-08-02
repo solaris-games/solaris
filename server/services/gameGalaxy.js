@@ -62,6 +62,13 @@ module.exports = class GameGalaxyService {
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
+        // Append the destruction flag before doing any scanning culling because
+        // we need to ensure that the flag is set based on ALL stars in the galaxy instead
+        // of culled stars (for example dark galaxy star culling)
+        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
+            this._appendStarsPendingDestructionFlag(game);
+        }
+
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
@@ -90,16 +97,10 @@ module.exports = class GameGalaxyService {
             this._setPlayerStats(game);
         }
 
-        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
-            this._appendStarsPendingDestructionFlag(game);
-        }
-
         if (isHistorical && cached) {
             cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
 
-        this._topSecretFeature(game);
-        
         return game;
     }
 
@@ -408,6 +409,7 @@ module.exports = class GameGalaxyService {
                 defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
+                missedTurns: p.missedTurns,
                 alias: p.alias,
                 avatar: p.avatar,
                 stats: p.stats,
@@ -579,24 +581,6 @@ module.exports = class GameGalaxyService {
 
         for (let pendingStar of pendingStars) {
             pendingStar.targeted = true;
-        }
-    }
-
-    _topSecretFeature(game) {
-        if (false) {
-            return;
-        }
-
-        let rnd = Math.floor(Math.random() * 100);
-
-        if (rnd === 0) {
-            let shapes = ['circle', 'square', 'diamond', 'hexagon'];
-            let colours = require('../config/game/colours.json');
-    
-            for (let player of game.galaxy.players) {
-                player.shape = shapes[Math.floor(Math.random() * shapes.length)];
-                player.colour = colours[Math.floor(Math.random() * colours.length)];
-            }
         }
     }
 

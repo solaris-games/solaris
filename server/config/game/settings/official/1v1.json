@@ -7,7 +7,7 @@
     "password": null,
     "starVictoryPercentage": 66,
     "playerLimit": 2,
-    "playerType": "all",
+    "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled"
@@ -77,7 +77,7 @@
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 30,
+    "speed": 1800,
     "startDelay": 30
   }
 }

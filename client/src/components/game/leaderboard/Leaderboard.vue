@@ -47,8 +47,8 @@
                           <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
-                              <i v-if="player.afk" class="fas fa-user-clock"></i>
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
                             </span>
                           </h5>
                       </td>
@@ -62,7 +62,7 @@
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
-                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -172,7 +172,7 @@ export default {
         this.timeRemaining = `Next tick: ${time}`
       } else {
         // Calculate when the max wait limit date is.
-        let maxWaitLimitDate = moment(this.$store.state.game.state.lastTickDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
+        let maxWaitLimitDate = moment(this.$store.state.game.state.lastTickDate).utc().add('minutes', this.$store.state.game.settings.gameTime.maxTurnWait)
 
         let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
 
@@ -319,6 +319,16 @@ table tr {
   .col-avatar {
     width: 45px;
     padding-top: 0.25rem !important;
+  }
+}
+
+.pulse {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
   }
 }
 </style>

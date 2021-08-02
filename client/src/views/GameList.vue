@@ -48,12 +48,12 @@
               <div class="card bg-dark text-white new-player-game" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
-                  <h5 class="card-title featured-card-title">
+                  <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
-                    <span class="ml-2">{{games.newPlayerRT.settings.general.name}}</span>
+                    <span class="ml-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle">
-                    {{getGameTypeFriendlyText(games.newPlayerRT)}}
+                  <h6 class="card-title card-subtitle new-player-card-subtitle">
+                    {{games.newPlayerRT.settings.general.name}}
                     ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
                   </h6>
                 </div>
@@ -208,6 +208,7 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
         </div>
+        
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
@@ -332,7 +333,7 @@ export default {
     },
     getGameTypeFriendlyText (game) {
       return {     
-        'new_player_rt': 'New Players',
+        'new_player_rt': 'New Player Game',
         'standard_rt': 'Standard',
         'standard_tb': 'Standard - TB',
         'standard_dark_rt': 'Dark Galaxy',
@@ -381,6 +382,10 @@ export default {
   background-color: #00bc8c;
 }
 
+.new-player-card-title {
+  background-color: #f39c12;
+}
+
 .card-subtitle {
   font-size: 12px;
   position: absolute;
@@ -390,7 +395,11 @@ export default {
   background-color: #3498DB;
 }
 
+.new-player-card-subtitle {
+  background-color: #f39c12;
+}
+
 .new-player-game {
-  border: solid;
+  border: 3px solid #f39c12;
 }
 </style>

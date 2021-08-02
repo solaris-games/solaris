@@ -72,13 +72,14 @@ class UserService extends BaseApiService {
     })
   }
 
-  getLeaderboard (limit, sortingKey) {
+  getLeaderboard (limit, sortingKey, skip) {
     return axios.get(this.BASE_URL + 'user/leaderboard',
       {
         withCredentials: true,
         params: {
           limit,
-          sortingKey
+          sortingKey,
+          skip
         }
       })
   }

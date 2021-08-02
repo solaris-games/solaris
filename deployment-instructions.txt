@@ -1,25 +1,5 @@
-db.games.find({}).forEach(function(game) {
-    game.galaxy.stars.forEach(function(star) {
-        star.ignoreBulkUpgrade = {
-            economy: star.ignoreBulkUpgrade,
-            industry: star.ignoreBulkUpgrade,
-            science: star.ignoreBulkUpgrade
-        };
-    });
-
-    db.games.save(game);
-});
-
-db.gamehistories.find({}).forEach(function(gamehistory) {
-    if (gamehistory.stars && gamehistory.stars.length) {
-        gamehistory.stars.forEach(function(star) {
-            star.ignoreBulkUpgrade = {
-                economy: star.ignoreBulkUpgrade,
-                industry: star.ignoreBulkUpgrade,
-                science: star.ignoreBulkUpgrade
-            };
-        });
-
-        db.gamehistories.save(gamehistory);
+db.games.updateMany({}, {
+    $set: {
+        'state.cleaned': false
     }
 });

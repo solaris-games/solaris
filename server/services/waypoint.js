@@ -32,6 +32,10 @@ module.exports = class WaypointService {
             throw new ValidationError('Cannot change waypoints of a carrier that is a gift.');
         }
 
+        if (waypoints.length > 30) {
+            throw new ValidationError('Cannot plot more than 30 waypoints.');
+        }
+
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
         if (!carrier.orbiting) {

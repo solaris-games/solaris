@@ -30,7 +30,7 @@ const schema = new Schema({
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
-        renown: { type: Types.Number, default: 0 },
+        renown: { type: Types.Number, default: 0 }, // TODO: Why are there 2 of these?
         combat: {
             kills: {
                 ships: { type: Types.Number, default: 0 },

@@ -72,13 +72,13 @@
         {
             "id": 6,
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -3 Weapons to the carrier.",
+            "description": "Grants +3 Hyperspace Range, -1 Weapons to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
                 "local": {
                     "hyperspace": 3,
-                    "weapons": -3
+                    "weapons": -1
                 }
             }
         },
@@ -99,13 +99,10 @@
         {
             "id": 8,
             "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships the carrier has. -1 Weapons.",
+            "description": "Prevents other players from seeing how many ships the carrier has.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
-                "local": {
-                    "weapons": -1
-                },
                 "special": {
                     "hideCarrierShips": true
                 }
@@ -216,7 +213,7 @@
         {
             "id": 16,
             "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed to the carrier.",
+            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "modifiers": {
@@ -333,15 +330,12 @@
         {
             "id": 8,
             "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships are garrisoned at the Star. -1 Weapons.",
+            "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "modifiers": {
                 "special": {
                     "hideStarShips": true
-                },
-                "local": {
-                    "weapons": -1
                 }
             }
         },
