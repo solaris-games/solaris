@@ -5,7 +5,7 @@ module.exports = class AdminService {
         this.gameModel = gameModel;
     }
 
-    async listUsers() {
+    async listUsers(limit) {
         return await this.userModel.find({}, {
             username: 1,
             email: 1,
@@ -20,6 +20,7 @@ module.exports = class AdminService {
         .sort({
             lastSeen: -1
         })
+        .limit(limit)
         .lean({defaults: true})
         .exec();
     }

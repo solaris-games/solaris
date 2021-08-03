@@ -6,7 +6,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/admin/user', middleware.authenticateAdmin, async (req, res, next) => {
         try {
-            let result = await container.adminService.listUsers();
+            let result = await container.adminService.listUsers(500);
             
             return res.status(200).json(result);
         } catch (err) {

@@ -50,6 +50,11 @@ const schema = new Schema({
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
         },
+		orbitalMechanics: {
+			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			orbitSpeed: { type: Types.Number, required: false, enum: [5, 10, 25], default: 10 },
+			orbitOrigin: { type: Types.String, required: false, enum: ['galacticCenter', 'galacticCenterOfMass'], default: 'galacticCenter' }
+		},
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
 			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
