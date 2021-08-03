@@ -153,11 +153,11 @@ module.exports = class GameListService {
             'state.startDate': -1
         })
         .select({
-            _id: 1,
-            state: 1,
-            settings: 1,
-            'galaxy.players': 1
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
         })
+        .lean()
         .exec();
     }
 

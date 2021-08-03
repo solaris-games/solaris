@@ -1,5 +1,7 @@
 db.games.updateMany({}, {
     $set: {
-        'state.cleaned': false
+        'settings.orbitalMechanics': {
+            enabled: 'disabled'
+        }
     }
 });
