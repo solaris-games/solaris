@@ -1,4 +1,12 @@
 module.exports = {
+    getOrInsert (map, key, defaultFunc) {
+        let value = map.get(key);
+        if (!value) {
+            value = defaultFunc(key);
+            map.set(key, value);
+        }
+        return value;
+    },
     intersectionOfSets(a, b) {
         return new Set(Array.from(a).filter(x => b.has(x)));
     },

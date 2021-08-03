@@ -3,7 +3,7 @@ const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Heap = require('qheap');
-const { minBy, minElementBy } = require('../utils.js')
+const { getOrInsert, minBy, minElementBy } = require('../utils.js')
 const AIOrderService = require('./aiOrder.js');
 
 module.exports = class AIService {
@@ -69,35 +69,35 @@ module.exports = class AIService {
         const starScores = this._computeStarScores(game, player, playerStars, starGraph);
 
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(starGraph, starScores);
-        
-        const existingLoops = this._computeExistingCarrierLoops(game, player);
-        const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
+        const logisticsGraph = this._createLogisticsGraph(starGraph, starScores, playerStars);
+
+        // Graph of current carrier loops
+        const existingGraph = this._computeExistingLogisticsGraph(game, player);
 
         player.scheduledOrders = null; //Reset currently scheduled orders and begin anew
 
-        const logisticsOrders = this._createCarrierOrders(carrierLoops, existingLoops);
+        const logisticsOrders = this._createCarrierOrders(logisticsGraph, existingGraph);
 
         player.scheduledOrders = logisticsOrders;
     }
 
-    _computeExistingCarrierLoops(game, player) {
+    _computeExistingLogisticsGraph(game, player) {
         const loopedCarriers = this.carrierService.listCarriersOwnedByPlayer(game, player._id).filter(c => c.waypointsLooped && c.waypoints && c.waypoints.length === 2);
 
-        const loops = new Array(loopedCarriers.length);
+        const graph = new Map();
 
         for (let carrier of loopedCarriers) {
-            const from = carrier.waypoints.filter(waypoint => waypoint.action === "collectAll");
-            const to = carrier.waypoints.filter(waypoint => waypoint.action === "dropAll");
-            if (from && to) {
-                loops.push({
-                    from: from.destination.toString(), 
-                    to: to.destination.toString()
-                });
+            const fromWaypoint = carrier.waypoints.filter(waypoint => waypoint.action === "collectAll");
+            const toWaypoint = carrier.waypoints.filter(waypoint => waypoint.action === "dropAll");
+            if (fromWaypoint && toWaypoint) {
+                const from = fromWaypoint.destination.toString();
+                const to = toWaypoint.destination.toString();
+                const destinations = getOrInsert(graph, from, () => new Set());
+                destinations.add(to);
             }
         }
 
-        return loops;
+        return graph;
     }
 
     _computeStarGraph(game, player, playerStars) {
@@ -121,8 +121,8 @@ module.exports = class AIService {
         return starGraph;
     }
 
-    _createCarrierOrders(carrierLoops, existingLoops) {
-        return carrierLoops.map(loop => {
+    _createCarrierOrders(logisticsGraph, existingGraph) {
+        /*return [carrierLoops.map(loop => {
             return {
                 orderType: AIOrderService.ORDER_BUILD_AND_SEND_CARRIER,
                 data: {
@@ -146,22 +146,8 @@ module.exports = class AIService {
                 },
                 retryPolicy: "retry"
             }
-        });
-    }
-
-    _computeCarrierLoopsFromGraph(logisticsGraph, playerStars) {
-        const loops = new Array(logisticsGraph.size);
-
-        for (let [ destination, connected ] of logisticsGraph) {
-            for (let source of connected) {
-                loops.push({
-                    from: playerStars[source]._id.toString(),
-                    to: playerStars[destination]._id.toString()
-                })
-            }
-        }
-
-        return loops;
+        });]*/
+        return [];
     }
 
     _computeStarScores(game, player, playerStars, starGraph) {
@@ -196,7 +182,7 @@ module.exports = class AIService {
         return queue;
     }
 
-    _createLogisticsGraph(starGraph, starScores) {
+    _createLogisticsGraph(starGraph, starScores, playerStars) {
         const starQueue = this._createStarQueue(starScores);
         const logisticsGraph = new Map();
         
@@ -206,9 +192,10 @@ module.exports = class AIService {
             if (nextConnection) {
                 const newScore = highestScoredItem.score * 0.5;
                 starScores.set(highestScoredItem.starIndex, newScore);
-                const connections = logisticsGraph.get(nextConnection.from) || new Set();
-                connections.add(nextConnection.to);
-                logisticsGraph.set(nextConnection.from, connections);
+                const from = playerStars[nextConnection.from]._id.toString();
+                const to = playerStars[nextConnection.to]._id.toString();
+                const connections = getOrInsert(logisticsGraph, from, () => new Set());
+                connections.add(to);
             }
         }
 
