@@ -84,7 +84,7 @@ module.exports = class AIOrderService {
                 startAction = "collectAll";
                 endAction = "dropAll";
             } else if (Math.floor(toStar.shipsActual)) {
-                carrier = await this.starUpgradeService.buildCarrier(game, player, toStar._id, toStar.ships).carrier;
+                carrier = await this.starUpgradeService.buildCarrier(game, player, toStar._id, 1).carrier;
                 start = data.to;
                 end = data.from;
                 startAction = "dropAll";
