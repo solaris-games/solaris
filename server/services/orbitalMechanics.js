@@ -35,16 +35,14 @@ module.exports = class OrbitalMechanicsService {
         let speed = game.settings.orbitalMechanics.orbitSpeed;
         let direction = 1; // TODO: Fuck it, clockwise everything.
 
+        // TODO: Get this logic checked by someone who knows what maths is.
+        let r = Math.sqrt(Math.pow(Math.abs(objectWithLocation.location.x), 2) + Math.pow(objectWithLocation.location.y, 2));
+        let arcLength = speed / r * 100;
+        
         objectWithLocation.location = this.rotate(
             galaxyCenter.x, galaxyCenter.y,
             objectWithLocation.location.x, objectWithLocation.location.y, 
-            speed);
-        
-        // objectWithLocation.location = this.orbit(galaxyCenter, objectWithLocation.location, direction, speed);
-    }
-
-    orbit(location, orbitLocation, speed, direction) {
-
+            arcLength);
     }
 
     rotate(cx, cy, x, y, angle) {
