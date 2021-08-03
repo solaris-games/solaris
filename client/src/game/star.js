@@ -526,6 +526,7 @@ class Star extends EventEmitter {
         this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
+        this.text_infrastructure.alpha = 0.75;
 
         this.container.addChild(this.text_infrastructure)
       }
