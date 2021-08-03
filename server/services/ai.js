@@ -210,8 +210,8 @@ module.exports = class AIService {
         this._findConnectables(logisticsGraph, starGraph, starIndex, candidates, new Set());
 
         const starScore = starScores.get(starIndex);
-        const lowerConnections = Array.from(candidates).filter(c => starScores.get(c.to) < starScore);
-        return minElementBy((connection) => starScores.get(connection.to), lowerConnections)
+        const lowerConnections = Array.from(candidates).filter(c => starScores.get(c.from) < starScore);
+        return minElementBy((connection) => starScores.get(connection.from), lowerConnections)
     }
 
     _findConnectables(logisticsGraph, starGraph, start, connectables, visited) {
@@ -227,8 +227,8 @@ module.exports = class AIService {
                     this._findConnectables(logisticsGraph, starGraph, c, connectables, visited);
                 } else {
                     connectables.add({
-                        from: start,
-                        to: c
+                        to: start,
+                        from: c
                     });
                 }
             }            
