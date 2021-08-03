@@ -631,7 +631,7 @@ module.exports = class PlayerService extends EventEmitter {
     incrementMissedTurns(game) {
         for (let player of game.galaxy.players) {
             // If the player isn't ready, increase their number of missed turns.
-            if (!player.ready) {
+            if (!player.ready && !player.defeated) {
                 player.missedTurns++;
             }
             else {
