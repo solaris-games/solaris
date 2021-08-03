@@ -92,8 +92,8 @@ module.exports = class AIService {
             if (fromWaypoint && toWaypoint) {
                 const from = fromWaypoint.destination.toString();
                 const to = toWaypoint.destination.toString();
-                const destinations = getOrInsert(graph, from, () => new Set());
-                destinations.add(to);
+                const destinations = getOrInsert(graph, from, () => new Map());
+                destinations.set(to, carrier);
             }
         }
 
@@ -121,33 +121,35 @@ module.exports = class AIService {
         return starGraph;
     }
 
+    // logisticsGraph: Map<String, Set<String>>; existingGraph: Map<String, Map<String, String>>
     _createCarrierOrders(logisticsGraph, existingGraph) {
-        /*return [carrierLoops.map(loop => {
-            return {
-                orderType: AIOrderService.ORDER_BUILD_AND_SEND_CARRIER,
-                data: {
-                    waypoints: [ 
-                        {
-                            source: loop.from._id,
-                            destination: loop.to._id,
-                            action: "dropAll",
-                            actionShips: 0,
-                            delayTicks: 0
-                        }, 
-                        {
-                            source: loop.to._id,
-                            destination: loop.from._id,
-                            action: "collectAll",
-                            actionShips: 0,
-                            delayTicks: 0
+        const orders = new Array();
+
+        for (let [ from, destinations ] of logisticsGraph) {
+            const existingDestinations = existingGraph.get(from) || new Map();
+
+            for (let to of destinations) {
+                if (!existingDestinations.has(to)) {
+                    orders.push({
+                        orderType: AIOrderService.CREATE_CARRIER_LOOP,
+                        data: {
+                            from,
+                            to
                         }
-                    ],
-                    loop: true
-                },
-                retryPolicy: "retry"
+                    });
+                } else {
+                    existingDestinations.delete(to);
+                }
             }
-        });]*/
-        return [];
+        }
+
+        for (let [ _from, oldDestinations ] of existingGraph) {
+            for (let [ _to, carrier ] of oldDestinations) {
+                carrier.waypointsLooped = false;
+            }
+        }
+
+        return orders;
     }
 
     _computeStarScores(game, player, playerStars, starGraph) {

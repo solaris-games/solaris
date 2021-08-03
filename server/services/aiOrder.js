@@ -1,5 +1,5 @@
 module.exports = class AIOrderService {
-    static ORDER_BUILD_AND_SEND_CARRIER = "ORDER_BUILD_AND_SEND_CARRIER";
+    static CREATE_CARRIER_LOOP = "CREATE_CARRIER_LOOP";
 
     constructor(carrierService, waypointService, starService, starUpgradeService) {
         this.carrierService = carrierService;
@@ -7,7 +7,7 @@ module.exports = class AIOrderService {
         this.starService = starService;
         this.starUpgradeService = starUpgradeService;
         this.orderHandlers = {
-            ORDER_BUILD_AND_SEND_CARRIER: this._handleBuildAndSendCarrier.bind(this)
+            CREATE_CARRIER_LOOP: this._handleCreateCarrierLoop.bind(this)
         }
     }
 
@@ -45,13 +45,18 @@ module.exports = class AIOrderService {
         return false;
     }
 
-    async _handleBuildAndSendCarrier(game, player, data) {
-        if (!data.waypoints || !data.waypoints.length) {
+    async _handleCreateCarrierLoop(game, player, data) {
+        if (!data || !data.from || !data.to) {
             return false;
         }
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
         const carrierCost = this.starUpgradeService.calculateCarrierCost(game, expenseConfig);
+
+        return true;
+
+        /*
+
 
         const startingStar = this.starService.getById(game, data.waypoints[0].source);
         
@@ -64,7 +69,7 @@ module.exports = class AIOrderService {
             carrier = availableCarriers[0];
         } else {
             if (!Math.floor(startingStar.shipsActual) || player.credits < carrierCost) {
-                //Returning false means we either skip this order or retry next time
+                //Returning false means we retry next time
                 return false;
             }
             
@@ -74,6 +79,6 @@ module.exports = class AIOrderService {
         if (carrier) {
             await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
             return true;
-        }
+        }*/
     }
 }
