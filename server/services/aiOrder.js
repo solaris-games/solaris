@@ -53,32 +53,79 @@ module.exports = class AIOrderService {
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
         const carrierCost = this.starUpgradeService.calculateCarrierCost(game, expenseConfig);
 
-        return true;
+        const carriersAtFrom = this.getAvailableCarriersAtStar(game, player, data.from);
+        const carriersAtTo = this.getAvailableCarriersAtStar(game, player, data.to);
 
-        /*
-
-
-        const startingStar = this.starService.getById(game, data.waypoints[0].source);
-        
-        const carriersAtStar = this.carrierService.getCarriersAtStar(game, startingStar._id);
-        const carriersOfPlayer = this.carrierService.listCarriersOwnedByPlayer(carriersAtStar, player._id);
-        // For simplicity, only handle carriers that have no specialists
-        const availableCarriers = carriersOfPlayer.filter(carrier => !carrier.specialistId && (!carrier.waypoints || !carrier.waypoints.length));
         let carrier;
-        if (availableCarriers.length != 0) {
-            carrier = availableCarriers[0];
-        } else {
-            if (!Math.floor(startingStar.shipsActual) || player.credits < carrierCost) {
-                //Returning false means we retry next time
+        let start;
+        let startAction;
+        let end;
+        let endAction;
+
+        if (carriersAtFrom && carriersAtFrom.length != 0) {
+            carrier = carriersAtFrom[0];
+            start = data.from;
+            end = data.to;
+            startAction = "collectAll";
+            endAction = "dropAll";
+        } else if (carriersAtTo && carriersAtTo.length != 0) {
+            carrier = carriersAtTo[0];
+            start = data.to;
+            end = data.from;
+            startAction = "dropAll";
+            endAction = "collectAll";
+        } else if (player.credits >= carrierCost) {
+            const fromStar = this.starService.getById(game, data.from);
+            const toStar = this.starService.getById(game, data.to);
+            if (Math.floor(fromStar.shipsActual)) {
+                carrier = await this.starUpgradeService.buildCarrier(game, player, fromStar._id, fromStar.ships).carrier;
+                start = data.from;
+                end = data.to;
+                startAction = "collectAll";
+                endAction = "dropAll";
+            } else if (Math.floor(toStar.shipsActual)) {
+                carrier = await this.starUpgradeService.buildCarrier(game, player, toStar._id, toStar.ships).carrier;
+                start = data.to;
+                end = data.from;
+                startAction = "dropAll";
+                endAction = "collectAll";
+            } else {
+                // Neither star has a ship
                 return false;
             }
-            
-            carrier = await this.starUpgradeService.buildCarrier(game, player, startingStar._id, startingStar.ships).carrier;
+        } else {
+            // No carriers exist and we can't afford one
+            return false;
         }
 
-        if (carrier) {
-            await this.waypointService.saveWaypointsForCarrier(game, player, carrier, data.waypoints, Boolean(data.loop))
-            return true;
-        }*/
+        if (!carrier) {
+            return false;
+        }
+
+        const waypoints = [
+            {
+                source: start,
+                destination: end,
+                action: endAction,
+                actionShips: 0,
+                delayTicks: 0
+            },
+            {
+                source: end,
+                destination: start,
+                action: startAction,
+                actionShips: 0,
+                delayTicks: 0
+            }
+        ];
+
+        return Boolean(await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, true));
+    }
+
+    getAvailableCarriersAtStar (game, player, starId) {
+        const carriersAtStar = this.carrierService.getCarriersAtStar(game, starId);
+        const carriersOfPlayer = this.carrierService.listCarriersOwnedByPlayer(carriersAtStar, player._id);
+        // For simplicity, only handle carriers that have no specialists
+        return carriersOfPlayer.filter(carrier => !carrier.specialistId && (!carrier.waypoints || !carrier.waypoints.length));
     }
 }
