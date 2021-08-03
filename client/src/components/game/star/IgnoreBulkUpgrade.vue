@@ -42,7 +42,14 @@ export default {
     starId: String
   },
   methods: {
+    triggerChanged () {
+      this.$emit("bulkIgnoreChanged", { 
+        starId: this.starId
+      });
+    },
     async toggleBulkIgnore (infrastructureType) {
+      this.triggerChanged();
+      
       try {
         let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id, infrastructureType)
         
@@ -60,6 +67,8 @@ export default {
       }
     },
     async toggleBulkIgnoreAll (ignoreStatus) {
+      this.triggerChanged();
+
       try {
         let response = await starService.toggleIgnoreBulkUpgradeAll(this.$store.state.game._id, this.star._id, ignoreStatus)
         

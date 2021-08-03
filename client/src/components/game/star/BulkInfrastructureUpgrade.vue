@@ -90,7 +90,7 @@
       </table>
     </div>
     
-    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" />
+    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview" />
   </div>
 </template>
 
