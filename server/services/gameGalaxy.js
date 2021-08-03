@@ -334,6 +334,8 @@ module.exports = class GameGalaxyService {
 
             p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
+            
+            p.scheduledOrders = null; //For AI players. We never want to return this.
 
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
