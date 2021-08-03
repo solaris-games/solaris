@@ -71,11 +71,33 @@ module.exports = class AIService {
         // Graph of carrier movements for logistics
         const logisticsGraph = this._createLogisticsGraph(starGraph, starScores);
         
+        const existingLoops = this._computeExistingCarrierLoops(game, player);
         const carrierLoops = this._computeCarrierLoopsFromGraph(logisticsGraph, playerStars);
 
-        const logisticsOrders = this._createCarrierOrders(carrierLoops);
+        player.scheduledOrders = null; //Reset currently scheduled orders and begin anew
+
+        const logisticsOrders = this._createCarrierOrders(carrierLoops, existingLoops);
 
         player.scheduledOrders = logisticsOrders;
+    }
+
+    _computeExistingCarrierLoops(game, player) {
+        const loopedCarriers = this.carrierService.listCarriersOwnedByPlayer(game, player._id).filter(c => c.waypointsLooped && c.waypoints && c.waypoints.length === 2);
+
+        const loops = new Array(loopedCarriers.length);
+
+        for (let carrier of loopedCarriers) {
+            const from = carrier.waypoints.filter(waypoint => waypoint.action === "collectAll");
+            const to = carrier.waypoints.filter(waypoint => waypoint.action === "dropAll");
+            if (from && to) {
+                loops.push({
+                    from: from.destination.toString(), 
+                    to: to.destination.toString()
+                });
+            }
+        }
+
+        return loops;
     }
 
     _computeStarGraph(game, player, playerStars) {
@@ -99,7 +121,7 @@ module.exports = class AIService {
         return starGraph;
     }
 
-    _createCarrierOrders(carrierLoops) {
+    _createCarrierOrders(carrierLoops, existingLoops) {
         return carrierLoops.map(loop => {
             return {
                 orderType: AIOrderService.ORDER_BUILD_AND_SEND_CARRIER,
@@ -133,8 +155,8 @@ module.exports = class AIService {
         for (let [ destination, connected ] of logisticsGraph) {
             for (let source of connected) {
                 loops.push({
-                    from: playerStars[source],
-                    to: playerStars[destination]
+                    from: playerStars[source]._id.toString(),
+                    to: playerStars[destination]._id.toString()
                 })
             }
         }
