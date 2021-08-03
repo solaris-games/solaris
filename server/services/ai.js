@@ -82,7 +82,7 @@ module.exports = class AIService {
     }
 
     _computeExistingLogisticsGraph(game, player) {
-        const loopedCarriers = this.carrierService.listCarriersOwnedByPlayer(game, player._id).filter(c => c.waypointsLooped && c.waypoints && c.waypoints.length === 2);
+        const loopedCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).filter(c => c.waypointsLooped && c.waypoints && c.waypoints.length === 2);
 
         const graph = new Map();
 
