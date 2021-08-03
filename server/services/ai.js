@@ -21,16 +21,16 @@ module.exports = class AIService {
             throw new Error('The player is not under AI control.');
         }
 
-        await this._doAdvancedLogic(game, player);
+        const isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
+        const isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
 
-        await this._doBasicLogic(game, player);
+        await this._doAdvancedLogic(game, player, isFirstTick, isLastTick);
+
+        await this._doBasicLogic(game, player, isFirstTick, isLastTick);
     }
 
-    async _doBasicLogic(game, player) {
+    async _doBasicLogic(game, player, isFirstTick, isLastTick) {
         try {
-            let isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
-            let isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
-    
             if (isFirstTick) {
                 await this._playFirstTick(game, player);
             } else if (isLastTick) {
@@ -46,14 +46,15 @@ module.exports = class AIService {
         player.credits = Math.max(0, player.credits);
     }
 
-    async _doAdvancedLogic(game, player) {
+    async _doAdvancedLogic(game, player, isFirstTick, isLastTick) {
         // Considering the growing complexity of AI logic, 
         // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
         try {
-            if (!player.ai) {
+            if (isFirstTick || !player.ai) {
                 await this._setupAi(game, player);
                 player.ai = true;
             }
+
             await this.aiOrderService.processOrdersForPlayer(game, player);
         } catch (e) {
             console.error(e);
