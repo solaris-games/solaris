@@ -88,8 +88,8 @@ module.exports = class AIService {
         const graph = new Map();
 
         for (let carrier of loopedCarriers) {
-            const fromWaypoint = carrier.waypoints.filter(waypoint => waypoint.action === "collectAll");
-            const toWaypoint = carrier.waypoints.filter(waypoint => waypoint.action === "dropAll");
+            const fromWaypoint = carrier.waypoints.find(waypoint => waypoint.action === "collectAll");
+            const toWaypoint = carrier.waypoints.find(waypoint => waypoint.action === "dropAll");
             if (fromWaypoint && toWaypoint) {
                 const from = fromWaypoint.destination.toString();
                 const to = toWaypoint.destination.toString();
