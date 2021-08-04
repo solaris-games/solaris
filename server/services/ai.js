@@ -55,7 +55,7 @@ module.exports = class AIService {
                 player.ai = true;
             }
 
-            await this.aiOrderService.processOrdersForPlayer(game, player);
+            await this.aiOrderService.processOrdersForPlayer(game, player, player.scheduledOrders || []);
         } catch (e) {
             console.error(e);
         }
@@ -76,7 +76,7 @@ module.exports = class AIService {
 
         const logisticsOrders = this._createCarrierOrders(logisticsGraph, existingGraph);
 
-        player.scheduledOrders = logisticsOrders;
+        await this.aiOrderService.processOrdersForPlayer(game, player, logisticsOrders);
     }
 
     _computeExistingLogisticsGraph(game, player) {

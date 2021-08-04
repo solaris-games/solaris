@@ -11,14 +11,14 @@ module.exports = class AIOrderService {
         }
     }
 
-    async processOrdersForPlayer(game, player) {
-        if (!player.scheduledOrders) {
-            player.scheduledOrders = [];
+    async processOrdersForPlayer(game, player, orders) {
+        if (!orders) {
+            return;
         }
 
         const newOrders = [];
 
-        for (let order of player.scheduledOrders) {
+        for (let order of orders) {
             let success = false;
             try {
                 success = await this._performOrder(game, player, order.orderType, order.data);
