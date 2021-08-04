@@ -66,11 +66,8 @@ module.exports = class AIService {
 
         const starGraph = this._computeStarGraph(game, player, playerStars);
 
-        // Star systems with computed score based on distance to enemy
-        const starScores = this._computeStarScores(game, player, playerStars, starGraph);
-
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(starGraph, starScores, playerStars);
+        const logisticsGraph = this._createLogisticsGraph(game, player, starGraph , playerStars);
 
         // Graph of current carrier loops
         const existingGraph = this._computeExistingLogisticsGraph(game, player);
@@ -185,7 +182,8 @@ module.exports = class AIService {
         return queue;
     }
 
-    _createLogisticsGraph(starGraph, starScores, playerStars) {
+    _createLogisticsGraph(game, player, starGraph, playerStars) {
+        const starScores = this._computeStarScores(game, player, playerStars, starGraph);
         const starQueue = this._createStarQueue(starScores);
         const logisticsGraph = new Map();
         
