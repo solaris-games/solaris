@@ -5,7 +5,7 @@
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
-{{highlightIgnoredInfrastructure}}
+  
   <div class="row">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
