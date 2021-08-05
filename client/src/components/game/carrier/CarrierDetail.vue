@@ -134,7 +134,7 @@
 
       <div class="row bg-primary pt-2 pb-0 mb-0" v-if="hasWaypoints">
         <div class="col">
-          <p class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
+          <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
       </div>
 
@@ -190,6 +190,7 @@ import SpecialistIconVue from '../specialist/SpecialistIcon'
 import ModalButton from '../../modal/ModalButton'
 import DialogModal from '../../modal/DialogModal'
 import AudioService from '../../../game/audio'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
@@ -199,7 +200,8 @@ export default {
     'gift-carrier': GiftCarrierVue,
     'specialist-icon': SpecialistIconVue,
     'modalButton': ModalButton,
-    'dialogModal': DialogModal
+    'dialogModal': DialogModal,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   props: {
     carrierId: String

@@ -229,7 +229,7 @@ class GameHelper {
       str += `${days}d `
       showDays = true
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && hours === 0 && mins === 0 && secs === 0) {
         return str
       }
     }
@@ -238,7 +238,7 @@ class GameHelper {
       str += `${hours}h `
       showHours = true
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && mins === 0 && secs === 0) {
         return str
       }
     }
@@ -246,7 +246,7 @@ class GameHelper {
     if (showHours || mins > 0) {
       str += `${mins}m `
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && secs === 0) {
         return str
       }
     }
@@ -362,6 +362,10 @@ class GameHelper {
 
   isDarkModeExtra (game) {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
+  isOrbitalMechanicsEnabled (game) {
+    return game.settings.orbitalMechanics.enabled === 'enabled'
   }
 
   getGameStatusText (game) {

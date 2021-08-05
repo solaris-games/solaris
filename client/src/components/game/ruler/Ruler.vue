@@ -30,7 +30,7 @@
 
     <div class="row bg-secondary pt-2 pb-2">
       <div class="col-2">
-          ETA
+          ETA<orbital-mechanics-eta-warning />
       </div>
       <div class="col-5 text-right">
           <span title="ETA Base Speed">
@@ -119,10 +119,12 @@
 import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
-    'menu-title': MenuTitleVue
+    'menu-title': MenuTitleVue,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   data () {
     return {

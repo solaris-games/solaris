@@ -42,7 +42,7 @@
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->
-		  		<p class="mb-1" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
+		  		<p class="mb-1" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA<orbital-mechanics-eta-warning />: {{totalEtaTimeString}}</p>
 		  	</div>
 		  	<div class="col">
 		  		<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
@@ -79,11 +79,13 @@ import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
 import CarrierApiService from '../../../services/api/carrier'
 import AudioService from '../../../game/audio'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'form-error-list': FormErrorList
+    'form-error-list': FormErrorList,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   props: {
     carrierId: String
