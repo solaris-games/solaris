@@ -14,6 +14,12 @@
         <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">Open Game <i class="fas fa-arrow-right"></i> </router-link>
       </div>
 
+      <div class="row mb-2" v-if="game.settings.general.type === 'new_player_rt' || game.settings.general.type === 'new_player_tb'">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
       <view-subtitle title="General Settings"/>
       <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">

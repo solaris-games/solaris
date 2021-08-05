@@ -524,6 +524,7 @@ module.exports = class GameGalaxyService {
                 gameStar.warpGate = historyStar.warpGate;
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
                 gameStar.infrastructure = historyStar.infrastructure;
+                // gameStar.location = historyStar.location || gameStar.location; // TODO: Get this data in the history.
             }
         }
 

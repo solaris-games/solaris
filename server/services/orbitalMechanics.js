@@ -37,7 +37,12 @@ module.exports = class OrbitalMechanicsService {
 
         // TODO: Get this logic checked by someone who knows what maths is.
         let r = Math.sqrt(Math.pow(Math.abs(objectWithLocation.location.x), 2) + Math.pow(objectWithLocation.location.y, 2));
-        let arcLength = speed / r * 100;
+        
+        let arcLength = 0;
+
+        if (r !== 0) {
+            arcLength = speed / r * 100;
+        }
         
         objectWithLocation.location = this.rotate(
             galaxyCenter.x, galaxyCenter.y,

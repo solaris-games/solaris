@@ -134,7 +134,8 @@ module.exports = class HistoryService {
                 specialistId: s.specialistId,
                 warpGate: s.warpGate,
                 ignoreBulkUpgrade: s.ignoreBulkUpgrade,
-                infrastructure: s.infrastructure
+                infrastructure: s.infrastructure,
+                // location: s.location
             };
         });
 
