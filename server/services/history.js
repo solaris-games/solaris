@@ -135,7 +135,7 @@ module.exports = class HistoryService {
                 warpGate: s.warpGate,
                 ignoreBulkUpgrade: s.ignoreBulkUpgrade,
                 infrastructure: s.infrastructure,
-                // location: s.location
+                location: s.location
             };
         });
 

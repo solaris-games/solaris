@@ -524,7 +524,7 @@ module.exports = class GameGalaxyService {
                 gameStar.warpGate = historyStar.warpGate;
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
                 gameStar.infrastructure = historyStar.infrastructure;
-                // gameStar.location = historyStar.location || gameStar.location; // TODO: Get this data in the history.
+                gameStar.location = historyStar.location == null || (historyStar.location.x == null || historyStar.location.y == null) ? gameStar.location : historyStar.location; // TODO: May not have history for the star (BR Mode). Can delete this in a few months after the history is cleaned.
             }
         }
 

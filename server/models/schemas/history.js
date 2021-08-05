@@ -88,11 +88,10 @@ const schema = new Schema({
                 industry: { type: Types.Number, required: true },
                 science: { type: Types.Number, required: true }
             },
-            // TODO: Need a migration script for this.
-            // location: {
-            //     x: { type: Types.Number, required: true },
-            //     y: { type: Types.Number, required: true }
-            // }
+            location: {
+                x: { type: Types.Number, required: true },
+                y: { type: Types.Number, required: true }
+            }
         }
     ],
     carriers: [
