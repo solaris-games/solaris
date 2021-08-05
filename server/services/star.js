@@ -337,7 +337,7 @@ module.exports = class StarService extends EventEmitter {
         star.naturalResources -= amount;
 
         // if the star reaches 0 resources then reduce the star to a dead hunk.
-        if (star.naturalResources < 0) {
+        if (star.naturalResources <= 0) {
             star.naturalResources = 0;
             star.specialistId = null;
             star.warpGate = false;
