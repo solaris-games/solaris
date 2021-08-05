@@ -2,16 +2,26 @@
   <view-container>
     <view-title title="My Games" />
 
-    <h4>Active Games</h4>
+    <div class="row">
+      <div class="col">
+        <h4>Active Games</h4>
+      </div>
+      <div class="col-auto">
+        <input class="form-check-input" type="checkbox" v-model="includeDefeated" id="chkIncludeDefeated">
+        <label class="form-check-label" for="chkIncludeDefeated">
+          Show Defeated/AFK
+        </label>
+      </div>
+    </div>
 
     <loading-spinner :loading="isLoadingActiveGames"/>
 
-    <div v-if="!isLoadingActiveGames && !activeGames.length">
+    <div v-if="!isLoadingActiveGames && !filteredActiveGames.length">
         <p>You are not in any active games.</p>
     </div>
 
     <div class="table-responsive">
-      <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
+      <table v-if="!isLoadingActiveGames && filteredActiveGames.length" class="table table-striped table-hover">
           <thead>
               <tr class="bg-primary">
                   <td class="col">Name</td>
@@ -21,7 +31,7 @@
               </tr>
           </thead>
           <tbody>
-              <tr v-for="game in activeGames" v-bind:key="game._id">
+              <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
                   <td class="col">
                     {{game.settings.general.name}}
                     <span v-if="game.defeated && !game.afk" class="ml-1 badge badge-danger">Defeated</span>
@@ -103,7 +113,8 @@ export default {
       activeGames: [],
       completedGames: [],
       isLoadingActiveGames: true,
-      isLoadingCompletedGames: true
+      isLoadingCompletedGames: true,
+      includeDefeated: true
     }
   },
   async mounted () {
@@ -129,6 +140,15 @@ export default {
     },
     getEndDateFromNow (game) {
       return moment(game.state.endDate).fromNow()
+    }
+  },
+  computed: {
+    filteredActiveGames () {
+      if (this.includeDefeated) {
+        return this.activeGames
+      }
+
+      return this.activeGames.filter(g => !g.defeated)
     }
   }
 }
