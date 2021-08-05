@@ -73,6 +73,9 @@ module.exports = class GameTickService extends EventEmitter {
     
             logTime(`Tick ${game.state.tick}`);
 
+            this._sanitiseCarrierWaypoints(game);
+            logTime('Sanitise carrier waypoints');
+
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
 
@@ -536,6 +539,12 @@ module.exports = class GameTickService extends EventEmitter {
             for (let carrier of game.galaxy.carriers) {
                 this.orbitalMechanicsService.orbitCarrier(game, carrier);
             }
+        }
+    }
+
+    _sanitiseCarrierWaypoints(game) {
+        for (let carrier of game.galaxy.carriers) {
+            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
         }
     }
 }
