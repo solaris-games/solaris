@@ -189,6 +189,8 @@ class Map extends EventEmitter {
   }
 
   draw () {
+    this.drawGalaxyCenter()
+
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
     } else {
@@ -201,6 +203,25 @@ class Map extends EventEmitter {
       this.drawRulerPoints()
     } else {
       this.clearRulerPoints()
+    }
+  }
+
+  drawGalaxyCenter () {
+    // TODO: Is there any need to display the galaxy center for non orbital games?
+    if (this.game.constants.distances.galaxyCenterLocation
+      && this.game.settings.orbitalMechanics.enabled === 'enabled') {
+        let galaxyCenterGraphics = new PIXI.Graphics()
+        let location = this.game.constants.distances.galaxyCenterLocation
+        let size = 10
+
+        galaxyCenterGraphics.lineStyle(2, 0xFFFFFF, 1)
+        galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        galaxyCenterGraphics.alpha = 0.75
+
+        this.starContainer.addChild(galaxyCenterGraphics)
     }
   }
 

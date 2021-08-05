@@ -97,6 +97,11 @@ module.exports = class GameGalaxyService {
             this._setPlayerStats(game);
         }
 
+        // If any kind of dark mode, remove the galaxy center from the constants.
+        if (this.gameService.isDarkMode(game)) {
+            delete game.constants.distances.galaxyCenterLocation;
+        }
+
         if (isHistorical && cached) {
             cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }

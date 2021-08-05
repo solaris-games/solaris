@@ -94,6 +94,8 @@ module.exports = class GameCreateService {
 
         this.conversationService.createConversationAllPlayers(game);
 
+        this._setGalaxyCenter(game);
+
         let gameObject = await game.save();
 
         // TODO: This is a bit more complicated as we need to update the history
@@ -102,5 +104,11 @@ module.exports = class GameCreateService {
         // await this.historyService.log(gameObject);
         
         return gameObject;
+    }
+
+    _setGalaxyCenter(game) {
+        const starLocations = game.galaxy.stars.map(s => s.location);
+
+        game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
     }
 }

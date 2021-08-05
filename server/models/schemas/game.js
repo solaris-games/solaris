@@ -132,7 +132,11 @@ const schema = new Schema({
 			lightYear: { type: Types.Number, required: true, default: 50 },
 			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
 			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
-			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 }
+			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 },
+			galaxyCenterLocation: {
+				x: { type: Types.Number, required: false, default: 0 },
+				y: { type: Types.Number, required: false, default: 0 }
+			}
 		},
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 }
