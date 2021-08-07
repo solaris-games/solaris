@@ -22,6 +22,7 @@ import MyGuild from './views/guild/MyGuild.vue'
 import GuildCreate from './views/guild/GuildCreate.vue'
 import GuildDetails from './views/guild/GuildDetails.vue'
 import Administration from './views/Administration.vue'
+import GalaxyEditor from './views/GalaxyEditor.vue'
 
 Vue.use(Router)
 
@@ -101,6 +102,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/editor',
+      name: 'galaxy-editor',
+      component: GalaxyEditor
     },
     {
       path: '/main-menu',
