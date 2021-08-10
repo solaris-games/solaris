@@ -83,6 +83,6 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 1800,
-    "startDelay": 30
+    "startDelay": 60
   }
 }

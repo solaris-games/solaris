@@ -637,6 +637,26 @@
             {
                 "value": 240,
                 "text": "4 Hours"
+            },
+            {
+                "value": 360,
+                "text": "6 Hours"
+            },
+            {
+                "value": 480,
+                "text": "8 Hours"
+            },
+            {
+                "value": 600,
+                "text": "10 Hours"
+            },
+            {
+                "value": 720,
+                "text": "12 Hours"
+            },
+            {
+                "value": 1440,
+                "text": "1 Day"
             }
         ],
         "turnJumps": [
