@@ -1,12 +1,12 @@
-const cache = require('memory-cache');
 const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
+    constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
         guildUserService, historyService, battleRoyaleService) {
+        this.cacheService = cacheService;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -103,7 +103,7 @@ module.exports = class GameGalaxyService {
         }
 
         if (isHistorical && cached) {
-            cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
+            this.cacheService.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
 
         return game;
@@ -127,7 +127,7 @@ module.exports = class GameGalaxyService {
         let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
         let galaxy = null;
 
-        let cached = cache.get(cacheKey);
+        let cached = this.cacheService.get(cacheKey);
 
         if (cached) {
             galaxy = cached;
