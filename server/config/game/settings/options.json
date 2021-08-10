@@ -10,15 +10,6 @@
                 "text": "Battle Royale"
             }
         ],
-        "starVictoryPercentage": [
-            25,
-            33,
-            50,
-            66,
-            75,
-            90,
-            100
-        ],
         "playerLimit": [
             2,
             3,
@@ -324,6 +315,27 @@
             34,
             36
         ]
+        },
+        "conquest": {
+            "victoryCondition": [
+                {
+                    "value": "starPercentage",
+                    "text": "Star Percentage"
+                },
+                {
+                    "value": "homeStarPercentage",
+                    "text": "Capital Star Percentage"
+                }
+            ],
+            "victoryPercentage": [
+                25,
+                33,
+                50,
+                66,
+                75,
+                90,
+                100
+            ]
         },
         "orbitalMechanics": {
             "enabled": [

@@ -29,8 +29,12 @@
               <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
             </tr>
             <tr v-if="game.settings.general.mode === 'conquest'">
+              <td>Victory Condition</td>
+              <td class="text-right">{{ game.settings.conquest.victoryCondition }}%</td>
+            </tr>
+            <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Stars For Victory</td>
-              <td class="text-right">{{ game.settings.general.starVictoryPercentage }}%</td>
+              <td class="text-right">{{ game.settings.conquest.victoryPercentage }}%</td>
             </tr>
             <tr>
               <td>Players</td>
@@ -437,7 +441,9 @@ export default {
         'battleRoyale': 'Battle Royale',
         'establishedPlayers': 'Established Players Only',
         'galacticCenter': 'Galactic Center',
-        'galacticCenterOfMass': 'Galactic Center of Mass'
+        'galacticCenterOfMass': 'Galactic Center of Mass',
+        'starPercentage': 'Star Percentage',
+        'homeStarPercentage': 'Capital Star Percentage'
       }[option]
 
       return text || option

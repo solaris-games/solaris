@@ -47,7 +47,7 @@ module.exports = class ReponseService {
                 { name: "Type", value: game.settings.general.type, inline: true },
                 { name: "Mode", value: game.settings.general.mode, inline: true },
                 { name: "Featured", value: game.settings.general.featured ? "true" : "false", inline: true },//next line
-                { name: "Star % for Victory", value: game.settings.general.starVictoryPercentage, inline: true },
+                { name: "Star % for Victory", value: game.settings.conquest.victoryPercentage, inline: true },
                 { name: "Maximum Players", value: game.settings.general.playerLimit, inline: true },
                 { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
                 { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },

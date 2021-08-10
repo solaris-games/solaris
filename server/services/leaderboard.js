@@ -490,9 +490,14 @@ module.exports = class LeaderboardService {
                 if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
             }
 
+            // If conquest and home star percentage then use the home star total stars as the sort
+            // All other cases use totalStars
+            let totalStarsKey = game.settings.general.mode === 'conquest' 
+                && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars'
+
             // Sort by total stars descending
-            if (a.stats.totalStars > b.stats.totalStars) return -1;
-            if (a.stats.totalStars < b.stats.totalStars) return 1;
+            if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
+            if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
 
             // Then by total ships descending
             if (a.stats.totalShips > b.stats.totalShips) return -1;
@@ -608,8 +613,13 @@ module.exports = class LeaderboardService {
         // If that's equal, then pick the player who has the most carriers.
         let leaderboard = this.getLeaderboardRankings(game).leaderboard;
 
+        // If conquest and home star percentage then use the totalHomeStars as the sort
+        // All other cases use totalStars
+        let totalStarsKey = game.settings.general.mode === 'conquest' 
+            && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars';
+
         let starWinners = leaderboard
-            .filter(p => !p.player.defeated && p.stats.totalStars >= game.state.starsForVictory)
+            .filter(p => !p.player.defeated && p.stats[totalStarsKey] >= game.state.starsForVictory)
             .map(p => p.player);
 
         if (starWinners.length) {

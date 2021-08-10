@@ -1,0 +1,10 @@
+db.games.find({}).forEach(function(game) {
+    game.settings.conquest = {
+        victoryCondition: 'starPercentage',
+        victoryPercentage: game.settings.general.starVictoryPercentage
+    };
+
+    delete game.settings.general.starVictoryPercentage;
+
+    db.games.save(game);
+});

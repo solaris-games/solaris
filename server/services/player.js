@@ -367,6 +367,10 @@ module.exports = class PlayerService extends EventEmitter {
         return playerStars.length;
     }
 
+    calculateTotalHomeStars(playerStars) {
+        return playerStars.filter(s => s.homeStar).length;
+    }
+
     calculateTotalShips(ownedStars, ownedCarriers) {
         return ownedStars.reduce((sum, s) => sum + s.ships, 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
@@ -453,6 +457,7 @@ module.exports = class PlayerService extends EventEmitter {
         return {
             totalStars: totalStars,
             totalCarriers: playerCarriers.length,
+            totalHomeStars: this.calculateTotalHomeStars(playerStars),
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
             totalEconomy: this.calculateTotalEconomy(playerStars),
             totalIndustry: this.calculateTotalIndustry(playerStars),

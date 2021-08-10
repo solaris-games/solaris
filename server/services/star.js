@@ -362,7 +362,17 @@ module.exports = class StarService extends EventEmitter {
 
         // Recalculate how many stars are needed for victory in conquest mode.
         if (game.settings.general.mode === 'conquest') {
-            game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+            // TODO: Find a better place for this as its shared in the gameCreate service.
+            switch (game.settings.conquest.victoryCondition) {
+                case 'starPercentage':
+                    game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.conquest.victoryPercentage);
+                    break;
+                case 'homeStarPercentage':
+                    game.state.starsForVictory = Math.ceil((game.settings.general.playerLimit / 100) * game.settings.conquest.victoryPercentage);
+                    break;
+                default:
+                    throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`)
+            }
         }
     }
 

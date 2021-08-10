@@ -451,9 +451,14 @@ class GameHelper {
     // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
+        // If conquest and home star percentage then use the home star total stars as the sort
+        // All other cases use totalStars
+        let totalStarsKey = game.settings.general.mode === 'conquest' 
+            && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars'
+
         // Sort by total stars descending
-        if (a.stats.totalStars > b.stats.totalStars) return -1
-        if (a.stats.totalStars < b.stats.totalStars) return 1
+        if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
+        if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
 
         // Then by total ships descending
         if (a.stats.totalShips > b.stats.totalShips) return -1
