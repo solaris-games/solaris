@@ -2,7 +2,7 @@
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
       <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-warning"><i class="fas fa-calculator"></i></button>
-      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress" classText="btn btn-sm btn-secondary ml-1"><i class="fas fa-trash"></i></modalButton>
+      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && canScuttleCarrier" classText="btn btn-sm btn-secondary ml-1"><i class="fas fa-trash"></i></modalButton>
       <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer && isGameInProgress" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
@@ -428,6 +428,9 @@ export default {
   computed: {
     canGiftCarrier: function () {
       return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' && this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+    },
+    canScuttleCarrier: function () {
+      return this.isOwnedByUserPlayer && !this.userPlayer.defeated && this.isGameInProgress && !this.carrier.isGift
     },
     isUserPlayerCarrier: function () {
       return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id
