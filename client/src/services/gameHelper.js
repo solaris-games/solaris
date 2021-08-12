@@ -798,25 +798,25 @@ class GameHelper {
   }
 
   _getBankingCredits (game, player) {
-    const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0;
+    const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
 
     if (!bankingEnabled) {
-      return 0;
+      return 0
     }
 
-    const bankingLevel = player.research.banking.level;
+    const bankingLevel = player.research.banking.level
 
     switch (game.settings.technology.bankingReward) {
       case 'standard':
-          return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy));
+          return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy))
       case 'legacy':
-          return bankingLevel * 75;
+          return bankingLevel * 75
     }
   }
 
   calculateIncome (game, player) {
-    const fromEconomy = player.stats.totalEconomy * 10;
-    return fromEconomy + this._getBankingCredits(game, player);
+    const fromEconomy = player.stats.totalEconomy * 10
+    return fromEconomy + this._getBankingCredits(game, player)
   }
 }
 
