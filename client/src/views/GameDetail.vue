@@ -175,7 +175,7 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
-              <td>Enabled</td>
+              <td>Galaxy Rotation</td>
               <td class="text-right">{{ getFriendlyText(game.settings.orbitalMechanics.enabled) }}</td>
             </tr>
             <tr v-if="game.settings.orbitalMechanics.enabled === 'enabled'">

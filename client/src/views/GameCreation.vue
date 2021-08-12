@@ -297,7 +297,7 @@
       <view-subtitle title="Orbital Mechanics"/>
 
       <div class="form-group">
-        <label for="orbitalMechanicsEnabled" class="col-form-label">Enabled</label>
+        <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation</label>
         <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
           <option v-for="opt in options.orbitalMechanics.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
