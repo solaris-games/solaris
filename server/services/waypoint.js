@@ -61,6 +61,7 @@ module.exports = class WaypointService {
 
             // Make sure the user isn't being a dumbass.
             waypoint.actionShips = waypoint.actionShips || 0;
+            waypoint.action = waypoint.action || 'nothing';
 
             if (waypoint.actionShips == null || waypoint.actionShips == '' || +waypoint.actionShips < 0) {
                 waypoint.actionShips = 0;
