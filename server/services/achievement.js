@@ -44,6 +44,10 @@ module.exports = class AchievementService {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGatesDestroyed', amount);
     }
 
+    async incrementWarpGatesDestroyed(userId, amount = 1) {
+        return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGatesDestroyed', amount);
+    }
+
     async incrementCarriersBuilt(userId, amount = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.carriers', amount);
     }

@@ -6,7 +6,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/admin/user', middleware.authenticateAdmin, async (req, res, next) => {
         try {
-            let result = await container.adminService.listUsers();
+            let result = await container.adminService.listUsers(500);
             
             return res.status(200).json(result);
         } catch (err) {
@@ -88,6 +88,7 @@ module.exports = (router, io, container) => {
         try {
             req.session.userId = req.params.userId;
             req.session.username = req.body.username;
+            req.session.roles = req.body.roles;
             req.session.isImpersonating = true;
 
             return res.sendStatus(200);
@@ -96,7 +97,7 @@ module.exports = (router, io, container) => {
         }
     });
 
-    router.get('/api/admin/game', middleware.authenticateAdmin, async (req, res, next) => {
+    router.get('/api/admin/game', middleware.authenticateSubAdmin, async (req, res, next) => {
         try {
             let result = await container.adminService.listGames();
             
@@ -106,7 +107,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/game/:gameId/featured', middleware.authenticateAdmin, async (req, res, next) => {
+    router.patch('/api/admin/game/:gameId/featured', middleware.authenticateSubAdmin, async (req, res, next) => {
         try {
             await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
 

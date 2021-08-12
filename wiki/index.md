@@ -260,6 +260,22 @@ The combat calculator is a useful tool to predict the outcome of combat.
 Simply input the defender and attacker's weapons level and number of ships and
 it will present the outcome.
 
+### Combat Weapons Technology
+When specialists with Weapons buffs/debuffs participate in combat, the following rules apply:
+
+```
+effective weapons level = max debuff + max buff
+```
+
+1. Defender bonus is applied **after** effective weapons level is calculated.
+2. Weapon deductions (i.e Infiltrator specialist) is applied **after** effective weapons level is calculated.
+3. If multiple specialists with buffs/debuffs participate, then the **highest** buff and **lowest** debuff are used.
+
+For example:
+- Specialist A has Weapons +3
+- Specialist B has Weapons +1
+- Specialist C has Weapons -2
+- `effective weapons level = -2 + 3 = +1 weapons` *(Specialist B is ignored)*
 
 ## Science & Technology
 

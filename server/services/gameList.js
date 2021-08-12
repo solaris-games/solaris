@@ -45,17 +45,11 @@ module.exports = class GameListService {
 
     async listActiveGames(userId) {
         const games = await this.gameModel.find({
-            'galaxy.players': { $elemMatch: { userId } },   // User is in game
-            $and: [                                         // and (game is in progress AND user's player is not defeated)
-                { 'state.endDate': { $eq: null } },
-                { 
-                    'galaxy.players': { 
-                        $elemMatch: { 
-                            userId, 
-                            defeated: { $in: [ null, false ] } // Defeated either not set or is false.
-                        }
-                    }
-                }
+            'state.endDate': { $eq: null }, // Game is in progress
+            $or: [
+                // User is playing or has been afk'd
+                { 'galaxy.players': { $elemMatch: { userId } } },
+                { 'afkers': { $in: [userId] } }
             ]
         })
         .sort({
@@ -85,32 +79,25 @@ module.exports = class GameListService {
                 settings: game.settings,
                 state: game.state,
                 unread: unreadConversations + unreadEvents,
-                turnWaiting
+                turnWaiting,
+                defeated: player.defeated,
+                afk: player.afk
             }
         }))
     }
 
-    async listFinishedGames() {
-        return await this.gameModel.find({
-            'state.endDate': { $ne: null }
-        })
-        .select({
-            'settings.general.name': 1,
-            'settings.general.playerLimit': 1,
-            state: 1
-        })
-        .lean({ defaults: true })
-        .exec();
-    }
-
     async listCompletedGames(userId) {
-        let games = await this.gameModel.find({
-            'galaxy.players': { $elemMatch: { userId } },   // User is in game
-            $or: [                                          // and (game is in progress OR user's player is defeated)
-                { 'state.endDate': { $ne: null } },
-                { 'galaxy.players': { $elemMatch: { userId, defeated: true } } }
+        return await this.gameModel.find({
+            'state.endDate': { $ne: null }, // Game is finished
+            $or: [
+                // User was active in the game or has been afk'd
+                { 'galaxy.players': { $elemMatch: { userId } } },
+                { 'afkers': { $in: [userId] } }
             ]
         })
+        .sort({
+            'state.endDate': -1 // Sort end date descending (most recent ended games appear first)
+        })
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
@@ -118,18 +105,6 @@ module.exports = class GameListService {
         })
         .lean({ defaults: true })
         .exec();
-
-        // Sort the games by date date where in progress
-        // games are listed first.
-        let inProgress = games
-            .filter(x => !x.state.endDate)
-            .sort((a, b) => b.state.startDate - a.state.startDate);
-
-        let completed = games
-            .filter(x => x.state.endDate)
-            .sort((a, b) => b.state.endDate - a.state.endDate);
-
-        return inProgress.concat(completed);
     }
 
     async listOldCompletedGames(months = 1, cleaned = null) {
@@ -178,11 +153,11 @@ module.exports = class GameListService {
             'state.startDate': -1
         })
         .select({
-            _id: 1,
-            state: 1,
-            settings: 1,
-            'galaxy.players': 1
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
         })
+        .lean()
         .exec();
     }
 

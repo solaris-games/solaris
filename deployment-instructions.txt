@@ -1,5 +1,27 @@
-db.games.updateMany({}, {
+db.games.find({}).forEach(function(game) {
+    game.settings.conquest = {
+        victoryCondition: 'starPercentage',
+        victoryPercentage: game.settings.general.starVictoryPercentage
+    };
+
+    delete game.settings.general.starVictoryPercentage;
+
+    for (let player of game.galaxy.players) {
+        let homeStar = game.galaxy.stars.find(s => s._id.equals(player.homeStarId));
+
+        if (homeStar) {
+            homeStar.homeStar = true;
+        }
+    }
+
+    db.games.save(game);
+});
+
+db.users.updateMany({}, {
     $set: {
-        'state.cleaned': false
+        'achievements.combat.homeStars': {
+            captured: 0,
+            lost: 0
+        }
     }
 });

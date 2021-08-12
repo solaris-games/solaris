@@ -61,7 +61,7 @@ module.exports = class MapService {
             
             stars.push(star);
 
-            if (starLocation.isHomeStar) {
+            if (starLocation.homeStar) {
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
