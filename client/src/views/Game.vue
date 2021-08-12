@@ -131,6 +131,7 @@ export default {
           if (response.data._id) {
             this.$store.commit('setUserId', response.data._id)
             this.$store.commit('setUsername', response.data.username)
+            this.$store.commit('setRoles', response.data.roles)
           }
         }
       } catch (err) {

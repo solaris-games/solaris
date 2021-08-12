@@ -17,7 +17,8 @@ module.exports = class AuthService {
         }, {
             username: 1,
             password: 1,
-            banned: 1
+            banned: 1,
+            roles: 1
         })
         .lean()
         .exec();

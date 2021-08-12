@@ -4,61 +4,17 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link active" data-toggle="tab" href="#users">Users</a>
+          <a class="nav-link active" data-toggle="tab" href="#games">Games</a>
       </li>
-      <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#games">Games</a>
+      <li class="nav-item" v-if="isAdministrator">
+          <a class="nav-link" data-toggle="tab" href="#users">Users</a>
       </li>
     </ul>
 
     <loading-spinner :loading="isLoading"/>
 
     <div class="tab-content pt-2" v-if="!isLoading">
-      <div class="tab-pane fade show active" id="users">
-        <div v-if="users">
-          <h4 class="mb-1">Users</h4>
-          <small class="text-warning">Total Users: {{users.length}}</small>
-          <table class="mt-2 table table-sm table-striped table-responsive">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Last Seen</th>
-                <th>Roles</th>
-                <th>Credits</th>
-                <th>Email</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user of users" :key="user._id">
-                <td :title="user.email">{{user.username}}</td>
-                <td :title="getDuplicateIPs(user)" :class="{'text-warning':getDuplicateIPs(user).length}">{{getLastSeenString(user.lastSeen)}}</td>
-                <td>
-                  <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}" @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
-                  <i class="fas fa-code ml-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
-                  <i class="fas fa-user-friends ml-1 clickable" :class="{'disabled-role':!user.roles.communityManager}" @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
-                  <i class="fas fa-dice ml-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}" @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
-                </td>
-                <td>
-                  <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)" title="Deduct Credits"></i>
-                  {{user.credits}}
-                  <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)" title="Add Credits"></i>
-                </td>
-                <td><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
-                <td>
-                  <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">PW Reset</a>
-                </td>
-                <td>
-                  <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
-                  <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user)" title="Impersonate User"></i>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="tab-pane fade" id="games">
+      <div class="tab-pane fade show active" id="games">
         <div v-if="games">
           <h4 class="mb-1">Games</h4>
           <p><small class="text-warning">Total Games: {{games.length}}</small></p>
@@ -103,6 +59,50 @@
           </table>
         </div>
       </div>
+      <div class="tab-pane fade" id="users" v-if="isAdministrator">
+        <div v-if="users">
+          <h4 class="mb-1">Users</h4>
+          <small class="text-warning">Total Users: {{users.length}}</small>
+          <table class="mt-2 table table-sm table-striped table-responsive">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Last Seen</th>
+                <th>Roles</th>
+                <th>Credits</th>
+                <th>Email</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user of users" :key="user._id">
+                <td :title="user.email">{{user.username}}</td>
+                <td :title="getDuplicateIPs(user)" :class="{'text-warning':getDuplicateIPs(user).length}">{{getLastSeenString(user.lastSeen)}}</td>
+                <td>
+                  <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}" @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
+                  <i class="fas fa-code ml-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
+                  <i class="fas fa-user-friends ml-1 clickable" :class="{'disabled-role':!user.roles.communityManager}" @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
+                  <i class="fas fa-dice ml-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}" @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
+                </td>
+                <td>
+                  <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)" title="Deduct Credits"></i>
+                  {{user.credits}}
+                  <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)" title="Add Credits"></i>
+                </td>
+                <td><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
+                <td>
+                  <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">PW Reset</a>
+                </td>
+                <td>
+                  <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
+                  <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user)" title="Impersonate User"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </view-container>
 </template>
@@ -135,18 +135,21 @@ export default {
 
     try {
       let requests = [
-        AdminApiService.getUsers(),
         AdminApiService.getGames()
       ]
+
+      if (this.isAdministrator) {
+        requests.push(AdminApiService.getUsers())
+      }
 
       let responses = await Promise.all(requests)
       
       if (responses[0].status === 200) {
-        this.users = responses[0].data
+        this.games = responses[0].data
       }
       
-      if (responses[1].status === 200) {
-        this.games = responses[1].data
+      if (responses[1] && responses[1].status === 200) {
+        this.users = responses[1].data
       }
     } catch (err) {
       console.error(err)
@@ -215,10 +218,11 @@ export default {
     },
     async impersonate (user) {
       try {
-        await AdminApiService.impersonate(user._id, user.username)
+        await AdminApiService.impersonate(user._id, user.username, user.roles)
         
         this.$store.commit('setUserId', user._id)
         this.$store.commit('setUsername', user.username)
+        this.$store.commit('setRoles', user.roles)
 
         router.push({ name: 'home' })
       } catch (err) {
@@ -236,6 +240,11 @@ export default {
     },
     gameNeedsAttention (game) {
       return game.state.endDate && game.state.tick <= 12
+    }
+  },
+  computed: {
+    isAdministrator () {
+      return this.$store.state.roles.administrator
     }
   }
 }
