@@ -31,10 +31,19 @@
       </div>
 
       <div class="form-group" v-if="settings.general.mode === 'conquest'">
-        <label for="starsForVictory" class="col-form-label">Stars For Victory</label>
-        <select class="form-control" id="starsForVictory" v-model="settings.general.starVictoryPercentage" :disabled="isCreatingGame">
-          <option v-for="opt in options.general.starVictoryPercentage" v-bind:key="opt" v-bind:value="opt">
-            {{ opt }}% of all Stars
+        <label for="conquestVictoryCondition" class="col-form-label">Victory Condition</label>
+        <select class="form-control" id="conquestVictoryCondition" v-model="settings.conquest.victoryCondition" :disabled="isCreatingGame">
+          <option v-for="opt in options.conquest.victoryCondition" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.general.mode === 'conquest'">
+        <label for="conquestVictoryPercentage" class="col-form-label">Stars For Victory</label>
+        <select class="form-control" id="conquestVictoryPercentage" v-model="settings.conquest.victoryPercentage" :disabled="isCreatingGame">
+          <option v-for="opt in options.conquest.victoryPercentage" v-bind:key="opt" v-bind:value="opt">
+            {{ opt }}% of <span v-if="settings.conquest.victoryCondition === 'homeStarPercentage'">Capital</span> Stars
           </option>
         </select>
       </div>

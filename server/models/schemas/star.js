@@ -9,6 +9,7 @@ const schema = new Schema({
     ships: { type: Types.Number, required: true, default: 0 }, // TODO: ships could be a computed field or instead returned to the client floored.
     shipsActual: { type: Types.Number, required: true, default: 0 },
     specialistId: { type: Types.Number, required: false, default: null },
+    homeStar: { type: Types.Boolean, required: false, default: false },
     warpGate: { type: Types.Boolean, required: true, default: false },
     ignoreBulkUpgrade: {
         economy: { type: Types.Boolean, required: false, default: false },

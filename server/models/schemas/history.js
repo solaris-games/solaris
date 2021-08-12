@@ -12,6 +12,7 @@ const schema = new Schema({
             playerId: { type: Types.ObjectId, required: true },
             statistics: {
                 totalStars: { type: Types.Number, required: true, default: 0 },
+                totalHomeStars: { type: Types.Number, required: true, default: 0 },
                 totalEconomy: { type: Types.Number, required: true, default: 0 },
                 totalIndustry: { type: Types.Number, required: true, default: 0 },
                 totalScience: { type: Types.Number, required: true, default: 0 },
@@ -77,6 +78,7 @@ const schema = new Schema({
             ships: { type: Types.Number, required: true },
             shipsActual: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },
+            homeStar: { type: Types.Boolean, required: false, default: false },
             warpGate: { type: Types.Boolean, required: true },
             ignoreBulkUpgrade: {
                 economy: { type: Types.Boolean, required: false, default: false },
