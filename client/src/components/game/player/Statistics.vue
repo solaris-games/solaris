@@ -51,6 +51,13 @@
                 :class="{'text-danger': player.stats.newShips > userPlayer.stats.newShips,
                           'text-success': player.stats.newShips < userPlayer.stats.newShips}">{{userPlayer.stats.newShips}}</td>
           </tr>
+          <tr>
+            <td>Income Next Cycle</td>
+            <td class="text-right">${{playerIncome}}</td>
+            <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              :class="{'text-danger': playerIncome > userPlayerIncome,
+                        'text-success': playerIncome < userPlayerIncome}">${{userPlayerIncome}}</td>
+          </tr>
       </tbody>
   </table>
 
@@ -91,6 +98,12 @@ export default {
     },
     isConquestHomeStars () {
       return GameHelper.isConquestHomeStars(this.$store.state.game)
+    },
+    playerIncome () {
+      return GameHelper.calculateIncome(this.$store.state.game, this.player)
+    },
+    userPlayerIncome () {
+      return GameHelper.calculateIncome(this.$store.state.game, this.userPlayer)
     }
   }
 }
