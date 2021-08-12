@@ -328,6 +328,10 @@ module.exports = class CarrierService {
             throw new ValidationError(`Cannot scuttle carrier, you are not its owner.`);
         }
 
+        if (carrier.isGift) {
+            throw new ValidationError(`Cannot scuttle a gift.`);
+        }
+
         await this.gameModel.updateOne({
             _id: game._id
         }, {

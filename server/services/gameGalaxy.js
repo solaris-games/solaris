@@ -1,12 +1,12 @@
-const cache = require('memory-cache');
 const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
+    constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
         guildUserService, historyService, battleRoyaleService) {
+        this.cacheService = cacheService;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -97,8 +97,13 @@ module.exports = class GameGalaxyService {
             this._setPlayerStats(game);
         }
 
+        // If any kind of dark mode, remove the galaxy center from the constants.
+        if (this.gameService.isDarkMode(game)) {
+            delete game.constants.distances.galaxyCenterLocation;
+        }
+
         if (isHistorical && cached) {
-            cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
+            this.cacheService.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
 
         return game;
@@ -122,7 +127,7 @@ module.exports = class GameGalaxyService {
         let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
         let galaxy = null;
 
-        let cached = cache.get(cacheKey);
+        let cached = this.cacheService.get(cacheKey);
 
         if (cached) {
             galaxy = cached;
@@ -455,6 +460,10 @@ module.exports = class GameGalaxyService {
             3. Continue to run through current logic as we do today.
         */
 
+        if (this.gameService.isFinished(game)) {
+            return;
+        }
+
         if (!this.gameService.isStarted(game) || tick === 0) {
             return;
         }
@@ -523,9 +532,11 @@ module.exports = class GameGalaxyService {
                 gameStar.ships = historyStar.ships;
                 gameStar.shipsActual = historyStar.shipsActual;
                 gameStar.specialistId = historyStar.specialistId;
+                gameStar.homeStar = historyStar.homeStar;
                 gameStar.warpGate = historyStar.warpGate;
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
                 gameStar.infrastructure = historyStar.infrastructure;
+                gameStar.location = historyStar.location == null || (historyStar.location.x == null || historyStar.location.y == null) ? gameStar.location : historyStar.location; // TODO: May not have history for the star (BR Mode). Can delete this in a few months after the history is cleaned.
             }
         }
 

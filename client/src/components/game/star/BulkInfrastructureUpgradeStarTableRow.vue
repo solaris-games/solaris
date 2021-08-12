@@ -9,7 +9,7 @@
       <span v-if="star.infrastructure" class="text-info" title="Science">{{star.infrastructure.science}}</span>
     </td>
     <td class="last">
-      <ignore-bulk-upgrade :starId="star._id"/>
+      <ignore-bulk-upgrade :starId="star._id" :highlightIgnoredInfrastructure="highlightIgnoredInfrastructure"/>
     </td>
 </tr>
 </template>
@@ -26,7 +26,8 @@ export default {
     'ignore-bulk-upgrade': IgnoreBulkUpgradeVue
   },
   props: {
-    star: Object
+    star: Object,
+    highlightIgnoredInfrastructure: String
   },
   data () {
     return {

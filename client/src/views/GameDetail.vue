@@ -14,6 +14,12 @@
         <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">Open Game <i class="fas fa-arrow-right"></i> </router-link>
       </div>
 
+      <div class="row mb-2" v-if="game.settings.general.type === 'new_player_rt' || game.settings.general.type === 'new_player_tb'">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
       <view-subtitle title="General Settings"/>
       <div class="table-responsive" v-if="game">
         <table class="table table-striped table-hover">
@@ -23,8 +29,12 @@
               <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
             </tr>
             <tr v-if="game.settings.general.mode === 'conquest'">
+              <td>Victory Condition</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.conquest.victoryCondition) }}</td>
+            </tr>
+            <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Stars For Victory</td>
-              <td class="text-right">{{ game.settings.general.starVictoryPercentage }}%</td>
+              <td class="text-right">{{ game.settings.conquest.victoryPercentage }}%</td>
             </tr>
             <tr>
               <td>Players</td>
@@ -41,6 +51,40 @@
             <tr>
               <td>Player Online Status</td>
               <td class="text-right">{{ getFriendlyText(game.settings.general.playerOnlineStatus) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <view-subtitle title="Game Time Settings"/>
+      <div class="table-responsive" v-if="game">
+        <table class="table table-striped table-hover">
+          <tbody>
+            <tr>
+              <td>Game Type</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.gameTime.gameType) }}</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
+              <td>Game Time</td>
+              <td class="text-right" v-if="game.settings.gameTime.speed >= 60">{{ game.settings.gameTime.speed/60 }} minute(s)/tick</td>
+              <td class="text-right" v-if="game.settings.gameTime.speed < 60">{{ game.settings.gameTime.speed }} second(s)/tick</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
+              <td>Start Delay</td>
+              <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
+              <td>Turn Jumps</td>
+              <td class="text-right">{{ game.settings.gameTime.turnJumps }} tick jumps</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
+              <td>Max Turn Wait</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
+              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
+            </tr>
+            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
+              <td>Missed Turn Limit</td>
+              <td class="text-right">{{ game.settings.gameTime.missedTurnLimit }} missed turns</td>
             </tr>
           </tbody>
         </table>
@@ -121,6 +165,26 @@
             <tr>
               <td>Carrier Speed</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierSpeed) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <view-subtitle title="Orbital Mechanics"/>
+      <div class="table-responsive" v-if="game">
+        <table class="table table-striped table-hover">
+          <tbody>
+            <tr>
+              <td>Galaxy Rotation</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.orbitalMechanics.enabled) }}</td>
+            </tr>
+            <tr v-if="game.settings.orbitalMechanics.enabled === 'enabled'">
+              <td>Orbit Speed</td>
+              <td class="text-right">{{ game.settings.orbitalMechanics.orbitSpeed }}</td>
+            </tr>
+            <tr v-if="game.settings.orbitalMechanics.enabled === 'enabled'">
+              <td>Orbit Origin</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.orbitalMechanics.orbitOrigin) }}</td>
             </tr>
           </tbody>
         </table>
@@ -273,40 +337,6 @@
         </table>
       </div>
 
-      <view-subtitle title="Game Time Settings"/>
-      <div class="table-responsive" v-if="game">
-        <table class="table table-striped table-hover">
-          <tbody>
-            <tr>
-              <td>Game Type</td>
-              <td class="text-right">{{ getFriendlyText(game.settings.gameTime.gameType) }}</td>
-            </tr>
-            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
-              <td>Game Time</td>
-              <td class="text-right" v-if="game.settings.gameTime.speed >= 60">{{ game.settings.gameTime.speed/60 }} minute(s)/tick</td>
-              <td class="text-right" v-if="game.settings.gameTime.speed < 60">{{ game.settings.gameTime.speed }} second(s)/tick</td>
-            </tr>
-            <tr v-if="game.settings.gameTime.gameType === 'realTime'">
-              <td>Start Delay</td>
-              <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
-            </tr>
-            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-              <td>Turn Jumps</td>
-              <td class="text-right">{{ game.settings.gameTime.turnJumps }} tick jumps</td>
-            </tr>
-            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-              <td>Max Turn Wait</td>
-              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
-              <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
-            </tr>
-            <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-              <td>Missed Turn Limit</td>
-              <td class="text-right">{{ game.settings.gameTime.missedTurnLimit }} missed turns</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <div>
         <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
       </div>
@@ -409,7 +439,11 @@ export default {
         'creditsSpecialists': 'Specialist Tokens',
         'conquest': 'Conquest',
         'battleRoyale': 'Battle Royale',
-        'establishedPlayers': 'Established Players Only'
+        'establishedPlayers': 'Established Players Only',
+        'galacticCenter': 'Galactic Center',
+        'galacticCenterOfMass': 'Galactic Center of Mass',
+        'starPercentage': 'Star Percentage',
+        'homeStarPercentage': 'Capital Star Percentage'
       }[option]
 
       return text || option

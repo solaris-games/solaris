@@ -367,6 +367,10 @@ module.exports = class PlayerService extends EventEmitter {
         return playerStars.length;
     }
 
+    calculateTotalHomeStars(playerStars) {
+        return playerStars.filter(s => s.homeStar).length;
+    }
+
     calculateTotalShips(ownedStars, ownedCarriers) {
         return ownedStars.reduce((sum, s) => sum + s.ships, 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
@@ -444,6 +448,7 @@ module.exports = class PlayerService extends EventEmitter {
         let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
         let totalStars = playerStars.length;
+        let totalHomeStars = this.calculateTotalHomeStars(playerStars);
 
         // In BR mode, the player star count is based on living stars only.
         if (game.settings.general.mode === 'battleRoyale') {
@@ -452,6 +457,7 @@ module.exports = class PlayerService extends EventEmitter {
 
         return {
             totalStars: totalStars,
+            totalHomeStars: totalHomeStars,
             totalCarriers: playerCarriers.length,
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
             totalEconomy: this.calculateTotalEconomy(playerStars),
@@ -631,7 +637,7 @@ module.exports = class PlayerService extends EventEmitter {
     incrementMissedTurns(game) {
         for (let player of game.galaxy.players) {
             // If the player isn't ready, increase their number of missed turns.
-            if (!player.ready) {
+            if (!player.ready && !player.defeated) {
                 player.missedTurns++;
             }
             else {
@@ -652,34 +658,24 @@ module.exports = class PlayerService extends EventEmitter {
 
     isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
-        // 1. The afk threshold date is less than the last seen date
-        // 2. The number of missed turns is greater or equal to the missed turn liimt
-        // 3. The game is RT and the first cycle has completed and the player has not been seen since the start of the game
-        // 4. The game is TB and the first turn has been missed.
+        // 1. They haven't been seen for 2 days.
+        // 2. They missed the turn limit in a turn based game.
+        // 3. They missed 3 cycles in a real time game (minimum of 12 hours)
+        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
 
-        let seconds3Cycles = 3 * game.settings.galaxy.productionTicks * game.settings.gameTime.speed;
-        let lastSeenMoreThan3CyclesAgo = moment(player.lastSeen).utc() < moment().utc().subtract(seconds3Cycles, 'seconds');
+        if (lastSeenMoreThanXDaysAgo) {
+            return true;
+        }
 
         if (isTurnBasedGame) {
-            // Calculate what turn this is.
-            let isFirstTurn = game.state.tick <= game.settings.gameTime.turnJumps;
-
-            if (isFirstTurn) {
-                return player.missedTurns > 0; // Missed the first turn
-            } else {
-                return player.missedTurns >= game.settings.gameTime.missedTurnLimit || lastSeenMoreThan3CyclesAgo; // Reached turn limit or 3 cycles
-            }
-        } else {
-            // If we have reached the first production tick then check here to see if
-            // the player has been active during the first 2 cycles, this is normally 24h.
-            let isWithinCycle = game.state.tick === (game.settings.galaxy.productionTicks * 2);
-
-            if (isWithinCycle) {
-                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc(); // Not seen for 2 cycles
-            } else {
-                return lastSeenMoreThan3CyclesAgo; // Reached 3 cycles
-            }
+            return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
         }
+
+        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * 3;
+        let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
+        let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() < moment().utc().subtract(secondsToAfk, 'seconds');
+
+        return lastSeenMoreThanXSecondsAgo;
     }
 
     setPlayerAsDefeated(game, player) {

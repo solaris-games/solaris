@@ -39,6 +39,7 @@ module.exports = class HistoryService {
             tick: 1,
             'players.playerId': 1,
             'players.statistics.totalStars': 1,
+            'players.statistics.totalHomeStars': 1,
             'players.statistics.totalEconomy': 1,
             'players.statistics.totalIndustry': 1,
             'players.statistics.totalScience': 1,
@@ -99,6 +100,7 @@ module.exports = class HistoryService {
                 playerId: player._id,
                 statistics: {
                     totalStars: stats.totalStars,
+                    totalHomeStars: stats.totalHomeStars,
                     totalEconomy: stats.totalEconomy,
                     totalIndustry: stats.totalIndustry,
                     totalScience: stats.totalScience,
@@ -132,9 +134,11 @@ module.exports = class HistoryService {
                 ships: s.ships,
                 shipsActual: s.shipsActual,
                 specialistId: s.specialistId,
+                homeStar: s.homeStar,
                 warpGate: s.warpGate,
                 ignoreBulkUpgrade: s.ignoreBulkUpgrade,
-                infrastructure: s.infrastructure
+                infrastructure: s.infrastructure,
+                location: s.location
             };
         });
 

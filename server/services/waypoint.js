@@ -86,7 +86,13 @@ module.exports = class WaypointService {
                 waypoint.delayTicks = 0;
             }
 
-            if (sourceStar && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)) {
+            // Validate waypoint hyperspace range if:
+            // The waypoint is not the first waypoint in the array.
+            // The carrier isn't in transit to the first waypoint.
+            if (
+                (i > 0 || (i === 0 && !this.carrierService.isInTransit(carrier))) &&                    // Is one of the next waypoints OR is the first waypoint and isn't in transit
+                (sourceStar && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint))     // Validation of whether the waypoint is within hyperspace range
+            ) {
                 throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
             }
         }

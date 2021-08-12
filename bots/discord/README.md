@@ -52,6 +52,8 @@ The filters can be almost anything, the full list of possible filters is:
 - `specialists-lost`
 - `stars-captured`
 - `stars-lost`
+- `home-stars-captured`
+- `home-stars-lost`
 - `economy` built
 - `industry` built
 - `science` built

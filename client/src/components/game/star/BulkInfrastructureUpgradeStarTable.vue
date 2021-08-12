@@ -5,7 +5,7 @@
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
-
+  
   <div class="row">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
@@ -26,7 +26,8 @@
           </thead>
           <tbody>
               <star-row v-for="star in sortedTableData" v-bind:key="star._id" :star="star"
-                @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+                @onOpenStarDetailRequested="onOpenStarDetailRequested"
+                :highlightIgnoredInfrastructure="highlightIgnoredInfrastructure"/>
           </tbody>
       </table>
     </div>
@@ -43,6 +44,9 @@ import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeSt
 export default {
   components: {
     'star-row': BulkInfrastructureUpgradeStarTableRow
+  },
+  props: {
+      highlightIgnoredInfrastructure: String
   },
   data: function () {
     return {

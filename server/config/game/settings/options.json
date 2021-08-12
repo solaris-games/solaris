@@ -10,15 +10,6 @@
                 "text": "Battle Royale"
             }
         ],
-        "starVictoryPercentage": [
-            25,
-            33,
-            50,
-            66,
-            75,
-            90,
-            100
-        ],
         "playerLimit": [
             2,
             3,
@@ -325,6 +316,64 @@
             36
         ]
         },
+        "conquest": {
+            "victoryCondition": [
+                {
+                    "value": "starPercentage",
+                    "text": "Star Percentage"
+                },
+                {
+                    "value": "homeStarPercentage",
+                    "text": "Capital Star Percentage"
+                }
+            ],
+            "victoryPercentage": [
+                25,
+                33,
+                50,
+                66,
+                75,
+                90,
+                100
+            ]
+        },
+        "orbitalMechanics": {
+            "enabled": [
+                {
+                    "value": "enabled",
+                    "text": "Enabled"
+                },
+                {
+                    "value": "disabled",
+                    "text": "Disabled"
+                }
+            ],
+            "orbitSpeed": [
+                {
+                    "value": 5,
+                    "text": "Slow"
+                },
+                {
+                    "value": 10,
+                    "text": "Standard"
+                },
+                {
+                    "value": 25,
+                    "text": "Fast"
+                }
+            ],
+            "orbitOrigin": [
+                {
+                    "value": "galacticCenter",
+                    "text": "Galactic Center"
+                },
+                {
+                    "value": "galacticCenterOfMass",
+                    "text": "Galactic Center of Mass"
+                }
+            ]
+
+        },
         "player": {
         "startingStars": [
             1,
@@ -600,6 +649,26 @@
             {
                 "value": 240,
                 "text": "4 Hours"
+            },
+            {
+                "value": 360,
+                "text": "6 Hours"
+            },
+            {
+                "value": 480,
+                "text": "8 Hours"
+            },
+            {
+                "value": 600,
+                "text": "10 Hours"
+            },
+            {
+                "value": 720,
+                "text": "12 Hours"
+            },
+            {
+                "value": 1440,
+                "text": "1 Day"
             }
         ],
         "turnJumps": [

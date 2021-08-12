@@ -12,7 +12,8 @@
 
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
-            <p class="mb-0" v-if="game.settings.general.mode === 'conquest'">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
             <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
@@ -52,12 +53,20 @@
                             </span>
                           </h5>
                       </td>
-                      <td class="fit pt-3 pr-2">
+                      <td class="fit pt-3 pr-2" v-if="isConquestAllStars">
                         <span class="d-xs-block d-sm-none">
                           <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalStars}} Stars
+                        </span> 
+                      </td>
+                      <td class="fit pt-3 pr-2" v-if="isConquestHomeStars">
+                        <span class="d-xs-block d-sm-none">
+                          <i class="fas fa-star mr-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
+                        </span>
+                        <span class="d-none d-sm-block">
+                          {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Stars
                         </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
@@ -273,6 +282,12 @@ export default {
     },
     isDarkModeExtra () {
       return gameHelper.isDarkModeExtra(this.$store.state.game)
+    },
+    isConquestAllStars () {
+      return gameHelper.isConquestAllStars(this.$store.state.game)
+    },
+    isConquestHomeStars () {
+      return gameHelper.isConquestHomeStars(this.$store.state.game)
     }
   }
 }

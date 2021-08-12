@@ -57,6 +57,10 @@ export default {
         return
       }
 
+      if (this.playerIsOfficer && !await this.$confirm('Promote to Guild Leader', `${this.player.username} will be promoted to the Guild Leader and you will be demoted to Officer, are you sure?`)) {
+        return
+      }
+
       this.isLoading = true
 
       try {

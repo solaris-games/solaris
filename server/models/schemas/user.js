@@ -45,6 +45,10 @@ const schema = new Schema({
             stars: {
                 captured: { type: Types.Number, default: 0 },
                 lost: { type: Types.Number, default: 0 },
+            },
+            homeStars: {
+                captured: { type: Types.Number, default: 0 },
+                lost: { type: Types.Number, default: 0 },
             }
         },
         infrastructure: {

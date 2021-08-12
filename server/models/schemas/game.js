@@ -22,7 +22,6 @@ const schema = new Schema({
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
-			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
@@ -50,6 +49,15 @@ const schema = new Schema({
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
         },
+		conquest: {
+			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
+			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
+		},
+		orbitalMechanics: {
+			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			orbitSpeed: { type: Types.Number, required: false, enum: [5, 10, 25], default: 10 },
+			orbitOrigin: { type: Types.String, required: false, enum: ['galacticCenter', 'galacticCenterOfMass'], default: 'galacticCenter' }
+		},
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
 			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
@@ -96,7 +104,7 @@ const schema = new Schema({
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
 			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600], default: 1800 }, // Time in seconds
-			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240], default: 30 },	// Time in minutes
+			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
 			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 }
@@ -127,7 +135,11 @@ const schema = new Schema({
 			lightYear: { type: Types.Number, required: true, default: 50 },
 			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
 			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
-			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 }
+			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 },
+			galaxyCenterLocation: {
+				x: { type: Types.Number, required: false, default: 0 },
+				y: { type: Types.Number, required: false, default: 0 }
+			}
 		},
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 }

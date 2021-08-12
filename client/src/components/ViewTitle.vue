@@ -13,9 +13,9 @@
           <i class="far fa-comments"></i>
           <span class="d-none d-md-inline-block ml-1">Forum</span>
         </a>
-        <a class="btn btn-info ml-1" :href="documentationUrl" target="_blank" title="Wiki">
+        <a class="btn btn-info ml-1" :href="documentationUrl" target="_blank" title="How to Play">
           <i class="far fa-question-circle"></i>
-          <span class="d-none d-md-inline-block ml-1">Wiki</span>
+          <span class="d-none d-md-inline-block ml-1">How to Play</span>
         </a>
         <button v-if="navigation && !hideHomeButton" @click="navigate" id="btnHome" class="btn btn-info ml-1"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
