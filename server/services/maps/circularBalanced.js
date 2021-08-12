@@ -101,10 +101,10 @@ module.exports = class CircularBalancedMapService {
 
         for(let i=0; i<playerCount; i++) {
             let locationIndex = (firstHomeLocationIndex+i);
-            locations[locationIndex].isHomeStar = true;
+            locations[locationIndex].homeStar = true;
         }
         
-        let homeLocations = locations.filter( (location) => { return location.isHomeStar; } );
+        let homeLocations = locations.filter( (location) => { return location.homeStar; } );
         let initialHyperRange = game.settings.technology.startingTechnologyLevel.hyperspace;
         let startingStarsCount = game.settings.player.startingStars-1;
 
@@ -112,7 +112,7 @@ module.exports = class CircularBalancedMapService {
             homeLocation.linkedLocations = [];
         }
 
-        let unlinkedLocations = locations.filter( (loc) => { return !loc.isHomeStar;} );
+        let unlinkedLocations = locations.filter( (loc) => { return !loc.homeStar;} );
 
         while(startingStarsCount--) {
             for(let homeLocation of homeLocations) {

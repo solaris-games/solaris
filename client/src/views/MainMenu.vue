@@ -113,6 +113,7 @@ export default {
 
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
+      this.$store.commit('clearRoles')
 
       this.isLoggingOut = false
 

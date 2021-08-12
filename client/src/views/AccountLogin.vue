@@ -79,6 +79,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('setUserId', response.data._id)
           this.$store.commit('setUsername', response.data.username)
+          this.$store.commit('setRoles', response.data.roles)
 
           router.push({ name: 'main-menu' })
         }

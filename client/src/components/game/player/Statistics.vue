@@ -16,6 +16,13 @@
                 :class="{'text-danger': player.stats.totalStars > userPlayer.stats.totalStars,
                           'text-success': player.stats.totalStars < userPlayer.stats.totalStars}">{{userPlayer.stats.totalStars}}</td>
           </tr>
+          <tr v-if="isConquestHomeStars">
+              <td>Capitals</td>
+              <td class="text-right">{{player.stats.totalHomeStars}}</td>
+              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+                :class="{'text-danger': player.stats.totalHomeStars > userPlayer.stats.totalHomeStars,
+                          'text-success': player.stats.totalHomeStars < userPlayer.stats.totalHomeStars}">{{userPlayer.stats.totalHomeStars}}</td>
+          </tr>
           <tr>
               <td>Carriers</td>
               <td class="text-right">{{player.stats.totalCarriers}}</td>
@@ -89,11 +96,14 @@ export default {
     isDarkModeExtra () {
       return GameHelper.isDarkModeExtra(this.$store.state.game)
     },
+    isConquestHomeStars () {
+      return GameHelper.isConquestHomeStars(this.$store.state.game)
+    },
     playerIncome () {
-      return GameHelper.calculateIncome(this.$store.state.game, this.player);
+      return GameHelper.calculateIncome(this.$store.state.game, this.player)
     },
     userPlayerIncome () {
-      return GameHelper.calculateIncome(this.$store.state.game, this.userPlayer);
+      return GameHelper.calculateIncome(this.$store.state.game, this.userPlayer)
     }
   }
 }

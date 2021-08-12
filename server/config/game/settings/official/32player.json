@@ -5,7 +5,6 @@
     "type": "32_player_rt",
     "mode": "conquest",
     "password": null,
-    "starVictoryPercentage": 33,
     "playerLimit": 32,
     "playerType": "establishedPlayers",
     "anonymity": "normal",
@@ -31,6 +30,10 @@
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 20
+  },
+  "conquest": {
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 33
   },
   "orbitalMechanics": {
     "enabled": "disabled",

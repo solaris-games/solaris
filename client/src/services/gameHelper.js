@@ -368,6 +368,14 @@ class GameHelper {
     return game.settings.orbitalMechanics.enabled === 'enabled'
   }
 
+  isConquestAllStars (game) {
+    return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'starPercentage'
+  }
+
+  isConquestHomeStars (game) {
+    return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
+  }
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
@@ -451,9 +459,13 @@ class GameHelper {
     // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
+        // If conquest and home star percentage then use the home star total stars as the sort
+        // All other cases use totalStars
+        let totalStarsKey = this.isConquestHomeStars(game) ? 'totalHomeStars' : 'totalStars'
+
         // Sort by total stars descending
-        if (a.stats.totalStars > b.stats.totalStars) return -1
-        if (a.stats.totalStars < b.stats.totalStars) return 1
+        if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
+        if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
 
         // Then by total ships descending
         if (a.stats.totalShips > b.stats.totalShips) return -1

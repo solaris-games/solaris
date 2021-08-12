@@ -147,7 +147,7 @@ class Star extends EventEmitter {
     let isInScanningRange = this._isInScanningRange()
     let radius = 4
     let alpha = isInScanningRange ? 1 : 0.5
-    let starPoints = 6
+    let starPoints = this.data.homeStar ? 9 : 6
 
     let isDeadStar = this._isDeadStar()
     let fillStar = isInScanningRange && !isDeadStar

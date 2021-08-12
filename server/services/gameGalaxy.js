@@ -458,6 +458,10 @@ module.exports = class GameGalaxyService {
             3. Continue to run through current logic as we do today.
         */
 
+        if (this.gameService.isFinished(game)) {
+            return;
+        }
+
         if (!this.gameService.isStarted(game) || tick === 0) {
             return;
         }
@@ -526,6 +530,7 @@ module.exports = class GameGalaxyService {
                 gameStar.ships = historyStar.ships;
                 gameStar.shipsActual = historyStar.shipsActual;
                 gameStar.specialistId = historyStar.specialistId;
+                gameStar.homeStar = historyStar.homeStar;
                 gameStar.warpGate = historyStar.warpGate;
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
                 gameStar.infrastructure = historyStar.infrastructure;
