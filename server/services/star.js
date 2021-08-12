@@ -50,6 +50,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.shipsActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 star at the home star so that a carrier can be built there.
         homeStar.ships = homeStar.shipsActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
+        homeStar.homeStar = true;
         homeStar.warpGate = false;
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
@@ -304,6 +305,10 @@ module.exports = class StarService extends EventEmitter {
 
         if (carrierUser && !carrierPlayer.defeated) {
             carrierUser.achievements.combat.stars.captured++;
+
+            if (star.homeStar) {
+                carrierUser.achievements.combat.homeStars.captured++;
+            }
         }
     }
 
@@ -470,10 +475,18 @@ module.exports = class StarService extends EventEmitter {
 
         if (defenderUser && !defender.defeated) {
             defenderUser.achievements.combat.stars.lost++;
+
+            if (star.homeStar) {
+                defenderUser.achievements.combat.homeStars.lost++;
+            }
         }
         
         if (newStarUser && !newStarPlayer.defeated) {
             newStarUser.achievements.combat.stars.captured++;
+
+            if (star.homeStar) {
+                newStarUser.achievements.combat.homeStars.captured++;
+            }
         }
 
         this.emit('onStarCaptured', {
@@ -501,5 +514,9 @@ module.exports = class StarService extends EventEmitter {
             industry: false,
             science: false
         }
+    }
+
+    listHomeStars(game) {
+        return game.galaxy.stars.filter(s => s.homeStar);
     }
 }

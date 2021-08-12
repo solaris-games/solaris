@@ -30,7 +30,7 @@
             </tr>
             <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Victory Condition</td>
-              <td class="text-right">{{ game.settings.conquest.victoryCondition }}%</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.conquest.victoryCondition) }}</td>
             </tr>
             <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Stars For Victory</td>

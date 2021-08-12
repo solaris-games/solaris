@@ -114,7 +114,7 @@ module.exports = class GameCreateService {
                 case 'starPercentage':
                     return Math.ceil((game.state.stars / 100) * game.settings.conquest.victoryPercentage);
                 case 'homeStarPercentage':
-                    return Math.ceil((game.settings.general.playerLimit / 100) * game.settings.conquest.victoryPercentage);
+                    return Math.max(2, Math.ceil((game.settings.general.playerLimit / 100) * game.settings.conquest.victoryPercentage)); // At least 2 home stars needed to win.
                 default:
                     throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`)
             }

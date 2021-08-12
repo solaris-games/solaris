@@ -386,6 +386,8 @@ module.exports = class ReponseService {
                 { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true },//next line
                 { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true },
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
+                { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },
+                { name: "Capitals Lost", value: user.achievements.combat.homeStars.lost, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },//next line
                 { name: "Games", value: "⬅️⬅️⬅️", inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
