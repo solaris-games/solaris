@@ -814,9 +814,27 @@ class GameHelper {
     }
   }
 
+  _getUpkeepCosts(game, player) {
+    const upkeepCosts = {
+      'none': 0,
+      'cheap': 1,
+      'standard': 3,
+      'expensive': 6
+    };
+
+    const costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+
+    if (!costPerCarrier) {
+        return 0;
+    }
+
+    return player.stats.totalCarriers * costPerCarrier;
+  }
+
   calculateIncome (game, player) {
     const fromEconomy = player.stats.totalEconomy * 10
-    return fromEconomy + this._getBankingCredits(game, player)
+    const upkeep = this._getUpkeepCosts(game, player);
+    return fromEconomy - upkeep  + this._getBankingCredits(game, player);
   }
 }
 
