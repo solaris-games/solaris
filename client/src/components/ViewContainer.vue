@@ -16,7 +16,7 @@
                 <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="mr-2">
                   <i class="fab fa-discord"></i>
                 </a>
-                <a href="https://forum.solaris.games" target="_blank" title="Forum" class="mr-2">
+                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="mr-2">
                   <i class="far fa-comments"></i>
                 </a>
             </div>

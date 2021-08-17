@@ -18,11 +18,12 @@ class UserService extends BaseApiService {
     return axios.put(this.BASE_URL + 'user/settings', settings, { withCredentials: true })
   }
 
-  createUser (email, username, password) {
+  createUser (email, username, password, recaptchaToken) {
     return axios.post(this.BASE_URL + 'user', {
       email: email,
       username: username,
-      password: password
+      password: password,
+      recaptchaToken: recaptchaToken
     })
   }
 

@@ -350,16 +350,20 @@
             ],
             "orbitSpeed": [
                 {
-                    "value": 5,
+                    "value": 2.5,
                     "text": "Slow"
                 },
                 {
-                    "value": 10,
+                    "value": 5,
                     "text": "Standard"
                 },
                 {
-                    "value": 25,
+                    "value": 10,
                     "text": "Fast"
+                },
+                {
+                    "value": 25,
+                    "text": "Very Fast"
                 }
             ],
             "orbitOrigin": [
@@ -619,6 +623,10 @@
             {
                 "value": 3600,
                 "text": "Slow (1 tick = 1 hour)"
+            },
+            {
+                "value": 7200,
+                "text": "Very Slow (1 tick = 2 hours)"
             }
         ],
         "startDelay": [

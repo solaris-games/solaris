@@ -55,7 +55,7 @@ const schema = new Schema({
 		},
 		orbitalMechanics: {
 			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			orbitSpeed: { type: Types.Number, required: false, enum: [5, 10, 25], default: 10 },
+			orbitSpeed: { type: Types.Number, required: false, enum: [2.5, 5, 10, 25], default: 5 },
 			orbitOrigin: { type: Types.String, required: false, enum: ['galacticCenter', 'galacticCenterOfMass'], default: 'galacticCenter' }
 		},
         player: {
@@ -103,7 +103,7 @@ const schema = new Schema({
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600], default: 1800 }, // Time in seconds
+			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600, 7200], default: 1800 }, // Time in seconds
 			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes

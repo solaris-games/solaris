@@ -489,23 +489,11 @@ module.exports = class StarService extends EventEmitter {
             }
         }
 
-        this.emit('onStarCaptured', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player: newStarPlayer,
-            star,
-            capturedBy: newStarPlayer,
+        return {
+            capturedById: newStarPlayer._id,
+            capturedByAlias: newStarPlayer.alias,
             captureReward
-        });
-        
-        this.emit('onStarCaptured', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player: defender,
-            star,
-            capturedBy: newStarPlayer,
-            captureReward
-        });
+        };
     }
 
     resetIgnoreBulkUpgradeStatuses(star) {

@@ -34,6 +34,14 @@
             <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm" :disabled="isLoading">
           </div>
 
+          <div class="form-group" v-if="recaptchaEnabled">
+            <recaptcha
+              :sitekey="recaptchaSiteKey"
+              @verify="onRecaptchaVerify" 
+              @expired="onRecaptchaExpired">
+            </recaptcha>
+          </div>
+
           <div class="form-group">
             <div class="row">
               <div class="col-6">
@@ -56,6 +64,7 @@
 </template>
 
 <script>
+import VueRecaptcha from 'vue-recaptcha'
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import router from '../router'
@@ -68,7 +77,8 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'form-error-list': FormErrorList
+    'form-error-list': FormErrorList,
+    'recaptcha': VueRecaptcha
   },
   data () {
     return {
@@ -77,10 +87,17 @@ export default {
       email: null,
       username: null,
       password: null,
-      passwordConfirm: null
+      passwordConfirm: null,
+      recaptchaToken: null
     }
   },
   methods: {
+    onRecaptchaVerify (e) {
+      this.recaptchaToken = e
+    },
+    onRecaptchaExpired (e) {
+      this.recaptchaToken = null
+    },
     async handleSubmit (e) {
       this.errors = []
 
@@ -104,6 +121,10 @@ export default {
         this.errors.push('Passwords must match.')
       }
 
+      if (this.recaptchaEnabled && !this.recaptchaToken) {
+        this.errors.push('Please complete the Recaptcha')
+      }
+
       e.preventDefault()
 
       if (this.errors.length) return
@@ -112,7 +133,7 @@ export default {
         this.isLoading = true
 
         // Call the account create API endpoint
-        let response = await userService.createUser(this.email, this.username, this.password)
+        let response = await userService.createUser(this.email, this.username, this.password, this.recaptchaToken)
 
         if (response.status === 201) {
           this.$toasted.show(`Account created! Welcome ${this.username}!`, { type: 'success' })
@@ -124,6 +145,14 @@ export default {
       }
 
       this.isLoading = false
+    }
+  },
+  computed: {
+    recaptchaEnabled () {
+      return process.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
+    },
+    recaptchaSiteKey () {
+      return process.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
     }
   }
 }

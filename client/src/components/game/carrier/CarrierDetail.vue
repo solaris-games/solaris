@@ -329,7 +329,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     async onConfirmGiftCarrier (e) {
-      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift? If the carrier has a specialist, it will be retired.`)) {
+      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift? If the carrier has a specialist, it will be retired when it arrives at the destination.`)) {
         return
       }
 
