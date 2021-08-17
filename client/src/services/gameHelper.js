@@ -800,7 +800,7 @@ class GameHelper {
   _getBankingCredits (game, player) {
     const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
 
-    if (!bankingEnabled) {
+    if (!bankingEnabled || !player.stats.totalStars) {
       return 0
     }
 
