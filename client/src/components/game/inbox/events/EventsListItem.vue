@@ -21,7 +21,8 @@
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'"/>
         <player-credits-received :event="event" v-if="event.type === 'playerCreditsReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -39,9 +40,6 @@
         <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
         <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-        <player-star-captured :event="event" v-if="event.type === 'playerStarCaptured'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"
-            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-star-warp-gate-built :event="event" v-if="event.type === 'playerStarWarpGateBuilt'"
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         <player-star-warp-gate-destroyed :event="event" v-if="event.type === 'playerStarWarpGateDestroyed'"
@@ -86,7 +84,6 @@ import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
 import PlayerResearchCompleteVue from './PlayerResearchComplete'
 import PlayerStarAbandonedVue from './PlayerStarAbandoned'
-import PlayerStarCapturedVue from './PlayerStarCaptured'
 import PlayerStarWarpGateBuiltVue from './PlayerStarWarpGateBuilt'
 import PlayerStarWarpGateDestroyedVue from './PlayerStarWarpGateDestroyed'
 import PlayerTechnologyReceivedVue from './PlayerTechnologyReceived'
@@ -120,7 +117,6 @@ export default {
     'player-renown-sent': PlayerRenownSentVue,
     'player-research-complete': PlayerResearchCompleteVue,
     'player-star-abandoned': PlayerStarAbandonedVue,
-    'player-star-captured': PlayerStarCapturedVue,
     'player-star-warp-gate-built': PlayerStarWarpGateBuiltVue,
     'player-star-warp-gate-destroyed': PlayerStarWarpGateDestroyedVue,
     'player-technology-received': PlayerTechnologyReceivedVue,

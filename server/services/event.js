@@ -26,7 +26,6 @@ module.exports = class EventService {
         PLAYER_RENOWN_RECEIVED: 'playerRenownReceived',
         PLAYER_RENOWN_SENT: 'playerRenownSent',
         PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
-        PLAYER_STAR_CAPTURED: 'playerStarCaptured',
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
@@ -59,7 +58,7 @@ module.exports = class EventService {
         this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
         
         this.combatService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
-            args.gameId, args.gameTick, args.defender, args.attackers, args.star, args.combatResult));
+            args.gameId, args.gameTick, args.defender, args.attackers, args.star, args.combatResult, args.captureResult));
         this.combatService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
             args.gameId, args.gameTick, args.defender, args.attackers, args.combatResult));
         
@@ -72,7 +71,6 @@ module.exports = class EventService {
         
         this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
-        this.starService.on('onStarCaptured', (args) => this.createStarCapturedEvent(args.gameId, args.gameTick, args.player, args.star, args.capturedBy, args.captureReward));
         this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
         
         this.starUpgradeService.on('onPlayerWarpGateBuilt', (args) => this.createWarpGateBuiltEvent(args.gameId, args.gameTick, args.player, args.star));
@@ -299,13 +297,14 @@ module.exports = class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
-    async createPlayerCombatStarEvent(gameId, gameTick, defender, attackers, star, combatResult) {
+    async createPlayerCombatStarEvent(gameId, gameTick, defender, attackers, star, combatResult, captureResult) {
         let data = {
             playerIdDefender: defender._id,
             playerIdAttackers: attackers.map(p => p._id),
             starId: star._id,
             starName: star.name,
-            combatResult
+            combatResult,
+            captureResult
         };
 
         await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
@@ -437,19 +436,6 @@ module.exports = class EventService {
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
-    }
-
-    async createStarCapturedEvent(gameId, gameTick, player, star, capturedBy, creditsReward) {
-        let data = {
-            starId: star._id,
-            starName: star.name,
-            capturedBy: capturedBy._id,
-            creditsReward
-        };
-
-        // TODO: Need to save the alias for the player who captured the star as it could change.
-
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_CAPTURED, data);
     }
 
     async createInfrastructureBulkUpgraded(gameId, gameTick, player, upgradeReport) {

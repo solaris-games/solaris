@@ -9,7 +9,7 @@
           <i class="fab fa-discord"></i>
           <span class="d-none d-md-inline-block ml-1">Discord</span>
         </a>
-        <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://forum.solaris.games" target="_blank" title="Forum">
+        <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum">
           <i class="far fa-comments"></i>
           <span class="d-none d-md-inline-block ml-1">Forum</span>
         </a>

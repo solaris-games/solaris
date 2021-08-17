@@ -247,8 +247,10 @@ module.exports = class CombatService extends EventEmitter {
 
         // If the defender has been eliminated at the star then the attacker who travelled the shortest distance in the last tick
         // captures the star. Repeat star combat until there is only one player remaining.
+        let captureResult = null;
+
         if (star) {
-            this._starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+            captureResult = this._starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers);
         }
 
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
@@ -265,7 +267,8 @@ module.exports = class CombatService extends EventEmitter {
                 defender,
                 attackers,
                 star,
-                combatResult
+                combatResult,
+                captureResult
             });
         } else {
             this.emit('onPlayerCombatCarrier', {
@@ -297,10 +300,13 @@ module.exports = class CombatService extends EventEmitter {
     _starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers) {
         let starDefenderDefeated = star && !Math.floor(star.shipsActual) && !defenderCarriers.length;
         let hasAttackersRemaining = attackerCarriers.reduce((sum, c) => sum + c.ships, 0) > 0;
+        let hasCapturedStar = starDefenderDefeated && hasAttackersRemaining;
 
-        if (starDefenderDefeated && hasAttackersRemaining) {
-            this.starService.captureStar(game, star, defender, defenderUser, attackers, attackerUsers, attackerCarriers);
+        if (hasCapturedStar) {
+            return this.starService.captureStar(game, star, defender, defenderUser, attackers, attackerUsers, attackerCarriers);
         }
+
+        return null;
     }
 
     _distributeDamage(combatResult, damageObjects, shipsToKill) {

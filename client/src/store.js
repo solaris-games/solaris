@@ -114,6 +114,13 @@ export default new Vuex.Store({
         data.permitCallback(data.star)
       }
     },
+    starRightClicked (state, data) {
+      if (state.currentConversation && data.player) {
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+      } else {
+        data.permitCallback(data.star)
+      }
+    },
     replaceInConversationText (state, data) {
       MentionHelper.useSuggestion(state.currentConversation, data)
     },

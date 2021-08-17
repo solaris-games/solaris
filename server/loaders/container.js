@@ -49,6 +49,7 @@ const GuildService = require('../services/guild');
 const GuildUserService = require('../services/guildUser');
 const OrbitalMechanicsService = require('../services/orbitalMechanics');
 const CacheService = require('../services/cache');
+const RecaptchaService = require('../services/recaptcha');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -67,6 +68,7 @@ module.exports = (config, io) => {
     const authService = new AuthService(UserModel, passwordService);
     const userService = new UserService(UserModel, passwordService);
     const adminService = new AdminService(UserModel, GameModel);
+    const recaptchaService = new RecaptchaService();
 
     const guildService = new GuildService(GuildModel, UserModel);
     const guildUserService = new GuildUserService(UserModel, guildService);
@@ -160,5 +162,6 @@ module.exports = (config, io) => {
         battleRoyaleService,
         orbitalMechanicsService,
         cacheService,
+        recaptchaService,
     };
 };
