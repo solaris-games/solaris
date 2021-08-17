@@ -57,6 +57,7 @@ class Carrier extends EventEmitter {
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
     this.clearPaths() // clear on setup since this is used to reset waypoints
+    this.enableInteractivity()
   }
 
   draw () {
@@ -296,8 +297,14 @@ class Carrier extends EventEmitter {
   }
 
   enableInteractivity() {
-   this.container.interactive = true
-   this.container.buttonMode = true
+    // Can only be interactive if its in transit
+    if (!this.data.orbiting) {
+      this.container.interactive = true
+      this.container.buttonMode = true
+    } else {
+      this.container.interactive = false
+      this.container.buttonMode = false
+    }
   }
 
   disableInteractivity() {
@@ -379,7 +386,7 @@ class Carrier extends EventEmitter {
     this.zoomPercent = zoomPercent
   }
 
-  cleanup () {
+  cleanupEventHandlers () {
     this.container.off('pointerup', this.onClicked.bind(this))
     this.container.off('mouseover', this.onMouseOver.bind(this))
     this.container.off('mouseout', this.onMouseOut.bind(this))
