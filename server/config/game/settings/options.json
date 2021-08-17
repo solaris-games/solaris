@@ -350,15 +350,15 @@
             ],
             "orbitSpeed": [
                 {
-                    "value": 5,
+                    "value": 2.5,
                     "text": "Slow"
                 },
                 {
-                    "value": 10,
+                    "value": 5,
                     "text": "Standard"
                 },
                 {
-                    "value": 25,
+                    "value": 10,
                     "text": "Fast"
                 }
             ],

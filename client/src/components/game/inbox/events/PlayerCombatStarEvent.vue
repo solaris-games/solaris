@@ -67,6 +67,17 @@
                 </tbody>
             </table>
         </div>
+        <!-- TODO: Needs testing -->
+        <div v-if="event.data.captureResult">
+          <p>
+            The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a> has been captured
+            by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{event.data.captureResult.capturedByAlias}}</a>.
+          </p>
+          <p v-if="event.data.captureResult.creditsReward">
+            <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a> is awarded
+            <span class="text-warning">${{event.data.captureResult.creditsReward}}</span> credits.
+          </p>
+        </div>
     </div>
 </template>
 
@@ -99,6 +110,9 @@ export default {
   methods: {
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', this.event.data.starId)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     getCarrierColour (carrier) {
       return GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)

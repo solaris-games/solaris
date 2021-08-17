@@ -113,7 +113,7 @@ module.exports = (config, io) => {
         ledgerService, conversationService, combatService);
 
     const gameListService = new GameListService(GameModel, gameService, conversationService, eventService);
-    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
+    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService);
 
     return {
         adminService,
