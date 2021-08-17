@@ -229,7 +229,7 @@ class GameHelper {
       str += `${days}d `
       showDays = true
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && hours === 0 && mins === 0 && secs === 0) {
         return str
       }
     }
@@ -238,7 +238,7 @@ class GameHelper {
       str += `${hours}h `
       showHours = true
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && mins === 0 && secs === 0) {
         return str
       }
     }
@@ -246,7 +246,7 @@ class GameHelper {
     if (showHours || mins > 0) {
       str += `${mins}m `
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && secs === 0) {
         return str
       }
     }
@@ -364,6 +364,18 @@ class GameHelper {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
   }
 
+  isOrbitalMechanicsEnabled (game) {
+    return game.settings.orbitalMechanics.enabled === 'enabled'
+  }
+
+  isConquestAllStars (game) {
+    return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'starPercentage'
+  }
+
+  isConquestHomeStars (game) {
+    return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
+  }
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
@@ -447,9 +459,13 @@ class GameHelper {
     // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
+        // If conquest and home star percentage then use the home star total stars as the sort
+        // All other cases use totalStars
+        let totalStarsKey = this.isConquestHomeStars(game) ? 'totalHomeStars' : 'totalStars'
+
         // Sort by total stars descending
-        if (a.stats.totalStars > b.stats.totalStars) return -1
-        if (a.stats.totalStars < b.stats.totalStars) return 1
+        if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
+        if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
 
         // Then by total ships descending
         if (a.stats.totalShips > b.stats.totalShips) return -1
@@ -779,6 +795,46 @@ class GameHelper {
 
   isUserSpectatingGame (game) {
     return this.isGameInProgress(game) && !this.getUserPlayer(game)
+  }
+
+  _getBankingCredits (game, player) {
+    const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
+
+    if (!bankingEnabled || !player.stats.totalStars) {
+      return 0
+    }
+
+    const bankingLevel = player.research.banking.level
+
+    switch (game.settings.technology.bankingReward) {
+      case 'standard':
+          return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy))
+      case 'legacy':
+          return bankingLevel * 75
+    }
+  }
+
+  _getUpkeepCosts(game, player) {
+    const upkeepCosts = {
+      'none': 0,
+      'cheap': 1,
+      'standard': 3,
+      'expensive': 6
+    };
+
+    const costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+
+    if (!costPerCarrier) {
+        return 0;
+    }
+
+    return player.stats.totalCarriers * costPerCarrier;
+  }
+
+  calculateIncome (game, player) {
+    const fromEconomy = player.stats.totalEconomy * 10
+    const upkeep = this._getUpkeepCosts(game, player);
+    return fromEconomy - upkeep  + this._getBankingCredits(game, player);
   }
 }
 

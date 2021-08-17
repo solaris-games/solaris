@@ -2,36 +2,48 @@
   <view-container>
     <view-title title="My Games" />
 
-    <h4>Active Games</h4>
+    <div class="row">
+      <div class="col">
+        <h4>Active Games</h4>
+      </div>
+      <div class="col-auto">
+        <input class="form-check-input" type="checkbox" v-model="includeDefeated" id="chkIncludeDefeated">
+        <label class="form-check-label" for="chkIncludeDefeated">
+          Show Defeated/AFK
+        </label>
+      </div>
+    </div>
 
     <loading-spinner :loading="isLoadingActiveGames"/>
 
-    <div v-if="!isLoadingActiveGames && !activeGames.length">
+    <div v-if="!isLoadingActiveGames && !filteredActiveGames.length">
         <p>You are not in any active games.</p>
     </div>
 
     <div class="table-responsive">
-      <table v-if="!isLoadingActiveGames && activeGames.length" class="table table-striped table-hover">
+      <table v-if="!isLoadingActiveGames && filteredActiveGames.length" class="table table-striped table-hover">
           <thead>
               <tr class="bg-primary">
                   <td class="col">Name</td>
                   <td class="col text-center">Players</td>
-                  <td class="col d-none d-md-table-cell">Status</td>
+                  <td class="col d-none d-lg-table-cell">Status</td>
                   <td class="col-auto"></td>
               </tr>
           </thead>
           <tbody>
-              <tr v-for="game in activeGames" v-bind:key="game._id">
+              <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
                   <td class="col">
                     {{game.settings.general.name}}
-                    <span v-if="game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
                     <span v-if="isRealTimeGame(game)" class="ml-1 badge badge-danger">
                       {{getNextCycleText(game)}} <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
                     </span>
-                    <span v-if="game.unread" class="ml-2 badge badge-info">{{game.unread}} Notifications</span>
+                    <span v-if="game.defeated && !game.afk" class="ml-1 badge badge-danger">Defeated</span>
+                    <span v-if="!game.defeated && game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
+                    <span v-if="!game.defeated && game.unread" class="ml-1 badge badge-info">{{game.unread}} Notifications</span>
+                    <span v-if="game.afk" class="ml-1 badge badge-warning">AFK</span>
                   </td>
                   <td class="col text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
-                  <td class="col d-none d-md-table-cell">{{getGameStatusText(game)}}</td>
+                  <td class="col d-none d-lg-table-cell">{{getGameStatusText(game)}}</td>
                   <td class="col-auto btn-group">
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
                     <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
@@ -106,7 +118,8 @@ export default {
       activeGames: [],
       completedGames: [],
       isLoadingActiveGames: true,
-      isLoadingCompletedGames: true
+      isLoadingCompletedGames: true,
+      includeDefeated: true
     }
   },
   async mounted () {
@@ -114,6 +127,7 @@ export default {
       let response = await gameService.listActiveGames()
 
       this.activeGames = response.data
+        .sort((a, b) => (a.defeated - a.afk) - (b.defeated - b.afk))
 
       response = await gameService.listCompletedGames()
 
@@ -130,11 +144,16 @@ export default {
       return GameHelper.getGameStatusText(game)
     },
     getEndDateFromNow (game) {
-      if (!game.state.endDate) {
-        return 'In Progress'
+      return moment(game.state.endDate).fromNow()
+    }
+  },
+  computed: {
+    filteredActiveGames () {
+      if (this.includeDefeated) {
+        return this.activeGames
       }
 
-      return moment(game.state.endDate).fromNow()
+      return this.activeGames.filter(g => !g.defeated)
     },
     isRealTimeGame (game) {
       return GameHelper.isRealTimeGame(game);

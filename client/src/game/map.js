@@ -189,6 +189,8 @@ class Map extends EventEmitter {
   }
 
   draw () {
+    this.drawGalaxyCenter()
+
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
     } else {
@@ -201,6 +203,25 @@ class Map extends EventEmitter {
       this.drawRulerPoints()
     } else {
       this.clearRulerPoints()
+    }
+  }
+
+  drawGalaxyCenter () {
+    // TODO: Is there any need to display the galaxy center for non orbital games?
+    if (this.game.constants.distances.galaxyCenterLocation
+      && this.game.settings.orbitalMechanics.enabled === 'enabled') {
+        let galaxyCenterGraphics = new PIXI.Graphics()
+        let location = this.game.constants.distances.galaxyCenterLocation
+        let size = 10
+
+        galaxyCenterGraphics.lineStyle(2, 0xFFFFFF, 1)
+        galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        galaxyCenterGraphics.alpha = 0.75
+
+        this.starContainer.addChild(galaxyCenterGraphics)
     }
   }
 
@@ -462,7 +483,7 @@ class Map extends EventEmitter {
 
   _undrawCarrier (carrier) {
     carrier.removeAllListeners()
-    carrier.cleanup()
+    carrier.cleanupEventHandlers()
     carrier.clearPaths()
     
     this.carrierContainer.removeChild(carrier.fixedContainer)
@@ -724,10 +745,25 @@ class Map extends EventEmitter {
     })
   }
 
-  onStarRightClicked (e) {
-    if (this.mode === 'galaxy') {
-      this.emit('onStarRightClicked', e)
-    }
+  onStarRightClicked (dic) {
+    // ignore clicks if its a drag motion
+    let e = dic.starData
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+
+    let owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData)
+
+    // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
+    this.store.commit('starRightClicked', {
+      star: dic.starData,
+      player: owningPlayer,
+      permitCallback: () => {
+        dic.permitCallback && dic.permitCallback()
+        
+        if (this.mode === 'galaxy') {
+          this.emit('onStarRightClicked', e)
+        }
+      }
+    })
   }
 
   onCarrierClicked (dic) {

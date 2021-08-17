@@ -5,7 +5,6 @@
     "type": "1v1_tb",
     "mode": "conquest",
     "password": null,
-    "starVictoryPercentage": 66,
     "playerLimit": 2,
     "playerType": "establishedPlayers",
     "anonymity": "normal",
@@ -31,6 +30,15 @@
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10
+  },
+  "conquest": {
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 66
+  },
+  "orbitalMechanics": {
+    "enabled": "disabled",
+    "orbitSpeed": 5,
+    "orbitOrigin": "galacticCenter"
   },
   "player": {
     "startingStars": 6,

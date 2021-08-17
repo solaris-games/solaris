@@ -5,7 +5,11 @@
       <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{username || 'My account'}}</router-link>
     </div>
     <div class="col-auto">
-      <router-link :to="{ name: 'account-achievements', params: { userId: userId }}">
+      <router-link :to="{ name: 'administration'}" v-if="userHasAdminRole">
+        <i class="fas fa-users-cog"></i>
+        <span class="d-none d-md-inline-block ml-1">Admin</span>
+      </router-link>
+      <router-link :to="{ name: 'account-achievements', params: { userId: userId }}" class="ml-3">
         <i class="fas fa-medal"></i>
         <span class="d-none d-md-inline-block ml-1">Achievements</span>
       </router-link>
@@ -36,6 +40,7 @@ export default {
 
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
+      this.$store.commit('clearRoles')
 
       this.isLoggingOut = false
 
@@ -51,6 +56,9 @@ export default {
     },
     username () {
       return this.$store.state.username
+    },
+    userHasAdminRole () {
+      return this.$store.state.roles && (this.$store.state.roles.administrator || this.$store.state.roles.communityManager || this.$store.state.roles.gameMaster)
     }
   }
 }

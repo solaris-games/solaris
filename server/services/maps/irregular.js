@@ -306,7 +306,7 @@ module.exports = class IrregularMapService {
         //TODO move the pulling star logic --/--
 
         for(let homeLocation of homeLocations) {
-            homeLocation.isHomeStar = true;
+            homeLocation.homeStar = true;
             homeLocation.linkedLocations = [];
         }
 

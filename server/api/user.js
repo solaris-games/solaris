@@ -17,6 +17,7 @@ module.exports = (router, io, container) => {
 
     router.post('/api/user/', async (req, res, next) => {
         let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        let recaptchaEnabled = container.recaptchaService.isEnabled();
 
         try {
             let errors = [];
@@ -31,6 +32,10 @@ module.exports = (router, io, container) => {
 
             if (!req.body.password) {
                 errors.push('Password is a required field');
+            }
+
+            if (recaptchaEnabled && !req.body.recaptchaToken) {
+                errors.push('Recaptcha token is required');
             }
 
             if (errors.length) {
@@ -55,6 +60,17 @@ module.exports = (router, io, container) => {
 
             if (errors.length) {
                 throw new ValidationError(errors);
+            }
+
+            // Before we create a new account, verify that the user is not a robot.
+            if (recaptchaEnabled) {
+                try {
+                    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    
+                    await container.recaptchaService.verify(ip, req.body.recaptchaToken);
+                } catch (err) {
+                    throw new ValidationError(['Recaptcha is invalid']);
+                }
             }
 
             let userId = await container.userService.create({

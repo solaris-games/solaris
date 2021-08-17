@@ -46,6 +46,9 @@ const AIService = require('../services/ai');
 const AITradeService = require('../services/aiTrade');
 const GuildService = require('../services/guild');
 const GuildUserService = require('../services/guildUser');
+const OrbitalMechanicsService = require('../services/orbitalMechanics');
+const CacheService = require('../services/cache');
+const RecaptchaService = require('../services/recaptcha');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -64,6 +67,7 @@ module.exports = (config, io) => {
     const authService = new AuthService(UserModel, passwordService);
     const userService = new UserService(UserModel, passwordService);
     const adminService = new AdminService(UserModel, GameModel);
+    const recaptchaService = new RecaptchaService();
 
     const guildService = new GuildService(GuildModel, UserModel);
     const guildUserService = new GuildUserService(UserModel, guildService);
@@ -71,6 +75,7 @@ module.exports = (config, io) => {
     const broadcastService = new BroadcastService(io);
     const distanceService = new DistanceService();
     const randomService = new RandomService();
+    const cacheService = new CacheService();
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const achievementService = new AchievementService(UserModel);
@@ -99,9 +104,10 @@ module.exports = (config, io) => {
     const aiService = new AIService(starUpgradeService);
     const historyService = new HistoryService(HistoryModel, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
-    const gameGalaxyService = new GameGalaxyService(broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService);
+    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService);
+    const orbitalMechanicsService = new OrbitalMechanicsService(mapService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService);
     const shipTransferService = new ShipTransferService(GameModel, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);
 
@@ -152,5 +158,8 @@ module.exports = (config, io) => {
         aiService,
         aiTradeService,
         battleRoyaleService,
+        orbitalMechanicsService,
+        cacheService,
+        recaptchaService,
     };
 };

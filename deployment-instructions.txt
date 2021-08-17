@@ -1,5 +1,3 @@
-db.games.updateMany({}, {
-    $set: {
-        'state.cleaned': false
-    }
+db.gameevents.deleteMany({
+    'type': 'playerStarCaptured'
 });

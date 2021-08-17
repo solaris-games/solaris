@@ -30,6 +30,7 @@ class Background {
     this.game = game
     this.userSettings = userSettings
     this.rng = rng.create(game._id)
+    // TODO: This should use the constant?
     this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
     this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
     this.clear()

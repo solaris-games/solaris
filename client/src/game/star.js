@@ -147,7 +147,7 @@ class Star extends EventEmitter {
     let isInScanningRange = this._isInScanningRange()
     let radius = 4
     let alpha = isInScanningRange ? 1 : 0.5
-    let starPoints = 6
+    let starPoints = this.data.homeStar ? 9 : 6
 
     let isDeadStar = this._isDeadStar()
     let fillStar = isInScanningRange && !isDeadStar
@@ -526,6 +526,7 @@ class Star extends EventEmitter {
         this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
+        this.text_infrastructure.alpha = 0.75;
 
         this.container.addChild(this.text_infrastructure)
       }
@@ -637,11 +638,14 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
+    let eventData = e ? e.data : null
+    
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onStarRightClicked', this.data)
+      this.emit('onStarRightClicked', {
+        starData: this.data,
+        eventData
+      })
     } else {
-      let eventData = e ? e.data : null
-
       this.emit('onStarClicked', {
         starData: this.data,
         eventData,
