@@ -1,11 +1,3 @@
-db.games.updateMany({
-    'settings.orbitalMechanics.orbitSpeed': 25
-}, {
-    $set: {
-        'settings.orbitalMechanics.orbitSpeed': 10
-    }
-});
-
 db.gameevents.deleteMany({
     'type': 'playerStarCaptured'
 });

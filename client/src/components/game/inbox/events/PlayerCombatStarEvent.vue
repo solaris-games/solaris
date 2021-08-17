@@ -67,15 +67,17 @@
                 </tbody>
             </table>
         </div>
-        <!-- TODO: Needs testing -->
+        
+        <hr class="mt-0"/>
+
         <div v-if="event.data.captureResult">
           <p>
             The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a> has been captured
-            by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{event.data.captureResult.capturedByAlias}}</a>.
+            by <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a>.
           </p>
-          <p v-if="event.data.captureResult.creditsReward">
+          <p v-if="event.data.captureResult.captureReward">
             <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a> is awarded
-            <span class="text-warning">${{event.data.captureResult.creditsReward}}</span> credits.
+            <span class="text-warning">${{event.data.captureResult.captureReward}}</span> credits for destroying economic infrastructure.
           </p>
         </div>
     </div>

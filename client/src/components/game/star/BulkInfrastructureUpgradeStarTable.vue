@@ -1,12 +1,12 @@
 <template>
 <div class="container">
-  <div class="row mb-2">
+  <div class="row mb-2" v-if="tableData.length">
     <div class="col-6 pl-0">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
   
-  <div class="row">
+  <div class="row" v-if="tableData.length">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
           <thead>
@@ -32,8 +32,6 @@
       </table>
     </div>
   </div>
-
-  <p v-if="!tableData.length" class="text-center">You have no stars.</p>
 </div>
 </template>
 

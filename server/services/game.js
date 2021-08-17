@@ -202,7 +202,7 @@ module.exports = class GameService extends EventEmitter {
             
             // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
             if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
-                throw new ValidationError('You must complete a "New Player" game before you can join an official game. You are free to create or join custom games.');
+                throw new ValidationError('You must complete a "New Player" game or a custom game before you can join an official game.');
             }
         }
 

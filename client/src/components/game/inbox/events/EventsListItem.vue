@@ -21,7 +21,8 @@
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'"/>
         <player-credits-received :event="event" v-if="event.type === 'playerCreditsReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>

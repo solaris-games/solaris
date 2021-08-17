@@ -360,6 +360,10 @@
                 {
                     "value": 10,
                     "text": "Fast"
+                },
+                {
+                    "value": 25,
+                    "text": "Very Fast"
                 }
             ],
             "orbitOrigin": [
