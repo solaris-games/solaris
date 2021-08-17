@@ -254,7 +254,6 @@ module.exports = class CarrierService {
             $set: {
                 'galaxy.carriers.$.isGift': true,
                 'galaxy.carriers.$.waypointsLooped': false,
-                'galaxy.carriers.$.specialistId': null,
                 'galaxy.carriers.$.waypoints': [firstWaypoint]
             }
         })
