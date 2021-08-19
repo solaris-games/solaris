@@ -69,13 +69,13 @@
         </button>
 			</div>
 			<div class="col-auto" v-if="!$isHistoricalMode()">
-				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ml-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
-          <i class="fas fa-edit"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-check"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Close</span>
         </button>
 			</div>
 		</div>
