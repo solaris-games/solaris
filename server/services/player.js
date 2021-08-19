@@ -495,7 +495,7 @@ module.exports = class PlayerService extends EventEmitter {
         let creditsFromEconomy = totalEco * 10;
         let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
-        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player);
+        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player, playerStars);
 
         player.credits += creditsTotal;
         player.creditsSpecialists += creditsFromSpecialistsTechnology;
@@ -531,7 +531,7 @@ module.exports = class PlayerService extends EventEmitter {
         if (!playerStars.length) {
             return 0;
         }
-        
+
         let isSpecialistsCreditsEnabled = this.technologyService.isTechnologyEnabled(game, 'specialists');
         let isCreditsSpecialistsCurrency = game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists';
 
