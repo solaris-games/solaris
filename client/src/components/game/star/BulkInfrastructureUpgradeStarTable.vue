@@ -26,6 +26,7 @@
           </thead>
           <tbody>
               <star-row v-for="star in sortedTableData" v-bind:key="star._id" :star="star"
+                @bulkIgnoreChanged="onBulkIgnoreChanged"
                 @onOpenStarDetailRequested="onOpenStarDetailRequested"
                 :highlightIgnoredInfrastructure="highlightIgnoredInfrastructure"/>
           </tbody>
@@ -58,6 +59,9 @@ export default {
     this.tableData = this.getTableData()
   },
   methods: {
+    onBulkIgnoreChanged (e) {
+      this.$emit('bulkIgnoreChanged', e);
+    },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
