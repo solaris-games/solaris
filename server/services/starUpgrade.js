@@ -639,7 +639,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     _calculateInfrastructureCost(baseCost, expenseConfig, current, terraformedResources) {
-        return Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100));
+        return Math.max(1, Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)));
     }
 
     calculateCarrierCost(game, expenseConfig) {
