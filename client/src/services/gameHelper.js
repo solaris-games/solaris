@@ -256,6 +256,20 @@ class GameHelper {
     return str
   }
 
+  getCountdownTimeForProductionCycle (game) {
+    const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
+    
+    return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, moment().utc());
+  }
+
+  getCountdownTimeForTurnTimeout (game) {
+    return moment(game.state.lastTickDate).utc().add('minutes', game.settings.gameTime.maxTurnWait)
+  }
+
+  getCountdownTimeStringForTurnTimeout (game) {
+    return this.getCountdownTimeString(game, this.getCountdownTimeForTurnTimeout(game))
+  }
+
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
   calculateWaypointTicks (game, carrier, waypoint) {
