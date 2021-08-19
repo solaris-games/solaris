@@ -1,3 +1,7 @@
 db.gameevents.deleteMany({
-    'type': 'playerStarCaptured'
+    'type': 'playerStarWarpGateBuilt'
+});
+
+db.gameevents.deleteMany({
+    'type': 'playerStarWarpGateDestroyed'
 });

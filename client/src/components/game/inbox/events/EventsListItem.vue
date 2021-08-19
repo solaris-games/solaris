@@ -40,10 +40,6 @@
         <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
         <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"
             @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-        <player-star-warp-gate-built :event="event" v-if="event.type === 'playerStarWarpGateBuilt'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-        <player-star-warp-gate-destroyed :event="event" v-if="event.type === 'playerStarWarpGateDestroyed'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         <player-technology-received :event="event" v-if="event.type === 'playerTechnologyReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"
@@ -84,8 +80,6 @@ import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
 import PlayerResearchCompleteVue from './PlayerResearchComplete'
 import PlayerStarAbandonedVue from './PlayerStarAbandoned'
-import PlayerStarWarpGateBuiltVue from './PlayerStarWarpGateBuilt'
-import PlayerStarWarpGateDestroyedVue from './PlayerStarWarpGateDestroyed'
 import PlayerTechnologyReceivedVue from './PlayerTechnologyReceived'
 import PlayerTechnologySentVue from './PlayerTechnologySent'
 import PlayerDebtForgivenVue from './PlayerDebtForgiven'
@@ -117,8 +111,6 @@ export default {
     'player-renown-sent': PlayerRenownSentVue,
     'player-research-complete': PlayerResearchCompleteVue,
     'player-star-abandoned': PlayerStarAbandonedVue,
-    'player-star-warp-gate-built': PlayerStarWarpGateBuiltVue,
-    'player-star-warp-gate-destroyed': PlayerStarWarpGateDestroyedVue,
     'player-technology-received': PlayerTechnologyReceivedVue,
     'player-technology-sent': PlayerTechnologySentVue,
     'player-debt-forgiven': PlayerDebtForgivenVue,
