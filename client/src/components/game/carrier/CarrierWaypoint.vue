@@ -121,7 +121,7 @@ export default {
     this.panToWaypoint()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateWaypointEta, 200)
+      this.intervalFunction = setInterval(this.recalculateWaypointEta, 1000)
       this.recalculateWaypointEta()
     }
   },
