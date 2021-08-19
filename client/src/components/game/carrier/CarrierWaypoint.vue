@@ -20,7 +20,7 @@
         
         <div class="row no-gutters mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
-              <input type="number" class="form-control input-sm" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
+              <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
             </div>
             <div class="col-3 text-center pt-1">
                 <!-- <a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(currentWaypoint.destination)}}</a> -->
@@ -263,11 +263,17 @@ export default {
       }
 
       this.waypointEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicks)
+    },
+    isFirstWaypoint (waypoint) {
+      return this.waypoints.indexOf(waypoint) === 0
     }
   },
   computed: {
     canLoop () {
       return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
+    },
+    isInTransit () {
+      return !this.carrier.orbiting
     }
   }
 }
