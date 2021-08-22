@@ -30,7 +30,7 @@ const schema = new Schema({
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
         },
         galaxy: {
-			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular'], default: 'circular' },
+			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30, 50], default: 20 },
 			productionTicks: { type: Types.Number, required: true, enum: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
