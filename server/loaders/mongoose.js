@@ -52,7 +52,8 @@ module.exports = async (config, options) => {
     const db = await mongoose.connect(options.connectionString, {
         useNewUrlParser: true,
         useCreateIndex: true,
-        keepAlive: true
+        keepAlive: true,
+        poolSize: process.env.CONNECTION_POOL_SIZE || 5
     });
 
     await unlockAgendaJobs(db);
