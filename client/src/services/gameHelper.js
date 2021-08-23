@@ -182,13 +182,23 @@ class GameHelper {
     return ticksToProduction
   }
 
-  getCountdownTimeString (game, date, largestUnitOnly = false) {
+  getCountdownTime (game, date) {
     if (date == null) {
       return 'Unknown'
     }
 
     let relativeTo = moment().utc()
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
+
+    return t
+  }
+
+  getCountdownTimeString (game, date, largestUnitOnly = false) {
+    if (date == null) {
+      return 'Unknown'
+    }
+
+    let t = this.getCountdownTime(game, date)
 
     return this.getDateToString(t, largestUnitOnly)
   }
@@ -259,7 +269,7 @@ class GameHelper {
   getCountdownTimeForProductionCycle (game) {
     const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
     
-    return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, moment().utc());
+    return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
   }
 
   getCountdownTimeForTurnTimeout (game) {

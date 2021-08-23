@@ -9,7 +9,8 @@ async function startup() {
     const container = containerLoader(config, null);
 
     mongo = await mongooseLoader(config, {
-        syncIndexes: true
+        syncIndexes: true,
+        poolSize: 1
     });
     
     console.log('MongoDB Intialized');

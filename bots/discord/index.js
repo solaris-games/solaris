@@ -77,7 +77,8 @@ async function startup() {
     mongo = await mongooseLoader({
         connectionString: process.env.CONNECTION_STRING
     }, {
-        syncIndexes: false
+        syncIndexes: false,
+        poolSize: 1
     });
 
     console.log('MongoDB Intialized');
