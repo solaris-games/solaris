@@ -46,6 +46,7 @@ module.exports = async (config, options) => {
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
     options.syncIndexes = options.syncIndexes == null ? false : options.syncIndexes;
+    options.poolSize = options.poolSize || 5;
 
     console.log(`Connecting to database: ${options.connectionString}`);
 
@@ -53,7 +54,7 @@ module.exports = async (config, options) => {
         useNewUrlParser: true,
         useCreateIndex: true,
         keepAlive: true,
-        poolSize: process.env.CONNECTION_POOL_SIZE || 5
+        poolSize: options.poolSize
     });
 
     await unlockAgendaJobs(db);
