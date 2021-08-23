@@ -1,70 +1,59 @@
 const ValidationError = require("../../errors/validation");
 
 module.exports = class CustomMapService {
-    constructor(randomService, starService, starDistanceService, distanceService) {
-        this.randomService = randomService;
-        this.starService = starService;
-        this.starDistanceService = starDistanceService;
-        this.distanceService = distanceService;
-    }
+    constructor() { }
 
-    generateLocations(game, starCount, playerCount, jsonData) {
-        const json = JSON.parse(jsonData)
+    generateLocations(game, starCount, playerCount) {
+        const json = JSON.parse(game.settings) //need correct path
         const locations = [];
-        const uidList = new Set()
         const nameList = new Set()
-        const homeList = new Map()
-        const ownedList = new Map()
+        const homeList = Array.from({ length: playerCount }, () => [])
+        const ownedList = Array.from({ length: playerCount }, () => [])
 
         for (const star of json.stars) {
-            if (!this._checkStarProperty(star, 'uid', 'number')) continue
-            if (uidList.has(star.uid)) continue
-            if (!this._checkStarProperty(star, 'name', 'string')) continue
             if (nameList.has(star.name)) continue
-            if (!this._checkStarProperty(star, 'x', 'number')) continue
-            if (!this._checkStarProperty(star, 'y', 'number')) continue
-            if (!this._checkStarProperty(star, 'r', 'number')) continue
-            if (star.r < 5 || star.r > 60) continue
-            if (!this._checkStarProperty(star, 'ga', 'number')) continue
-            if (star.ga < 0 || star.ga > 1) continue
-            if (!this._checkStarProperty(star, 'e', 'number')) continue
-            if (!this._checkStarProperty(star, 'i', 'number')) continue
-            if (!this._checkStarProperty(star, 's', 'number')) continue
-            if (!this._checkStarProperty(star, 'st', 'number')) continue
-            if (!this._checkStarProperty(star, 'isHome', 'boolean')) continue
-            if (homeList.get(star.puid) !== null) continue
-            if (star?.puid !== undefined) this._addStarToPlayer(ownedList, star.puid, star.uid)
-            if (star.isHome) homeList.set(star.puid, star.uid)
-            uidList.add(star.uid)
+
+            if (!this._checkStarProperty(star?.location, 'x', 'number')) continue
+            if (!this._checkStarProperty(star?.location, 'y', 'number')) continue
+            if (!this._checkStarProperty(star, 'naturalResources', 'number')) continue
+            if (!this._checkStarProperty(star, 'warpGate', 'boolean')) continue
+            if (!this._checkStarProperty(star?.infrastructure, 'economy', 'number')) continue
+            if (!this._checkStarProperty(star?.infrastructure, 'industry', 'number')) continue
+            if (!this._checkStarProperty(star?.infrastructure, 'science', 'number')) continue
+            if (!this._checkStarProperty(star, 'ships', 'number')) continue
+            if (!this._checkStarProperty(star, 'ownedByPlayerId', 'number')) continue
+            if (!this._checkStarProperty(star, 'isHomeStar', 'boolean')) continue
+
+            if (star.naturalResources < 10 || star.naturalResources > 100)
+                throw new ValidationError('Illigal starting amount of resources, range needs to be between 10 and 100 inclusive')
+            if (star.ownedByPlayerId < -1 || star.ownedByPlayerId >= playerCount)
+                throw new ValidationError('Invalid playerid')
+
+            if (star?.ownedByPlayerId !== -1) {
+                ownedList[star.ownedByPlayerId].push(star)
+                if (star.isHome) homeList[star.ownedByPlayerId].push(star)
+            }
             nameList.add(star.name)
-            locations.push({star})
+
+            locations.push(star)
         }
 
-        let enoughStarsPerPlayer = true
-        for (const playerList of ownedList) {
-            if (playerList.size() != starCount / playerCount) enoughStarsPerPlayer = false
-        }
-        if (!enoughStarsPerPlayer)
-            throw new ValidationError('Not enough stars per player')
+        if (!ownedList.every(array => array.length === starCount / playerCount))
+            throw new ValidationError('Not enough stars per player.')
 
-        if (locations.length <= starCount)
-            throw new ValidationError('Not enough stars in json data generated')
+        if (!homeList.every(array => array.length === 1))
+            throw new ValidationError('Duplicate or players without homeStars.')
+
+        if (locations.length !== starCount)
+            throw new ValidationError('Not enough stars in json data generated.')
+
         return locations
     }
-    
-    _checkStarProperty(star, property, type) {
-        if (star?.[property] === undefined) return false
-        if (typeof star[property] !== type) return false
-        return true
-    }
 
-    _addStarToPlayer(list, puid, uid) {
-        let l = list.get(puid)
-        if (!l) {
-            l = new Set()
-            l.add(uid)
-            return l
-        }
-        list.get(puid).add(uid)
+    _checkStarProperty(star, property, type) {
+        if (star === undefined) throw new ValidationError(`Missing property location or infrastructure of star ${star}`)
+        if (star?.[property] === undefined) throw new ValidationError(`Missing property ${property} of star ${star}`)
+        if (typeof star[property] !== type) throw new ValidationError(`Invalid type property ${property} of star ${star}`)
+        return true
     }
 }
