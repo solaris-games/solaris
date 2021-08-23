@@ -34,7 +34,7 @@ module.exports = class CustomMapService {
             if (!this._checkStarProperty(star, 'isHome', 'boolean')) continue
             if (homeList.get(star.puid) !== null) continue
             if (star?.puid !== undefined) this._addStarToPlayer(ownedList, star.puid, star.uid)
-            homeList.set(star.puid, star.uid)
+            if (star.isHome) homeList.set(star.puid, star.uid)
             uidList.add(star.uid)
             nameList.add(star.name)
             locations.push({star})
