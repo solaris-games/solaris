@@ -40,8 +40,11 @@
                     <span v-if="game.afk" class="ml-1 badge badge-warning">AFK</span>
                   </td>
                   <td class="col-3 d-none d-md-table-cell">
-                    <span>
-                      {{getNextCycleText(game)}} <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                    <span v-if="isGamePendingStart(game)">
+                      Starting Soon
+                    </span>
+                    <span v-if="!isGamePendingStart(game)">
+                      <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
                     </span>
                   </td>
                   <td class="col-1 col-md-6 text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
@@ -147,13 +150,14 @@ export default {
     isRealTimeGame (game) {
       return GameHelper.isRealTimeGame(game);
     },
-    getNextCycleText (game) {
-      if (GameHelper.isGamePendingStart(game)) {
-        return "Starts in: ";
-      }
-      return "";
+    isGamePendingStart (game) {
+      return GameHelper.isGamePendingStart(game)
     },
     getNextCycleDate (game) {
+      // TODO: This doesn't work, for some reason getCountdownTime returns a number wtf
+      // if (GameHelper.isGamePendingStart(game)) {
+      //   return GameHelper.getCountdownTime(game, game.state.startDate)
+      // } else 
       if (GameHelper.isRealTimeGame(game)) {
         return GameHelper.getCountdownTimeForProductionCycle(game)
       } else if (GameHelper.isTurnBasedGame(game)) {
