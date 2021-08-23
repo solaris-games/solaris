@@ -16,10 +16,10 @@
     <div class="tab-content pt-2" v-if="!isLoading">
       <div class="tab-pane fade show active" id="games">
         <div v-if="games">
-          <h4 class="mb-1">Games</h4>
-          <p><small class="text-warning">Total Games: {{games.length}}</small></p>
+          <h4 class="mb-1">Recent Games</h4>
+          <!-- <p><small class="text-warning">Total Games: {{games.length}}</small></p>
           <p><small class="text-warning">Total Started: {{games.filter(x => x.state.startDate).length}}</small></p>
-          <p><small class="text-warning">Total Completed: {{games.filter(x => x.state.endDate).length}}</small></p>
+          <p><small class="text-warning">Total Completed: {{games.filter(x => x.state.endDate).length}}</small></p> -->
           <table class="mt-2 table table-sm table-striped table-responsive">
             <thead>
               <tr>
@@ -61,8 +61,8 @@
       </div>
       <div class="tab-pane fade" id="users" v-if="isAdministrator">
         <div v-if="users">
-          <h4 class="mb-1">Users</h4>
-          <small class="text-warning">Total Users: {{users.length}}</small>
+          <h4 class="mb-1">Recent Users</h4>
+          <!-- <small class="text-warning">Total Users: {{users.length}}</small> -->
           <table class="mt-2 table table-sm table-striped table-responsive">
             <thead>
               <tr>
@@ -71,6 +71,7 @@
                 <th>Roles</th>
                 <th>Credits</th>
                 <th>Email</th>
+                <th>EP</th>
                 <th></th>
                 <th></th>
               </tr>
@@ -91,6 +92,7 @@
                   <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)" title="Add Credits"></i>
                 </td>
                 <td><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
+                <td><i class="fas clickable" :class="{'fa-check':user.isEstablishedPlayer,'fa-times text-danger': !user.isEstablishedPlayer}" @click="promoteToEstablishedPlayer(user)"></i></td>
                 <td>
                   <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">PW Reset</a>
                 </td>
@@ -212,6 +214,19 @@ export default {
         } else {
           await AdminApiService.unban(user._id)
         }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async promoteToEstablishedPlayer (user) {
+      if (user.isEstablishedPlayer) {
+        return
+      }
+
+      try {
+        user.isEstablishedPlayer = true
+
+        await AdminApiService.promoteToEstablishedPlayer(user._id)
       } catch (err) {
         console.error(err)
       }

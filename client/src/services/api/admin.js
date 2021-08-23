@@ -52,6 +52,11 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  promoteToEstablishedPlayer (userId) {
+    return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/promoteToEstablishedPlayer', {},
+    { withCredentials: true })
+  }
+
   impersonate (userId, username, roles) {
     return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {
       username,
