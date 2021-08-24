@@ -26,7 +26,7 @@
         <div class='row'>
           <select class='col mx-3' v-model.number='galaxyEditor.selectedStar.playerIndex'>
             <option value='-1'>None</option>
-            <option v-for='(playerShapeAndColour,index) in (galaxyEditor.playerShapeAndColours)' v-bind:value='index'>{{ playerShapeAndColour }}</option>
+            <option v-for='(playerShapeAndColour,index) in playerShapeAndColours' v-bind:value='index'>{{ playerShapeAndColour }}</option>
           </select>
         </div>
         <div class='row'>
@@ -61,7 +61,10 @@
     },
     computed: {
       specialists() {
-        return this.galaxyEditor.specialists.star
+        return this.galaxyEditor.specialists
+      }
+      playerShapeAndColour() {
+        return this.galaxyEditor.playerShapeAndColours
       }
     }
   }

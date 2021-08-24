@@ -1,401 +1,50 @@
-{
-    "carrier": [
-        {
-            "id": 1,
-            "name": "Admiral",
-            "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "local": {
-                    "speed": 1.5,
-                    "weapons": -1,
-                    "hyperspace": -2
-                }
-            }
-        },
-        {
-            "id": 2,
-            "name": "Lieutenant",
-            "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
-            "baseCostCredits": 100,
-            "baseCostCreditsSpecialists": 2,
-            "modifiers": {
-                "local": {
-                    "weapons": 1,
-                    "hyperspace": -1
-                }
-            }
-        },
-        {
-            "id": 3,
-            "name": "Colonel",
-            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "local": {
-                    "weapons": 2,
-                    "hyperspace": -1,
-                    "speed": 0.75
-                }
-            }
-        },
-        {
-            "id": 4,
-            "name": "General",
-            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "weapons": 3,
-                    "hyperspace": -1,
-                    "speed": 0.5
-                }
-            }
-        },
-        {
-            "id": 5,
-            "name": "Smuggler",
-            "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "speed": 2,
-                    "hyperspace": -1,
-                    "weapons": -1
-                }
-            }
-        },
-        {
-            "id": 6,
-            "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -1 Weapons to the carrier.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "local": {
-                    "hyperspace": 3,
-                    "weapons": -1
-                }
-            }
-        },
-        {
-            "id": 7,
-            "name": "Destroyer",
-            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the carrier.",
-            "baseCostCredits": 1000,
-            "baseCostCreditsSpecialists": 10,
-            "modifiers": {
-                "local": {
-                    "hyperspace": -3,
-                    "weapons": 5,
-                    "speed": 0.5
-                }
-            }
-        },
-        {
-            "id": 8,
-            "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships the carrier has.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "special": {
-                    "hideCarrierShips": true
-                }
-            }
-        },
-        {
-            "id": 9,
-            "name": "Infiltrator",
-            "description": "When participating in combat, the enemy fights with -1 Weapons.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "special": {
-                    "deductEnemyWeapons": 1
-                }
-            }
-        },
-        {
-            "id": 10,
-            "name": "Warp Stabilizer",
-            "description": "Warp Scramblers do not affect the carrier.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "special": {
-                    "unlockWarpGates": true
-                }
-            }
-        },
-        {
-            "id": 11,
-            "name": "Raider",
-            "description": "Carrier travels at x2 Speed, -2 Weapons. The carrier is awarded x2 star capture rewards for destroying infrastructure.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "speed": 2,
-                    "weapons": -2
-                },
-                "special": {
-                    "starCaptureRewardMultiplier": 2
-                }
-            }
-        },
-        {
-            "id": 12,
-            "name": "Coward",
-            "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed.",
-            "baseCostCredits": 1000,
-            "baseCostCreditsSpecialists": 10,
-            "modifiers": {
-                "local": {
-                    "speed": 2
-                },
-                "special": {
-                    "avoidCombatCarrierToCarrier": true
-                }
-            }
-        },
-        {
-            "id": 13,
-            "name": "Pirate",
-            "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "speed": 1.5,
-                    "carrierToCarrierCombat": {
-                        "weapons": 3
-                    },
-                    "carrierToStarCombat": {
-                        "weapons": -2
-                    }
-                }
-            }
-        },
-        {
-            "id": 14,
-            "name": "Pathfinder",
-            "description": "Grants +1 Hyperspace Range to the carrier.",
-            "baseCostCredits": 50,
-            "baseCostCreditsSpecialists": 1,
-            "modifiers": {
-                "local": {
-                    "hyperspace": 1
-                }
-            }
-        },
-        {
-            "id": 15,
-            "name": "Marauder",
-            "description": "The carrier does not participate in carrier-to-carrier combat. x1.5 Speed, -2 Hyperspace Range, -1 Weapons.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "speed": 1.5,
-                    "hyperspace": -2,
-                    "weapons": -1
-                },
-                "special": {
-                    "avoidCombatCarrierToCarrier": true
-                }
-            }
-        },
-        {
-            "id": 16,
-            "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "speed": 0.5
-                },
-                "special": {
-                    "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": 10
-                }
-            }
-        }
-    ],
-    "star": [
-        {
-            "id": 1,
-            "name": "Orbital Array",
-            "description": "Grants +1 Scanning Range to the Star.",
-            "baseCostCredits": 50,
-            "baseCostCreditsSpecialists": 1,
-            "modifiers": {
-                "local": {
-                    "scanning": 1
-                }
-            }
-        },
-        {
-            "id": 2,
-            "name": "Space Dock",
-            "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
-            "baseCostCredits": 100,
-            "baseCostCreditsSpecialists": 2,
-            "modifiers": {
-                "local": {
-                    "manufacturing": 2,
-                    "terraforming": -1
-                }
-            }
-        },
-        {
-            "id": 3,
-            "name": "Atmosphere Processor",
-            "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
-            "baseCostCredits": 100,
-            "baseCostCreditsSpecialists": 2,
-            "modifiers": {
-                "local": {
-                    "terraforming": 3,
-                    "scanning": -1
-                }
-            }
-        },
-        {
-            "id": 4,
-            "name": "Orbital Cannon",
-            "description": "Grants +1 Weapons, -1 Scanning, -1 Terraforming to the Star.",
-            "baseCostCredits": 100,
-            "baseCostCreditsSpecialists": 2,
-            "modifiers": {
-                "local": {
-                    "weapons": 1,
-                    "scanning": -1,
-                    "terraforming": -1
-                }
-            }
-        },
-        {
-            "id": 5,
-            "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent other players from using it. Weapons -1.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "local": {
-                    "weapons": -1
-                },
-                "special": {
-                    "lockWarpGates": true
-                }
-            }
-        },
-        {
-            "id": 6,
-            "name": "World Builder",
-            "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
-            "baseCostCredits": 1000,
-            "baseCostCreditsSpecialists": 10,
-            "modifiers": {
-                "special": {
-                    "addNaturalResourcesOnTick": 1
-                },
-                "local": {
-                    "scanning": -3,
-                    "weapons": -5
-                }
-            }
-        },
-        {
-            "id": 7,
-            "name": "War Machine",
-            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. This specialist retires if the star reaches 0 natural resources.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "special": {
-                    "deductNaturalResourcesOnTick": 1
-                },
-                "local": {
-                    "manufacturing": 5,
-                    "weapons": 5
-                }
-            }
-        },
-        {
-            "id": 8,
-            "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
-            "baseCostCredits": 200,
-            "baseCostCreditsSpecialists": 3,
-            "modifiers": {
-                "special": {
-                    "hideStarShips": true
-                }
-            }
-        },
-        {
-            "id": 9,
-            "name": "Demolition Controller",
-            "description": "If the Star is captured, all infrastructure is destroyed.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "special": {
-                    "destroyInfrastructureOnLoss": true
-                }
-            }
-        },
-        {
-            "id": 10,
-            "name": "Trade Port",
-            "description": "The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning.",
-            "baseCostCredits": 1000,
-            "baseCostCreditsSpecialists": 10,
-            "modifiers": {
-                "local": {
-                    "terraforming": -5,
-                    "weapons": -3,
-                    "scanning": 1
-                },
-                "special": {
-                    "economyInfrastructureMultiplier": 2
-                }
-            }
-        },
-        {
-            "id": 11,
-            "name": "Research Station",
-            "description": "The Star's Science infrastructure contributes x2 to research. -3 Terraforming, -3 Weapons, +1 Scanning.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
-            "modifiers": {
-                "local": {
-                    "terraforming": -3,
-                    "weapons": -3,
-                    "scanning": 1
-                },
-                "special": {
-                    "scienceInfrastructureMultiplier": 2
-                }
-            }
-        },
-        {
-            "id": 12,
-            "name": "Financial Analyst",
-            "description": "The star produces 1 credit per tick for each point of science on the star.",
-            "baseCostCredits": 1000,
-            "baseCostCreditsSpecialists": 10,
-            "modifiers": {
-                "special": {
-                    "creditsPerTickByScience": 1
-                }
-            }
-        }
-    ]
-}
+[
+		{
+				"id": 1,
+				"name": "Orbital Array"
+		},
+		{
+				"id": 2,
+				"name": "Space Dock"
+		},
+		{
+				"id": 3,
+				"name": "Atmosphere Processor"
+		},
+		{
+				"id": 4,
+				"name": "Orbital Cannon"
+		},
+		{
+				"id": 5,
+				"name": "Warp Scrambler"
+		},
+		{
+				"id": 6,
+				"name": "World Builder"
+		},
+		{
+				"id": 7,
+				"name": "War Machine"
+		},
+		{
+				"id": 8,
+				"name": "Scrambler"
+		},
+		{
+				"id": 9,
+				"name": "Demolition Controller"
+		},
+		{
+				"id": 10,
+				"name": "Trade Port"
+		},
+		{
+				"id": 11,
+				"name": "Research Station"
+		},
+		{
+				"id": 12,
+				"name": "Financial Analyst"
+		}
+]
