@@ -404,18 +404,21 @@ module.exports = class GameTickService extends EventEmitter {
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
 
-                this.emit('onPlayerGalacticCycleCompleted', {
-                    gameId: game._id,
-                    gameTick: game.state.tick,
-                    player, 
-                    creditsEconomy: creditsResult.creditsFromEconomy, 
-                    creditsBanking: creditsResult.creditsFromBanking,
-                    creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
-                    experimentTechnology: experimentResult.technology,
-                    experimentTechnologyLevel: experimentResult.level,
-                    experimentAmount: experimentResult.amount,
-                    carrierUpkeep: carrierUpkeepResult
-                });
+                // Raise an event if the player isn't defeated, AI doesn't care about events.
+                if (!player.defeated) {
+                    this.emit('onPlayerGalacticCycleCompleted', {
+                        gameId: game._id,
+                        gameTick: game.state.tick,
+                        player, 
+                        creditsEconomy: creditsResult.creditsFromEconomy, 
+                        creditsBanking: creditsResult.creditsFromBanking,
+                        creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
+                        experimentTechnology: experimentResult.technology,
+                        experimentTechnologyLevel: experimentResult.level,
+                        experimentAmount: experimentResult.amount,
+                        carrierUpkeep: carrierUpkeepResult
+                    });
+                }
             }
 
             // Destroy stars for battle royale mode.
@@ -535,6 +538,10 @@ module.exports = class GameTickService extends EventEmitter {
 
             for (let carrier of game.galaxy.carriers) {
                 this.orbitalMechanicsService.orbitCarrier(game, carrier);
+            }
+
+            for (let carrier of game.galaxy.carriers) {
+                this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
             }
         }
     }

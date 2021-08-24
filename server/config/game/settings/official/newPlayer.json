@@ -5,7 +5,6 @@
     "type": "new_player_rt",
     "mode": "conquest",
     "password": null,
-    "starVictoryPercentage": 66,
     "playerLimit": 4,
     "playerType": "all",
     "anonymity": "normal",
@@ -32,9 +31,13 @@
     "playerDistribution": "circular",
     "carrierSpeed": 10
   },
+  "conquest": {
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 66
+  },
   "orbitalMechanics": {
     "enabled": "disabled",
-    "orbitSpeed": 10,
+    "orbitSpeed": 5,
     "orbitOrigin": "galacticCenter"
   },
   "player": {
@@ -83,6 +86,6 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 1800,
-    "startDelay": 30
+    "startDelay": 60
   }
 }

@@ -114,6 +114,14 @@
               <td>Stars Lost</td>
               <td class="text-right">{{ user.achievements.combat.stars.lost }}</td>
             </tr>
+            <tr>
+              <td>Capital Stars Captured</td>
+              <td class="text-right">{{ user.achievements.combat.homeStars.captured }}</td>
+            </tr>
+            <tr>
+              <td>Capital Stars Lost</td>
+              <td class="text-right">{{ user.achievements.combat.homeStars.lost }}</td>
+            </tr>
           </tbody>
         </table>
       </div>

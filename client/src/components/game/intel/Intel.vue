@@ -12,6 +12,7 @@
         <div class="col">
         <select class="form-control input-sm" id="intelType" v-model="intelType" v-on:change="fillData" :disabled="history == null">
           <option key="totalStars" value="totalStars">Total Stars</option>
+          <option key="totalHomeStars" value="totalHomeStars">Total Capital Stars</option>
           <option key="totalEconomy" value="totalEconomy">Total Economy</option>
           <option key="totalIndustry" value="totalIndustry">Total Industry</option>
           <option key="totalScience" value="totalScience">Total Science</option>

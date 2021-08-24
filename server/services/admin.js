@@ -6,7 +6,7 @@ module.exports = class AdminService {
     }
 
     async listUsers(limit) {
-        return await this.userModel.find({}, {
+        let users = await this.userModel.find({}, {
             username: 1,
             email: 1,
             credits: 1,
@@ -15,7 +15,9 @@ module.exports = class AdminService {
             emailEnabled: 1,
             resetPasswordToken: 1,
             lastSeen: 1,
-            lastSeenIP: 1
+            lastSeenIP: 1,
+            'achievements.rank': 1,
+            'achievements.completed': 1
         })
         .sort({
             lastSeen: -1
@@ -23,13 +25,23 @@ module.exports = class AdminService {
         .limit(limit)
         .lean({defaults: true})
         .exec();
+
+        for (let user of users) {
+            user.isEstablishedPlayer = user.achievements.rank > 0 || user.achievements.completed > 0;
+        }
+
+        return users;
     }
 
-    async listGames() {
+    async listGames(limit) {
         return await this.gameModel.find({}, {
             'settings.general': 1,
             'state': 1
         })
+        .sort({
+            _id: -1
+        })
+        .limit(limit)
         .lean({defaults: true})
         .exec();
     }
@@ -79,6 +91,20 @@ module.exports = class AdminService {
             _id: userId
         }, {
             'banned': false
+        }).exec();
+    }
+
+    async promoteToEstablishedPlayer(userId) {
+        await this.userModel.updateOne({
+            _id: userId,
+            $and: [
+                { 'achievements.rank': { $eq: 0 }},
+                { 'achievements.completed': { $eq: 0 }}
+            ]
+        }, {
+            $inc: {
+                'achievements.completed': 1
+            }
         }).exec();
     }
 

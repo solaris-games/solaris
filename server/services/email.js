@@ -215,7 +215,16 @@ module.exports = class EmailService {
 
         switch (game.settings.general.mode) {
             case 'conquest':
-                winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} of ${game.state.stars} stars</span>.`;
+                switch (game.settings.conquest.victoryCondition) {
+                    case 'starPercentage':
+                        winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} of ${game.state.stars} stars</span>.`;
+                        break;
+                    case 'homeStarPercentage':
+                        winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} capital stars of ${game.settings.general.playerLimit} stars</span>.`;
+                        break;
+                    default:
+                        throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`);
+                }
                 break;
             case 'battleRoyale':
                 winConditionText = 'Winner will be the <span style="color:#3498DB;">last man standing</span>.';

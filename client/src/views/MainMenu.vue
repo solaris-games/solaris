@@ -62,6 +62,12 @@
       </div>
     </div>
 
+    <div class="row">
+      <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+
     <div class="row pb-0">
       <div class="col d-none d-md-block">
         <leaderboard-user-table :limit="10"></leaderboard-user-table>
@@ -107,6 +113,7 @@ export default {
 
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
+      this.$store.commit('clearRoles')
 
       this.isLoggingOut = false
 

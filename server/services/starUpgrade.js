@@ -60,13 +60,6 @@ module.exports = class StarUpgradeService extends EventEmitter {
             await this.achievementService.incrementWarpGatesBuilt(player.userId);
         }
 
-        this.emit('onPlayerWarpGateBuilt', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            star
-        });
-
         return {
             starId: star._id,
             cost
@@ -94,13 +87,6 @@ module.exports = class StarUpgradeService extends EventEmitter {
         if (!player.defeated) {
             await this.achievementService.incrementWarpGatesDestroyed(player.userId);
         }
-
-        this.emit('onPlayerWarpGateDestroyed', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            star
-        });
     }
 
     async buildCarrier(game, player, starId, ships) {
@@ -653,7 +639,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     _calculateInfrastructureCost(baseCost, expenseConfig, current, terraformedResources) {
-        return Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100));
+        return Math.max(1, Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)));
     }
 
     calculateCarrierCost(game, expenseConfig) {

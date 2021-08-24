@@ -9,9 +9,20 @@
 
       <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
 
-      <div class="mb-4">
-        <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
-        <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">Open Game <i class="fas fa-arrow-right"></i> </router-link>
+      <div class="row mb-4">
+        <div class="col">
+          <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
+          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ml-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
+        </div>
+      </div>
+
+      <div class="row mb-2" v-if="game.settings.general.type === 'new_player_rt' || game.settings.general.type === 'new_player_tb'">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
       </div>
 
       <view-subtitle title="General Settings"/>
@@ -23,8 +34,12 @@
               <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
             </tr>
             <tr v-if="game.settings.general.mode === 'conquest'">
+              <td>Victory Condition</td>
+              <td class="text-right">{{ getFriendlyText(game.settings.conquest.victoryCondition) }}</td>
+            </tr>
+            <tr v-if="game.settings.general.mode === 'conquest'">
               <td>Stars For Victory</td>
-              <td class="text-right">{{ game.settings.general.starVictoryPercentage }}%</td>
+              <td class="text-right">{{ game.settings.conquest.victoryPercentage }}%</td>
             </tr>
             <tr>
               <td>Players</td>
@@ -165,7 +180,7 @@
         <table class="table table-striped table-hover">
           <tbody>
             <tr>
-              <td>Enabled</td>
+              <td>Galaxy Rotation</td>
               <td class="text-right">{{ getFriendlyText(game.settings.orbitalMechanics.enabled) }}</td>
             </tr>
             <tr v-if="game.settings.orbitalMechanics.enabled === 'enabled'">
@@ -326,10 +341,6 @@
           </tbody>
         </table>
       </div>
-
-      <div>
-        <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
-      </div>
     </div>
   </view-container>
 </template>
@@ -431,7 +442,9 @@ export default {
         'battleRoyale': 'Battle Royale',
         'establishedPlayers': 'Established Players Only',
         'galacticCenter': 'Galactic Center',
-        'galacticCenterOfMass': 'Galactic Center of Mass'
+        'galacticCenterOfMass': 'Galactic Center of Mass',
+        'starPercentage': 'Star Percentage',
+        'homeStarPercentage': 'Capital Star Percentage'
       }[option]
 
       return text || option

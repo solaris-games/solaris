@@ -47,6 +47,13 @@ export default new Vuex.Store({
       state.username = null
     },
 
+    setRoles (state, roles) {
+      state.roles = roles
+    },
+    clearRoles (state) {
+      state.roles = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },
@@ -103,6 +110,13 @@ export default new Vuex.Store({
     starClicked (state, data) {
       if (state.currentConversation) {
         MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
+      } else {
+        data.permitCallback(data.star)
+      }
+    },
+    starRightClicked (state, data) {
+      if (state.currentConversation && data.player) {
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
       } else {
         data.permitCallback(data.star)
       }

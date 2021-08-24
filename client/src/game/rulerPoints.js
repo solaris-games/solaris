@@ -47,14 +47,14 @@ class RulerPoints extends EventEmitter {
 
     // Start the line from where the first point is.
     let firstPoint = this.rulerPoints[0]
-    graphics.moveTo(firstPoint.x, firstPoint.y)
+    graphics.moveTo(firstPoint.location.x, firstPoint.location.y)
     graphics.lineStyle(1, 0xFFFFFF, 0.8)
 
     // Draw a line to each other point
     for (let i = 1; i < this.rulerPoints.length; i++) {
       let point = this.rulerPoints[i]
 
-      graphics.lineTo(point.x, point.y)
+      graphics.lineTo(point.location.x, point.location.y)
     }
 
     this.container.addChild(graphics)
@@ -73,7 +73,7 @@ class RulerPoints extends EventEmitter {
 
     graphics.lineStyle(1, 0xFFFFFF, 0.2)
     graphics.beginFill(0xFFFFFF, 0.075)
-    graphics.drawStar(lastPoint.x, lastPoint.y, radius, radius, radius - 3)
+    graphics.drawStar(lastPoint.location.x, lastPoint.location.y, radius, radius, radius - 3)
     graphics.endFill()
     graphics.zIndex = -1
 
@@ -81,11 +81,19 @@ class RulerPoints extends EventEmitter {
   }
 
   onStarClicked (e) {
-    this._createRulerPoint(e.location)
+    this._createRulerPoint({
+      type: 'star',
+      object: e,
+      location: e.location
+    })
   }
 
   onCarrierClicked (e) {
-    this._createRulerPoint(e.location)
+    this._createRulerPoint({
+      type: 'carrier',
+      object: e,
+      location: e.location
+    })
   }
 
   removeLastRulerPoint () {
@@ -96,20 +104,20 @@ class RulerPoints extends EventEmitter {
     this.emit('onRulerPointRemoved', old)
   }
 
-  _createRulerPoint (desiredLocation) {
+  _createRulerPoint (desiredPoint) {
     let lastPoint = this.rulerPoints[this.rulerPoints.length - 1]
 
     if (lastPoint &&
-      lastPoint.x === desiredLocation.x &&
-      lastPoint.y === desiredLocation.y) {
+      lastPoint.location.x === desiredPoint.location.x &&
+      lastPoint.location.y === desiredPoint.location.y) {
       return
     }
 
-    desiredLocation.distance = this.rulerPoints.push(desiredLocation)
+    desiredPoint.distance = this.rulerPoints.push(desiredPoint)
 
     this.draw()
 
-    this.emit('onRulerPointCreated', desiredLocation)
+    this.emit('onRulerPointCreated', desiredPoint)
   }
 }
 

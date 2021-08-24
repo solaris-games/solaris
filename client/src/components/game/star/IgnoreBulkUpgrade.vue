@@ -1,7 +1,10 @@
 <template>
     <div class="btn-group">
-        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas mr-1" :class="{'fa-ban':isAllIgnored,'fa-check':!isAllIgnored}"></i>
+        <button class="btn btn-secondary btn-sm dropdown-toggle"
+            :class="{'btn-danger':highlightIgnoredInfrastructure && getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure),
+                     'btn-success':highlightIgnoredInfrastructure && !getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure)}"
+            type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas mr-1" :class="{'fa-ban':isAllIgnored,'fa-check-double':isAllIncluded,'fa-check':!isAllIgnored && !isAllIncluded}"></i>
         </button>
         <div class="dropdown-menu">
             <h6 class="dropdown-header">Bulk Upgrade</h6>
@@ -39,10 +42,18 @@ export default {
 
   },
   props: {
-    starId: String
+    starId: String,
+    highlightIgnoredInfrastructure: String
   },
   methods: {
+    triggerChanged () {
+      this.$emit("bulkIgnoreChanged", { 
+        starId: this.starId
+      });
+    },
     async toggleBulkIgnore (infrastructureType) {
+      this.triggerChanged();
+      
       try {
         let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id, infrastructureType)
         
@@ -60,6 +71,8 @@ export default {
       }
     },
     async toggleBulkIgnoreAll (ignoreStatus) {
+      this.triggerChanged();
+
       try {
         let response = await starService.toggleIgnoreBulkUpgradeAll(this.$store.state.game._id, this.star._id, ignoreStatus)
         
@@ -90,6 +103,11 @@ export default {
         return this.getInfrastructureIgnoreStatus('economy')
             && this.getInfrastructureIgnoreStatus('industry')
             && this.getInfrastructureIgnoreStatus('science')
+    },
+    isAllIncluded: function () {
+        return !this.getInfrastructureIgnoreStatus('economy')
+            && !this.getInfrastructureIgnoreStatus('industry')
+            && !this.getInfrastructureIgnoreStatus('science')
     }
   }
 }

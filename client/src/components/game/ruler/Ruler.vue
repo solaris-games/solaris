@@ -30,7 +30,7 @@
 
     <div class="row bg-secondary pt-2 pb-2">
       <div class="col-2">
-          ETA
+          ETA<orbital-mechanics-eta-warning />
       </div>
       <div class="col-5 text-right">
           <span title="ETA Base Speed">
@@ -112,6 +112,12 @@
           </div>
         </div>
     </div>
+
+    <div class="row bg-dark" v-if="warpGateCost">
+      <div class="col">
+        <p class="mt-2 mb-2"><small>To build Warp Gates on the selected route will cost <span class="text-warning">${{warpGateCost}}</span>.</small></p>
+      </div>
+    </div>
 </div>
 </template>
 
@@ -119,10 +125,12 @@
 import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
-    'menu-title': MenuTitleVue
+    'menu-title': MenuTitleVue,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   data () {
     return {
@@ -185,9 +193,10 @@ export default {
     },
     recalculateETAs () {
       let game = this.$store.state.game
+      let locations = this.points.map(p => p.location)
 
-      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, this.points)
-      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, this.points, game.constants.distances.warpSpeedMultiplier)
+      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, locations)
+      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, locations, game.constants.distances.warpSpeedMultiplier)
 
       let totalTimeString = GameHelper.getCountdownTimeStringByTicks(game, totalTicks, true)
       let totalTimeWarpString = GameHelper.getCountdownTimeStringByTicks(game, totalTicksWarp, true)
@@ -215,7 +224,7 @@ export default {
           continue
         }
 
-        distances.push(GameHelper.getDistanceBetweenLocations(point, nextPoint))
+        distances.push(GameHelper.getDistanceBetweenLocations(point.location, nextPoint.location))
       }
 
       let longestWaypoint = Math.max(...distances)
@@ -233,9 +242,23 @@ export default {
       let game = this.$store.state.game
 
       for (let i = 0; i < this.points.length - 1; i++) {
-        this.distanceLightYears += GameHelper.getDistanceBetweenLocations(this.points[i], this.points[i + 1])
+        this.distanceLightYears += GameHelper.getDistanceBetweenLocations(this.points[i].location, this.points[i + 1].location)
       }
       this.distanceLightYears = Math.round(this.distanceLightYears / game.constants.distances.lightYear * 100.0) / 100.0
+    }
+  },
+  computed: {
+    warpGateCost () {
+      let starPoints = this.points.filter(p => p.type === 'star' && !p.object.warpGate && p.object.upgradeCosts)
+      let starIds = [...new Set(starPoints.map(p => p.object._id))]
+
+      let sum = 0
+
+      for (let starId of starIds) {
+        sum += starPoints.find(p => p.object._id === starId).object.upgradeCosts.warpGate
+      }
+      
+      return sum
     }
   }
 }

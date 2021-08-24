@@ -17,10 +17,10 @@
                 <span v-if="currentWaypoint && currentWaypoint.action && isActionRequiresPercentage(currentWaypoint.action)">%</span>
             </div>
         </div>
-
+        
         <div class="row no-gutters mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
-                <input type="number" class="form-control input-sm" v-model="currentWaypoint.delayTicks">
+              <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
             </div>
             <div class="col-3 text-center pt-1">
                 <!-- <a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(currentWaypoint.destination)}}</a> -->
@@ -45,6 +45,15 @@
             </div>
         </div>
 
+        <div class="row bg-primary pt-2 pb-0 mb-0">
+          <div class="col">
+            <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{waypointEta}}</p>
+          </div>
+          <div class="col-auto">
+            <p class="mb-2">Duration<orbital-mechanics-eta-warning />: {{waypointDuration}}</p>
+          </div>
+        </div>
+
 		<div class="row bg-secondary pt-2 pb-2">
 			<div class="col pr-0">
 				<button class="btn btn-sm btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints">
@@ -60,13 +69,13 @@
         </button>
 			</div>
 			<div class="col-auto" v-if="!$isHistoricalMode()">
-				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ml-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
-          <i class="fas fa-edit"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-check"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Close</span>
         </button>
 			</div>
 		</div>
@@ -78,10 +87,12 @@ import MenuTitle from '../MenuTitle'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
 import CarrierApiService from '../../../services/api/carrier'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
-    	'menu-title': MenuTitle
+    'menu-title': MenuTitle,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   props: {
     carrierId: String,
@@ -93,7 +104,9 @@ export default {
       carrier: null,
       isSavingWaypoints: false,
       currentWaypoint: null,
-      waypoints: []
+      waypoints: [],
+      waypointDuration: null,
+      waypointEta: null
     }
   },
   mounted () {
@@ -103,7 +116,14 @@ export default {
     // Make a copy of the carriers waypoints.
     this.waypoints = JSON.parse(JSON.stringify(this.carrier.waypoints))
     this.currentWaypoint = this.waypoints.find(x => x._id === this.waypoint._id)
+    this.recalculateWaypointDuration()
+    this.recalculateWaypointEta()
     this.panToWaypoint()
+
+    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
+      this.intervalFunction = setInterval(this.recalculateWaypointEta, 1000)
+      this.recalculateWaypointEta()
+    }
   },
   destroyed () {
     GameContainer.map.clearHighlightedLocations()
@@ -171,6 +191,7 @@ export default {
       }
 
       this.currentWaypoint = this.waypoints[index]
+      this.recalculateWaypointDuration()
       this.panToWaypoint()
     },
     nextWaypoint () {
@@ -183,6 +204,7 @@ export default {
       }
 
       this.currentWaypoint = this.waypoints[index]
+      this.recalculateWaypointDuration()
       this.panToWaypoint()
     },
     panToWaypoint () {
@@ -220,11 +242,38 @@ export default {
       }
 
       this.isSavingWaypoints = false
+    },
+    recalculateWaypointDuration () {
+      if (this.currentWaypoint) {
+        let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.currentWaypoint.ticks + +this.currentWaypoint.delayTicks, this.$store.state.game.settings.gameTime.speed, null)
+        this.waypointDuration = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate, true)
+      }
+      
+      this.recalculateWaypointEta()
+    },
+    recalculateWaypointEta () {
+      // Calculate the ticks + delay up to and including the current waypoint.
+      let index = this.waypoints.indexOf(this.currentWaypoint)
+      let totalTicks = 0;
+
+      for (let i = 0; i <= index; i++) {
+        let wp = this.waypoints[i]
+
+        totalTicks += wp.ticks + +wp.delayTicks
+      }
+
+      this.waypointEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicks)
+    },
+    isFirstWaypoint (waypoint) {
+      return this.waypoints.indexOf(waypoint) === 0
     }
   },
   computed: {
     canLoop () {
       return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
+    },
+    isInTransit () {
+      return !this.carrier.orbiting
     }
   }
 }

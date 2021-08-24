@@ -12,7 +12,8 @@
 
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
-            <p class="mb-0" v-if="game.settings.general.mode === 'conquest'">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
             <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
@@ -52,12 +53,20 @@
                             </span>
                           </h5>
                       </td>
-                      <td class="fit pt-3 pr-2">
+                      <td class="fit pt-3 pr-2" v-if="isConquestAllStars">
                         <span class="d-xs-block d-sm-none">
                           <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalStars}} Stars
+                        </span> 
+                      </td>
+                      <td class="fit pt-3 pr-2" v-if="isConquestHomeStars">
+                        <span class="d-xs-block d-sm-none">
+                          <i class="fas fa-star mr-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
+                        </span>
+                        <span class="d-none d-sm-block">
+                          {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Stars
                         </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
@@ -136,7 +145,7 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
       this.recalculateTimeRemaining()
     }
   },
@@ -166,17 +175,10 @@ export default {
       return userPlayer && userPlayer._id === player._id
     },
     recalculateTimeRemaining () {
-      if (this.$store.state.game.settings.gameTime.gameType === 'realTime') {
-        let time = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)
-
-        this.timeRemaining = `Next tick: ${time}`
-      } else {
-        // Calculate when the max wait limit date is.
-        let maxWaitLimitDate = moment(this.$store.state.game.state.lastTickDate).utc().add('minutes', this.$store.state.game.settings.gameTime.maxTurnWait)
-
-        let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
-
-        this.timeRemaining = `Next turn: ${time}`
+      if (gameHelper.isRealTimeGame(this.$store.state.game)) {
+        this.timeRemaining = `Next tick: ${gameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)}`
+      } else if (gameHelper.isTurnBasedGame(this.$store.state.game)) {
+        this.timeRemaining = `Next turn: ${gameHelper.getCountdownTimeStringForTurnTimeout(this.$store.state.game)}`
       }
     },
     async concedeDefeat () {
@@ -273,6 +275,12 @@ export default {
     },
     isDarkModeExtra () {
       return gameHelper.isDarkModeExtra(this.$store.state.game)
+    },
+    isConquestAllStars () {
+      return gameHelper.isConquestAllStars(this.$store.state.game)
+    },
+    isConquestHomeStars () {
+      return gameHelper.isConquestHomeStars(this.$store.state.game)
     }
   }
 }

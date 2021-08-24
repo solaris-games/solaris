@@ -367,6 +367,10 @@ module.exports = class PlayerService extends EventEmitter {
         return playerStars.length;
     }
 
+    calculateTotalHomeStars(playerStars) {
+        return playerStars.filter(s => s.homeStar).length;
+    }
+
     calculateTotalShips(ownedStars, ownedCarriers) {
         return ownedStars.reduce((sum, s) => sum + s.ships, 0) 
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
@@ -444,6 +448,7 @@ module.exports = class PlayerService extends EventEmitter {
         let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
         let totalStars = playerStars.length;
+        let totalHomeStars = this.calculateTotalHomeStars(playerStars);
 
         // In BR mode, the player star count is based on living stars only.
         if (game.settings.general.mode === 'battleRoyale') {
@@ -452,6 +457,7 @@ module.exports = class PlayerService extends EventEmitter {
 
         return {
             totalStars: totalStars,
+            totalHomeStars: totalHomeStars,
             totalCarriers: playerCarriers.length,
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
             totalEconomy: this.calculateTotalEconomy(playerStars),
@@ -489,7 +495,7 @@ module.exports = class PlayerService extends EventEmitter {
         let creditsFromEconomy = totalEco * 10;
         let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
-        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player);
+        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player, playerStars);
 
         player.credits += creditsTotal;
         player.creditsSpecialists += creditsFromSpecialistsTechnology;
@@ -521,7 +527,11 @@ module.exports = class PlayerService extends EventEmitter {
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
     }
 
-    _getCreditsSpecialistsReward(game, player) {
+    _getCreditsSpecialistsReward(game, player, playerStars) {
+        if (!playerStars.length) {
+            return 0;
+        }
+
         let isSpecialistsCreditsEnabled = this.technologyService.isTechnologyEnabled(game, 'specialists');
         let isCreditsSpecialistsCurrency = game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists';
 

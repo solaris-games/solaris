@@ -46,13 +46,15 @@ module.exports = async (config, options) => {
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
     options.syncIndexes = options.syncIndexes == null ? false : options.syncIndexes;
+    options.poolSize = options.poolSize || 5;
 
     console.log(`Connecting to database: ${options.connectionString}`);
 
     const db = await mongoose.connect(options.connectionString, {
         useNewUrlParser: true,
         useCreateIndex: true,
-        keepAlive: true
+        keepAlive: true,
+        poolSize: options.poolSize
     });
 
     await unlockAgendaJobs(db);

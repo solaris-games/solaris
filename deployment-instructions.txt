@@ -1,7 +1,7 @@
-db.games.updateMany({}, {
-    $set: {
-        'settings.orbitalMechanics': {
-            enabled: 'disabled'
-        }
-    }
+db.gameevents.deleteMany({
+    'type': 'playerStarWarpGateBuilt'
+});
+
+db.gameevents.deleteMany({
+    'type': 'playerStarWarpGateDestroyed'
 });
