@@ -6,6 +6,13 @@ class GalaxyEditor {
 
   constructor() {
     this.stars = new Array()
+    this.selectedStar = null
+    //this.vueContainer = null
+
+    this.brushOptions = {
+      brushRadius: 2,
+      starAmount: 3
+    }
   }
 
   createPixiApp () {
@@ -16,8 +23,8 @@ class GalaxyEditor {
     //let antialiasing = userSettings.map.antiAliasing === 'enabled';
 
     this.app = new PIXI.Application({
-      width: window.innerWidth, // window.innerWidth,
-      height: window.innerHeight, // window.innerHeight,
+      width: window.innerWidth/2.0, // window.innerWidth,
+      height: window.innerHeight/2.0, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: 'enabled',
@@ -45,8 +52,6 @@ class GalaxyEditor {
     // add the viewport to the stage
     this.app.stage.addChild(this.viewport)
 
-    let testStar = new Star( this.app, {x: 64.0, y: 64.0} )
-    this.viewport.addChild(testStar.container)
   }
 
   destroy () {
@@ -100,18 +105,85 @@ class GalaxyEditor {
   }
 
   _onViewportClicked(clickEvent) {
-    this.addStar(clickEvent.world)
+    if( this.hoveredStar ) {
+      this.selectedStar = this.hoveredStar
+      console.log(this.selectedStar)
+    }
+    else {
+      this.selectedStar = null
+      this.addStars(clickEvent.world)
+    }
   }
 
   addStar( location ) {
     let star = new Star(this.app, location)
+    star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
+    star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
     this.stars.push(star)
     this.viewport.addChild(star.container)
   }
 
+  addStars( location ) {
+    let amount = this.brushOptions.starAmount
+    let radius = this.brushOptions.brushRadius*50
+    if(amount === 1) {
+      this.addStar(location)
+      return
+    }
+    for( let i = 0; i < amount; i++ ) {
+      let randomLocation = {
+        x: (location.x - radius) + (Math.random()*radius*2.0),
+        y: (location.y - radius) + (Math.random()*radius*2.0)
+      }
+      let star = new Star(this.app, randomLocation)
+      star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
+      star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
+      this.stars.push(star)
+      this.viewport.addChild(star.container)
+    }
+  }
+
   clear() {
     for(let star of this.stars) {
-      this.viewport.removeChild(star)
+      this.viewport.removeChild(star.container)
+    }
+    this.stars = new Array()
+  }
+
+  generateJSON() {
+    return JSON.stringify({
+      homeStars: this.homeStars,
+      stars: this.stars
+    }, null, 2)
+  }
+
+  loadFromJSON( json ) {
+    this.clear()
+  }
+
+  onStarMouseOver(star) {
+    this.hoveredStar = star
+  }
+
+  onStarMouseOut(star) {
+    this.hoveredStar = null
+  }
+
+  updateSelected() {
+    if( this.selectedStar ) {
+      this.selectedStar.update()
+    }
+  }
+
+  destroySelected() {
+    if( this.selectedStar ) {
+
+      //TODO check if this is implemented in any helper class
+      const index = this.stars.indexOf(this.selectedStar)
+      if( index > -1 ) { this.stars.splice(index, 1) }
+
+      this.viewport.removeChild( this.selectedStar.container )
+      this.selectedStar = null
     }
   }
 }

@@ -1,19 +1,29 @@
 <template>
-  <div id="galaxyEditorContainer"></div>
+  <div id="galaxyEditorContainer" class='container'>
+    <brush-tool :toolOptions='galaxyEditor.brushOptions'/>
+    <star-tool v-if='galaxyEditor.selectedStar' :galaxyEditor='galaxyEditor'/>
+    <div id="pixi-app" ref='pixiApp'/>
+    <json-tool :galaxyEditor='galaxyEditor'/>
+  </div>
 </template>
 
 <script>
+
 import GalaxyEditor from '../../galaxy-editor/editor'
 
+import StarToolVue from './StarTool.vue'
+import BrushToolVue from './BrushTool.vue'
+import JSONToolVue from './JSONTool.vue'
+
 export default {
+  components: {
+    'star-tool': StarToolVue,
+    'json-tool': JSONToolVue,
+    'brush-tool': BrushToolVue
+  },
   data () {
     return {
-      onStarClickedHandler: null,
-      onStarRightClickedHandler: null,
-      onCarrierClickedHandler: null,
-      onWaypointCreatedHandler: null,
-      onObjectsClickedHandler: null,
-      polling: null
+      galaxyEditor: GalaxyEditor
     }
   },
 
@@ -22,24 +32,12 @@ export default {
   },
 
   beforeMount () {
-    this.galaxyEditor= GalaxyEditor
+    //this.galaxyEditor.vueContainer = this
     this.galaxyEditor.createPixiApp()
   },
 
   mounted () {
-    // Add the game canvas to the screen.
-    this.$el.appendChild(this.galaxyEditor.app.view) // Add the pixi canvas to the element.
-
-    // Bind to game events.
-		/*
-    this.onStarClickedHandler = this.onStarClicked.bind(this)
-    this.onStarRightClickedHandler = this.onStarRightClicked.bind(this)
-    this.onCarrierClickedHandler = this.onCarrierClicked.bind(this)
-    this.onCarrierRightClickedHandler = this.onCarrierRightClicked.bind(this)
-    this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
-    this.onObjectsClickedHandler = this.onObjectsClicked.bind(this)
-		*/
-
+    this.$refs.pixiApp.appendChild(this.galaxyEditor.app.view) // Add the pixi canvas to the element.
   },
 
   destroyed () {
@@ -48,26 +46,20 @@ export default {
 
   beforeDestroy () {
     window.removeEventListener('resize', this.handleResize)
-
     clearInterval(this.polling)
   },
 
   methods: {
-    loadFromJSON(json) {
-      this.galaxyEditor.loadFromJSON(json)
-    },
+    //TODO
     handleResize (e) {
       this.galaxyEditor.onResized()
-    },
-    onStarClicked (e) {
-      this.$emit('onStarClicked', e._id)
     }
   }
 }
 </script>
 
 <style scoped>
-#galaxyEditorContainer {
+#pixi-app {
   z-index: -1;
   left: 0;
   top: 0;
