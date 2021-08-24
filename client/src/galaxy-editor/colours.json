@@ -1,0 +1,34 @@
+[
+    {
+        "alias": "Red",
+        "value": "0xff2d4a"
+    },
+    {
+        "alias": "Green",
+        "value": "0x82ff26"
+    },
+    {
+        "alias": "Pink",
+        "value": "0xff4bda"
+    },
+    {
+        "alias": "Orange",
+        "value": "0xff7a2a"
+    },
+    {
+        "alias": "Purple",
+        "value": "0x9c0fff"
+    },
+    {
+        "alias": "Yellow",
+        "value": "0xdaff2f"
+    },
+    {
+        "alias": "Blue",
+        "value": "0x00acec"
+    },
+    {
+        "alias": "Cyan",
+        "value": "0x45ffc6"
+    }
+]

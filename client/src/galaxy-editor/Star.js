@@ -14,6 +14,8 @@ class Star extends EventEmitter {
     }
     this.hasWarpGate = false
     this.isHomeStar = false
+    this.playerIndex = -1
+    this.specialistID = -1
 
     this.naturalResources = Math.round(Math.random()*50)
     this.app = app

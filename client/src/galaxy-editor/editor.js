@@ -4,6 +4,9 @@ import Star from './Star'
 
 class GalaxyEditor {
 
+  static COLOURS = require('./colours.json') //TODO pull this from the api
+  static SPECIALISTS = require('./specialists.json')
+
   constructor() {
     this.stars = new Array()
     this.selectedStar = null
@@ -12,6 +15,15 @@ class GalaxyEditor {
     this.brushOptions = {
       brushRadius: 2,
       starAmount: 3
+    }
+    this.specialists = GalaxyEditor.SPECIALISTS
+    this.playerShapeAndColours = []
+    let shapes = ['circle', 'square', 'diamond', 'hexagon'] //TODO pull this from api, this is hardcoded in the server's player service and not defined in any specific file
+    for( let shape of shapes ) {
+      for( let colour of GalaxyEditor.COLOURS ) {
+        let alias = colour.alias
+        this.playerShapeAndColours.push(alias+' '+shape)
+      }
     }
   }
 
@@ -107,7 +119,6 @@ class GalaxyEditor {
   _onViewportClicked(clickEvent) {
     if( this.hoveredStar ) {
       this.selectedStar = this.hoveredStar
-      console.log(this.selectedStar)
     }
     else {
       this.selectedStar = null

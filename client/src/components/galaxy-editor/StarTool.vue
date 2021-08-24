@@ -24,6 +24,18 @@
           </div>
         </div>
         <div class='row'>
+          <select class='col mx-3' v-model.number='galaxyEditor.selectedStar.playerIndex'>
+            <option value='-1'>None</option>
+            <option v-for='(playerShapeAndColour,index) in (galaxyEditor.playerShapeAndColours)' v-bind:value='index'>{{ playerShapeAndColour }}</option>
+          </select>
+        </div>
+        <div class='row'>
+          <select v-model.number='galaxyEditor.selectedStar.specialistID' class='col mx-3'>
+            <option value='-1'>None</option>
+            <option v-for='specialist in specialists' v-bind:value='specialist.id'>{{specialist.name}}</option>
+          </select>
+        </div>
+        <div class='row'>
           <button @click="updateStar" class='col mx-3 btn btn-warning btn-lg'>Update</button>
           <button @click="destroyStar" class='col mx-3 btn btn-danger btn-lg'>Destroy</button>
         </div>
@@ -42,6 +54,14 @@
       },
       destroyStar() {
         this.galaxyEditor.destroySelected()
+      },
+      updateSpecialistID(id) {
+        this.galaxyEditor.selectedStar.specialistID = id
+      }
+    },
+    computed: {
+      specialists() {
+        return this.galaxyEditor.specialists.star
       }
     }
   }
