@@ -13,8 +13,8 @@ class Star extends EventEmitter {
       industry: 0,
       science: 0,
     }
-    this.hasWarpGate = false
-    this.isHomeStar = false
+    this.warpGate = false
+    this.homeStar = false
     this.playerIndex = -1
     this.specialistID = -1
 
@@ -47,7 +47,7 @@ class Star extends EventEmitter {
   }
 
   _updateGraphics() {
-    if( this.isHomeStar ) {
+    if( this.homeStar ) {
       this.container.scale.x = 2.0
       this.container.scale.y = 2.0
     }
@@ -136,7 +136,7 @@ class Star extends EventEmitter {
     if( this.warpGate_geometry ) {
       this.container.removeChild(this.warpGate_geometry)
     }
-    if( this.hasWarpGate ) {
+    if( this.warpGate ) {
       this.warpGate_geometry = new PIXI.Graphics()
       this.warpGate_geometry.lineStyle(2, 0xffffff, 1.0)
       this.warpGate_geometry.drawCircle(0, 0, 32)
@@ -148,7 +148,6 @@ class Star extends EventEmitter {
     if( this.star_geometry ) {
       this.container.removeChild(this.star_geometry)
     }
-    if( this.hasWarpGate ) { return }
     if( this.specialistID !== -1 ) { return }
 
     this.star_geometry = new PIXI.Graphics()
@@ -208,8 +207,10 @@ class Star extends EventEmitter {
       location: this.location,
       naturalResources: this.naturalResources,
       infrastructure: this.infrastructure,
-      hasWarpGate: this.hasWarpGate,
-      isHomeStar: this.isHomeStar
+      warpGate: this.warpGate,
+      homeStar: this.homeStar,
+      playerIndex: this.playerIndex,
+      specialistID: this.specialistID
     })
   }
 

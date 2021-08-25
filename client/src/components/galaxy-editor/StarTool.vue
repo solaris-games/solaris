@@ -1,8 +1,8 @@
-<template>
-    <div id="star-attributes" v-if="galaxyEditor.selectedStar" >
-      <div class='col-auto bg-dark'>
-        <div class='row'>
-          <label class='col-6 col-form-label-sm'>Economy</label>
+  <template>
+      <div id="star-attributes" v-if="galaxyEditor.selectedStar" >
+        <div class='col-auto bg-dark'>
+          <div class='row'>
+            <label class='col-6 col-form-label-sm'>Economy</label>
           <input class='col mr-3 form-control-sm' type='number' v-model.number='galaxyEditor.selectedStar.infrastructure.economy'/>
         </div>
         <div class='row'>
@@ -16,11 +16,11 @@
         <div class='row form-check form-check-inline'>
           <div class='col-6'>
             <label>Warp Gate </label>
-            <input class='form-check-input' type='checkbox' v-model.number='galaxyEditor.selectedStar.hasWarpGate'></input>
+            <input class='form-check-input' type='checkbox' v-model.number='galaxyEditor.selectedStar.warpGate'></input>
           </div>
           <div class='col-6'>
             <label>Home Star </label>
-            <input class='form-check-input' type='checkbox' v-model.number='galaxyEditor.selectedStar.isHomeStar'></input>
+            <input class='form-check-input' type='checkbox' v-model.number='galaxyEditor.selectedStar.homeStar'></input>
           </div>
         </div>
         <div class='row'>
