@@ -8,7 +8,7 @@ class TextureService {
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
 
-    initialize () {
+    initialize () { //TODO since both game and editor uses this. it should bot be initialized by both
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
         fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,

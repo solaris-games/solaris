@@ -62,8 +62,8 @@
     computed: {
       specialists() {
         return this.galaxyEditor.specialists
-      }
-      playerShapeAndColour() {
+      },
+      playerShapeAndColours() {
         return this.galaxyEditor.playerShapeAndColours
       }
     }

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Star from './Star'
+import TextureService from '../game/texture'
 
 class GalaxyEditor {
 
@@ -18,13 +19,17 @@ class GalaxyEditor {
     }
     this.specialists = GalaxyEditor.SPECIALISTS
     this.playerShapeAndColours = []
-    let shapes = ['circle', 'square', 'diamond', 'hexagon'] //TODO pull this from api, this is hardcoded in the server's player service and not defined in any specific file
-    for( let shape of shapes ) {
+    this.coloursValues = []
+    this.shapes = ['circle', 'square', 'diamond', 'hexagon'] //TODO pull this from api, this is hardcoded in the server's player service and not defined in any specific file
+    for( let shape of this.shapes ) {
       for( let colour of GalaxyEditor.COLOURS ) {
         let alias = colour.alias
+        this.coloursValues.push(colour.value)
         this.playerShapeAndColours.push(alias+' '+shape)
       }
     }
+
+    TextureService.initialize()
   }
 
   createPixiApp () {
@@ -182,7 +187,7 @@ class GalaxyEditor {
 
   updateSelected() {
     if( this.selectedStar ) {
-      this.selectedStar.update()
+      this.selectedStar.update(this.coloursValues, this.shapes)
     }
   }
 
