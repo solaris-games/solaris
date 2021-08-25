@@ -13,6 +13,10 @@
           <label class='col-6 col-form-label-sm'>Science</label>
           <input class='col mr-3 form-control-sm' type='number' v-model.number='galaxyEditor.selectedStar.infrastructure.science'/>
         </div>
+        <div class='row'>
+          <label class='col-6 col-form-label-sm'>Natural Resources</label>
+          <input class='col mr-3 form-control-sm' type='number' v-model.number='galaxyEditor.selectedStar.naturalResources'/>
+        </div>
         <div class='row form-check form-check-inline'>
           <div class='col-6'>
             <label>Warp Gate </label>
