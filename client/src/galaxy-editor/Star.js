@@ -51,6 +51,10 @@ class Star extends EventEmitter {
       this.container.scale.x = 2.0
       this.container.scale.y = 2.0
     }
+    else {
+      this.container.scale.x = 1.0
+      this.container.scale.y = 1.0
+    }
     this._updateStarGeometry()
     this._updateWarpGateGeometry()
     this._updatePlayerGeometry()
