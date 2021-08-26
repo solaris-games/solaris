@@ -15,9 +15,18 @@ async function startup() {
     
     console.log('MongoDB Intialized');
 
+    // ------------------------------
+    // Jobs that run every time the server restarts.
+    
     console.log('Unlock all games...');
     await container.gameService.lockAll(false);
     console.log('All games unlocked');
+
+    console.log('Recalculating user ratings...');
+    await container.ratingService.recalculateAllEloRatings();
+    console.log('Recalculated user ratings.');
+
+    // ------------------------------
 
     const gameTickJob = require('./gameTick')(container);
     const officialGamesCheckJob = require('./officialGamesCheck')(container);
@@ -70,11 +79,6 @@ async function startup() {
     agendajs.every('5 minutes', 'new-player-game-check');
     agendajs.every('1 hour', 'cleanup-old-custom-games');
     agendajs.every('1 day', 'cleanup-old-game-history');
-
-    // Jobs that run every time the server restarts.
-    console.log('Recalculating user ratings...');
-    await container.ratingService.recalculateAllEloRatings();
-    console.log('Done');
 }
 
 process.on('SIGINT', async () => {
