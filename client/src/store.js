@@ -176,12 +176,15 @@ export default new Vuex.Store({
         }
 
         if (s.manufacturing != null) {
+          player.stats.newShips -= star.manufacturing // Deduct old value
           star.manufacturing = s.manufacturing
-          player.stats.newShips = Math.round((player.stats.newShips + s.manufacturing + Number.EPSILON) * 100) / 100
+          player.stats.newShips += s.manufacturing // Add the new value
         }
 
         GameContainer.reloadStar(star)
       })
+
+      player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
       
       // Update player total stats.
 
