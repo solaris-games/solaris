@@ -17,14 +17,10 @@ async function startup() {
 
     // ------------------------------
     // Jobs that run every time the server restarts.
-    
+
     console.log('Unlock all games...');
     await container.gameService.lockAll(false);
     console.log('All games unlocked');
-
-    console.log('Recalculating user ratings...');
-    await container.ratingService.recalculateAllEloRatings();
-    console.log('Recalculated user ratings.');
 
     // ------------------------------
 
