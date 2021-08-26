@@ -49,7 +49,7 @@
           <div class="col">
             <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{waypointEta}}</p>
           </div>
-          <div class="col-auto">
+          <div class="col-auto" v-if="isRealTimeGame">
             <p class="mb-2">Duration<orbital-mechanics-eta-warning />: {{waypointDuration}}</p>
           </div>
         </div>
@@ -274,6 +274,9 @@ export default {
     },
     isInTransit () {
       return !this.carrier.orbiting
+    },
+    isRealTimeGame () {
+      return GameHelper.isRealTimeGame(this.$store.state.game)
     }
   }
 }
