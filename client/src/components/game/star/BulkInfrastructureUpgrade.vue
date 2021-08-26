@@ -89,7 +89,7 @@
         </tbody>
       </table>
     </div>
-    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" :highlightIgnoredInfrastructure="selectedType" />
+    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
   </div>
 </template>
 

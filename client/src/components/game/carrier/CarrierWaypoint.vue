@@ -20,7 +20,7 @@
         
         <div class="row no-gutters mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
-              <input type="number" class="form-control input-sm" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
+              <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
             </div>
             <div class="col-3 text-center pt-1">
                 <!-- <a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(currentWaypoint.destination)}}</a> -->
@@ -69,13 +69,13 @@
         </button>
 			</div>
 			<div class="col-auto" v-if="!$isHistoricalMode()">
-				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ml-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
-          <i class="fas fa-edit"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+          <i class="fas fa-check"></i>
+          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Close</span>
         </button>
 			</div>
 		</div>
@@ -121,7 +121,7 @@ export default {
     this.panToWaypoint()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateWaypointEta, 200)
+      this.intervalFunction = setInterval(this.recalculateWaypointEta, 1000)
       this.recalculateWaypointEta()
     }
   },
@@ -263,11 +263,17 @@ export default {
       }
 
       this.waypointEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicks)
+    },
+    isFirstWaypoint (waypoint) {
+      return this.waypoints.indexOf(waypoint) === 0
     }
   },
   computed: {
     canLoop () {
       return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
+    },
+    isInTransit () {
+      return !this.carrier.orbiting
     }
   }
 }

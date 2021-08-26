@@ -24,23 +24,30 @@
       <table v-if="!isLoadingActiveGames && filteredActiveGames.length" class="table table-striped table-hover">
           <thead>
               <tr class="bg-primary">
-                  <td class="col">Name</td>
-                  <td class="col text-center">Players</td>
-                  <td class="col d-none d-lg-table-cell">Status</td>
+                  <td class="col-9 col-md-6">Name</td>
+                  <td class="col-3 d-none d-md-table-cell">Cycle/Turn</td>
+                  <td class="col-1 col-md-6 text-center">Players</td>
                   <td class="col-auto"></td>
               </tr>
           </thead>
           <tbody>
               <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
-                  <td class="col">
+                  <td class="col-6">
                     {{game.settings.general.name}}
                     <span v-if="game.defeated && !game.afk" class="ml-1 badge badge-danger">Defeated</span>
                     <span v-if="!game.defeated && game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
                     <span v-if="!game.defeated && game.unread" class="ml-1 badge badge-info">{{game.unread}} Notifications</span>
                     <span v-if="game.afk" class="ml-1 badge badge-warning">AFK</span>
                   </td>
-                  <td class="col text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
-                  <td class="col d-none d-lg-table-cell">{{getGameStatusText(game)}}</td>
+                  <td class="col-3 d-none d-md-table-cell">
+                    <span v-if="isGamePendingStart(game)">
+                      Starting Soon
+                    </span>
+                    <span v-if="!isGamePendingStart(game)">
+                      <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                    </span>
+                  </td>
+                  <td class="col-1 col-md-6 text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                   <td class="col-auto btn-group">
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
                     <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
@@ -101,12 +108,14 @@ import ViewTitle from '../components/ViewTitle'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import moment from 'moment'
+import CountdownTimer from '../components/CountdownTimer.vue'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
-    'view-title': ViewTitle
+    'view-title': ViewTitle,
+    'countdown-timer': CountdownTimer
   },
   data () {
     return {
@@ -135,11 +144,25 @@ export default {
     this.isLoadingCompletedGames = false
   },
   methods: {
-    getGameStatusText (game) {
-      return GameHelper.getGameStatusText(game)
-    },
     getEndDateFromNow (game) {
       return moment(game.state.endDate).fromNow()
+    },
+    isRealTimeGame (game) {
+      return GameHelper.isRealTimeGame(game);
+    },
+    isGamePendingStart (game) {
+      return GameHelper.isGamePendingStart(game)
+    },
+    getNextCycleDate (game) {
+      // TODO: This doesn't work, for some reason getCountdownTime returns a number wtf
+      // if (GameHelper.isGamePendingStart(game)) {
+      //   return GameHelper.getCountdownTime(game, game.state.startDate)
+      // } else 
+      if (GameHelper.isRealTimeGame(game)) {
+        return GameHelper.getCountdownTimeForProductionCycle(game)
+      } else if (GameHelper.isTurnBasedGame(game)) {
+        return GameHelper.getCountdownTimeForTurnTimeout(game)
+      }
     }
   },
   computed: {

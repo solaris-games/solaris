@@ -9,7 +9,7 @@
       <span v-if="star.infrastructure" class="text-info" title="Science">{{star.infrastructure.science}}</span>
     </td>
     <td class="last">
-      <ignore-bulk-upgrade :starId="star._id" :highlightIgnoredInfrastructure="highlightIgnoredInfrastructure"/>
+      <ignore-bulk-upgrade :starId="star._id" :highlightIgnoredInfrastructure="highlightIgnoredInfrastructure" @bulkIgnoreChanged="onBulkIgnoreChanged"/>
     </td>
 </tr>
 </template>
@@ -35,6 +35,9 @@ export default {
     }
   },
   methods: {
+    onBulkIgnoreChanged (e) {
+      this.$emit('bulkIgnoreChanged', e);
+    },
     clickStar (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },

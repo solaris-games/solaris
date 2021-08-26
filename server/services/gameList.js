@@ -58,7 +58,10 @@ module.exports = class GameListService {
         .select({
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.gametime.speed': 1,
+            'settings.gametime.gameType': 1,
             'settings.gameTime': 1,
+            'settings.galaxy.productionTicks': 1,
             'galaxy.players': 1,
             conversations: 1,
             state: 1

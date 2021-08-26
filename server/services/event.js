@@ -15,8 +15,6 @@ module.exports = class EventService {
         PLAYER_COMBAT_STAR: 'playerCombatStar',
         PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
         PLAYER_RESEARCH_COMPLETE: 'playerResearchComplete',
-        PLAYER_STAR_WARP_GATE_BUILT: 'playerStarWarpGateBuilt',
-        PLAYER_STAR_WARP_GATE_DESTROYED: 'playerStarWarpGateDestroyed',
         PLAYER_TECHNOLOGY_RECEIVED: 'playerTechnologyReceived',
         PLAYER_TECHNOLOGY_SENT: 'playerTechnologySent',
         PLAYER_CREDITS_RECEIVED: 'playerCreditsReceived',
@@ -73,8 +71,6 @@ module.exports = class EventService {
 
         this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
         
-        this.starUpgradeService.on('onPlayerWarpGateBuilt', (args) => this.createWarpGateBuiltEvent(args.gameId, args.gameTick, args.player, args.star));
-        this.starUpgradeService.on('onPlayerWarpGateDestroyed', (args) => this.createWarpGateDestroyedEvent(args.gameId, args.gameTick, args.player, args.star));
         this.starUpgradeService.on('onPlayerInfrastructureBulkUpgraded', (args) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
 
         this.tradeService.on('onPlayerCreditsReceived', (args) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
@@ -337,24 +333,6 @@ module.exports = class EventService {
         };
 
         return await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
-    }
-
-    async createWarpGateBuiltEvent(gameId, gameTick, player, star) {
-        let data = {
-            starId: star._id,
-            starName: star.name
-        };
-
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_BUILT, data, true);
-    }
-
-    async createWarpGateDestroyedEvent(gameId, gameTick, player, star) {
-        let data = {
-            starId: star._id,
-            starName: star.name
-        };
-
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_WARP_GATE_DESTROYED, data, true);
     }
 
     async createTechnologyReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, technology) {

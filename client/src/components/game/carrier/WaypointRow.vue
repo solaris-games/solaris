@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <td>{{waypoint.delayTicks}}</td>
+        <td><span v-if="!(isFirstWaypoint(waypoint) && isInTransit)">{{waypoint.delayTicks}}</span></td>
         <td><a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(waypoint.destination)}}</a></td>
         <td v-if="!showAction">{{timeRemainingEta}}</td>
         <td v-if="showAction">
@@ -31,7 +31,7 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
       this.recalculateTimeRemaining()
     }
   },
@@ -76,11 +76,17 @@ export default {
     },
     recalculateTimeRemaining () {
       this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.waypoint.ticksEta)
+    },
+    isFirstWaypoint (waypoint) {
+      return this.carrier.waypoints.indexOf(waypoint) === 0
     }
   },
   computed: {
     canEditWaypoints: function () {
       return !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
+    },
+    isInTransit () {
+      return !this.carrier.orbiting
     }
   }
 }
