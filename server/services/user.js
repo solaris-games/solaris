@@ -361,4 +361,14 @@ module.exports = class UserService extends EventEmitter {
         });
     }
 
+    async listUserEloRatingsByIds(userIds) {
+        return await this.userModel.find({
+            _id: { $in: userIds }
+        }, {
+            'achievements.eloRating': 1
+        })
+        .lean()
+        .exec();
+    }
+
 };

@@ -24,6 +24,7 @@ const schema = new Schema({
     achievements: {
         victories: { type: Types.Number, default: 0 },
         rank: { type: Types.Number, default: 0 },
+        eloRating: { type: Types.Number, default: null },
         renown: { type: Types.Number, default: 0 },
         joined: { type: Types.Number, default: 0 },
         completed: { type: Types.Number, default: 0 },

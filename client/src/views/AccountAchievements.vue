@@ -50,6 +50,10 @@
             <td class="text-right">{{ user.achievements.victories }}</td>
           </tr>
           <tr>
+            <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
+            <td class="text-right">{{ user.achievements.eloRating || 1200 }}</td>
+          </tr>
+          <tr>
             <td>Joined</td>
             <td class="text-right">{{ user.achievements.joined }}</td>
           </tr>

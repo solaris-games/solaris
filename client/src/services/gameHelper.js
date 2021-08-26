@@ -722,6 +722,10 @@ class GameHelper {
     return game.settings.gameTime.gameType === 'turnBased';
   }
 
+  is1v1Game (game) {
+    return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type)
+  }
+
   isAllUndefeatedPlayersReady(game) {
     let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
 

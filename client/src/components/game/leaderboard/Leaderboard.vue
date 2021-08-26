@@ -69,7 +69,7 @@
                           {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Stars
                         </span> 
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
                         <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
@@ -281,6 +281,9 @@ export default {
     },
     isConquestHomeStars () {
       return gameHelper.isConquestHomeStars(this.$store.state.game)
+    },
+    canEndTurn () {
+      return GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)
     }
   }
 }

@@ -16,7 +16,8 @@ module.exports = class LeaderboardService {
                 'roles.gameMaster': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
-                'achievements.renown': 1
+                'achievements.renown': 1,
+                'achievements.eloRating': 1
             }
         },
         victories: {
@@ -33,9 +34,10 @@ module.exports = class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
-                'achievements.victories': 1,
                 'achievements.rank': 1,
-                'achievements.renown': 1
+                'achievements.victories': 1,
+                'achievements.renown': 1,
+                'achievements.eloRating': 1
             }
         },
         renown: {
@@ -52,9 +54,10 @@ module.exports = class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
-                'achievements.renown': 1,
                 'achievements.rank': 1,
-                'achievements.victories': 1
+                'achievements.victories': 1,
+                'achievements.renown': 1,
+                'achievements.eloRating': 1
             }
         },
         joined: {
@@ -426,6 +429,30 @@ module.exports = class LeaderboardService {
                 username: 1,
                 'achievements.trade.renownSent': 1
             }
+        },
+        "elo-rating": {
+            fullKey: 'achievements.eloRating',
+            query: {
+                'achievements.eloRating': { $ne: null }
+            },
+            sort: {
+                'achievements.eloRating': -1,
+                'achievements.rank': -1,
+                'achievements.victories': -1,
+                'achievements.renown': -1
+            },
+            select: {
+                username: 1,
+                guildId: 1,
+                'roles.contributor': 1,
+                'roles.developer': 1,
+                'roles.communityManager': 1,
+                'roles.gameMaster': 1,
+                'achievements.rank': 1,
+                'achievements.victories': 1,
+                'achievements.renown': 1,
+                'achievements.eloRating': 1
+            }
         }
     }
 
@@ -451,17 +478,19 @@ module.exports = class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userModel, userService, playerService, guildUserService) {
+    constructor(userModel, userService, playerService, guildUserService, ratingService) {
         this.userModel = userModel;
         this.userService = userService;
         this.playerService = playerService;
         this.guildUserService = guildUserService;
+        this.ratingService = ratingService;
     }
 
     async getLeaderboard(limit, sortingKey, skip = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
         
-        let leaderboard = await this.userModel.find({})
+        let leaderboard = await this.userModel
+            .find(sorter.query || {})
             .skip(skip)
             .limit(limit)
             .sort(sorter.sort)
@@ -605,6 +634,19 @@ module.exports = class LeaderboardService {
             if (!player.defeated) {
                 user.achievements.completed++;
             }
+        }
+
+        this.addUserRatingCheck(game, gameUsers);
+    }
+
+    addUserRatingCheck(game, gameUsers) {
+        if (['1v1_rt', '1v1_tb'].includes(game.settings.general.type)) {
+            let userA = gameUsers[0];
+            let userB = gameUsers[1];
+
+            let userAIsWinner = userA._id.equals(game.state.winner);
+
+            this.ratingService.recalculateEloRating(userA, userB, userAIsWinner);
         }
     }
 
