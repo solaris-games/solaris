@@ -27,11 +27,9 @@ class Star extends EventEmitter {
     //this.container.interactiveChildren = false
     this.container.buttonMode = true
     this.container.hitArea = new PIXI.Circle(0, 0, 32)
+    this.baseScale = 1.0/8.8
 
-    this.graphics = new PIXI.Graphics()
     this._updateGraphics()
-
-    this.container.addChild(this.graphics)
 
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
@@ -48,12 +46,12 @@ class Star extends EventEmitter {
 
   _updateGraphics() {
     if( this.homeStar ) {
-      this.container.scale.x = 2.0
-      this.container.scale.y = 2.0
+      this.container.scale.x = 2.0*this.baseScale
+      this.container.scale.y = 2.0*this.baseScale
     }
     else {
-      this.container.scale.x = 1.0
-      this.container.scale.y = 1.0
+      this.container.scale.x = 1.0*this.baseScale
+      this.container.scale.y = 1.0*this.baseScale
     }
     this._updateStarGeometry()
     this._updateWarpGateGeometry()

@@ -7,6 +7,7 @@ class GalaxyEditor {
 
   static COLOURS = require('./colours.json') //TODO pull this from the api
   static SPECIALISTS = require('./specialists.json')
+  static LIGHT_YEAR_LENGTH = 50
 
   constructor() {
     this.stars = new Array()
@@ -65,9 +66,13 @@ class GalaxyEditor {
       disableOnContextMenu: true
     })
     this.setupViewport()
+    this.viewport.setZoom(2)
+    this._drawScaleBar()
 
     // add the viewport to the stage
     this.app.stage.addChild(this.viewport)
+
+    this.app.ticker.add(this._onTick.bind(this))
 
   }
 
@@ -201,6 +206,28 @@ class GalaxyEditor {
       this.viewport.removeChild( this.selectedStar.container )
       this.selectedStar = null
     }
+  }
+
+  _onTick() {
+    let viewportWidth = (this.viewport.right-this.viewport.left)
+    let zoom = (this.viewport.screenWidth / viewportWidth)
+    this._updateScaleBarScale(zoom)
+  }
+
+  _drawScaleBar() {
+    this.scaleText = new PIXI.Text('1 light year: ',{fontFamily : 'Arial', fontSize: 14, fill : 0xffffff, align : 'center'})
+    this.app.stage.addChild(this.scaleText)
+    this.scaleBar = new PIXI.Graphics()
+    this.scaleBar.beginFill(0xffffff, 1.0)
+    this.scaleBar.drawRect(0,0,GalaxyEditor.LIGHT_YEAR_LENGTH, this.scaleText.height/4.0)
+    this.scaleBar.endFill()
+    this.scaleBar.position.x = this.scaleText.width
+    this.scaleBar.position.y = this.scaleText.height/2.0 - this.scaleBar.height/2.0
+    this.app.stage.addChild(this.scaleBar)
+  }
+
+  _updateScaleBarScale(zoom) {
+    this.scaleBar.scale.x = zoom
   }
 }
 
