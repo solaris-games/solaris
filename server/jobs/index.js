@@ -22,6 +22,10 @@ async function startup() {
     await container.gameService.lockAll(false);
     console.log('All games unlocked');
 
+    console.log('Recalculating all ELO ratings...');
+    await container.ratingService.recalculateAllEloRatings(false);
+    console.log('ELO ratings recalculated');
+
     // ------------------------------
 
     const gameTickJob = require('./gameTick')(container);

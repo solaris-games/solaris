@@ -38,12 +38,19 @@ module.exports = class RatingService {
             let userA = users.find(u => u._id.toString() === game.galaxy.players[0].userId.toString());
             let userB = users.find(u => u._id.toString() === game.galaxy.players[1].userId.toString());
 
-            if (!userA || !userB) {
-                continue;
+            let userAIsWinner;
+
+            // Note: This factors in whether user accounts still exist for both players.
+            if (!userA) {
+                userAIsWinner = false;
+            } else if (!userB) {
+                userAIsWinner = true;
+            } else {
+                let winningPlayer = game.galaxy.players.find(p => p._id.equals(game.state.winner));
+
+                userAIsWinner = userA._id.toString() === winningPlayer.userId;
             }
-
-            let userAIsWinner = userA._id.equals(game.state.winner);
-
+    
             this.recalculateEloRating(userA, userB, userAIsWinner);
         }
 
@@ -66,13 +73,23 @@ module.exports = class RatingService {
     }
 
     recalculateEloRating(userA, userB, userAIsWinner) {
+        // Note that some players may no longer have accounts, in which case consider it a win for the
+        // player against the same rank as their own.
+        let userARating = userA == null ? userB.achievements.eloRating : userA.achievements.eloRating;
+        let userBRating = userB == null ? userA.achievements.eloRating : userB.achievements.eloRating;
+
         let eloResult = EloRating.calculate(
-            userA.achievements.eloRating == null ? 1200 : userA.achievements.eloRating, 
-            userB.achievements.eloRating == null ? 1200 : userB.achievements.eloRating, 
+            userARating == null ? 1200 : userARating, 
+            userBRating == null ? 1200 : userBRating, 
             userAIsWinner);
 
-        userA.achievements.eloRating = eloResult.playerRating;
-        userB.achievements.eloRating = eloResult.opponentRating;
+        if (userA) {
+            userA.achievements.eloRating = eloResult.playerRating;
+        }
+
+        if (userB) {
+            userB.achievements.eloRating = eloResult.opponentRating;
+        }
     }
 
     async _listCompleted1v1s() {
@@ -81,6 +98,7 @@ module.exports = class RatingService {
             'state.endDate': { $ne: null }
         }, {
             'state': 1,
+            'galaxy.players._id': 1,
             'galaxy.players.userId': 1
         })
         .sort({
