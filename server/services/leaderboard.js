@@ -644,7 +644,9 @@ module.exports = class LeaderboardService {
             let userA = gameUsers[0];
             let userB = gameUsers[1];
 
-            let userAIsWinner = userA._id.equals(game.state.winner);
+            let winningPlayer = game.galaxy.players.find(p => p._id.equals(game.state.winner));
+
+            let userAIsWinner = userA._id.toString() === winningPlayer.userId;
 
             this.ratingService.recalculateEloRating(userA, userB, userAIsWinner);
         }
