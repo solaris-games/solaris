@@ -6,12 +6,11 @@ module.exports = class CustomMapService {
     generateLocations(game, starCount, playerCount) {
         const json = JSON.parse(game.settings) //need correct path
         const locations = [];
-        const nameList = new Set()
-        const homeList = Array.from({ length: playerCount }, () => [])
-        const ownedList = Array.from({ length: playerCount }, () => [])
+        //const nameList = new Set()
+        const homeStars = []
 
         for (const star of json.stars) {
-            if (nameList.has(star.name)) continue
+            //if (nameList.has(star.name)) continue
 
             if (!this._checkStarProperty(star?.location, 'x', 'number')) continue
             if (!this._checkStarProperty(star?.location, 'y', 'number')) continue
@@ -20,20 +19,21 @@ module.exports = class CustomMapService {
             if (!this._checkStarProperty(star?.infrastructure, 'economy', 'number')) continue
             if (!this._checkStarProperty(star?.infrastructure, 'industry', 'number')) continue
             if (!this._checkStarProperty(star?.infrastructure, 'science', 'number')) continue
-            if (!this._checkStarProperty(star, 'ships', 'number')) continue
-            if (!this._checkStarProperty(star, 'ownedByPlayerId', 'number')) continue
-            if (!this._checkStarProperty(star, 'isHomeStar', 'boolean')) continue
+            //if (!this._checkStarProperty(star, 'ships', 'number')) continue
+            if (!this._checkStarProperty(star, 'playerIndex', 'number')) continue
+            if (!this._checkStarProperty(star, 'homeStar', 'boolean')) continue
+            if (!this._checkStarProperty(star, 'specialistId', 'number')) continue
 
             if (star.naturalResources < 10 || star.naturalResources > 100)
                 throw new ValidationError('Illigal starting amount of resources, range needs to be between 10 and 100 inclusive')
-            if (star.ownedByPlayerId < -1 || star.ownedByPlayerId >= playerCount)
+            if (star.playerIndex >= (8*4)) //colours*shapes
                 throw new ValidationError('Invalid playerid')
 
-            if (star?.ownedByPlayerId !== -1) {
-                ownedList[star.ownedByPlayerId].push(star)
-                if (star.isHome) homeList[star.ownedByPlayerId].push(star)
+            if (star?.homeStar) {
+              homeStars.push(star)
+              if (star.playerIndex && star.playerIndex >=0) { playerIndexes.push(star.playerIndex) }
             }
-            nameList.add(star.name)
+            //nameList.add(star.name)
 
             locations.push(star)
         }
@@ -47,6 +47,21 @@ module.exports = class CustomMapService {
         if (locations.length !== starCount)
             throw new ValidationError('Not enough stars in json data generated.')
 
+        if (homeStars.length === playerIndexes.length) {
+          _linkStars(homeStars, json.stars)
+        }
+        else {
+          if(playerIndexes.length !== 0) {
+            throw new ValidationError('Unequal amount of home stars and players')
+          } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
+        }
+
+        let commonStarAmount = homeStars[0].linkedStars
+        for (let homeStar of homeStars) {
+          if(homeStar.linkedStars !== commonStarAmount)
+            throw new ValidationError('unfair start - players dont have the same amount of stars')
+        }
+
         return locations
     }
 
@@ -55,5 +70,18 @@ module.exports = class CustomMapService {
         if (star?.[property] === undefined) throw new ValidationError(`Missing property ${property} of star ${star}`)
         if (typeof star[property] !== type) throw new ValidationError(`Invalid type property ${property} of star ${star}`)
         return true
+    }
+
+    _linkStars(homeStars, stars) {
+      let commonStars = stars.filter( (star) => { !star.homeStar })
+      for(let homeStar of homeStars) {
+        homeStar.linkedStars = []
+        for(let commonStar of commonStars) {
+          if(commonStar.playerIndex === homeStar.playerIndex) {
+            homeStar.linkedStars.push(commonStar)
+            commonStars.linked = true
+          }
+        }
+      }
     }
 }

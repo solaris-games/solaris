@@ -42,7 +42,7 @@ module.exports = class MapService {
                 starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             case 'custom':
-                return this.customMapService.generateLocations(game, starCount, playerLimit)
+                starLocations = this.customMapService.generateLocations(game, starCount, playerLimit)
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
@@ -71,6 +71,9 @@ module.exports = class MapService {
             stars.push(star);
 
             if (starLocation.homeStar) {
+                if (starLocation.playerIndex) {
+                  game.galaxy.playerIndexes.push(starLocation.playerIndex)
+                }
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {

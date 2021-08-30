@@ -71,6 +71,7 @@ module.exports = class GameCreateService {
 
         // Create all of the stars required.
         game.galaxy.homeStars = [];
+        game.galaxy.playerIndexes = [];
         game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
             game,
