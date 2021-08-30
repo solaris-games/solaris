@@ -2,8 +2,8 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService) {
+    constructor(randomService, starService, starDistanceService, nameService,
+        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, customMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
@@ -13,6 +13,7 @@ module.exports = class MapService {
         this.doughnutMapService = doughnutMapService;
         this.circularBalancedMapService = circularBalancedMapService;
         this.irregularMapService = irregularMapService;
+        this.customMapService = customMapService;
     }
 
     generateStars(game, starCount, playerLimit, warpGatesSetting) {
@@ -25,13 +26,13 @@ module.exports = class MapService {
         let starLocations = [];
 
         switch (game.settings.galaxy.galaxyType) {
-            case 'circular': 
+            case 'circular':
                 starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'spiral': 
+            case 'spiral':
                 starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'doughnut': 
+            case 'doughnut':
                 starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'circular-balanced':
@@ -40,6 +41,8 @@ module.exports = class MapService {
             case 'irregular':
                 starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
+            case 'custom':
+                return this.customMapService.generateLocations(game, starCount, playerLimit)
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
@@ -91,14 +94,14 @@ module.exports = class MapService {
         if (warpGatesSetting !== 'none') {
             this.generateGates(stars, warpGatesSetting, playerLimit);
         }
-        
+
         return stars;
     }
 
     generateGates(stars, type, playerCount) {
         let gateCount = 0;
 
-        switch(type) {
+        switch (type) {
             case 'rare': gateCount = playerCount; break;            // 1 per player
             case 'common': gateCount = stars.length / playerCount; break;  // fucking loads
         }
@@ -153,7 +156,7 @@ module.exports = class MapService {
                 y: 0
             };
         }
-        
+
         let totalX = starLocations.reduce((total, s) => total += s.x, 0);
         let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 
