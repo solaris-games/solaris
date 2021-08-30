@@ -239,11 +239,11 @@ module.exports = class PlayerService extends EventEmitter {
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
             
-            star.warpGate ??= false;
-            star.specialistId ??= null;
-            star.infrastructure.economy ??= 0;
-            star.infrastructure.industry ??= 0;
-            star.infrastructure.science ??= 0;
+            star.warpGate = star.warpGate ?? false;
+            star.specialistId = star.specialistId ?? null;
+            star.infrastructure.economy = star.infrastructure.economy ?? 0;
+            star.infrastructure.industry = star.infrastructure.industry ?? 0;
+            star.infrastructure.science = star.infrastructure.science ?? 0;
 
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
