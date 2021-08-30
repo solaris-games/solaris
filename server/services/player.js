@@ -106,20 +106,31 @@ module.exports = class PlayerService extends EventEmitter {
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
-        for(let i = 0; i < game.settings.general.playerLimit; i++) {
-            // Get a random colour to assign to the player.
-            if (!colours.length) {
-                colours = require('../config/game/colours').slice();
-                shapeIndex++;
-            }
-
-            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
-            let shape = shapes[shapeIndex];
-
-            let player = this.createEmptyPlayer(game, colour, shape);
-
+        if(game.galaxy.playerIndexes) {
+          for(let index of game.galaxy.playerIndexes) {
+            let colour = colours[index%8][0] // 0 for alias
+            let shape = shapes[Math.floor(index/8)]
+            let player = createEmptyPlayer(game, colour, shape)
             this._setDefaultResearchTechnology(game, player);
             players.push(player);
+          }
+        }
+        else {
+          for(let i = 0; i < game.settings.general.playerLimit; i++) {
+              // Get a random colour to assign to the player.
+              if (!colours.length) {
+                  colours = require('../config/game/colours').slice();
+                  shapeIndex++;
+              }
+
+              let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+              let shape = shapes[shapeIndex];
+
+              let player = this.createEmptyPlayer(game, colour, shape);
+
+              this._setDefaultResearchTechnology(game, player);
+              players.push(player);
+          }
         }
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
@@ -227,11 +238,12 @@ module.exports = class PlayerService extends EventEmitter {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            star.warpGate = false;
-            star.specialistId = null;
-            star.infrastructure.economy = 0;
-            star.infrastructure.industry = 0;
-            star.infrastructure.science = 0;
+            
+            star.warpGate ??= false;
+            star.specialistId ??= null;
+            star.infrastructure.economy ??= 0;
+            star.infrastructure.industry ??= 0;
+            star.infrastructure.science ??= 0;
 
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }

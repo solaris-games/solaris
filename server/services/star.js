@@ -27,6 +27,16 @@ module.exports = class StarService extends EventEmitter {
         };
     }
 
+    generateStar(game, name, location) {
+      return {
+        _id: mongoose.Types.ObjectId(),
+        name,
+        naturalResources: location.naturalResources,
+        location,
+        infrastructure: location.infrastructure,
+        specialistId: location.specialistId
+    }
+
     generateStarPosition(game, originX, originY, radius) {
         if (radius == null) {
             radius = game.constants.distances.maxDistanceBetweenStars;
@@ -51,14 +61,14 @@ module.exports = class StarService extends EventEmitter {
         homeStar.ships = homeStar.shipsActual;
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.homeStar = true;
-        homeStar.warpGate = false;
+        homeStar.warpGate ??= false;
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
         
         // ONLY the home star gets the starting infrastructure.
-        homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
-        homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
-        homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
+        homeStar.infrastructure.economy ??= gameSettings.player.startingInfrastructure.economy;
+        homeStar.infrastructure.industry ??= gameSettings.player.startingInfrastructure.industry;
+        homeStar.infrastructure.science ??= gameSettings.player.startingInfrastructure.science;
     }
 
     getPlayerHomeStar(stars, player) {
