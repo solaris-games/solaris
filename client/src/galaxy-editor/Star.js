@@ -16,7 +16,7 @@ class Star extends EventEmitter {
     this.warpGate = false
     this.homeStar = false
     this.playerIndex = -1
-    this.specialistID = -1
+    this.specialistId = -1
 
     this.naturalResources = Math.round(Math.random()*50)
     this.app = app
@@ -122,9 +122,9 @@ class Star extends EventEmitter {
       this.specialist_sprite.destroy()
       this.specialist_sprite = null
     }
-    if(this.specialistID === -1) { return }
+    if(this.specialistId === -1) { return }
 
-    let specialistTexture = TextureService.getSpecialistTexture(this.specialistID, false)
+    let specialistTexture = TextureService.getSpecialistTexture(this.specialistId, false)
     this.specialist_sprite = new PIXI.Sprite(specialistTexture)
     this.specialist_sprite.width = 32
     this.specialist_sprite.height = 32
@@ -150,7 +150,7 @@ class Star extends EventEmitter {
     if( this.star_geometry ) {
       this.container.removeChild(this.star_geometry)
     }
-    if( this.specialistID !== -1 ) { return }
+    if( this.specialistId !== -1 ) { return }
 
     this.star_geometry = new PIXI.Graphics()
     this.star_geometry.lineStyle(2, 0xffffff, 1.0)
@@ -212,7 +212,7 @@ class Star extends EventEmitter {
       warpGate: this.warpGate,
       homeStar: this.homeStar,
       playerIndex: this.playerIndex,
-      specialistID: this.specialistID
+      specialistId: this.specialistId
     })
   }
 

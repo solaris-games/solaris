@@ -34,7 +34,7 @@
           </select>
         </div>
         <div class='row'>
-          <select v-model.number='galaxyEditor.selectedStar.specialistID' class='col mx-3'>
+          <select v-model.number='galaxyEditor.selectedStar.specialistId' class='col mx-3'>
             <option value='-1'>None</option>
             <option v-for='specialist in specialists' v-bind:value='specialist.id'>{{specialist.name}}</option>
           </select>
@@ -60,7 +60,7 @@
         this.galaxyEditor.destroySelected()
       },
       updateSpecialistID(id) {
-        this.galaxyEditor.selectedStar.specialistID = id
+        this.galaxyEditor.selectedStar.specialistId = id
       }
     },
     computed: {
