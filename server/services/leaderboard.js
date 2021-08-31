@@ -211,73 +211,73 @@ module.exports = class LeaderboardService {
             }
         },
         "economy": {
-            fullKey: 'achievements.infastructure.economy',
+            fullKey: 'achievements.infrastructure.economy',
             sort: {
-                'achievements.infastructure.economy': -1
+                'achievements.infrastructure.economy': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.economy': 1
+                'achievements.infrastructure.economy': 1
             }
         },
         "industry": {
-            fullKey: 'achievements.infastructure.industry',
+            fullKey: 'achievements.infrastructure.industry',
             sort: {
-                'achievements.infastructure.industry': -1
+                'achievements.infrastructure.industry': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.industry': 1
+                'achievements.infrastructure.industry': 1
             }
         },
         "science": {
-            fullKey: 'achievements.infastructure.science',
+            fullKey: 'achievements.infrastructure.science',
             sort: {
-                'achievements.infastructure.science': -1
+                'achievements.infrastructure.science': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.science': 1
+                'achievements.infrastructure.science': 1
             }
         },
         "warpgates-built": {
-            fullKey: 'achievements.infastructure.warpGates',
+            fullKey: 'achievements.infrastructure.warpGates',
             sort: {
-                'achievements.infastructure.warpGates': -1
+                'achievements.infrastructure.warpGates': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.warpGates': 1
+                'achievements.infrastructure.warpGates': 1
             }
         },
         "warpgates-destroyed": {
-            fullKey: 'achievements.infastructure.warpGatesDestroyed',
+            fullKey: 'achievements.infrastructure.warpGatesDestroyed',
             sort: {
-                'achievements.infastructure.warpGatesDestroyed': -1
+                'achievements.infrastructure.warpGatesDestroyed': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.warpGatesDestroyed': 1
+                'achievements.infrastructure.warpGatesDestroyed': 1
             }
         },
         "carriers-built": {
-            fullKey: 'achievements.infastructure.carriers',
+            fullKey: 'achievements.infrastructure.carriers',
             sort: {
-                'achievements.infastructure.carriers': -1
+                'achievements.infrastructure.carriers': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.carriers': 1
+                'achievements.infrastructure.carriers': 1
             }
         },
         "specialists-hired": {
-            fullKey: 'achievements.infastructure.specialistsHired',
+            fullKey: 'achievements.infrastructure.specialistsHired',
             sort: {
-                'achievements.infastructure.specialistsHired': -1
+                'achievements.infrastructure.specialistsHired': -1
             },
             select: {
                 username: 1,
-                'achievements.infastructure.specialistsHired': 1
+                'achievements.infrastructure.specialistsHired': 1
             }
         },
         "scanning": {
@@ -488,7 +488,7 @@ module.exports = class LeaderboardService {
 
     async getLeaderboard(limit, sortingKey, skip = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
-        
+
         let leaderboard = await this.userModel
             .find(sorter.query || {})
             .skip(skip)
@@ -541,7 +541,7 @@ module.exports = class LeaderboardService {
 
             // If conquest and home star percentage then use the home star total stars as the sort
             // All other cases use totalStars
-            let totalStarsKey = game.settings.general.mode === 'conquest' 
+            let totalStarsKey = game.settings.general.mode === 'conquest'
                 && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars'
 
             // Sort by total stars descending
@@ -699,7 +699,7 @@ module.exports = class LeaderboardService {
 
         // If conquest and home star percentage then use the totalHomeStars as the sort
         // All other cases use totalStars
-        let totalStarsKey = game.settings.general.mode === 'conquest' 
+        let totalStarsKey = game.settings.general.mode === 'conquest'
             && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars';
 
         let starWinners = leaderboard
