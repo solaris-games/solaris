@@ -1,7 +1,0 @@
-db.gameevents.deleteMany({
-    'type': 'playerStarWarpGateBuilt'
-});
-
-db.gameevents.deleteMany({
-    'type': 'playerStarWarpGateDestroyed'
-});

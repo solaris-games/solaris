@@ -8,6 +8,7 @@
         <i class="fas fa-user-friends ml-1" v-if="user.roles.communityManager" title="This player is an active community manager"></i>
         <i class="fas fa-dice ml-1" v-if="user.roles.gameMaster" title="This player is an active game master"></i>
       </span>
+      <elo-rating v-if="is1v1Game" :user="user" class="mr-2"/>
       <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-sm btn-info"><i class="fas fa-chevron-left"></i></button>
       <button @click="onOpenNextPlayerDetailRequested" class="btn btn-sm btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
       <button @click="panToPlayer" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
@@ -62,6 +63,7 @@ import SendRenown from './SendRenown'
 import Badges from './Badges'
 import Reputation from './Reputation'
 import PlayerTradeVue from './PlayerTrade'
+import EloRating from './EloRating'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
@@ -78,7 +80,8 @@ export default {
     'sendRenown': SendRenown,
     'badges': Badges,
     'reputation': Reputation,
-    'player-trade': PlayerTradeVue
+    'player-trade': PlayerTradeVue,
+    'elo-rating': EloRating
   },
   props: {
     playerId: String
@@ -169,6 +172,9 @@ export default {
     },
     isAnonymousGame () {
       return this.game.settings.general.anonymity === 'extra'
+    },
+    is1v1Game () {
+      return GameHelper.is1v1Game(this.game)
     },
     canViewAchievements () {
       if (this.isAnonymousGame) {
