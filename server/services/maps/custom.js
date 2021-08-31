@@ -16,6 +16,7 @@ module.exports = class CustomMapService {
         }
 
         const locations = [];
+        const playerIndexes = [];
         //const nameList = new Set()
         const homeStars = []
 
@@ -34,31 +35,32 @@ module.exports = class CustomMapService {
             if (!this._checkStarProperty(star, 'homeStar', 'boolean')) continue
             if (!this._checkStarProperty(star, 'specialistId', 'number')) continue
 
-            if (star.naturalResources < 10 || star.naturalResources > 100)
+            if (star.naturalResources < 0 || star.naturalResources > 100)
                 throw new ValidationError('Illigal starting amount of resources, range needs to be between 10 and 100 inclusive')
             if (star.playerIndex >= (8*4)) //colours*shapes
                 throw new ValidationError('Invalid playerid')
 
             if (star?.homeStar) {
               homeStars.push(star)
-              if (star.playerIndex && star.playerIndex >=0) { playerIndexes.push(star.playerIndex) }
+              if (star.playerIndex >=0) { playerIndexes.push(star.playerIndex) }
             }
             //nameList.add(star.name)
 
             locations.push(star)
         }
-
+        /*
         if (!ownedList.every(array => array.length === starCount / playerCount))
             throw new ValidationError('Not enough stars per player.')
 
         if (!homeList.every(array => array.length === 1))
             throw new ValidationError('Duplicate or players without homeStars.')
+        */
 
         if (locations.length !== starCount)
             throw new ValidationError('Not enough stars in json data generated.')
 
         if (homeStars.length === playerIndexes.length) {
-          _linkStars(homeStars, json.stars)
+          this._linkStars(homeStars, locations)
         }
         else {
           if(playerIndexes.length !== 0) {
@@ -66,9 +68,9 @@ module.exports = class CustomMapService {
           } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
         }
 
-        let commonStarAmount = homeStars[0].linkedStars
+        let commonStarAmount = homeStars[0].linkedLocations.length
         for (let homeStar of homeStars) {
-          if(homeStar.linkedStars !== commonStarAmount)
+          if(homeStar.linkedLocations.length !== commonStarAmount)
             throw new ValidationError('unfair start - players dont have the same amount of stars')
         }
 
@@ -83,13 +85,13 @@ module.exports = class CustomMapService {
     }
 
     _linkStars(homeStars, stars) {
-      let commonStars = stars.filter( (star) => { !star.homeStar })
+      let commonStars = stars.filter( (star) => { return !star.homeStar })
       for(let homeStar of homeStars) {
-        homeStar.linkedStars = []
+        homeStar.linkedLocations = []
         for(let commonStar of commonStars) {
           if(commonStar.playerIndex === homeStar.playerIndex) {
-            homeStar.linkedStars.push(commonStar)
-            commonStars.linked = true
+            homeStar.linkedLocations.push(commonStar)
+            commonStar.linked = true
           }
         }
       }

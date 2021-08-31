@@ -27,14 +27,16 @@ module.exports = class StarService extends EventEmitter {
         };
     }
 
-    generateStar(game, name, location) {
+    generateStar(game, name, star) {
       return {
         _id: mongoose.Types.ObjectId(),
-        name,
-        naturalResources: location.naturalResources,
-        location,
-        infrastructure: location.infrastructure,
-        specialistId: location.specialistId
+        name: name,
+        naturalResources: star.naturalResources,
+        location: star.location,
+        infrastructure: star.infrastructure,
+        specialistId: star.specialistId,
+        homeStar: star.homeStar,
+        warpGate: star.warpGate
       }
     }
 

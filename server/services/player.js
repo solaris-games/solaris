@@ -106,11 +106,12 @@ module.exports = class PlayerService extends EventEmitter {
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
-        if(game.galaxy.playerIndexes) {
+        if(game.galaxy.playerIndexes.length) {
           for(let index of game.galaxy.playerIndexes) {
-            let colour = colours[index%8][0] // 0 for alias
+            let colour = colours.splice(index%8, 1)[0];
+            //let colour = colours[index%8][0] // 0 for alias
             let shape = shapes[Math.floor(index/8)]
-            let player = createEmptyPlayer(game, colour, shape)
+            let player = this.createEmptyPlayer(game, colour, shape)
             this._setDefaultResearchTechnology(game, player);
             players.push(player);
           }

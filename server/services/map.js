@@ -43,6 +43,7 @@ module.exports = class MapService {
                 break;
             case 'custom':
                 starLocations = this.customMapService.generateLocations(game, settings, starCount, playerLimit)
+                break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
@@ -61,8 +62,8 @@ module.exports = class MapService {
             };
             
             let star;
-            if(game.settings.galaxyType === 'custom') {
-              star = this.starService.generateStar(game, starNames[starNamesIndex++], location)
+            if(game.settings.galaxy.galaxyType === 'custom') {
+              star = this.starService.generateStar(game, starNames[starNamesIndex++], starLocation)
             }
             else {
               star = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], loc, starLocation.resources);
@@ -71,15 +72,15 @@ module.exports = class MapService {
             stars.push(star);
 
             if (starLocation.homeStar) {
-                if (starLocation.playerIndex) {
+                if (starLocation.playerIndex !== undefined) {
                   game.galaxy.playerIndexes.push(starLocation.playerIndex)
                 }
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
                   let linkedStar;
-                  if(game.settings.galaxyType === 'custom') {
-                    linkedStar = this.starService.generateStar(game, starNames[starNamesIndex++], location)
+                  if(game.settings.galaxy.galaxyType === 'custom') {
+                    linkedStar = this.starService.generateStar(game, starNames[starNamesIndex++], linkedLocation)
                   }
                   else {
                     linkedStar = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
