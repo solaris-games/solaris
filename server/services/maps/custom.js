@@ -74,6 +74,10 @@ module.exports = class CustomMapService {
             throw new ValidationError('unfair start - players dont have the same amount of stars')
         }
 
+        for(let location of locations) {
+          if(location.specialistId === -1) { location.specialistId = null; }
+        }
+
         return locations
     }
 
