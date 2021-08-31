@@ -16,7 +16,7 @@ module.exports = class MapService {
         this.customMapService = customMapService;
     }
 
-    generateStars(game, starCount, playerLimit, warpGatesSetting) {
+    generateStars(game, settings, starCount, playerLimit, warpGatesSetting) {
         let stars = [];
 
         // Get an array of random star names for however many stars we want.
@@ -42,7 +42,7 @@ module.exports = class MapService {
                 starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             case 'custom':
-                starLocations = this.customMapService.generateLocations(game, starCount, playerLimit)
+                starLocations = this.customMapService.generateLocations(game, settings, starCount, playerLimit)
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }

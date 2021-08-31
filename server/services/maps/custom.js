@@ -3,8 +3,18 @@ const ValidationError = require("../../errors/validation");
 module.exports = class CustomMapService {
     constructor() { }
 
-    generateLocations(game, starCount, playerCount) {
-        const json = JSON.parse(game.settings) //need correct path
+    generateLocations(game, settings, starCount, playerCount) {
+        let s = settings.galaxy.customJSON
+        //s = s.replace(/[\u0000-\u0019]+/g,""); 
+        let json;
+        try {
+          json = JSON.parse(s)
+        }
+        catch (e) {
+          console.log(e)
+          throw new ValidationError('malformed json.')
+        }
+
         const locations = [];
         //const nameList = new Set()
         const homeStars = []

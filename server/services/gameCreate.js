@@ -74,7 +74,7 @@ module.exports = class GameCreateService {
         game.galaxy.playerIndexes = [];
         game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
-            game,
+            game, settings,
             desiredStarCount,
             game.settings.general.playerLimit,
             game.settings.specialGalaxy.randomGates);
