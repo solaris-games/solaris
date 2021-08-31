@@ -517,10 +517,20 @@ module.exports = class GameService extends EventEmitter {
         return game.settings.gameTime.gameType === 'turnBased';
     }
 
+    listAllUndefeatedPlayers(game) {
+        return game.galaxy.players.filter(p => !p.defeated);
+    }
+
     isAllUndefeatedPlayersReady(game) {
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+    }
+
+    isAllUndefeatedPlayersReadyToQuit(game) {
+        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+
+        return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
 
     isDarkStart(game) {

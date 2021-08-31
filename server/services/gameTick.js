@@ -41,10 +41,10 @@ module.exports = class GameTickService extends EventEmitter {
             6. Check to see if anyone has won the game.
         */
 
-       let startTime = process.hrtime();
-       console.info(`[${game.settings.general.name}] - Game tick started.`);
+        let startTime = process.hrtime();
+        console.info(`[${game.settings.general.name}] - Game tick started.`);
 
-       game.state.lastTickDate = moment().utc();
+        game.state.lastTickDate = moment().utc();
 
         let taskTime = process.hrtime();
         let taskTimeEnd = null;
@@ -70,7 +70,7 @@ module.exports = class GameTickService extends EventEmitter {
 
         while (iterations--) {
             game.state.tick++;
-    
+
             logTime(`Tick ${game.state.tick}`);
 
             await this._combatCarriers(game, gameUsers);
@@ -143,9 +143,9 @@ module.exports = class GameTickService extends EventEmitter {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
             nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
         } else if (this.gameService.isTurnBasedGame(game)) {
-            // If in turn based mode, then check if all undefeated players are ready.
+            // If in turn based mode, then check if all undefeated players are ready OR all players are ready to quit
             // OR the max time wait limit has been reached.
-            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game);
+            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game) || this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
             
             if (isAllPlayersReady) {
                 return true;
@@ -440,10 +440,17 @@ module.exports = class GameTickService extends EventEmitter {
         let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
+        // If all players are ready to quit then declare them all as defeated.
+        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
+
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            this.playerService.performDefeatedOrAfkCheck(game, player, isTurnBasedGame);
+            if (isAllUndefeatedPlayersReadyToQuit) {
+                player.defeated = true;
+            } else {
+                this.playerService.performDefeatedOrAfkCheck(game, player, isTurnBasedGame);
+            }
 
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.

@@ -163,6 +163,20 @@ export default new Vuex.Store({
       player.ready = false
     },
 
+    gamePlayerReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = true
+      player.readyToQuit = true
+    },
+
+    gamePlayerNotReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = false
+      player.readyToQuit = false
+    },
+
     gameStarBulkUpgraded (state, data) {
       let player = GameHelper.getUserPlayer(state.game)
 
