@@ -489,20 +489,23 @@ module.exports = class GameTickService extends EventEmitter {
         if (winner) {
             this.gameService.finishGame(game, winner);
 
+            let rankingResult = null;
+
             // There must have been at least 1 production ticks in order for
             // rankings to be added to players. This is to slow down players
             // should they wish to cheat the system.
             if (game.state.productionTick > 0) {
                 let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
                 
-                await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
 
             await this.emailService.sendGameFinishedEmail(game);
 
             this.emit('onGameEnded', {
                 gameId: game._id,
-                gameTick: game.state.tick
+                gameTick: game.state.tick,
+                rankingResult
             });
 
             return true;

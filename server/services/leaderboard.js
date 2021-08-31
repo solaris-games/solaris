@@ -587,6 +587,7 @@ module.exports = class LeaderboardService {
 
     async addGameRankings(game, gameUsers, leaderboard) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
+        let result = {};
 
         // Remove any afk players from the leaderboard, they will not
         // receive any achievements.
@@ -636,20 +637,39 @@ module.exports = class LeaderboardService {
             }
         }
 
-        this.addUserRatingCheck(game, gameUsers);
+        result.eloRating = this.addUserRatingCheck(game, gameUsers);
+
+        return result;
     }
 
     addUserRatingCheck(game, gameUsers) {
         if (['1v1_rt', '1v1_tb'].includes(game.settings.general.type)) {
-            let userA = gameUsers[0];
-            let userB = gameUsers[1];
-
             let winningPlayer = game.galaxy.players.find(p => p._id.equals(game.state.winner));
+            let losingPlayer = game.galaxy.players.find(p => !p._id.equals(game.state.winner));
 
-            let userAIsWinner = userA._id.toString() === winningPlayer.userId;
+            let winningUser = gameUsers.find(u => u._id.toString() === winningPlayer.userId);
+            let losingUser = gameUsers.find(u => u._id.toString() === losingPlayer.userId);
 
-            this.ratingService.recalculateEloRating(userA, userB, userAIsWinner);
+            let winningUserOldRating = winningUser.achievements.eloRating || 1200;
+            let losingUserOldRating = losingUser.achievements.eloRating || 1200;
+
+            this.ratingService.recalculateEloRating(winningUser, losingUser, true);
+
+            return {
+                winner: {
+                    _id: winningPlayer._id,
+                    newRating: winningUser.achievements.eloRating,
+                    oldRating: winningUserOldRating
+                },
+                loser: {
+                    _id: losingPlayer._id,
+                    newRating: losingUser.achievements.eloRating,
+                    oldRating: losingUserOldRating
+                }
+            };
         }
+
+        return null;
     }
 
     getGameWinner(game) {
