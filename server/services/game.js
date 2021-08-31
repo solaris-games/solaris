@@ -452,6 +452,7 @@ module.exports = class GameService extends EventEmitter {
             'achievements.rank': 1,
             'achievements.renown': 1,
             'achievements.victories': 1,
+            'achievements.eloRating': 1,
             roles: 1
         });
     }
@@ -463,6 +464,17 @@ module.exports = class GameService extends EventEmitter {
     async lock(gameId, locked = true) {
         await this.gameModel.updateOne({
             _id: gameId
+        }, {
+            $set: {
+                'state.locked': locked
+            }
+        })
+        .exec();
+    }
+
+    async lockAll(locked = true) {
+        await this.gameModel.updateMany({
+            'state.locked': { $ne: locked }
         }, {
             $set: {
                 'state.locked': locked
@@ -505,10 +517,20 @@ module.exports = class GameService extends EventEmitter {
         return game.settings.gameTime.gameType === 'turnBased';
     }
 
+    listAllUndefeatedPlayers(game) {
+        return game.galaxy.players.filter(p => !p.defeated);
+    }
+
     isAllUndefeatedPlayersReady(game) {
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+    }
+
+    isAllUndefeatedPlayersReadyToQuit(game) {
+        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+
+        return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
 
     isDarkStart(game) {

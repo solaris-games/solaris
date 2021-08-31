@@ -163,6 +163,20 @@ export default new Vuex.Store({
       player.ready = false
     },
 
+    gamePlayerReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = true
+      player.readyToQuit = true
+    },
+
+    gamePlayerNotReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = false
+      player.readyToQuit = false
+    },
+
     gameStarBulkUpgraded (state, data) {
       let player = GameHelper.getUserPlayer(state.game)
 
@@ -176,12 +190,15 @@ export default new Vuex.Store({
         }
 
         if (s.manufacturing != null) {
+          player.stats.newShips -= star.manufacturing // Deduct old value
           star.manufacturing = s.manufacturing
-          player.stats.newShips = Math.round((player.stats.newShips + s.manufacturing + Number.EPSILON) * 100) / 100
+          player.stats.newShips += s.manufacturing // Add the new value
         }
 
         GameContainer.reloadStar(star)
       })
+
+      player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
       
       // Update player total stats.
 

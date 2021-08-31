@@ -245,6 +245,8 @@ export default {
       this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
       this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
       this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
+      this.sockets.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
+      this.sockets.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
       this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
 
@@ -259,6 +261,8 @@ export default {
       this.sockets.unsubscribe('gamePlayerQuit')
       this.sockets.unsubscribe('gamePlayerReady')
       this.sockets.unsubscribe('gamePlayerNotReady')
+      this.sockets.unsubscribe('gamePlayerReadyToQuit')
+      this.sockets.unsubscribe('gamePlayerNotReadyToQuit')
       this.sockets.unsubscribe('playerDebtSettled')
       this.sockets.unsubscribe('gameMessageSent')
     },

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
+const ValidationError = require('../errors/validation');
 
 module.exports = class PlayerService extends EventEmitter {
     
@@ -244,6 +245,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.credits = game.settings.player.startingCredits;
         player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
         player.ready = false;
+        player.readyToQuit = false;
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);
@@ -594,6 +596,44 @@ module.exports = class PlayerService extends EventEmitter {
         }, {
             $set: {
                 'galaxy.players.$.ready': false
+            }
+        });
+    }
+
+    async declareReadyToQuit(game, player) {
+        if (game.state.productionTick <= 0) {
+            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
+        }
+
+        player.ready = true;
+        player.readyToQuit = true;
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': true,
+                'galaxy.players.$.readyToQuit': true
+            }
+        });
+    }
+
+    async undeclareReadyToQuit(game, player) {
+        if (game.state.productionTick <= 0) {
+            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
+        }
+        
+        player.ready = false;
+        player.readyToQuit = false;
+
+        await this.gameModel.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': false,
+                'galaxy.players.$.readyToQuit': false
             }
         });
     }

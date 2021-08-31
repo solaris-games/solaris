@@ -52,7 +52,6 @@ module.exports = class EventService {
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
         this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.gameId, args.gameTick));
         this.gameService.on('onPlayerQuit', (args) => this.createPlayerQuitEvent(args.gameId, args.gameTick, args.player, args.alias));
-        this.gameService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick));
         this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
         
         this.combatService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
@@ -65,7 +64,7 @@ module.exports = class EventService {
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
-        this.gameTickService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick));
+        this.gameTickService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick, args.rankingResult));
         
         this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
@@ -265,8 +264,10 @@ module.exports = class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_STARTED, data);
     }
 
-    async createGameEndedEvent(gameId, gameTick) {
-        let data = {};
+    async createGameEndedEvent(gameId, gameTick, rankingResult) {
+        let data = {
+            rankingResult
+        };
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_ENDED, data);
     }
