@@ -36,10 +36,9 @@ client.on('message', async (msg) => {
 
     //non-contenrelated responses; the bot has to react to a message, not for what is in it, but for where it has been sent or whatever non-contentrelated reason. Content may be taken into account later in the function
     // Whether the message is in specialist suggestions is being checked.
-    if (msg.channel.id === process.env.CHAT_ID_SPECIALIST_SUGGESTIONS) {
+    if (msg.channel.id === process.env.CHAT_ID_SPECIALIST_SUGGESTIONS || msg.channel.id === process.env.CHAT_ID_GENERAL_SUGGESTIONS) {
         botResponseService.reactThumbsUp(msg);
         botResponseService.reactThumbsDown(msg);
-
         return;
     };
 
