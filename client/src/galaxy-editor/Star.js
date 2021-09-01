@@ -4,7 +4,7 @@ import TextureService from '../game/texture'
 
 class Star extends EventEmitter {
 
-  constructor (app, location) {
+  constructor (app, location, fullStar, coloursValues, shapes) {
     super()
 
     this.location = location
@@ -19,6 +19,17 @@ class Star extends EventEmitter {
     this.specialistId = -1
 
     this.naturalResources = Math.round(Math.random()*50)
+
+    if(fullStar) {
+      this.location = fullStar.location
+      this.infrastructure = fullStar.infrastructure
+      this.warpGate = fullStar.warpGate
+      this.homeStar = fullStar.homeStar
+      this.playerIndex = fullStar.playerIndex
+      this.specialistId = fullStar.specialistId
+      this.naturalResources = fullStar.naturalResources
+    }
+
     this.app = app
     this.container = new PIXI.Container()
     this.container.position.x = location.x
@@ -27,15 +38,16 @@ class Star extends EventEmitter {
     //this.container.interactiveChildren = false
     this.container.buttonMode = true
     this.container.hitArea = new PIXI.Circle(0, 0, 32)
-    this.baseScale = 1.0
-
-    this._updateGraphics()
+    this.baseScale = 1.0/4.0
 
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.player = {}
+    this._updatePlayer(coloursValues, shapes)
+
+    this._updateGraphics()
   }
 
   _updatePlayer(colours, shapes) {
@@ -154,7 +166,7 @@ class Star extends EventEmitter {
 
     this.star_geometry = new PIXI.Graphics()
     this.star_geometry.lineStyle(2, 0xffffff, 1.0)
-    this.star_geometry.drawStar(0, 0, 6, 4, 2)
+    this.star_geometry.drawStar(0, 0, 6, 16, 8)
     this.container.addChild(this.star_geometry)
   }
 

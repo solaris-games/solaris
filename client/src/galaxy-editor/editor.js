@@ -136,8 +136,8 @@ class GalaxyEditor {
     }
   }
 
-  addStar( location ) {
-    let star = new Star(this.app, location)
+  addStar( location, fullStar ) {
+    let star = new Star(this.app, location, fullStar, this.coloursValues, this.shapes)
     star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
     star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
     this.stars.push(star)
@@ -165,6 +165,7 @@ class GalaxyEditor {
   }
 
   clear() {
+    this.selectedStar = null
     for(let star of this.stars) {
       this.viewport.removeChild(star.container)
     }
@@ -180,6 +181,28 @@ class GalaxyEditor {
 
   loadFromJSON( json ) {
     this.clear()
+    let rawStructure = JSON.parse(json)
+    let rawStars = rawStructure.stars
+    try {
+      for(let star of rawStars) {
+        if( typeof star.location.x !== 'number' ) return
+        if( typeof star.location.y !== 'number' ) return
+
+        if( typeof star.homeStar !== 'boolean' ) return
+        if( typeof star.warpGate !== 'boolean' ) return
+
+        if( typeof star.specialistId !== 'number' ) return
+        if( typeof star.playerIndex !== 'number' ) return
+
+        if( typeof star.naturalResources !== 'number' ) return
+      }
+      for(let star of rawStars) {
+        this.addStar(star.location, star)
+      }
+    }
+    catch(e) {
+      console.error(e)
+    }
   }
 
   onStarMouseOver(star) {
