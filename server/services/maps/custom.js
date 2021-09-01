@@ -42,6 +42,7 @@ module.exports = class CustomMapService {
 
             if (star?.homeStar) {
               homeStars.push(star)
+              star.linkedLocations = []
               if (star.playerIndex >=0) { playerIndexes.push(star.playerIndex) }
             }
             //nameList.add(star.name)
