@@ -27,7 +27,7 @@ class Star extends EventEmitter {
     //this.container.interactiveChildren = false
     this.container.buttonMode = true
     this.container.hitArea = new PIXI.Circle(0, 0, 32)
-    this.baseScale = 1.0/8.8
+    this.baseScale = 1.0
 
     this._updateGraphics()
 
@@ -154,7 +154,7 @@ class Star extends EventEmitter {
 
     this.star_geometry = new PIXI.Graphics()
     this.star_geometry.lineStyle(2, 0xffffff, 1.0)
-    this.star_geometry.drawStar(0, 0, 4, 16, 8)
+    this.star_geometry.drawStar(0, 0, 6, 4, 2)
     this.container.addChild(this.star_geometry)
   }
 
