@@ -84,6 +84,20 @@ module.exports = class BroadcastService {
         }));
     }
 
+    gameConversationMessagePinned(game, conversation, messageId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessagePinned', {
+            conversationId: conversation._id,
+            messageId: messageId
+        }));
+    }
+
+    gameConversationMessageUnpinned(game, conversation, messageId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessageUnpinned', {
+            conversationId: conversation._id,
+            messageId: messageId
+        }));
+    }
+
     // gameMessagesAllRead(game, playerId) {
     //     this.io.to(playerId).emit('gameMessagesAllRead');
     // }

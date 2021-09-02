@@ -309,4 +309,33 @@ module.exports = class ConversationService extends EventEmitter {
             }, 0);
     }
 
+    async pinMessage(game, conversationId, messageId) {
+        return await this.setPinnedMessage(game, conversationId, messageId, true);
+    }
+
+    async unpinMessage(game, conversationId, messageId) {
+        return await this.setPinnedMessage(game, conversationId, messageId, false);
+    }
+
+    async setPinnedMessage(game, conversationId, messageId, isPinned) {
+        return await this.gameModel.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'conversations.$[c].messages.$[m].pinned': isPinned
+            }
+        }, 
+        {
+            arrayFilters: [
+                {
+                    'c._id': conversationId
+                },
+                {
+                    'm._id': messageId
+                }
+            ]
+        })
+        .exec();
+    }
+
 }

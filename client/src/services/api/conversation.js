@@ -48,6 +48,16 @@ class ConversationService extends BaseApiService {
       { withCredentials: true })
   }
 
+  pinMessage (gameId, conversationId, messageId) {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/pin/' + messageId, { },
+    { withCredentials: true })
+  }
+
+  unpinMessage (gameId, conversationId, messageId) {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/unpin/' + messageId, { },
+    { withCredentials: true })
+  }
+
 }
 
 export default new ConversationService()

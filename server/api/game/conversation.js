@@ -142,6 +142,46 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.conversationService.pinMessage(
+                req.game,
+                req.params.conversationId,
+                req.params.messageId);
+
+            let convo = await container.conversationService.detail(
+                req.game,
+                req.player._id,
+                req.params.conversationId);
+    
+            container.broadcastService.gameConversationMessagePinned(req.game, convo, req.params.messageId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.conversationService.unpinMessage(
+                req.game,
+                req.params.conversationId,
+                req.params.messageId);
+
+            let convo = await container.conversationService.detail(
+                req.game,
+                req.player._id,
+                req.params.conversationId);
+
+            container.broadcastService.gameConversationMessageUnpinned(req.game, convo, req.params.messageId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

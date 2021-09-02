@@ -1,13 +1,17 @@
 <template>
-  <div class="container bg-primary"
-    :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer}">
+  <div class="container message-container"
+    :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer,
+            'bg-secondary': !message.pinned, 'bg-primary': message.pinned}">
     <div class="row mt-0" :style="{'background-color': getFriendlyColour(fromPlayer.colour.value)}" style="height:6px;"></div>
-    <div class="row mt-0 bg-secondary" v-if="message">
-      <div class="col-12 mt-1 mb-0">
+    <div class="row mt-0" v-if="message">
+      <div class="col mt-1 mb-0">
         <span class="pointer" @click="onOpenPlayerDetailRequested(fromPlayer)">
           <player-icon :playerId="fromPlayer._id"/>
           <strong class="ml-2">{{fromPlayer.alias}}</strong>
         </span>
+      </div>
+      <div class="col-auto thumbtack">
+        <conversation-message-pin :conversationId="conversationId" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
       </div>
       <div class="col-12">
         <p class="mt-0 mb-0">
@@ -16,7 +20,7 @@
         </p>
       </div>
     </div>
-    <div class="row bg-secondary mt-0">
+    <div class="row mt-0">
         <div class="col">
             <p class="mt-2 mb-2 linebreaks" ref="messageElement" />
         </div>
@@ -28,14 +32,17 @@
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
 import PlayerIconVue from '../../player/PlayerIcon'
+import ConversationMessagePinVue from './ConversationMessagePin'
 import mentionHelper from '../../../../services/mentionHelper'
 import gameHelper from '../../../../services/gameHelper'
 
 export default {
   components: {
-    'player-icon': PlayerIconVue
+    'player-icon': PlayerIconVue,
+    'conversation-message-pin': ConversationMessagePinVue
   },
   props: {
+    conversationId: String,
     message: Object
   },
   mounted () {
@@ -53,6 +60,12 @@ export default {
     },
     onOpenPlayerDetailRequested (player) {
       this.$emit('onOpenPlayerDetailRequested', player._id)
+    },
+    onPinned () {
+      this.message.pinned = true
+    },
+    onUnpinned () {
+      this.message.pinned = false
     },
     panToStar (id) {
       const star = gameHelper.getStarById(this.$store.state.game, id)
@@ -103,5 +116,13 @@ export default {
 
 .linebreaks {
   white-space: break-spaces;
+}
+
+.thumbtack {
+  display: none;
+}
+
+.message-container:hover .thumbtack {
+  display: block;
 }
 </style>
