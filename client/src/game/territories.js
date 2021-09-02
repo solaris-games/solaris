@@ -134,12 +134,11 @@ class Territories {
         // find the closest star and its owner
         let pointLocation = {x: ix*CELL_SIZE+minX, y: iy*CELL_SIZE+minY}
         let closestStar = gameHelper.getClosestStar(this.game.galaxy.stars, pointLocation)
-        let owner = this.game.galaxy.players.find( p => p._id === closestStar.ownedByPlayerId )
+        let owner = this.game.galaxy.players.find( p => p._id === closestStar.star.ownedByPlayerId )
         // TODO get the intensity of the metaball composed of all stars of the owner
         // the owner stars shouold be cached outside this loop
 
-        let distance = gameHelper.getDistanceBetweenLocations(pointLocation, closestStar.location)
-        if( distance<METABALL_RADIUS ) {
+        if( closestStar.distance<METABALL_RADIUS ) {
           samplePoints[ix][iy] = owner
         }
         if(false)
