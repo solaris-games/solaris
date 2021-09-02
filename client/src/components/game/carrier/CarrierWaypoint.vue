@@ -49,7 +49,7 @@
           <div class="col">
             <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{waypointEta}}</p>
           </div>
-          <div class="col-auto">
+          <div class="col-auto" v-if="isRealTimeGame">
             <p class="mb-2">Duration<orbital-mechanics-eta-warning />: {{waypointDuration}}</p>
           </div>
         </div>
@@ -69,13 +69,13 @@
         </button>
 			</div>
 			<div class="col-auto" v-if="!$isHistoricalMode()">
-				<button class="btn btn-sm btn-success" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ml-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-check"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Close</span>
+          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
         </button>
 			</div>
 		</div>
@@ -274,6 +274,9 @@ export default {
     },
     isInTransit () {
       return !this.carrier.orbiting
+    },
+    isRealTimeGame () {
+      return GameHelper.isRealTimeGame(this.$store.state.game)
     }
   }
 }

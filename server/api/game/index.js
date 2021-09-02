@@ -194,6 +194,34 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/readyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.declareReadyToQuit(
+                req.game,
+                req.player);
+            
+            res.sendStatus(200);
+
+            container.broadcastService.gamePlayerReadyToQuit(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/notReadyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.undeclareReadyToQuit(
+                req.game,
+                req.player);
+
+            res.sendStatus(200);
+                
+            container.broadcastService.gamePlayerNotReadyToQuit(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
         try {
             let notes = await container.playerService.getGameNotes(

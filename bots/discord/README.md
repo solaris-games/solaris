@@ -76,6 +76,7 @@ The filters can be almost anything, the full list of possible filters is:
 - `ships-gifted`
 - `ships-received`
 - `renown-sent`
+- `elo-rating`
 
 Remember to use the word in the `code-block` as the word for the filter.
 

@@ -69,8 +69,13 @@
                           {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Stars
                         </span> 
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
-                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
+                        <h5 v-if="player.readyToQuit" class="pt-2 pr-2 pl-2" @click="unconfirmReadyToQuit(player)" :disabled="$isHistoricalMode()">
+                          <i class="fas fa-check text-warning" title="This player is ready to quit."></i>
+                        </h5>
+                        <h5 v-if="player.ready && !player.readyToQuit" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
+                          <i class="fas fa-check text-success" title="This player is ready."></i>
+                        </h5>
                         <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
@@ -90,6 +95,12 @@
           <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-sign-out-alt"></i> Quit Game
           </modalButton>
+          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit" class="btn btn-sm btn-warning mr-1">
+            <i class="fas fa-times"></i> Ready to Quit
+          </button>
+          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit" class="btn btn-sm btn-success mr-1">
+            <i class="fas fa-check"></i> Ready to Quit
+          </button>
           <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-skull-crossbones"></i> Concede Defeat
           </modalButton>
@@ -247,6 +258,36 @@ export default {
         console.error(err)
       }
     },
+    async confirmReadyToQuit (player) {
+      if (!await this.$confirm('Ready to Quit?', 'Are you sure you want declare that you are ready to quit? If all active players declare ready to quit then the game will end early.')) {
+        return
+      }
+      
+      try {
+        let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`You have confirmed that you are ready to quit.`, { type: 'success' })
+
+          player.ready = true
+          player.readyToQuit = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async unconfirmReadyToQuit (player) {
+      try {
+        let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          player.ready = false
+          player.readyToQuit = false
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -281,6 +322,9 @@ export default {
     },
     isConquestHomeStars () {
       return gameHelper.isConquestHomeStars(this.$store.state.game)
+    },
+    canEndTurn () {
+      return GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)
     }
   }
 }

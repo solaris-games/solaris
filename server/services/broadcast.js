@@ -54,6 +54,18 @@ module.exports = class BroadcastService {
         });
     }
 
+    gamePlayerReadyToQuit(game, player) {
+        this.io.to(game.id).emit('gamePlayerReadyToQuit', {
+            playerId: player.id
+        });
+    }
+
+    gamePlayerNotReadyToQuit(game, player) {
+        this.io.to(game.id).emit('gamePlayerNotReadyToQuit', {
+            playerId: player.id
+        });
+    }
+
     gameMessageSent(game, message) {
         message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
     }

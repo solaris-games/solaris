@@ -34,6 +34,7 @@ const schema = new Schema({
             defeatedDate: { type: Types.Date, required: false, default: null },
             afk: { type: Types.Boolean, required: true },
             ready: { type: Types.Boolean, required: false, default: false },
+            readyToQuit: { type: Types.Boolean, required: false, default: false },
             research: {
                 scanning: {
                     level: { type: Types.Number, required: true, default: 1  },

@@ -122,6 +122,7 @@ module.exports = class HistoryService {
                 defeatedDate: player.defeatedDate,
                 afk: player.afk,
                 ready: player.ready,
+                readyToQuit: player.readyToQuit,
                 research: player.research
             });
         }
@@ -201,6 +202,7 @@ module.exports = class HistoryService {
                 'players.$[].defeatedDate': '',
                 'players.$[].afk': '',
                 'players.$[].ready': '',
+                'players.$[].readyToQuit': '',
                 'players.$[].alias': '',
                 'stars': '',
                 'carriers': ''
