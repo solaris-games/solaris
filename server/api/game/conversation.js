@@ -106,7 +106,7 @@ module.exports = (router, io, container) => {
 
             container.broadcastService.gameMessageSent(req.game, message);
 
-            return res.sendStatus(200);
+            return res.status(200).send(message);
         } catch (err) {
             return next(err);
         }

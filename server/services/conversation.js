@@ -178,10 +178,12 @@ module.exports = class ConversationService extends EventEmitter {
         let convo = await this.detail(game, playerId, conversationId, false); // Call this for the validation.
 
         let newMessage = {
+            _id: mongoose.Types.ObjectId(),
             fromPlayerId: playerId,
             message,
             sentDate: moment().utc(),
             sentTick: game.state.tick,
+            pinned: false,
             readBy: [playerId]
         };
 
@@ -328,7 +330,8 @@ module.exports = class ConversationService extends EventEmitter {
         {
             arrayFilters: [
                 {
-                    'c._id': conversationId
+                    'c._id': conversationId,
+                    'c.createdBy': { $ne: null } // Not the global chat
                 },
                 {
                     'm._id': messageId

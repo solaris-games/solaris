@@ -10,8 +10,8 @@
           <strong class="ml-2">{{fromPlayer.alias}}</strong>
         </span>
       </div>
-      <div class="col-auto thumbtack">
-        <conversation-message-pin :conversationId="conversationId" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
+      <div class="col-auto thumbtack" v-if="conversation.createdBy">
+        <conversation-message-pin :conversationId="conversation._id" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
       </div>
       <div class="col-12">
         <p class="mt-0 mb-0">
@@ -42,7 +42,7 @@ export default {
     'conversation-message-pin': ConversationMessagePinVue
   },
   props: {
-    conversationId: String,
+    conversation: Object,
     message: Object
   },
   mounted () {
