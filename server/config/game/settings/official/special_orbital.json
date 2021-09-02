@@ -26,7 +26,7 @@
     "darkGalaxy": "start",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
-    "carrierToCarrierCombat": "enabled",
+    "carrierToCarrierCombat": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10

@@ -61,6 +61,11 @@ module.exports = class GameCreateService {
         if (desiredPlayerStarCount > desiredStarCount) {
             throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
         }
+
+        // Ensure that c2c combat is disabled for orbital games.
+        if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
+            game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
