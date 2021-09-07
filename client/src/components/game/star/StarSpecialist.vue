@@ -8,7 +8,8 @@
             <button class="btn btn-sm btn-success" @click="onViewHireStarSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">
-              <p v-if="star.specialist">{{star.specialist.description}}</p>
+            <p v-if="star.specialist">{{star.specialist.description}}</p>
+            <p v-if="star.specialist && star.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
             <p class="mb-2" v-if="!star.specialistId">
                 This star does not have a specialist assigned.
             </p>
@@ -34,8 +35,10 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
-    this.canHireSpecialist = this.userPlayer && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
+    this.canHireSpecialist = this.userPlayer 
+      && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
       && this.userPlayer._id === this.star.ownedByPlayerId
+      && (!this.star.specialistId || !this.star.specialist.oneShot)
   },
   methods: {
     onViewHireStarSpecialistRequested() {
