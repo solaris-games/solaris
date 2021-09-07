@@ -1,7 +1,7 @@
 <template>
 <div>
   <p>
-      You hired the specialist <span class="text-warning">{{event.data.specialistName}}</span> on the carrier <a href="javascript:;" @click="onOpenCarrierDetailRequested">{{event.data.carrierName}}</a>.
+      You hired the specialist <span class="text-warning">{{event.data.specialistName}}</span> on the carrier <carrier-label :carrierId="event.data.carrierId" :carrierName="event.data.carrierName"/>.
   </p>
   <p>
     <small><em>{{event.data.specialistDescription}}</em></small>
@@ -10,21 +10,14 @@
 </template>
 
 <script>
-import GameHelper from '../../../../services/gameHelper'
+import CarrierLabelVue from '../../carrier/CarrierLabel'
 
 export default {
+  components: {
+    'carrier-label': CarrierLabelVue
+  },
   props: {
     event: Object
-  },
-  methods: {
-    onOpenCarrierDetailRequested (e) {
-      // Make sure the carrier exists before opening.
-      let carrier = GameHelper.getCarrierById(this.$store.state.game, this.event.data.carrierId)
-
-      if (carrier) {
-        this.$emit('onOpenCarrierDetailRequested', this.event.data.carrierId)
-      }
-    }
   }
 }
 </script>

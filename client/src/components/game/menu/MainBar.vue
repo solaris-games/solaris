@@ -78,9 +78,7 @@
       <inbox v-if="menuState == MENU_STATES.INBOX"
         @onCloseRequested="onCloseRequested"
         @onViewConversationRequested="onViewConversationRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
