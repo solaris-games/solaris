@@ -158,6 +158,22 @@ module.exports = class UserService extends EventEmitter {
         return user.roles.administrator || user.roles.gameMaster || user.roles.communityManager;
     }
 
+    async getUserIsGameMaster(userId) {
+        let user = await this.userModel.findOne({
+            _id: userId,
+            $or: [
+                { 'roles.administrator': 1 },
+                { 'roles.gameMaster': 1 }
+            ]
+        }, {
+            _id: 1
+        })
+        .lean({defaults: true})
+        .exec();
+
+        return user != null;
+    }
+
     async create(user, ipAddress) {
         user.username = user.username.trim();
         user.email = user.email.trim();
