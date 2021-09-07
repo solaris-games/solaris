@@ -219,7 +219,7 @@ class Territories {
   }
 
   _drawTerritoriesVoronoi () {
-    this.container.alpha = 0.3
+    this.container.alpha = 1
 
     const maxDistance = 200
 
@@ -262,22 +262,24 @@ class Territories {
 
       for (let point of points) {
         let distance = gameHelper.getDistanceBetweenLocations(cell.site, point)
+        let angle = gameHelper.getAngleBetweenLocations(cell.site, point)
 
         if (distance > maxDistance) {
-          let angle = gameHelper.getAngleBetweenLocations(cell.site, point)
           let newPoint = gameHelper.getPointFromLocation(cell.site, angle, maxDistance)
 
           sanitizedPoints.push(newPoint)
         }
         else {
-          sanitizedPoints.push(point)
+          let newPoint = gameHelper.getPointFromLocation(point, angle, -1)
+
+          sanitizedPoints.push(newPoint)
         }
       }
       
       // Draw the graphic
       let territoryGraphic = new PIXI.Graphics()
-      territoryGraphic.lineStyle(1, 0xFFFFFF, 1)
-      territoryGraphic.beginFill(colour, 1)
+      territoryGraphic.lineStyle(2, colour, 1)
+      territoryGraphic.beginFill(colour, 0.3)
       territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
       for (let point of sanitizedPoints) {
