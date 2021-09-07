@@ -8,10 +8,10 @@
         <span class="d-inline-block d-md-none">
             <i class="fas fa-stopwatch"></i>
         </span>
-        <span class="user-select-none pointer ml-1">{{tick}} <i class="fas d-none d-sm-inline-block" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i></span>
+        <span class="user-select-none pointer ml-1">{{tick}} <i class="fas" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i></span>
     </div>
 
-    <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display" style="position:absolute;width:300px;left:-100px;">
+    <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display" style="position:absolute;width:300px;left:-200px;">
         <div class="row mt-0 pt-2 pb-2">
             <div class="col-12 mb-1">
                 <input type="range" :min="minimumTick" :max="stateTick" class="slider" v-model="tick" @change="onRequestedTickChanged" :disabled="isLoading">
