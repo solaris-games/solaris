@@ -52,7 +52,7 @@ module.exports = class PlayerService extends EventEmitter {
                 continue;
             }
 
-            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+            let playerStars = this.starService.listStarsAliveOwnedByPlayer(game.galaxy.stars, p._id);
 
             let isInRange = false;
 

@@ -69,6 +69,10 @@ module.exports = class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
+    listStarsAliveOwnedByPlayer(stars, playerId) {
+        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s))
+    }
+
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
         return this.listStarsOwnedByPlayer(stars, playerId)
             .filter(s => s.ignoreBulkUpgrade[infrastructureType]);
@@ -100,7 +104,7 @@ module.exports = class StarService extends EventEmitter {
 
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
         let starsToCheck = game.galaxy.stars.map(s => {
             return {
                 _id: s._id,
@@ -168,7 +172,7 @@ module.exports = class StarService extends EventEmitter {
     isStarInScanningRangeOfPlayer(game, star, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
         let isInScanRange = this.isStarWithinScanningRangeOfStars(game, star, playerStars);
 
         return isInScanRange;
