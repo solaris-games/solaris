@@ -313,6 +313,8 @@ module.exports = class StarService extends EventEmitter {
     }
 
     applyStarSpecialistSpecialModifiers(game) {
+        // NOTE: Specialist modifiers that affect stars on tick only apply
+        // to stars that are owned by players. i.e NOT abandoned stars.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let star = game.galaxy.stars[i];
 

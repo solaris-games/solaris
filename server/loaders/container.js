@@ -94,8 +94,8 @@ module.exports = (config, io) => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService);
     const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
     const ledgerService = new LedgerService(GameModel, playerService);
-    const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService, ratingService);
     const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService, achievementService);
+    const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService, ratingService, gameService);
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, starService, userService);
     const reputationService = new ReputationService(GameModel, playerService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService);
