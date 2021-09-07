@@ -74,6 +74,24 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/guild', middleware.authenticate, async (req, res, next) => {
+        if (!req.body.name) {
+            throw new ValidationError(`name is required.`);
+        }
+
+        if (!req.body.tag) {
+            throw new ValidationError(`tag is required.`);
+        }
+
+        try {
+            await container.guildService.rename(req.session.userId, req.body.name, req.body.tag);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.delete('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
         try {
             await container.guildService.delete(req.session.userId, req.params.guildId);

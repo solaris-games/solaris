@@ -70,7 +70,7 @@ module.exports = (config, io) => {
     const adminService = new AdminService(UserModel, GameModel);
     const recaptchaService = new RecaptchaService();
 
-    const guildService = new GuildService(GuildModel, UserModel);
+    const guildService = new GuildService(GuildModel, UserModel, userService);
     const guildUserService = new GuildUserService(UserModel, guildService);
 
     const broadcastService = new BroadcastService(io);
