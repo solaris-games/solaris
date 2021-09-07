@@ -46,7 +46,14 @@ export default {
     message: Object
   },
   mounted () {
-    let onStarClicked = (id) => this.panToStar(id)
+    let onStarClicked = (id) => {
+      this.panToStar(id)
+
+      if (this.$isMobile()) {
+        this.$emit('onMinimizeConversationRequested')
+      }
+    }
+
     let onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
     
     mentionHelper.renderMessageWithMentionsAndLinks(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
