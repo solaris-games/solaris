@@ -4,15 +4,13 @@ module.exports = class CustomMapService {
     constructor() { }
 
     generateLocations(game, settings, starCount, playerCount) {
-        let s = settings.galaxy.customJSON
-        //s = s.replace(/[\u0000-\u0019]+/g,""); 
         let json;
+
         try {
-          json = JSON.parse(s)
+          json = JSON.parse(settings.galaxy.customJSON)
         }
         catch (e) {
-          console.log(e)
-          throw new ValidationError('malformed json.')
+          throw new ValidationError('The custom map JSON is malformed.')
         }
 
         const locations = [];
