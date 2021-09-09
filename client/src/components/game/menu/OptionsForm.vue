@@ -99,6 +99,20 @@
         </div>
       </div>
 
+      <div v-if="settings.map.territoryStyle=='voronoi'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="grid-size" class="col-12 col-sm-6 col-form-label">Cell Border Width</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="0" max="5" class="form-control" id="grid-size" v-model="settings.map.voronoiCellBorderWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='voronoi'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="grid-size" class="col-12 col-sm-6 col-form-label">Territory Border Width</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="0" max="8" class="form-control" id="grid-size" v-model="settings.map.voronoiTerritoryBorderWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
     </div>
 
     <div class="mb-1 pb-1">
