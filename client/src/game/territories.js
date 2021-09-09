@@ -5,6 +5,7 @@ import gameHelper from '../services/gameHelper'
 class Territories {
 
   static zoomLevel = 100
+  static maxVoronoiDistance = 200
 
   constructor () {
     this.container = new PIXI.Container()
@@ -30,7 +31,7 @@ class Territories {
         this._drawTerritoriesMarchingCube(userSettings)
         break;
       case 'voronoi':
-        this._drawTerritoriesVoronoi()
+        this._drawTerritoriesVoronoi(userSettings)
         break;
     }
 
@@ -218,10 +219,8 @@ class Territories {
     }
   }
 
-  _drawTerritoriesVoronoi () {
+  _drawTerritoriesVoronoi (userSettings) {
     this.container.alpha = 1
-
-    const maxDistance = 200
 
     let voronoi = new Voronoi()
 
@@ -231,10 +230,10 @@ class Territories {
     let maxY = gameHelper.calculateMaxStarY(this.game)
 
     let boundingBox = {
-      xl: minX - maxDistance,
-      xr: maxX + maxDistance,
-      yt: minY - maxDistance,
-      yb: maxY + maxDistance
+      xl: minX - Territories.maxVoronoiDistance,
+      xr: maxX + Territories.maxVoronoiDistance,
+      yt: minY - Territories.maxVoronoiDistance,
+      yb: maxY + Territories.maxVoronoiDistance
     }
 
     let sites = []
@@ -257,6 +256,9 @@ class Territories {
       }
     }
 
+    let borderWidth = +userSettings.map.voronoiCellBorderWidth
+
+    // Draw the cells
     for (let cell of diagram.cells) {
       let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
 
@@ -274,28 +276,13 @@ class Territories {
       }
 
       // Do not draw points that are more than X distance away from the star.
-      let sanitizedPoints = []
+      let sanitizedPoints = points
+        // .filter(point => !Number.isNaN(point.x) && !Number.isNaN(point.y)) // For some reason some of the points have NaN x and y
+        .map(point => this._sanitizeVoronoiPoint(cell.site, point))
 
-      for (let point of points) {
-        let distance = gameHelper.getDistanceBetweenLocations(cell.site, point)
-        let angle = gameHelper.getAngleBetweenLocations(cell.site, point)
-
-        if (distance > maxDistance) {
-          let newPoint = gameHelper.getPointFromLocation(cell.site, angle, maxDistance)
-
-          sanitizedPoints.push(newPoint)
-        }
-        else {
-          //let newPoint = gameHelper.getPointFromLocation(point, angle, -0.5)
-          let newPoint = point
-
-          sanitizedPoints.push(newPoint)
-        }
-      }
-      
       // Draw the graphic
       let territoryGraphic = new PIXI.Graphics()
-      territoryGraphic.lineStyle(0.5, colour, 1)
+      territoryGraphic.lineStyle(borderWidth, colour, 1)
       territoryGraphic.beginFill(colour, 0.3)
       territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
@@ -310,33 +297,55 @@ class Territories {
 
       this.container.addChild(territoryGraphic)
     }
+    // ----------
 
-    let borderWidth = 2//TODO get from player options
+    // Draw the cell territory borders
+    borderWidth = +userSettings.map.voronoiTerritoryBorderWidth
 
     let borderGraphics = new PIXI.Graphics()
+
     for(let border of borders) {
       let leftNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)+Math.PI/2.0
-      let rightNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)-Math.PI/2.0
       let leftVA = gameHelper.getPointFromLocation(border.va, leftNormalAngle, borderWidth/2.0)
       let leftVB = gameHelper.getPointFromLocation(border.vb, leftNormalAngle, borderWidth/2.0)
+
+      let rightNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)-Math.PI/2.0
       let rightVA = gameHelper.getPointFromLocation(border.va, rightNormalAngle, borderWidth/2.0)
       let rightVB = gameHelper.getPointFromLocation(border.vb, rightNormalAngle, borderWidth/2.0)
+
       let colour = 0x000000
+
       if(border.lSite.playerID) {
         colour = this.game.galaxy.players.find(p => p._id === border.lSite.playerID).colour.value
       }
+
       borderGraphics.lineStyle(borderWidth, colour)
       borderGraphics.moveTo(rightVA.x, rightVA.y)
       borderGraphics.lineTo(rightVB.x, rightVB.y)
+
       colour = 0x000000
+
       if(border.rSite.playerID) {
         colour = this.game.galaxy.players.find(p => p._id === border.rSite.playerID).colour.value
       }
+
       borderGraphics.lineStyle(borderWidth, colour)
       borderGraphics.moveTo(leftVA.x, leftVA.y)
       borderGraphics.lineTo(leftVB.x, leftVB.y)
     }
+
     this.container.addChild(borderGraphics)
+  }
+
+  _sanitizeVoronoiPoint(site, point) {
+    let distance = gameHelper.getDistanceBetweenLocations(site, point)
+    let angle = gameHelper.getAngleBetweenLocations(site, point)
+
+    if (distance > Territories.maxVoronoiDistance) {
+      return gameHelper.getPointFromLocation(site, angle, Territories.maxVoronoiDistance)
+    }
+
+    return point;
   }
 
   refreshZoom (zoomPercent) {
