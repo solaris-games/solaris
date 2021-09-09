@@ -63,8 +63,9 @@ module.exports = class GameCreateService {
 
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
+        let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
+
         if (!isCustomGalaxy) {
-            let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
             let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
     
             if (desiredPlayerStarCount > desiredStarCount) {
