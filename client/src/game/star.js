@@ -544,6 +544,8 @@ class Star extends EventEmitter {
 
     if (!player || this._isDeadStar()) { return }
 
+    if (!player.research) { return }
+
     // TODO: Use the game helper instead?
     let techLevel = player.research.scanning.level
 
@@ -577,6 +579,8 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
+    if (!player.research) { return }
+    
     // TODO: Use the game helper instead?
     let techLevel = player.research.hyperspace.level
 
