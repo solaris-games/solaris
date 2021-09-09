@@ -237,10 +237,27 @@ class Territories {
       yb: maxY + maxDistance
     }
 
-    let sites = this.game.galaxy.stars.map(s => s.location)
+    let sites = []
+    for( let star of this.game.galaxy.stars) {
+      sites.push( {
+        x: star.location.x,
+        y: star.location.y,
+        playerID: star.ownedByPlayerId
+        })
+    }
+    //let sites = this.game.galaxy.stars.map(s => s.location)
+
 
     let diagram = voronoi.compute(sites, boundingBox)
 
+    let borders = []
+    for (let edge of diagram.edges) {
+      if(edge.lSite && edge.rSite) {
+        if(edge.lSite.playerID !== edge.rSite.playerID) {
+          borders.push(edge)
+        }
+      }
+    }
     for (let cell of diagram.cells) {
       let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
 
@@ -251,7 +268,7 @@ class Territories {
       }
 
       let points = []
-      
+
       for (let halfedge of cell.halfedges) {
         points.push(halfedge.getStartpoint())
         points.push(halfedge.getEndpoint())
@@ -278,7 +295,7 @@ class Territories {
       
       // Draw the graphic
       let territoryGraphic = new PIXI.Graphics()
-      territoryGraphic.lineStyle(2, colour, 1)
+      territoryGraphic.lineStyle(0.5, colour, 1)
       territoryGraphic.beginFill(colour, 0.3)
       territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
@@ -293,6 +310,14 @@ class Territories {
 
       this.container.addChild(territoryGraphic)
     }
+
+    let borderGraphics = new PIXI.Graphics()
+    borderGraphics.lineStyle(2, 0xFFFFFF)
+    for(let border of borders) {
+      borderGraphics.moveTo(border.va.x, border.va.y)
+      borderGraphics.lineTo(border.vb.x, border.vb.y)
+    }
+    this.container.addChild(borderGraphics)
   }
 
   refreshZoom (zoomPercent) {
