@@ -59,12 +59,17 @@ module.exports = class GameCreateService {
             settings
         });
 
-        // Calculate how many stars we need.
-        let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
-        let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
+        let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
 
-        if (desiredPlayerStarCount > desiredStarCount) {
-            throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
+        // For non-custom galaxies we need to check that the player has actually provided
+        // enough stars for each player.
+        if (!isCustomGalaxy) {
+            let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
+            let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
+    
+            if (desiredPlayerStarCount > desiredStarCount) {
+                throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
+            }
         }
 
         // Ensure that c2c combat is disabled for orbital games.
@@ -84,11 +89,11 @@ module.exports = class GameCreateService {
         game.galaxy.playerIndexes = [];
         game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
-            game, settings,
+            game, 
+            settings,
             desiredStarCount,
             game.settings.general.playerLimit,
             game.settings.specialGalaxy.randomGates);
-
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
