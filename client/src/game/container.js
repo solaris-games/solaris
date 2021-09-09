@@ -143,10 +143,10 @@ class GameContainer {
   setupViewport (game) {
     this.game = game
 
-    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1000
-    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1000
-    this.starFieldTop = gameHelper.calculateMinStarY(game) - 500
-    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 500
+    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
+    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1500
+    this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
+    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 750
 
     // activate plugins
     this.viewport
