@@ -328,6 +328,7 @@ class Territories {
       borderGraphics.lineStyle(borderWidth, colour)
       borderGraphics.moveTo(rightVA.x, rightVA.y)
       borderGraphics.lineTo(rightVB.x, rightVB.y)
+      colour = 0x000000
       if(border.rSite.playerID) {
         colour = this.game.galaxy.players.find(p => p._id === border.rSite.playerID).colour.value
       }
