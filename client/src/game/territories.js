@@ -243,10 +243,8 @@ class Territories {
         x: star.location.x,
         y: star.location.y,
         playerID: star.ownedByPlayerId
-        })
+      })
     }
-    //let sites = this.game.galaxy.stars.map(s => s.location)
-
 
     let diagram = voronoi.compute(sites, boundingBox)
 
@@ -258,6 +256,7 @@ class Territories {
         }
       }
     }
+
     for (let cell of diagram.cells) {
       let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
 
@@ -287,7 +286,8 @@ class Territories {
           sanitizedPoints.push(newPoint)
         }
         else {
-          let newPoint = gameHelper.getPointFromLocation(point, angle, -1)
+          //let newPoint = gameHelper.getPointFromLocation(point, angle, -0.5)
+          let newPoint = point
 
           sanitizedPoints.push(newPoint)
         }
@@ -311,11 +311,29 @@ class Territories {
       this.container.addChild(territoryGraphic)
     }
 
+    let borderWidth = 2//TODO get from player options
+
     let borderGraphics = new PIXI.Graphics()
-    borderGraphics.lineStyle(2, 0xFFFFFF)
     for(let border of borders) {
-      borderGraphics.moveTo(border.va.x, border.va.y)
-      borderGraphics.lineTo(border.vb.x, border.vb.y)
+      let leftNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)+Math.PI/2.0
+      let rightNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)-Math.PI/2.0
+      let leftVA = gameHelper.getPointFromLocation(border.va, leftNormalAngle, borderWidth/2.0)
+      let leftVB = gameHelper.getPointFromLocation(border.vb, leftNormalAngle, borderWidth/2.0)
+      let rightVA = gameHelper.getPointFromLocation(border.va, rightNormalAngle, borderWidth/2.0)
+      let rightVB = gameHelper.getPointFromLocation(border.vb, rightNormalAngle, borderWidth/2.0)
+      let colour = 0x000000
+      if(border.lSite.playerID) {
+        colour = this.game.galaxy.players.find(p => p._id === border.lSite.playerID).colour.value
+      }
+      borderGraphics.lineStyle(borderWidth, colour)
+      borderGraphics.moveTo(rightVA.x, rightVA.y)
+      borderGraphics.lineTo(rightVB.x, rightVB.y)
+      if(border.rSite.playerID) {
+        colour = this.game.galaxy.players.find(p => p._id === border.rSite.playerID).colour.value
+      }
+      borderGraphics.lineStyle(borderWidth, colour)
+      borderGraphics.moveTo(leftVA.x, leftVA.y)
+      borderGraphics.lineTo(leftVB.x, leftVB.y)
     }
     this.container.addChild(borderGraphics)
   }
