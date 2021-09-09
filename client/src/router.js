@@ -20,6 +20,7 @@ import PremiumStore from './views/PremiumStore.vue'
 import Leaderboard from './views/Leaderboard.vue'
 import MyGuild from './views/guild/MyGuild.vue'
 import GuildCreate from './views/guild/GuildCreate.vue'
+import GuildRename from './views/guild/GuildRename.vue'
 import GuildDetails from './views/guild/GuildDetails.vue'
 import Administration from './views/Administration.vue'
 
@@ -121,6 +122,11 @@ export default new Router({
       path: '/guild/create',
       name: 'guild-create',
       component: GuildCreate
+    },
+    {
+      path: '/guild/rename',
+      name: 'guild-rename',
+      component: GuildRename
     },
     {
       path: '/guild',

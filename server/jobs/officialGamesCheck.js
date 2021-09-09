@@ -9,6 +9,8 @@ const officialGameSettings = [
     require('../config/game/settings/official/special_battleRoyale'),
     require('../config/game/settings/official/special_orbital'),
     require('../config/game/settings/official/special_ultraDark'),
+    require('../config/game/settings/official/special_homeStar'),
+    require('../config/game/settings/official/special_anonymous'),
 ];
 
 module.exports = (container) => {

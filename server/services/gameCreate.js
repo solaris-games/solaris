@@ -4,7 +4,7 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
         this.gameModel = gameModel;
         this.gameListService = gameListService;
         this.nameService = nameService;
@@ -14,6 +14,7 @@ module.exports = class GameCreateService {
         this.conversationService = conversationService;
         this.historyService = historyService;
         this.achievementService = achievementService;
+        this.userService = userService;
     }
 
     async create(settings) {
@@ -30,7 +31,11 @@ module.exports = class GameCreateService {
 
             // Validate that the player cannot create large games.
             if (settings.general.playerLimit > 16) {
-                throw new ValidationError(`Games larger than 16 players are reserved for official games only.`);
+                let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
+
+                if (!userIsGameMaster) {
+                    throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
+                }
             }
 
             let userAchievements = await this.achievementService.getAchievements(settings.general.createdByUserId);

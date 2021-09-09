@@ -22,9 +22,9 @@ async function startup() {
     await container.gameService.lockAll(false);
     console.log('All games unlocked');
 
-    console.log('Recalculating all ELO ratings...');
-    await container.ratingService.recalculateAllEloRatings(false);
-    console.log('ELO ratings recalculated');
+    // console.log('Recalculating all ELO ratings...');
+    // await container.ratingService.recalculateAllEloRatings(false);
+    // console.log('ELO ratings recalculated');
 
     // ------------------------------
 

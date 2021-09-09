@@ -71,7 +71,7 @@ module.exports = (config, io) => {
     const adminService = new AdminService(UserModel, GameModel);
     const recaptchaService = new RecaptchaService();
 
-    const guildService = new GuildService(GuildModel, UserModel);
+    const guildService = new GuildService(GuildModel, UserModel, userService);
     const guildUserService = new GuildUserService(UserModel, guildService);
 
     const broadcastService = new BroadcastService(io);
@@ -96,8 +96,8 @@ module.exports = (config, io) => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, customMapService);
     const playerService = new PlayerService(GameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
     const ledgerService = new LedgerService(GameModel, playerService);
-    const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService, ratingService);
     const gameService = new GameService(GameModel, userService, starService, carrierService, playerService, passwordService, achievementService);
+    const leaderboardService = new LeaderboardService(UserModel, userService, playerService, guildUserService, ratingService, gameService);
     const researchService = new ResearchService(GameModel, technologyService, randomService, playerService, starService, userService);
     const reputationService = new ReputationService(GameModel, playerService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService);
@@ -119,7 +119,7 @@ module.exports = (config, io) => {
         ledgerService, conversationService, combatService);
 
     const gameListService = new GameListService(GameModel, gameService, conversationService, eventService);
-    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService);
+    const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService);
 
     return {
         adminService,

@@ -1,8 +1,7 @@
 <template>
     <div>
         <p>
-            Your forces have engaged the enemy in <span class="text-warning">carrier-to-star</span> combat at
-            <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
+            Your forces have engaged the enemy in <span class="text-warning">carrier-to-star</span> combat at <star-label :starId="event.data.starId" :starName="event.data.starName"/>.
         </p>
         <div class="table-responsive mt-2">
             <table class="table table-sm" v-if="event">
@@ -72,7 +71,7 @@
 
         <div v-if="event.data.captureResult">
           <p>
-            The star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a> has been captured
+            The star <star-label :starId="event.data.starId" :starName="event.data.starName"/> has been captured
             by <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a>.
           </p>
           <p v-if="event.data.captureResult.captureReward">
@@ -86,10 +85,12 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconShape from '../../player/PlayerIconShape.vue'
+import StarLabelVue from '../../star/StarLabel'
 
 export default {
   components: {
-    PlayerIconShape
+    PlayerIconShape,
+    'star-label': StarLabelVue
   },
   props: {
     event: Object
@@ -110,9 +111,6 @@ export default {
     this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId !== this.event.data.playerIdDefender)
   },
   methods: {
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.event.data.starId)
-    },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },

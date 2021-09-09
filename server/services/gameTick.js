@@ -85,9 +85,6 @@ module.exports = class GameTickService extends EventEmitter {
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
 
-            let hasWinner = await this._gameWinCheck(game, gameUsers);
-            logTime('Game win check');
-
             await this._playAI(game);
             logTime('AI controlled players turn');
             
@@ -98,7 +95,10 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Award tick credits from specialists');
 
             this._orbitGalaxy(game);
-            logTime('Orbital mechanics')
+            logTime('Orbital mechanics');
+
+            let hasWinner = await this._gameWinCheck(game, gameUsers);
+            logTime('Game win check');
 
             await this._logHistory(game);
             logTime('Log history');
@@ -440,17 +440,10 @@ module.exports = class GameTickService extends EventEmitter {
         let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
-        // If all players are ready to quit then declare them all as defeated.
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
-
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            if (isAllUndefeatedPlayersReadyToQuit) {
-                player.defeated = true;
-            } else {
-                this.playerService.performDefeatedOrAfkCheck(game, player, isTurnBasedGame);
-            }
+            this.playerService.performDefeatedOrAfkCheck(game, player, isTurnBasedGame);
 
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.

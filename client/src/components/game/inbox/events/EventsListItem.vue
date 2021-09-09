@@ -21,7 +21,6 @@
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-combat-carrier :event="event" v-if="event.type === 'playerCombatCarrier'"/>
         <player-credits-received :event="event" v-if="event.type === 'playerCreditsReceived'"
@@ -38,8 +37,7 @@
         <player-renown-sent :event="event" v-if="event.type === 'playerRenownSent'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
-        <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"/>
         <player-technology-received :event="event" v-if="event.type === 'playerTechnologyReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"
@@ -48,10 +46,8 @@
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-debt-settled :event="event" v-if="event.type === 'playerDebtSettled'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-        <player-star-specialist-hired :event="event" v-if="event.type === 'playerStarSpecialistHired'"
-            @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-        <player-carrier-specialist-hired :event="event" v-if="event.type === 'playerCarrierSpecialistHired'"
-            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        <player-star-specialist-hired :event="event" v-if="event.type === 'playerStarSpecialistHired'"/>
+        <player-carrier-specialist-hired :event="event" v-if="event.type === 'playerCarrierSpecialistHired'"/>
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
@@ -125,14 +121,8 @@ export default {
     event: Object
   },
   methods: {
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', e)
     },
     async markAsRead () {
         if (this.isRead) {

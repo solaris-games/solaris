@@ -51,6 +51,9 @@
                               <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
                               <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
                             </span>
+                            <span v-if="player.readyToQuit" @click="unconfirmReadyToQuit(player)">
+                              <i class="fas fa-check text-warning" title="This player is ready to quit"></i>
+                            </span>
                           </h5>
                       </td>
                       <td class="fit pt-3 pr-2" v-if="isConquestAllStars">
@@ -70,10 +73,7 @@
                         </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
-                        <h5 v-if="player.readyToQuit" class="pt-2 pr-2 pl-2" @click="unconfirmReadyToQuit(player)" :disabled="$isHistoricalMode()">
-                          <i class="fas fa-check text-warning" title="This player is ready to quit."></i>
-                        </h5>
-                        <h5 v-if="player.ready && !player.readyToQuit" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
                           <i class="fas fa-check text-success" title="This player is ready."></i>
                         </h5>
                         <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
@@ -95,10 +95,10 @@
           <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-sign-out-alt"></i> Quit Game
           </modalButton>
-          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit" class="btn btn-sm btn-warning mr-1">
-            <i class="fas fa-times"></i> Ready to Quit
+          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-warning mr-1">
+            <i class="fas fa-times"></i> Declare Ready to Quit
           </button>
-          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit" class="btn btn-sm btn-success mr-1">
+          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success mr-1">
             <i class="fas fa-check"></i> Ready to Quit
           </button>
           <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
@@ -259,6 +259,10 @@ export default {
       }
     },
     async confirmReadyToQuit (player) {
+      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
+        return
+      }
+      
       if (!await this.$confirm('Ready to Quit?', 'Are you sure you want declare that you are ready to quit? If all active players declare ready to quit then the game will end early.')) {
         return
       }
@@ -277,6 +281,10 @@ export default {
       }
     },
     async unconfirmReadyToQuit (player) {
+      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
+        return
+      }
+
       try {
         let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
 

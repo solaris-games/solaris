@@ -178,10 +178,12 @@ module.exports = class ConversationService extends EventEmitter {
         let convo = await this.detail(game, playerId, conversationId, false); // Call this for the validation.
 
         let newMessage = {
+            _id: mongoose.Types.ObjectId(),
             fromPlayerId: playerId,
             message,
             sentDate: moment().utc(),
             sentTick: game.state.tick,
+            pinned: false,
             readBy: [playerId]
         };
 
@@ -307,6 +309,36 @@ module.exports = class ConversationService extends EventEmitter {
             .reduce((sum, c) => {
                 return sum + c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length
             }, 0);
+    }
+
+    async pinMessage(game, conversationId, messageId) {
+        return await this.setPinnedMessage(game, conversationId, messageId, true);
+    }
+
+    async unpinMessage(game, conversationId, messageId) {
+        return await this.setPinnedMessage(game, conversationId, messageId, false);
+    }
+
+    async setPinnedMessage(game, conversationId, messageId, isPinned) {
+        return await this.gameModel.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'conversations.$[c].messages.$[m].pinned': isPinned
+            }
+        }, 
+        {
+            arrayFilters: [
+                {
+                    'c._id': conversationId,
+                    'c.createdBy': { $ne: null } // Not the global chat
+                },
+                {
+                    'm._id': messageId
+                }
+            ]
+        })
+        .exec();
     }
 
 }

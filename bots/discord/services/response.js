@@ -263,8 +263,8 @@ module.exports = class ReponseService {
     async inviteError(authorId, reason) {
         let response = `Hey @<${authorId}>,`
         switch (reason) {
-            case 'noUser':
-                response += "It seems like the user you tried to look up does not exist, check if you spelled it correctly, and used capitalised letters at the right places." +
+            case 'noGame':
+                response += "It seems like the game you wanted to invite people to was not found, check if you used the correct link.\n" +
                     "If you belief this is a bug, please contact @Tristanvds#9505"
         }
         return response;

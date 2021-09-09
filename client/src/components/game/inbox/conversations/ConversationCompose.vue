@@ -116,17 +116,7 @@ export default {
         if (response.status === 200) {
           AudioService.type()
 
-          let userPlayerId = GameHelper.getUserPlayer(this.$store.state.game)._id
-
-          this.$emit('onConversationMessageSent', {
-            conversationId: this.conversationId,
-            fromPlayerId: userPlayerId,
-            message: message,
-            sentDate: moment().utc(),
-            sentTick: this.$store.state.tick,
-            readBy: [userPlayerId],
-            type: 'message'
-          })
+          this.$emit('onConversationMessageSent', response.data)
 
           this.$store.commit('resetCurrentConversationText')
           this.currentMention = null

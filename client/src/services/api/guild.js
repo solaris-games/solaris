@@ -38,6 +38,13 @@ class GuildService extends BaseApiService {
     }, { withCredentials: true })
   }
 
+  rename (name, tag) {
+    return axios.patch(this.BASE_URL + 'guild', {
+      name,
+      tag
+    }, { withCredentials: true })
+  }
+
   delete (guildId) {
     return axios.delete(this.BASE_URL + 'guild/' + guildId, { withCredentials: true })
   }

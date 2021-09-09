@@ -26,7 +26,9 @@ const schema = new Schema({
 				'32_player_rt',
 				'special_ultraDark',
 				'special_orbital',
-				'special_battleRoyale'
+				'special_battleRoyale',
+				'special_homeStar',
+				'special_anonymous'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
 				'conquest', 'battleRoyale'

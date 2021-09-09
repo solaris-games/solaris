@@ -20,10 +20,7 @@
               @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
         </div>
         <div class="tab-pane fade" id="events">
-            <events-list
-                @onOpenStarDetailRequested="onOpenStarDetailRequested"
-                @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-                @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+            <events-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         </div>
     </div>
 </div>
@@ -76,14 +73,8 @@ export default {
     onViewConversationRequested (e) {
       this.$emit('onViewConversationRequested', e)
     },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', e)
     },
     onCreateNewConversationRequested (e) {
       this.$emit('onCreateNewConversationRequested', e)
