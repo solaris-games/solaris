@@ -42,6 +42,7 @@ class Star extends EventEmitter {
     this.graphics_scanningRange = new PIXI.Graphics()
     this.graphics_star = new PIXI.Graphics()
     this.graphics_targeted = new PIXI.Graphics()
+    this.graphics_selected = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
@@ -49,6 +50,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_part_warp)
     this.container.addChild(this.graphics_shape_full_warp)
     this.container.addChild(this.graphics_targeted)
+    this.container.addChild(this.graphics_selected)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -57,7 +59,7 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    this.isSelected = false
+    this.unselect()
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
@@ -126,6 +128,7 @@ class Star extends EventEmitter {
     // star to be re-drawn.
 
     this.drawTarget()
+    this.drawSelectedCircle()
     this.drawStar()
     this.drawSpecialist()
     this.drawPlanets()
@@ -539,7 +542,9 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
-    if (!player) { return }
+    if (!player || this._isDeadStar()) { return }
+
+    if (!player.research) { return }
 
     // TODO: Use the game helper instead?
     let techLevel = player.research.scanning.level
@@ -554,7 +559,6 @@ class Star extends EventEmitter {
 
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
-    // this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
@@ -575,6 +579,8 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
+    if (!player.research) { return }
+    
     // TODO: Use the game helper instead?
     let techLevel = player.research.hyperspace.level
 
@@ -609,7 +615,16 @@ class Star extends EventEmitter {
     }
   }
 
+  drawSelectedCircle () {
+    this.graphics_selected.clear()
 
+    if (this.isSelected) {
+      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_selected.alpha = 0.3
+      this.graphics_selected.drawCircle(0, 0, 20)
+    }
+  }
+  
   onZoomChanging(zoomPercent) {
     this.zoomPercent = zoomPercent
     this.setScale(zoomPercent)
@@ -752,6 +767,21 @@ class Star extends EventEmitter {
 
   _isDeadStar () {
     return this.data.naturalResources != null && this.data.naturalResources <= 0
+  }
+
+  select () {
+    this.isSelected = true
+    this.drawSelectedCircle()
+  }
+
+  unselect () {
+    this.isSelected = false
+    this.drawSelectedCircle()
+  }
+
+  toggleSelected () {
+    this.isSelected = !this.isSelected
+    this.drawSelectedCircle()
   }
 }
 

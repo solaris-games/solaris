@@ -14,7 +14,21 @@ const schema = new Schema({
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false },
 			type: { type: Types.String, required: true, enum: [
-				'custom', 'standard_rt', 'standard_tb', 'standard_dark_rt', 'standard_dark_tb', '1v1_rt', '1v1_tb', 'new_player_rt', 'new_player_tb', '32_player_rt'
+				'custom', 
+				'standard_rt', 
+				'standard_tb', 
+				'standard_dark_rt', 
+				'standard_dark_tb', 
+				'1v1_rt', 
+				'1v1_tb', 
+				'new_player_rt', 
+				'new_player_tb', 
+				'32_player_rt',
+				'special_ultraDark',
+				'special_orbital',
+				'special_battleRoyale',
+				'special_homeStar',
+				'special_anonymous'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
 				'conquest', 'battleRoyale'

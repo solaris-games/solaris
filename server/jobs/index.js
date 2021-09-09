@@ -15,10 +15,22 @@ async function startup() {
     
     console.log('MongoDB Intialized');
 
+    // ------------------------------
+    // Jobs that run every time the server restarts.
+
+    console.log('Unlock all games...');
+    await container.gameService.lockAll(false);
+    console.log('All games unlocked');
+
+    // console.log('Recalculating all ELO ratings...');
+    // await container.ratingService.recalculateAllEloRatings(false);
+    // console.log('ELO ratings recalculated');
+
+    // ------------------------------
+
     const gameTickJob = require('./gameTick')(container);
     const officialGamesCheckJob = require('./officialGamesCheck')(container);
     const cleanupCustomGamesJob = require('./cleanupCustomGames')(container);
-    // const cleanupOldGamesJob = require('./cleanupOldGames')(container);
     const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
 
     // Set up the agenda instance.
@@ -49,12 +61,6 @@ async function startup() {
         priority: 'high', concurrency: 1
     },
     cleanupCustomGamesJob.handler);
-
-    // Cleanup old games // TODO: Do we really need this?
-    // agendajs.define('cleanup-old-games', {
-    //     priority: 'high', concurrency: 1
-    // },
-    // cleanupOldGamesJob.handler);
 
     // Cleanup old game history
     agendajs.define('cleanup-old-game-history', {

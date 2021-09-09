@@ -7,6 +7,7 @@ const schema = new Schema({
     message: { type: Types.String, required: true },
     sentDate: { type: Types.Date, required: true },
     sentTick: { type: Types.Number, required: false },
+    pinned: { type: Types.Boolean, required: false },
     readBy: [{ type: Types.ObjectId, required: true }]
 });
 

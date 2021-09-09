@@ -1,0 +1,91 @@
+{
+  "general": {
+    "name": "[[[RANDOM]]]",
+    "description": "Capital Stars are the targets in this mode, capture enemy capitals to win and protect your own.",
+    "type": "special_homeStar",
+    "mode": "conquest",
+    "password": null,
+    "playerLimit": 8,
+    "playerType": "establishedPlayers",
+    "anonymity": "normal",
+    "playerOnlineStatus": "hidden",
+    "timeMachine": "enabled"
+  },
+  "galaxy": {
+    "galaxyType": "irregular",
+    "starsPerPlayer": 20,
+    "productionTicks": 20
+  },
+  "specialGalaxy": {
+    "carrierCost": "standard",
+    "carrierUpkeepCost": "none",
+    "warpgateCost": "standard",
+    "specialistCost": "standard",
+    "specialistsCurrency": "creditsSpecialists",
+    "randomGates": "none",
+    "darkGalaxy": "start",
+    "giftCarriers": "enabled",
+    "defenderBonus": "enabled",
+    "carrierToCarrierCombat": "enabled",
+    "resourceDistribution": "random",
+    "playerDistribution": "circular",
+    "carrierSpeed": 10
+  },
+  "conquest": {
+    "victoryCondition": "homeStarPercentage",
+    "victoryPercentage": 50
+  },
+  "orbitalMechanics": {
+    "enabled": "disabled",
+    "orbitSpeed": 5,
+    "orbitOrigin": "galacticCenter"
+  },
+  "player": {
+    "startingStars": 6,
+    "startingCredits": 500,
+    "startingCreditsSpecialists": 5,
+    "startingShips": 10,
+    "startingInfrastructure": {
+      "economy": 10,
+      "industry": 10,
+      "science": 3
+    },
+    "developmentCost": {
+      "economy": "standard",
+      "industry": "standard",
+      "science": "standard"
+    },
+    "tradeCredits": true,
+    "tradeCreditsSpecialists": true,
+    "tradeCost": 15,
+    "tradeScanning": "scanned"
+  },
+  "technology": {
+    "startingTechnologyLevel": {
+      "terraforming": 1,
+      "experimentation": 1,
+      "scanning": 1,
+      "hyperspace": 1,
+      "manufacturing": 1,
+      "banking": 1,
+      "weapons": 1,
+      "specialists": 1
+    },
+    "researchCosts": {
+      "terraforming": "standard",
+      "experimentation": "standard",
+      "scanning": "standard",
+      "hyperspace": "standard",
+      "manufacturing": "standard",
+      "banking": "standard",
+      "weapons": "standard",
+      "specialists": "standard"
+    },
+    "bankingReward": "standard"
+  },
+  "gameTime": {
+    "gameType": "realTime",
+    "speed": 1800,
+    "startDelay": 240
+  }
+}

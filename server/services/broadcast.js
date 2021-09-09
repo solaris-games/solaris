@@ -54,6 +54,18 @@ module.exports = class BroadcastService {
         });
     }
 
+    gamePlayerReadyToQuit(game, player) {
+        this.io.to(game.id).emit('gamePlayerReadyToQuit', {
+            playerId: player.id
+        });
+    }
+
+    gamePlayerNotReadyToQuit(game, player) {
+        this.io.to(game.id).emit('gamePlayerNotReadyToQuit', {
+            playerId: player.id
+        });
+    }
+
     gameMessageSent(game, message) {
         message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
     }
@@ -69,6 +81,20 @@ module.exports = class BroadcastService {
         conversation.participants.forEach(p => this.io.to(p).emit('gameConversationLeft', {
             conversationId: conversation._id,
             playerId
+        }));
+    }
+
+    gameConversationMessagePinned(game, conversation, messageId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessagePinned', {
+            conversationId: conversation._id,
+            messageId: messageId
+        }));
+    }
+
+    gameConversationMessageUnpinned(game, conversation, messageId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessageUnpinned', {
+            conversationId: conversation._id,
+            messageId: messageId
         }));
     }
 

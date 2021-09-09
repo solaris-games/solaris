@@ -350,8 +350,8 @@ leaderboard.
  7b. Experimentations are performed.
  7c. Carrier upkeep is deducted.
  8.  Game checks for afk and defeated players.
- 9.  Game checks for a winner.
- 10. AI actions are performed.
- 11. Research is performed.
+ 9. AI actions are performed.
+ 10. Research is performed.
+ 11. Game checks for a winner.
  12. Intel is logged.
 

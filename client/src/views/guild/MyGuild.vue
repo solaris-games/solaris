@@ -15,6 +15,7 @@
         <template v-slot:default="{ value, getColumnClass }">
           <guild-member :guild="guild" :player="value" :role="value.role" :getColumnClass="getColumnClass"
             @onPlayerPromoted="onPlayerPromoted"
+            @onPlayerDemoted="onPlayerDemoted"
             @onPlayerKicked="onPlayerKicked"
             @onPlayerUninvited="onPlayerUninvited"></guild-member>
         </template>
@@ -23,6 +24,10 @@
       <guild-new-invite v-if="isLeader || isOfficer"
         :guildId="this.guild._id"
         @onUserInvited="onUserInvited"/>
+
+      <router-link to="/guild/rename" class="btn btn-sm btn-primary mt-2" v-if="isLeader">
+        <i class="fas fa-pencil-alt"></i> Rename Guild
+      </router-link>
     </div>
 
     <div v-if="!isLoading && !guild" class="mb-4">

@@ -155,7 +155,7 @@
               <td>Defender Bonus</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.defenderBonus) }}</td>
             </tr>
-            <tr>
+            <tr v-if="game.settings.orbitalMechanics.enabled === 'disabled'">
               <td>Carrier-to-Carrier Combat</td>
               <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
             </tr>

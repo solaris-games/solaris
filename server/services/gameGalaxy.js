@@ -416,6 +416,7 @@ module.exports = class GameGalaxyService {
                 defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
+                readyToQuit: p.readyToQuit,
                 missedTurns: p.missedTurns,
                 alias: p.alias,
                 avatar: p.avatar,
@@ -504,6 +505,7 @@ module.exports = class GameGalaxyService {
                     gamePlayer.afk = historyPlayer.afk;
                     gamePlayer.research = historyPlayer.research;
                     gamePlayer.ready = historyPlayer.ready;
+                    gamePlayer.readyToQuit = historyPlayer.readyToQuit;
                 }
             }
         }

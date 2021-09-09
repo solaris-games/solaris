@@ -13,7 +13,7 @@
 
     <div class="tab-content pt-2">
         <div class="tab-pane fade show active" id="newGames">
-          <h4>Official Games</h4>
+          <h4>Standard Games</h4>
 
           <p>These are official games and have standard settings.</p>
 
@@ -169,6 +169,99 @@
 
           <hr/>
 
+          <h4>Special Games</h4>
+
+          <p>These are official games with interesting twists.</p>
+
+          <div class="row">
+            <!-- Special Ultra Dark -->
+            <div class="col-sm-12 col-md-8 col-lg-8 pr-1" v-if="games.specialUltraDark">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialUltraDark._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_ultraDark.png')" alt="Special - Ultra Dark">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-moon"></i>
+                    <span class="ml-2">{{games.specialUltraDark.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialUltraDark)}}
+                    ({{games.specialUltraDark.state.players}}/{{games.specialUltraDark.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <!-- Battle Royale -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialBattleRoyale">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialBattleRoyale._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_battleRoyale.png')" alt="Special - Battle Royale">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-drumstick-bite"></i>
+                    <span class="ml-2">{{games.specialBattleRoyale.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialBattleRoyale)}}
+                    ({{games.specialBattleRoyale.state.players}}/{{games.specialBattleRoyale.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <!-- Orbital -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialOrbital">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialOrbital._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_orbital.png')" alt="Special - Orbital Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-satellite"></i>
+                    <span class="ml-2">{{games.specialOrbital.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialOrbital)}}
+                    ({{games.specialOrbital.state.players}}/{{games.specialOrbital.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <!-- Home Stars -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialHomeStar">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialHomeStar._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_homeStar.png')" alt="Special - Capital Stars Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-home"></i>
+                    <span class="ml-2">{{games.specialHomeStar.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialHomeStar)}}
+                    ({{games.specialHomeStar.state.players}}/{{games.specialHomeStar.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anonymous -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialAnonymous">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialAnonymous._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_anonymous.png')" alt="Special - Capital Stars Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-user-secret"></i>
+                    <span class="ml-2">{{games.specialAnonymous.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialAnonymous)}}
+                    ({{games.specialAnonymous.state.players}}/{{games.specialAnonymous.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr/>
+
           <h4 class="mb-0">User Created Games</h4>
 
           <p class="mb-2"><small class="text-warning" v-if="userGames.length">Total Games: {{userGames.length}}</small></p>
@@ -281,7 +374,12 @@ export default {
         standardDarkRT: null,
         oneVsOneRT: null,
         oneVsOneTB: null,
-        thirtyTwoPlayerRT: null
+        thirtyTwoPlayerRT: null,
+        specialUltraDark: null,
+        specialBattleRoyale: null,
+        specialOrbital: null,
+        specialHomeStar: null,
+        specialAnonymous: null
       }
     }
   },
@@ -309,6 +407,11 @@ export default {
       this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
       this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
       this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
+      this.games.specialUltraDark = this.getOfficialGame('special_ultraDark')
+      this.games.specialBattleRoyale = this.getOfficialGame('special_battleRoyale')
+      this.games.specialOrbital = this.getOfficialGame('special_orbital')
+      this.games.specialHomeStar = this.getOfficialGame('special_homeStar')
+      this.games.specialAnonymous = this.getOfficialGame('special_anonymous')
     } catch (err) {
       console.error(err)
     }
@@ -340,7 +443,12 @@ export default {
         '1v1_rt': '1 vs. 1',
         '1v1_tb': '1 vs. 1 - TB',
         '32_player_rt': '32 Players',
-        'custom': 'Custom Game'
+        'custom': 'Custom Game',
+        'special_ultraDark': 'Ultra Dark Galaxy',
+        'special_orbital': 'Orbital',
+        'special_battleRoyale': 'Battle Royale',
+        'special_homeStar': 'Capital Stars',
+        'special_anonymous': 'Anonymous',
       }[game.settings.general.type]
     }
   }
@@ -384,6 +492,10 @@ export default {
 
 .new-player-card-title {
   background-color: #f39c12;
+}
+
+.special-card-title {
+  background-color: #d62c1a;
 }
 
 .card-subtitle {

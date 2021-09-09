@@ -32,8 +32,15 @@ module.exports = class UserService extends EventEmitter {
         .exec();
     }
 
-    async getById(id) {
-        return await this.userModel.findById(id);
+    async getById(id, select = null) {
+        return await this.userModel.findById(id, select);
+    }
+
+    async getByUsername(username, select = null) {
+        return await this.userModel.findOne({
+            username
+        }, select)
+        .lean().exec();
     }
 
     async getByUsernameAchievementsLean(username) {
@@ -156,6 +163,22 @@ module.exports = class UserService extends EventEmitter {
         .exec();
 
         return user.roles.administrator || user.roles.gameMaster || user.roles.communityManager;
+    }
+
+    async getUserIsGameMaster(userId) {
+        let user = await this.userModel.findOne({
+            _id: userId,
+            $or: [
+                { 'roles.administrator': 1 },
+                { 'roles.gameMaster': 1 }
+            ]
+        }, {
+            _id: 1
+        })
+        .lean({defaults: true})
+        .exec();
+
+        return user != null;
     }
 
     async create(user, ipAddress) {
@@ -359,6 +382,54 @@ module.exports = class UserService extends EventEmitter {
                 'lastSeenIP': ipAddress
             }
         });
+    }
+
+    async listUserEloRatingsByIds(userIds) {
+        return await this.userModel.find({
+            _id: { $in: userIds }
+        }, {
+            'achievements.eloRating': 1
+        })
+        .lean()
+        .exec();
+    }
+
+    async listUsersInGuilds() {
+        return await this.userModel.find({ 
+            guildId: { $ne: null }
+        }, {
+            'achievements.rank': 1
+        })
+        .lean()
+        .exec();
+    }
+
+    async listUsersInGuild(guildId, select = null) {
+        return await this.userModel.find({
+            guildId
+        }, select)
+        .lean()
+        .exec();
+    }
+
+    async listUsers(userIds, select = null) {
+        return await this.userModel.find({
+            _id: {
+                $in: userIds
+            }
+        }, select)
+        .lean()
+        .exec();
+    }
+
+    async getUserCredits(userId) {
+        let userCredits = await this.userModel.findById(userId, {
+            credits: 1
+        })
+        .lean()
+        .exec();
+
+        return userCredits?.credits;
     }
 
 };

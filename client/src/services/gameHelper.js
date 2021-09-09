@@ -108,7 +108,7 @@ class GameHelper {
   getClosestStar (stars, point) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
-
+    
     for(let star of stars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
 
@@ -118,7 +118,10 @@ class GameHelper {
       }
     }
 
-    return closestStar
+    return {
+      star: closestStar,
+      distance: smallerDistance
+    }
   }
   
   getClosestPlayerStar (stars, point, player) {
@@ -720,6 +723,10 @@ class GameHelper {
 
   isTurnBasedGame(game) {
     return game.settings.gameTime.gameType === 'turnBased';
+  }
+
+  is1v1Game (game) {
+    return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type)
   }
 
   isAllUndefeatedPlayersReady(game) {

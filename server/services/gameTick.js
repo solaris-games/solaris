@@ -41,10 +41,10 @@ module.exports = class GameTickService extends EventEmitter {
             6. Check to see if anyone has won the game.
         */
 
-       let startTime = process.hrtime();
-       console.info(`[${game.settings.general.name}] - Game tick started.`);
+        let startTime = process.hrtime();
+        console.info(`[${game.settings.general.name}] - Game tick started.`);
 
-       game.state.lastTickDate = moment().utc();
+        game.state.lastTickDate = moment().utc();
 
         let taskTime = process.hrtime();
         let taskTimeEnd = null;
@@ -70,7 +70,7 @@ module.exports = class GameTickService extends EventEmitter {
 
         while (iterations--) {
             game.state.tick++;
-    
+
             logTime(`Tick ${game.state.tick}`);
 
             await this._combatCarriers(game, gameUsers);
@@ -85,9 +85,6 @@ module.exports = class GameTickService extends EventEmitter {
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
 
-            let hasWinner = await this._gameWinCheck(game, gameUsers);
-            logTime('Game win check');
-
             await this._playAI(game);
             logTime('AI controlled players turn');
             
@@ -98,7 +95,10 @@ module.exports = class GameTickService extends EventEmitter {
             logTime('Award tick credits from specialists');
 
             this._orbitGalaxy(game);
-            logTime('Orbital mechanics')
+            logTime('Orbital mechanics');
+
+            let hasWinner = await this._gameWinCheck(game, gameUsers);
+            logTime('Game win check');
 
             await this._logHistory(game);
             logTime('Log history');
@@ -143,9 +143,9 @@ module.exports = class GameTickService extends EventEmitter {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
             nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
         } else if (this.gameService.isTurnBasedGame(game)) {
-            // If in turn based mode, then check if all undefeated players are ready.
+            // If in turn based mode, then check if all undefeated players are ready OR all players are ready to quit
             // OR the max time wait limit has been reached.
-            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game);
+            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game) || this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
             
             if (isAllPlayersReady) {
                 return true;
@@ -489,20 +489,23 @@ module.exports = class GameTickService extends EventEmitter {
         if (winner) {
             this.gameService.finishGame(game, winner);
 
+            let rankingResult = null;
+
             // There must have been at least 1 production ticks in order for
             // rankings to be added to players. This is to slow down players
             // should they wish to cheat the system.
             if (game.state.productionTick > 0) {
                 let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
                 
-                await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
 
             await this.emailService.sendGameFinishedEmail(game);
 
             this.emit('onGameEnded', {
                 gameId: game._id,
-                gameTick: game.state.tick
+                gameTick: game.state.tick,
+                rankingResult
             });
 
             return true;

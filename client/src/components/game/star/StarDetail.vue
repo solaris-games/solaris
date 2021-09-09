@@ -401,7 +401,10 @@ export default {
       return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && !GameHelper.isGameFinished(this.$store.state.game) && !this.isDeadStar
+      return this.canShowSpecialist 
+        && !GameHelper.isGameFinished(this.$store.state.game) 
+        && !this.isDeadStar
+        && (!this.star.specialistId || !this.star.specialist.oneShot)
     },
     isOwnedByUserPlayer: function() {
       let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)

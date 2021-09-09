@@ -25,6 +25,7 @@ const schema = new Schema({
     ai: { type: Types.Boolean, required: false, default: false },
     renownToGive: { type: Types.Number, required: true, default: 8 },
     ready: { type: Types.Boolean, required: false, default: false },
+    readyToQuit: { type: Types.Boolean, required: false, default: false },
     missedTurns: { type: Types.Number, required: false, default: 0 },
     hasSentTurnReminder: { type: Types.Boolean, required: false, default: false },
     research: {
