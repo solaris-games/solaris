@@ -185,6 +185,7 @@ module.exports = class TechnologyService {
         }
 
         buffs.push(this.getStarWeaponsBuff(star));
+        buffs.push(this.getDefenderBonus(game));
 
         return this._calculateActualWeaponsBuff(weapons, buffs);
     }
@@ -210,4 +211,7 @@ module.exports = class TechnologyService {
         return Math.max(1, weapons + actualBuff);
     }   
 
+    getDefenderBonus(game) {
+        return game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
+    }
 }
