@@ -8,7 +8,8 @@
             <button class="btn btn-sm btn-success" @click="onViewHireCarrierSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">
-              <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
+            <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
+            <p v-if="carrier.specialist && carrier.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
             <p class="mb-2" v-if="!carrier.specialistId">
                 This carrier does not have a specialist assigned.
             </p>
@@ -40,6 +41,7 @@ export default {
       && this.carrier.orbiting
       && !this.carrier.isGift
       && !this.isDeadStar
+      && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
   },
   methods: {
     onViewHireCarrierSpecialistRequested() {

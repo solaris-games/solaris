@@ -90,14 +90,8 @@ export default {
         console.error(err)
       }
     },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', e)
     },
     onSelectedFilterChanged (e) {
       const categories = {

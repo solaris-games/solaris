@@ -140,11 +140,11 @@
 
       <div v-if="!$isHistoricalMode() && canEditWaypoints && isStandardUIStyle" class="row bg-secondary pt-2 pb-2 mb-0">
         <div class="col">
-          <button class="btn btn-success" :class="{'btn-sm':isCompactUIStyle}" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-sm btn-success" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
             <i class="fas fa-sync"></i>
           </button>
-          <button class="btn btn-danger" :class="{'btn-sm':isCompactUIStyle}" v-if="carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-sm btn-danger" v-if="carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Unloop
             <i class="fas fa-map-marker-alt"></i>
           </button>
@@ -451,7 +451,11 @@ export default {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && this.carrier.orbiting && !GameHelper.isGameFinished(this.$store.state.game) && !this.isDeadStar
+      return this.canShowSpecialist 
+        && this.carrier.orbiting 
+        && !GameHelper.isGameFinished(this.$store.state.game) 
+        && !this.isDeadStar
+        && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
     },
     isOwnedByUserPlayer: function () {
       let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)

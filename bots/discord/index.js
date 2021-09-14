@@ -49,9 +49,8 @@ client.on('message', async (msg) => {
 
 async function executeCommand(msg) {
     const command = commandService.identify(msg, prefix);
-    
     if (command.type !== 'dm') {
-        if (commandService.correctChannel(msg, command.cmd) && publicCommandService[command.cmd]) {
+        if (commandService.isCorrectChannel(msg, command.cmd) && publicCommandService[command.cmd]) {
             await publicCommandService[command.cmd](msg, command.directions);
         }
     } else {

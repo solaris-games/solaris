@@ -175,7 +175,7 @@
 
           <div class="row">
             <!-- Special Ultra Dark -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pr-1" v-if="games.specialUltraDark">
+            <div class="col-sm-12 col-md-8 col-lg-8 pr-1" v-if="games.specialUltraDark">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialUltraDark._id })">
                 <img class="card-img" :src="require('../assets/screenshots/special_ultraDark.png')" alt="Special - Ultra Dark">
                 <div class="card-img-overlay">
@@ -220,6 +220,40 @@
                   <h6 class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.specialOrbital)}}
                     ({{games.specialOrbital.state.players}}/{{games.specialOrbital.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <!-- Home Stars -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialHomeStar">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialHomeStar._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_homeStar.png')" alt="Special - Capital Stars Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-home"></i>
+                    <span class="ml-2">{{games.specialHomeStar.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialHomeStar)}}
+                    ({{games.specialHomeStar.state.players}}/{{games.specialHomeStar.settings.general.playerLimit}})
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anonymous -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialAnonymous">
+              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialAnonymous._id })">
+                <img class="card-img" :src="require('../assets/screenshots/special_anonymous.png')" alt="Special - Capital Stars Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title special-card-title">
+                    <i class="fas fa-user-secret"></i>
+                    <span class="ml-2">{{games.specialAnonymous.settings.general.name}}</span>
+                  </h5>
+                  <h6 class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.specialAnonymous)}}
+                    ({{games.specialAnonymous.state.players}}/{{games.specialAnonymous.settings.general.playerLimit}})
                   </h6>
                 </div>
               </div>
@@ -343,7 +377,9 @@ export default {
         thirtyTwoPlayerRT: null,
         specialUltraDark: null,
         specialBattleRoyale: null,
-        specialOrbital: null
+        specialOrbital: null,
+        specialHomeStar: null,
+        specialAnonymous: null
       }
     }
   },
@@ -374,6 +410,8 @@ export default {
       this.games.specialUltraDark = this.getOfficialGame('special_ultraDark')
       this.games.specialBattleRoyale = this.getOfficialGame('special_battleRoyale')
       this.games.specialOrbital = this.getOfficialGame('special_orbital')
+      this.games.specialHomeStar = this.getOfficialGame('special_homeStar')
+      this.games.specialAnonymous = this.getOfficialGame('special_anonymous')
     } catch (err) {
       console.error(err)
     }
@@ -408,7 +446,9 @@ export default {
         'custom': 'Custom Game',
         'special_ultraDark': 'Ultra Dark Galaxy',
         'special_orbital': 'Orbital',
-        'special_battleRoyale': 'Battle Royale'
+        'special_battleRoyale': 'Battle Royale',
+        'special_homeStar': 'Capital Stars',
+        'special_anonymous': 'Anonymous',
       }[game.settings.general.type]
     }
   }

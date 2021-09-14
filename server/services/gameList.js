@@ -71,20 +71,30 @@ module.exports = class GameListService {
 
         return await Promise.all(games.map(async game => {
             const player = game.galaxy.players.find(p => p.userId === userId.toString());
-            const playerId = player._id;
-            const unreadConversations = this.conversationService.getUnreadCount(game, playerId);
-            const unreadEvents = await this.eventService.getUnreadCount(game, playerId);
 
-            const turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
+            let unreadConversations = null,
+                unreadEvents = null,
+                totalUnread = null,
+                turnWaiting = null;
+
+            // Note: The player may have gone afk and been replaced by another player so we need to
+            // double check that the player is actually in the game to retrieve conversation counts etc.
+            if (player) {
+                unreadConversations = this.conversationService.getUnreadCount(game, player._id);
+                unreadEvents = await this.eventService.getUnreadCount(game, player._id);
+                turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
+
+                totalUnread = unreadConversations + unreadEvents;
+            }
 
             return {
                 _id: game._id,
                 settings: game.settings,
                 state: game.state,
-                unread: unreadConversations + unreadEvents,
+                unread: totalUnread,
                 turnWaiting,
-                defeated: player.defeated,
-                afk: player.afk
+                defeated: player?.defeated,
+                afk: player?.afk
             }
         }))
     }

@@ -8,7 +8,7 @@ module.exports = (router, io, container) => {
         try {
             const limit = +req.query.limit || null;
             const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey);
-                
+
             return res.status(200).json(result);
         } catch (err) {
             return next(err);
@@ -66,7 +66,7 @@ module.exports = (router, io, container) => {
             if (recaptchaEnabled) {
                 try {
                     let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    
+
                     await container.recaptchaService.verify(ip, req.body.recaptchaToken);
                 } catch (err) {
                     throw new ValidationError(['Recaptcha is invalid']);
@@ -84,7 +84,7 @@ module.exports = (router, io, container) => {
             return next(err);
         }
     }, middleware.handleError);
-    
+
     router.get('/api/user/settings', async (req, res, next) => {
         try {
             let settings = await container.userService.getGameSettings(req.session.userId);
@@ -138,7 +138,7 @@ module.exports = (router, io, container) => {
     router.put('/api/user/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
         try {
             await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
-            
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -202,10 +202,10 @@ module.exports = (router, io, container) => {
 
         try {
             await container.userService.updatePassword(
-                req.session.userId, 
+                req.session.userId,
                 req.body.currentPassword,
                 req.body.newPassword);
-                
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -215,7 +215,7 @@ module.exports = (router, io, container) => {
     router.post('/api/user/requestResetPassword', async (req, res, next) => {
         try {
             let token = await container.userService.requestResetPassword(req.body.email);
-            
+
             try {
                 await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
             } catch (emailError) {
@@ -237,7 +237,7 @@ module.exports = (router, io, container) => {
 
         try {
             await container.userService.resetPassword(req.body.token, req.body.newPassword);
-            
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -247,7 +247,7 @@ module.exports = (router, io, container) => {
     router.post('/api/user/requestUsername', async (req, res, next) => {
         try {
             let username = await container.userService.getUsernameByEmail(req.body.email);
-            
+
             try {
                 await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
             } catch (emailError) {
@@ -274,9 +274,19 @@ module.exports = (router, io, container) => {
                 if (err) {
                     return next(err);
                 }
-    
+
                 return res.sendStatus(200);
             });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/user/donations/recent', middleware.authenticate, async (req, res, next) => {
+        try {
+            let result = await container.donateService.listRecentDonations(3);
+
+            return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }

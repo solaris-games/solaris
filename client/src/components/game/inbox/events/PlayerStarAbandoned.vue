@@ -1,28 +1,20 @@
 <template>
 <div>
   <p>
-      You have abandoned the star <a href="javascript:;" @click="onOpenStarDetailRequested">{{event.data.starName}}</a>.
+      You have abandoned the star <star-label :starId="event.data.starId" :starName="event.data.starName"/>.
   </p>
 </div>
 </template>
 
 <script>
+import StarLabelVue from '../../star/StarLabel'
+
 export default {
   components: {
-
+    'star-label': StarLabelVue
   },
   props: {
     event: Object
-  },
-  data () {
-    return {
-      star: null
-    }
-  },
-  methods: {
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.event.data.starId)
-    }
   }
 }
 </script>

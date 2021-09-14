@@ -224,7 +224,7 @@
 
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
       <p>Are you sure you want to abandon <b>{{star.name}}</b>?</p>
-      <p>It's Economy, Industry and Science will remain, but all ships and carriers at this star will be destroyed.</p>
+      <p>Its Economy, Industry and Science will remain, but all ships and carriers at this star will be destroyed.</p>
     </dialogModal>
 </div>
 </template>
@@ -401,7 +401,10 @@ export default {
       return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && !GameHelper.isGameFinished(this.$store.state.game) && !this.isDeadStar
+      return this.canShowSpecialist 
+        && !GameHelper.isGameFinished(this.$store.state.game) 
+        && !this.isDeadStar
+        && (!this.star.specialistId || !this.star.specialist.oneShot)
     },
     isOwnedByUserPlayer: function() {
       let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)

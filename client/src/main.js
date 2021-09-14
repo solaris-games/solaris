@@ -53,6 +53,10 @@ Vue.prototype.$isHistoricalMode = function() {
   return this.$store.state.tick !== this.$store.state.game.state.tick
 }
 
+Vue.prototype.$isMobile = function () {
+  return window.matchMedia("only screen and (max-width: 576px)").matches
+}
+
 new Vue({
   router,
   store,

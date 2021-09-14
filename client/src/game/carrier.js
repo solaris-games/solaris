@@ -18,9 +18,11 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = true
 
     this.graphics_colour = new PIXI.Graphics()
+    this.graphics_selected = new PIXI.Graphics()
     this.graphics_ship = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_colour)
+    this.container.addChild(this.graphics_selected)
     this.container.addChild(this.graphics_ship)
 
     this.container.on('pointerup', this.onClicked.bind(this))
@@ -62,6 +64,7 @@ class Carrier extends EventEmitter {
 
   draw () {
     this.drawColour()
+    this.drawSelectedCircle()
     this.drawCarrier()
     this.drawShips()
     this.drawSpecialist()
@@ -296,6 +299,16 @@ class Carrier extends EventEmitter {
     }
   }
 
+  drawSelectedCircle () {
+    this.graphics_selected.clear()
+
+    if (this.isSelected) {
+      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_selected.alpha = 0.3
+      this.graphics_selected.drawCircle(0, 0, 15)
+    }
+  }
+
   enableInteractivity() {
     // Can only be interactive if its in transit
     if (!this.data.orbiting) {
@@ -395,6 +408,21 @@ class Carrier extends EventEmitter {
   destroy () {
     this.container.destroy()
     this.fixedContainer.destroy()
+  }
+
+  select () {
+    this.isSelected = true
+    this.drawSelectedCircle()
+  }
+
+  unselect () {
+    this.isSelected = false
+    this.drawSelectedCircle()
+  }
+
+  toggleSelected () {
+    this.isSelected = !this.isSelected
+    this.drawSelectedCircle()
   }
 }
 

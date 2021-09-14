@@ -478,12 +478,13 @@ module.exports = class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userModel, userService, playerService, guildUserService, ratingService) {
+    constructor(userModel, userService, playerService, guildUserService, ratingService, gameService) {
         this.userModel = userModel;
         this.userService = userService;
         this.playerService = playerService;
         this.guildUserService = guildUserService;
         this.ratingService = ratingService;
+        this.gameService = gameService;
     }
 
     async getLeaderboard(limit, sortingKey, skip = 0) {
@@ -673,6 +674,12 @@ module.exports = class LeaderboardService {
     }
 
     getGameWinner(game) {
+        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
+
+        if (isAllUndefeatedPlayersReadyToQuit) {
+            return this.getFirstPlacePlayer(game);
+        }
+
         if (game.settings.general.mode === 'conquest') {
             let starWinner = this.getStarCountWinner(game);
 
@@ -725,12 +732,16 @@ module.exports = class LeaderboardService {
         let defeatedPlayers = game.galaxy.players.filter(p => p.defeated);
 
         if (defeatedPlayers.length === game.settings.general.playerLimit) {
-            let leaderboard = this.getLeaderboardRankings(game).leaderboard;
-
-            return leaderboard[0].player;
+            return this.getFirstPlacePlayer(game);
         }
 
         return null;
+    }
+
+    getFirstPlacePlayer(game) {
+        let leaderboard = this.getLeaderboardRankings(game).leaderboard;
+
+        return leaderboard[0].player;
     }
 
 };

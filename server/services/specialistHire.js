@@ -49,6 +49,14 @@ module.exports = class SpecialistHireService {
 
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
+        if (carrier.specialistId) {
+            let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+            if (carrierSpecialist.oneShot) {
+                throw new ValidationError(`The current specialist cannot be replaced.`);
+            }
+        }
+
         carrier.specialistId = specialist.id;
 
         // Update the DB.
@@ -117,6 +125,14 @@ module.exports = class SpecialistHireService {
         }
 
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+
+        if (star.specialistId) {
+            let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
+
+            if (starSpecialist.oneShot) {
+                throw new ValidationError(`The current specialist cannot be replaced.`);
+            }
+        }
 
         star.specialistId = specialist.id;
 

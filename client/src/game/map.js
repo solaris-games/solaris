@@ -576,7 +576,7 @@ class Map extends EventEmitter {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
-    star.isSelected = true
+    star.select()
     star.updateVisibility()
   }
 
@@ -584,14 +584,14 @@ class Map extends EventEmitter {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
     carrier.onClicked()
-    carrier.isSelected = true
+    carrier.select()
   }
 
   unselectAllStars () {
     for (let i = 0; i < this.stars.length; i++) {
       let s = this.stars[i]
 
-      s.isSelected = false
+      s.unselect()
       s.updateVisibility() // Should be fine to pass in false for force
     }
   }
@@ -600,7 +600,7 @@ class Map extends EventEmitter {
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
 
-      c.isSelected = false
+      c.unselect()
       c.updateVisibility()
     }
   }
@@ -611,7 +611,7 @@ class Map extends EventEmitter {
       .forEach(s => {
         // Set all other stars to unselected.
         if (s.data._id !== star.data._id) {
-          s.isSelected = false
+          s.unselect()
         }
 
         s.updateVisibility()
@@ -624,7 +624,7 @@ class Map extends EventEmitter {
       .forEach(c => {
         // Set all other carriers to unselected.
         if (c.data._id !== carrier.data._id) {
-          c.isSelected = false
+          c.unselect()
         }
 
         c.updateVisibility()
@@ -724,7 +724,7 @@ class Map extends EventEmitter {
         // Clicking stars should only raise events to the UI if in galaxy mode.
         if (this.mode === 'galaxy') {
           let selectedStar = this.stars.find(x => x.data._id === e._id)
-          selectedStar.isSelected = !selectedStar.isSelected
+          selectedStar.toggleSelected()
 
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
@@ -732,7 +732,7 @@ class Map extends EventEmitter {
           if (!this.tryMultiSelect(e.location)) {
             this.emit('onStarClicked', e)
           } else {
-            selectedStar.isSelected = false // If multi-select then do not select the star.
+            selectedStar.unselect() // If multi-select then do not select the star.
             selectedStar.updateVisibility()
           }
         } else if (this.mode === 'waypoints') {
@@ -782,7 +782,7 @@ class Map extends EventEmitter {
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
-      selectedCarrier.isSelected = !selectedCarrier.isSelected
+      selectedCarrier.toggleSelected()
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
@@ -790,7 +790,7 @@ class Map extends EventEmitter {
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
-        selectedCarrier.isSelected = false
+        selectedCarrier.unselect()
       }
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
