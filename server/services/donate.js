@@ -44,7 +44,7 @@ module.exports = class DonateService {
 
             this.cacheService.put(this.CACHE_KEY_RECENT_DONATIONS, donators, 3600000); // 1 hour
 
-            return donators.splice(amount);
+            return donators.slice(0, amount);
         } catch (err) {
             console.error(err);
 
