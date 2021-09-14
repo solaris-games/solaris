@@ -93,6 +93,12 @@ export default {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
+    },
     onSelectedFilterChanged (e) {
       const categories = {
         trade: [

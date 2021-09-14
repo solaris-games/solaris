@@ -588,7 +588,11 @@ module.exports = class LeaderboardService {
 
     async addGameRankings(game, gameUsers, leaderboard) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
-        let result = {};
+
+        let result = {
+            ranks: [],
+            eloRating: null
+        };
 
         // Remove any afk players from the leaderboard, they will not
         // receive any achievements.
@@ -619,17 +623,28 @@ module.exports = class LeaderboardService {
             let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
 
             if (isOfficialGame) {
+                let rankIncrease = 0;
+
                 if (i == 0) {
                     user.achievements.victories++; // Increase the winner's victory count
                     user.credits++; // Give the winner a galactic credit.
-                    user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
+                    rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 }
                 else if (game.settings.general.awardRankTo === 'all') {
-                    user.achievements.rank += leaderboard.length / 2 - i;
-                    user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
+                    rankIncrease = Math.round(leaderboard.length / 2 - i);
                 }
 
-                user.achievements.rank = Math.round(user.achievements.rank);
+                let currentRank = user.achievements.rank;
+                let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
+
+                user.achievements.rank = newRank;
+
+                // Append the rank adjustment to the results.
+                result.ranks.push({
+                    playerId: player._id,
+                    current: currentRank,
+                    new: newRank
+                });
             }
 
             // If the player hasn't been defeated then add completed stats.
