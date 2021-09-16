@@ -40,10 +40,13 @@
                     <span v-if="game.afk" class="ml-1 badge badge-warning">AFK</span>
                   </td>
                   <td class="col-3 d-none d-md-table-cell">
+                    <span v-if="isGameWaitingForPlayers(game)">
+                      Waiting for Players
+                    </span>
                     <span v-if="isGamePendingStart(game)">
                       Starting Soon
                     </span>
-                    <span v-if="!isGamePendingStart(game)">
+                    <span v-if="isGameInProgress(game)">
                       <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
                     </span>
                   </td>
@@ -150,8 +153,14 @@ export default {
     isRealTimeGame (game) {
       return GameHelper.isRealTimeGame(game);
     },
+    isGameWaitingForPlayers (game) {
+      return GameHelper.isGameWaitingForPlayers(game)
+    },
     isGamePendingStart (game) {
       return GameHelper.isGamePendingStart(game)
+    },
+    isGameInProgress (game) {
+      return GameHelper.isGameInProgress(game)
     },
     getNextCycleDate (game) {
       // TODO: This doesn't work, for some reason getCountdownTime returns a number wtf
