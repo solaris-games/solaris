@@ -7,26 +7,26 @@ class Territories {
   static zoomLevel = 100
   static maxVoronoiDistance = 200
 
-  constructor () {
+  constructor() {
     this.container = new PIXI.Container()
 
     this.zoomPercent = 0
   }
 
-  setup (game, userSettings) {
+  setup(game, userSettings) {
     this.game = game
 
     Territories.zoomLevel = userSettings.map.zoomLevels.territories
   }
 
-  draw (userSettings) {
+  draw(userSettings) {
     this.container.removeChildren()
 
     if (!this.game.galaxy.stars || !this.game.galaxy.stars.length) {
       return; //No territories if we have no stars
     }
 
-    switch(userSettings.map.territoryStyle) {
+    switch (userSettings.map.territoryStyle) {
       case 'marching-square':
         this._drawTerritoriesMarchingCube(userSettings)
         break;
@@ -38,72 +38,72 @@ class Territories {
     this.refreshZoom(this.zoomPercent || 0)
   }
 
-  _drawTerritoriesMarchingCube (userSettings) {
+  _drawTerritoriesMarchingCube(userSettings) {
     this.container.alpha = 1
 
-    const CELL_SIZE = 5*userSettings.map.marchingSquareGridSize
-    const METABALL_RADIUS = 20*userSettings.map.marchingSquareTerritorySize
-    const LINE_PROPORTION = (1/16)*userSettings.map.marchingSquareBorderWidth
-    const LINE_WIDTH = CELL_SIZE*LINE_PROPORTION
-    const LINE_OFFSET = LINE_PROPORTION/2
+    const CELL_SIZE = 5 * userSettings.map.marchingSquareGridSize
+    const METABALL_RADIUS = 20 * userSettings.map.marchingSquareTerritorySize
+    const LINE_PROPORTION = (1 / 16) * userSettings.map.marchingSquareBorderWidth
+    const LINE_WIDTH = CELL_SIZE * LINE_PROPORTION
+    const LINE_OFFSET = LINE_PROPORTION / 2
 
     // enum
     const ACTION_COMBINE = 1
-    const ACTION_NEW = 2 
+    const ACTION_NEW = 2
     const ACTION_SKIP = 0
 
     const ACTION_INDEX = 0
     const LINES_INDEX = 1
     const POLYGON_INEDX = 2
     const VERTEX_TABLE = [
-      [  ACTION_SKIP, [], []  ],
-      [ACTION_NEW, [{x: 0, y: 0.5+LINE_OFFSET},{x: 0.5-LINE_OFFSET, y: 1}],
-        [{x: 0, y: 0.5+LINE_OFFSET},{x: 0.5-LINE_OFFSET, y: 1},{x: 0, y: 1}]
+      [ACTION_SKIP, [], []],
+      [ACTION_NEW, [{ x: 0, y: 0.5 + LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+        [{ x: 0, y: 0.5 + LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 0, y: 1 }]
       ],
-      [  ACTION_NEW, [{x: 1, y: 0.5+LINE_OFFSET},{x: 0.5+LINE_OFFSET, y: 1}],
-        [{x: 1, y: 0.5+LINE_OFFSET},{x: 0.5+LINE_OFFSET, y: 1},{x: 1, y: 1}]
+      [ACTION_NEW, [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+        [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 1, y: 1 }]
       ],
-      [  ACTION_NEW, [{x: 1, y: 0.5+LINE_OFFSET},{x: 0, y: 0.5+LINE_OFFSET}],
-        [{x: 1, y: 0.5+LINE_OFFSET},{x: 0, y: 0.5+LINE_OFFSET},{x: 0, y: 1},{x: 1, y: 1}]
-      ],
-
-      [  ACTION_NEW, [{x: 0.5+LINE_OFFSET, y: 0},{x: 1, y: 0.5-LINE_OFFSET}],
-        [{x: 0.5+LINE_OFFSET, y: 0},{x: 1, y: 0.5-LINE_OFFSET},{x: 1, y: 0}]
-      ],
-      [  ACTION_NEW, [{x: 0.5+LINE_OFFSET, y: 0},{x: 0, y: 0.5+LINE_OFFSET},{x: 1, y: 0.5-LINE_OFFSET},{x: 0.5-LINE_OFFSET, y: 1}],
-        [{x: 0.5+LINE_OFFSET, y: 0},{x: 0, y: 0.5+LINE_OFFSET},{x: 0, y: 1},{x: 0.5-LINE_OFFSET, y: 1},{x: 1, y: 0.5-LINE_OFFSET},{x: 1, y: 0}]
-      ],
-      [  ACTION_NEW, [{x: 0.5+LINE_OFFSET, y: 0},{x: 0.5+LINE_OFFSET, y: 1}],
-        [{x: 0.5+LINE_OFFSET, y: 0},{x: 0.5+LINE_OFFSET, y: 1},{x: 1, y: 1},{x: 1, y: 0}]
-      ],
-      [  ACTION_NEW, [{x: 0.5+LINE_OFFSET, y: 0},{x: 0, y: 0.5+LINE_OFFSET}],
-        [{x: 0.5+LINE_OFFSET, y: 0},{x: 0, y: 0.5+LINE_OFFSET},{x: 0, y: 1},{x: 1, y: 1},{x: 1, y: 0}]
+      [ACTION_NEW, [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 + LINE_OFFSET }],
+        [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 0, y: 1 }, { x: 1, y: 1 }]
       ],
 
-      [  ACTION_NEW, [{x: 0.5-LINE_OFFSET, y: 0},{x: 0, y: 0.5-LINE_OFFSET}],
-        [{x: 0.5-LINE_OFFSET, y: 0},{x: 0, y: 0.5-LINE_OFFSET},{x: 0, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 - LINE_OFFSET }],
+        [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0 }]
       ],
-      [  ACTION_NEW, [{x: 0.5-LINE_OFFSET, y: 0},{x: 0.5-LINE_OFFSET, y: 1}],
-        [{x: 0.5-LINE_OFFSET, y: 0},{x: 0.5-LINE_OFFSET, y: 1},{x: 0, y: 1},{x: 0, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+        [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 0, y: 1 }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0 }]
       ],
-      [  ACTION_NEW, [{x: 0.5-LINE_OFFSET, y: 0},{x: 1, y: 0.5+LINE_OFFSET},{x: 0, y: 0.5-LINE_OFFSET},{x: 0.5+LINE_OFFSET, y: 1}],
-        [{x: 0.5-LINE_OFFSET, y: 0},{x: 1, y: 0.5+LINE_OFFSET},{x: 1, y: 1},{x: 0.5+LINE_OFFSET, y: 1},{x: 0, y: 0.5-LINE_OFFSET},{x: 0, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+        [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }]
       ],
-      [  ACTION_NEW, [{x: 0.5-LINE_OFFSET, y: 0},{x: 1, y: 0.5+LINE_OFFSET}],
-        [{x: 0.5-LINE_OFFSET, y: 0},{x: 1, y: 0.5+LINE_OFFSET},{x: 1, y: 1},{x: 0, y: 1},{x: 0, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }],
+        [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }]
       ],
 
-      [  ACTION_NEW, [{x: 0, y: 0.5-LINE_OFFSET},{x: 1, y: 0.5-LINE_OFFSET}],
-        [{x: 0, y: 0.5-LINE_OFFSET},{x: 1, y: 0.5-LINE_OFFSET},{x: 1, y: 0},{x: 0, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 - LINE_OFFSET }],
+        [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0, y: 0 }]
       ],
-      [  ACTION_NEW, [{x: 1, y: 0.5-LINE_OFFSET},{x: 0.5-LINE_OFFSET, y: 1}],
-        [{x: 1, y: 0.5-LINE_OFFSET},{x: 0.5-LINE_OFFSET, y: 1},{x: 0, y: 1},{x: 0, y: 0},{x: 1, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+        [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 0 }]
       ],
-      [  ACTION_NEW, [{x: 0, y: 0.5-LINE_OFFSET},{x: 0.5+LINE_OFFSET, y: 1}],
-        [{x: 0, y: 0.5-LINE_OFFSET},{x: 0.5+LINE_OFFSET, y: 1},{x: 1, y: 1},{x: 1, y: 0},{x: 0, y: 0}]
+      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+        [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 1, y: 1 }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0, y: 0 }]
       ],
-      [  ACTION_COMBINE, [],
-        [{x: 0, y: 0},{x: 1, y: 0},{x: 1, y: 1},{x: 0, y: 1}]
+      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }],
+        [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 1, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 0 }]
+      ],
+
+      [ACTION_NEW, [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }],
+        [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0 }, { x: 0, y: 0 }]
+      ],
+      [ACTION_NEW, [{ x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+        [{ x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }]
+      ],
+      [ACTION_NEW, [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+        [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }, { x: 0, y: 0 }]
+      ],
+      [ACTION_COMBINE, [],
+        [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }]
       ],
     ]
 
@@ -111,50 +111,49 @@ class Territories {
     let minY = gameHelper.calculateMinStarY(this.game)
     let maxX = gameHelper.calculateMaxStarX(this.game)
     let maxY = gameHelper.calculateMaxStarY(this.game)
-    minX -= minX%CELL_SIZE
-    minX -= Math.floor(METABALL_RADIUS*1.5/CELL_SIZE)*CELL_SIZE
-    minY -= minY%CELL_SIZE
-    minY -= Math.floor(METABALL_RADIUS*1.5/CELL_SIZE)*CELL_SIZE
-    maxX -= maxX%CELL_SIZE
+    minX -= minX % CELL_SIZE
+    minX -= Math.floor(METABALL_RADIUS * 1.5 / CELL_SIZE) * CELL_SIZE
+    minY -= minY % CELL_SIZE
+    minY -= Math.floor(METABALL_RADIUS * 1.5 / CELL_SIZE) * CELL_SIZE
+    maxX -= maxX % CELL_SIZE
     maxX += CELL_SIZE
-    maxX += Math.floor(METABALL_RADIUS*1.5/CELL_SIZE)*CELL_SIZE
-    maxY -= maxY%CELL_SIZE
+    maxX += Math.floor(METABALL_RADIUS * 1.5 / CELL_SIZE) * CELL_SIZE
+    maxY -= maxY % CELL_SIZE
     maxY += CELL_SIZE
-    maxY += Math.floor(METABALL_RADIUS*1.5/CELL_SIZE)*CELL_SIZE
-    if(minX < 0){ minX -= CELL_SIZE }
-    if(minY < 0){ minY -= CELL_SIZE }
+    maxY += Math.floor(METABALL_RADIUS * 1.5 / CELL_SIZE) * CELL_SIZE
+    if (minX < 0) { minX -= CELL_SIZE }
+    if (minY < 0) { minY -= CELL_SIZE }
 
-    let gridWidth = (maxX-minX)/CELL_SIZE
-    let gridHeight = (maxY-minY)/CELL_SIZE
+    let gridWidth = (maxX - minX) / CELL_SIZE
+    let gridHeight = (maxY - minY) / CELL_SIZE
 
-    let samplePoints = new Array(gridWidth+1)
-    
-    for( let ix = 0; ix<samplePoints.length; ix++ ) {
-      samplePoints[ix] = new Array(gridHeight+1)
-      for( let iy = 0; iy<samplePoints[ix].length; iy++ ) {
+    let samplePoints = new Array(gridWidth + 1)
+
+    for (let ix = 0; ix < samplePoints.length; ix++) {
+      samplePoints[ix] = new Array(gridHeight + 1)
+      for (let iy = 0; iy < samplePoints[ix].length; iy++) {
         // find the closest star and its owner
-        let pointLocation = {x: ix*CELL_SIZE+minX, y: iy*CELL_SIZE+minY}
+        let pointLocation = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
         let closestStar = gameHelper.getClosestStar(this.game.galaxy.stars, pointLocation)
-        let owner = this.game.galaxy.players.find( p => p._id === closestStar.star.ownedByPlayerId )
+        let owner = this.game.galaxy.players.find(p => p._id === closestStar.star.ownedByPlayerId)
         // TODO get the intensity of the metaball composed of all stars of the owner
         // the owner stars shouold be cached outside this loop
 
-        if( closestStar.distance<METABALL_RADIUS ) {
+        if (closestStar.distance < METABALL_RADIUS) {
           samplePoints[ix][iy] = owner
         }
-        if(false)
-        {
-        let pointGraphics = new PIXI.Graphics()
-        pointGraphics.lineStyle(1, samplePoints[ix][iy], 1.0)
-        pointGraphics.drawStar(0, 0, 5, 5, 5 - 2)
-        pointGraphics.position.x = pointLocation.x
-        pointGraphics.position.y = pointLocation.y
-        this.container.addChild(pointGraphics)
+        if (false) {
+          let pointGraphics = new PIXI.Graphics()
+          pointGraphics.lineStyle(1, samplePoints[ix][iy], 1.0)
+          pointGraphics.drawStar(0, 0, 5, 5, 5 - 2)
+          pointGraphics.position.x = pointLocation.x
+          pointGraphics.position.y = pointLocation.y
+          this.container.addChild(pointGraphics)
         }
-        
+
       }
     }
-    for( let player of this.game.galaxy.players ) {
+    for (let player of this.game.galaxy.players) {
       let color = player.colour.value
       let territoryPolygons = new PIXI.Graphics()
       let territoryLines = new PIXI.Graphics()
@@ -165,51 +164,51 @@ class Territories {
       territoryPolygons.alpha = 0.333
 
       let combining = false
-      for( let ix = 0; ix<samplePoints.length-1; ix++ ) {
-        for( let iy = 0; iy<samplePoints[ix].length-1; iy++ ) {
+      for (let ix = 0; ix < samplePoints.length - 1; ix++) {
+        for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
           let lookUpIndex = 0
-          lookUpIndex += (player==samplePoints[ix][iy])*8
-          lookUpIndex += (player==samplePoints[ix+1][iy])*4
-          lookUpIndex += (player==samplePoints[ix][iy+1])*1
-          lookUpIndex += (player==samplePoints[ix+1][iy+1])*2
-          if( VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != ACTION_SKIP ){
-            let cellOrigin = {x: ix*CELL_SIZE+minX, y: iy*CELL_SIZE+minY}
-            if( VERTEX_TABLE[lookUpIndex][LINES_INDEX].length>1 ) {
+          lookUpIndex += (player == samplePoints[ix][iy]) * 8
+          lookUpIndex += (player == samplePoints[ix + 1][iy]) * 4
+          lookUpIndex += (player == samplePoints[ix][iy + 1]) * 1
+          lookUpIndex += (player == samplePoints[ix + 1][iy + 1]) * 2
+          if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != ACTION_SKIP) {
+            let cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
+            if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 1) {
               //if there are vertices, draw the lines
-              territoryLines.moveTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][0].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][0].y*CELL_SIZE+cellOrigin.y)
-              territoryLines.lineTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][1].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][1].y*CELL_SIZE+cellOrigin.y)
-              if( VERTEX_TABLE[lookUpIndex][LINES_INDEX].length>2 ) {
-                territoryLines.moveTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][2].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][2].y*CELL_SIZE+cellOrigin.y)
-                territoryLines.lineTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][3].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][3].y*CELL_SIZE+cellOrigin.y)
+              territoryLines.moveTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][0].y * CELL_SIZE + cellOrigin.y)
+              territoryLines.lineTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][1].y * CELL_SIZE + cellOrigin.y)
+              if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 2) {
+                territoryLines.moveTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][2].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][2].y * CELL_SIZE + cellOrigin.y)
+                territoryLines.lineTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][3].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][3].y * CELL_SIZE + cellOrigin.y)
               }
             }
-            
-            if( VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == ACTION_NEW ) {
-              if( combining ) {
+
+            if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == ACTION_NEW) {
+              if (combining) {
                 //finish combining
-                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][1].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][1].y*CELL_SIZE+cellOrigin.y)
-                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][0].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][0].y*CELL_SIZE+cellOrigin.y)
+                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][1].y * CELL_SIZE + cellOrigin.y)
+                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][0].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.endFill()
                 combining = false
               }
-              territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INEDX][0].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INEDX][0].y*CELL_SIZE+cellOrigin.y)
+              territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INEDX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INEDX][0].y * CELL_SIZE + cellOrigin.y)
               territoryPolygons.beginFill(color, 1)
               let first = true
               let vertices = VERTEX_TABLE[lookUpIndex][POLYGON_INEDX]
-              for( let vertex of vertices ) {
-                if(first) { first = false; continue }
-                territoryPolygons.lineTo(vertex.x*CELL_SIZE+cellOrigin.x, vertex.y*CELL_SIZE+cellOrigin.y)
+              for (let vertex of vertices) {
+                if (first) { first = false; continue }
+                territoryPolygons.lineTo(vertex.x * CELL_SIZE + cellOrigin.x, vertex.y * CELL_SIZE + cellOrigin.y)
               }
               territoryPolygons.endFill()
-              
+
             }
-            
-            if( VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == ACTION_COMBINE ) {
-              if( !combining ) {
+
+            if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == ACTION_COMBINE) {
+              if (!combining) {
                 //start combining
-                territoryPolygons.moveTo(VERTEX_TABLE[15][POLYGON_INEDX][0].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][0].y*CELL_SIZE+cellOrigin.y)
+                territoryPolygons.moveTo(VERTEX_TABLE[15][POLYGON_INEDX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][0].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.beginFill(color, 1)
-                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][1].x*CELL_SIZE+cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][1].y*CELL_SIZE+cellOrigin.y)
+                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][1].y * CELL_SIZE + cellOrigin.y)
                 combining = true
               }
             }
@@ -219,7 +218,7 @@ class Territories {
     }
   }
 
-  _drawTerritoriesVoronoi (userSettings) {
+  _drawTerritoriesVoronoi(userSettings) {
     this.container.alpha = 1
 
     let voronoi = new Voronoi()
@@ -237,8 +236,8 @@ class Territories {
     }
 
     let sites = []
-    for( let star of this.game.galaxy.stars) {
-      sites.push( {
+    for (let star of this.game.galaxy.stars) {
+      sites.push({
         x: star.location.x,
         y: star.location.y,
         playerID: star.ownedByPlayerId
@@ -249,8 +248,8 @@ class Territories {
 
     let borders = []
     for (let edge of diagram.edges) {
-      if(edge.lSite && edge.rSite) {
-        if(edge.lSite.playerID !== edge.rSite.playerID) {
+      if (edge.lSite && edge.rSite) {
+        if (edge.lSite.playerID !== edge.rSite.playerID) {
           borders.push(edge)
         }
       }
@@ -258,6 +257,30 @@ class Territories {
 
     let borderWidth = +userSettings.map.voronoiCellBorderWidth
 
+    let AllPoints = new Map()
+    for (let cell of diagram.cells) {
+      for (let halfedge of cell.halfedges) {
+        if (AllPoints.has(halfedge.getStartpoint())) {
+          let NewPoint = this._sanitizeVoronoiPoint(cell.site, halfedge.getStartpoint())
+          let ListPoints = AllPoints.get(halfedge.getStartpoint())
+          if (ListPoints.every(point => point.x !== NewPoint.x && point.y !== NewPoint.y)) ListPoints.push(NewPoint)
+        } else {
+          AllPoints.set(halfedge.getStartpoint(), [this._sanitizeVoronoiPoint(cell.site, halfedge.getStartpoint())])
+        }
+        if (AllPoints.has(halfedge.getEndpoint())) {
+          let NewPoint = this._sanitizeVoronoiPoint(cell.site, halfedge.getEndpoint())
+          let ListPoints = AllPoints.get(halfedge.getEndpoint())
+          if (ListPoints.every(point => point.x !== NewPoint.x && point.y !== NewPoint.y)) ListPoints.push(NewPoint)
+        } else {
+          AllPoints.set(halfedge.getEndpoint(), [this._sanitizeVoronoiPoint(cell.site, halfedge.getEndpoint())])
+        }
+      }
+    }
+    function GetPoint(point) {
+      return AllPoints.get(point).reduce((pointA, pointB) => {
+        return { x: pointA.x + pointB.x / AllPoints.get(point).length, y: pointA.y + pointB.y / AllPoints.get(point).length }
+      }, { x: 0, y: 0 })
+    }
     // Draw the cells
     for (let cell of diagram.cells) {
       let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
@@ -276,9 +299,11 @@ class Territories {
       }
 
       // Do not draw points that are more than X distance away from the star.
-      let sanitizedPoints = points
-        // .filter(point => !Number.isNaN(point.x) && !Number.isNaN(point.y)) // For some reason some of the points have NaN x and y
-        .map(point => this._sanitizeVoronoiPoint(cell.site, point))
+      // let sanitizedPoints = points
+      // .filter(point => !Number.isNaN(point.x) && !Number.isNaN(point.y)) // For some reason some of the points have NaN x and y
+      // .map(point => this._sanitizeVoronoiPoint(cell.site, point))
+      // points.forEach(point => console.log(AllPoints.get(point)))
+      let sanitizedPoints = points.map(GetPoint)
 
       // Draw the graphic
       let territoryGraphic = new PIXI.Graphics()
@@ -304,18 +329,20 @@ class Territories {
 
     let borderGraphics = new PIXI.Graphics()
 
-    for(let border of borders) {
-      let leftNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)+Math.PI/2.0
-      let leftVA = gameHelper.getPointFromLocation(border.va, leftNormalAngle, borderWidth/2.0)
-      let leftVB = gameHelper.getPointFromLocation(border.vb, leftNormalAngle, borderWidth/2.0)
+    for (let border of borders) {
+      let borderVA = GetPoint(border.va)
+      let borderVB = GetPoint(border.vb)
+      let leftNormalAngle = gameHelper.getAngleBetweenLocations(borderVA, borderVB) + Math.PI / 2.0
+      let leftVA = gameHelper.getPointFromLocation(borderVA, leftNormalAngle, borderWidth / 2.0)
+      let leftVB = gameHelper.getPointFromLocation(borderVB, leftNormalAngle, borderWidth / 2.0)
 
-      let rightNormalAngle = gameHelper.getAngleBetweenLocations(border.va, border.vb)-Math.PI/2.0
-      let rightVA = gameHelper.getPointFromLocation(border.va, rightNormalAngle, borderWidth/2.0)
-      let rightVB = gameHelper.getPointFromLocation(border.vb, rightNormalAngle, borderWidth/2.0)
+      let rightNormalAngle = gameHelper.getAngleBetweenLocations(borderVA, borderVB) - Math.PI / 2.0
+      let rightVA = gameHelper.getPointFromLocation(borderVA, rightNormalAngle, borderWidth / 2.0)
+      let rightVB = gameHelper.getPointFromLocation(borderVB, rightNormalAngle, borderWidth / 2.0)
 
       let colour = 0x000000
 
-      if(border.lSite.playerID) {
+      if (border.lSite.playerID) {
         colour = this.game.galaxy.players.find(p => p._id === border.lSite.playerID).colour.value
       }
 
@@ -325,7 +352,7 @@ class Territories {
 
       colour = 0x000000
 
-      if(border.rSite.playerID) {
+      if (border.rSite.playerID) {
         colour = this.game.galaxy.players.find(p => p._id === border.rSite.playerID).colour.value
       }
 
@@ -348,7 +375,7 @@ class Territories {
     return point;
   }
 
-  refreshZoom (zoomPercent) {
+  refreshZoom(zoomPercent) {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
