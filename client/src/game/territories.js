@@ -257,30 +257,31 @@ class Territories {
 
     let borderWidth = +userSettings.map.voronoiCellBorderWidth
 
-    let AllPoints = new Map()
-    for (let cell of diagram.cells) {
-      for (let halfedge of cell.halfedges) {
-        if (AllPoints.has(halfedge.getStartpoint())) {
-          let NewPoint = this._sanitizeVoronoiPoint(cell.site, halfedge.getStartpoint())
-          let ListPoints = AllPoints.get(halfedge.getStartpoint())
-          if (ListPoints.every(point => point.x !== NewPoint.x && point.y !== NewPoint.y)) ListPoints.push(NewPoint)
-        } else {
-          AllPoints.set(halfedge.getStartpoint(), [this._sanitizeVoronoiPoint(cell.site, halfedge.getStartpoint())])
-        }
-        if (AllPoints.has(halfedge.getEndpoint())) {
-          let NewPoint = this._sanitizeVoronoiPoint(cell.site, halfedge.getEndpoint())
-          let ListPoints = AllPoints.get(halfedge.getEndpoint())
-          if (ListPoints.every(point => point.x !== NewPoint.x && point.y !== NewPoint.y)) ListPoints.push(NewPoint)
-        } else {
-          AllPoints.set(halfedge.getEndpoint(), [this._sanitizeVoronoiPoint(cell.site, halfedge.getEndpoint())])
-        }
-      }
-    }
-    function GetPoint(point) {
-      return AllPoints.get(point).reduce((pointA, pointB) => {
-        return { x: pointA.x + pointB.x / AllPoints.get(point).length, y: pointA.y + pointB.y / AllPoints.get(point).length }
+    let allPoints = new Map()
+
+    const getPoint = (point) => {
+      return allPoints.get(point).reduce((pointA, pointB) => {
+        return { x: pointA.x + pointB.x / allPoints.get(point).length, y: pointA.y + pointB.y / allPoints.get(point).length }
       }, { x: 0, y: 0 })
     }
+
+    const endpointCheck = (cell, endpoint) => {
+      if (allPoints.has(endpoint)) {
+        let newPoint = this._sanitizeVoronoiPoint(cell.site, endpoint)
+        let ListPoints = allPoints.get(endpoint)
+        if (ListPoints.every(point => point.x !== newPoint.x && point.y !== newPoint.y)) ListPoints.push(newPoint)
+      } else {
+        allPoints.set(endpoint, [this._sanitizeVoronoiPoint(cell.site, endpoint)])
+      }
+    }
+
+    for (let cell of diagram.cells) {
+      for (let halfedge of cell.halfedges) {
+        endpointCheck(cell, halfedge.getStartpoint())
+        endpointCheck(cell, halfedge.getEndpoint())
+      }
+    }
+    
     // Draw the cells
     for (let cell of diagram.cells) {
       let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
@@ -300,10 +301,7 @@ class Territories {
 
       // Do not draw points that are more than X distance away from the star.
       // let sanitizedPoints = points
-      // .filter(point => !Number.isNaN(point.x) && !Number.isNaN(point.y)) // For some reason some of the points have NaN x and y
-      // .map(point => this._sanitizeVoronoiPoint(cell.site, point))
-      // points.forEach(point => console.log(AllPoints.get(point)))
-      let sanitizedPoints = points.map(GetPoint)
+      let sanitizedPoints = points.map(getPoint)
 
       // Draw the graphic
       let territoryGraphic = new PIXI.Graphics()
@@ -330,8 +328,8 @@ class Territories {
     let borderGraphics = new PIXI.Graphics()
 
     for (let border of borders) {
-      let borderVA = GetPoint(border.va)
-      let borderVB = GetPoint(border.vb)
+      let borderVA = getPoint(border.va)
+      let borderVB = getPoint(border.vb)
       let leftNormalAngle = gameHelper.getAngleBetweenLocations(borderVA, borderVB) + Math.PI / 2.0
       let leftVA = gameHelper.getPointFromLocation(borderVA, leftNormalAngle, borderWidth / 2.0)
       let leftVB = gameHelper.getPointFromLocation(borderVB, leftNormalAngle, borderWidth / 2.0)
