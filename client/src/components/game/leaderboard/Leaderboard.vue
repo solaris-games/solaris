@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
-      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" title="View Settings" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i></router-link>
+      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
     </menu-title>
 
     <div class="row bg-primary">
@@ -169,6 +169,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e._id)
+    },
+    onViewSettingsRequested (e) {
+      this.$emit('onViewSettingsRequested', e)
     },
     panToPlayer (player) {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
