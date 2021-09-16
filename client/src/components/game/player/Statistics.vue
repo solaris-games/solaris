@@ -52,7 +52,7 @@
                           'text-success': player.stats.newShips < userPlayer.stats.newShips}">{{userPlayer.stats.newShips}}</td>
           </tr>
           <tr>
-            <td>Income Next Cycle</td>
+            <td>Cycle Income</td>
             <td class="text-right">${{playerIncome}}</td>
             <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
               :class="{'text-danger': playerIncome > userPlayerIncome,
