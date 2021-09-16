@@ -164,7 +164,8 @@
           </div>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
 
           <hr/>
@@ -340,7 +341,8 @@
           </table>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
         </div>
     </div>
