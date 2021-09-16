@@ -116,7 +116,8 @@ module.exports = class GameService extends EventEmitter {
     async getByIdInfo(id, userId) {
         let game = await this.getByIdLean(id, {
             settings: 1,
-            state: 1
+            state: 1,
+            constants: 1
         });
 
         if (game.settings.general.createdByUserId) {

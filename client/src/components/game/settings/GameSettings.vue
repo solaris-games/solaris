@@ -144,7 +144,7 @@
           </tr>
           <tr>
             <td>Carrier Speed</td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierSpeed) }}</td>
+            <td class="text-right">{{ game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear }}/ly tick</td>
           </tr>
         </tbody>
       </table>
