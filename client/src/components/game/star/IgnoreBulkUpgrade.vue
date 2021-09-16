@@ -52,8 +52,6 @@ export default {
       });
     },
     async toggleBulkIgnore (infrastructureType) {
-      this.triggerChanged();
-      
       try {
         let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id, infrastructureType)
         
@@ -65,14 +63,14 @@ export default {
           } else {
             this.$toasted.show(`${this.star.name} ${infrastructureType} is now included in Bulk Upgrade.`)
           }
+          
+          this.triggerChanged();
         }
       } catch (err) {
         console.log(err)
       }
     },
     async toggleBulkIgnoreAll (ignoreStatus) {
-      this.triggerChanged();
-
       try {
         let response = await starService.toggleIgnoreBulkUpgradeAll(this.$store.state.game._id, this.star._id, ignoreStatus)
         
@@ -86,6 +84,8 @@ export default {
           } else {
             this.$toasted.show(`${this.star.name} is now included in Bulk Upgrade.`)
           }
+
+          this.triggerChanged();
         }
       } catch (err) {
         console.log(err)

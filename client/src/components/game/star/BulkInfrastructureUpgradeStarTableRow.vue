@@ -16,7 +16,6 @@
 
 <script>
 import gameContainer from '../../../game/container'
-import gameHelper from '../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
 
