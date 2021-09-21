@@ -594,10 +594,6 @@ module.exports = class LeaderboardService {
             eloRating: null
         };
 
-        // Remove any afk players from the leaderboard, they will not
-        // receive any achievements.
-        leaderboardPlayers = leaderboardPlayers.filter(p => !p.afk);
-
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboardPlayers[i];
 
@@ -634,6 +630,18 @@ module.exports = class LeaderboardService {
                     rankIncrease = Math.round(leaderboard.length / 2 - i);
                 }
 
+                // For AFK players, do not award any positive rank
+                // and make sure they are deducted at least 1 rank.
+                if (player.afk) {
+                    rankIncrease = Math.min(rankIncrease, -1);
+                }
+                // However if they are active and they have
+                // filled an AFK slot then reward the player.
+                // Award extra rank (at least 0) and do not allow a decrease in rank.
+                else if (player.hasFilledAfkSlot) {
+                    rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
+                }
+
                 let currentRank = user.achievements.rank;
                 let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
 
@@ -647,8 +655,9 @@ module.exports = class LeaderboardService {
                 });
             }
 
-            // If the player hasn't been defeated then add completed stats.
-            if (!player.defeated) {
+            // If the player hasn't been defeated 
+            // and they are active then add completed stats.
+            if (!player.defeated && !player.afk) {
                 user.achievements.completed++;
             }
         }
