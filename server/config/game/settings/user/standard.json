@@ -24,7 +24,7 @@
         "specialistsCurrency": "creditsSpecialists",
         "randomGates": "none",
         "darkGalaxy": "disabled",
-        "giftCarriers": "disabled",
+        "giftCarriers": "enabled",
         "defenderBonus": "enabled",
         "carrierToCarrierCombat": "enabled",
         "resourceDistribution": "random",
