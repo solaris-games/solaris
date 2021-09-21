@@ -472,6 +472,8 @@ module.exports = class StarService extends EventEmitter {
         star.ownedByPlayerId = newStarPlayer._id;
         newStarPlayer.credits += captureReward;
         star.infrastructure.economy = 0;
+        star.shipsActual = 0;
+        star.ships = 0;
 
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
