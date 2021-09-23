@@ -1,0 +1,17 @@
+db.games.updateMany({}, {
+    $set: {
+        'galaxy.players.$[].diplomacy': {
+            allies: []
+        }
+    }
+});
+
+db.games.updateMany({}, {
+    $set: {
+        'settings.player.alliances': 'disabled'
+    }
+});
+
+TODO: Combat at stars after ally -> enemy state change.
+TODO: Web socket on client for diplomacy state change.
+TODO: UI tidy up, titles, icons etc.

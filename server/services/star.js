@@ -73,6 +73,25 @@ module.exports = class StarService extends EventEmitter {
         return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s))
     }
 
+    listStarsWithScanningRangeByPlayer(game, playerId) {
+        // A player has access to the scanning range of a star if
+        // - The player owns the star
+        // - The player has a carrier in orbit regardless of who owns the star
+        let starIds = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id);
+        
+        if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
+            starIds = starIds.concat(
+                game.galaxy.carriers
+                    .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
+                    .map(c => c.orbiting)
+            );
+        }
+
+        starIds = [...new Set(starIds)];
+
+        return starIds.map(id => this.getByObjectId(game, id));
+    }
+
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
         return this.listStarsOwnedByPlayer(stars, playerId)
             .filter(s => s.ignoreBulkUpgrade[infrastructureType]);
@@ -104,7 +123,7 @@ module.exports = class StarService extends EventEmitter {
 
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
         let starsToCheck = game.galaxy.stars.map(s => {
             return {
                 _id: s._id,
@@ -172,7 +191,7 @@ module.exports = class StarService extends EventEmitter {
     isStarInScanningRangeOfPlayer(game, star, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
         let isInScanRange = this.isStarWithinScanningRangeOfStars(game, star, playerStars);
 
         return isInScanRange;

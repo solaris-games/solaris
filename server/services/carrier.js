@@ -88,7 +88,7 @@ module.exports = class CarrierService {
     filterCarriersByScanningRange(game, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.starService.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
         // Start with all of the carriers that the player owns as
         // the player can always see those carriers.

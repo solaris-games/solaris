@@ -31,6 +31,7 @@ export default {
   MAP_OBJECT_SELECTOR: 'mapObjectSelector',
   RULER: 'ruler',
   LEDGER: 'ledger',
+  DIPLOMACY: 'diplomacy',
   HIRE_SPECIALIST_CARRIER: 'hireSpecialistCarrier',
   HIRE_SPECIALIST_STAR: 'hireSpecialistStar',
   GAME_NOTES: 'gameNotes',

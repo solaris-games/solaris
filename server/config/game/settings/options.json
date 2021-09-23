@@ -512,6 +512,16 @@
             "value": "scanned",
             "text": "Trade with scanned players only"
             }
+        ],
+        "alliances": [
+            {
+            "value": "enabled",
+            "text": "Enabled"
+            },
+            {
+            "value": "disabled",
+            "text": "Disabled"
+            }
         ]
         },
         "technology": {

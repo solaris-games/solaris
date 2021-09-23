@@ -306,6 +306,10 @@ module.exports = class WaypointService {
     }
 
     performWaypointAction(carrier, star, waypoint) {
+        if (!carrier.ownedByPlayerId.equals(star.ownedByPlayerId)) {
+            throw new Error('Cannot perform waypoint action, the carrier and star are owned by different players.')
+        }
+
         switch (waypoint.action) {
             case 'dropAll':
                 this._performWaypointActionDropAll(carrier, star, waypoint);
@@ -481,7 +485,10 @@ module.exports = class WaypointService {
     }
 
     _performWaypointActions(game, actionWaypoints) {
-        for (let actionWaypoint of actionWaypoints) {
+        // Don't perform the waypoint action if the star and carrier are owned by different players.
+        let filteredActionWaypoints = actionWaypoints.filter(w => w.carrier.ownedByPlayerId.equals(w.star.ownedByPlayerId));
+
+        for (let actionWaypoint of filteredActionWaypoints) {
             this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
         }
     }

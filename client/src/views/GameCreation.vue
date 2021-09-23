@@ -436,6 +436,15 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.player.tradeCost > 0">
+        <label for="alliances" class="col-form-label">Formal Alliances</label>
+        <select class="form-control" id="alliances" v-model="settings.player.alliances" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.alliances" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <view-subtitle title="Technology Settings"/>
 
       <div class="form-group">

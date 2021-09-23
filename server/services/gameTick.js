@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService, diplomacyService) {
         super();
             
         this.distanceService = distanceService;
@@ -27,6 +27,7 @@ module.exports = class GameTickService extends EventEmitter {
         this.emailService = emailService;
         this.battleRoyaleService = battleRoyaleService;
         this.orbitalMechanicsService = orbitalMechanicsService;
+        this.diplomacyService = diplomacyService;
     }
 
     async tick(gameId) {
@@ -164,6 +165,8 @@ module.exports = class GameTickService extends EventEmitter {
             return;
         }
 
+        let isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
+
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
         let carrierPositions = game.galaxy.carriers
@@ -262,7 +265,20 @@ module.exports = class GameTickService extends EventEmitter {
 
             // Double check that there are carriers that can fight.
             if (!combatCarriers.length) {
-                return;
+                continue;
+            }
+
+            // If alliances is enabled then ensure that only enemies fight.
+            // TODO: Alliance combat here is very complicated when more than 2 players are involved.
+            // For now, we will perform normal combat if any participant is an enemy of the others.
+            if (isAlliancesEnabled) {
+                const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId))];
+
+                const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
+
+                if (isAllPlayersAllied) {
+                    continue;
+                }
             }
 
             // TODO: Check for specialists that affect pre-combat.
@@ -285,6 +301,8 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     async _moveCarriers(game, gameUsers) {
+        let isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
+
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
         // Note, we order by distance ascending for 2 reasons:
@@ -362,6 +380,23 @@ module.exports = class GameTickService extends EventEmitter {
             let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combatStar._id));
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
+
+            // If alliances is enabled then ensure that only enemies fight.
+            // TODO: Alliance combat here is very complicated when more than 2 players are involved.
+            // For now, we will perform normal combat if any participant is an enemy of the others.
+            if (isAlliancesEnabled) {
+                const playerIds = [...new Set(carriersAtStar.map(x => x.ownedByPlayerId))];
+
+                if (playerIds.indexOf(starOwningPlayer._id) < 0) {
+                    playerIds.push(starOwningPlayer._id);
+                }
+
+                const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
+
+                if (isAllPlayersAllied) {
+                    continue;
+                }
+            }
 
             this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
