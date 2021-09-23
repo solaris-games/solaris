@@ -6,10 +6,10 @@ const REPUTATION_INCREMENT = 1;
 
 module.exports = class ReputationService extends EventEmitter {
 
-    constructor(gameModel, playerService) {
+    constructor(gameRepo, playerService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.playerService = playerService;
     }
 
@@ -95,7 +95,7 @@ module.exports = class ReputationService extends EventEmitter {
 
     async _updateReputation(game, player, forPlayer, reputation) {
         if (reputation.isNew) {
-            return await this.gameModel.updateOne({
+            return await this.gameRepo.updateOne({
                 _id: game._id,
                 'galaxy.players._id': player._id
             }, {
@@ -104,15 +104,13 @@ module.exports = class ReputationService extends EventEmitter {
                 }
             });
         } else {
-            return await this.gameModel.updateOne({
+            return await this.gameRepo.updateOne({
                 _id: game._id,
-            }, 
-            {
+            }, {
                 $set: {
                     'galaxy.players.$[p].reputations.$[r].score': reputation.score
                 }
-            }, 
-            {
+            }, {
                 arrayFilters: [
                     {
                         'p._id': player._id

@@ -158,8 +158,10 @@ export default {
       this.hasChecked = false
       this.upgradePreview = null
 
-      let star = GameHelper.getStarById(this.$store.state.game, e.starId)
-      GameContainer.reloadStar(star)
+      if (e.starId) {
+        let star = GameHelper.getStarById(this.$store.state.game, e.starId)
+        GameContainer.reloadStar(star)
+      }
     },
     panToStar (starId) {
       let star = this.getStar(starId)

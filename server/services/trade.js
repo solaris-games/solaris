@@ -4,10 +4,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(gameModel, userService, playerService, ledgerService, achievementService, reputationService) {
+    constructor(gameRepo, userService, playerService, ledgerService, achievementService, reputationService) {
         super();
 
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.ledgerService = ledgerService;
@@ -61,7 +61,7 @@ module.exports = class TradeService extends EventEmitter {
             await this.playerService.addCredits(game, toPlayer, amount, false)
         ];
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
 
@@ -123,7 +123,7 @@ module.exports = class TradeService extends EventEmitter {
             await this.playerService.addCreditsSpecialists(game, toPlayer, amount, false)
         ];
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         if (!fromPlayer.defeated) {
             await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
@@ -191,7 +191,7 @@ module.exports = class TradeService extends EventEmitter {
 
         // Note: AI will never ever send renown so no need to check
         // if players are AI controlled here.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': fromPlayer._id
         }, {
@@ -273,7 +273,7 @@ module.exports = class TradeService extends EventEmitter {
             }
         ];
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
 

@@ -4,10 +4,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, starService, carrierService, playerService, passwordService, achievementService) {
+    constructor(gameRepo, userService, starService, carrierService, playerService, passwordService, achievementService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.userService = userService;
         this.starService = starService;
         this.carrierService = carrierService;
@@ -17,58 +17,42 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async getByIdAll(id) {
-        return await this.gameModel.findById(id).exec();
+        return await this.gameRepo.findByIdAsModel(id);
     }
 
     async getByIdAllLean(id) {
-        return await this.gameModel.findById(id)
-            .lean()
-            .exec();
+        return await this.gameRepo.findById(id);
     }
 
     async getById(id, select) {
-        return await this.gameModel.findById(id)
-            .select(select)
-            .exec();
+        return await this.gameRepo.findByIdAsModel(id, select);
     }
 
     async getByNameSettingsLean(name) {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.name': name
-        })
-        .select({
+        }, {
             'settings': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getByNameStateSettingsLean(name) {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.name': name
-        })
-        .select({
+        }, {
             state: 1,
             settings: 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getByIdSettingsLean(id) {
-        return await this.gameModel.findById(id)
-        .select({
+        return await this.gameRepo.findById(id, {
             'settings': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getByIdLean(id, select) {
-        return await this.gameModel.findById(id)
-            .select(select)
-            .lean({ defaults: true })
-            .exec();
+        return await this.gameRepo.findById(id, select);
     }
 
     async getByIdGalaxy(id, select) {
@@ -430,7 +414,9 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
-        await this.gameModel.deleteOne({ _id: game._id });
+        await this.gameRepo.deleteOne({ 
+            _id: game._id 
+        });
 
         // TODO: Delete game events
         // TODO: Delete game history
@@ -464,25 +450,23 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async lock(gameId, locked = true) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId
         }, {
             $set: {
                 'state.locked': locked
             }
-        })
-        .exec();
+        });
     }
 
     async lockAll(locked = true) {
-        await this.gameModel.updateMany({
+        await this.gameRepo.updateMany({
             'state.locked': { $ne: locked }
         }, {
             $set: {
                 'state.locked': locked
             }
-        })
-        .exec();
+        });
     }
 
     // TODO: All of below needs a rework. A game is started if the start date is less than now and the game hasn't finished
@@ -565,7 +549,7 @@ module.exports = class GameService extends EventEmitter {
     }
     
     async quitAllActiveGames(userId) {
-        let allGames = await this.gameModel.find({
+        let allGames = await this.gameRepo.findAsModels({
             'galaxy.players': {
                 $elemMatch: { 
                     userId,             // User is in game
@@ -592,14 +576,13 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async markAsCleaned(gameId) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId
         }, {
             $set: {
                 'state.cleaned': true
             }
-        })
-        .exec();
+        });
     }
 
 };

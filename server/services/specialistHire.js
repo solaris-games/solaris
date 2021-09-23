@@ -2,8 +2,8 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class SpecialistHireService {
 
-    constructor(gameModel, specialistService, achievementService, waypointService, playerService, starService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, specialistService, achievementService, waypointService, playerService, starService) {
+        this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
@@ -60,7 +60,7 @@ module.exports = class SpecialistHireService {
         carrier.specialistId = specialist.id;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {
@@ -137,7 +137,7 @@ module.exports = class SpecialistHireService {
         star.specialistId = specialist.id;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {

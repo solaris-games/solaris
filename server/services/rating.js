@@ -2,14 +2,14 @@ const EloRating = require('elo-rating');
 
 module.exports = class RatingService {
 
-    constructor(userModel, gameModel, userService) {
-        this.userModel = userModel;
-        this.gameModel = gameModel;
+    constructor(userRepo, gameRepo, userService) {
+        this.userRepo = userRepo;
+        this.gameRepo = gameRepo;
         this.userService = userService;
     }
 
     async resetAllEloRatings() {
-        await this.userModel.updateMany({
+        await this.userRepo.updateMany({
             'achievements.eloRating': { $ne: null }
         }, {
             $set: {
@@ -69,7 +69,7 @@ module.exports = class RatingService {
             };
         });
 
-        await this.userModel.bulkWrite(dbWrites);
+        await this.userRepo.bulkWrite(dbWrites);
     }
 
     recalculateEloRating(userA, userB, userAIsWinner) {
@@ -93,19 +93,16 @@ module.exports = class RatingService {
     }
 
     async _listCompleted1v1s() {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.type': { $in: ['1v1_rt', '1v1_tb'] },
             'state.endDate': { $ne: null }
         }, {
             'state': 1,
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1
-        })
-        .sort({
+        }, {
             'state.endDate': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
 };

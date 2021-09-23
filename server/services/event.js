@@ -34,10 +34,11 @@ module.exports = class EventService {
         PLAYER_CONVERSATION_LEFT: 'playerConversationLeft'
     }
 
-    constructor(eventModel, broadcastService,
+    constructor(eventModel, eventRepo, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService) {
         this.eventModel = eventModel;
+        this.eventRepo = eventRepo;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.gameTickService = gameTickService;
@@ -91,10 +92,9 @@ module.exports = class EventService {
     }
 
     async deleteByGameId(gameId) {
-        await this.eventModel.deleteMany({
+        await this.eventRepo.deleteMany({
             gameId
-        })
-        .exec();
+        });
     }
 
     async createGameEvent(gameId, gameTick, type, data) {
@@ -124,7 +124,7 @@ module.exports = class EventService {
     }
 
     async getPlayerEvents(gameId, player, startTick = 0) {
-        let events = await this.eventModel.find({
+        let events = await this.eventRepo.find({
             gameId: gameId,
             tick: { $gte: startTick },
             playerId: {
@@ -133,19 +133,18 @@ module.exports = class EventService {
                     null
                 ]
             }
-        })
-        .sort({
+        },
+        null, // All fields
+        {
             tick: -1, // Sort by tick descending
             _id: -1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
 
         return events;
     }
 
     async getPlayerTradeEvents(gameId, gameTick, player, startTick = 0) {
-        let tradeEvents = await this.eventModel.find({
+        let tradeEvents = await this.eventRepo.find({
             gameId: gameId,
             tick: { $gte: startTick },
             playerId: {
@@ -166,13 +165,12 @@ module.exports = class EventService {
                     this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
                 ]
             }
-        })
-        .sort({
+        },
+        null, // All fields
+        {
             tick: -1, // Sort by tick descending
             _id: -1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
 
         // Calculate when the event was created.
         // TODO: Is this more efficient than storing the UTC in the document itself?
@@ -184,7 +182,7 @@ module.exports = class EventService {
     }
 
     async markAllEventsAsRead(game, playerId) {
-        await this.eventModel.updateMany({
+        await this.eventRepo.updateMany({
             gameId: game._id,
             playerId: playerId,
             read: false
@@ -192,13 +190,13 @@ module.exports = class EventService {
             $set: {
                 read: true
             }
-        }).exec();
+        });
 
         this.broadcastService.playerAllEventsRead(game, playerId);
     }
 
     async markEventAsRead(game, playerId, eventId) {
-        await this.eventModel.updateOne({
+        await this.eventRepo.updateOne({
             _id: eventId,
             gameId: game._id,
             playerId: playerId,
@@ -207,17 +205,17 @@ module.exports = class EventService {
             $set: {
                 read: true
             }
-        }).exec();
+        });
 
         this.broadcastService.playerEventRead(game, playerId, eventId);
     }
 
     async getUnreadCount(game, playerId) {
-        return await this.eventModel.count({
+        return await this.eventRepo.count({
             gameId: game._id,
             playerId: playerId,
             read: false
-        }).exec();
+        });
     }
 
     /* GLOBAL EVENTS */

@@ -13,21 +13,22 @@ module.exports = class GuildService {
     CREATE_GUILD_CREDITS_COST = 3
     RENAME_GUILD_CREDITS_COST = 1
     
-    constructor(guildModel, userModel, userService) {
+    constructor(guildModel, guildRepo, userRepo, userService) {
         this.guildModel = guildModel;
-        this.userModel = userModel;
+        this.guildRepo = guildRepo;
+        this.userRepo = userRepo;
         this.userService = userService;
     }
 
     async list() {
         let users = await this.userService.listUsersInGuilds();
 
-        let guilds = await this.guildModel.find({}, {
+        let guilds = await this.guildRepo.find({
+            // All guilds
+        }, {
             name: 1,
             tag: 1
-        })
-        .lean()
-        .exec();
+        });
 
         for (let guild in guilds) {
             let usersInGuild = users.filter(x => x.guildId.equals(guild._id));
@@ -39,29 +40,25 @@ module.exports = class GuildService {
     }
 
     async listInfoByIds(guildIds) {
-        return await this.guildModel.find({
+        return await this.guildRepo.find({
             _id: {
                 $in: guildIds
             }
         }, {
             name: 1,
             tag: 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async listInvitations(userId) {
-        let guilds = await this.guildModel.find({
+        let guilds = await this.guildRepo.find({
             invitees: {
                 $in: [mongoose.Types.ObjectId(userId)]
             }
         }, {
             name: 1,
             tag: 1
-        })
-        .lean()
-        .exec();
+        });
 
         return guilds;
     }
@@ -71,11 +68,9 @@ module.exports = class GuildService {
             throw new ValidationError("Guild ID is required.");
         }
 
-        let guild = await this.guildModel.findOne({
+        let guild = await this.guildRepo.findOne({
             _id: guildId
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
 
         if (!guild) {
             throw new ValidationError("Guild not found.");
@@ -135,13 +130,12 @@ module.exports = class GuildService {
         name = toProperCase(name.trim());
         tag = tag.trim().replace(/\s/g, '');
 
-        let existing = await this.guildModel.findOne({
+        let existing = await this.guildRepo.findOne({
             $or: [
                 { name },
                 { tag }
             ]
-        })
-        .exec();
+        });
 
         if (existing) {
             throw new ValidationError(`A guild with the same name or tag already exists.`);
@@ -155,7 +149,7 @@ module.exports = class GuildService {
 
         await guild.save();
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             $set: {
@@ -164,8 +158,7 @@ module.exports = class GuildService {
             $inc: {
                 credits: -this.CREATE_GUILD_CREDITS_COST
             }
-        })
-        .exec();
+        });
 
         return guild;
     }
@@ -193,25 +186,23 @@ module.exports = class GuildService {
         newTag = newTag.trim().replace(/\s/g, '');
 
         // Update the guild
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guild._id
         }, {
             $set: {
                 name: newName,
                 tag: newTag
             }
-        })
-        .exec();
+        });
 
         // Deduct user credits
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             $inc: {
-                credits: -this.CREATE_GUILD_CREDITS_COST
+                credits: -this.RENAME_GUILD_CREDITS_COST
             }
-        })
-        .exec();
+        });
     }
 
     async delete(userId, guildId) {
@@ -221,16 +212,17 @@ module.exports = class GuildService {
             throw new ValidationError(`You do not have the authority to disband the guild.`);
         }
 
-        await this.userModel.updateMany({
+        await this.userRepo.updateMany({
             guildId
         }, {
             $unset: {
                 guildId: undefined
             }
-        })
-        .exec();
+        });
 
-        await this.guildModel.deleteOne({ _id: guildId }).exec();
+        await this.guildRepo.deleteOne({ 
+            _id: guildId 
+        });
     }
 
     async invite(username, guildId, invitedByUserId) {
@@ -269,14 +261,13 @@ module.exports = class GuildService {
             throw new ValidationError(`There is a maximum of ${this.MAX_INVITE_COUNT} invitees at one time.`);
         }
 
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guildId
         }, {
             $push: {
                 invitees: userId
             }
-        })
-        .exec();
+        });
 
         return user;
     }
@@ -294,14 +285,13 @@ module.exports = class GuildService {
             throw new ValidationError(`The user has not been invited to the guild.`);
         }
 
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guildId
         }, {
             $pull: {
                 invitees: userId
             }
-        })
-        .exec();
+        });
     }
 
     async acceptInvite(userId, guildId) {
@@ -315,37 +305,34 @@ module.exports = class GuildService {
         await this.declineAllInvitations(userId);
 
         // Add the user to the chosen guild.
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guildId
         }, {
             $push: {
                 members: userId
             }
-        })
-        .exec();
+        });
 
         // Set the user's guild id
-        await this.userModel.updateOne({ 
+        await this.userRepo.updateOne({ 
             _id: userId
         }, {
             $set: {
                 guildId
             }
-        })
-        .exec();
+        });
 
         guild.members.push(userId);
 
         // If maximum members reached, clear pending invites.
         if (this._totalMemberCount(guild) >= this.MAX_MEMBER_COUNT) {
-            await this.guildModel.updateOne({
+            await this.guildRepo.updateOne({
                 _id: guildId
             }, {
                 $set: {
                     invitees: []
                 }
-            })
-            .exec();
+            });
         }
     }
 
@@ -356,18 +343,17 @@ module.exports = class GuildService {
             throw new ValidationError(`The user is not an invitee of this guild.`);
         }
 
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guildId
         }, {
             $pull: {
                 invitees: userId
             }
-        })
-        .exec();
+        });
     }
 
     async declineAllInvitations(userId) {
-        await this.guildModel.updateMany({
+        await this.guildRepo.updateMany({
             invitees: {
                 $in: [userId]
             }
@@ -375,8 +361,7 @@ module.exports = class GuildService {
             $pull: {
                 invitees: userId
             }
-        })
-        .exec();
+        });
     }
 
     async tryLeaveGuild(userId) {
@@ -409,7 +394,7 @@ module.exports = class GuildService {
 
         if (this._isOfficer(guild, userId)) {
             // Officer to leader
-            await this.guildModel.updateOne({
+            await this.guildRepo.updateOne({
                 _id: guildId,
                 'officers': userId
             }, {
@@ -417,11 +402,10 @@ module.exports = class GuildService {
                     leader: userId,
                     'officers.$': promotedByUserId
                 }
-            })
-            .exec();
+            });
         } else if (this._isMember(guild, userId)) {
             // Member to officer
-            await this.guildModel.updateOne({
+            await this.guildRepo.updateOne({
                 _id: guildId
             }, {
                 $pull: {
@@ -430,8 +414,7 @@ module.exports = class GuildService {
                 $push: {
                     officers: userId
                 }
-            })
-            .exec();
+            });
         } else {
             throw new ValidationError(`The user is not a member of this guild.`);
         }
@@ -464,10 +447,9 @@ module.exports = class GuildService {
             throw new ValidationError(`The user is not a member of this guild.`);
         }
 
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guildId
-        }, updateObject)
-        .exec();
+        }, updateObject);
     }
 
     async kick(userId, guildId, kickedByUserId) {
@@ -506,19 +488,17 @@ module.exports = class GuildService {
             throw new ValidationError(`The user is not a member of this guild.`);
         }
 
-        await this.guildModel.updateOne({
+        await this.guildRepo.updateOne({
             _id: guild._id
-        }, updateObject)
-        .exec();
+        }, updateObject);
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             $set: {
                 guildId: null
             }
-        })
-        .exec();
+        });
     }
 
     _isLeader(guild, userId) {
@@ -542,36 +522,32 @@ module.exports = class GuildService {
     }
 
     async _isUserInAGuild(userId) {
-        return await this.userModel.count({
+        return await this.userRepo.count({
             _id: userId,
             guildId: { $ne: null }
-        }).exec() > 0;
+        }) > 0;
     }
 
     async listUserRanksInGuilds() {
-        return await this.userModel.find({
+        return await this.userRepo.find({
             guildId: { $ne: null }
         }, {
             guildId: 1,
             'achievements.rank': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getLeaderboard(limit, sortingKey) {
         limit = limit || 100;
         sortingKey = GuildService.SORTERS.includes(sortingKey) ? sortingKey : 'totalRank';
 
-        let guilds = await this.guildModel.find({}, {
+        let guilds = await this.guildRepo.find({}, {
             name: 1,
             tag: 1,
             leader: 1,
             officers: 1,
             members: 1
-        })
-        .lean()
-        .exec();
+        });
 
         // Calculate the rankings of each guild.
         let users = await this.listUserRanksInGuilds();

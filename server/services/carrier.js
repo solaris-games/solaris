@@ -3,8 +3,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(gameModel, achievementService, distanceService, starService, technologyService, specialistService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService) {
+        this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
@@ -247,7 +247,7 @@ module.exports = class CarrierService {
 
         carrier.waypoints = [firstWaypoint];
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {
@@ -280,15 +280,14 @@ module.exports = class CarrierService {
 
         let carrierName = name.trim().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrierId
         }, {
             $set: {
                 'galaxy.carriers.$.name': carrierName
             }
-        })
-        .exec();
+        });
     }
 
     async transferGift(game, gameUsers, star, carrier) {
@@ -330,7 +329,7 @@ module.exports = class CarrierService {
             throw new ValidationError(`Cannot scuttle a gift.`);
         }
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id
         }, {
             $pull: {
@@ -338,8 +337,7 @@ module.exports = class CarrierService {
                     _id: carrierId
                 }
             }
-        })
-        .exec();
+        });
 
         // TODO: Event?
     }

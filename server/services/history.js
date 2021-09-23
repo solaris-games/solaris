@@ -5,8 +5,9 @@ const MIN_HISTORY_TICK_OFFSET = 24;
 
 module.exports = class HistoryService {
 
-    constructor(historyModel, playerService, gameService) {
+    constructor(historyModel, historyRepo, playerService, gameService) {
         this.historyModel = historyModel;
+        this.historyRepo = historyRepo;
         this.playerService = playerService;
         this.gameService = gameService;
     }
@@ -28,7 +29,7 @@ module.exports = class HistoryService {
             return cached;
         }
 
-        let intel = await this.historyModel.find({
+        let intel = await this.historyRepo.find({
             gameId,
             tick: { 
                 $gte: startTick,
@@ -58,10 +59,9 @@ module.exports = class HistoryService {
             'players.research.experimentation.level': 1,
             'players.research.terraforming.level': 1,
             'players.research.specialists.level': 1,
-        })
-        .sort({ tick: 1 })
-        .lean({ defaults: true })
-        .exec();
+        }, { 
+            tick: 1 
+        });
 
         cache.put(cacheKey, intel, 3600000); // 1 hour
 
@@ -71,11 +71,10 @@ module.exports = class HistoryService {
     async log(game) {
         // Check if there is already a history record with this tick, if so we should
         // overwrite it.
-        let history = await this.historyModel.findOne({
+        let history = await this.historyRepo.findOneAsModel({
             gameId: game._id,
             tick: game.state.tick
-        })
-        .exec();
+        });
 
         if (!history) {
             history = new this.historyModel({
@@ -181,7 +180,7 @@ module.exports = class HistoryService {
             maxTick = Math.max(0, game.state.tick - MIN_HISTORY_TICK_OFFSET);
         }
 
-        await this.historyModel.updateMany({
+        await this.historyRepo.updateMany({
             gameId: game._id,
             tick: {
                 $lt: maxTick
@@ -211,19 +210,16 @@ module.exports = class HistoryService {
     }
 
     async getHistoryByTick(gameId, tick) {
-        return await this.historyModel.findOne({
+        return await this.historyRepo.findOne({
             gameId,
             tick
-        })
-        .lean({defaults: true})
-        .exec();
+        });
     }
 
     async deleteByGameId(gameId) {
-        await this.historyModel.deleteMany({
+        await this.historyRepo.deleteMany({
             gameId
-        })
-        .exec();
+        });
     }
 
 };

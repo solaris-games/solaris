@@ -4,10 +4,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(gameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
+    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.nameService = nameService;
         this.distanceService = distanceService;
@@ -418,7 +418,7 @@ module.exports = class StarService extends EventEmitter {
 
         updateObject['$set'][`galaxy.stars.$.ignoreBulkUpgrade.${infrastructureType}`] = newValue
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.stars._id': starId
         }, updateObject);
@@ -431,7 +431,7 @@ module.exports = class StarService extends EventEmitter {
             throw new ValidationError(`You do not own this star.`);
         }
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.stars._id': starId
         }, {

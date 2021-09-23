@@ -478,8 +478,8 @@ module.exports = class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userModel, userService, playerService, guildUserService, ratingService, gameService) {
-        this.userModel = userModel;
+    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService) {
+        this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.guildUserService = guildUserService;
@@ -490,14 +490,14 @@ module.exports = class LeaderboardService {
     async getLeaderboard(limit, sortingKey, skip = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
-        let leaderboard = await this.userModel
-            .find(sorter.query || {})
-            .skip(skip)
-            .limit(limit)
-            .sort(sorter.sort)
-            .select(sorter.select)
-            .lean({ defaults: true })
-            .exec();
+        let leaderboard = await this.userRepo
+            .find(
+                sorter.query || {},
+                sorter.select,
+                sorter.sort,
+                limit,
+                skip
+            );
 
         let userIds = leaderboard.map(x => x._id);
         let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
@@ -510,7 +510,7 @@ module.exports = class LeaderboardService {
             user.guild = guildUsers.find(x => x._id.equals(user._id)).guild;
         }
 
-        let totalPlayers = await this.userModel.countDocuments();
+        let totalPlayers = await this.userRepo.countAll();
 
         return {
             totalPlayers,

@@ -127,7 +127,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             let convo = await container.conversationService.leave(
                 req.game,
@@ -142,7 +142,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             await container.conversationService.pinMessage(
                 req.game,
@@ -162,7 +162,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             await container.conversationService.unpinMessage(
                 req.game,

@@ -2,9 +2,9 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(gameModel, carrierService, starService, distanceService, 
+    constructor(gameRepo, carrierService, starService, distanceService, 
         starDistanceService, technologyService, gameService, playerService) {
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
@@ -105,7 +105,7 @@ module.exports = class WaypointService {
         carrier.waypointsLooped = looped;
 
         // Update the DB.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {
@@ -149,7 +149,7 @@ module.exports = class WaypointService {
         let cullResult = this.cullWaypointsByHyperspaceRange(game, carrier);
 
         if (cullResult) {
-            await this.gameModel.updateOne({
+            await this.gameRepo.updateOne({
                 _id: game._id,
                 'galaxy.carriers._id': carrier._id
             }, {
@@ -221,7 +221,7 @@ module.exports = class WaypointService {
         }
         
         // Update the DB.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {

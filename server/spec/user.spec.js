@@ -12,14 +12,18 @@ const fakeBcrypt = {
 let userList = [];
 
 const fakeUserModel = {
-    findById(id) {
-        return userList.find(x => x._id == id);
+
+};
+
+const fakeUserRepo = {
+    async findById(id) {
+        return Promise.resolve(userList.find(x => x._id == id));
     },
-    findOne(user) {
-        return userList.find(x => x.email == user.email);
+    async findOne(user) {
+        return Promise.resolve(userList.find(x => x.email == user.email));
     },
-    updateOne(user) {
-        return user;
+    async updateOne(user) {
+        return Promise.resolve(user);
     }
 };
 
@@ -27,7 +31,7 @@ describe('user', () => {
     let service;
 
     beforeAll(() => {
-        service = new UserService(fakeUserModel, fakeBcrypt);
+        service = new UserService(fakeUserModel, fakeUserRepo, fakeBcrypt);
 
         userList = [
             {
@@ -59,52 +63,40 @@ describe('user', () => {
     //     done();
     // });
 
-    it('should get a user by ID', async (done) => {
+    it('should get a user by ID', async () => {
         let result = await service.getById(2);
 
         expect(result._id).toBe(2);
-
-        done();
     });
 
-    it('should check if a user exists', async (done) => {
+    it('should check if a user exists', async () => {
         let result = await service.userExists('test@test.com');
 
         expect(result).toBeTruthy();
-
-        done();
     });
 
-    it('should check if a user exists in a different case', async (done) => {
+    it('should check if a user exists in a different case', async () => {
         let result = await service.userExists('tesT@test.com');
 
         expect(result).toBeTruthy();
-
-        done();
     });
 
 
-    it('should check if a user does not exist', async (done) => {
+    it('should check if a user does not exist', async () => {
         let result = await service.userExists('fffff');
 
         expect(result).toBeFalsy();
-
-        done();
     });
 
-    it('should fail to update the password of a user if the passwords do not match', async (done) => {
+    it('should fail to update the password of a user if the passwords do not match', async () => {
         let userId = 1;
         let oldPassword = 'yyyy';
         let newPassword = 'xxxx';
 
         try {
             await service.updatePassword(userId, oldPassword, newPassword);
-
-            done();
         } catch (err) {
             expect(err.message).toBe('The current password is incorrect.');
-
-            done();
         }
     });
 

@@ -1,11 +1,11 @@
 module.exports = class AchievementService {
     
-    constructor(userModel) {
-        this.userModel = userModel;
+    constructor(userRepo) {
+        this.userRepo = userRepo;
     }
 
     async getAchievements(id) {
-        return await this.userModel.findById(id, {
+        return await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             achievements: 1,
             username: 1,
@@ -13,9 +13,7 @@ module.exports = class AchievementService {
             'roles.developer': 1,
             'roles.communityManager': 1,
             'roles.gameMaster': 1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
     }
 
     async incrementAchievement(userId, achievement, amount = 1) {
@@ -25,11 +23,9 @@ module.exports = class AchievementService {
 
         updateQuery.$inc[achievement] = amount;
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
-        },
-        updateQuery)
-        .exec();
+        }, updateQuery);
     }
 
     async incrementSpecialistsHired(userId, amount = 1) {
@@ -38,10 +34,6 @@ module.exports = class AchievementService {
 
     async incrementWarpGatesBuilt(userId, amount = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGates', amount);
-    }
-
-    async incrementWarpGatesDestroyed(userId, amount = 1) {
-        return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGatesDestroyed', amount);
     }
 
     async incrementWarpGatesDestroyed(userId, amount = 1) {
