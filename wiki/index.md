@@ -275,6 +275,16 @@ For example:
 - Specialist C has Weapons -2
 - `effective weapons level = -2 + 3 = +1 weapons` *(Specialist B is ignored)*
 
+### Formal Alliance Combat Rules
+When formal alliances is enabled then a there are a few conditions that need to be met in order for combat to take place:
+1. When a carrier arrives at a star, if the player is allied with the defender then no combat occurs.
+2. When a carrier arrives at a star, if the player is enemies with the defender then combat occurs.
+2a. Carriers in orbit who are allied to the defender will help defend.
+2b. If the attacker wins and captures the star, then combat will repeat until there are no enemies to the defender.
+
+Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur
+if the guest players are enemies but are both allied to the defender.
+
 ## Science & Technology
 
 Science infrastructure built at Stars contribute to the overall research amount

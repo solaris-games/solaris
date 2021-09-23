@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 
 module.exports = class CombatService extends EventEmitter {
     
-    constructor(technologyService, specialistService, playerService, starService, reputationService) {
+    constructor(technologyService, specialistService, playerService, starService, reputationService, diplomacyService) {
         super();
 
         this.technologyService = technologyService;
@@ -10,6 +10,7 @@ module.exports = class CombatService extends EventEmitter {
         this.playerService = playerService;
         this.starService = starService;
         this.reputationService = reputationService;
+        this.diplomacyService = diplomacyService;
     }
 
     calculate(defender, attacker, isTurnBased = true, calculateNeeded = false) {    
@@ -137,10 +138,20 @@ module.exports = class CombatService extends EventEmitter {
     async performCombat(game, gameUsers, player, star, carriers) {
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
+        let defenderAllies = [];
+
+        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            defenderAllies = this.diplomacyService.getAlliesOfPlayer(game, player);
+        }
+
         // Get all defender carriers ordered by most carriers present descending.
         // Carriers who have the most ships will be target first in combat.
         let defenderCarriers = carriers
-            .filter(c => c.ships > 0 && !c.isGift && c.ownedByPlayerId.equals(player._id))
+            .filter(c => 
+                c.ships > 0
+                && !c.isGift
+                && (c.ownedByPlayerId.equals(player._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId)))  // Either owned by the defender or owned by an ally
+            )
             .sort((a, b) => b.ships - a.ships);
 
         // If in carrier-to-carrier combat, verify that there are carriers that can fight.
@@ -150,7 +161,12 @@ module.exports = class CombatService extends EventEmitter {
 
         // Get all attacker carriers.
         let attackerCarriers = carriers
-            .filter(c => c.ships > 0 && !c.isGift && !c.ownedByPlayerId.equals(player._id))
+            .filter(c => 
+                c.ships > 0 
+                && !c.isGift 
+                && !c.ownedByPlayerId.equals(player._id)    // Not owned by the player and
+                && !defenderAllies.find(a => a._id.equals(c.ownedByPlayerId))   // Not owned by an ally
+            )
             .sort((a, b) => b.ships - a.ships);
 
         // Double check that the attacking carriers can fight.

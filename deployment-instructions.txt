@@ -15,3 +15,4 @@ db.games.updateMany({}, {
 TODO: Combat at stars after ally -> enemy state change.
 TODO: Web socket on client for diplomacy state change.
 TODO: UI tidy up, titles, icons etc.
+TODO: What happens when stars are abandoned with allied carriers in orbit?

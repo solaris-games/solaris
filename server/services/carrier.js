@@ -3,13 +3,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService) {
+    constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService) {
         this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.diplomacyService = diplomacyService;
     }
 
     getById(game, id) {
@@ -402,7 +403,13 @@ module.exports = class CarrierService {
             if (carrier.isGift) {
                 await this.transferGift(game, gameUsers, destinationStar, carrier);
             } else {
-                report.combatRequiredStar = true;
+                if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+                    let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, star.ownedByPlayerId]);
+
+                    report.combatRequiredStar = !isAllied;
+                } else {
+                    report.combatRequiredStar = true;
+                }
             }
         } else {
             // Make sure the carrier gift is reset if the star is owned by the same player.

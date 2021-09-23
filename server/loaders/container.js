@@ -87,6 +87,7 @@ module.exports = (config, io) => {
     const randomService = new RandomService();
     const cacheService = new CacheService();
     const specialistService = new SpecialistService();
+    const diplomacyService = new DiplomacyService(gameRepository);
     const conversationService = new ConversationService(gameRepository, eventRepository);
     const achievementService = new AchievementService(userRepository);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
@@ -94,7 +95,7 @@ module.exports = (config, io) => {
     const starDistanceService = new StarDistanceService(distanceService);
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService);
-    const carrierService = new CarrierService(gameRepository, achievementService, distanceService, starService, technologyService, specialistService);
+    const carrierService = new CarrierService(gameRepository, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
     const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService);
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService);
@@ -103,12 +104,11 @@ module.exports = (config, io) => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
     const ledgerService = new LedgerService(gameRepository, playerService);
-    const diplomacyService = new DiplomacyService(gameRepository, playerService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService);
     const leaderboardService = new LeaderboardService(userRepository, userService, playerService, guildUserService, ratingService, gameService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerService, starService, userService);
     const reputationService = new ReputationService(gameRepository, playerService);
-    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService);
+    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService);
     const tradeService = new TradeService(gameRepository, userService, playerService, ledgerService, achievementService, reputationService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService);
