@@ -612,9 +612,6 @@ module.exports = class LeaderboardService {
             // 3rd place will receive 0 rank (4 / 2 - 2)
             // 4th place will receive -1 rank (4 / 2 - 3)
 
-            // TODO: Maybe a better ranking system would be to simply award players
-            // rank equal to the number of stars they have at the end of the game?
-
             // Official games are either not user created or featured (featured games can be user created)
             let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
 

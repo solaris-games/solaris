@@ -203,16 +203,6 @@ module.exports = class StarService extends EventEmitter {
         this.resetIgnoreBulkUpgradeStatuses(star);
         
         game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
-
-        // TODO: Re-assign home star?
-        // // If this was the player's home star, then we need to find a new home star.
-        // if (star.homeStar) {
-        //     let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, player);
-
-        //     if (closestStars.length) {
-        //         closestStars[0].homeStar = true;
-        //     }
-        // }
         
         await game.save();
 
@@ -477,9 +467,6 @@ module.exports = class StarService extends EventEmitter {
 
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
-
-        // TODO: If the home star is captured, find a new one?
-        // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
         if (defenderUser && !defender.defeated) {
             defenderUser.achievements.combat.stars.lost++;

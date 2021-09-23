@@ -15,8 +15,6 @@ module.exports = class TradeService extends EventEmitter {
         this.reputationService = reputationService;
     }
 
-    // TODO: Specialist token trading
-
     isTradingCreditsDisabled(game) {
         return game.settings.player.tradeCredits === false;
     }
