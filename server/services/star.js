@@ -52,6 +52,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.homeStar = true;
         homeStar.warpGate = false;
+        homeStar.specialistId = null;
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
         
