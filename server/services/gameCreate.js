@@ -21,18 +21,19 @@ module.exports = class GameCreateService {
         if (settings.general.createdByUserId) {
             settings.general.type = 'custom'; // All user games MUST be custom type.
             settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
-
+            
+            let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
             // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
 
             if (openGames.length) {
-                throw new ValidationError('Cannot create game, you already have another game waiting for players.');
+                if (!userIsGameMaster) {
+                    throw new ValidationError('Cannot create game, you already have another game waiting for players.\nCreating multiple games are reserved for official games or can be created by GMs.');
+                }
             }
 
             // Validate that the player cannot create large games.
             if (settings.general.playerLimit > 16) {
-                let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
-
                 if (!userIsGameMaster) {
                     throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
                 }
