@@ -159,8 +159,12 @@ will travel at times 6 speed.
 You may choose to **abandon a star**, in which case all Carriers and Ships at
 the star will be destroyed and all infrastructure will remain intact, including
 a warp gate if present.
+
 When abandoned the warp gate will become inactive until the star is claimed
 again, so it will not grant a speed boost to incoming Carriers.
+
+If an ally is in orbit when you abandon a star, that player will capture the star on the next tick. If there are more than 1 ally, then
+the player with the highest number of ships in a single carrier will capture the abandoned star.
 
 
 ## Infrastructure

@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container" v-if="star">
     <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
-      <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade" :starId="star._id" class="mr-1"/>
+      <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade && isOwnedByUserPlayer" :starId="star._id" class="mr-1"/>
       <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-secondary">
         <i class="fas fa-trash"></i>
       </modalButton>

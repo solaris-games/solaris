@@ -87,9 +87,9 @@ module.exports = class StarService extends EventEmitter {
                     .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
                     .map(c => c.orbiting)
             );
-        }
 
-        starIds = [...new Set(starIds)];
+            starIds = [...new Set(starIds)];
+        }
 
         return starIds.map(id => this.getByObjectId(game, id));
     }
@@ -220,6 +220,7 @@ module.exports = class StarService extends EventEmitter {
         this.resetIgnoreBulkUpgradeStatuses(star);
         
         // Destroy the carriers owned by the player who abandoned the star.
+        // Note: If an ally is currently in orbit then they will capture the star on the next tick.
         let playerCarriers = game.galaxy.carriers
             .filter(x => 
                 x.orbiting
@@ -231,20 +232,9 @@ module.exports = class StarService extends EventEmitter {
             game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(playerCarrier), 1);
         }
 
-        // If there are any other players still in orbit at this star, then give the star to the player
-        // who has the most ships and transfer the garrison to the new owner.
-        // If not. Destroy all ships garrisoned at the star.
-        let carriersInOrbit = game.galaxy.carriers
-            .filter(x => x.orbiting && x.orbiting.equals(star._id))
-            .sort((a, b) => b.ships - a.ships);
-
-        if (carriersInOrbit.length) {
-            star.ownedByPlayerId = carriersInOrbit[0].ownedByPlayerId;
-        } else {
-            star.ownedByPlayerId = null;
-            star.shipsActual = 0;
-            star.ships = star.shipsActual;
-        }
+        star.ownedByPlayerId = null;
+        star.shipsActual = 0;
+        star.ships = star.shipsActual;
 
         await game.save();
 
@@ -554,7 +544,9 @@ module.exports = class StarService extends EventEmitter {
                 let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));
                 let otherPlayerIdsInOrbit = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))];
 
-                otherPlayerIdsInOrbit.splice(otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId), 1); // Remove the star owner as we don't need it here.
+                if (otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId) > -1) {
+                    otherPlayerIdsInOrbit.splice(otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId), 1); // Remove the star owner as we don't need it here.
+                }
 
                 return {
                     star: s,
@@ -566,7 +558,20 @@ module.exports = class StarService extends EventEmitter {
                 // Filter stars where there are other players in orbit and those players are not allied with the star owner.
                 return x.otherPlayerIdsInOrbit.length
                     && !this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, x.star.ownedByPlayerId, x.otherPlayerIdsInOrbit);
+            });
+    }
+
+    listContestedUnownedStars(game) {
+        return game.galaxy.stars
+            .filter(s => s.ownedByPlayerId == null)
+            .map(s => {
+                let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));
+
+                return {
+                    star: s,
+                    carriersInOrbit
+                };
             })
-            .map(x => x.star);
+            .filter(x => x.carriersInOrbit.length);
     }
 }

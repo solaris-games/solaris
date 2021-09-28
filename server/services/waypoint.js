@@ -479,16 +479,12 @@ module.exports = class WaypointService {
     }
 
     _performFilteredWaypointActions(game, waypoints, waypointTypes) {
-        let actionWaypoints = waypoints.filter(w => waypointTypes.indexOf(w.waypoint.action) > -1);
+        let actionWaypoints = waypoints.filter(w => 
+            waypointTypes.indexOf(w.waypoint.action) > -1
+            && w.carrier.ownedByPlayerId.equals(w.star.ownedByPlayerId) // The carrier must be owned by the player who owns the star.
+        );
 
-        this._performWaypointActions(game, actionWaypoints);
-    }
-
-    _performWaypointActions(game, actionWaypoints) {
-        // Don't perform the waypoint action if the star and carrier are owned by different players.
-        let filteredActionWaypoints = actionWaypoints.filter(w => w.carrier.ownedByPlayerId.equals(w.star.ownedByPlayerId));
-
-        for (let actionWaypoint of filteredActionWaypoints) {
+        for (let actionWaypoint of actionWaypoints) {
             this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
         }
     }

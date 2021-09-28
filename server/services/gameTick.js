@@ -79,6 +79,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             logTime(`Tick ${game.state.tick}`);
 
+            await this._captureAbandonedStars(game, gameUsers);
+            logTime('Capture abandoned stars');
+
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
 
@@ -419,14 +422,31 @@ module.exports = class GameTickService extends EventEmitter {
         let contestedStars = this.starService.listContestedStars(game);
 
         for (let i = 0; i < contestedStars.length; i++) {
-            let combatStar = contestedStars[i];
+            let contestedStar = contestedStars[i];
 
-            // Get all carriers orbiting the star and perform combat.
-            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combatStar._id));
+            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
 
-            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
+            this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
+        }
+    }
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+    async _captureAbandonedStars(game, gameUsers) {
+        // Note: Capturing abandoned stars in this way is only possible in the scenario
+        // where a player has abandoned a star for an ally to capture who is already in orbit.
+        if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return;
+        }
+
+        let contestedAbandonedStars = this.starService.listContestedUnownedStars(game);
+
+        for (let i = 0; i < contestedAbandonedStars.length; i++) {
+            let contestedStar = contestedAbandonedStars[i];
+
+            // The player who owns the carrier with the most ships will capture the star.
+            let carrier = contestedStar.carriersInOrbit
+                .sort((a, b) => b.ships - a.ships)[0];
+
+            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
     }
 
