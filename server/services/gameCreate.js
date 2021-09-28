@@ -24,18 +24,15 @@ module.exports = class GameCreateService {
 
             // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
+            let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
 
-            if (openGames.length) {
+            if (openGames.length && !userIsGameMaster) {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
             // Validate that the player cannot create large games.
-            if (settings.general.playerLimit > 16) {
-                let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
-
-                if (!userIsGameMaster) {
-                    throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
-                }
+            if (settings.general.playerLimit > 16 && !userIsGameMaster) {
+                throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
             }
 
             let userAchievements = await this.achievementService.getAchievements(settings.general.createdByUserId);

@@ -1,10 +1,6 @@
-const EventEmitter = require('events');
-
-module.exports = class DiplomacyService extends EventEmitter {
+module.exports = class DiplomacyService {
 
     constructor(gameRepo) {
-        super();
-
         this.gameRepo = gameRepo;
     }
 
@@ -45,9 +41,10 @@ module.exports = class DiplomacyService extends EventEmitter {
         let actualStatus = isAllied ? 'allies' : 'enemies';
 
         return {
-            playerId: playerIdB,
-            statusTo,
+            playerIdFrom: playerIdA,
+            playerIdTo: playerIdB,
             statusFrom,
+            statusTo,
             actualStatus
         };
     }
@@ -88,6 +85,22 @@ module.exports = class DiplomacyService extends EventEmitter {
         return this.getDiplomaticStatusBetweenPlayers(game, playerIds) === 'allies';
     }
 
+    isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
+        let playerIdA = playerId;
+
+        for (let i = 0; i < toPlayerIds.length; i++) {
+            let playerIdB = toPlayerIds[i];
+
+            let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerIdA, playerIdB);
+
+            if (diplomaticStatus.actualStatus === 'enemies') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     async declareAlly(game, playerId, playerIdTarget) {
         await this.gameRepo.updateOne({
             _id: game._id,
@@ -106,12 +119,6 @@ module.exports = class DiplomacyService extends EventEmitter {
         }
 
         let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
-
-        this.emit('onPlayerDiplomaticStatusChanged', {
-            playerId,
-            playerIdTarget,
-            diplomaticStatus
-        });
 
         return diplomaticStatus;
     }
@@ -134,12 +141,6 @@ module.exports = class DiplomacyService extends EventEmitter {
         }
 
         let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
-
-        this.emit('onPlayerDiplomaticStatusChanged', {
-            playerId,
-            playerIdTarget,
-            diplomaticStatus
-        });
 
         return diplomaticStatus;
     }

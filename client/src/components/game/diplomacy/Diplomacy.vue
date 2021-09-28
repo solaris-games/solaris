@@ -6,6 +6,10 @@
 
     <p v-if="!isFormalAlliancesEnabled" class="pb-2">Formal alliances has been disabled in this game.</p>
 
+    <p class="mb-2">
+      Declare your diplomatic statuses to players.
+    </p>
+
     <div class="row" v-if="!isLoading && isFormalAlliancesEnabled">
       <div class="table-responsive">
         <table class="table table-sm table-striped mb-0">
@@ -19,6 +23,14 @@
         </table>
       </div>
     </div>
+
+    <p class="mt-2 pb-2">
+      <small>
+        If you are allied with another player, you can visit their stars.
+        <br/>
+        Combat will not occur if all players at a star are allied with the star owner. See the help guide for more details.
+      </small>
+    </p>
 </div>
 </template>
 
@@ -76,10 +88,12 @@ export default {
       this.isLoading = false
     },
     onPlayerDiplomaticStatusChanged (e) {
-        let diplomaticStatus = this.diplomaticStatuses.find(d => d.playerId === e.data.playerId);
+        let diplomaticStatus = this.diplomaticStatuses.find(d => d.playerIdTo === e.diplomaticStatus.playerIdFrom);
 
         if (diplomaticStatus) {
-            diplomaticStatus.status = e.data.status;
+            diplomaticStatus.statusTo = e.diplomaticStatus.statusFrom;
+            diplomaticStatus.statusFrom = e.diplomaticStatus.statusTo;
+            diplomaticStatus.actualStatus = e.diplomaticStatus.actualStatus;
         }
     }
   },

@@ -1,19 +1,19 @@
 <template>
 <tr>
-  <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerId)}"></td>
-  <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerId)">
-    <player-avatar @onClick="onPlayerDetailRequested(diplomaticStatus.playerId)" :player="getPlayer(diplomaticStatus.playerId)"/>
+  <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerIdTo)}"></td>
+  <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
+    <player-avatar @onClick="onPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
   </td>
   <td class="pl-2 pt-3 pb-2">
-    <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerId)}}</h5>
+    <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
   </td>
   <td class="fit pt-3 pr-1">
-    <i :class="getStatusIcon(diplomaticStatus.statusFrom)"></i> (<i :class="getStatusIcon(diplomaticStatus.actualStatus)"></i>) <i :class="getStatusIcon(diplomaticStatus.statusTo)"></i>
+    <i :class="getStatusIcon(diplomaticStatus.statusFrom)" :title="diplomaticStatus.statusFrom"></i> (<i :class="getStatusIcon(diplomaticStatus.actualStatus)" :title="diplomaticStatus.actualStatus"></i>) <i :class="getStatusIcon(diplomaticStatus.statusTo)" :title="diplomaticStatus.statusTo"></i>
   </td>
-  <td class="fit pt-2 pb-2 pr-2">
+  <td class="fit pt-3 pb-2 pr-2">
     <div class="btn-group">
-      <button class="btn btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare Allies"><i class="fas fa-handshake"></i></button>
-      <button class="btn btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare Enemies"><i class="fas fa-skull"></i></button>
+      <button class="btn btn-sm btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare Allies"><i class="fas fa-handshake"></i></button>
+      <button class="btn btn-sm btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare Enemies"><i class="fas fa-skull"></i></button>
     </div>
   </td>
 </tr>
@@ -45,11 +45,11 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },
     async declareAlly (diplomaticStatus) {
-      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerId)
+      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
 
       if (await this.$confirm('Declare Allies', `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`)) {
         try {
-          let response = await DiplomacyApiService.declareAlly(this.$store.state.game._id, diplomaticStatus.playerId)
+          let response = await DiplomacyApiService.declareAlly(this.$store.state.game._id, diplomaticStatus.playerIdTo)
 
           if (response.status === 200) {
             this.$toasted.show(`Your diplomatic status to ${playerAlias} is now allied.`, { type: 'success' })
@@ -64,11 +64,11 @@ export default {
       }
     },
     async declareEnemy (diplomaticStatus) {
-      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerId)
+      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
 
       if (await this.$confirm('Declare Enemy', `Are you sure you want to change your diplomatic status to ${playerAlias} to enemies?`)) {
         try {
-          let response = await DiplomacyApiService.declareEnemy(this.$store.state.game._id, diplomaticStatus.playerId)
+          let response = await DiplomacyApiService.declareEnemy(this.$store.state.game._id, diplomaticStatus.playerIdTo)
 
           if (response.status === 200) {
             this.$toasted.show(`Your diplomatic status to ${playerAlias} is now enemies.`, { type: 'success' })

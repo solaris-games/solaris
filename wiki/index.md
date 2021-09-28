@@ -223,6 +223,14 @@ its destination the player who owns the star will gain control of the carrier
 and its ships. Note that if a carrier has a specialist, that specialist will be
 retired.
 
+## Alliances
+
+Your diplomatic status to other players can be changed in the **Menu -> Diplomacy** (hotkey D) screen. If both you and another player set each other to **allied** then you both will receive the following benefits:
+
+- You may visit allied stars.
+- When in orbit at an allied star, your scanning range will take effect.
+
+**Warning** - An alliance can be broken at any time and combat will occur at contested stars.
 
 ## Combat
 
@@ -281,6 +289,8 @@ When formal alliances is enabled then a there are a few conditions that need to 
 2. When a carrier arrives at a star, if the player is enemies with the defender then combat occurs.
 2a. Carriers in orbit who are allied to the defender will help defend.
 2b. If the attacker wins and captures the star, then combat will repeat until there are no enemies to the defender.
+3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
+4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
 
 Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur
 if the guest players are enemies but are both allied to the defender.
@@ -373,13 +383,14 @@ Additionally:
  4.  Ships are built at stars.
  5.  Carrier collect actions are performed.
  6.  Carrier garrison actions are performed.
- 7.  If at the end of a galactic cycle:
- 7a. Players receive credits from economy and banking.
- 7b. Experimentations are performed.
- 7c. Carrier upkeep is deducted.
- 8.  Game checks for afk and defeated players.
- 9. AI actions are performed.
- 10. Research is performed.
- 11. Game checks for a winner.
- 12. Intel is logged.
+ 7.  Combat occurs at contested stars.
+ 8.  If at the end of a galactic cycle:
+ 8a. Players receive credits from economy and banking.
+ 8b. Experimentations are performed.
+ 8c. Carrier upkeep is deducted.
+ 9.  Game checks for afk and defeated players.
+ 10. AI actions are performed.
+ 11. Research is performed.
+ 12. Game checks for a winner.
+ 13. Intel is logged.
 

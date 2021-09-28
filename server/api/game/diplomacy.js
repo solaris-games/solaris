@@ -16,12 +16,14 @@ module.exports = (router, io, container) => {
 
     router.put('/api/game/:gameId/diplomacy/ally/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            let diplomaticStatus = await container.diplomacyService.declareAlly(
+            let newStatus = await container.diplomacyService.declareAlly(
                 req.game,
                 req.player._id,
                 req.params.playerId);
 
-            return res.status(200).json(diplomaticStatus);
+            await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
+
+            return res.status(200).json(newStatus);
         } catch (err) {
             return next(err);
         }
@@ -29,12 +31,14 @@ module.exports = (router, io, container) => {
 
     router.put('/api/game/:gameId/diplomacy/enemy/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            let diplomaticStatus = await container.diplomacyService.declareEnemy(
+            let newStatus = await container.diplomacyService.declareEnemy(
                 req.game,
                 req.player._id,
                 req.params.playerId);
 
-            return res.status(200).json(diplomaticStatus);
+            await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
+
+            return res.status(200).json(newStatus);
         } catch (err) {
             return next(err);
         }

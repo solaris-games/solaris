@@ -402,14 +402,12 @@ module.exports = class CarrierService {
             // Otherwise, perform combat.
             if (carrier.isGift) {
                 await this.transferGift(game, gameUsers, destinationStar, carrier);
-            } else {
-                if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-                    let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, star.ownedByPlayerId]);
+            } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
 
-                    report.combatRequiredStar = !isAllied;
-                } else {
-                    report.combatRequiredStar = true;
-                }
+                report.combatRequiredStar = !isAllied;
+            } else {
+                report.combatRequiredStar = true;
             }
         } else {
             // Make sure the carrier gift is reset if the star is owned by the same player.

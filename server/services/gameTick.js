@@ -33,6 +33,11 @@ module.exports = class GameTickService extends EventEmitter {
     async tick(gameId) {
         let game = await this.gameService.getByIdAll(gameId);
 
+        // Double check the game isn't locked.
+        if (!this.gameService.isLocked(game)) {
+            throw new Error(`The game is not locked.`);
+        }
+
         /*
             1. Move all carriers
             2. Perform combat at stars that have enemy carriers in orbit
@@ -79,6 +84,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
+
+            await this._combatContestedStars(game, gameUsers);
+            logTime('Combat at contested stars');
 
             await this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
@@ -398,6 +406,28 @@ module.exports = class GameTickService extends EventEmitter {
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
 
         this._sanitiseDarkModeCarrierWaypoints(game);
+    }
+
+    async _combatContestedStars(game, gameUsers) {
+        // Note: Contested stars are only possible when formal alliances is enabled.
+        if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return;
+        }
+
+        // Check for scenario where a player changes diplomatic status to another player.
+        // Perform combat at contested stars.
+        let contestedStars = this.starService.listContestedStars(game);
+
+        for (let i = 0; i < contestedStars.length; i++) {
+            let combatStar = contestedStars[i];
+
+            // Get all carriers orbiting the star and perform combat.
+            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combatStar._id));
+
+            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
+
+            this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+        }
     }
 
     _sanitiseDarkModeCarrierWaypoints(game) {

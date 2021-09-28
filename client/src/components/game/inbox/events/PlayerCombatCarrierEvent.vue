@@ -69,18 +69,18 @@ export default {
   },
   data () {
     return {
-      defender: null,
+      defenders: [],
       attackers: [],
       defenderCarriers: [],
       attackerCarriers: []
     }
   },
   mounted () {
-    this.defender = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender)
+    this.defenders = this.event.data.playerIdDefenders.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
     this.attackers = this.event.data.playerIdAttackers.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
 
-    this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId === this.event.data.playerIdDefender)
-    this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId !== this.event.data.playerIdDefender)
+    this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => this.defenders.find(d => d._id === c.ownedByPlayerId) != null)
+    this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => this.attackers.find(a => a._id === c.ownedByPlayerId) != null)
   },
   methods: {
     getCarrierColour (carrier) {
