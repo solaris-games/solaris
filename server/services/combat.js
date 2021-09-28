@@ -176,11 +176,11 @@ module.exports = class CombatService extends EventEmitter {
         }
 
         // Get the players for the defender and all attackers.
-        let defenderPlayerIds = defenderAllies.map(a => a._id);
+        let defenderPlayerIds = defenderCarriers.map(c => c.ownedByPlayerId);
         defenderPlayerIds.push(defender._id);
         defenderPlayerIds = [...new Set(defenderPlayerIds)];
 
-        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId))];
 
         let defenders = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
         let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
@@ -303,7 +303,7 @@ module.exports = class CombatService extends EventEmitter {
         }
 
         // If there are still attackers remaining, recurse.
-        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId))];
 
         if (attackerPlayerIds.length > 1) {
             // Get the next player to act as the defender.
