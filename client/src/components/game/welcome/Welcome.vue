@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Welcome" @onCloseRequested="onCloseRequested">
-      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" title="View Settings" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i></router-link>
+      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
     </menu-title>
 
     <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged"/>
@@ -57,6 +57,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onViewSettingsRequested (e) {
+      this.$emit('onViewSettingsRequested', e)
     },
     onAvatarChanged (e) {
       this.avatar = e

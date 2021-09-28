@@ -908,6 +908,18 @@ class Map extends EventEmitter {
   clearHighlightedLocations () {
     this.highlightLocationsContainer.removeChildren()
   }
+
+  showIgnoreBulkUpgrade () {
+    for (let star of this.stars) {
+      star.showIgnoreBulkUpgrade()
+    }
+  }
+
+  hideIgnoreBulkUpgrade () {
+    for (let star of this.stars) {
+      star.hideIgnoreBulkUpgrade()
+    }
+  }
 }
 
 export default Map

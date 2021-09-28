@@ -63,8 +63,11 @@
     </div>
 
     <div class="row">
-      <div class="embed-responsive embed-responsive-16by9">
+      <div class="col-sm-12 col-md-6 embed-responsive embed-responsive-16by9">
         <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="col-sm-12 col-md-6">
+        <recent-donations />
       </div>
     </div>
 
@@ -86,6 +89,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
 import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
+import RecentDonations from '../components/game/donate/RecentDonations.vue'
 
 export default {
   components: {
@@ -93,7 +97,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'leaderboard-user-table': LeaderboardUserTable
+    'leaderboard-user-table': LeaderboardUserTable,
+    'recent-donations': RecentDonations
   },
   data () {
     return {

@@ -39,11 +39,9 @@ and your borders protected from unwanted aggression.
 ## Trade
 
 Trade is an integral part of diplomacy. When you select a player in a game there
-will be an option to trade either technology or credits. Trading technology with
-another player will cost a certain amount of credits based on the game's
-settings. In a standard game the transfer cost of technology is $15 per tech
-level, so trading a level 2 technology would cost $30 and a level 3 technology
-would cost $45.
+will be an option to trade either technology or credits.
+
+Trading technology with another player has a transaction fee. For each trade involving technology, the system imposes a fee depending on the level of technology and the game's settings, which the gifting player pays when they send the technology. In a standard game the transfer cost of technology is $15 per tech level, so trading a level 2 technology would cost $30 and a level 3 technology would cost $45.
 
 Alongside technology you can also send credits to another player. To send
 credits to a player simply input how much you want to give to the player in the
@@ -333,6 +331,26 @@ Your game statistics are tracked whilst playing [Solaris](https://solaris.games)
 breakdown of your achievements on the Achievements page.
 You can also view other player’s achievements by selecting their name on the
 leaderboard.
+
+### Game Leaderboard Rankings
+When a game ends, rank is awarded to all players using the following rules:
+
+- The leaderboard is ordered by stars, then by ships, then by carriers, then by defeated date (undefeated ordered above defeated).
+- `rank awarded = (number of players / 2)` - zero based leaderboard position
+- For first place its `rank awarded = number of players`
+- AFK players are not awarded positive rank, they will receieve negative rank (at least -1).
+- Players who have filled AFK slots are awarded 1.5x rank rounded up (at least 0).
+
+So for example, in a 4 player game:
+- 1st place receives 4 rank.
+- 2nd place receives 1 rank.
+- 3rd place receives 0 rank.
+- 4th receives -1 rank.
+
+Additionally:
+- 1st place receives a galactic credit.
+- Players who are undefeated and active (not AFK) receive +1 to their completed statistic on their profile.
+- Players cannot have less than 0 rank in their profiles.
 
 
 ## Game Tick Events

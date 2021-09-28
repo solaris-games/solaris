@@ -478,8 +478,8 @@ module.exports = class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userModel, userService, playerService, guildUserService, ratingService, gameService) {
-        this.userModel = userModel;
+    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService) {
+        this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.guildUserService = guildUserService;
@@ -490,14 +490,14 @@ module.exports = class LeaderboardService {
     async getLeaderboard(limit, sortingKey, skip = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
-        let leaderboard = await this.userModel
-            .find(sorter.query || {})
-            .skip(skip)
-            .limit(limit)
-            .sort(sorter.sort)
-            .select(sorter.select)
-            .lean({ defaults: true })
-            .exec();
+        let leaderboard = await this.userRepo
+            .find(
+                sorter.query || {},
+                sorter.select,
+                sorter.sort,
+                limit,
+                skip
+            );
 
         let userIds = leaderboard.map(x => x._id);
         let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
@@ -510,7 +510,7 @@ module.exports = class LeaderboardService {
             user.guild = guildUsers.find(x => x._id.equals(user._id)).guild;
         }
 
-        let totalPlayers = await this.userModel.countDocuments();
+        let totalPlayers = await this.userRepo.countAll();
 
         return {
             totalPlayers,
@@ -588,11 +588,11 @@ module.exports = class LeaderboardService {
 
     async addGameRankings(game, gameUsers, leaderboard) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
-        let result = {};
 
-        // Remove any afk players from the leaderboard, they will not
-        // receive any achievements.
-        leaderboardPlayers = leaderboardPlayers.filter(p => !p.afk);
+        let result = {
+            ranks: [],
+            eloRating: null
+        };
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboardPlayers[i];
@@ -612,28 +612,49 @@ module.exports = class LeaderboardService {
             // 3rd place will receive 0 rank (4 / 2 - 2)
             // 4th place will receive -1 rank (4 / 2 - 3)
 
-            // TODO: Maybe a better ranking system would be to simply award players
-            // rank equal to the number of stars they have at the end of the game?
-
             // Official games are either not user created or featured (featured games can be user created)
             let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
 
             if (isOfficialGame) {
+                let rankIncrease = 0;
+
                 if (i == 0) {
                     user.achievements.victories++; // Increase the winner's victory count
                     user.credits++; // Give the winner a galactic credit.
-                    user.achievements.rank += leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
+                    rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
                 }
                 else if (game.settings.general.awardRankTo === 'all') {
-                    user.achievements.rank += leaderboard.length / 2 - i;
-                    user.achievements.rank = Math.max(user.achievements.rank, 0); // Cannot go less than 0.
+                    rankIncrease = Math.round(leaderboard.length / 2 - i);
                 }
 
-                user.achievements.rank = Math.round(user.achievements.rank);
+                // For AFK players, do not award any positive rank
+                // and make sure they are deducted at least 1 rank.
+                if (player.afk) {
+                    rankIncrease = Math.min(rankIncrease, -1);
+                }
+                // However if they are active and they have
+                // filled an AFK slot then reward the player.
+                // Award extra rank (at least 0) and do not allow a decrease in rank.
+                else if (player.hasFilledAfkSlot) {
+                    rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
+                }
+
+                let currentRank = user.achievements.rank;
+                let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
+
+                user.achievements.rank = newRank;
+
+                // Append the rank adjustment to the results.
+                result.ranks.push({
+                    playerId: player._id,
+                    current: currentRank,
+                    new: newRank
+                });
             }
 
-            // If the player hasn't been defeated then add completed stats.
-            if (!player.defeated) {
+            // If the player hasn't been defeated 
+            // and they are active then add completed stats.
+            if (!player.defeated && !player.afk) {
                 user.achievements.completed++;
             }
         }

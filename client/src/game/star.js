@@ -63,6 +63,7 @@ class Star extends EventEmitter {
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
+    this.showIgnoreBulkUpgradeInfrastructure = false
 
     /**
       Zoomdepth
@@ -139,6 +140,7 @@ class Star extends EventEmitter {
     this.drawName()
     this.drawShips()
     this.drawInfrastructure()
+    this.drawInfrastructureBulkIgnored()
 
     this.isInScanningRange = this._isInScanningRange()
   }
@@ -536,6 +538,29 @@ class Star extends EventEmitter {
     }
   }
 
+  drawInfrastructureBulkIgnored () {
+    if (this.text_infrastructureBulkIgnored) {
+      this.container.removeChild(this.text_infrastructureBulkIgnored)
+      this.text_infrastructureBulkIgnored = null
+    }
+
+    if (this.data.ignoreBulkUpgrade == null) {
+      return
+    }
+
+    if (!this.text_infrastructureBulkIgnored) {
+      let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
+
+      let bitmapFont = {fontName: "space-mono", fontSize: 8}
+      this.text_infrastructureBulkIgnored = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+      this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
+      this.text_infrastructureBulkIgnored.y = 12
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+
+      this.container.addChild(this.text_infrastructureBulkIgnored)
+    }
+  }
+
   drawScanningRange () {
     this.graphics_scanningRange.clear()
 
@@ -782,6 +807,22 @@ class Star extends EventEmitter {
   toggleSelected () {
     this.isSelected = !this.isSelected
     this.drawSelectedCircle()
+  }
+
+  showIgnoreBulkUpgrade () {
+    this.showIgnoreBulkUpgradeInfrastructure = true
+
+    if (this.text_infrastructureBulkIgnored) {
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+    }
+  }
+
+  hideIgnoreBulkUpgrade () {
+    this.showIgnoreBulkUpgradeInfrastructure = false
+
+    if (this.text_infrastructureBulkIgnored) {
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+    }
   }
 }
 

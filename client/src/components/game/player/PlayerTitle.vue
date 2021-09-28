@@ -9,10 +9,11 @@
       </div>
       <div class="col-auto">
         <h4 class="pt-2">
+          <i v-if="player.hasFilledAfkSlot && !player.afk" class="fas fa-user-friends ml-2" title="This player has filled an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"></i>
           <span v-if="player.defeated" :title="getPlayerStatus(player)">
-            <i class="fas fa-robot mr-2" v-if="player.defeated" title="AI Controlled"></i>
-            <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
-            <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
+            <i class="fas fa-robot ml-2" v-if="player.defeated" title="AI Controlled"></i>
+            <i v-if="!player.afk" class="fas fa-skull-crossbones ml-2" title="Defeated"></i>
+            <i v-if="player.afk" class="fas fa-user-clock ml-2" title="AFK"></i>
           </span>
           <span class="ml-2" v-if="player.hasDuplicateIP" title="Warning: This player shares the same IP address as another player in this game.">
             <i class="fas fa-exclamation-triangle"></i>

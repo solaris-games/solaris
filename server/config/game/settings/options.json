@@ -686,6 +686,10 @@
                 "text": "1 Tick Jumps"
             },
             {
+                "value": 4,
+                "text": "4 Tick Jumps"
+            },
+            {
                 "value": 6,
                 "text": "6 Tick Jumps"
             },

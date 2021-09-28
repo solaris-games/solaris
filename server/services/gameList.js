@@ -2,27 +2,24 @@ const moment = require('moment');
 
 module.exports = class GameListService {
     
-    constructor(gameModel, gameService, conversationService, eventService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, gameService, conversationService, eventService) {
+        this.gameRepo = gameRepo;
         this.gameService = gameService;
         this.conversationService = conversationService;
         this.eventService = eventService;
     }
 
     async listOfficialGames() {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.type': { $ne: 'custom' },
             'state.startDate': { $eq: null }
-        })
-        .select({
+        }, {
             'settings.general.type': 1,
             'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             state: 1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
     }
 
     async listUserGames(select) {
@@ -34,28 +31,21 @@ module.exports = class GameListService {
             state: 1
         };
 
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.type': { $eq: 'custom' },
             'state.startDate': { $eq: null }
-        })
-        .select(select)
-        .lean({ defaults: true })
-        .exec();
+        }, select);
     }
 
     async listActiveGames(userId) {
-        const games = await this.gameModel.find({
+        const games = await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress
             $or: [
                 // User is playing or has been afk'd
                 { 'galaxy.players': { $elemMatch: { userId } } },
                 { 'afkers': { $in: [userId] } }
             ]
-        })
-        .sort({
-            'state.startDate': -1 // Sort start date descending (most recent started games appear first)
-        })
-        .select({
+        }, {
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             'settings.gametime.speed': 1,
@@ -65,9 +55,9 @@ module.exports = class GameListService {
             'galaxy.players': 1,
             conversations: 1,
             state: 1
-        })
-        .lean({ defaults: true })
-        .exec();
+        }, {
+            'state.startDate': -1 // Sort start date descending (most recent started games appear first)
+        });
 
         return await Promise.all(games.map(async game => {
             const player = game.galaxy.players.find(p => p.userId === userId.toString());
@@ -100,24 +90,20 @@ module.exports = class GameListService {
     }
 
     async listCompletedGames(userId) {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'state.endDate': { $ne: null }, // Game is finished
             $or: [
                 // User was active in the game or has been afk'd
                 { 'galaxy.players': { $elemMatch: { userId } } },
                 { 'afkers': { $in: [userId] } }
             ]
-        })
-        .sort({
-            'state.endDate': -1 // Sort end date descending (most recent ended games appear first)
-        })
-        .select({
+        }, {
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             state: 1
-        })
-        .lean({ defaults: true })
-        .exec();
+        }, {
+            'state.endDate': -1 // Sort end date descending (most recent ended games appear first)
+        });
     }
 
     async listOldCompletedGames(months = 1, cleaned = null) {
@@ -136,11 +122,9 @@ module.exports = class GameListService {
             });
         }
 
-        return await this.gameModel.find(query, {
+        return await this.gameRepo.find(query, {
             _id: 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async listCustomGamesTimedOut() {
@@ -157,48 +141,40 @@ module.exports = class GameListService {
     }
 
     async listInProgressGames() {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'state.startDate': { $lte: moment().utc().toDate() },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
-        })
-        .sort({
-            'state.startDate': -1
-        })
-        .select({
+        }, {
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             state: 1
-        })
-        .lean()
-        .exec();
+        }, {
+            'state.startDate': -1
+        });
     }
 
     async listInProgressGamesGameTick() {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'state.startDate': { $lte: moment().utc().toDate() },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false },
             'state.locked': { $eq: false }
-        })
-        .sort({
-            'settings.gameTime.speed': 1    // Prioritise faster games first.
-        })
-        .select({
+        }, {
             _id: 1,
             state: 1,
             settings: 1,
             'galaxy.players': 1
-        })
-        .exec();
+        }, {
+            'settings.gameTime.speed': 1    // Prioritise faster games first.
+        });
     }
 
     async listOpenGamesCreatedByUser(userId) {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.createdByUserId': { $eq: userId },
             'state.startDate': { $eq: null }
-        })
-        .exec();
+        });
     }
 
 };

@@ -367,16 +367,20 @@ class GameHelper {
     return distanceBetweenStars <= hyperspaceDistance
   }
 
+  isGameWaitingForPlayers (game) {
+    return game.state.startDate == null
+  }
+
   isGamePaused (game) {
     return game.state.paused
   }
 
   isGameInProgress (game) {
-    return !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
+    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
 
   isGamePendingStart (game) {
-    return !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
+    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
   isGameFinished (game) {

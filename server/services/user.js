@@ -11,15 +11,16 @@ function uuidv4() {
 
 module.exports = class UserService extends EventEmitter {
     
-    constructor(userModel, passwordService) {
+    constructor(userModel, userRepo, passwordService) {
         super();
 
         this.userModel = userModel;
+        this.userRepo = userRepo;
         this.passwordService = passwordService;
     }
 
     async getMe(id) {
-        return await this.userModel.findById(id, {
+        return await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
@@ -27,40 +28,34 @@ module.exports = class UserService extends EventEmitter {
             banned: 0,
             lastSeen: 0,
             lastSeenIP: 0
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
     }
 
     async getById(id, select = null) {
-        return await this.userModel.findById(id, select);
+        return await this.userRepo.findById(id, select);
     }
 
     async getByUsername(username, select = null) {
-        return await this.userModel.findOne({
+        return await this.userRepo.findOne({
             username
-        }, select)
-        .lean().exec();
+        }, select);
     }
 
     async getByUsernameAchievementsLean(username) {
-        return await this.userModel.findOne({
+        return await this.userRepo.findOne({
             username: username
-        })
-        .select({
+        }, {
             username: 1,
             achievements: 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getUserCount() {
-        return this.userModel.estimatedDocumentCount();
+        return this.userRepo.countAll();
     }
 
     async getGameUsers(game) {
-        return await this.userModel.find({
+        return await this.userRepo.findAsModels({
             _id: {
                 $in: game.galaxy.players.map(p => p.userId)
             }
@@ -68,7 +63,7 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async getInfoById(id) {
-        return await this.userModel.findById(id, {
+        return await this.userRepo.findByIdAsModel(id, {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
@@ -100,13 +95,11 @@ module.exports = class UserService extends EventEmitter {
             lastSeenIP: 0
         };
 
-        return await this.userModel.findById(id, select)
-        .lean({ defaults: true })
-        .exec();
+        return await this.userRepo.findById(id, select);
     }
     
     async getEmailById(id) {
-        return await this.userModel.findById(id, {
+        return await this.userRepo.findById(id, {
             email: 1,
             emailEnabled: 1
         });
@@ -116,7 +109,9 @@ module.exports = class UserService extends EventEmitter {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userModel.findOne({email}, {
+        let user = await this.userRepo.findOne({
+            email
+        }, {
             username: 1
         });
 
@@ -128,45 +123,39 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async getUserIsBanned(userId) {
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             _id: userId
         }, {
             banned: 1
-        })
-        .lean({defaults: true})
-        .exec();
+        });
 
         return user.banned;
     }
 
     async getUserIsAdmin(userId) {
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             _id: userId
         }, {
             'roles.administrator': 1
-        })
-        .lean({defaults: true})
-        .exec();
+        });
 
         return user.roles.administrator;
     }
 
     async getUserIsSubAdmin(userId) {
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             _id: userId
         }, {
             'roles.administrator': 1,
             'roles.gameMaster': 1,
             'roles.communityManager': 1
-        })
-        .lean({defaults: true})
-        .exec();
+        });
 
         return user.roles.administrator || user.roles.gameMaster || user.roles.communityManager;
     }
 
     async getUserIsGameMaster(userId) {
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             _id: userId,
             $or: [
                 { 'roles.administrator': 1 },
@@ -174,9 +163,7 @@ module.exports = class UserService extends EventEmitter {
             ]
         }, {
             _id: 1
-        })
-        .lean({defaults: true})
-        .exec();
+        });
 
         return user != null;
     }
@@ -207,7 +194,7 @@ module.exports = class UserService extends EventEmitter {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             email
         });
 
@@ -217,11 +204,11 @@ module.exports = class UserService extends EventEmitter {
     async usernameExists(username) {
         username = username.trim();
 
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             username
-        }, { _id: 1 })
-        .lean()
-        .exec();
+        }, { 
+            _id: 1 
+        });
 
         return user != null;
     }
@@ -229,18 +216,18 @@ module.exports = class UserService extends EventEmitter {
     async otherUsernameExists(username, ignoreUserId) {
         username = username.trim();
 
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             _id: { $ne: ignoreUserId },
             username
-        }, { _id: 1 })
-        .lean()
-        .exec();
+        }, { 
+            _id: 1 
+        });
 
         return user != null;
     }
 
     async updateEmailPreference(id, preference) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: id
         }, {
             emailEnabled: preference
@@ -255,7 +242,7 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError('Cannot change your email address, the new email address is already in use by another account.');
         }
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: id
         }, {
             email
@@ -273,7 +260,7 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError('Cannot change your username, the new username is already in use by another account.');
         }
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: id
         }, {
             username
@@ -281,7 +268,7 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async updatePassword(id, currentPassword, newPassword) {
-        let user = await this.userModel.findById(id);
+        let user = await this.userRepo.findById(id);
         
         // Make sure the current password matches.
         let result = await this.passwordService.compare(currentPassword, user.password);
@@ -290,7 +277,7 @@ module.exports = class UserService extends EventEmitter {
             // Update the current password to the new password.
             let hash = await this.passwordService.hash(newPassword, 10);
             
-            await this.userModel.updateOne({
+            await this.userRepo.updateOne({
                 _id: user._id
             }, {
                 password: hash
@@ -304,7 +291,7 @@ module.exports = class UserService extends EventEmitter {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             email
         });
 
@@ -314,7 +301,7 @@ module.exports = class UserService extends EventEmitter {
 
         let resetPasswordToken = uuidv4();
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: user._id
         }, {
             resetPasswordToken
@@ -328,7 +315,7 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError(`The token is required`);
         }
 
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             resetPasswordToken
         });
 
@@ -339,7 +326,7 @@ module.exports = class UserService extends EventEmitter {
         // Update the current password to the new password.
         let hash = await this.passwordService.hash(newPassword, 10);
         
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: user._id
         }, {
             password: hash,
@@ -348,7 +335,9 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async closeAccount(id) {
-        await this.userModel.deleteOne({_id: id});
+        await this.userRepo.deleteOne({
+            _id: id
+        });
     }
 
     async getGameSettings(userId) {
@@ -366,7 +355,7 @@ module.exports = class UserService extends EventEmitter {
             throw new ValidationError(`Carrier default amount must be greater than 0.`);
         }
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             gameSettings: settings
@@ -374,7 +363,7 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async updateLastSeen(userId, ipAddress) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             $set: {
@@ -385,49 +374,39 @@ module.exports = class UserService extends EventEmitter {
     }
 
     async listUserEloRatingsByIds(userIds) {
-        return await this.userModel.find({
+        return await this.userRepo.find({
             _id: { $in: userIds }
         }, {
             'achievements.eloRating': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async listUsersInGuilds() {
-        return await this.userModel.find({ 
+        return await this.userRepo.find({ 
             guildId: { $ne: null }
         }, {
             'achievements.rank': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async listUsersInGuild(guildId, select = null) {
-        return await this.userModel.find({
+        return await this.userRepo.find({
             guildId
-        }, select)
-        .lean()
-        .exec();
+        }, select);
     }
 
     async listUsers(userIds, select = null) {
-        return await this.userModel.find({
+        return await this.userRepo.find({
             _id: {
                 $in: userIds
             }
-        }, select)
-        .lean()
-        .exec();
+        }, select);
     }
 
     async getUserCredits(userId) {
-        let userCredits = await this.userModel.findById(userId, {
+        let userCredits = await this.userRepo.findById(userId, {
             credits: 1
-        })
-        .lean()
-        .exec();
+        });
 
         return userCredits?.credits;
     }

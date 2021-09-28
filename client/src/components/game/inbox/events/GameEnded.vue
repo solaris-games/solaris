@@ -3,10 +3,31 @@
   <p>
     The game has ended, send congratulations to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getWinnerAlias()}}</a>!
   </p>
-  <p v-if="hasEloRatingResult && userPlayerRating.newRating != userPlayerRating.oldRating">
+  <p>
+    Show your support and award <span class="text-warning">renown</span> to your friends and enemies alike.
+  </p>
+
+  <!-- Rank Change -->
+  <table v-if="hasRankResults" class="table table-sm">
+    <thead>
+      <tr>
+        <td><small>Player</small></td>
+        <td class="text-right"><small>Rank Change</small></td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="rank in event.data.rankingResult.ranks" :key="rank.playerId">
+        <td><small>{{getPlayerAlias(rank.playerId)}}</small></td>
+        <td class="text-right"><small>{{rank.current}}<i class="fas fa-arrow-right ml-2 mr-2"></i>{{rank.new}}</small></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ELO Change -->
+  <p v-if="hasEloRatingResult && userPlayerRating && userPlayerRating.newRating != userPlayerRating.oldRating">
     <small>Your ELO rating has changed from <span class="text-info">{{userPlayerRating.oldRating}}</span> to <span class="text-warning">{{userPlayerRating.newRating}}</span>.</small>
   </p>
-  <p v-if="hasEloRatingResult && userPlayerRating.newRating === userPlayerRating.oldRating">
+  <p v-if="hasEloRatingResult && userPlayerRating && userPlayerRating.newRating === userPlayerRating.oldRating">
     <small>Your ELO is unchanged. (<span class="text-success">{{userPlayerRating.newRating}}</span>)</small>
   </p>
 </div>
@@ -46,11 +67,17 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.$store.state.game.state.winner)
+    },
+    getPlayerAlias (playerId) {
+      return GameHelper.getPlayerById(this.$store.state.game, playerId).alias
     }
   },
   computed: {
+    hasRankResults () {
+      return this.event.data && this.event.data.rankingResult && this.event.data.rankingResult.ranks
+    },
     hasEloRatingResult () {
-      return this.event.data.rankingResult && this.event.data.rankingResult.eloRating
+      return this.event.data && this.event.data.rankingResult && this.event.data.rankingResult.eloRating
     }
   }
 }

@@ -2,8 +2,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ShipTransferService {
 
-    constructor(gameModel, carrierService, starService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, carrierService, starService) {
+        this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
     }
@@ -57,7 +57,7 @@ module.exports = class ShipTransferService {
         });
 
         // Update the DB.
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         return {
             star: {
@@ -116,7 +116,7 @@ module.exports = class ShipTransferService {
         star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             {
                 updateOne: {
                     filter: {

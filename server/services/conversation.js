@@ -57,18 +57,18 @@ function getNewConversation(game, playerId, name, participantIds) {
 
 module.exports = class ConversationService extends EventEmitter {
 
-    constructor(gameModel, eventModel) {
+    constructor(gameRepo, eventRepo) {
         super();
 
-        this.gameModel = gameModel;
-        this.eventModel = eventModel;
+        this.gameRepo = gameRepo;
+        this.eventRepo = eventRepo;
     }
 
     async create(game, playerId, name, participantIds) {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id
         }, {
             $push: {
@@ -188,7 +188,7 @@ module.exports = class ConversationService extends EventEmitter {
         };
 
         // Push a new message into the conversation messages array.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'conversations._id': conversationId
         }, {
@@ -222,7 +222,7 @@ module.exports = class ConversationService extends EventEmitter {
 
             // TODO: This doesn't work in prod because prod is running an older
             // version of MongoDB that doesn't support $[]
-            // await this.gameModel.updateOne({
+            // await this.gameRepo.updateOne({
             //     _id: game._id,
             //     'conversations._id': conversationId,
             //     'conversations.messages._id': {
@@ -246,7 +246,7 @@ module.exports = class ConversationService extends EventEmitter {
             throw new ValidationError(`Cannot leave this conversation.`);
         }
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'conversations._id': conversationId
         }, {
@@ -268,7 +268,7 @@ module.exports = class ConversationService extends EventEmitter {
     }
 
     async _getTradeEventsBetweenParticipants(game, playerId, participants) {
-        let events = await this.eventModel.find({
+        let events = await this.eventRepo.find({
             gameId: game._id,
             playerId: playerId,
             type: {
@@ -287,9 +287,7 @@ module.exports = class ConversationService extends EventEmitter {
                 { 'data.fromPlayerId': { $in: participants } },
                 { 'data.toPlayerId': { $in: participants } }
             ]
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
 
         return events
         .map(e => {
@@ -320,14 +318,13 @@ module.exports = class ConversationService extends EventEmitter {
     }
 
     async setPinnedMessage(game, conversationId, messageId, isPinned) {
-        return await this.gameModel.updateOne({
+        return await this.gameRepo.updateOne({
             _id: game._id
         }, {
             $set: {
                 'conversations.$[c].messages.$[m].pinned': isPinned
             }
-        }, 
-        {
+        }, {
             arrayFilters: [
                 {
                     'c._id': conversationId,
@@ -337,8 +334,7 @@ module.exports = class ConversationService extends EventEmitter {
                     'm._id': messageId
                 }
             ]
-        })
-        .exec();
+        });
     }
 
 }

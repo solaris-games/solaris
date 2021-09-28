@@ -164,7 +164,8 @@
           </div>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
 
           <hr/>
@@ -305,7 +306,7 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots.</p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -340,7 +341,8 @@
           </table>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/active-games" tag="button" class="btn btn-success">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
           </div>
         </div>
     </div>

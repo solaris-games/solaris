@@ -85,9 +85,6 @@ module.exports = class CombatService extends EventEmitter {
         // Calculate the weapons tech levels based on any specialists present at stars or carriers.
         let defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defender, star, defenderCarriers);
         
-        // Add the defender bonus if applicable.
-        defenderWeaponsTechLevel += this.getDefenderBonus(game);
-
         // Use the highest weapons tech of the attacking players to calculate combat result.
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, true);
 
@@ -135,10 +132,6 @@ module.exports = class CombatService extends EventEmitter {
         }, false);
 
         return combatResult;
-    }
-
-    getDefenderBonus(game) {
-        return game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
     }
 
     async performCombat(game, gameUsers, player, star, carriers) {

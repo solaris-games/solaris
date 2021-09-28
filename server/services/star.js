@@ -4,10 +4,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(gameModel, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
+    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.nameService = nameService;
         this.distanceService = distanceService;
@@ -52,6 +52,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.homeStar = true;
         homeStar.warpGate = false;
+        homeStar.specialistId = null;
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
         
@@ -203,16 +204,6 @@ module.exports = class StarService extends EventEmitter {
         this.resetIgnoreBulkUpgradeStatuses(star);
         
         game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
-
-        // TODO: Re-assign home star?
-        // // If this was the player's home star, then we need to find a new home star.
-        // if (star.homeStar) {
-        //     let closestStars = this.starDistanceService.getClosestPlayerOwnedStars(star, game.galaxy.stars, player);
-
-        //     if (closestStars.length) {
-        //         closestStars[0].homeStar = true;
-        //     }
-        // }
         
         await game.save();
 
@@ -418,7 +409,7 @@ module.exports = class StarService extends EventEmitter {
 
         updateObject['$set'][`galaxy.stars.$.ignoreBulkUpgrade.${infrastructureType}`] = newValue
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.stars._id': starId
         }, updateObject);
@@ -431,7 +422,7 @@ module.exports = class StarService extends EventEmitter {
             throw new ValidationError(`You do not own this star.`);
         }
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.stars._id': starId
         }, {
@@ -472,12 +463,11 @@ module.exports = class StarService extends EventEmitter {
         star.ownedByPlayerId = newStarPlayer._id;
         newStarPlayer.credits += captureReward;
         star.infrastructure.economy = 0;
+        star.shipsActual = 0;
+        star.ships = 0;
 
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
-
-        // TODO: If the home star is captured, find a new one?
-        // TODO: Also need to consider if the player doesn't own any stars and captures one, then the star they captured should then become the home star.
 
         if (defenderUser && !defender.defeated) {
             defenderUser.achievements.combat.stars.lost++;

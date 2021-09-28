@@ -14,9 +14,11 @@
 
     <div class="menu-content bg-dark" v-if="menuState">
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewSettingsRequested="onViewSettingsRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewSettingsRequested="onViewSettingsRequested"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onViewConversationRequested="onViewConversationRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -111,6 +113,8 @@
         @onCloseRequested="onCloseRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
         @onCloseRequested="onCloseRequested"/>
+      <settings v-if="menuState == MENU_STATES.SETTINGS"
+        @onCloseRequested="onCloseRequested"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"
         @onCloseRequested="onCloseRequested"
@@ -160,6 +164,7 @@ import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 import GameNotesVue from '../notes/GameNotes.vue'
 import OptionsVue from './Options.vue'
+import SettingsVue from '../settings/Settings.vue'
 import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 import FooterBarVue from './FooterBar.vue'
@@ -195,6 +200,7 @@ export default {
     'hire-specialist-star': HireSpecialistStarVue,
     'game-notes': GameNotesVue,
     'options': OptionsVue,
+    'settings': SettingsVue,
     'create-conversation': ConversationCreateVue,
     'conversation': ConversationDetailVue,
     'not-logged-in-bar': NotLoggedInBarVue,
@@ -276,6 +282,9 @@ export default {
     },
     onViewCarrierCombatCalculatorRequested (e) {
       this.changeMenuState(MENU_STATES.COMBAT_CALCULATOR, e)
+    },
+    onViewSettingsRequested (e) {
+      this.changeMenuState(MENU_STATES.SETTINGS, e)
     }
   },
   computed: {

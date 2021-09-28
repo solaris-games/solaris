@@ -6,6 +6,7 @@ export default {
   GALAXY: 'galaxy',
   INTEL: 'intel',
   OPTIONS: 'options',
+  SETTINGS: 'settings',
   HELP: 'help',
   INBOX: 'inbox',
   CONVERSATION: 'conversation',

@@ -425,7 +425,8 @@ module.exports = class GameGalaxyService {
                 lastSeen: p.lastSeen,
                 isOnline: p.isOnline,
                 guild: playerGuild,
-                hasDuplicateIP: p.hasDuplicateIP
+                hasDuplicateIP: p.hasDuplicateIP,
+                hasFilledAfkSlot: p.hasFilledAfkSlot
             };
         });
     }

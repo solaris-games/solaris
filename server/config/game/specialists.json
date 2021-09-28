@@ -228,7 +228,7 @@
         {
             "id": 16,
             "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
+            "description": "Reignites a dead star with 25 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -238,7 +238,7 @@
                 },
                 "special": {
                     "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": 10
+                    "reigniteDeadStarNaturalResources": 25
                 }
             }
         }
