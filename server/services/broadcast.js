@@ -197,6 +197,15 @@ module.exports = class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtSettled', data);
     }
 
+    gamePlayerDiplomaticStatusChanged(playerIdFrom, playerIdTo, diplomaticStatus) {
+        let data = {
+            diplomaticStatus
+        };
+
+        this.io.to(playerIdFrom).emit('playerDiplomaticStatusChanged', data);
+        this.io.to(playerIdTo).emit('playerDiplomaticStatusChanged', data);
+    }
+
     // userRenownReceived(game, toUserId, renown) {
     //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?
     // }

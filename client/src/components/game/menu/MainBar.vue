@@ -101,6 +101,7 @@
         @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
       <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <diplomacy v-if="menuState == MENU_STATES.DIPLOMACY" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"
@@ -160,6 +161,7 @@ import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
+import DiplomacyVue from '../diplomacy/Diplomacy.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 import GameNotesVue from '../notes/GameNotes.vue'
@@ -196,6 +198,7 @@ export default {
     'map-object-selector': MapObjectSelectorVue,
     'ruler': RulerVue,
     'ledger': LedgerVue,
+    'diplomacy': DiplomacyVue,
     'hire-specialist-carrier': HireSpecialistCarrierVue,
     'hire-specialist-star': HireSpecialistStarVue,
     'game-notes': GameNotesVue,
@@ -204,7 +207,7 @@ export default {
     'create-conversation': ConversationCreateVue,
     'conversation': ConversationDetailVue,
     'not-logged-in-bar': NotLoggedInBarVue,
-    'dark-mode-warning-bar': DarkModeWarningBarVue
+    'dark-mode-warning-bar': DarkModeWarningBarVue,
   },
   props: {
     menuState: String,

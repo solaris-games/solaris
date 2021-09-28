@@ -97,18 +97,20 @@ export default {
   },
   data () {
     return {
-      defender: null,
+      owner: null,
+      defenders: null,
       attackers: [],
       defenderCarriers: [],
       attackerCarriers: []
     }
   },
   mounted () {
-    this.defender = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender)
+    this.owner = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner)
+    this.defenders = this.event.data.playerIdDefenders.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
     this.attackers = this.event.data.playerIdAttackers.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
 
-    this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId === this.event.data.playerIdDefender)
-    this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => c.ownedByPlayerId !== this.event.data.playerIdDefender)
+    this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => this.defenders.find(d => d._id === c.ownedByPlayerId) != null)
+    this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => this.attackers.find(a => a._id === c.ownedByPlayerId) != null)
   },
   methods: {
     onOpenPlayerDetailRequested (e) {
@@ -121,10 +123,10 @@ export default {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
     },
     getStarColour () {
-      return GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdDefender)
+      return GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdOwner)
     },
     getStarShape () {
-      return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdDefender).shape;
+      return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner).shape;
     }
   }
 }

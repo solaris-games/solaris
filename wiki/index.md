@@ -159,8 +159,12 @@ will travel at times 6 speed.
 You may choose to **abandon a star**, in which case all Carriers and Ships at
 the star will be destroyed and all infrastructure will remain intact, including
 a warp gate if present.
+
 When abandoned the warp gate will become inactive until the star is claimed
 again, so it will not grant a speed boost to incoming Carriers.
+
+If an ally is in orbit when you abandon a star, that player will capture the star on the next tick. If there are more than 1 ally, then
+the player with the highest number of ships in a single carrier will capture the abandoned star.
 
 
 ## Infrastructure
@@ -223,6 +227,14 @@ its destination the player who owns the star will gain control of the carrier
 and its ships. Note that if a carrier has a specialist, that specialist will be
 retired.
 
+## Alliances
+
+Your diplomatic status to other players can be changed in the **Menu -> Diplomacy** (hotkey D) screen. If both you and another player set each other to **allied** then you both will receive the following benefits:
+
+- You may visit allied stars.
+- When in orbit at an allied star, your scanning range will take effect.
+
+**Warning** - An alliance can be broken at any time and combat will occur at contested stars.
 
 ## Combat
 
@@ -274,6 +286,18 @@ For example:
 - Specialist B has Weapons +1
 - Specialist C has Weapons -2
 - `effective weapons level = -2 + 3 = +1 weapons` *(Specialist B is ignored)*
+
+### Formal Alliance Combat Rules
+When formal alliances is enabled then a there are a few conditions that need to be met in order for combat to take place:
+1. When a carrier arrives at a star, if the player is allied with the defender then no combat occurs.
+2. When a carrier arrives at a star, if the player is enemies with the defender then combat occurs.
+2a. Carriers in orbit who are allied to the defender will help defend.
+2b. If the attacker wins and captures the star, then combat will repeat until there are no enemies to the defender.
+3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
+4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
+
+Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur
+if the guest players are enemies but are both allied to the defender.
 
 ## Science & Technology
 
@@ -363,13 +387,14 @@ Additionally:
  4.  Ships are built at stars.
  5.  Carrier collect actions are performed.
  6.  Carrier garrison actions are performed.
- 7.  If at the end of a galactic cycle:
- 7a. Players receive credits from economy and banking.
- 7b. Experimentations are performed.
- 7c. Carrier upkeep is deducted.
- 8.  Game checks for afk and defeated players.
- 9. AI actions are performed.
- 10. Research is performed.
- 11. Game checks for a winner.
- 12. Intel is logged.
+ 7.  Combat occurs at contested stars.
+ 8.  If at the end of a galactic cycle:
+ 8a. Players receive credits from economy and banking.
+ 8b. Experimentations are performed.
+ 8c. Carrier upkeep is deducted.
+ 9.  Game checks for afk and defeated players.
+ 10. AI actions are performed.
+ 11. Research is performed.
+ 12. Game checks for a winner.
+ 13. Intel is logged.
 

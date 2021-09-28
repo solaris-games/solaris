@@ -75,7 +75,10 @@ const schema = new Schema({
             playerId: { type: Types.ObjectId, required: true },
             score: { type: Types.Number, required: true, default: 0  }
         }
-    ]
+    ],
+    diplomacy: {
+        allies: [{ type: Types.ObjectId, required: true }]
+    }
 });
 
 module.exports = schema;

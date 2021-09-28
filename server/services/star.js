@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService) {
+    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService) {
         super();
         
         this.gameRepo = gameRepo;
@@ -15,6 +15,7 @@ module.exports = class StarService extends EventEmitter {
         this.technologyService = technologyService;
         this.specialistService = specialistService;
         this.userService = userService;
+        this.diplomacyService = diplomacyService;
     }
 
     generateUnownedStar(game, name, location, naturalResources) {
@@ -74,6 +75,25 @@ module.exports = class StarService extends EventEmitter {
         return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s))
     }
 
+    listStarsWithScanningRangeByPlayer(game, playerId) {
+        // A player has access to the scanning range of a star if
+        // - The player owns the star
+        // - The player has a carrier in orbit regardless of who owns the star
+        let starIds = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id);
+        
+        if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
+            starIds = starIds.concat(
+                game.galaxy.carriers
+                    .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
+                    .map(c => c.orbiting)
+            );
+
+            starIds = [...new Set(starIds)];
+        }
+
+        return starIds.map(id => this.getByObjectId(game, id));
+    }
+
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
         return this.listStarsOwnedByPlayer(stars, playerId)
             .filter(s => s.ignoreBulkUpgrade[infrastructureType]);
@@ -105,7 +125,7 @@ module.exports = class StarService extends EventEmitter {
 
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
         let starsToCheck = game.galaxy.stars.map(s => {
             return {
                 _id: s._id,
@@ -173,7 +193,7 @@ module.exports = class StarService extends EventEmitter {
     isStarInScanningRangeOfPlayer(game, star, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
         let isInScanRange = this.isStarWithinScanningRangeOfStars(game, star, playerStars);
 
         return isInScanRange;
@@ -197,14 +217,25 @@ module.exports = class StarService extends EventEmitter {
             throw new ValidationError(`Cannot abandon a star that is not owned by the player.`);
         }
 
+        this.resetIgnoreBulkUpgradeStatuses(star);
+        
+        // Destroy the carriers owned by the player who abandoned the star.
+        // Note: If an ally is currently in orbit then they will capture the star on the next tick.
+        let playerCarriers = game.galaxy.carriers
+            .filter(x => 
+                x.orbiting
+                && x.orbiting.equals(star._id)
+                && x.ownedByPlayerId.equals(player._id)
+            );
+
+        for (let playerCarrier of playerCarriers) {
+            game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(playerCarrier), 1);
+        }
+
         star.ownedByPlayerId = null;
         star.shipsActual = 0;
         star.ships = star.shipsActual;
 
-        this.resetIgnoreBulkUpgradeStatuses(star);
-        
-        game.galaxy.carriers = game.galaxy.carriers.filter(x => (x.orbiting || '').toString() != star._id.toString());
-        
         await game.save();
 
         this.emit('onPlayerStarAbandoned', {
@@ -434,7 +465,7 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
-    captureStar(game, star, defender, defenderUser, attackers, attackerUsers, attackerCarriers) {
+    captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers) {
         let specialist = this.specialistService.getByIdStar(star.specialistId);
 
         // If the star had a specialist that destroys infrastructure then perform demolition.
@@ -469,11 +500,13 @@ module.exports = class StarService extends EventEmitter {
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
 
-        if (defenderUser && !defender.defeated) {
-            defenderUser.achievements.combat.stars.lost++;
+        const oldStarUser = defenderUsers.find(u => u._id.equals(owner.userId));
+
+        if (oldStarUser && !owner.defeated) {
+            oldStarUser.achievements.combat.stars.lost++;
 
             if (star.homeStar) {
-                defenderUser.achievements.combat.homeStars.lost++;
+                oldStarUser.achievements.combat.homeStars.lost++;
             }
         }
         
@@ -502,5 +535,43 @@ module.exports = class StarService extends EventEmitter {
 
     listHomeStars(game) {
         return game.galaxy.stars.filter(s => s.homeStar);
+    }
+
+    listContestedStars(game) {
+        return game.galaxy.stars
+            .map(s => {
+                // Calculate other players in orbit of the star
+                let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));
+                let otherPlayerIdsInOrbit = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))];
+
+                if (otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId) > -1) {
+                    otherPlayerIdsInOrbit.splice(otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId), 1); // Remove the star owner as we don't need it here.
+                }
+
+                return {
+                    star: s,
+                    carriersInOrbit,
+                    otherPlayerIdsInOrbit
+                };
+            })
+            .filter(x => {
+                // Filter stars where there are other players in orbit and those players are not allied with the star owner.
+                return x.otherPlayerIdsInOrbit.length
+                    && !this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, x.star.ownedByPlayerId, x.otherPlayerIdsInOrbit);
+            });
+    }
+
+    listContestedUnownedStars(game) {
+        return game.galaxy.stars
+            .filter(s => s.ownedByPlayerId == null)
+            .map(s => {
+                let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));
+
+                return {
+                    star: s,
+                    carriersInOrbit
+                };
+            })
+            .filter(x => x.carriersInOrbit.length);
     }
 }

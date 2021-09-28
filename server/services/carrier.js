@@ -3,13 +3,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService) {
+    constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService) {
         this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.diplomacyService = diplomacyService;
     }
 
     getById(game, id) {
@@ -88,7 +89,7 @@ module.exports = class CarrierService {
     filterCarriersByScanningRange(game, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.starService.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
         // Start with all of the carriers that the player owns as
         // the player can always see those carriers.
@@ -401,6 +402,10 @@ module.exports = class CarrierService {
             // Otherwise, perform combat.
             if (carrier.isGift) {
                 await this.transferGift(game, gameUsers, destinationStar, carrier);
+            } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
+
+                report.combatRequiredStar = !isAllied;
             } else {
                 report.combatRequiredStar = true;
             }
