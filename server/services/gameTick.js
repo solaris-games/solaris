@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService) {
+        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService, diplomacyService) {
         super();
             
         this.distanceService = distanceService;
@@ -27,10 +27,16 @@ module.exports = class GameTickService extends EventEmitter {
         this.emailService = emailService;
         this.battleRoyaleService = battleRoyaleService;
         this.orbitalMechanicsService = orbitalMechanicsService;
+        this.diplomacyService = diplomacyService;
     }
 
     async tick(gameId) {
         let game = await this.gameService.getByIdAll(gameId);
+
+        // Double check the game isn't locked.
+        if (!this.gameService.isLocked(game)) {
+            throw new Error(`The game is not locked.`);
+        }
 
         /*
             1. Move all carriers
@@ -73,11 +79,17 @@ module.exports = class GameTickService extends EventEmitter {
 
             logTime(`Tick ${game.state.tick}`);
 
+            await this._captureAbandonedStars(game, gameUsers);
+            logTime('Capture abandoned stars');
+
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
 
             await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
+
+            await this._combatContestedStars(game, gameUsers);
+            logTime('Combat at contested stars');
 
             await this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
@@ -163,6 +175,8 @@ module.exports = class GameTickService extends EventEmitter {
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
         }
+
+        let isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
 
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
@@ -262,7 +276,20 @@ module.exports = class GameTickService extends EventEmitter {
 
             // Double check that there are carriers that can fight.
             if (!combatCarriers.length) {
-                return;
+                continue;
+            }
+
+            // If alliances is enabled then ensure that only enemies fight.
+            // TODO: Alliance combat here is very complicated when more than 2 players are involved.
+            // For now, we will perform normal combat if any participant is an enemy of the others.
+            if (isAlliancesEnabled) {
+                const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId.toString()))];
+
+                const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
+
+                if (isAllPlayersAllied) {
+                    continue;
+                }
             }
 
             // TODO: Check for specialists that affect pre-combat.
@@ -382,6 +409,45 @@ module.exports = class GameTickService extends EventEmitter {
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
 
         this._sanitiseDarkModeCarrierWaypoints(game);
+    }
+
+    async _combatContestedStars(game, gameUsers) {
+        // Note: Contested stars are only possible when formal alliances is enabled.
+        if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return;
+        }
+
+        // Check for scenario where a player changes diplomatic status to another player.
+        // Perform combat at contested stars.
+        let contestedStars = this.starService.listContestedStars(game);
+
+        for (let i = 0; i < contestedStars.length; i++) {
+            let contestedStar = contestedStars[i];
+
+            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
+
+            this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
+        }
+    }
+
+    async _captureAbandonedStars(game, gameUsers) {
+        // Note: Capturing abandoned stars in this way is only possible in the scenario
+        // where a player has abandoned a star for an ally to capture who is already in orbit.
+        if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return;
+        }
+
+        let contestedAbandonedStars = this.starService.listContestedUnownedStars(game);
+
+        for (let i = 0; i < contestedAbandonedStars.length; i++) {
+            let contestedStar = contestedAbandonedStars[i];
+
+            // The player who owns the carrier with the most ships will capture the star.
+            let carrier = contestedStar.carriersInOrbit
+                .sort((a, b) => b.ships - a.ships)[0];
+
+            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
+        }
     }
 
     _sanitiseDarkModeCarrierWaypoints(game) {

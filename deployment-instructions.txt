@@ -1,0 +1,36 @@
+db.games.updateMany({}, {
+    $set: {
+        'galaxy.players.$[].diplomacy': {
+            allies: []
+        }
+    }
+});
+
+db.games.updateMany({}, {
+    $set: {
+        'settings.player.alliances': 'disabled'
+    }
+});
+
+db.gameevents.find({
+    type: 'playerCombatStar',
+    'data.playerIdOwner': { $eq: null }
+}).forEach(function(gameEvent) {
+    gameEvent.data.playerIdOwner = gameEvent.data.playerIdDefender;
+    gameEvent.data.playerIdDefenders = [gameEvent.data.playerIdDefender];
+
+    delete gameEvent.data.playerIdDefender;
+
+    db.gameevents.save(gameEvent);
+});
+
+db.gameevents.find({
+    type: 'playerCombatCarrier',
+    'data.playerIdDefender': { $ne: null }
+}).forEach(function(gameEvent) {
+    gameEvent.data.playerIdDefenders = [gameEvent.data.playerIdDefender];
+
+    delete gameEvent.data.playerIdDefender;
+
+    db.gameevents.save(gameEvent);
+});

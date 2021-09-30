@@ -159,8 +159,12 @@ will travel at times 6 speed.
 You may choose to **abandon a star**, in which case all Carriers and Ships at
 the star will be destroyed and all infrastructure will remain intact, including
 a warp gate if present.
+
 When abandoned the warp gate will become inactive until the star is claimed
 again, so it will not grant a speed boost to incoming Carriers.
+
+If an ally is in orbit when you abandon a star, that player will capture the star on the next tick. If there are more than 1 ally, then
+the player with the highest number of ships in a single carrier will capture the abandoned star.
 
 
 ## Infrastructure
@@ -223,6 +227,14 @@ its destination the player who owns the star will gain control of the carrier
 and its ships. Note that if a carrier has a specialist, that specialist will be
 retired.
 
+## Alliances
+
+Your diplomatic status to other players can be changed in the **Menu -> Diplomacy** (hotkey D) screen. If both you and another player set each other to **allied** then you both will receive the following benefits:
+
+- You may visit allied stars.
+- When in orbit at an allied star, your scanning range will take effect.
+
+**Warning** - An alliance can be broken at any time and combat will occur at contested stars.
 
 ## Combat
 
@@ -275,6 +287,18 @@ For example:
 - Specialist C has Weapons -2
 - `effective weapons level = -2 + 3 = +1 weapons` *(Specialist B is ignored)*
 
+### Formal Alliance Combat Rules
+When formal alliances is enabled then a there are a few conditions that need to be met in order for combat to take place:
+1. When a carrier arrives at a star, if the player is allied with the defender then no combat occurs.
+2. When a carrier arrives at a star, if the player is enemies with the defender then combat occurs.
+2a. Carriers in orbit who are allied to the defender will help defend.
+2b. If the attacker wins and captures the star, then combat will repeat until there are no enemies to the defender.
+3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
+4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
+
+Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur
+if the guest players are enemies but are both allied to the defender.
+
 ## Science & Technology
 
 Science infrastructure built at Stars contribute to the overall research amount
@@ -288,19 +312,17 @@ The types of technologies are as follows:
 ![The Research menu](img/research-menu.png)
 
  - **Scanning** - Improves the visible area star a star can see.
-   The higher your scanning, the further you can see.
+   The higher your scanning, the further you can see. The equation is `(scanning + 1) * lightYear`.
  - **Hyperspace Range** - Improves the distance a carrier can travel in between
-   each waypoint.
+   each waypoint. The equation is `(hyperspace + 1.5) * lightYear`.
  - **Terraforming** - Improves the natural resources at Stars to make
    infrastructure upgrades cheaper.
- - **Experimentation** - Grants a 50 bonus points per level to a random
+ - **Experimentation** - Grants a `50` bonus points per level to a random
    technology each production.
  - **Weapons** - Improves the amount of enemy carriers each friendly carrier
    destroys in combat. Each carrier destroys enemy carriers exactly equal to the
    local weapons level.
- - **Banking** - Earns 75 extra credits every production. If experimental
-   banking is enabled in game settings, you get additional extra credits based
-   from your economy level.
+ - **Banking** - Earns extra credits every production cycle. For experimental banking the equation is `(banking * 75) + (0.15 * banking * totalEco)` and for legacy banking its `banking * 75`.
  - **Manufacturing** - Increases ship production rate on all stars. The exact
    formula is a star produces `(X*(Y+5))/T` ships per tick, where `X` is the
    star's industry, `Y` is the star's manufacturing level, and `T` is the number
@@ -308,6 +330,7 @@ The types of technologies are as follows:
  - **Specialists** - Increases the number of specialist tokens awarded at the
    end of a galactic cycle, these are used to hire specialists.
 
+Note: A `lightYear` distance unit is `50`.
 
 ## Turn Based Games
 
@@ -351,6 +374,7 @@ Additionally:
 - 1st place receives a galactic credit.
 - Players who are undefeated and active (not AFK) receive +1 to their completed statistic on their profile.
 - Players cannot have less than 0 rank in their profiles.
+- Rank is not awarded in New Player Games.
 
 
 ## Game Tick Events
@@ -363,13 +387,14 @@ Additionally:
  4.  Ships are built at stars.
  5.  Carrier collect actions are performed.
  6.  Carrier garrison actions are performed.
- 7.  If at the end of a galactic cycle:
- 7a. Players receive credits from economy and banking.
- 7b. Experimentations are performed.
- 7c. Carrier upkeep is deducted.
- 8.  Game checks for afk and defeated players.
- 9. AI actions are performed.
- 10. Research is performed.
- 11. Game checks for a winner.
- 12. Intel is logged.
+ 7.  Combat occurs at contested stars.
+ 8.  If at the end of a galactic cycle:
+ 8a. Players receive credits from economy and banking.
+ 8b. Experimentations are performed.
+ 8c. Carrier upkeep is deducted.
+ 9.  Game checks for afk and defeated players.
+ 10. AI actions are performed.
+ 11. Research is performed.
+ 12. Game checks for a winner.
+ 13. Intel is logged.
 

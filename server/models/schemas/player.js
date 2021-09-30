@@ -83,7 +83,10 @@ const schema = new Schema({
             data: { type: Types.Mixed, required: false },
             retryPolicy: { type: Types.String, required: false }
         }
-    ]
+    ],
+    diplomacy: {
+        allies: [{ type: Types.ObjectId, required: true }]
+    }
 });
 
 module.exports = schema;

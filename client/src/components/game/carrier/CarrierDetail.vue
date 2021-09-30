@@ -112,7 +112,7 @@
         <div class="col">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
-        <div class="col-auto" v-if="!$isHistoricalMode()">
+        <div class="col-auto" v-if="!$isHistoricalMode() && isStarOwnedByUserPlayer">
           <button class="btn btn-sm btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
             <i class="fas fa-exchange-alt"></i> Ship Transfer
           </button>
@@ -459,6 +459,11 @@ export default {
     },
     isOwnedByUserPlayer: function () {
       let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
+
+      return owner && this.userPlayer && owner._id === this.userPlayer._id
+    },
+    isStarOwnedByUserPlayer: function () {
+      let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.getCarrierOrbitingStar())
 
       return owner && this.userPlayer && owner._id === this.userPlayer._id
     },
