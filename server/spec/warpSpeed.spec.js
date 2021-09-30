@@ -49,7 +49,8 @@ describe('warp speed', () => {
 
         carrier = {
             _id: carrierId,
-            specialistId: null
+            specialistId: null,
+            ownedByPlayerId: playerId
         };
 
         sourceStar = {
@@ -268,5 +269,36 @@ describe('warp speed', () => {
         
         expect(warpSpeed).toBeFalsy();
     });
+
+    it('should travel at warp speed if source and destination are not owned by the same player but allied carrier does not unlock warp gates', async () => {
+        destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
+
+        player.diplomacy = {
+            allies: [destinationStar.ownedByPlayerId]
+        }
+
+        carrier.specialistId = 1;
+        carrierSpecialist = {
+            modifiers: {
+                special: {
+                    unlockWarpGates: false
+                }
+            }
+        };
+
+        destinationStar.specialistId = 1;
+        sourceStar.specialistId = 1;
+        starSpecialist = {
+            modifiers: {
+                special: {
+                    lockWarpGates: true
+                }
+            }
+        };
+
+        const warpSpeed = service.canTravelAtWarpSpeed(player, carrier, sourceStar, destinationStar);
+        
+        expect(warpSpeed).toBeTruthy();
+    })
 
 });
