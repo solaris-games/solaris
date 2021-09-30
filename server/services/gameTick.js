@@ -283,7 +283,7 @@ module.exports = class GameTickService extends EventEmitter {
             // TODO: Alliance combat here is very complicated when more than 2 players are involved.
             // For now, we will perform normal combat if any participant is an enemy of the others.
             if (isAlliancesEnabled) {
-                const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId))];
+                const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId.toString()))];
 
                 const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
 

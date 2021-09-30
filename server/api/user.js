@@ -93,7 +93,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
         try {
@@ -103,7 +103,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {

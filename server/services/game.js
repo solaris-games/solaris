@@ -78,6 +78,10 @@ module.exports = class GameService extends EventEmitter {
             'state.tick': 1
         });
 
+        if (!game) {
+            return null;
+        }
+
         return game.state.tick;
     }
 

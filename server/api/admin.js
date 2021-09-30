@@ -22,7 +22,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/developer', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -32,7 +32,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/communityManager', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -42,7 +42,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/gameMaster', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -52,7 +52,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/credits', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -62,7 +62,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/ban', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -72,7 +72,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/unban', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -82,7 +82,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateAdmin, async (req, res, next) => {
         try {
@@ -92,7 +92,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.post('/api/admin/user/:userId/impersonate', middleware.authenticateAdmin, (req, res, next) => {
         try {
@@ -105,7 +105,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.get('/api/admin/game', middleware.authenticateSubAdmin, async (req, res, next) => {
         try {
@@ -125,7 +125,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     return router;
 

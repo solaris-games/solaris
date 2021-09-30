@@ -79,19 +79,19 @@ module.exports = class StarService extends EventEmitter {
         // A player has access to the scanning range of a star if
         // - The player owns the star
         // - The player has a carrier in orbit regardless of who owns the star
-        let starIds = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id);
+        let starIds = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
         
         if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
             starIds = starIds.concat(
                 game.galaxy.carriers
                     .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
-                    .map(c => c.orbiting)
+                    .map(c => c.orbiting.toString())
             );
 
             starIds = [...new Set(starIds)];
         }
 
-        return starIds.map(id => this.getByObjectId(game, id));
+        return starIds.map(id => this.getById(game, id));
     }
 
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
@@ -542,10 +542,10 @@ module.exports = class StarService extends EventEmitter {
             .map(s => {
                 // Calculate other players in orbit of the star
                 let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));
-                let otherPlayerIdsInOrbit = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))];
+                let otherPlayerIdsInOrbit = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId.toString()))];
 
-                if (otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId) > -1) {
-                    otherPlayerIdsInOrbit.splice(otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId), 1); // Remove the star owner as we don't need it here.
+                if (otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId.toString()) > -1) {
+                    otherPlayerIdsInOrbit.splice(otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId.toString()), 1); // Remove the star owner as we don't need it here.
                 }
 
                 return {

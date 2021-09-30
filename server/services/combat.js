@@ -176,11 +176,11 @@ module.exports = class CombatService extends EventEmitter {
         }
 
         // Get the players for the defender and all attackers.
-        let defenderPlayerIds = defenderCarriers.map(c => c.ownedByPlayerId);
-        defenderPlayerIds.push(defender._id);
+        let defenderPlayerIds = defenderCarriers.map(c => c.ownedByPlayerId.toString());
+        defenderPlayerIds.push(defender._id.toString());
         defenderPlayerIds = [...new Set(defenderPlayerIds)];
 
-        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId))];
+        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
 
         let defenders = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
         let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
@@ -190,12 +190,18 @@ module.exports = class CombatService extends EventEmitter {
         
         for (let defender of defenders) {
             let user = gameUsers.find(u => u._id.equals(defender.userId));
-            defenderUsers.push(user);
+            
+            if (user) {
+                defenderUsers.push(user);
+            }
         }
         
         for (let attacker of attackers) {
             let user = gameUsers.find(u => u._id.equals(attacker.userId));
-            attackerUsers.push(user);
+            
+            if (user) {
+                attackerUsers.push(user);
+            }
         }
 
         // Perform combat at the star.
@@ -303,7 +309,7 @@ module.exports = class CombatService extends EventEmitter {
         }
 
         // If there are still attackers remaining, recurse.
-        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId))];
+        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
 
         if (attackerPlayerIds.length > 1) {
             // Get the next player to act as the defender.
