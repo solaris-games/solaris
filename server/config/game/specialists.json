@@ -303,7 +303,7 @@
         {
             "id": 5,
             "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent other players from using it. Weapons -1.",
+            "description": "Locks the Warp Gate at the Star to prevent enemy players from using it. Weapons -1.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
