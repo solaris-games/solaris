@@ -255,9 +255,8 @@ module.exports = class StarService extends EventEmitter {
         // If both stars have warp gates and they are both owned by players...
         if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
             // If both stars are owned by the player then carriers can always move at warp.
-            let sourceAllied = isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, carrier.ownedByPlayerId) && this.diplomacyService.isFormalAlliancesEnabled(game) || sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayer)
-            let desinationAllied = isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, carrier.ownedByPlayerId) && this.diplomacyService.isFormalAlliancesEnabled(game) || sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayer)
-
+            let sourceAllied = (player?.diplomacy?.allies.includes(sourceStar.ownedByPlayerId)) || sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)
+            let desinationAllied = (player?.diplomacy?.allies.includes(destinationStar.ownedByPlayerId)) || sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)
             // If both stars are owned by the player then carriers can always move at warp.
             if (sourceAllied && desinationAllied) {
                 return true;
