@@ -14,68 +14,47 @@ module.exports = class CombatService extends EventEmitter {
     }
 
     calculate(defender, attacker, isTurnBased = true, calculateNeeded = false) {    
-        let defenderShipsRemaining = defender.ships;
-        let attackerShipsRemaining = attacker.ships;
+      let defenderShipsRemaining = defender.ships;
+      let attackerShipsRemaining = attacker.ships;
 
-        const defendPower = defender.weaponsLevel;
-        const attackPower = attacker.weaponsLevel;
-        const defenderAdditionalTurns = isTurnBased ? 1 : 0;
-        
-        const defenderTurns = Math.ceil(attacker.ships / defendPower);
-        const attackerTurns = Math.ceil(defender.ships / attackPower);
+      const defendPower = defender.weaponsLevel;
+      const attackPower = attacker.weaponsLevel;
+      
+      const defenderTurns = Math.ceil(attackerShipsRemaining / defendPower) * 2 - isTurnBased;
+      const attackerTurns = Math.ceil(defenderShipsRemaining / attackPower) * 2;
+      const minimumTurns = Math.min(defenderTurns, attackerTurns) / 2;
 
-        let needed = null;
+      const defenderLost = Math.max(0, attackPower * (minimumTurns | 0));
+      const attackerLost = Math.max(0, defendPower * (minimumTurns + 0.5 | 0));
 
-        if (defenderTurns <= attackerTurns)  {
-            attackerShipsRemaining = 0;
-            defenderShipsRemaining = defender.ships - (defenderTurns - defenderAdditionalTurns) * attackPower;
-
-            if (calculateNeeded) {
-                needed = {
-                    defender: 0,
-                    attacker: attackerTurns * defendPower + 1
-                };
-            }
-        } else {
-            defenderShipsRemaining = 0;
-            attackerShipsRemaining = attacker.ships - attackerTurns * defendPower;
-
-            if (calculateNeeded) {
-                needed = {
-                    attacker: 0,
-                    defender: (defenderTurns - defenderAdditionalTurns) * attackPower + defenderAdditionalTurns
-                };
-            }
+      let result = {
+        weapons: {
+            defender: defendPower,
+            attacker: attackPower
+        },
+        before: {
+            defender: defenderShipsRemaining,
+            attacker: attackerShipsRemaining
+        },
+        after: {
+            defender: defenderShipsRemaining - defenderLost,
+            attacker: attackerShipsRemaining - attackerLost
+        },
+        lost: {
+            defender: defenderLost,
+            attacker: attackerLost
         }
+      };
 
-        attackerShipsRemaining = Math.max(0, attackerShipsRemaining);
-        defenderShipsRemaining = Math.max(0, defenderShipsRemaining);
-
-        let result = {
-            weapons: {
-                defender: defendPower,
-                attacker: attackPower
-            },
-            before: {
-                defender: defender.ships,
-                attacker: attacker.ships
-            },
-            after: {
-                defender: defenderShipsRemaining,
-                attacker: attackerShipsRemaining
-            },
-            lost: {
-                defender: defender.ships - defenderShipsRemaining,
-                attacker: attacker.ships - attackerShipsRemaining
-            }
-        };
-
-        if (calculateNeeded) {
-            result.needed = needed;
+      if (calculateNeeded) {
+        result.needed = {
+            defender: minimumTurns === defenderTurns ? 0 : (defenderTurns - isTurnBased) * attackPower + isTurnBased,
+            attacker: minimumTurns === attackerTurns ? 0 : attackerTurns * defendPower + 1
         }
+      }
 
-        return result;
-    }
+      return result;
+  }
 
     calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers) {
         // Calculate the combined combat result taking into account
