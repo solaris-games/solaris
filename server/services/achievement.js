@@ -1,19 +1,27 @@
 module.exports = class AchievementService {
     
-    constructor(userRepo) {
+    constructor(userRepo, guildService) {
         this.userRepo = userRepo;
+        this.guildService = guildService;
     }
 
     async getAchievements(id) {
-        return await this.userRepo.findById(id, {
+        const user = await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             achievements: 1,
+            guildId: 1,
             username: 1,
             'roles.contributor': 1,
             'roles.developer': 1,
             'roles.communityManager': 1,
             'roles.gameMaster': 1
         });
+
+        if (user.guildId) {
+            user.guild = await this.guildService.listInfoByIds([user.guildId])[0];
+        }
+
+        return user;
     }
 
     async incrementAchievement(userId, achievement, amount = 1) {
