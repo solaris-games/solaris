@@ -38,7 +38,7 @@ module.exports = class DiplomacyService {
 
         let isAllied = statusTo === 'allies' && statusFrom === 'allies';
 
-        let actualStatus = isAllied ? 'allies' : 'enemies';
+        let actualStatus = isAllied || playerIdA === playerIdB ? 'allies' : 'enemies';
 
         return {
             playerIdFrom: playerIdA,
