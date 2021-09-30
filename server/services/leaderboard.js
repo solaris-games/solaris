@@ -587,6 +587,10 @@ module.exports = class LeaderboardService {
     }
 
     async addGameRankings(game, gameUsers, leaderboard) {
+        if (this.gameService.isNewPlayerGame(game)) {
+            return null;
+        }
+        
         let leaderboardPlayers = leaderboard.map(x => x.player);
 
         let result = {

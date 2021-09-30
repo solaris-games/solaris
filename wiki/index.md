@@ -374,6 +374,7 @@ Additionally:
 - 1st place receives a galactic credit.
 - Players who are undefeated and active (not AFK) receive +1 to their completed statistic on their profile.
 - Players cannot have less than 0 rank in their profiles.
+- Rank is not awarded in New Player Games.
 
 
 ## Game Tick Events
