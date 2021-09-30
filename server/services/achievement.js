@@ -18,7 +18,7 @@ module.exports = class AchievementService {
         });
 
         if (user.guildId) {
-            user.guild = await this.guildService.listInfoByIds([user.guildId])[0];
+            user.guild = (await this.guildService.listInfoByIds([user.guildId]))[0];
         }
 
         return user;
