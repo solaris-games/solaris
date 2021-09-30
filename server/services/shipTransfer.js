@@ -78,11 +78,11 @@ module.exports = class ShipTransferService {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier || !carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        if (!star.ownedByPlayerId.equals(player._id)) {
+        if (!star || !star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 

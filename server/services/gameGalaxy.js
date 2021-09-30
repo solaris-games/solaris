@@ -30,6 +30,10 @@ module.exports = class GameGalaxyService {
         // Try loading the game for the user from the cache for historical ticks.
         let gameStateTick = await this.gameService.getGameStateTick(gameId);
 
+        if (gameStateTick == null) {
+            throw new ValidationError('Game not found.', 404);
+        }
+
         let isHistorical = tick != null && tick !== gameStateTick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
 
         let cached;

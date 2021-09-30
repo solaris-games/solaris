@@ -129,7 +129,11 @@ module.exports = class UserService extends EventEmitter {
             banned: 1
         });
 
-        return user.banned;
+        if (user) {
+            return user.banned;
+        }
+
+        return null;
     }
 
     async getUserIsAdmin(userId) {

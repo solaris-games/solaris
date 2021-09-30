@@ -336,7 +336,7 @@
         {
             "id": 7,
             "name": "War Machine",
-            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. This specialist retires when the star reaches 0 natural resources.",
+            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. When the star reaches 0 natural resources, the star dies and the specialist retires.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": true,
