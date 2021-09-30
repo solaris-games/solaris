@@ -36,6 +36,15 @@
 
     <loading-spinner :loading="!user"/>
 
+    <div class="row bg-secondary mb-2 p-2" v-if="user && user.guild">
+      <h5 class="mb-0">
+        <span>Guild: </span>
+        <router-link :to="{ name: 'guild-details', params: { guildId: user.guild._id }}">
+          <span>{{user.guild.name}} [{{user.guild.tag}}]</span>
+        </router-link>
+      </h5>
+    </div>
+
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
     <p class="text-center pt-3 mb-3">Detailed statistics are listed below.</p>
