@@ -543,6 +543,7 @@ module.exports = class StarService extends EventEmitter {
 
     listContestedStars(game) {
         return game.galaxy.stars
+            .filter(s => s.ownedByPlayerId)
             .map(s => {
                 // Calculate other players in orbit of the star
                 let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));
