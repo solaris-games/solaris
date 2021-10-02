@@ -299,16 +299,31 @@ module.exports = class EventService {
             playerIdAttackers: attackers.map(p => p._id),
             starId: star._id,
             starName: star.name,
-            combatResult,
             captureResult
         };
 
         for (let defender of defenders) {
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+            let defenderCombatResult = combatResult
+            defenderCombatResult.carriers = combatResult.carriers.map(c => {
+                if (c.specialist && c.specialist.name === 'Scrambler' && (defender._id === c.ownedByPlayerId.toString())) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+            let attackerCombatResult = combatResult
+            let bool = attackerCombatResult.star.specialist && attackerCombatResult.star.specialist.name === 'Scrambler'
+            attackerCombatResult.star = { ...combatResult.star, before: bool ? '???' : combatResult.star.before, after: bool ? '???' : combatResult.star.after }
+            attackerCombatResult.carriers = combatResult.carriers.map(c => {
+                if (c.specialist && c.specialist.name === 'Scrambler' && (attacker._id === c.ownedByPlayerId.toString())) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
     }
 
@@ -320,11 +335,25 @@ module.exports = class EventService {
         };
 
         for (let defender of defenders) {
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+            let defenderCombatResult = combatResult
+            defenderCombatResult.carriers = combatResult.carriers.map(c => {
+                if (c.specialist && c.specialist.name === 'Scrambler' && (defender._id === c.ownedByPlayerId.toString())) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+            let attackerCombatResult = combatResult
+            attackerCombatResult.carriers = combatResult.carriers.map(c => {
+                if (c.specialist && c.specialist.name === 'Scrambler' && (attacker._id === c.ownedByPlayerId.toString())) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
     }
 
