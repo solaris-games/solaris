@@ -36,13 +36,20 @@
 
     <loading-spinner :loading="!user"/>
 
-    <div class="row bg-secondary mb-2 p-2" v-if="user && user.guild">
-      <h5 class="mb-0">
+    <div class="row bg-secondary mb-2 p-2" v-if="user">
+      <h5 class="mb-0" v-if="user.guild">
         <span>Guild: </span>
         <router-link :to="{ name: 'guild-details', params: { guildId: user.guild._id }}">
           <span>{{user.guild.name}} [{{user.guild.tag}}]</span>
         </router-link>
       </h5>
+      <div v-if="!user.guild && myGuild && ownUserCanInvite()">
+        <h5 v-if="isUserInvited()">This player is already invited into your guild</h5>
+        <button class="btn btn-success" v-if="!isUserInvited()">
+          <i class="fas fa-user-plus"></i>
+          Invite
+        </button>
+      </div>
     </div>
 
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
@@ -449,6 +456,7 @@ import Achievements from '../components/game/player/Achievements'
 import PieChart from '../components/game/intel/PieChart.js'
 import PolarArea from '../components/game/intel/PolarAreaChart.js'
 import userService from '../services/api/user'
+import GuildApiService from '../services/api/guild'
 
 export default {
   components: {
@@ -467,6 +475,7 @@ export default {
       militaryChartData: null,
       infrastructureChartData: null,
       researchChartData: null,
+      myGuild: null,
       pieChartOptions: {
         legend: {
           display: false
@@ -516,6 +525,7 @@ export default {
 
       this.user = response.data
 
+      await this.loadMyGuild()
       this.loadGamesChart()
       this.loadMilitaryChart()
       this.loadInfrastructureChart()
@@ -526,6 +536,23 @@ export default {
     }
   },
   methods: {
+    ownUserCanInvite () {
+      return true; //TODO
+    },
+    isUserInvited () {
+      return this.myGuild && this.myGuild.invitees.find(inv => inv._id === this.user._id);
+    },
+    async loadMyGuild () {
+      try {
+        let response = await GuildApiService.detailMyGuild()
+
+        if (response.status === 200) {
+          this.myGuild = response.data
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     loadGamesChart () {
       this.gamesChartData = null
 
