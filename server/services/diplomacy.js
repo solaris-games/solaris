@@ -30,7 +30,7 @@ module.exports = class DiplomacyService {
     }
 
     getDiplomaticStatusToPlayer(game, playerIdA, playerIdB) {
-        if (playerIdA.equals(playerIdB)) return {
+        if (playerIdA.toString() === playerIdB.toString()) return {
             playerIdFrom: playerIdA,
             playerIdTo: playerIdB,
             statusFrom: 'allies',
