@@ -553,7 +553,8 @@ export default {
       }
     },
     ownUserCanInvite () {
-      return true; //TODO
+      const userId = this.$store.state.userId;
+      return this.myGuild && (this.myGuild.leader._id === userId || this.myGuild.officers.find(x => x._id === userId));
     },
     isUserInvited () {
       return this.myGuild && this.myGuild.invitees.find(inv => inv._id === this.user._id);
