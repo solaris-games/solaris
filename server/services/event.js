@@ -305,7 +305,7 @@ module.exports = class EventService {
         for (let defender of defenders) {
             let defenderCombatResult = combatResult
             defenderCombatResult.carriers = combatResult.carriers.map(c => {
-                if (c.specialist && c.specialist.name === 'Scrambler' && (defender._id === c.ownedByPlayerId.toString())) {
+                if (c.specialist && c.specialist.name === 'Scrambler' && (defender._id === c.ownedByPlayerId.toString()) && c.after !== 0) {
                     return { ...c, before: '???', after: '???' }
                 }
                 return c
@@ -315,10 +315,10 @@ module.exports = class EventService {
 
         for (let attacker of attackers) {
             let attackerCombatResult = combatResult
-            let bool = attackerCombatResult.star.specialist && attackerCombatResult.star.specialist.name === 'Scrambler'
+            let bool = attackerCombatResult.star.specialist && attackerCombatResult.star.specialist.name === 'Scrambler' && attackerCombatResult.star.after !== 0
             attackerCombatResult.star = { ...combatResult.star, before: bool ? '???' : combatResult.star.before, after: bool ? '???' : combatResult.star.after }
             attackerCombatResult.carriers = combatResult.carriers.map(c => {
-                if (c.specialist && c.specialist.name === 'Scrambler' && (attacker._id === c.ownedByPlayerId.toString())) {
+                if (c.specialist && c.specialist.name === 'Scrambler' && (attacker._id === c.ownedByPlayerId.toString()) && c.after !== 0) {
                     return { ...c, before: '???', after: '???' }
                 }
                 return c
