@@ -36,21 +36,22 @@
 
     <loading-spinner :loading="!user"/>
 
-    <div class="row bg-secondary mb-2 p-2" v-if="user">
-      <h5 class="mb-0" v-if="user.guild">
-        <span>Guild: </span>
+    <div class="row bg-secondary mb-2 p-2" v-if="user && user.guild">
+      <h5 class="mb-0">
+        <span>Member of: </span>
         <router-link :to="{ name: 'guild-details', params: { guildId: user.guild._id }}">
           <span>{{user.guild.name}} [{{user.guild.tag}}]</span>
         </router-link>
       </h5>
-      <div v-if="!user.guild && myGuild && ownUserCanInvite()">
-        <h5 v-if="isUserInvited()">This player is already invited into your guild</h5>
-        <div v-if="!isUserInvited()">
-          <button class="btn btn-success" @click="inviteUser">
-            <i class="fas fa-user-plus"></i>
-            Invite
-          </button>
-        </div>
+    </div>
+
+    <div class="row bg-secondary mb-2 p-2" v-if="user && !user.guild && myGuild && ownUserCanInvite()">
+      <h5 v-if="isUserInvited()">This player is already invited into your guild</h5>
+      <div v-if="!isUserInvited()">
+        <button class="btn btn-success" @click="inviteUser">
+          <i class="fas fa-user-plus"></i>
+          Invite
+        </button>
       </div>
     </div>
 
