@@ -473,6 +473,8 @@ export default {
   data () {
     return {
       user: null,
+      gamesChartData: null,
+      tradeChartData: null,
       achievements: null,
       militaryChartData: null,
       infrastructureChartData: null,
