@@ -45,10 +45,12 @@
       </h5>
       <div v-if="!user.guild && myGuild && ownUserCanInvite()">
         <h5 v-if="isUserInvited()">This player is already invited into your guild</h5>
-        <button class="btn btn-success" v-if="!isUserInvited()">
-          <i class="fas fa-user-plus"></i>
-          Invite
-        </button>
+        <div v-if="!isUserInvited()">
+          <button class="btn btn-success" @click="inviteUser">
+            <i class="fas fa-user-plus"></i>
+            Invite
+          </button>
+        </div>
       </div>
     </div>
 
@@ -536,6 +538,18 @@ export default {
     }
   },
   methods: {
+    async inviteUser () {
+      try {
+        const response = await GuildApiService.invite(this.myGuild._id, this.user.username);
+
+        if (response.status === 200) {
+          this.$toasted.show(`You invited ${this.user.username} to your guild.`, { type: 'success' })
+        }
+        await this.loadMyGuild();
+      } catch (err) {
+        console.log(err)
+      }
+    },
     ownUserCanInvite () {
       return true; //TODO
     },
@@ -544,7 +558,7 @@ export default {
     },
     async loadMyGuild () {
       try {
-        let response = await GuildApiService.detailMyGuild()
+        const response = await GuildApiService.detailMyGuild()
 
         if (response.status === 200) {
           this.myGuild = response.data
