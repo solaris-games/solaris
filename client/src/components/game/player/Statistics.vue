@@ -11,49 +11,49 @@
       <tbody>
           <tr>
               <td>Stars</td>
-              <td class="text-right">{{player.stats.totalStars}}</td>
+              <td class="text-right">{{player.stats.totalStars ?? 0}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': (player.stats.totalStars ?? 0) > userPlayer.stats.totalStars,
                           'text-success': (player.stats.totalStars ?? 0) < userPlayer.stats.totalStars}">{{userPlayer.stats.totalStars}}</td>
           </tr>
           <tr v-if="isConquestHomeStars">
               <td>Capitals</td>
-              <td class="text-right">{{player.stats.totalHomeStars}}</td>
+              <td class="text-right">{{player.stats.totalHomeStars ?? 0}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': (player.stats.totalHomeStars ?? 0) > userPlayer.stats.totalHomeStars,
                           'text-success': (player.stats.totalHomeStars ?? 0) < userPlayer.stats.totalHomeStars}">{{userPlayer.stats.totalHomeStars}}</td>
           </tr>
           <tr>
               <td>Carriers</td>
-              <td class="text-right">{{player.stats.totalCarriers}}</td>
+              <td class="text-right">{{player.stats.totalCarriers ?? 0}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': (player.stats.totalCarriers ?? 0) > userPlayer.stats.totalCarriers,
                           'text-success': (player.stats.totalCarriers ?? 0) < userPlayer.stats.totalCarriers}">{{userPlayer.stats.totalCarriers}}</td>
           </tr>
           <tr v-if="isSpecialistsEnabled">
               <td>Specialists</td>
-              <td class="text-right">{{player.stats.totalSpecialists}}</td>
+              <td class="text-right">{{player.stats.totalSpecialists ?? 0}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': (player.stats.totalSpecialists ?? 0) > userPlayer.stats.totalSpecialists,
                           'text-success': (player.stats.totalSpecialists ?? 0) < userPlayer.stats.totalSpecialists}">{{userPlayer.stats.totalSpecialists}}</td>
           </tr>
           <tr>
               <td>Ships</td>
-              <td class="text-right">{{player.stats.totalShips}}</td>
+              <td class="text-right">{{player.stats.totalShips ?? 0}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': (player.stats.totalShips ?? 0) > userPlayer.stats.totalShips,
                           'text-success': (player.stats.totalShips ?? 0) < userPlayer.stats.totalShips}">{{userPlayer.stats.totalShips}}</td>
           </tr>
           <tr>
               <td>New Ships</td>
-              <td class="text-right">{{player.stats.newShips}}</td>
+              <td class="text-right">{{player.stats.newShips ?? 0}}</td>
               <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': (player.stats.newShips ?? 0) > userPlayer.stats.newShips,
                           'text-success': (player.stats.newShips ?? 0) < userPlayer.stats.newShips}">{{userPlayer.stats.newShips}}</td>
           </tr>
           <tr>
             <td>Cycle Income</td>
-            <td class="text-right">${{playerIncome}}</td>
+            <td class="text-right">${{playerIncome ?? 0}}</td>
             <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
               :class="{'text-danger': (playerIncome ?? 0) > userPlayerIncome,
                         'text-success': (playerIncome ?? 0) < userPlayerIncome}">${{userPlayerIncome}}</td>
