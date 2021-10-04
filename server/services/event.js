@@ -315,7 +315,7 @@ module.exports = class EventService {
 
         for (let attacker of attackers) {
             let attackerCombatResult = combatResult
-            let bool = attackerCombatResult.star.specialist && attackerCombatResult.star.specialist.name === 'Scrambler' && attackerCombatResult.star.after !== 0
+            let bool = attackerCombatResult.star.specialist && attackerCombatResult.star.specialist.name === 'Scrambler' && (captureResult !== null)
             attackerCombatResult.star = { ...combatResult.star, before: bool ? '???' : combatResult.star.before, after: bool ? '???' : combatResult.star.after }
             attackerCombatResult.carriers = combatResult.carriers.map(c => {
                 if (c.specialist && c.specialist.name === 'Scrambler' && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
