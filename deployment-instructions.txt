@@ -1,36 +1,11 @@
-db.games.updateMany({}, {
-    $set: {
-        'galaxy.players.$[].diplomacy': {
-            allies: []
-        }
-    }
-});
+db.games.find({}).forEach(function(game) {
+    game.settings.gameTime.afk = {
+        lastSeenTimeout: 2,
+        cycleTimeout: 3,
+        turnTimeout: game.settings.gameTime.missedTurnLimit
+    };
 
-db.games.updateMany({}, {
-    $set: {
-        'settings.player.alliances': 'disabled'
-    }
-});
+    delete game.settings.gameTime.missedTurnLimit;
 
-db.gameevents.find({
-    type: 'playerCombatStar',
-    'data.playerIdOwner': { $eq: null }
-}).forEach(function(gameEvent) {
-    gameEvent.data.playerIdOwner = gameEvent.data.playerIdDefender;
-    gameEvent.data.playerIdDefenders = [gameEvent.data.playerIdDefender];
-
-    delete gameEvent.data.playerIdDefender;
-
-    db.gameevents.save(gameEvent);
-});
-
-db.gameevents.find({
-    type: 'playerCombatCarrier',
-    'data.playerIdDefender': { $ne: null }
-}).forEach(function(gameEvent) {
-    gameEvent.data.playerIdDefenders = [gameEvent.data.playerIdDefender];
-
-    delete gameEvent.data.playerIdDefender;
-
-    db.gameevents.save(gameEvent);
+    db.games.save(game);
 });

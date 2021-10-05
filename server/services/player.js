@@ -700,20 +700,20 @@ module.exports = class PlayerService extends EventEmitter {
 
     isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
-        // 1. They haven't been seen for 2 days.
+        // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
-        // 3. They missed 3 cycles in a real time game (minimum of 12 hours)
-        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+        // 3. They missed X cycles in a real time game (minimum of 12 hours)
+        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
 
         if (lastSeenMoreThanXDaysAgo) {
             return true;
         }
 
         if (isTurnBasedGame) {
-            return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
+            return player.missedTurns >= game.settings.gameTime.afk.turnTimeout;
         }
 
-        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * 3;
+        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
         let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
         let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() < moment().utc().subtract(secondsToAfk, 'seconds');
 
