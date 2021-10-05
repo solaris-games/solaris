@@ -277,7 +277,7 @@ module.exports = class WaypointService {
         }
 
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
         let tickDistance = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed);
@@ -489,32 +489,51 @@ module.exports = class WaypointService {
         }
     }
 
-    sanitiseDarkModeCarrierWaypoints(game, carrier) {
-        // If in dark mode then we need to verify that waypoints are still valid.
+    sanitiseAllCarrierWaypointsByScanningRange(game) {
+        const scanningRanges = game.galaxy.players
+            .map(p => {
+                return {
+                    player: p,
+                    stars: this.starService.listStarsWithScanningRangeByPlayer(game, p._id)
+                }
+            });
+
+        game.galaxy.carriers
+            .filter(c => c.waypoints.length)
+            .map(c => {
+                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId));
+
+                return {
+                    carrier: c,
+                    owner: scanningRangePlayer.player,
+                    ownerScannedStars: scanningRangePlayer.stars
+                }
+            })
+            .forEach(x => this.sanitiseCarrierWaypointsByScanningRange(game, x.carrier, x.owner, x.ownerScannedStars));
+    }
+
+    sanitiseCarrierWaypointsByScanningRange(game, carrier, owner, ownerScannedStars) {
+        // Verify that waypoints are still valid.
         // For example, if a star is captured then it may no longer be in scanning range
         // so any waypoints to it should be removed unless already in transit.
-        const isDarkMode = this.gameService.isDarkMode(game);
 
-        if (!isDarkMode) {
+        if (!carrier.waypoints.length) {
             return;
         }
 
-        let player = this.playerService.getById(game, carrier.ownedByPlayerId);
         let startIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
 
         for (let i = startIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];
-            let destination = this.starService.getById(game, waypoint.destination);
 
-            // If the destination is not within scanning range of the player, remove it
-            // and all subsequent waypoints.
-            let inRange = this.starService.isStarInScanningRangeOfPlayer(game, destination, player);
+            // If the destination is not within scanning range of the player, remove it and all subsequent waypoints.
+            let inRange = ownerScannedStars.find(s => s._id.equals(waypoint.destination)) != null;
 
             if (!inRange) {
                 carrier.waypoints.splice(i);
 
                 if (carrier.waypointsLooped) {
-                    carrier.waypointsLooped = this.canLoop(game, player, carrier);
+                    carrier.waypointsLooped = this.canLoop(game, owner, carrier);
                 }
 
                 break;

@@ -43,7 +43,7 @@ module.exports = class DatabaseRepository {
     }
 
     async count(query) {
-        return await this.model.count(query).exec();
+        return await this.model.countDocuments(query).exec();
     }
 
     async countAll() {

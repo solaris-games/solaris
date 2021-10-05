@@ -246,7 +246,7 @@ module.exports = class StarService extends EventEmitter {
         });
     }
 
-    canTravelAtWarpSpeed(player, carrier, sourceStar, destinationStar) {
+    canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar) {
         // Double check for destroyed stars.
         if (sourceStar == null || destinationStar == null) {
             return false;
@@ -254,8 +254,12 @@ module.exports = class StarService extends EventEmitter {
 
         // If both stars have warp gates and they are both owned by players...
         if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
+            // If both stars are owned by the player or by allies then carriers can always move at warp.
+            let sourceAllied = sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayerId) || this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, carrier.ownedByPlayerId)
+            let desinationAllied = destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId) || this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, carrier.ownedByPlayerId)
+
             // If both stars are owned by the player then carriers can always move at warp.
-            if (destinationStar.ownedByPlayerId.equals(player._id) && sourceStar.ownedByPlayerId.equals(player._id)) {
+            if (sourceAllied && desinationAllied) {
                 return true;
             }
 
@@ -274,7 +278,7 @@ module.exports = class StarService extends EventEmitter {
 
             // If either star has a warp scrambler present then carriers cannot move at warp.
             // Note that we only need to check for scramblers on stars that do not belong to the player.
-            if (!sourceStar.ownedByPlayerId.equals(player._id) && sourceStar.specialistId) {
+            if (!sourceAllied && sourceStar.specialistId) {
                 let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
 
                 if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
@@ -282,7 +286,7 @@ module.exports = class StarService extends EventEmitter {
                 }
             }
 
-            if (!destinationStar.ownedByPlayerId.equals(player._id) && destinationStar.specialistId) {
+            if (!desinationAllied && destinationStar.specialistId) {
                 let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
 
                 if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
@@ -539,6 +543,7 @@ module.exports = class StarService extends EventEmitter {
 
     listContestedStars(game) {
         return game.galaxy.stars
+            .filter(s => s.ownedByPlayerId)
             .map(s => {
                 // Calculate other players in orbit of the star
                 let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(s._id));

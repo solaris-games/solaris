@@ -30,6 +30,14 @@ module.exports = class DiplomacyService {
     }
 
     getDiplomaticStatusToPlayer(game, playerIdA, playerIdB) {
+        if (playerIdA.toString() === playerIdB.toString()) return {
+            playerIdFrom: playerIdA,
+            playerIdTo: playerIdB,
+            statusFrom: 'allies',
+            statusTo: 'allies',
+            actualStatus: 'allies'
+        }
+
         let playerA = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString());
         let playerB = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString());
 
