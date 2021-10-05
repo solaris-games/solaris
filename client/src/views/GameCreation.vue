@@ -86,7 +86,7 @@
 
       <form-error-list v-bind:errors="errors"/>
 
-      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
       <loading-spinner :loading="isCreatingGame"/>
 
@@ -545,6 +545,8 @@
           </option>
         </select>
       </div>
+      
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
     </form>
   </view-container>
