@@ -18,6 +18,9 @@ import UserApiService from '../../../services/api/user'
 import * as moment from 'moment'
 
 export default {
+    props: {
+        maxLength: Number
+    },
   data () {
     return {
         donations: []
@@ -39,15 +42,19 @@ export default {
           return moment(date).utc().fromNow()
       },
       getFriendlyNote(note) {
-          if (note == null) {
-              return null
-          }
+        if (note == null) {
+            return null
+        }
 
-          if (note.length > 75) {
-              return '"' + note.substring(0, 75) + '..."'
-          }
+        if (this.maxLength != null) {
+          let max = this.maxLength
 
-          return '"' + note + '"'
+          if (note.length > max) {
+              return '"' + note.substring(0, max) + '..."'
+          }
+        }
+
+        return '"' + note + '"'
       }
   }
 }
