@@ -305,7 +305,7 @@ module.exports = class EventService {
         for (let defender of defenders) {
             let defenderCombatResult = combatResult
             defenderCombatResult.carriers = combatResult.carriers.map(c => {
-                if (c.specialist?.modifiers?.special?.hideCarrierShips && !defender._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                if (checkHideCarrierShips(c) && !defender._id.equals(c.ownedByPlayerId) && c.after !== 0) {
                     return { ...c, before: '???', after: '???' }
                 }
                 return c
@@ -315,10 +315,10 @@ module.exports = class EventService {
 
         for (let attacker of attackers) {
             let attackerCombatResult = combatResult
-            let bool = attackerCombatResult.star.specialist?.modifiers?.special?.hideCarrierShips && (captureResult !== null)
+            let bool = checkHideCarrierShips(attackerCombatResult.star) && (captureResult !== null)
             attackerCombatResult.star = { ...combatResult.star, before: bool ? '???' : combatResult.star.before, after: bool ? '???' : combatResult.star.after }
             attackerCombatResult.carriers = combatResult.carriers.map(c => {
-                if (c.specialist?.modifiers?.special?.hideCarrierShips && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                if (checkHideCarrierShips(c) && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
                     return { ...c, before: '???', after: '???' }
                 }
                 return c
@@ -337,7 +337,7 @@ module.exports = class EventService {
         for (let defender of defenders) {
             let defenderCombatResult = combatResult
             defenderCombatResult.carriers = combatResult.carriers.map(c => {
-                if (c.specialist?.modifiers?.special?.hideCarrierShips && !defender._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                if (checkHideCarrierShips(c) && !defender._id.equals(c.ownedByPlayerId) && c.after !== 0) {
                     return { ...c, before: '???', after: '???' }
                 }
                 return c
@@ -348,13 +348,17 @@ module.exports = class EventService {
         for (let attacker of attackers) {
             let attackerCombatResult = combatResult
             attackerCombatResult.carriers = combatResult.carriers.map(c => {
-                if (c.specialist?.modifiers?.special?.hideCarrierShips && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                if (checkHideCarrierShips(c) && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
                     return { ...c, before: '???', after: '???' }
                 }
                 return c
             })
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
+    }
+
+    checkHideShips(object) {
+        return object.specialist?.modifiers?.hideCarrierShips
     }
 
     async createResearchCompleteEvent(gameId, gameTick, playerId, technologyKey, technologyLevel, technologyKeyNext, technologyLevelNext) {
