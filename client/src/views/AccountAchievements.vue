@@ -36,24 +36,7 @@
 
     <loading-spinner :loading="!user"/>
 
-    <div class="row bg-secondary mb-2 p-2" v-if="user && user.guild">
-      <h5 class="mb-0">
-        <span>Member of: </span>
-        <router-link :to="{ name: 'guild-details', params: { guildId: user.guild._id }}">
-          <span>{{user.guild.name}} [{{user.guild.tag}}]</span>
-        </router-link>
-      </h5>
-    </div>
-
-    <div class="row bg-secondary mb-2 p-2" v-if="user && !user.guild && myGuild && ownUserCanInvite()">
-      <h5 v-if="isUserInvited()">This player is already invited into your guild</h5>
-      <div v-if="!isUserInvited()">
-        <button class="btn btn-success" @click="inviteUser">
-          <i class="fas fa-user-plus"></i>
-          Invite
-        </button>
-      </div>
-    </div>
+    <user-guild-info :user="user" />
 
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
@@ -459,7 +442,7 @@ import Achievements from '../components/game/player/Achievements'
 import PieChart from '../components/game/intel/PieChart.js'
 import PolarArea from '../components/game/intel/PolarAreaChart.js'
 import userService from '../services/api/user'
-import GuildApiService from '../services/api/guild'
+import UserGuildInfoVue from './guild/UserGuildInfo'
 
 export default {
   components: {
@@ -469,7 +452,8 @@ export default {
     'view-subtitle': ViewSubtitle,
     'achievements': Achievements,
     'pie-chart': PieChart,
-    'polar-area-chart': PolarArea
+    'polar-area-chart': PolarArea,
+    'user-guild-info': UserGuildInfoVue
   },
   data () {
     return {
@@ -480,7 +464,6 @@ export default {
       militaryChartData: null,
       infrastructureChartData: null,
       researchChartData: null,
-      myGuild: null,
       pieChartOptions: {
         legend: {
           display: false
@@ -530,7 +513,6 @@ export default {
 
       this.user = response.data
 
-      await this.loadMyGuild()
       this.loadGamesChart()
       this.loadMilitaryChart()
       this.loadInfrastructureChart()
@@ -541,36 +523,6 @@ export default {
     }
   },
   methods: {
-    async inviteUser () {
-      try {
-        const response = await GuildApiService.invite(this.myGuild._id, this.user.username);
-
-        if (response.status === 200) {
-          this.$toasted.show(`You invited ${this.user.username} to your guild.`, { type: 'success' })
-        }
-        await this.loadMyGuild();
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    ownUserCanInvite () {
-      const userId = this.$store.state.userId;
-      return this.myGuild && (this.myGuild.leader._id === userId || this.myGuild.officers.find(x => x._id === userId));
-    },
-    isUserInvited () {
-      return this.myGuild && this.myGuild.invitees.find(inv => inv._id === this.user._id);
-    },
-    async loadMyGuild () {
-      try {
-        const response = await GuildApiService.detailMyGuild()
-
-        if (response.status === 200) {
-          this.myGuild = response.data
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
     loadGamesChart () {
       this.gamesChartData = null
 
