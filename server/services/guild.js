@@ -50,6 +50,15 @@ module.exports = class GuildService {
         });
     }
 
+    async getInfoById(guildId) {
+        return await this.guildRepo.findOne({
+            _id: guildId
+        }, {
+            name: 1,
+            tag: 1
+        });
+    }
+
     async listInvitations(userId) {
         let guilds = await this.guildRepo.find({
             invitees: {
