@@ -87,6 +87,11 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 3600,
-    "startDelay": 360
+    "startDelay": 360,
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
   }
 }

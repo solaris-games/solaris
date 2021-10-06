@@ -36,6 +36,8 @@
 
     <loading-spinner :loading="!user"/>
 
+    <user-guild-info :user="user" />
+
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
     <p class="text-center pt-3 mb-3">Detailed statistics are listed below.</p>
@@ -440,6 +442,7 @@ import Achievements from '../components/game/player/Achievements'
 import PieChart from '../components/game/intel/PieChart.js'
 import PolarArea from '../components/game/intel/PolarAreaChart.js'
 import userService from '../services/api/user'
+import UserGuildInfoVue from './guild/UserGuildInfo'
 
 export default {
   components: {
@@ -449,11 +452,14 @@ export default {
     'view-subtitle': ViewSubtitle,
     'achievements': Achievements,
     'pie-chart': PieChart,
-    'polar-area-chart': PolarArea
+    'polar-area-chart': PolarArea,
+    'user-guild-info': UserGuildInfoVue
   },
   data () {
     return {
       user: null,
+      gamesChartData: null,
+      tradeChartData: null,
       achievements: null,
       militaryChartData: null,
       infrastructureChartData: null,

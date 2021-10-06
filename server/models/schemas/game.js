@@ -122,7 +122,11 @@ const schema = new Schema({
 			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, enum: [1, 4, 6, 8, 12, 24], default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
-			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 }
+			afk: {
+				lastSeenTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 6, 7], default: 2}, // Time in days, real time and turn based
+				cycleTimeout: { type: Types.Number, required: true, enum: [3, 4, 5, 6, 7, 8, 9, 10], default: 3}, // Real time games' production cycle limit
+				turnTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 },	// Turn based games' missed turn limit
+			}
 		}
     },
     galaxy: {

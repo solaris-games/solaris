@@ -90,7 +90,7 @@ module.exports = (config, io) => {
     const specialistService = new SpecialistService();
     const diplomacyService = new DiplomacyService(gameRepository);
     const conversationService = new ConversationService(gameRepository, eventRepository);
-    const achievementService = new AchievementService(userRepository);
+    const achievementService = new AchievementService(userRepository, guildService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);

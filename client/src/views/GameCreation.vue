@@ -86,7 +86,7 @@
 
       <form-error-list v-bind:errors="errors"/>
 
-      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
       <loading-spinner :loading="isCreatingGame"/>
 
@@ -137,10 +137,28 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit</label>
+        <select class="form-control" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.afk.lastSeenTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
+        <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit</label>
+        <select class="form-control" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.afk.cycleTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
-        <label for="missedTurnLimit" class="col-form-label">Missed Turn Limit</label>
-        <select class="form-control" id="missedTurnLimit" v-model="settings.gameTime.missedTurnLimit" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.missedTurnLimit" v-bind:key="opt.value" v-bind:value="opt.value">
+        <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit</label>
+        <select class="form-control" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.afk.turnTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
@@ -545,6 +563,8 @@
           </option>
         </select>
       </div>
+      
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
     </form>
   </view-container>

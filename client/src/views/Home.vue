@@ -18,9 +18,11 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-3">
       <img :src="require('../assets/screenshots/game1.png')" class="img-fluid w-100"/>
     </div>
+
+    <recent-donations :maxLength="null" />
   </view-container>
 </template>
 
@@ -31,13 +33,15 @@ import AccountLoginVue from './AccountLogin'
 import ApiAuthService from '../services/api/auth'
 import router from '../router'
 import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import RecentDonationsVue from '../components/game/donate/RecentDonations.vue'
 
 export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'account-login': AccountLoginVue,
-    'loading-spinner': LoadingSpinnerVue
+    'loading-spinner': LoadingSpinnerVue,
+    'recent-donations': RecentDonationsVue
   },
   data () {
     return {
