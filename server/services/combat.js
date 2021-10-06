@@ -339,7 +339,7 @@ module.exports = class CombatService extends EventEmitter {
 
     _distributeDamage(combatResult, damageObjects, shipsToKill) {
         while (shipsToKill) {
-            let objectsToDeduct = damageObjects.filter(c => c.ships).sort(() => Math.random() < 0.5 ? 1 : -1);
+            let objectsToDeduct = damageObjects.filter(c => c.ships);
 
             // Try to distribute damage evenly across all objects, minimum of 1.
             let shipsPerObject = Math.max(1, Math.floor(shipsToKill / objectsToDeduct.length));
