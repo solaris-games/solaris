@@ -587,10 +587,9 @@ module.exports = class LeaderboardService {
     }
 
     async addGameRankings(game, gameUsers, leaderboard) {
-        if (this.gameService.isNewPlayerGame(game)) {
-            return null;
-        }
-        
+        // Official games are either not user created or featured (featured games can be user created)
+        const isRankedGame = !this.gameService.isNewPlayerGame(game) && (game.settings.general.type != 'custom' || game.settings.general.featured);
+
         let leaderboardPlayers = leaderboard.map(x => x.player);
 
         let result = {
@@ -616,10 +615,7 @@ module.exports = class LeaderboardService {
             // 3rd place will receive 0 rank (4 / 2 - 2)
             // 4th place will receive -1 rank (4 / 2 - 3)
 
-            // Official games are either not user created or featured (featured games can be user created)
-            let isOfficialGame = game.settings.general.type != 'custom' || game.settings.general.featured;
-
-            if (isOfficialGame) {
+            if (isRankedGame) {
                 let rankIncrease = 0;
 
                 if (i == 0) {

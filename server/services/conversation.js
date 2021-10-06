@@ -302,7 +302,7 @@ module.exports = class ConversationService extends EventEmitter {
     }
 
     getUnreadCount(game, playerId) {
-        return game.conversations
+        return (game.conversations || [])
             .filter(c => c.participants.find(p => p.equals(playerId)))
             .reduce((sum, c) => {
                 return sum + c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length

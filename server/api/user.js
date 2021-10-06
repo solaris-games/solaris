@@ -282,7 +282,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/donations/recent', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/donations/recent', async (req, res, next) => {
         try {
             let result = await container.donateService.listRecentDonations(3);
 

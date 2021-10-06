@@ -451,8 +451,9 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _sanitiseDarkModeCarrierWaypoints(game) {
-        game.galaxy.carriers.forEach(c => 
-            this.waypointService.sanitiseDarkModeCarrierWaypoints(game, c));
+        if (this.gameService.isDarkMode(game)) {
+            this.waypointService.sanitiseAllCarrierWaypointsByScanningRange(game);
+        }
     }
 
     async _endOfGalacticCycleCheck(game) {

@@ -52,45 +52,27 @@ module.exports = class GameListService {
             'settings.gametime.gameType': 1,
             'settings.gameTime': 1,
             'settings.galaxy.productionTicks': 1,
-            'galaxy.players': 1,
-            conversations: 1,
+            'galaxy.players._id': 1,
+            'galaxy.players.userId': 1,
+            'galaxy.players.ready': 1,
+            'galaxy.players.defeated': 1,
+            'galaxy.players.afk': 1,
+            'conversations.participants': 1,
+            'conversations.messages.readBy': 1,
             state: 1
         }, {
             'state.startDate': -1 // Sort start date descending (most recent started games appear first)
         });
 
         return await Promise.all(games.map(async game => {
-            const player = game.galaxy.players.find(p => p.userId === userId.toString());
+            game.userNotifications = await this.getUserPlayerNotifications(game, userId, true, true, true);
 
-            let unreadConversations = null,
-                unreadEvents = null,
-                totalUnread = null,
-                turnWaiting = null;
-
-            // Note: The player may have gone afk and been replaced by another player so we need to
-            // double check that the player is actually in the game to retrieve conversation counts etc.
-            if (player) {
-                unreadConversations = this.conversationService.getUnreadCount(game, player._id);
-                unreadEvents = await this.eventService.getUnreadCount(game, player._id);
-                turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
-
-                totalUnread = unreadConversations + unreadEvents;
-            }
-
-            return {
-                _id: game._id,
-                settings: game.settings,
-                state: game.state,
-                unread: totalUnread,
-                turnWaiting,
-                defeated: player?.defeated,
-                afk: player?.afk
-            }
-        }))
+            return game;
+        }));
     }
 
     async listCompletedGames(userId) {
-        return await this.gameRepo.find({
+        const games = await this.gameRepo.find({
             'state.endDate': { $ne: null }, // Game is finished
             $or: [
                 // User was active in the game or has been afk'd
@@ -99,11 +81,50 @@ module.exports = class GameListService {
             ]
         }, {
             'settings.general.name': 1,
-            'settings.general.playerLimit': 1,
+            'galaxy.players._id': 1,
+            'galaxy.players.userId': 1,
+            'galaxy.players.defeated': 1,
+            'galaxy.players.afk': 1,
+            'conversations.participants': 1,
+            'conversations.messages.readBy': 1,
             state: 1
         }, {
             'state.endDate': -1 // Sort end date descending (most recent ended games appear first)
         });
+
+        return await Promise.all(games.map(async game => {
+            game.userNotifications = await this.getUserPlayerNotifications(game, userId, false, false, true);
+
+            return game;
+        }));
+    }
+
+    async getUserPlayerNotifications(game, userId, includeTurnWaiting = true, includeUnreadEvents = true, includeUnreadConversastions = true) {
+        const player = game.galaxy.players.find(p => p.userId === userId.toString());
+
+        let unreadConversations = null,
+            unreadEvents = null,
+            totalUnread = null,
+            turnWaiting = null;
+
+        // Note: The player may have gone afk and been replaced by another player so we need to
+        // double check that the player is actually in the game to retrieve conversation counts etc.
+        if (player) {
+            if (includeUnreadConversastions) unreadConversations = this.conversationService.getUnreadCount(game, player._id);
+            if (includeUnreadEvents) unreadEvents = await this.eventService.getUnreadCount(game, player._id);
+            if (includeTurnWaiting) turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
+
+            totalUnread = (unreadConversations || 0) + (unreadEvents || 0);
+        }
+
+        return {
+            unreadConversations,
+            unreadEvents,
+            unread: totalUnread,
+            turnWaiting,
+            defeated: player?.defeated,
+            afk: player?.afk
+        };
     }
 
     async listOldCompletedGames(months = 1, cleaned = null) {

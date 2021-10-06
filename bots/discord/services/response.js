@@ -199,7 +199,7 @@ module.exports = class ReponseService {
             response = response.addFields(
                 { name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true },//next line
                 { name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true },
-                { name: "Missed Turn Limit", value: game.settings.gameTime.missedTurnLimit, inline: true },
+                { name: "AFK Missed Turn Limit", value: game.settings.gameTime.afk.turnTimeout, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true }//next line
             );
         }
