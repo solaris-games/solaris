@@ -55,6 +55,8 @@ module.exports = class GameListService {
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1,
             'galaxy.players.ready': 1,
+            'galaxy.players.defeated': 1,
+            'galaxy.players.afk': 1,
             'conversations.participants': 1,
             'conversations.messages.readBy': 1,
             state: 1
@@ -81,6 +83,8 @@ module.exports = class GameListService {
             'settings.general.name': 1,
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1,
+            'galaxy.players.defeated': 1,
+            'galaxy.players.afk': 1,
             'conversations.participants': 1,
             'conversations.messages.readBy': 1,
             state: 1
