@@ -59,7 +59,7 @@
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
     "tradeScanning": "all",
-    "alliances": "disabled"
+    "alliances": "enabled"
   },
   "technology": {
     "startingTechnologyLevel": {

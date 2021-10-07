@@ -9,3 +9,26 @@ db.games.find({}).forEach(function(game) {
 
     db.games.save(game);
 });
+
+db.games.updateMany({
+    'settings.general.type': {
+        $in: [
+            'standard_rt',
+            'standard_tb',
+            'standard_dark_rt',
+            'standard_dark_tb',
+            'new_player_rt',
+            'new_player_tb',
+            '32_player_rt',
+            'special_ultraDark',
+            'special_orbital',
+            'special_battleRoyale',
+            'special_homeStar',
+            'special_anonymous'
+        ]
+    }
+}, {
+    $set: {
+        'settings.player.alliances': 'enabled'
+    }
+});
