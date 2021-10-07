@@ -299,16 +299,31 @@ module.exports = class EventService {
             playerIdAttackers: attackers.map(p => p._id),
             starId: star._id,
             starName: star.name,
-            combatResult,
             captureResult
         };
 
         for (let defender of defenders) {
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+            let defenderCombatResult = combatResult
+            defenderCombatResult.carriers = combatResult.carriers.map(c => {
+                if (checkHideCarrierShips(c) && !defender._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+            let attackerCombatResult = combatResult
+            let bool = checkHideCarrierShips(attackerCombatResult.star) && (captureResult !== null)
+            attackerCombatResult.star = { ...combatResult.star, before: bool ? '???' : combatResult.star.before, after: bool ? '???' : combatResult.star.after }
+            attackerCombatResult.carriers = combatResult.carriers.map(c => {
+                if (checkHideCarrierShips(c) && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
     }
 
@@ -320,12 +335,30 @@ module.exports = class EventService {
         };
 
         for (let defender of defenders) {
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+            let defenderCombatResult = combatResult
+            defenderCombatResult.carriers = combatResult.carriers.map(c => {
+                if (checkHideCarrierShips(c) && !defender._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+            let attackerCombatResult = combatResult
+            attackerCombatResult.carriers = combatResult.carriers.map(c => {
+                if (checkHideCarrierShips(c) && !attacker._id.equals(c.ownedByPlayerId) && c.after !== 0) {
+                    return { ...c, before: '???', after: '???' }
+                }
+                return c
+            })
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
+    }
+
+    checkHideShips(object) {
+        return object.specialist?.modifiers?.hideCarrierShips
     }
 
     async createResearchCompleteEvent(gameId, gameTick, playerId, technologyKey, technologyLevel, technologyKeyNext, technologyLevelNext) {
