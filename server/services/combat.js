@@ -236,6 +236,7 @@ module.exports = class CombatService extends EventEmitter {
             // Do the same with the star.
             combatResult.star = {
                 _id: star._id,
+                ownedByPlayerId: star.ownedByPlayerId,
                 specialist,
                 before: Math.floor(star.shipsActual),
                 lost: 0,

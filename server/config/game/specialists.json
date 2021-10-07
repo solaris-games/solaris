@@ -112,7 +112,7 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "hideCarrierShips": true
+                    "hideShips": true
                 }
             }
         },
@@ -359,7 +359,7 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "hideStarShips": true
+                    "hideShips": true
                 }
             }
         },

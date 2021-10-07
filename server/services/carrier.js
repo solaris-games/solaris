@@ -347,9 +347,9 @@ module.exports = class CarrierService {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            // If the carrier has a hideCarrierShips spec and is not owned by the given player
+            // If the carrier has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideCarrierShips
+            if (specialist.modifiers.special && specialist.modifiers.special.hideShips
                 && carrier.ownedByPlayerId.toString() !== player._id.toString()) {
                 return false;
             }

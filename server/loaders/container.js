@@ -125,7 +125,7 @@ module.exports = (config, io) => {
     const donateService = new DonateService(cacheService);
 
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService);
+        ledgerService, conversationService, combatService, specialistService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService);
     const gameCreateService = new GameCreateService(GameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService);
