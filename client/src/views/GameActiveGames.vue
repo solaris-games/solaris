@@ -160,7 +160,7 @@ export default {
         let response = await gameService.listActiveGames()
 
         this.activeGames = response.data
-          .sort((a, b) => (a.defeated - a.afk) - (b.defeated - b.afk))
+          .sort((a, b) => (a.userNotifications.defeated - a.userNotifications.afk) - (b.userNotifications.defeated - b.userNotifications.afk))
       } catch (err) {
         console.error(err)
       }
@@ -213,7 +213,7 @@ export default {
         return this.activeGames
       }
 
-      return this.activeGames.filter(g => !g.defeated)
+      return this.activeGames.filter(g => !g.userNotifications.defeated)
     }
   }
 }
