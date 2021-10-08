@@ -415,4 +415,24 @@ module.exports = class UserService extends EventEmitter {
         return userCredits?.credits;
     }
 
+    async setCredits(userId, credits) {
+        credits = Math.max(credits, 0);
+        
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            credits
+        });
+    }
+
+    async incrementCredits(userId, credits) {
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            $inc: {
+                credits: credits
+            }
+        });
+    }
+
 };

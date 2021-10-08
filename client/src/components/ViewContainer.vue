@@ -21,7 +21,7 @@
                 </a>
             </div>
             <div class="col-auto">
-                <a href="https://www.redbubble.com/shop/ap/82527983" target="_blank" class="text-info"><i class="fas fa-tshirt mr-1"></i>Shop</a>
+                <a href="https://www.redbubble.com/shop/ap/82527983" target="_blank" class="text-info"><i class="fas fa-tshirt mr-1"></i>Swag</a>
                 |
                 <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="text-warning"><i class="fas fa-coffee mr-1"></i>Donate</a>
             </div>

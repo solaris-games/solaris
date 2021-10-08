@@ -59,6 +59,7 @@ const RecaptchaService = require('../services/recaptcha');
 const RatingService = require('../services/rating');
 const DonateService = require('../services/donate');
 const DiplomacyService = require('../services/diplomacy');
+const AvatarService = require('../services/avatar');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -88,6 +89,7 @@ module.exports = (config, io) => {
     const cacheService = new CacheService();
     const specialistService = new SpecialistService();
     const diplomacyService = new DiplomacyService(gameRepository);
+    const avatarService = new AvatarService(userRepository, userService);
     const conversationService = new ConversationService(gameRepository, eventRepository);
     const achievementService = new AchievementService(userRepository, guildService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
@@ -104,7 +106,7 @@ module.exports = (config, io) => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
     const ledgerService = new LedgerService(gameRepository, playerService);
-    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService);
+    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService);
     const leaderboardService = new LeaderboardService(userRepository, userService, playerService, guildUserService, ratingService, gameService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerService, starService, userService);
     const reputationService = new ReputationService(gameRepository, playerService);
@@ -177,5 +179,6 @@ module.exports = (config, io) => {
         ratingService,
         donateService,
         diplomacyService,
+        avatarService,
     };
 };

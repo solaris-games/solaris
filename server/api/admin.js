@@ -56,7 +56,7 @@ module.exports = (router, io, container) => {
 
     router.patch('/api/admin/user/:userId/credits', middleware.authenticateAdmin, async (req, res, next) => {
         try {
-            await container.adminService.setCredits(req.params.userId, +req.body.credits);
+            await container.userService.setCredits(req.params.userId, +req.body.credits);
 
             return res.sendStatus(200);
         } catch (err) {

@@ -35,10 +35,10 @@ module.exports = class GameCreateService {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
             }
 
-            let userAchievements = await this.achievementService.getAchievements(settings.general.createdByUserId);
+            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(settings.general.createdByUserId);
 
             // Disallow new players from creating games if they haven't completed a game yet.
-            if (userAchievements.achievements.completed === 0) {
+            if (!isEstablishedPlayer) {
                 throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }

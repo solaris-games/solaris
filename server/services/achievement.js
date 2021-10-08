@@ -121,4 +121,10 @@ module.exports = class AchievementService {
     async incrementQuit(userId, amount = 1) {
         return await this.incrementAchievement(userId, 'achievements.quit', amount);
     }
+
+    async isEstablishedPlayer(userId) {
+        let userAchievements = await this.getAchievements(userId);
+
+        return userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
+    }
 };

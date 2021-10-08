@@ -23,6 +23,7 @@ import GuildCreate from './views/guild/GuildCreate.vue'
 import GuildRename from './views/guild/GuildRename.vue'
 import GuildDetails from './views/guild/GuildDetails.vue'
 import Administration from './views/Administration.vue'
+import Avatars from './views/Avatars.vue'
 
 Vue.use(Router)
 
@@ -142,6 +143,11 @@ export default new Router({
       path: '/administration',
       name: 'administration',
       component: Administration
+    },
+    {
+      path: '/avatars',
+      name: 'avatars',
+      component: Avatars
     }
   ]
 })
