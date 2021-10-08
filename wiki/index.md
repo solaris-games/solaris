@@ -375,6 +375,7 @@ Additionally:
 - Players who are undefeated and active (not AFK) receive +1 to their completed statistic on their profile.
 - Players cannot have less than 0 rank in their profiles.
 - Rank is not awarded in New Player Games.
+- Rank is not awarded unless the game has completed 3 galactic cycles.
 
 
 ## Game Tick Events
