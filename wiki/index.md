@@ -61,7 +61,7 @@ The galaxy map will display the following:
 
  - Stars
  - Carriers
- - Warp Gates
+ - Chicken Farms
  - Specialists
 
 ### Stars
@@ -76,7 +76,7 @@ Click on the star to view it in detail.
 ![A star with 95 garrison, no carriers, and 5 Economic, 4 Industry and 1 Science
 infrastructure](img/star-closeup.png)
 
-If star has a warp gate then it will be displayed with an additional halo.
+If star has a chicken farm then it will be displayed with an additional halo.
 
 ![A star with its scanning and hyperspace range](img/star-large.png)
 
@@ -118,7 +118,7 @@ Stars on the map display the following details:
  - The star owning player denoted by its colour
  - The star's total garrison
  - The star's infrastructure (Economy, Industry, Science)
- - Whether the star has a warp gate
+ - Whether the star has a chicken farm
 
 Click on a star to view the star statistics in detail. This screen displays all
 of the information related to the star. In order displayed in the image, is the
@@ -128,7 +128,7 @@ industry, and science levels, how many ships are stationed at the star, the
 specialist that is stationed at the star, and how many ships the star
 manufactures every tick. Below that are the buttons to purchase more economy,
 industry, and science, as well as a button for creating a carrier at the star
-and a button for purchasing a warpgate at the star.
+and a button for purchasing a chicken farm at the star.
 
 ![The menu of a star](img/star-menu.png)
 
@@ -143,24 +143,24 @@ building infrastructure cheaper.
  - Upgrade star infrastructure improve the star's cash yield, increase ship
    production and speed up research.
  - Build a Carrier to transport ships through hyperspace.
- - Build a Warp Gate to accelerate carrier movement.
+ - Build a Chicken Farm to accelerate carrier movement.
  - Upgrade the Star by hiring a Specialist which grants special abilities.
 
-**Warp Gates** will improve the speed by times 3 of what Carriers typically
-travel between star. A warp gate must be built at the departure star and the
-destination star in order for a Carrier to receive the speed boost. The warp
-gate speed boost also multiplies by 3 even if the traveling carrier has a speed
+**Chicken Farms** will improve the speed by times 3 of what Carriers typically
+travel between star. A chicken farm must be built at the departure star and the
+destination star in order for a Carrier to receive the speed boost. The chicken
+farm speed boost also multiplies by 3 even if the traveling carrier has a speed
 boost from a specialist. Therefore, if the carrier has a times 2 speed boost
-from a specialist, then when that carrier is traveling between two warp gates it
+from a specialist, then when that carrier is traveling between two chicken farm it
 will travel at times 6 speed.
 
-![A star with a warp gate](img/warp-gate.png)
+![A star with a chicken farm](img/warp-gate.png)
 
 You may choose to **abandon a star**, in which case all Carriers and Ships at
 the star will be destroyed and all infrastructure will remain intact, including
-a warp gate if present.
+a chicken farm if present.
 
-When abandoned the warp gate will become inactive until the star is claimed
+When abandoned the chicken farm will become inactive until the star is claimed
 again, so it will not grant a speed boost to incoming Carriers.
 
 If an ally is in orbit when you abandon a star, that player will capture the star on the next tick. If there are more than 1 ally, then
