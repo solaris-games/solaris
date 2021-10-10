@@ -154,11 +154,11 @@
               <td class="text-right">{{ user.achievements.infrastructure.science }}</td>
             </tr>
             <tr>
-              <td>Warp Gates Built</td>
+              <td>Chicken Farms Built</td>
               <td class="text-right">{{ user.achievements.infrastructure.warpGates }}</td>
             </tr>
             <tr>
-              <td>Warp Gates Destroyed</td>
+              <td>Chicken Farms Destroyed (AKA Monster Score)</td>
               <td class="text-right">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
             </tr>
             <tr>
