@@ -80,8 +80,8 @@ module.exports = class ReponseService {
                 { name: "Carrier Cost", value: game.settings.specialGalaxy.carrierCost, inline: true },
                 { name: "Carrier Upkeep", value: game.settings.specialGalaxy.carrierUpkeepCost, inline: true },
                 { name: "Carrier Speed", value: game.settings.specialGalaxy.carrierSpeed, inline: true },//next line
-                { name: "Warpgate Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true },
-                { name: "Random Warpgates", value: game.settings.specialGalaxy.randomGates, inline: true },
+                { name: "Chicken Farm Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true },
+                { name: "Random Chicken Farms", value: game.settings.specialGalaxy.randomGates, inline: true },
                 { name: "Specialist Cost", value: game.settings.specialGalaxy.specialistCost, inline: true },//next line
                 { name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true },
                 { name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true },
@@ -406,10 +406,10 @@ module.exports = class ReponseService {
                 { name: "Economy", value: user.achievements.infrastructure.economy, inline: true },
                 { name: "Industry", value: user.achievements.infrastructure.industry, inline: true },
                 { name: "Science", value: user.achievements.infrastructure.science, inline: true },//next line
-                { name: "Warp Gates built", value: user.achievements.infrastructure.warpGates, inline: true },
+                { name: "Chicken Farms built", value: user.achievements.infrastructure.warpGates, inline: true },
                 { name: "Carriers built", value: user.achievements.infrastructure.carriers, inline: true },
                 { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true },//next line
-                { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
+                { name: "Monster Score", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },//next line
                 { name: "Combat", value: "⬅️⬅️⬅️", inline: true },
