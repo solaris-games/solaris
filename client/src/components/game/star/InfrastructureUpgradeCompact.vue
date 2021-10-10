@@ -24,10 +24,10 @@
       </button>
     </div>
     <div class="col-auto pl-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a Chicken Farm" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canBuildWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy Warp Gate">
+      <button v-if="canBuildWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy Chicken Farm">
         <i class="fas fa-trash"></i> <i class="fas fa-dungeon ml-1"></i>
       </button>
       <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
@@ -126,7 +126,7 @@ export default {
       this.isUpgradingScience = false
     },
     async confirmBuildWarpGate (e) {
-      if (!await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
+      if (!await this.$confirm('Build Chicken Farm', `Are you sure you want build a Chicken Farm at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
         return
       }
 
@@ -134,7 +134,7 @@ export default {
         let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
+          this.$toasted.show(`Chicken Farm built at ${this.star.name}.`)
 
           this.$store.commit('gameStarWarpGateBuilt', response.data)
           
@@ -145,7 +145,7 @@ export default {
       }
     },
     async confirmDestroyWarpGate (e) {
-      if (!await this.$confirm('Destroy Warp Gate', `Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
+      if (!await this.$confirm('Destroy Chicken Farm', `Are you sure you want destroy Chicken Farm at ${this.star.name}? (think of the poor chicks!)`)) {
         return
       }
 
@@ -153,7 +153,7 @@ export default {
         let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
+          this.$toasted.show(`Chicken Farm destroyed at ${this.star.name}. (you monster)`)
 
           this.$store.commit('gameStarWarpGateDestroyed', {
             starId: this.star._id
