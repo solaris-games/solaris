@@ -28,7 +28,7 @@
           </span>
         </div>
         <div class="col-auto">
-          <span :title="star.warpGate ? 'Warp Gate':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
+          <span :title="star.warpGate ? 'Chicken Farm':'No Chicken Farm'" :class="{'no-warp-gate':!star.warpGate}">
             <i class="fas fa-dungeon ml-1"></i>
           </span>
         </div>
@@ -188,7 +188,7 @@
 
         <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="canBuildWarpGates">
           <div class="col-8">
-            <p class="mb-2">Build a Warp Gate to accelerate carrier movement.</p>
+            <p class="mb-2">Build a Chicken Farm to accelerate carrier movement.</p>
           </div>
           <div class="col-4">
             <modalButton v-if="!star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
@@ -213,13 +213,13 @@
 
     <!-- Modals -->
 
-    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
-      <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
+    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Chicken Farm" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
+      <p>Are you sure you want build a Chicken Farm at <b>{{star.name}}</b>?</p>
       <p>The upgrade will cost ${{star.upgradeCosts.warpGate}}.</p>
     </dialogModal>
 
-    <dialogModal modalName="destroyWarpGateModal" titleText="Destroy Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmDestroyWarpGate">
-      <p>Are you sure you want destroy Warp Gate at <b>{{star.name}}</b>?</p>
+    <dialogModal modalName="destroyWarpGateModal" titleText="Destroy Chicken Farm" cancelText="No" confirmText="Yes" @onConfirm="confirmDestroyWarpGate">
+      <p>Are you sure you want destroy Chicken Farm at <b>{{star.name}}</b>? (think of the poor chicks!)</p>
     </dialogModal>
 
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
@@ -344,7 +344,7 @@ export default {
         let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
+          this.$toasted.show(`Chicken Farm built at ${this.star.name}.`)
 
           this.$store.commit('gameStarWarpGateBuilt', response.data)
           
@@ -359,7 +359,7 @@ export default {
         let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
+          this.$toasted.show(`Chicken Farm destroyed at ${this.star.name}. (you monster)`)
 
           this.$store.commit('gameStarWarpGateDestroyed', {
             starId: this.star._id
