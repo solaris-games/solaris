@@ -38,8 +38,8 @@
           </span>
       </div>
       <div class="col-5 text-right">
-          <span title="ETA Warp Speed">
-            Warp {{totalEtaWarp || 'N/A'}}
+          <span title="ETA Chicken Speed">
+            Chicken {{totalEtaWarp || 'N/A'}}
           </span>
       </div>
     </div>
@@ -103,10 +103,10 @@
 
       <div class="row bg-primary pt-2 pb-2">
           <div class="col-6">
-              ETA Warp Speed
+              ETA Chicken Speed
           </div>
           <div class="col-6 text-right">
-              <span title="ETA Warp Speed">
+              <span title="ETA Chicken Speed">
                 {{totalEtaWarp || 'N/A'}}
               </span>
           </div>
@@ -115,7 +115,7 @@
 
     <div class="row bg-dark" v-if="warpGateCost">
       <div class="col">
-        <p class="mt-2 mb-2"><small>To build Warp Gates on the selected route will cost <span class="text-warning">${{warpGateCost}}</span>.</small></p>
+        <p class="mt-2 mb-2"><small>To build Chicken Farms on the selected route will cost <span class="text-warning">${{warpGateCost}}</span>. (m-m-m, so much chicken)</small></p>
       </div>
     </div>
 </div>
