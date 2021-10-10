@@ -26,15 +26,15 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         if (star.warpGate) {
-            throw new ValidationError(`The star already has a warp gate.`);
+            throw new ValidationError(`The star already has a chicken farm.`);
         }
 
         if (game.settings.specialGalaxy.warpgateCost === 'none') {
-            throw new ValidationError('The game settings has disabled the building of warp gates.');
+            throw new ValidationError('The game settings has disabled the building of chicken farms.');
         }
 
         if (this.starService.isDeadStar(star)) {
-            throw new ValidationError('Cannot build a warp gate on a dead star.');
+            throw new ValidationError('Cannot build a chicken farm on a dead star.');
         }
 
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
@@ -72,11 +72,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Check whether the star is owned by the player
         if (star.ownedByPlayerId == null || star.ownedByPlayerId.toString() !== player._id.toString()) {
-            throw new ValidationError(`Cannot destroy warp gate, the star is not owned by the current player.`);
+            throw new ValidationError(`Cannot destroy chicken farm, the star is not owned by the current player.`);
         }
 
         if (!star.warpGate) {
-            throw new ValidationError(`The star does not have a warp gate to destroy.`);
+            throw new ValidationError(`The star does not have a chicken farm to destroy.`);
         }
 
         // Update the DB.
