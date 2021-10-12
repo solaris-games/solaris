@@ -119,6 +119,7 @@ Stars on the map display the following details:
  - The star's total garrison
  - The star's infrastructure (Economy, Industry, Science)
  - Whether the star has a warp gate
+ - Whether the star has more than 1 player in orbit
 
 Click on a star to view the star statistics in detail. This screen displays all
 of the information related to the star. In order displayed in the image, is the
@@ -166,6 +167,15 @@ again, so it will not grant a speed boost to incoming Carriers.
 If an ally is in orbit when you abandon a star, that player will capture the star on the next tick. If there are more than 1 ally, then
 the player with the highest number of ships in a single carrier will capture the abandoned star.
 
+### Star Indicators
+When zoomed in, you will be able to see the star's indicator which gives an at-a-glance information about the star. For example an `125/3` indicator displays that the star has `125` ships in total, with `3` carriers in orbit. The full format is as follows:
+
+```
+<total garrison>/<carrier count>*+
+```
+
+- `*` - Indicates that the star garrison may not be accurate, the star or a carrier in orbit has been **scrambled**. (See Scrambler specialist).
+- `+` - Indicates that the star has more than 1 player in orbit.
 
 ## Infrastructure
 
@@ -233,6 +243,7 @@ Your diplomatic status to other players can be changed in the **Menu -> Diplomac
 
 - You may visit allied stars.
 - When in orbit at an allied star, your scanning range will take effect.
+- When more than 1 player is in orbit at a star, the star indicator will display a `+` suffix. For example: `100/1+` means that the star has 100 ships with 1 carrier in orbit where the carrier is not owned by the player who owns the star.
 
 **Warning** - An alliance can be broken at any time and combat will occur at contested stars.
 

@@ -876,7 +876,11 @@ class GameHelper {
     let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
     let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
 
-    return playerIds.length > 1
+    if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
+      playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
+    }
+    
+    return playerIds.length
   }
 
 }

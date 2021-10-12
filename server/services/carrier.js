@@ -79,8 +79,7 @@ module.exports = class CarrierService {
 
         // Go through all carriers and the ones that are within the star's scanning range.
         let carriersInRange = carriers.filter(c => {
-            return c.ownedByPlayerId.equals(star.ownedByPlayerId)
-                || this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
+            return this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
         });
 
         return carriersInRange;
