@@ -601,7 +601,7 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _orbitGalaxy(game) {
-        if (game.settings.orbitalMechanics.enabled === 'enabled') {
+        if (this.gameService.isOrbitalMode(game)) {
             for (let star of game.galaxy.stars) {
                 this.orbitalMechanicsService.orbitStar(game, star);
             }

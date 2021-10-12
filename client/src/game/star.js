@@ -803,16 +803,21 @@ class Star extends EventEmitter {
   select () {
     this.isSelected = true
     this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
   }
 
   toggleSelected () {
-    this.isSelected = !this.isSelected
-    this.drawSelectedCircle()
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
   }
 
   showIgnoreBulkUpgrade () {

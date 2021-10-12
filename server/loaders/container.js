@@ -118,9 +118,9 @@ module.exports = (config, io) => {
     const aiService = new AIService(starUpgradeService);
     const historyService = new HistoryService(HistoryModel, historyRepository, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
-    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService);
-    const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);
+    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, orbitalMechanicsService);
+    const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService, diplomacyService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService);

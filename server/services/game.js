@@ -547,6 +547,10 @@ module.exports = class GameService extends EventEmitter {
         return game.settings.general.mode === 'battleRoyale';
     }
 
+    isOrbitalMode(game) {
+        return game.settings.orbitalMechanics.enabled === 'enabled';
+    }
+
     isAnonymousGame(game) {
         return game.settings.general.anonymity === 'extra';
     }
