@@ -871,6 +871,14 @@ class GameHelper {
     const upkeep = this._getUpkeepCosts(game, player);
     return fromEconomy - upkeep  + this._getBankingCredits(game, player);
   }
+
+  isStarHasMultiplePlayersInOrbit (game, star) {
+    let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
+    let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
+
+    return playerIds.length > 1
+  }
+
 }
 
 export default new GameHelper()

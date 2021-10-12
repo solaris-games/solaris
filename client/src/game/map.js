@@ -161,7 +161,7 @@ class Map extends EventEmitter {
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
     }
 
-    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -355,7 +355,7 @@ class Map extends EventEmitter {
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
-        existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+        existing.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       } else {
         existing = this.setupStar(game, userSettings, starData)
       }
