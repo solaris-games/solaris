@@ -164,6 +164,16 @@ module.exports = (container) => {
             return next();
         },
 
+        async loadGameDiplomacyLean(req, res, next) {
+            req.game = await container.gameService.getByIdDiplomacyLean(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
+            }
+
+            return next();
+        },
+
         async loadGamePlayers(req, res, next) {
             req.game = await container.gameService.getByIdLean(req.params.gameId, {
                 'galaxy.players': 1,

@@ -7,6 +7,11 @@ class DiplomacyService extends BaseApiService {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/diplomacy',
       { withCredentials: true })
   }
+
+  getDiplomaticStatusToPlayer (gameId, toPlayerId) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/diplomacy/' + toPlayerId,
+      { withCredentials: true })
+  }
   
   declareAlly (gameId, playerId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/diplomacy/ally/' + playerId, {},

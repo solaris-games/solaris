@@ -160,6 +160,14 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async getByIdDiplomacyLean(id) {
+        return await this.getByIdLean(id, {
+            'galaxy.players._id': 1,
+            'galaxy.players.userId': 1,
+            'galaxy.players.diplomacy': 1
+        });
+    }
+
     async join(game, userId, playerId, alias, avatar, password) {
         // The player cannot join the game if:
         // 1. The game has finished.

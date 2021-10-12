@@ -9,6 +9,7 @@
       </div>
       <div class="col-auto">
         <h4 class="pt-2">
+          <player-diplomatic-status-icon v-if="isFormalAlliancesEnabled" :toPlayerId="player._id" class="ml-2"/>
           <i v-if="player.hasFilledAfkSlot && !player.afk" class="fas fa-user-friends ml-2" title="This player has filled an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"></i>
           <span v-if="player.defeated" :title="getPlayerStatus(player)">
             <i class="fas fa-robot ml-2" v-if="player.defeated" title="AI Controlled"></i>
@@ -31,12 +32,14 @@ import GameHelper from '../../../services/gameHelper'
 import PlayerIconVue from '../player/PlayerIcon'
 import PlayerOnlineStatusVue from './PlayerOnlineStatus'
 import PlayerMissedTurnsVue from './PlayerMissedTurns'
+import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon'
 
 export default {
   components: {
     'player-icon': PlayerIconVue,
     'player-online-status': PlayerOnlineStatusVue,
-    'player-missed-turns': PlayerMissedTurnsVue
+    'player-missed-turns': PlayerMissedTurnsVue,
+    'player-diplomatic-status-icon': PlayerDiplomaticStatusIcon
   },
   props: {
     player: Object
@@ -55,6 +58,11 @@ export default {
     },  
     getPlayerStatus () {
       return GameHelper.getPlayerStatus(this.player)
+    }
+  },
+  computed: {
+    isFormalAlliancesEnabled () {
+      return this.$store.state.game.settings.player.alliances === 'enabled'
     }
   }
 }
