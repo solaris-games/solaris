@@ -572,7 +572,7 @@ module.exports = class GameTickService extends EventEmitter {
             this.emit('onGameEnded', {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                rankingResult
+                rankingResult: this.gameService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
             });
 
             return true;

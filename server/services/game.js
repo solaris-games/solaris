@@ -441,7 +441,7 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async getPlayerUserLean(game, playerId) {
-        if (game.settings.general.anonymity === 'extra') {
+        if (this.isAnonymousGame(game)) {
             return null;
         }
         
@@ -545,6 +545,10 @@ module.exports = class GameService extends EventEmitter {
 
     isBattleRoyaleMode(game) {
         return game.settings.general.mode === 'battleRoyale';
+    }
+
+    isAnonymousGame(game) {
+        return game.settings.general.anonymity === 'extra';
     }
 
     isNewPlayerGame(game) {

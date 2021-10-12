@@ -305,7 +305,7 @@ module.exports = class GameGalaxyService {
         // Get the list of all guilds associated to players, we'll need this later.
         let guildUsers = [];
 
-        if (doc.settings.general.anonymity === 'normal') {
+        if (!this.gameService.isAnonymousGame(doc)) {
             let userIds = doc.galaxy.players.filter(x => x.userId).map(x => x.userId);
             guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds)
         }
