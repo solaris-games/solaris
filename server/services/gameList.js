@@ -163,7 +163,7 @@ module.exports = class GameListService {
 
     async listInProgressGames() {
         return await this.gameRepo.find({
-            'state.startDate': { $lte: moment().utc().toDate() },
+            'state.startDate': { $ne: null },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
         }, {
@@ -177,7 +177,7 @@ module.exports = class GameListService {
 
     async listInProgressGamesGameTick() {
         return await this.gameRepo.find({
-            'state.startDate': { $lte: moment().utc().toDate() },
+            'state.startDate': { $ne: null },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false },
             'state.locked': { $eq: false }
