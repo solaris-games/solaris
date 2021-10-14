@@ -17,10 +17,25 @@ module.exports = class CombatService extends EventEmitter {
         let defenderShipsRemaining = defender.ships;
         let attackerShipsRemaining = attacker.ships;
 
-        const defendPower = defender.weaponsLevel;
-        const attackPower = attacker.weaponsLevel;
+        let defendPower = defender.weaponsLevel;
+        let attackPower = attacker.weaponsLevel;
+
+        // If in non-turn based mode the attacker/defender cannot survive a single blow
+        // then they should outright be destroyed without delivering a blow to the opposition.
+        // Note: This addresses an exploit where players can send out 1 ship carriers to chip away 
+        // at incoming carriers.
+        if (!isTurnBased) {
+            if (defender.ships <= attackPower) {
+                defendPower = 1;
+            }
+            
+            if (attacker.ships <= defendPower) {
+                attackPower = 1;
+            }
+        }
+
         const defenderAdditionalTurns = isTurnBased ? 1 : 0;
-        
+
         const defenderTurns = Math.ceil(attacker.ships / defendPower);
         const attackerTurns = Math.ceil(defender.ships / attackPower);
 
@@ -50,7 +65,7 @@ module.exports = class CombatService extends EventEmitter {
 
         attackerShipsRemaining = Math.max(0, attackerShipsRemaining);
         defenderShipsRemaining = Math.max(0, defenderShipsRemaining);
-
+        
         let result = {
             weapons: {
                 defender: defendPower,

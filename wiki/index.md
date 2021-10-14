@@ -277,6 +277,10 @@ Combat can also occur between two carriers. When two carriers from different
 players intercept each other they will engage in carrier to carrier combat.
 In carrier to carrier combat there is no defender bonus.
 
+Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's
+weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players
+from exploiting 1 ship carriers to chip away at incoming enemy forces.
+
 The combat calculator is a useful tool to predict the outcome of combat.
 Simply input the defender and attacker's weapons level and number of ships and
 it will present the outcome.
