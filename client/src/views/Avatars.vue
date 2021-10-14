@@ -1,9 +1,9 @@
 <template>
   <view-container>
-    <view-title title="Avatar Store" />
+    <view-title title="Avatar Shop" />
 
-    <p>Unlock new races to play with <strong class="text-warning">Galactic Credits</strong> which can be earned by winning official games.</p>
-    <p v-if="userInfo">You have <span class="text-warning"><strong>{{userInfo.credits}}</strong> Galactic Credits</span>.</p>
+    <p>Unlock new races to play with <strong class="text-warning">Galactic Credits</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
+    <h5 v-if="userInfo">You have <span class="text-warning"><strong>{{userInfo.credits}}</strong> Galactic Credits</span>.</h5>
 
     <hr />
 
@@ -20,9 +20,12 @@
               <h5>{{avatar.name}}</h5>
             </div>
             <div class="col-auto">
-              <button class="btn btn-sm btn-success" v-if="!avatar.purchased" :disabled="userInfo.credits < avatar.price" @click="purchaseAvatar(avatar)">
+              <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userInfo.credits >= avatar.price" @click="purchaseAvatar(avatar)">
                 <i class="fas fa-shopping-basket"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </button>
+              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userInfo.credits < avatar.price">
+                <i class="fas fa-coins"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
+              </router-link>
               <span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span>
             </div>
             <div class="col-12">

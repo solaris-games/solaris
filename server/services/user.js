@@ -435,4 +435,17 @@ module.exports = class UserService extends EventEmitter {
         });
     }
 
+    async incrementCreditsByPurchase(userId, credits) {
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            $set: {
+                'roles.contributor': true
+            },
+            $inc: {
+                credits: credits
+            }
+        });
+    }
+
 };

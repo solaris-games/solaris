@@ -5,14 +5,19 @@
     <loading-spinner :loading="!info"/>
 
     <div v-if="info">
-      
+      <roles :user="info" />
+
       <div class="row pt-3 pb-3 bg-info">
         <div class="col">
           <p>Galactic Credits</p>
-          <p><small>Earn credits by winning official games.</small></p>
+          <p><small>Purchase credits in the shop or earn credits by winning official games.</small></p>
         </div>
         <div class="col">
-          <p class="text-right"><strong>{{ info.credits }}</strong> credits</p>
+          <p class="text-right">
+            <i class="fas fa-coins mr-2"></i>
+            <strong>{{ info.credits }}</strong> credits
+            <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-success ml-2"><i class="fas fa-shopping-cart"></i></router-link>
+          </p>
         </div>
       </div>
      
@@ -76,6 +81,7 @@ import ViewSubtitleVue from '../components/ViewSubtitle'
 import OptionsFormVue from '../components/game/menu/OptionsForm'
 import userService from '../services/api/user'
 import router from '../router'
+import Roles from '../components/game/player/Roles'
 
 export default {
   components: {
@@ -83,7 +89,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitleVue,
-    'options-form': OptionsFormVue
+    'options-form': OptionsFormVue,
+    'roles': Roles
   },
   data () {
     return {

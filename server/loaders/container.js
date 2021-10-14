@@ -5,6 +5,7 @@ const UserModel = require('../models/User');
 const HistoryModel = require('../models/History');
 const EventModel = require('../models/Event');
 const GuildModel = require('../models/Guild');
+const PaymentModel = require('../models/Payment');
 const DatabaseRepository = require('../models/DatabaseRepository');
 
 const gameRepository = new DatabaseRepository(GameModel);
@@ -12,6 +13,7 @@ const userRepository = new DatabaseRepository(UserModel);
 const historyRepository = new DatabaseRepository(HistoryModel);
 const eventRepository = new DatabaseRepository(EventModel);
 const guildRepository = new DatabaseRepository(GuildModel);
+const paymentRepository = new DatabaseRepository(PaymentModel);
 
 const AdminService = require('../services/admin');
 const PasswordService = require('../services/password');
@@ -60,6 +62,7 @@ const RatingService = require('../services/rating');
 const DonateService = require('../services/donate');
 const DiplomacyService = require('../services/diplomacy');
 const AvatarService = require('../services/avatar');
+const PaypalService = require('../services/paypal');
 
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
@@ -87,6 +90,7 @@ module.exports = (config, io) => {
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const cacheService = new CacheService();
+    const paypalService = new PaypalService(PaymentModel, paymentRepository, userService, cacheService);
     const specialistService = new SpecialistService();
     const diplomacyService = new DiplomacyService(gameRepository);
     const avatarService = new AvatarService(userRepository, userService);
@@ -180,5 +184,6 @@ module.exports = (config, io) => {
         donateService,
         diplomacyService,
         avatarService,
+        paypalService,
     };
 };

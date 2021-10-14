@@ -66,7 +66,7 @@
           <div class="card-img-overlay">
             <h5 class="card-title card-title-success">
               <i class="fas fa-shopping-basket"></i>
-              <span class="ml-2">Store</span>
+              <span class="ml-2">Avatar Shop</span>
             </h5>
           </div>
         </div>

@@ -5,6 +5,7 @@ const GameModel = require('../models/Game');
 const GuildModel = require('../models/Guild');
 const HistoryModel = require('../models/History');
 const UserModel = require('../models/User');
+const PaymentModel = require('../models/Payment');
 
 async function unlockAgendaJobs(db) {
     try {
@@ -35,6 +36,7 @@ async function syncIndexes() {
     await GuildModel.syncIndexes();
     await HistoryModel.syncIndexes();
     await UserModel.syncIndexes();
+    await PaymentModel.syncIndexes();
     console.log('Indexes synced.');
 }
 
