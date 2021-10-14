@@ -724,6 +724,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.defeated = true;
         player.defeatedDate = moment().utc();
         player.researchingNext = 'random'; // Set up the AI for random research.
+        player.diplomacy.allies = []; // Set all players to enemies.
 
         // Auto-ready the player so they don't hold up the game.
         if (game.settings.gameTime.gameType === 'turnBased') {
