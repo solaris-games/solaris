@@ -50,7 +50,8 @@ module.exports = class ResourceService {
         // The closer to the center of the galaxy, the more likely (exponentially) to find stars with higher resources.
         let RMIN = game.constants.star.resources.minNaturalResources;
         let RMAX = game.constants.star.resources.maxNaturalResources;
-        let galaxyRadius = this.getGalaxyDiameter(locations).x / 2;
+        let galaxyRadius = Math.max(...Object.values(this.getGalaxyDiameter(locations))) / 2;
+        console.log(galaxyRadius);
         let galacticCenter = {x:0, y:0};
 
         if (game.settings.galaxy.galaxyType == 'circular-balanced') {
@@ -64,7 +65,10 @@ module.exports = class ResourceService {
         } else {
             for (let location of locations) {
                 let radius = this.distanceService.getDistanceBetweenLocations(galacticCenter, location)
+                console.log(radius);
                 // The * 0.6 + 0.2 in the function prevents values like 0 or 1, in which case randomisation is gone, and the outcome can only be a min or a max value
+                // If you want the differences to be more extreme you can increase the 0.6 and decrease the 0.2 notice how: 1 - 0.6 = 2 * 0.2, keep that relation intact.
+                // So for example a good tweak to make the center even stronger and the edges weaker would be to pick * 0.8 + 0.1, and notice again how 1 - 0.8 = 2 * 0.1 
                 let resources = this.randomService.getRandomNumberBetweenEXP(RMIN, RMAX, radius/galaxyRadius * 0.6 + 0.2)
                 location.resources = resources;
             }
