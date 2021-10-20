@@ -64,7 +64,8 @@ module.exports = class ResourceService {
         } else {
             for (let location of locations) {
                 let radius = this.distanceService.getDistanceBetweenLocations(galacticCenter, location)
-                let resources = this.randomService.getRandomNumberBetweenEXP(RMIN, RMAX, radius/galaxyRadius)
+                // The * 0.6 + 0.2 in the function prevents values like 0 or 1, in which case randomisation is gone, and the outcome can only be a min or a max value
+                let resources = this.randomService.getRandomNumberBetweenEXP(RMIN, RMAX, radius/galaxyRadius * 0.6 + 0.2)
                 location.resources = resources;
             }
         }
