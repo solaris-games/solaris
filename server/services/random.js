@@ -28,13 +28,13 @@ module.exports = class RandomService {
         return Math.random() * Math.PI * 2;
     }
 
-    getRandomRadius(maxRadius) {
-        return maxRadius * Math.random()**0.5;
+    getRandomRadius(maxRadius, offset) {
+        return maxRadius * Math.random()**offset;
     }
 
-    getRandomPositionInCircle(maxRadius) {
+    getRandomPositionInCircle(maxRadius, offset = 0.5) {
         let angle = this.getRandomAngle();
-        let radius = this.getRandomRadius(maxRadius);
+        let radius = this.getRandomRadius(maxRadius, offset);
 
         return {
             x: Math.cos(angle) * radius,

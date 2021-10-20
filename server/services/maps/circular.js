@@ -13,16 +13,20 @@ module.exports = class CircularMapService {
 
     generateLocations(game, starCount, resourceDistribution) {
         let locations = [];
+        // These two values should probably be ingame constants but they can for now just be plugged in here
         const starDensity = 1.3 * 10**-4
-        // To generate locations we do the following:
-        // - Try to create a location at a random angle and distance from the center
-        // - If after X number of tries, we can't generate a location, increment the current radius.
+        const offset = 0.5
+        // There are a few options to tweak the offset:
+        // 0.5- --> now the outerranges will contain more stars than the inner ones || 0.5 --> roughly the entire map has the same star density
+        // 0.5-1 --> now the inner ranges will get more stars than the outer || 1 --> now at each distance from the center there will be roughly the same amount of stars
+        // 1+ --> there will be an extremely increasing amount of stars in the middle with an increasingly low amount of stars in the outerranges 
+
         let maxRadius = (starCount/(Math.PI*starDensity))**0.5;
 
         do {
             // Try to find the star location X
             while (true) {
-                let location = this.randomService.getRandomPositionInCircle(maxRadius);
+                let location = this.randomService.getRandomPositionInCircle(maxRadius, offset);
 
                 // Stars must not be too close to eachother.
                 if (!this.isLocationTooCloseToOthers(game, location, locations)) {
