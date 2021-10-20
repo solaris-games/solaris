@@ -2,17 +2,18 @@ const ValidationError = require("../../errors/validation");
 
 module.exports = class DoughnutMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.resourceService = resourceService;
     }
 
     generateLocations(game, count, resourceDistribution) {
         let locations = this.generateCircle(count);
 
-        this.setResources(game, locations, resourceDistribution);
+        locations = this.resourceService.setResources(game, locations, resourceDistribution);
         this.applyNoise(locations);
         this.applyPadding(locations);
 
@@ -89,22 +90,6 @@ module.exports = class DoughnutMapService {
                     }
                 }
             }
-        }
-    }
-
-    setResources(game, locations, resourceDistribution) {
-        if (resourceDistribution !== 'random') {
-            throw new ValidationError(`Doughnut Galaxies only support random resource distributions.`);
-        }
-
-        // Allocate random resources.
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-
-        for (let location of locations) {
-            let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
-
-            location.resources = Math.floor(r);
         }
     }
 

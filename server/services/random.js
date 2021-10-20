@@ -9,6 +9,18 @@ module.exports = class RandomService {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    getRandomNumberBetweenEXP(min, max, P1 = 0.5) {
+        let P2 = 1 - P1;
+        if (P1 <= 0) {
+            return max;
+        } else if (P1 >= 1) {
+            return min;
+        }
+        let t = Math.random()
+        let exp = Math.log(P2) / Math.log(0.5)
+        return Math.floor(t**exp * (max - min + 1) + min);
+    }
+
     getRandomAngle() {
         return Math.random() * Math.PI * 2;
     }

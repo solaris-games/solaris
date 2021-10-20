@@ -3,11 +3,12 @@ const RNG = require('random-seed');
 
 module.exports = class CircularBalancedMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.resourceService = resourceService;
     }
 
     _generateStarPositionInSector(currentRadius, rng, playerCount) {
@@ -175,67 +176,9 @@ module.exports = class CircularBalancedMapService {
             //now all linked stars should be reachable
         }
 
-        this.setResources(game, locations, resourceDistribution, playerCount, rng);
+        locations = this.resourceService.setResources(game, locations, resourceDistribution);
 
         return locations;
-    }
-
-    setResources(game, locations, resourceDistribution, playerCount, rng) {
-        switch (resourceDistribution) {
-            case 'random': 
-                this.setResourcesRandom(game, locations, playerCount, rng);
-                break;
-            case 'weightedCenter': 
-                this.setResourcesWeightedCenter(game, locations, playerCount, rng);
-                break;
-            default:
-                throw new ValidationError(`Unsupported resource distribution type: ${resourceDistribution}`);
-        }
-    }
-
-    setResourcesRandom(game, locations, playerCount, rng) { 
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-
-        for (let i = 0; i<locations.length; ) {
-            let naturalResources = Math.floor(this.randomService.getRandomNumberBetween(RMIN, RMAX));
-
-            for(let j = 0; j<playerCount; j++) {
-                let location = locations[i];
-                i++;
-                location.resources = naturalResources;
-            }
-        }
-    }
-
-    setResourcesWeightedCenter(game, locations, playerCount, rng) {
-        // The closer to the center of the galaxy, the more likely to find stars with higher resources.
-        let galaxyRadius = this._getGalaxyDiameter(locations).x/2;//this is fine since the galaxy is a circle, and not an ellipse
-        
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-        let RSPREAD = RMAX-RMIN;
-        let NOISE = RSPREAD/3.0;
-
-        for (let i = 0; i<locations.length; ) {
-            let location = locations[i];
-            let normalizedDistance = this.distanceService.getDistanceBetweenLocations(location, { x: 0, y: 0 })/galaxyRadius;
-            //this is fine since galaxy center is guaranteed at 0,0 
-             
-            let weight = 1.0-normalizedDistance;
-            let naturalResources = RMIN + (weight*RSPREAD);
-            
-            naturalResources += ( rng.range(NOISE*2) - NOISE/2.0 );
-            //clamp and round
-            naturalResources = Math.max( naturalResources, RMIN );
-            naturalResources = Math.min( naturalResources, RMAX );
-            naturalResources = Math.floor( naturalResources );
-            for(let j = 0; j<playerCount; j++) {
-                location = locations[i]
-                i++;
-                location.resources = naturalResources;
-            }
-        }
     }
 
     _getGalaxyDiameter(locations) {
