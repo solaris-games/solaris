@@ -2,9 +2,9 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(gameModel, carrierService, starService, distanceService, 
+    constructor(gameRepo, carrierService, starService, distanceService, 
         starDistanceService, technologyService, gameService, playerService) {
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
@@ -105,7 +105,7 @@ module.exports = class WaypointService {
         carrier.waypointsLooped = looped;
 
         // Update the DB.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {
@@ -149,7 +149,7 @@ module.exports = class WaypointService {
         let cullResult = this.cullWaypointsByHyperspaceRange(game, carrier);
 
         if (cullResult) {
-            await this.gameModel.updateOne({
+            await this.gameRepo.updateOne({
                 _id: game._id,
                 'galaxy.carriers._id': carrier._id
             }, {
@@ -221,7 +221,7 @@ module.exports = class WaypointService {
         }
         
         // Update the DB.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {
@@ -277,7 +277,7 @@ module.exports = class WaypointService {
         }
 
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
         let tickDistance = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed);
@@ -306,6 +306,10 @@ module.exports = class WaypointService {
     }
 
     performWaypointAction(carrier, star, waypoint) {
+        if (!carrier.ownedByPlayerId.equals(star.ownedByPlayerId)) {
+            throw new Error('Cannot perform waypoint action, the carrier and star are owned by different players.')
+        }
+
         switch (waypoint.action) {
             case 'dropAll':
                 this._performWaypointActionDropAll(carrier, star, waypoint);
@@ -475,43 +479,61 @@ module.exports = class WaypointService {
     }
 
     _performFilteredWaypointActions(game, waypoints, waypointTypes) {
-        let actionWaypoints = waypoints.filter(w => waypointTypes.indexOf(w.waypoint.action) > -1);
+        let actionWaypoints = waypoints.filter(w => 
+            waypointTypes.indexOf(w.waypoint.action) > -1
+            && w.carrier.ownedByPlayerId.equals(w.star.ownedByPlayerId) // The carrier must be owned by the player who owns the star.
+        );
 
-        this._performWaypointActions(game, actionWaypoints);
-    }
-
-    _performWaypointActions(game, actionWaypoints) {
         for (let actionWaypoint of actionWaypoints) {
             this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
         }
     }
 
-    sanitiseDarkModeCarrierWaypoints(game, carrier) {
-        // If in dark mode then we need to verify that waypoints are still valid.
+    sanitiseAllCarrierWaypointsByScanningRange(game) {
+        const scanningRanges = game.galaxy.players
+            .map(p => {
+                return {
+                    player: p,
+                    stars: this.starService.filterStarsByScanningRange(game, p)
+                }
+            });
+
+        game.galaxy.carriers
+            .filter(c => c.waypoints.length)
+            .map(c => {
+                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId));
+
+                return {
+                    carrier: c,
+                    owner: scanningRangePlayer.player,
+                    ownerScannedStars: scanningRangePlayer.stars
+                }
+            })
+            .forEach(x => this.sanitiseCarrierWaypointsByScanningRange(game, x.carrier, x.owner, x.ownerScannedStars));
+    }
+
+    sanitiseCarrierWaypointsByScanningRange(game, carrier, owner, ownerScannedStars) {
+        // Verify that waypoints are still valid.
         // For example, if a star is captured then it may no longer be in scanning range
         // so any waypoints to it should be removed unless already in transit.
-        const isDarkMode = this.gameService.isDarkMode(game);
 
-        if (!isDarkMode) {
+        if (!carrier.waypoints.length) {
             return;
         }
 
-        let player = this.playerService.getById(game, carrier.ownedByPlayerId);
         let startIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
 
         for (let i = startIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];
-            let destination = this.starService.getById(game, waypoint.destination);
 
-            // If the destination is not within scanning range of the player, remove it
-            // and all subsequent waypoints.
-            let inRange = this.starService.isStarInScanningRangeOfPlayer(game, destination, player);
+            // If the destination is not within scanning range of the player, remove it and all subsequent waypoints.
+            let inRange = ownerScannedStars.find(s => s._id.equals(waypoint.destination)) != null;
 
             if (!inRange) {
                 carrier.waypoints.splice(i);
 
                 if (carrier.waypointsLooped) {
-                    carrier.waypointsLooped = this.canLoop(game, player, carrier);
+                    carrier.waypointsLooped = this.canLoop(game, owner, carrier);
                 }
 
                 break;

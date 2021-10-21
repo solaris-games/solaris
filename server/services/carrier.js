@@ -3,13 +3,14 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class CarrierService {
 
-    constructor(gameModel, achievementService, distanceService, starService, technologyService, specialistService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService) {
+        this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.diplomacyService = diplomacyService;
     }
 
     getById(game, id) {
@@ -78,8 +79,7 @@ module.exports = class CarrierService {
 
         // Go through all carriers and the ones that are within the star's scanning range.
         let carriersInRange = carriers.filter(c => {
-            return c.ownedByPlayerId.equals(star.ownedByPlayerId)
-                || this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
+            return this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
         });
 
         return carriersInRange;
@@ -88,7 +88,7 @@ module.exports = class CarrierService {
     filterCarriersByScanningRange(game, player) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.starService.listStarsAliveOwnedByPlayer(game.galaxy.stars, player._id);
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
         // Start with all of the carriers that the player owns as
         // the player can always see those carriers.
@@ -247,7 +247,7 @@ module.exports = class CarrierService {
 
         carrier.waypoints = [firstWaypoint];
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
         }, {
@@ -280,15 +280,14 @@ module.exports = class CarrierService {
 
         let carrierName = name.trim().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrierId
         }, {
             $set: {
                 'galaxy.carriers.$.name': carrierName
             }
-        })
-        .exec();
+        });
     }
 
     async transferGift(game, gameUsers, star, carrier) {
@@ -330,7 +329,7 @@ module.exports = class CarrierService {
             throw new ValidationError(`Cannot scuttle a gift.`);
         }
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id
         }, {
             $pull: {
@@ -338,8 +337,7 @@ module.exports = class CarrierService {
                     _id: carrierId
                 }
             }
-        })
-        .exec();
+        });
 
         // TODO: Event?
     }
@@ -348,9 +346,9 @@ module.exports = class CarrierService {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            // If the carrier has a hideCarrierShips spec and is not owned by the given player
+            // If the carrier has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideCarrierShips
+            if (specialist.modifiers.special && specialist.modifiers.special.hideShips
                 && carrier.ownedByPlayerId.toString() !== player._id.toString()) {
                 return false;
             }
@@ -403,6 +401,10 @@ module.exports = class CarrierService {
             // Otherwise, perform combat.
             if (carrier.isGift) {
                 await this.transferGift(game, gameUsers, destinationStar, carrier);
+            } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
+
+                report.combatRequiredStar = !isAllied;
             } else {
                 report.combatRequiredStar = true;
             }
@@ -419,7 +421,7 @@ module.exports = class CarrierService {
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
         let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
 
         let carrierMovementReport = {
@@ -458,7 +460,7 @@ module.exports = class CarrierService {
         let warpSpeed = false;
         
         if (sourceStar) {
-            warpSpeed = this.starService.canTravelAtWarpSpeed(carrierOwner, carrier, sourceStar, destinationStar);
+            warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
         }
 
         let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);

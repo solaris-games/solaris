@@ -35,7 +35,13 @@ export default {
   },
   methods: {
     getAvatarImage () {
-      return require(`../../../assets/avatars/${this.player.avatar}.png`)
+      try {
+        return require(`../../../assets/avatars/${this.player.avatar}.png`)
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     },
     isFirstPlace () {
       let position = this.leaderboard.indexOf(this.player)

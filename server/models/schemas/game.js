@@ -90,7 +90,8 @@ const schema = new Schema({
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
-			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
+			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
+			alliances: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
         },
         technology: {
 			startingTechnologyLevel: {
@@ -118,10 +119,14 @@ const schema = new Schema({
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
 			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600, 7200], default: 1800 }, // Time in seconds
-			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720], default: 240 },	// Time in minutes
+			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, enum: [1, 4, 6, 8, 12, 24], default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
-			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 }
+			afk: {
+				lastSeenTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 6, 7], default: 2}, // Time in days, real time and turn based
+				cycleTimeout: { type: Types.Number, required: true, enum: [3, 4, 5, 6, 7, 8, 9, 10], default: 3}, // Real time games' production cycle limit
+				turnTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 },	// Turn based games' missed turn limit
+			}
 		}
     },
     galaxy: {

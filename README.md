@@ -46,6 +46,18 @@ The client uses the following tech:
 
 *Note: Development work is to be based on the `master` branch, for a new feature or bug fix, create a branch from `master`.*
 
+### Development Environment Automation
+To automate the development environment, it is recommended to use [PM2](https://pm2.keymetrics.io/).
+
+1. Install `pm2`.
+2. `pm2 start pm2.config.js` to register `pm2` apps.
+
+The above script will create the server jobs, API and client applications, watch for changes and restart those applications when necessary. 
+
+You can make use of debugger attach for VS Code defined in the `.vscode/launch.json` configuration file to easily attach the debugger to running apps.
+
+Once configured, you can browse to the site locally (default [http://localhost:8080](http://localhost:8080)) as using the normal way detailed in the section above and any changes you make will automatically restart the applications.
+
 ### Common Fixes
 - If you're on Windows and you get an error running `npm install` in `server/` complaining about `node-gyp`, try the following command:
     - `npm install --global --production windows-build-tools`

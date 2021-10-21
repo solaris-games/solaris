@@ -835,7 +835,7 @@ class GameHelper {
   _getBankingCredits (game, player) {
     const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
 
-    if (!bankingEnabled || !player.stats.totalStars) {
+    if (!bankingEnabled || !player.stats.totalStars || !player.research || !player.research.banking) {
       return 0
     }
 
@@ -871,6 +871,18 @@ class GameHelper {
     const upkeep = this._getUpkeepCosts(game, player);
     return fromEconomy - upkeep  + this._getBankingCredits(game, player);
   }
+
+  isStarHasMultiplePlayersInOrbit (game, star) {
+    let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
+    let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
+
+    if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
+      playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
+    }
+    
+    return playerIds.length
+  }
+
 }
 
 export default new GameHelper()

@@ -123,9 +123,9 @@ module.exports = class EmailService {
 
         // Replace the default parameters in the file
         // TODO: These should be environment variables.
-        html = html.replace('[{solaris_url}]', 'https://solaris.games');
-        html = html.replace('[{solaris_url_gamelist}]', 'https://solaris.games/#/game/list');
-        html = html.replace('[{solaris_url_resetpassword}]', 'https://solaris.games/#/account/reset-password-external');
+        html = html.replace('[{solaris_url}]', process.env.CLIENT_URL);
+        html = html.replace('[{solaris_url_gamelist}]', `${process.env.CLIENT_URL}/#/game/list`);
+        html = html.replace('[{solaris_url_resetpassword}]', `${process.env.CLIENT_URL}/#/account/reset-password-external`);
         html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
 
         // Replace the parameters in the file
@@ -148,7 +148,7 @@ module.exports = class EmailService {
 
     async sendGameStartedEmail(gameId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -168,7 +168,7 @@ module.exports = class EmailService {
     }
 
     async sendGameFinishedEmail(game) {
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -206,7 +206,7 @@ module.exports = class EmailService {
             .join('');
         }
 
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
@@ -275,7 +275,7 @@ module.exports = class EmailService {
             player.hasSentTurnReminder = true;
             await game.save();
 
-            let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+            let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
             let user = await this.userService.getEmailById(player.userId);

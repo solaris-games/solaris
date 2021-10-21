@@ -58,7 +58,8 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all"
+    "tradeScanning": "all",
+    "alliances": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -86,6 +87,11 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 1800,
-    "startDelay": 60
+    "startDelay": 60,
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
   }
 }

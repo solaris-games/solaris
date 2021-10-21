@@ -3,10 +3,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ResearchService extends EventEmitter {
 
-    constructor(gameModel, technologyService, randomService, playerService, starService, userService) {
+    constructor(gameRepo, technologyService, randomService, playerService, starService, userService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.technologyService = technologyService;
         this.randomService = randomService;
         this.playerService = playerService;
@@ -24,7 +24,7 @@ module.exports = class ResearchService extends EventEmitter {
 
         player.researchingNow = preference;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -53,7 +53,7 @@ module.exports = class ResearchService extends EventEmitter {
 
         player.researchingNext = preference;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {

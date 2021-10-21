@@ -93,7 +93,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
         try {
@@ -103,13 +103,33 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {
             let user = await container.userService.getMe(req.session.userId);
 
             return res.status(200).json(user);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/user/avatars', middleware.authenticate, async (req, res, next) => {
+        try {
+            let avatars = await container.avatarService.listUserAvatars(req.session.userId);
+
+            return res.status(200).json(avatars);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.post('/api/user/avatars/:avatarId/purchase', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.avatarService.purchaseAvatar(req.session.userId, parseInt(req.params.avatarId));
+
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -282,7 +302,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/donations/recent', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/donations/recent', async (req, res, next) => {
         try {
             let result = await container.donateService.listRecentDonations(3);
 

@@ -31,7 +31,6 @@ const schema = new Schema({
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
-        renown: { type: Types.Number, default: 0 }, // TODO: Why are there 2 of these?
         combat: {
             kills: {
                 ships: { type: Types.Number, default: 0 },
@@ -159,7 +158,8 @@ const schema = new Schema({
             defaultAmount: { type: Types.Number, required: false, default: 0 },
             confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         }
-    }
+    },
+    avatars: [{ type: Types.Number, required: false }]
 });
 
 module.exports = schema;

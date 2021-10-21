@@ -2,15 +2,16 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ShipTransferService {
 
-    constructor(gameModel, carrierService, starService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, carrierService, starService) {
+        this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
     }
 
     async transferAllToStar(game, player, starId) {
-        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId);
         let star = this.starService.getById(game, starId);
+        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
+            .filter(c => c.ownedByPlayerId.equals(player._id));
 
         if (!star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
@@ -57,7 +58,7 @@ module.exports = class ShipTransferService {
         });
 
         // Update the DB.
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         return {
             star: {
@@ -77,11 +78,11 @@ module.exports = class ShipTransferService {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier || !carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        if (!star.ownedByPlayerId.equals(player._id)) {
+        if (!star || !star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 
@@ -116,7 +117,7 @@ module.exports = class ShipTransferService {
         star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             {
                 updateOne: {
                     filter: {

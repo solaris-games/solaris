@@ -4,71 +4,56 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameModel, userService, starService, carrierService, playerService, passwordService, achievementService) {
+    constructor(gameRepo, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.userService = userService;
         this.starService = starService;
         this.carrierService = carrierService;
         this.playerService = playerService;
         this.passwordService = passwordService;
         this.achievementService = achievementService;
+        this.avatarService = avatarService;
     }
 
     async getByIdAll(id) {
-        return await this.gameModel.findById(id).exec();
+        return await this.gameRepo.findByIdAsModel(id);
     }
 
     async getByIdAllLean(id) {
-        return await this.gameModel.findById(id)
-            .lean()
-            .exec();
+        return await this.gameRepo.findById(id);
     }
 
     async getById(id, select) {
-        return await this.gameModel.findById(id)
-            .select(select)
-            .exec();
+        return await this.gameRepo.findByIdAsModel(id, select);
     }
 
     async getByNameSettingsLean(name) {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.name': name
-        })
-        .select({
+        }, {
             'settings': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getByNameStateSettingsLean(name) {
-        return await this.gameModel.find({
+        return await this.gameRepo.find({
             'settings.general.name': name
-        })
-        .select({
+        }, {
             state: 1,
             settings: 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getByIdSettingsLean(id) {
-        return await this.gameModel.findById(id)
-        .select({
+        return await this.gameRepo.findById(id, {
             'settings': 1
-        })
-        .lean()
-        .exec();
+        });
     }
 
     async getByIdLean(id, select) {
-        return await this.gameModel.findById(id)
-            .select(select)
-            .lean({ defaults: true })
-            .exec();
+        return await this.gameRepo.findById(id, select);
     }
 
     async getByIdGalaxy(id, select) {
@@ -93,6 +78,10 @@ module.exports = class GameService extends EventEmitter {
         let game = await this.getByIdLean(id, {
             'state.tick': 1
         });
+
+        if (!game) {
+            return null;
+        }
 
         return game.state.tick;
     }
@@ -171,6 +160,14 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async getByIdDiplomacyLean(id) {
+        return await this.getByIdLean(id, {
+            'galaxy.players._id': 1,
+            'galaxy.players.userId': 1,
+            'galaxy.players.diplomacy': 1
+        });
+    }
+
     async join(game, userId, playerId, alias, avatar, password) {
         // The player cannot join the game if:
         // 1. The game has finished.
@@ -198,8 +195,7 @@ module.exports = class GameService extends EventEmitter {
         // Perform a new player check if the game is for established players only.
         // If the player is new then they cannot join.
         if (this.isForEstablishedPlayersOnly(game)) {
-            let userAchievements = await this.achievementService.getAchievements(userId);
-            let isEstablishedPlayer = userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
+            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(userId);
             
             // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
             if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
@@ -207,9 +203,16 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
-        let isQuitter = game.quitters.find(x => x.equals(userId));
+        // Verify that the user has purchased the avatar they selected.
+        const userAvatar = await this.avatarService.getUserAvatar(userId, avatar);
+
+        if (!userAvatar.purchased) {
+            throw new ValidationError(`You have not purchased the selected avatar.`);
+        }
 
         // The user cannot rejoin if they quit early.
+        let isQuitter = game.quitters.find(x => x.equals(userId));
+
         if (isQuitter) {
             throw new ValidationError('You cannot rejoin this game.');
         }
@@ -273,6 +276,7 @@ module.exports = class GameService extends EventEmitter {
 
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
+        player.hasFilledAfkSlot = player.afk;
         player.defeated = false;
         player.defeatedDate = null;
         player.afk = false;
@@ -429,7 +433,9 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
-        await this.gameModel.deleteOne({ _id: game._id });
+        await this.gameRepo.deleteOne({ 
+            _id: game._id 
+        });
 
         // TODO: Delete game events
         // TODO: Delete game history
@@ -443,7 +449,7 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async getPlayerUserLean(game, playerId) {
-        if (game.settings.general.anonymity === 'extra') {
+        if (this.isAnonymousGame(game)) {
             return null;
         }
         
@@ -463,25 +469,23 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async lock(gameId, locked = true) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId
         }, {
             $set: {
                 'state.locked': locked
             }
-        })
-        .exec();
+        });
     }
 
     async lockAll(locked = true) {
-        await this.gameModel.updateMany({
+        await this.gameRepo.updateMany({
             'state.locked': { $ne: locked }
         }, {
             $set: {
                 'state.locked': locked
             }
-        })
-        .exec();
+        });
     }
 
     // TODO: All of below needs a rework. A game is started if the start date is less than now and the game hasn't finished
@@ -551,6 +555,14 @@ module.exports = class GameService extends EventEmitter {
         return game.settings.general.mode === 'battleRoyale';
     }
 
+    isOrbitalMode(game) {
+        return game.settings.orbitalMechanics.enabled === 'enabled';
+    }
+
+    isAnonymousGame(game) {
+        return game.settings.general.anonymity === 'extra';
+    }
+
     isNewPlayerGame(game) {
         return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
     }
@@ -564,7 +576,7 @@ module.exports = class GameService extends EventEmitter {
     }
     
     async quitAllActiveGames(userId) {
-        let allGames = await this.gameModel.find({
+        let allGames = await this.gameRepo.findAsModels({
             'galaxy.players': {
                 $elemMatch: { 
                     userId,             // User is in game
@@ -591,14 +603,13 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async markAsCleaned(gameId) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId
         }, {
             $set: {
                 'state.cleaned': true
             }
-        })
-        .exec();
+        });
     }
 
 };

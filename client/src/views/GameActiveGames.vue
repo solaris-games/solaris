@@ -34,10 +34,12 @@
               <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
                   <td class="col-6">
                     {{game.settings.general.name}}
-                    <span v-if="game.defeated && !game.afk" class="ml-1 badge badge-danger">Defeated</span>
-                    <span v-if="!game.defeated && game.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
-                    <span v-if="!game.defeated && game.unread" class="ml-1 badge badge-info">{{game.unread}} Notifications</span>
-                    <span v-if="game.afk" class="ml-1 badge badge-warning">AFK</span>
+                    <br/>
+                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ml-1 badge badge-danger">Defeated</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="ml-1 badge badge-warning">{{game.userNotifications.unreadEvents}} Events</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                    <span v-if="game.userNotifications.afk" class="ml-1 badge badge-warning">AFK</span>
 
                     <div class="d-md-none">
                       <small>
@@ -77,8 +79,8 @@
     </div>
 
     <div class="text-right" v-if="!isLoadingActiveGames">
-      <router-link to="/game/create" tag="button" class="btn btn-info mr-1">Create Game</router-link>
-      <router-link to="/game/list" tag="button" class="btn btn-success">Join New  Game</router-link>
+      <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+      <router-link to="/game/list" tag="button" class="btn btn-success">Join New  Game <i class="fas fa-arrow-right"></i></router-link>
     </div>
 
     <hr>
@@ -101,7 +103,10 @@
         </thead>
         <tbody>
             <tr v-for="game in completedGames" v-bind:key="game._id">
-                <td>{{game.settings.general.name}}</td>
+                <td>
+                  {{game.settings.general.name}}
+                  <span v-if="game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                </td>
                 <td class="d-none d-sm-table-cell text-right">{{getEndDateFromNow(game)}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
@@ -111,8 +116,8 @@
     </table>
 
     <div class="text-right" v-if="!isLoadingCompletedGames">
-      <router-link to="/game/create" tag="button" class="btn btn-info mr-1">Create Game</router-link>
-      <router-link to="/game/list" tag="button" class="btn btn-success">Join New  Game</router-link>
+      <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+      <router-link to="/game/list" tag="button" class="btn btn-success">Join New  Game <i class="fas fa-arrow-right"></i></router-link>
     </div>
 
   </view-container>
@@ -143,24 +148,38 @@ export default {
       includeDefeated: true
     }
   },
-  async mounted () {
-    try {
-      let response = await gameService.listActiveGames()
-
-      this.activeGames = response.data
-        .sort((a, b) => (a.defeated - a.afk) - (b.defeated - b.afk))
-
-      response = await gameService.listCompletedGames()
-
-      this.completedGames = response.data
-    } catch (err) {
-      console.error(err)
-    }
-
-    this.isLoadingActiveGames = false
-    this.isLoadingCompletedGames = false
+  mounted () {
+    this.loadActiveGames()
+    this.loadCompletedGames()
   },
   methods: {
+    async loadActiveGames () {
+      this.isLoadingActiveGames = true
+
+      try {
+        let response = await gameService.listActiveGames()
+
+        this.activeGames = response.data
+          .sort((a, b) => (a.userNotifications.defeated - a.userNotifications.afk) - (b.userNotifications.defeated - b.userNotifications.afk))
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoadingActiveGames = false
+    },
+    async loadCompletedGames () {
+      this.isLoadingCompletedGames = true
+
+      try {
+        let response = await gameService.listCompletedGames()
+
+        this.completedGames = response.data
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoadingCompletedGames = false
+    },
     getEndDateFromNow (game) {
       return moment(game.state.endDate).fromNow()
     },
@@ -194,7 +213,7 @@ export default {
         return this.activeGames
       }
 
-      return this.activeGames.filter(g => !g.defeated)
+      return this.activeGames.filter(g => !g.userNotifications.defeated)
     }
   }
 }

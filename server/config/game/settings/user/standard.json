@@ -24,7 +24,7 @@
         "specialistsCurrency": "creditsSpecialists",
         "randomGates": "none",
         "darkGalaxy": "disabled",
-        "giftCarriers": "disabled",
+        "giftCarriers": "enabled",
         "defenderBonus": "enabled",
         "carrierToCarrierCombat": "enabled",
         "resourceDistribution": "random",
@@ -58,7 +58,8 @@
         "tradeCredits": true,
         "tradeCreditsSpecialists": true,
         "tradeCost": 15,
-        "tradeScanning": "scanned"
+        "tradeScanning": "scanned",
+        "alliances": "enabled"
     },
     "technology": {
         "startingTechnologyLevel": {
@@ -89,6 +90,10 @@
         "startDelay": 240,
         "turnJumps": 6,
         "maxTurnWait": 1440,
-        "missedTurnLimit": 3
+        "afk": {
+            "lastSeenTimeout": 2,
+            "cycleTimeout": 3,
+            "turnTimeout": 3
+        }
     }
 }

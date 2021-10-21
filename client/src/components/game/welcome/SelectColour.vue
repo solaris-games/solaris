@@ -68,7 +68,13 @@ export default {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
     },
     getAvatarImage (player) {
-      return require(`../../../assets/avatars/${player.avatar}.png`)
+      try {
+        return require(`../../../assets/avatars/${player.avatar}.png`)
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     },
     getPlayerStatus (player) {
       return gameHelper.getPlayerStatus(player)

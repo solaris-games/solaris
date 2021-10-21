@@ -88,7 +88,13 @@ export default {
       this.$emit('onOpenTradeRequested', this.playerId)
     },
     getAvatarImage () {
-      return require(`../../../assets/avatars/${this.player.avatar}.png`)
+      try {
+        return require(`../../../assets/avatars/${this.player.avatar}.png`)
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     },
     async loadConversation () {
       if (this.userPlayer && this.userPlayer._id !== this.player._id) {

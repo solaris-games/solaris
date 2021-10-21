@@ -5,10 +5,10 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class PlayerService extends EventEmitter {
     
-    constructor(gameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService) {
+    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
@@ -330,8 +330,6 @@ module.exports = class PlayerService extends EventEmitter {
     _setDefaultResearchTechnology(game, player) {
         let enabledTechs = this.technologyService.getEnabledTechnologies(game);
 
-        // TODO: Should we select a random enabled technology instead of the first enabled one?
-
         player.researchingNow = enabledTechs[0] || 'weapons';
         player.researchingNext = player.researchingNow;
     }
@@ -478,7 +476,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     async updateLastSeenLean(gameId, userId, ipAddress) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId,
             'galaxy.players.userId': userId
         }, {
@@ -572,7 +570,7 @@ module.exports = class PlayerService extends EventEmitter {
     async declareReady(game, player) {
         player.ready = true;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -590,7 +588,7 @@ module.exports = class PlayerService extends EventEmitter {
     async undeclareReady(game, player) {
         player.ready = false;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -608,7 +606,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.ready = true;
         player.readyToQuit = true;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -627,7 +625,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.ready = false;
         player.readyToQuit = false;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -645,7 +643,7 @@ module.exports = class PlayerService extends EventEmitter {
     async updateGameNotes(game, player, notes) {
         player.notes = notes;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -702,20 +700,20 @@ module.exports = class PlayerService extends EventEmitter {
 
     isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
-        // 1. They haven't been seen for 2 days.
+        // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
-        // 3. They missed 3 cycles in a real time game (minimum of 12 hours)
-        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(2, 'days');
+        // 3. They missed X cycles in a real time game (minimum of 12 hours)
+        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
 
         if (lastSeenMoreThanXDaysAgo) {
             return true;
         }
 
         if (isTurnBasedGame) {
-            return player.missedTurns >= game.settings.gameTime.missedTurnLimit;
+            return player.missedTurns >= game.settings.gameTime.afk.turnTimeout;
         }
 
-        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * 3;
+        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
         let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
         let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() < moment().utc().subtract(secondsToAfk, 'seconds');
 
@@ -726,6 +724,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.defeated = true;
         player.defeatedDate = moment().utc();
         player.researchingNext = 'random'; // Set up the AI for random research.
+        player.diplomacy.allies = []; // Set all players to enemies.
 
         // Auto-ready the player so they don't hold up the game.
         if (game.settings.gameTime.gameType === 'turnBased') {
@@ -777,7 +776,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
         
         if (commit) {
-            await this.gameModel.bulkWrite([query]);
+            await this.gameRepo.bulkWrite([query]);
         }
         
         return query;
@@ -801,7 +800,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
         
         if (commit) {
-            await this.gameModel.bulkWrite([query]);
+            await this.gameRepo.bulkWrite([query]);
         }
         
         return query;

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import gameHelper from '../services/gameHelper'
 
 class Star extends EventEmitter {
 
@@ -100,7 +101,8 @@ class Star extends EventEmitter {
     return !(typeof this.data.infrastructure === 'undefined')
   }
 
-  setup (data, userSettings, players, carriers, lightYearDistance) {
+  setup (game, data, userSettings, players, carriers, lightYearDistance) {
+    this.game = game
     this.data = data
     this.players = players
     this.carriers = carriers
@@ -490,6 +492,10 @@ class Star extends EventEmitter {
     if (carrierCount) {
       shipsText += '/'
       shipsText += carrierCount.toString()
+
+      if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
+        shipsText += '+'
+      }
     }
 
     if (shipsText) {
@@ -797,16 +803,21 @@ class Star extends EventEmitter {
   select () {
     this.isSelected = true
     this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
   }
 
   toggleSelected () {
-    this.isSelected = !this.isSelected
-    this.drawSelectedCircle()
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
   }
 
   showIgnoreBulkUpgrade () {

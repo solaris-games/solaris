@@ -24,6 +24,7 @@ export default {
     'm': MENU_STATES.INBOX,
     'n': MENU_STATES.GAME_NOTES,
     'l': MENU_STATES.LEDGER,
+    'd': MENU_STATES.DIPLOMACY,
     'b': MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE,
   }
 }

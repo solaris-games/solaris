@@ -13,6 +13,10 @@ module.exports = class OrbitalMechanicsService {
     }
 
     orbitObject(game, objectWithLocation) {
+        objectWithLocation.location = this.getNextLocation(game, objectWithLocation);
+    }
+
+    getNextLocation(game, objectWithLocation) {
         if (game.settings.orbitalMechanics.enabled === 'disabled') {
             throw new Error('Game settings disallow orbital mechanics.');
         }
@@ -48,7 +52,7 @@ module.exports = class OrbitalMechanicsService {
             arcLength = speed / r * 100;
         }
         
-        objectWithLocation.location = this.rotate(
+        return this.rotate(
             galaxyCenter.x, galaxyCenter.y,
             objectWithLocation.location.x, objectWithLocation.location.y, 
             arcLength);

@@ -164,8 +164,8 @@
           </div>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
 
           <hr/>
@@ -193,7 +193,7 @@
             </div>
 
             <!-- Battle Royale -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialBattleRoyale">
+            <div class="col-sm-12 col-md-4 col-lg-4 pl-1" v-if="games.specialBattleRoyale">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialBattleRoyale._id })">
                 <img class="card-img" :src="require('../assets/screenshots/special_battleRoyale.png')" alt="Special - Battle Royale">
                 <div class="card-img-overlay">
@@ -210,7 +210,7 @@
             </div>
 
             <!-- Orbital -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialOrbital">
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1" v-if="games.specialOrbital">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialOrbital._id })">
                 <img class="card-img" :src="require('../assets/screenshots/special_orbital.png')" alt="Special - Orbital Game">
                 <div class="card-img-overlay">
@@ -244,7 +244,7 @@
             </div>
 
             <!-- Anonymous -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.specialAnonymous">
+            <div class="col-sm-12 col-md-4 col-lg-4 pl-1" v-if="games.specialAnonymous">
               <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.specialAnonymous._id })">
                 <img class="card-img" :src="require('../assets/screenshots/special_anonymous.png')" alt="Special - Capital Stars Game">
                 <div class="card-img-overlay">
@@ -298,15 +298,15 @@
           </table>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
         
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots.</p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -341,8 +341,8 @@
           </table>
 
           <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info">Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1">View My Games</router-link>
+            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
     </div>

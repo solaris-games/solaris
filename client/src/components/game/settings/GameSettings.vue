@@ -62,9 +62,17 @@
             <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
             <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
           </tr>
+          <tr>
+            <td>AFK Last Seen Limit</td>
+            <td class="text-right">{{ game.settings.gameTime.afk.lastSeenTimeout }} day(s)</td>
+          </tr>
+          <tr v-if="game.settings.gameTime.gameType === 'realTime'">
+            <td>AFK Galactic Cycle Limit</td>
+            <td class="text-right">{{ game.settings.gameTime.afk.cycleTimeout }} cycles</td>
+          </tr>
           <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-            <td>Missed Turn Limit</td>
-            <td class="text-right">{{ game.settings.gameTime.missedTurnLimit }} missed turns</td>
+            <td>AFK Missed Turn Limit</td>
+            <td class="text-right">{{ game.settings.gameTime.afk.turnTimeout }} missed turns</td>
           </tr>
         </tbody>
       </table>
@@ -130,7 +138,7 @@
             <td>Defender Bonus</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.defenderBonus) }}</td>
           </tr>
-          <tr v-if="game.settings.orbitalMechanics.enabled === 'disabled'">
+          <tr>
             <td>Carrier-to-Carrier Combat</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
           </tr>

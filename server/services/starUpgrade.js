@@ -4,10 +4,10 @@ const Heap = require('qheap');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService, playerService) {
+    constructor(gameRepo, starService, carrierService, achievementService, researchService, technologyService, playerService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.starService = starService;
         this.carrierService = carrierService;
         this.achievementService = achievementService;
@@ -51,7 +51,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= cost;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             this._getSetStarWarpGateDBWrite(game, star, true)
         ]);
@@ -80,7 +80,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             this._getSetStarWarpGateDBWrite(game, star, false)
         ]);
 
@@ -128,7 +128,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= cost;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             {
                 updateOne: {
@@ -235,7 +235,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         // Update the DB.
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         if (!player.defeated) {
             await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
@@ -435,7 +435,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
 
             // Update the DB.
-            await this.gameModel.bulkWrite(dbWrites);
+            await this.gameRepo.bulkWrite(dbWrites);
         }
 
         // Check for AI control.

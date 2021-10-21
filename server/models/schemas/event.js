@@ -12,5 +12,6 @@ const schema = new Schema({
 });
 
 schema.index({gameId: 1, tick: 1}, {unique: false});
+schema.index({gameId: 1, playerId: 1}, {unique: false});
 
 module.exports = schema;

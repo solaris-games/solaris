@@ -1,12 +1,14 @@
 module.exports = class AdminService {
     
-    constructor(userModel, gameModel) {
-        this.userModel = userModel;
-        this.gameModel = gameModel;
+    constructor(userRepo, gameRepo) {
+        this.userRepo = userRepo;
+        this.gameRepo = gameRepo;
     }
 
     async listUsers(limit) {
-        let users = await this.userModel.find({}, {
+        let users = await this.userRepo.find({
+            // All users
+        }, {
             username: 1,
             email: 1,
             credits: 1,
@@ -18,13 +20,9 @@ module.exports = class AdminService {
             lastSeenIP: 1,
             'achievements.rank': 1,
             'achievements.completed': 1
-        })
-        .sort({
+        }, {
             lastSeen: -1
-        })
-        .limit(limit)
-        .lean({defaults: true})
-        .exec();
+        }, limit);
 
         for (let user of users) {
             user.isEstablishedPlayer = user.achievements.rank > 0 || user.achievements.completed > 0;
@@ -34,68 +32,67 @@ module.exports = class AdminService {
     }
 
     async listGames(limit) {
-        return await this.gameModel.find({}, {
+        return await this.gameRepo.find({
+            // All games
+        }, {
             'settings.general': 1,
             'state': 1
-        })
-        .sort({
+        }, {
             _id: -1
-        })
-        .limit(limit)
-        .lean({defaults: true})
-        .exec();
+        },
+        limit);
     }
 
     async setRoleContributor(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.contributor': enabled
-        }).exec();
+        });
     }
 
     async setRoleDeveloper(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.developer': enabled
-        }).exec();
+        });
     }
 
     async setRoleCommunityManager(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.communityManager': enabled
-        }).exec();
+        });
     }
 
     async setRoleGameMaster(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.gameMaster': enabled
-        }).exec();
+        });
     }
 
     async ban(userId) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'banned': true
-        }).exec();
+        });
     }
 
     async unban(userId) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'banned': false
-        }).exec();
+        });
     }
 
     async promoteToEstablishedPlayer(userId) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId,
             $and: [
                 { 'achievements.rank': { $eq: 0 }},
@@ -105,25 +102,15 @@ module.exports = class AdminService {
             $inc: {
                 'achievements.completed': 1
             }
-        }).exec();
-    }
-
-    async setCredits(userId, credits) {
-        credits = Math.max(credits, 0);
-        
-        await this.userModel.updateOne({
-            _id: userId
-        }, {
-            'credits': credits
-        }).exec();
+        });
     }
 
     async setGameFeatured(gameId, featured) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId
         }, {
             'settings.general.featured': featured
-        }).exec();
+        });
     }
 
 };

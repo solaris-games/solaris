@@ -58,7 +58,8 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all"
+    "tradeScanning": "all",
+    "alliances": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -87,6 +88,10 @@
     "gameType": "turnBased",
     "turnJumps": 4,
     "maxTurnWait": 1440,
-    "missedTurnLimit": 3
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
   }
 }

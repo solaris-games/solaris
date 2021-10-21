@@ -284,7 +284,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    }, middleware.handleError);    
+    }, middleware.handleError);
 
     return router;
 
