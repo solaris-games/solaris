@@ -5,8 +5,6 @@
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
   <div class="menu">
-    <div class="header-buffer"></div>
-
     <not-logged-in-bar v-if="!isLoggedIn"/>
     <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
 
@@ -322,14 +320,11 @@ export default {
   bottom: 0px;
 }
 
-.header-buffer {
-  height: 45px;
-}
-
 .menu {
   position:absolute; /* This is a must otherwise the div overlays the map */
   width: 473px;
   max-height: 100%;
+  top: 45px;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
