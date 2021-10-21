@@ -4,11 +4,12 @@ const simplexNoise = require('simplex-noise');
 
 module.exports = class IrregularMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.resourceService = resourceService;
     }
     
     //TODO this is generator agnostic and could be on a base class or service
@@ -377,55 +378,9 @@ module.exports = class IrregularMapService {
 
         locations = locations.concat(homeLocations);
 
-        this.setResources(game, locations, resourceDistribution, playerCount, RNG);
+        this.resourceService.distribute(game, locations, resourceDistribution);
         
         return locations;
     }
-
-    setResources(game, locations, resourceDistribution, playerCount, rng) {
-        switch (resourceDistribution) {
-            case 'random': 
-                this._setResourcesRandom(game, locations, playerCount, rng);
-                break;
-            case 'weightedCenter': 
-                this._setResourcesWeightedCenter(game, locations, playerCount, rng);
-                break;
-            default:
-                throw new ValidationError(`Unsupported resource distribution type: ${resourceDistribution}`);
-        }
-    }
-
-    _setResourcesRandom(game, locations, playerCount, rng) { 
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-
-        for (let i = 0; i<locations.length; i++ ) {
-            let naturalResources = Math.floor(this.randomService.getRandomNumberBetween(RMIN, RMAX));
-            locations[i].resources = naturalResources;
-        }
-    }
-
-    // set random instead, since the galaxy shape is unpredictible, the 'center' has not meaing
-    _setResourcesWeightedCenter(game, locations, playerCount, rng) {
-        this._setResourcesRandom(game, locations, playerCount, rng);
-    }
-
-    //TODO this is generator agnostic and could be on a base class or service
-    _getGalaxyDiameter(locations) {
-        let xArray = locations.map( (location) => { return location.x; } );
-        let yArray = locations.map( (location) => { return location.y; } );
-
-        let maxX = Math.max(...xArray);
-        let maxY = Math.max(...yArray);
-
-        let minX = Math.min(...xArray);
-        let minY = Math.min(...yArray);
-
-        return {
-            x: maxX - minX,
-            y: maxY - minY
-        };
-    }
-
 };
 

@@ -2,11 +2,12 @@ const ValidationError = require("../../errors/validation");
 
 module.exports = class CircularMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.resourceService = resourceService;
     }
 
     generateLocations(game, starCount, resourceDistribution) {
@@ -41,59 +42,9 @@ module.exports = class CircularMapService {
             }
         } while (locations.length < starCount)
 
-        this.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
 
         return locations;
-    }
-
-    setResources(game, locations, resourceDistribution) {
-        switch (resourceDistribution) {
-            case 'random': 
-                this.setResourcesRandom(game, locations);
-                break;
-            case 'weightedCenter': 
-                this.setResourcesWeightedCenter(game, locations);
-                break;
-            default:
-                throw new ValidationError(`Unsupported resource distribution type: ${resourceDistribution}`);
-        }
-    }
-
-    setResourcesRandom(game, locations) { 
-        // Allocate random resources.
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-
-        for (let location of locations) {
-            let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
-
-            location.resources = Math.floor(r);
-        }
-    }
-
-    setResourcesWeightedCenter(game, locations) {
-        // Work out how large the radius of the circle used to determine natural resources.
-        // The closer to the center of the galaxy, the more likely to find stars with higher resources.
-        const resourceRadius = this.getGalaxyDiameter(locations).x / 3;
-        
-        for (let location of locations) {
-            let resources = this.randomService.generateStarNaturalResources(resourceRadius, location.x, location.y, 
-                game.constants.star.resources.minNaturalResources, game.constants.star.resources.maxNaturalResources, true);
-            
-            location.resources = resources;
-        }
-    }
-
-    getGalaxyDiameter(locations) {
-        let maxX = locations.sort((a, b) => b.x - a.x)[0].x;
-        let maxY = locations.sort((a, b) => b.y - a.y)[0].y;
-        let minX = locations.sort((a, b) => a.x - b.x)[0].x;
-        let minY = locations.sort((a, b) => a.y - b.y)[0].y;
-
-        return {
-            x: Math.abs(minX) + Math.abs(maxX),
-            y: Math.abs(minY) + Math.abs(maxY),
-        };
     }
 
     isLocationTooCloseToOthers(game, location, locations) {

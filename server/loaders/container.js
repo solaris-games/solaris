@@ -64,6 +64,7 @@ const DiplomacyService = require('../services/diplomacy');
 const AvatarService = require('../services/avatar');
 const PaypalService = require('../services/paypal');
 
+const ResourceService = require('../services/resource')
 const CircularMapService = require('../services/maps/circular');
 const CircularBalancedMapService = require('../services/maps/circularBalanced');
 const SpiralMapService = require('../services/maps/spiral');
@@ -102,11 +103,12 @@ module.exports = (config, io) => {
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService);
     const carrierService = new CarrierService(gameRepository, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService);
-    const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService);
-    const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService);
-    const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService);
-    const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService);
-    const irregularMapService = new IrregularMapService(randomService, starService, starDistanceService, distanceService);
+    const resourceService = new ResourceService(randomService, distanceService, starDistanceService);
+    const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService, resourceService);
+    const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService, resourceService);
+    const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService, resourceService);
+    const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService, resourceService);
+    const irregularMapService = new IrregularMapService(randomService, starService, starDistanceService, distanceService, resourceService);
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService);
     const ledgerService = new LedgerService(gameRepository, playerService);

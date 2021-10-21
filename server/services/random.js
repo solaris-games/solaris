@@ -9,6 +9,21 @@ module.exports = class RandomService {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    getRandomNumberBetweenEXP(min, max, P1 = 0.5) {
+        // P1 is the chance that the result is below half. So if the end result is between 0 and 1, like a Math.random,
+        // P1 describes the chance of the number being between 0 and 0.5, this makes P2 the chance of it being between 0.5 and 1
+        let P2 = 1 - P1;
+        if (P1 <= 0) {
+            return max;
+        } else if (P1 >= 1) {
+            return min;
+        }
+        let t = Math.random()
+        let exp = Math.log(P2) / Math.log(0.5)
+        // t**exp is still a value between 0 and 1, however the odds on each range is not the same, for example, if exp = 2, the odds on t**exp > 0.5 are 75%,
+        return Math.floor(t**exp * (max - min + 1) + min);
+    }
+
     getRandomAngle() {
         return Math.random() * Math.PI * 2;
     }
