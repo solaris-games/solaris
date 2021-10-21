@@ -182,12 +182,12 @@ module.exports = class TechnologyService {
         let buffs = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true) + defenderBonus);
+            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true));
         }
 
-        buffs.push(this.getStarWeaponsBuff(star) + defenderBonus);
+        buffs.push(this.getStarWeaponsBuff(star));
 
-        return this._calculateActualWeaponsBuff(weapons, buffs);
+        return this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
     }
 
     getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat) {
@@ -199,16 +199,16 @@ module.exports = class TechnologyService {
 
         let buffs = carriers.map(c => this.getCarrierWeaponsBuff(c, isCarrierToStarCombat));
 
-        return this._calculateActualWeaponsBuff(weapons, buffs);
+        return this._calculateActualWeaponsBuff(weapons, buffs, 0);
     }
 
-    _calculateActualWeaponsBuff(weapons, buffs) {
+    _calculateActualWeaponsBuff(weapons, buffs, additionalBuff) {
         let buff = Math.max(0, buffs.sort((a, b) => b - a)[0]);
         let debuff = buffs.sort((a, b) => a - b)[0];
 
         let actualBuff = debuff < 0 ? debuff + buff : buff;
 
-        return Math.max(1, weapons + actualBuff);
+        return Math.max(1, weapons + actualBuff + additionalBuff);
     }   
 
     getDefenderBonus(game) {
