@@ -11,7 +11,7 @@ module.exports = class CircularMapService {
     }
 
     generateLocations(game, starCount, resourceDistribution) {
-        let locations = [];
+        const locations = [];
 
         // To generate locations we do the following:
         // - Try to create a location at a random angle and distance from the center
@@ -42,7 +42,7 @@ module.exports = class CircularMapService {
             }
         } while (locations.length < starCount)
 
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
 
         return locations;
     }

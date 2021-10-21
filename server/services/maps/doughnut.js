@@ -13,7 +13,8 @@ module.exports = class DoughnutMapService {
     generateLocations(game, count, resourceDistribution) {
         let locations = this.generateCircle(count);
 
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
+        
         this.applyNoise(locations);
         this.applyPadding(locations);
 

@@ -177,12 +177,12 @@ module.exports = class PlayerService extends EventEmitter {
 
         // doughnut galaxies the distance from the center needs to be slightly more than others
         if (game.settings.galaxy.galaxyType === 'doughnut') {
-            distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 1.5;
+            distanceFromCenter = this.starDistanceService.getGalaxyDiameter(starLocations).x / 2 / 1.5;
         }
         else {
             // The desired distance from the center is half way from the galaxy center and the edge
             // for all galaxies other than doughnut.
-            distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
+            distanceFromCenter = this.starDistanceService.getGalaxyDiameter(starLocations).x / 2 / 2;
         }
 
         return distanceFromCenter;

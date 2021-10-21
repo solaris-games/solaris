@@ -43,7 +43,7 @@ module.exports = class CircularBalancedMapService {
     }
 
     generateLocations(game, starCount, resourceDistribution, playerCount) {
-        let locations = [];
+        const locations = [];
         let seed = ( Math.random()*(10**8) ).toFixed(0);
         const rng = RNG.create(seed); //TODO get seed from player
         const tau = 2.0*Math.PI;
@@ -94,7 +94,7 @@ module.exports = class CircularBalancedMapService {
         // choose home stars
 
         // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this._getGalaxyDiameter(locations).x / 2 / 2;
+        const distanceFromCenter = this.starDistanceService.getGalaxyDiameter(locations).x / 2 / 2;
         let playerAngle = (sectorAngle/2.0);//take a location from the middle of the sector
         let desiredLocation = this._getRotatedLocation({x: 0.0, y: distanceFromCenter}, playerAngle);
         let firstHomeLocation = this.distanceService.getClosestLocation(desiredLocation, locations);
@@ -176,25 +176,9 @@ module.exports = class CircularBalancedMapService {
             //now all linked stars should be reachable
         }
 
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
 
         return locations;
-    }
-
-    _getGalaxyDiameter(locations) {
-        let xArray = locations.map( (location) => { return location.x; } );
-        let yArray = locations.map( (location) => { return location.y; } );
-
-        let maxX = Math.max(...xArray);
-        let maxY = Math.max(...yArray);
-
-        let minX = Math.min(...xArray);
-        let minY = Math.min(...yArray);
-
-        return {
-            x: maxX - minX,
-            y: maxY - minY
-        };
     }
 
     isLocationTooCloseToOthers(game, location, locations) {
