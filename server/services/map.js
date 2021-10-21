@@ -103,18 +103,6 @@ module.exports = class MapService {
         } while (gateCount--);
     }
 
-    getGalaxyDiameter(stars) {
-        let maxX = stars.sort((a, b) => b.x - a.x)[0].x;
-        let maxY = stars.sort((a, b) => b.y - a.y)[0].y;
-        let minX = stars.sort((a, b) => a.x - b.x)[0].x;
-        let minY = stars.sort((a, b) => a.y - b.y)[0].y;
-
-        return {
-            x: Math.abs(minX) + Math.abs(maxX),
-            y: Math.abs(minY) + Math.abs(maxY),
-        };
-    }
-
     getGalaxyCenter(starLocations) {
         if (!starLocations.length) {
             return {
