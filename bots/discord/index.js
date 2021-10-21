@@ -8,7 +8,7 @@ const containerLoader = require('../../server/loaders/container.js');
 
 const BotResponseService = require('./services/response.js')
 const CommandService = require('./services/command.js')
-const ContentUnrelatedService = require('./services/contentUnrelated.js')
+const ReactionService = require('./services/reaction.js')
 const PublicCommandService = require('./services/publicCommand.js')
 const PrivateCommandService = require('./services/privateCommand.js')
 
@@ -18,7 +18,7 @@ let mongo,
     container,
     botResponseService,
     commandService,
-    contentUnrelatedService,
+    reactionService,
     publicCommandService, 
     privateCommandService;
 
@@ -39,7 +39,6 @@ client.on('message', async (msg) => {
     //non-contenrelated responses; the bot has to react to a message, not for what is in it, but for where it has been sent or whatever non-contentrelated reason. Content may be taken into account later in the function
     // Whether the message is in specialist suggestions is being checked.
     if([process.env.CHAT_ID_GENERAL_SUGGESTIONS, process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_POLLS].includes(msg.channel.id)) {
-        console.log(0);
         await contentUnrelated(msg);
     }
 
@@ -49,10 +48,15 @@ client.on('message', async (msg) => {
 });
 
 async function contentUnrelated(msg) {
-    console.log(1)
-    let suggestionChannels = [process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_GENERAL_SUGGESTIONS]
-    await contentUnrelatedService.suggestions(msg, suggestionChannels)
-    await contentUnrelatedService.polls(msg, process.env.CHAT_ID_POLLS)
+    let suggestionChannels = [process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_GENERAL_SUGGESTIONS];
+
+    if (suggestionChannels.includes(msg.channel.id)) {
+        await reactionService.thumbsUpDown(msg);
+    }
+
+    if (msg.channel.id === process.env.CHAT_ID_POLLS) {
+        await reactionService.messageEmojis(msg);
+    }
 }
 
 async function executeCommand(msg) {
@@ -73,7 +77,7 @@ async function startup() {
 
     botResponseService = new BotResponseService();
     commandService = new CommandService();
-    contentUnrelatedService = new ContentUnrelatedService();
+    reactionService = new ReactionService();
     publicCommandService = new PublicCommandService(botResponseService, 
         container.gameGalaxyService, container.gameService, 
         container.leaderboardService, container.userService);
