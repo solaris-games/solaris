@@ -79,6 +79,14 @@ export default new Vuex.Store({
     setConfirmationDialogSettings (state, settings) {
       state.confirmationDialog = settings
     },
+
+    setUnreadMessages (state, count) {
+      state.unreadMessages = count
+    },
+    clearUnreadMessages (state) {
+      state.unreadMessages = null
+    },
+
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
