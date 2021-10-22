@@ -64,6 +64,8 @@ module.exports = class ResourceService {
     }
 
     _distributeWeightedCenterMirrored(game, locations, minResources, maxResources, galaxyRadius, galacticCenter) {
+        let playerCount = game.settings.general.playerLimit;
+        
         for (let i = 0; i < locations.length / playerCount; i++) {
             let radius = this.distanceService.getDistanceBetweenLocations(galacticCenter, locations[i*playerCount]);
             let resources = this.randomService.getRandomNumberBetweenEXP(minResources, maxResources, radius/galaxyRadius);
