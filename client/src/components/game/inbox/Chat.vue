@@ -1,5 +1,5 @@
 <template>
-  <div class="d-none d-lg-block">
+  <div class="d-none d-lg-block" v-if="isUserInGame">
     <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread': unreadMessages}" @click="toggle" title="Inbox (M)">
       <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
@@ -139,7 +139,7 @@ export default {
       }
       
       let isLoggedIn = this.$store.state.userId != null
-      let isInGame = GameHelper.getUserPlayer(this.$store.state.game) != null
+      let isInGame = this.isUserInGame
 
       if (!isLoggedIn || !isInGame) {
         return
@@ -164,6 +164,9 @@ export default {
   computed: {
     unreadMessages () {
       return this.$store.state.unreadMessages
+    },
+    isUserInGame () {
+      return GameHelper.getUserPlayer(this.$store.state.game) != null
     }
   }
 }
@@ -186,7 +189,7 @@ export default {
   right: 20px;
   bottom: 100px;
   width: 473px;
-  max-height: 775px;
+  top: 60px;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
