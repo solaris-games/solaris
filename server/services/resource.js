@@ -33,7 +33,7 @@ module.exports = class ResourceService {
             for (let i = 0; i < locations.length / playerCount; i++) {
                 let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
                 for (let j = 0; j < playerCount; j++){
-                    location[i*playerCount+j].resources = Math.floor(r);
+                    locations[i*playerCount+j].resources = Math.floor(r);
                 }
             }
         } else {

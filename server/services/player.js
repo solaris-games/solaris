@@ -158,7 +158,7 @@ module.exports = class PlayerService extends EventEmitter {
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
         let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
 
-        const distanceFromCenter = this._getPlayerDistanceFromCenter(game);
+        const distanceFromCenter = this._getPlayerDistanceFromCenter(game, galaxyCenter);
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
@@ -172,18 +172,19 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
-    _getPlayerDistanceFromCenter(game) {
+    _getPlayerDistanceFromCenter(game, galacticCenter) {
         let distanceFromCenter;
 
-        // doughnut galaxies the distance from the center needs to be slightly more than others
+        // doughnut galaxies need the distance from the center needs to be slightly more than others
+        // spiral galaxies need the distance to be slightly less, and they have a different galactic center
         if (game.settings.galaxy.galaxyType === 'doughnut') {
             distanceFromCenter = (this.mapService.getGalaxyDiameter(game.galaxy.stars) / 2) * (3/4);
-            console.log(distanceFromCenter)
-        }
-        else {
-            // The desired distance from the center is half way from the galaxy center and the edge
-            // for all galaxies other than doughnut.
-            distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars) / 2 / 2;
+        } else if(game.settings.galaxy.galaxyType === 'spiral') {
+            distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars, galacticCenter) / 2 / 2;
+        } else{
+            // The desired distance from the center is on two thirds from the galaxy center and the edge
+            // for all galaxies other than doughnut and spiral.
+            distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars) / 2 * (2/3);
         }
 
         return distanceFromCenter;
