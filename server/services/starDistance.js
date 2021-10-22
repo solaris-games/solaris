@@ -155,6 +155,27 @@ module.exports = class StarDistanceService {
         return sorted.slice(0, amount); 
     }
 
+    getFurthestStar(star, stars) {
+        return this.getFurthestStars(star, stars, 1)[0];
+    }
+
+    getFurthestStars(star, stars, amount) {
+        let sorted = stars
+            .filter(s => s._id !== star._id) // Exclude the current star.
+            .sort((a, b) => {
+                return this.getDistanceBetweenStars(star, b)
+                    - this.getDistanceBetweenStars(star, a);
+            });
+        
+        return sorted.slice(0, amount); // Slice 1 ignores the first star because it will be the current star.
+    }
+
+    getDistanceToFurthestStar(star, stars) {
+        let furthest = this.getFurthestStar(star, stars);
+
+        return this.distanceService.getDistanceBetweenLocations(star.location, furthest.location);
+    }
+
     getFurthestStarFromLocation(loc, stars){
         return this.getFurthestStarsFromLocation(loc, stars, 1)[0];
     }

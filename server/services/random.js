@@ -32,6 +32,10 @@ module.exports = class RandomService {
         return maxRadius * Math.random()**offset;
     }
 
+    getRandomRadiusInRange(minRadius, maxRadius){
+        return (Math.random()*(maxRadius**2 - minRadius**2) + minRadius**2)**0.5;
+    }
+
     getRandomPositionInCircle(maxRadius, offset = 0.5) {
         let angle = this.getRandomAngle();
         let radius = this.getRandomRadius(maxRadius, offset);
@@ -50,7 +54,17 @@ module.exports = class RandomService {
 
         return position;
     }
+
+    getRandomPositionInDoughnut(minRadius, maxRadius) {
+        let angle = this.getRandomAngle();
+        let radius = this.getRandomRadiusInRange(minRadius, maxRadius)
     
+        return {
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius
+        };
+    }
+
     generateStarNaturalResources(radius, x, y, minResources, maxResources, fuzzy = false){
         const RS_BASE = 2;
         const RS_EXPONENT = 5.8;
