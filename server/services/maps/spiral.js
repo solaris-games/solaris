@@ -27,7 +27,8 @@ module.exports = class SpiralMapService {
         // This service should be responsible for plotting where player home stars are as
         // the current logic doesn't really work well when galaxies are stretched.
         //this.applyQuadraticStretch(locations);
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
+
         this.applyNoise(locations);
         this.applyPadding(locations);
 

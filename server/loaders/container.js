@@ -103,7 +103,7 @@ module.exports = (config, io) => {
     const technologyService = new TechnologyService(specialistService);
     const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService);
     const carrierService = new CarrierService(gameRepository, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService);
-    const resourceService = new ResourceService(randomService, distanceService);
+    const resourceService = new ResourceService(randomService, distanceService, starDistanceService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService, resourceService);
     const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService, resourceService);
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService, resourceService);

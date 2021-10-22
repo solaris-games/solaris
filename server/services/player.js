@@ -184,7 +184,7 @@ module.exports = class PlayerService extends EventEmitter {
         } else{
             // The desired distance from the center is on two thirds from the galaxy center and the edge
             // for all galaxies other than doughnut and spiral.
-            distanceFromCenter = this.mapService.getGalaxyDiameter(game.galaxy.stars) / 2 * (2/3);
+            distanceFromCenter = (this.mapService.getGalaxyDiameter(game.galaxy.stars) / 2) * (2/3);
         }
 
         return distanceFromCenter;

@@ -5,8 +5,6 @@
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
   <div class="menu">
-    <div class="header-buffer"></div>
-
     <not-logged-in-bar v-if="!isLoggedIn"/>
     <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
 
@@ -82,6 +80,9 @@
         @onViewConversationRequested="onViewConversationRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
+      <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
         :tab="menuArguments"
@@ -152,6 +153,7 @@ import CarrierRenameVue from '../carrier/CarrierRename.vue'
 import ShipTransferVue from '../carrier/ShipTransfer.vue'
 import BuildCarrierVue from '../carrier/BuildCarrier.vue'
 import InboxVue from '../inbox/Inbox.vue'
+import EventLogVue from '../eventLog/EventLog.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
 import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
@@ -192,6 +194,7 @@ export default {
     'ship-transfer': ShipTransferVue,
     'build-carrier': BuildCarrierVue,
     'inbox': InboxVue,
+    'event-log': EventLogVue,
     'intel': IntelVue,
     'galaxy': GalaxyVue,
     'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
@@ -309,24 +312,19 @@ export default {
 .header-bar {
   position:absolute;
   height: 45px;
-  z-index: 1;
 }
 
 .footer-bar {
   position: fixed;
   height: 52px;
   bottom: 0px;
-  z-index: 1;
-}
-
-.header-buffer {
-  height: 45px;
 }
 
 .menu {
   position:absolute; /* This is a must otherwise the div overlays the map */
   width: 473px;
   max-height: 100%;
+  top: 45px;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;

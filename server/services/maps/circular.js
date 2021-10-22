@@ -35,7 +35,7 @@ module.exports = class CircularMapService {
             }
         } while (locations.length < starCount)
 
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
 
         return locations;
     }

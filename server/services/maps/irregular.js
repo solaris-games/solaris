@@ -378,7 +378,7 @@ module.exports = class IrregularMapService {
 
         locations = locations.concat(homeLocations);
 
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
         
         return locations;
     }

@@ -7,16 +7,18 @@
     <div v-if="hasGame">
         <span class="d-none">{{ gameId }}</span>
 
-        <main-bar :menuState="menuState"
-                  :menuArguments="menuArguments"
-                  @onMenuStateChanged="onMenuStateChanged"
-                  @onPlayerSelected="onPlayerSelected"/>
-
         <game-container @onStarClicked="onStarClicked"
                     @onStarRightClicked="onStarRightClicked"
                     @onCarrierClicked="onCarrierClicked"
                     @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
+
+        <main-bar :menuState="menuState"
+                  :menuArguments="menuArguments"
+                  @onMenuStateChanged="onMenuStateChanged"
+                  @onPlayerSelected="onPlayerSelected"/>
+
+        <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
     </div>
   </div>
 </template>
@@ -27,6 +29,7 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
+import Chat from '../components/game/inbox/Chat.vue'
 import GameApiService from '../services/api/game'
 import UserApiService from '../services/api/user'
 import GameHelper from '../services/gameHelper'
@@ -40,7 +43,8 @@ export default {
     'logo': LogoVue,
     'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
-    'main-bar': MainBar
+    'main-bar': MainBar,
+    'chat': Chat
   },
   data () {
     return {
@@ -267,6 +271,10 @@ export default {
       this.sockets.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
+      if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
+        return
+      }
+
       let conversationId = e.conversationId
 
       // Show a toast only if the user isn't already in the conversation.

@@ -189,5 +189,17 @@ module.exports = class StarDistanceService {
     
         return sorted.slice(0, amount);
     }
+
+    getGalaxyDiameter(locations) {
+        let maxX = locations.sort((a, b) => b.x - a.x)[0].x;
+        let maxY = locations.sort((a, b) => b.y - a.y)[0].y;
+        let minX = locations.sort((a, b) => a.x - b.x)[0].x;
+        let minY = locations.sort((a, b) => a.y - b.y)[0].y;
+
+        return {
+            x: maxX - minX,
+            y: maxY - minY,
+        };
+    }
     
 };
