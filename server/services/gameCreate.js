@@ -30,6 +30,10 @@ module.exports = class GameCreateService {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
+            if (userIsGameMaster && openGames.length > 5) {
+                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
+            }
+
             // Validate that the player cannot create large games.
             if (settings.general.playerLimit > 16 && !userIsGameMaster) {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
