@@ -287,9 +287,6 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
-    },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
     },

@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import eventBus from '../../../../eventBus'
 import GameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
@@ -102,7 +103,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
-      this.$emit('onOpenInboxRequested', e)
+      eventBus.$emit('onOpenInboxRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)

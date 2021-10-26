@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import eventBus from '../../../eventBus'
 import Statistics from './Statistics'
 import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
@@ -69,11 +70,11 @@ export default {
   methods: {
     onViewConversationRequested (e) {
       if (this.conversation) {
-        this.$emit('onViewConversationRequested', {
+        eventBus.$emit('onViewConversationRequested', {
           conversationId: this.conversation._id
         })
       } else {
-        this.$emit('onViewConversationRequested', {
+        eventBus.$emit('onViewConversationRequested', {
           participantIds: [
             this.userPlayer._id,
             this.player._id
