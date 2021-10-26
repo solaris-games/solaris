@@ -421,7 +421,7 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "creditsPerTickByScience": 1
+                    "creditsPerTickByScience": 3
                 }
             }
         }
