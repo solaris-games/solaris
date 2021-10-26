@@ -39,7 +39,6 @@ export default {
       && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
       && this.userPlayer._id === this.carrier.ownedByPlayerId
       && this.carrier.orbiting
-      && !this.carrier.isGift
       && !this.isDeadStar
       && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
   },

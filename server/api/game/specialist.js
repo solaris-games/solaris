@@ -5,12 +5,6 @@ module.exports = (router, io, container) => {
     const middleware = require('../middleware')(container);
 
     router.get('/api/game/:gameId/specialists/carrier', middleware.loadGameLean, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let specialists = await container.specialistService.listCarrier(req.game);
 
@@ -21,12 +15,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.get('/api/game/:gameId/specialists/star', middleware.loadGameLean, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let specialists = await container.specialistService.listStar(req.game);
 
@@ -37,12 +25,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/carrier/:carrierId/hire/:specialistId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let result = await container.specialistHireService.hireCarrierSpecialist(
                 req.game,
@@ -67,12 +49,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/star/:starId/hire/:specialistId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let result = await container.specialistHireService.hireStarSpecialist(
                 req.game,

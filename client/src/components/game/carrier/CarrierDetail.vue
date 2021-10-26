@@ -7,11 +7,12 @@
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
-    <div class="row bg-secondary">
+    <div class="row bg-secondary" :class="{'bg-warning': carrier.isGift}">
       <div class="col text-center pt-2">
-        <p class="mb-2" v-if="isUserPlayerCarrier">A carrier under your command.</p>
+        <p class="mb-2" v-if="isUserPlayerCarrier && !carrier.isGift">A carrier under your command.</p>
         <p class="mb-2" v-if="isNotUserPlayerCarrier">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
-        <p class="mb-2 text-warning" v-if="carrier.isGift">This carrier is a gift.</p>
+        <p class="mb-2" v-if="carrier.isGift"><strong>This carrier is a gift.</strong></p>
+        <p class="mb-2" v-if="carrier.isGift"><small>When the carrier arrives at another player's star, it will transfer ownership.</small></p>
       </div>
     </div>
 
@@ -427,7 +428,11 @@ export default {
   },
   computed: {
     canGiftCarrier: function () {
-      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' && this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' 
+        && this.isUserPlayerCarrier 
+        && !this.carrier.isGift 
+        && !this.userPlayer.defeated 
+        && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canScuttleCarrier: function () {
       return this.isOwnedByUserPlayer && !this.userPlayer.defeated && this.isGameInProgress && !this.carrier.isGift
@@ -442,10 +447,10 @@ export default {
       return this.carrier.waypoints && this.carrier.waypoints.length
     },
     canEditWaypoints: function () {
-      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canTransferShips: function () {
-      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canShowSpecialist: function () {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)

@@ -22,7 +22,6 @@
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
                         :carrier="carrier"
                         :waypoint="waypoint" :showAction="showAction"
-                        :showEdit="!carrier.isGift"
                         @onEditWaypointRequested="onEditWaypointRequested"
                         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>
@@ -62,7 +61,7 @@ export default {
   },
   computed: {
     canEditWaypoints: function () {
-      return !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
+      return !GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

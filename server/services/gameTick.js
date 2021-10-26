@@ -82,6 +82,9 @@ module.exports = class GameTickService extends EventEmitter {
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
 
+            await this._transferGiftsInOrbit(game, gameUsers);
+            logTime('Transfer gifts in orbit');
+
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
 
@@ -613,6 +616,16 @@ module.exports = class GameTickService extends EventEmitter {
             for (let carrier of game.galaxy.carriers) {
                 this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
             }
+        }
+    }
+
+    _transferGiftsInOrbit(game, gameUsers) {
+        const carriers = this.carrierService.listGiftCarriersInOrbit(game);
+
+        for (let carrier of carriers) {
+            const star = this.starService.getById(game, carrier.orbiting);
+
+            this.carrierService.transferGift(game, gameUsers, star, carrier);
         }
     }
 }

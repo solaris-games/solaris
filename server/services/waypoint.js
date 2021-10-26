@@ -24,10 +24,6 @@ module.exports = class WaypointService {
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
-        
-        if (carrier.isGift) {
-            throw new ValidationError('Cannot change waypoints of a carrier that is a gift.');
-        }
 
         if (waypoints.length > 30) {
             throw new ValidationError('Cannot plot more than 30 waypoints.');
@@ -232,7 +228,7 @@ module.exports = class WaypointService {
     }
 
     canLoop(game, player, carrier) {
-        if (carrier.waypoints.length < 2) {
+        if (carrier.waypoints.length < 2 || carrier.isGift) {
             return false;
         }
 
