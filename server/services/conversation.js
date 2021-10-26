@@ -211,29 +211,22 @@ module.exports = class ConversationService extends EventEmitter {
         // if there are no unread messages.
         let unreadMessages = convo.messages
             .filter(m => m.type === 'message')
-            .filter(m => m.readBy.find(r => r.equals(playerId)) == null);
-            //.map(m => m._id);
+            .filter(m => m.readBy.find(r => r.equals(playerId)) == null)
+            .map(m => m._id);
 
         if (unreadMessages.length) {
-            // TODO: Fix this to use the straight DB method asap.
-            unreadMessages.forEach(u => u.readBy.push(playerId));
-
-            await game.save();
-
-            // TODO: This doesn't work in prod because prod is running an older
-            // version of MongoDB that doesn't support $[]
-            // await this.gameRepo.updateOne({
-            //     _id: game._id,
-            //     'conversations._id': conversationId,
-            //     'conversations.messages._id': {
-            //         $in: unreadMessages
-            //     }
-            // },
-            // {
-            //     $addToSet: {
-            //         'conversations.$.messages.$[].readBy': playerId
-            //     }
-            // });
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'conversations._id': conversationId,
+                'conversations.messages._id': {
+                    $in: unreadMessages
+                }
+            },
+            {
+                $addToSet: {
+                    'conversations.$.messages.$[].readBy': playerId
+                }
+            });
         }
 
         return convo;
