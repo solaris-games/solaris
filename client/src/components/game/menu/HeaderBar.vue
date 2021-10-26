@@ -14,7 +14,7 @@
         <div class="col-auto pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
           <tick-selector />
         </div>
-        <div class="col-auto text-right pt-1" v-if="userPlayer">
+        <div class="col-auto d-none d-md-block text-right pt-1" v-if="userPlayer">
             <span class="pointer" title="Credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
