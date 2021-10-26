@@ -325,6 +325,7 @@ export default {
 .header-bar {
   position:absolute;
   height: 45px;
+  z-index: 1;
 }
 
 .footer-bar {
@@ -336,8 +337,8 @@ export default {
 .menu {
   position:absolute; /* This is a must otherwise the div overlays the map */
   width: 473px;
-  max-height: 90%; /* TODO: This needs to expand to full height but if at 100% it adds a scroll bar */
-  top: 45px;
+  padding-top: 45px;
+  max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;

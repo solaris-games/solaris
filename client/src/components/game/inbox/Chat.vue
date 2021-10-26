@@ -217,14 +217,15 @@ export default {
   width: 60px;
   border-radius: 50%;
   cursor: pointer;
+  z-index: 1;
 }
 
 #window {
   position: absolute;
-  right: 20px;
+  right: 0px;
   bottom: 100px;
   width: 473px;
-  top: 60px;
+  top: 45px;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
