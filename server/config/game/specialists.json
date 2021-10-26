@@ -295,9 +295,7 @@
             "oneShot": false,
             "modifiers": {
                 "local": {
-                    "weapons": 1,
-                    "scanning": -1,
-                    "terraforming": -1
+                    "weapons": 1
                 }
             }
         },
