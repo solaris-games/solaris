@@ -281,7 +281,7 @@
             <td>Starting Weapons Level</td>
             <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.weapons }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
             <td>Starting Specialists Level</td>
             <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.specialists }}</td>
           </tr>

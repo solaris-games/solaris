@@ -102,7 +102,7 @@ const schema = new Schema({
 				manufacturing: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				banking: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				specialists: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
+				specialists: { type: Types.Number, required: true, min: 0, max: 16, default: 1 }
 			},
 			researchCosts: {
 				terraforming: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
