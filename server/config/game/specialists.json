@@ -83,8 +83,9 @@
             "oneShot": false,
             "modifiers": {
                 "local": {
+                    "speed": 1.5,
                     "hyperspace": 3,
-                    "weapons": -1
+                    "weapons": -3
                 }
             }
         },
