@@ -29,7 +29,7 @@ module.exports = class DoughnutMapService {
         } while(locations.length < starCount)
 
         // Giving each star its resources
-        this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
 
         return locations;
     }
