@@ -225,27 +225,13 @@ module.exports = class CarrierService {
             throw new ValidationError(`Cannot convert carrier into a gift, you do not own this carrier.`);
         }
 
-        if (carrier.orbiting) {
-            throw new ValidationError(`The carrier must be in transit in order to be converted into a gift.`);
-        }
-
         if (carrier.isGift) {
             throw new ValidationError(`The carrier has already been converted into a gift.`);
         }
 
         // Convert the carrier into a gift.
-        // Remove all waypoints except from the first waypoint
-        // Set its waypoint action to be "do nothing"
         carrier.isGift = true;
         carrier.waypointsLooped = false;
-
-        let firstWaypoint = carrier.waypoints[0];
-
-        firstWaypoint.action = 'nothing';
-        firstWaypoint.actionShips = 0;
-        firstWaypoint.delayTicks = 0;
-
-        carrier.waypoints = [firstWaypoint];
 
         await this.gameRepo.updateOne({
             _id: game._id,
@@ -254,9 +240,8 @@ module.exports = class CarrierService {
             $set: {
                 'galaxy.carriers.$.isGift': true,
                 'galaxy.carriers.$.waypointsLooped': false,
-                'galaxy.carriers.$.waypoints': [firstWaypoint]
             }
-        })
+        });
     }
 
     async rename(game, player, carrierId, name) {
@@ -298,20 +283,26 @@ module.exports = class CarrierService {
         let starPlayer = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
         let starUser = gameUsers.find(u => u._id.equals(starPlayer.userId));
 
-        if (starUser && !starPlayer.defeated) {
-            starUser.achievements.trade.giftsReceived += carrier.ships;
-        }
-
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
-        if (carrierUser && !carrierPlayer.defeated) {
-            carrierUser.achievements.trade.giftsSent += carrier.ships;
+        const isSamePlayer = starPlayer._id.equals(carrierPlayer._id);
+
+        if (!isSamePlayer) {
+            // If the star is not owned by the same player then increment player achievements.
+            if (starUser && !starPlayer.defeated) {
+                starUser.achievements.trade.giftsReceived += carrier.ships;
+            }
+    
+            if (carrierUser && !carrierPlayer.defeated) {
+                carrierUser.achievements.trade.giftsSent += carrier.ships;
+            }
+
+            carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
+            carrier.specialistId = null; // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
         }
 
-        carrier.ownedByPlayerId = star.ownedByPlayerId;
         carrier.isGift = false;
-        carrier.specialistId = null; // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
     }
 
     async scuttle(game, player, carrierId) {
@@ -512,4 +503,9 @@ module.exports = class CarrierService {
         // If there are no waypoints and they are in transit then must be lost, otherwise all good.
         return carrier.waypoints.length === 0;
     }
+
+    listGiftCarriersInOrbit(game) {
+        return game.galaxy.carriers.filter(c => c.isGift && c.orbiting);
+    }
+
 };

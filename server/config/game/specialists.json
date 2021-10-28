@@ -77,14 +77,15 @@
         {
             "id": 6,
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -1 Weapons to the carrier.",
+            "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
                 "local": {
+                    "speed": 1.5,
                     "hyperspace": 3,
-                    "weapons": -1
+                    "weapons": -3
                 }
             }
         },
@@ -288,15 +289,13 @@
         {
             "id": 4,
             "name": "Orbital Cannon",
-            "description": "Grants +1 Weapons, -1 Scanning, -1 Terraforming to the Star.",
+            "description": "Grants +1 Weapons to the Star.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
                 "local": {
-                    "weapons": 1,
-                    "scanning": -1,
-                    "terraforming": -1
+                    "weapons": 1
                 }
             }
         },
@@ -415,13 +414,13 @@
         {
             "id": 12,
             "name": "Financial Analyst",
-            "description": "The star produces 1 credit per tick for each point of science on the star.",
+            "description": "The star produces 3 credits per tick for each point of science on the star.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "creditsPerTickByScience": 1
+                    "creditsPerTickByScience": 3
                 }
             }
         }

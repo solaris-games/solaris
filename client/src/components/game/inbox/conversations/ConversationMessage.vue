@@ -123,6 +123,7 @@ export default {
 
 .linebreaks {
   white-space: break-spaces;
+  word-wrap: break-word;
 }
 
 .thumbtack {

@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import eventBus from '../../../../eventBus'
 import GameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import MenuTitle from '../../MenuTitle'
@@ -74,7 +75,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
-      this.$emit('onOpenInboxRequested', e)
+      eventBus.$emit('onOpenInboxRequested', e)
     },
     async createConversation (e) {
       this.errors = []
@@ -97,7 +98,7 @@ export default {
         let response = await ConversationApiService.create(this.$store.state.game._id, this.name, this.participants)
 
         if (response.status === 200) {
-          this.$emit('onViewConversationRequested', {
+          eventBus.$emit('onViewConversationRequested', {
             conversationId: response.data._id
           })
         }

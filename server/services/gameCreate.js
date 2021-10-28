@@ -30,6 +30,10 @@ module.exports = class GameCreateService {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
+            if (userIsGameMaster && openGames.length > 5) {
+                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
+            }
+
             // Validate that the player cannot create large games.
             if (settings.general.playerLimit > 16 && !userIsGameMaster) {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
@@ -67,6 +71,14 @@ module.exports = class GameCreateService {
         // Ensure that c2c combat is disabled for orbital games.
         if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
             game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
+        }
+
+        // Ensure that specialist credits setting defaults token specific settings
+        if (game.settings.specialGalaxy.specialistsCurrency === 'credits') {
+            game.settings.player.startingCreditsSpecialists = 0;
+            game.settings.player.tradeCreditsSpecialists = false;
+            game.settings.technology.startingTechnologyLevel.specialists = 0;
+            game.settings.technology.researchCosts.specialists = 'none';
         }
         
         // If the game name contains a special string, then replace it with a random name.

@@ -6,7 +6,7 @@
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
-        <td class="text-right" v-if="showEdit">
+        <td class="text-right">
           <a href="javascript:;" v-if="!$isHistoricalMode() && canEditWaypoints" @click="editWaypoint">Edit</a>
         </td>
     </tr>
@@ -19,8 +19,7 @@ export default {
   props: {
     carrier: Object,
     waypoint: Object,
-    showAction: Boolean,
-    showEdit: Boolean
+    showAction: Boolean
   },
   data () {
     return {
@@ -83,7 +82,7 @@ export default {
   },
   computed: {
     canEditWaypoints: function () {
-      return !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
+      return !GameHelper.isGameFinished(this.$store.state.game)
     },
     isInTransit () {
       return !this.carrier.orbiting

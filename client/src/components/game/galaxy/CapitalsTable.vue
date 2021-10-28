@@ -10,12 +10,6 @@
     <div class="col ml-2 mr-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
-    <div class="col-auto">
-      <select class="form-control form-control-sm" v-if="!isGameFinished" v-model="allowUpgrades">
-        <option :value="true">Enable Upgrades</option>
-        <option :value="false">Disable Upgrades</option>
-      </select>
-    </div>
   </div>
 
   <div class="row">
@@ -34,16 +28,10 @@
                       <a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a>
                     </span>
                   </td>
-                  <!-- <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td> -->
-                  <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
               </tr>
           </thead>
           <tbody>
-              <star-row v-for="star in sortedTableData" v-bind:key="star._id" :star="star" :allowUpgrades="allowUpgrades"
+              <capital-row v-for="star in sortedTableData" v-bind:key="star._id" :star="star"
                 @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
           </tbody>
       </table>
@@ -56,16 +44,15 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
-import StarRowVue from './StarRow'
+import CapitalRowVue from './CapitalRow'
 
 export default {
   components: {
-    'star-row': StarRowVue
+    'capital-row': CapitalRowVue
   },
   data: function () {
     return {
       showAll: false,
-      allowUpgrades: true,
       tableData: [],
       sortBy: null,
       sortDirection: true,
@@ -74,8 +61,6 @@ export default {
   },
   mounted () {
     this.tableData = this.getTableData()
-
-    this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished
   },
   methods: {
     getUserPlayer () {
@@ -90,9 +75,9 @@ export default {
       let sorter = (a, b) => a.name.localeCompare(b.name)
 
       if (this.showAll) {
-        return this.$store.state.game.galaxy.stars.sort(sorter)
+        return this.$store.state.game.galaxy.stars.filter(s => s.homeStar).sort(sorter)
       } else {
-        return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
+        return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.homeStar && x.ownedByPlayerId === this.getUserPlayer()._id)
       }
     },
     sort (columnName) {
@@ -160,9 +145,5 @@ export default {
 <style scoped>
 td {
   padding: 12px 6px !important;
-}
-
-.infrastructure-filters {
-  white-space: pre;
 }
 </style>

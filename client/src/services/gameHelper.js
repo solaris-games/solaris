@@ -337,7 +337,7 @@ class GameHelper {
   }
 
   canLoop (game, player, carrier) {
-    if (carrier.waypoints.length < 2) {
+    if (carrier.waypoints.length < 2 || carrier.isGift) {
       return false
     }
     
