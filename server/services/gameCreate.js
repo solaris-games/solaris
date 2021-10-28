@@ -95,7 +95,7 @@ module.exports = class GameCreateService {
             game,
             desiredStarCount,
             game.settings.general.playerLimit,
-            game.settings.specialGalaxy.randomGates);
+            game.settings.specialGalaxy.randomWarpGates);
 
         
         // Setup players and assign to their starting positions.

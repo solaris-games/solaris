@@ -142,7 +142,7 @@
                 "text": "Specialist Tokens"
             }
         ],
-        "randomGates": [
+        "randomWarpGates": [
             {
             "value": "none",
             "text": "No"

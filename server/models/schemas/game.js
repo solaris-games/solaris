@@ -54,7 +54,7 @@ const schema = new Schema({
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
-			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
+			randomWarpGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },

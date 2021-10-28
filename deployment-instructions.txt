@@ -1,5 +1,7 @@
-db.users.updateMany({}, {
-    $set: {
-        'avatars': []
-    }
+db.games.find({}).forEach(function(game) {
+    game.settings.specialGalaxy.randomWarpGates = game.settings.specialGalaxy.randomGates;
+
+    delete game.settings.specialGalaxy.randomGates;
+
+    db.games.save(game);
 });

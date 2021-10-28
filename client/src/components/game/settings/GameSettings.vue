@@ -123,8 +123,8 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistsCurrency) }}</td>
           </tr>
           <tr>
-            <td>Random Gates</td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomGates) }}</td>
+            <td>Random Warp Gates</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWarpGates) }}</td>
           </tr>
           <tr>
             <td>Dark Galaxy</td>

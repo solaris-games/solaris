@@ -241,9 +241,9 @@
       </div>
 
       <div class="form-group">
-        <label for="randomGates" class="col-form-label">Random Gates</label>
-        <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.randomGates" v-bind:key="opt.value" v-bind:value="opt.value">
+        <label for="randomWarpGates" class="col-form-label">Random Warp Gates</label>
+        <select class="form-control" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.randomWarpGates" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Gates
           </option>
         </select>
