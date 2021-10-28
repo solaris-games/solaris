@@ -53,7 +53,7 @@ module.exports = class ResourceService {
         // The closer to the center of the galaxy, the more likely (exponentially) to find stars with higher resources.
         let minResources = game.constants.star.resources.minNaturalResources;
         let maxResources = game.constants.star.resources.maxNaturalResources;
-        let galaxyRadius = Math.max(...Object.values(this.starDistanceService.getGalaxyDiameter(locations))) / 2;
+        let galaxyRadius = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2;
         let galacticCenter = { x: 0, y: 0 };
 
         if (game.settings.galaxy.galaxyType == 'circular-balanced') {

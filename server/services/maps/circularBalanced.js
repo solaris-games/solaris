@@ -93,7 +93,7 @@ module.exports = class CircularBalancedMapService {
         // choose home stars
 
         // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.starDistanceService.getGalaxyDiameter(locations).x / 2 / 2;
+        const distanceFromCenter = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2 / 2;
         let playerAngle = (sectorAngle/2.0);//take a location from the middle of the sector
         let desiredLocation = this._getRotatedLocation({x: 0.0, y: distanceFromCenter}, playerAngle);
         let firstHomeLocation = this.distanceService.getClosestLocation(desiredLocation, locations);
