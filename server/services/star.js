@@ -169,6 +169,25 @@ module.exports = class StarService extends EventEmitter {
             }
         }
 
+        // If worm holes are present, then ensure that any owned star
+        // also has its paired star visible.
+        if (game.settings.specialGalaxy.randomWormHoles !== 'none') {
+            let wormHoleStars = game.galaxy.stars
+                .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id) && s.wormHoleToStarId)
+                .map(s => {
+                    return {
+                        source: s,
+                        destination: this.getByObjectId(game, s.wormHoleToStarId)
+                    };
+                });
+    
+            for (let wormHoleStar of wormHoleStars) {
+                if (starsInScanningRange.indexOf(wormHoleStar.destination) < 0) {
+                    starsInScanningRange.push(wormHoleStar.destination);
+                }
+            }
+        }
+
         return starsInScanningRange;
     }
     
@@ -299,6 +318,13 @@ module.exports = class StarService extends EventEmitter {
         }
 
         return false;
+    }
+
+    isStarPairWormHole(sourceStar, destinationStar) {
+        return sourceStar.wormHoleToStarId 
+            && destinationStar.wormHoleToStarId 
+            && sourceStar.wormHoleToStarId.equals(destinationStar._id)
+            && destinationStar.wormHoleToStarId.equals(sourceStar._id);
     }
 
     canPlayerSeeStarShips(player, star) {

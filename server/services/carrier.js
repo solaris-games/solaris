@@ -200,7 +200,11 @@ module.exports = class CarrierService {
             || !c.ownedByPlayerId.equals(player._id));
     }
 
-    getCarrierDistancePerTick(game, carrier, warpSpeed = false) {
+    getCarrierDistancePerTick(game, carrier, warpSpeed = false, instantSpeed = false) {
+        if (instantSpeed) {
+            return null;
+        }
+
         let distanceModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1;
 
         if (carrier.specialistId) {
@@ -413,7 +417,8 @@ module.exports = class CarrierService {
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
+        let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed); // Null signifies instant travel
 
         let carrierMovementReport = {
             carrier,
@@ -421,13 +426,14 @@ module.exports = class CarrierService {
             destinationStar,
             carrierOwner,
             warpSpeed,
+            instantSpeed,
             distancePerTick,
             waypoint,
             combatRequiredStar: false,
             arrivedAtStar: false
         };
         
-        if (carrier.distanceToDestination <= distancePerTick) {
+        if (instantSpeed || carrier.distanceToDestination <= distancePerTick) {
             let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrier, destinationStar);
             
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
@@ -449,18 +455,29 @@ module.exports = class CarrierService {
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
         let warpSpeed = false;
+        let instantSpeed = false;
         
         if (sourceStar) {
             warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+            instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
         }
 
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed);
-        let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
+        let nextLocation;
+        let distancePerTick;
+
+        if (instantSpeed) {
+            distancePerTick = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
+            nextLocation = destinationStar.location;
+        } else {
+            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+            nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
+        }
 
         return {
             location: nextLocation,
             distance: distancePerTick,
             warpSpeed,
+            instantSpeed,
             sourceStar,
             destinationStar
         };

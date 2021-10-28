@@ -23,6 +23,7 @@
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
     "randomWarpGates": "rare",
+    "randomWormHoles": "none",
     "darkGalaxy": "standard",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",

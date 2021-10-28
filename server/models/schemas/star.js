@@ -11,6 +11,7 @@ const schema = new Schema({
     specialistId: { type: Types.Number, required: false, default: null },
     homeStar: { type: Types.Boolean, required: false, default: false },
     warpGate: { type: Types.Boolean, required: true, default: false },
+    wormHoleToStarId: { type: Types.ObjectId, required: false, default: null },
     ignoreBulkUpgrade: {
         economy: { type: Types.Boolean, required: false, default: false },
         industry: { type: Types.Boolean, required: false, default: false },

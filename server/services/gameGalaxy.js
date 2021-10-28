@@ -178,7 +178,8 @@ module.exports = class GameGalaxyService {
                 name: s.name,
                 ownedByPlayerId: s.ownedByPlayerId,
                 location: s.location,
-                warpGate: false
+                warpGate: false,
+                wormHoleToStarId: null
             }
         });
     }
@@ -272,7 +273,8 @@ module.exports = class GameGalaxyService {
                     ownedByPlayerId: s.ownedByPlayerId,
                     location: s.location,
                     locationNext: s.locationNext,
-                    warpGate: false // Hide warp gates outside of scanning range.
+                    warpGate: false, // Hide warp gates outside of scanning range
+                    wormHoleToStarId: s.wormHoleToStarId
                 }
             }
         });

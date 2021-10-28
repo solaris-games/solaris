@@ -85,7 +85,7 @@ module.exports = class WaypointService {
             // The carrier isn't in transit to the first waypoint.
             if (
                 (i > 0 || (i === 0 && !this.carrierService.isInTransit(carrier))) &&                    // Is one of the next waypoints OR is the first waypoint and isn't in transit
-                (sourceStar && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint))     // Validation of whether the waypoint is within hyperspace range
+                (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)))     // Validation of whether the waypoint is within hyperspace range
             ) {
                 throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
             }
@@ -139,6 +139,18 @@ module.exports = class WaypointService {
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
 
         return distanceBetweenStars <= hyperspaceDistance;
+    }
+
+    _waypointRouteIsBetweenWormHoles(game, waypoint) {
+        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
+        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        // Stars may have been destroyed.
+        if (sourceStar == null || destinationStar == null) {
+            return false;
+        }
+
+        return this.starService.isStarPairWormHole(sourceStar, destinationStar);
     }
 
     async cullWaypointsByHyperspaceRangeDB(game, carrier) {
@@ -245,6 +257,10 @@ module.exports = class WaypointService {
             return false;
         }
 
+        if (this.starService.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
+            return true;
+        }
+
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
@@ -252,16 +268,25 @@ module.exports = class WaypointService {
     }
 
     calculateWaypointTicks(game, carrier, waypoint) {
+        const delayTicks = waypoint.delayTicks || 0;
+
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
 
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
         if (waypoint.source.equals(waypoint.destination)) {
-            return 1 + (waypoint.delayTicks || 0);
+            return 1 + delayTicks;
         }
 
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
         let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+
+        // If the carrier can travel instantly then it'll take 1 tick + any delay.
+        let instantSpeed = sourceStar && this.starService.isStarPairWormHole(sourceStar, destinationStar);
+
+        if (instantSpeed) {
+            return 1 + delayTicks;
+        }
 
         let source = sourceStar == null ? carrier.location : sourceStar.location;
         let destination = destinationStar.location;
@@ -271,16 +296,19 @@ module.exports = class WaypointService {
         if (!carrier.orbiting && carrier.waypoints[0]._id.toString() === waypoint._id.toString()) {
             source = carrier.location;
         }
-
+        
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
-        let tickDistance = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed);
+        let tickDistance = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+        let ticks = 1;
 
-        let ticks = Math.ceil(distance / tickDistance);
+        if (tickDistance) {
+            ticks = Math.ceil(distance / tickDistance);
+        }
 
-        ticks += waypoint.delayTicks; // Add any delay ticks the waypoint has.
+        ticks += delayTicks; // Add any delay ticks the waypoint has.
 
         return ticks;
     }

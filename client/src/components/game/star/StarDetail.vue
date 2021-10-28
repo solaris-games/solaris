@@ -5,9 +5,9 @@
       <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-secondary">
         <i class="fas fa-trash"></i>
       </modalButton>
-      <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button @click="viewOnMap(star)" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
-
+    
     <div class="row bg-secondary">
       <div class="col text-center pt-2">
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
@@ -15,9 +15,11 @@
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
+        <p class="mb-0" v-if="star.wormHoleToStarId && wormHolePairStar">This star is a <strong>Worm Hole</strong> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
+        <p class="mb-0" v-if="star.wormHoleToStarId && !wormHolePairStar">This star is a <strong>Worm Hole</strong> to an unknown star.</p>
+        <p class="mb-2 text-info" v-if="star.wormHoleToStarId"><small><i>Travel between Worm Holes is instantaneous.</i></small></p>
       </div>
     </div>
-    
     <div v-if="isCompactUIStyle && star.infrastructure">
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
@@ -28,8 +30,11 @@
           </span>
         </div>
         <div class="col-auto">
+          <span v-if="star.wormHoleToStarId" title="Worm Hole">
+            <i class="far fa-sun ml-1"></i>
+          </span>
           <span :title="star.warpGate ? 'Warp Gate':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
-            <i class="fas fa-dungeon ml-1"></i>
+            <i class="fas fa-dungeon ml-2"></i>
           </span>
         </div>
       </div>
@@ -317,7 +322,7 @@ export default {
       this.$emit('onBuildCarrierRequested', this.star._id)
     },
     viewOnMap (e) {
-      GameContainer.map.panToStar(this.star)
+      GameContainer.map.panToStar(e)
     },
     async confirmAbandonStar (e) {
       try {
@@ -413,6 +418,13 @@ export default {
     },
     isDeadStar: function () {
       return GameHelper.isDeadStar(this.star)
+    },
+    wormHolePairStar: function () {
+      if (!this.star.wormHoleToStarId) {
+        return null
+      }
+
+      return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
     }
   }
 }

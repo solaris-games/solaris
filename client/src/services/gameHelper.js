@@ -289,6 +289,10 @@ class GameHelper {
     let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
     let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
 
+    if (sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)) {
+      return 1
+    }
+
     let source = sourceStar == null ? carrier.location : sourceStar.location
     let destination = destinationStar.location
 
@@ -355,10 +359,21 @@ class GameHelper {
       return false
     }
 
+    if (this.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
+      return true
+    }
+
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
     let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)
 
     return distanceBetweenStars <= hyperspaceDistance
+  }
+
+  isStarPairWormHole (sourceStar, destinationStar) {
+    return sourceStar.wormHoleToStarId 
+      && destinationStar.wormHoleToStarId 
+      && sourceStar.wormHoleToStarId === destinationStar._id
+      && destinationStar.wormHoleToStarId === sourceStar._id
   }
 
   isGameWaitingForPlayers (game) {

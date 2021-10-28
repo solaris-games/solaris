@@ -244,7 +244,16 @@
         <label for="randomWarpGates" class="col-form-label">Random Warp Gates</label>
         <select class="form-control" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.randomWarpGates" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }} Gates
+            {{ opt.text }} Warp Gates
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="randomWormHoles" class="col-form-label">Random Worm Holes</label>
+        <select class="form-control" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.randomWormHoles" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }} Worm Holes
           </option>
         </select>
       </div>

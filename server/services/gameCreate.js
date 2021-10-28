@@ -94,9 +94,7 @@ module.exports = class GameCreateService {
         game.galaxy.stars = this.mapService.generateStars(
             game,
             desiredStarCount,
-            game.settings.general.playerLimit,
-            game.settings.specialGalaxy.randomWarpGates);
-
+            game.settings.general.playerLimit);
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);

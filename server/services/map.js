@@ -15,7 +15,7 @@ module.exports = class MapService {
         this.irregularMapService = irregularMapService;
     }
 
-    generateStars(game, starCount, playerLimit, warpGatesSetting) {
+    generateStars(game, starCount, playerLimit) {
         let stars = [];
 
         // Get an array of random star names for however many stars we want.
@@ -76,8 +76,13 @@ module.exports = class MapService {
         }
 
         // If warp gates are enabled, assign random stars to start as warp gates.
-        if (warpGatesSetting !== 'none') {
-            this.generateGates(stars, warpGatesSetting, playerLimit);
+        if (game.settings.specialGalaxy.randomWarpGates !== 'none') {
+            this.generateGates(stars, game.settings.specialGalaxy.randomWarpGates, playerLimit);
+        }
+
+        // If worm holes are enabled, assign random warp gates to start as worm hole pairs
+        if (game.settings.specialGalaxy.randomWormHoles !== 'none') {
+            this.generateWormHoles(stars, game.settings.specialGalaxy.randomWormHoles, playerLimit);
         }
         
         return stars;
@@ -88,7 +93,7 @@ module.exports = class MapService {
 
         switch(type) {
             case 'rare': gateCount = playerCount; break;            // 1 per player
-            case 'common': gateCount = stars.length / playerCount; break;  // fucking loads
+            case 'common': gateCount = Math.floor(stars.length / playerCount); break;  // fucking loads
         }
 
         // Pick stars at random and set them to be warp gates.
@@ -101,6 +106,31 @@ module.exports = class MapService {
                 star.warpGate = true;
             }
         } while (gateCount--);
+    }
+
+    generateWormHoles(stars, type, playerCount) {
+        let wormHoleCount = 0;
+
+        switch(type) {
+            case 'rare': wormHoleCount = playerCount; break;            // 1 per player
+            case 'common': wormHoleCount = Math.floor(stars.length / playerCount); break;  // fucking loads
+        }
+
+        // Pick stars at random and pair them up with another star to create a worm hole.
+        while (wormHoleCount--) {
+            const remaining = stars.filter(s => !s.wormHoleToStarId);
+
+            let starA = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
+            let starB = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
+
+            // Check validity of the ramdom selection.
+            if (starA._id.equals(starB._id) || starA.wormHoleToStarId || starB.wormHoleToStarId) {
+                wormHoleCount++; // Increment because the while loop will decrement.
+            } else {
+                starA.wormHoleToStarId = starB._id;
+                starB.wormHoleToStarId = starA._id;
+            }
+        }
     }
 
     getGalaxyCenter(starLocations) {
