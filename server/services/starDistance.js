@@ -155,10 +155,6 @@ module.exports = class StarDistanceService {
         return sorted.slice(0, amount); 
     }
 
-    getFurthestStarFromLocation(loc, stars){
-        return this.getFurthestStarsFromLocation(loc, stars, 1)[0];
-    }
-
     getFurthestStarsFromLocation(loc, stars, amount){
         let sorted = stars
         .sort((a, b) => {
@@ -169,9 +165,15 @@ module.exports = class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
+    getMaxGalaxyDiameter(locations) {
+        const diameter = this.getGalaxyDiameter(locations);
+
+        return diameter.x > diameter.y ? diameter.x : diameter.y;
+    }
+
     getGalaxyDiameter(locations) {
-        let xArray = locations.map( (location) => { return location.x; } );
-        let yArray = locations.map( (location) => { return location.y; } );
+        let xArray = locations.map((location) => { return location.x; });
+        let yArray = locations.map((location) => { return location.y; });
 
         let maxX = Math.max(...xArray);
         let maxY = Math.max(...yArray);

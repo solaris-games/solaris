@@ -1,4 +1,3 @@
-const ValidationError = require("../../errors/validation");
 const randomSeeded = require('random-seed');
 const simplexNoise = require('simplex-noise');
 
