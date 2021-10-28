@@ -190,21 +190,15 @@ module.exports = class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
-    getMaxGalaxyDiameter(stars, galacticCenter) {
-        // galacticCenter = galacticCenter || {x: 0, y: 0};
-
-        // const star = this.starDistanceService.getFurthestStarFromLocation(galacticCenter, stars);
-
-        // return 2 * this.starDistanceService.getDistanceBetweenStarAndLocation(star, galacticCenter);
-
-        // TODO: Is this the same as the above?
-        const locations = stars.map(s => s.location);
-        const diameter = this.getGalaxyDiameter(locations);
+    getMaxGalaxyDiameter(stars) {
+        const diameter = this.getGalaxyDiameter(stars);
 
         return diameter.x > diameter.y ? diameter.x : diameter.y;
     }
 
-    getGalaxyDiameter(locations) {
+    getGalaxyDiameter(stars) {
+        const locations = stars.map(s => s.location);
+
         let xArray = locations.map((location) => { return location.x; });
         let yArray = locations.map((location) => { return location.y; });
 
