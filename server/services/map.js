@@ -103,12 +103,6 @@ module.exports = class MapService {
         } while (gateCount--);
     }
 
-    getGalaxyDiameter(stars, galacticCenter = {x:0, y:0}) {
-        const star = this.starDistanceService.getFurthestStarFromLocation(galacticCenter, stars);
-
-        return 2 * this.starDistanceService.getDistanceBetweenStarAndLocation(star, galacticCenter);
-    }
-
     getGalaxyCenterOfMass(starLocations) {
         if (!starLocations.length) {
             return {

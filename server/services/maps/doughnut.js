@@ -1,5 +1,3 @@
-const ValidationError = require("../../errors/validation");
-
 module.exports = class DoughnutMapService {
 
     constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
@@ -14,7 +12,7 @@ module.exports = class DoughnutMapService {
         // The starDensity constant can really be a setting, once it is turned into an intuitive variable...
         const starDensity = 1.3 * 10**-4;
         const maxRadius = ((4 * starCount) / (3 * Math.PI * starDensity))**0.5;
-        let locations = [];
+        const locations = [];
 
         // Generating locations for each star on the map
         do {
@@ -31,7 +29,7 @@ module.exports = class DoughnutMapService {
         } while(locations.length < starCount)
 
         // Giving each star its resources
-        locations = this.resourceService.setResources(game, locations, resourceDistribution);
+        this.resourceService.setResources(game, locations, resourceDistribution);
 
         return locations;
     }

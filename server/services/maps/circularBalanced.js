@@ -1,4 +1,3 @@
-const ValidationError = require("../../errors/validation");
 const RNG = require('random-seed');
 
 module.exports = class CircularBalancedMapService {

@@ -1,4 +1,3 @@
-const { max } = require("moment");
 const ValidationError = require("../../errors/validation");
 
 module.exports = class CircularMapService {
@@ -20,7 +19,7 @@ module.exports = class CircularMapService {
         // 0.5-1 --> now the inner ranges will get more stars than the outer || 1 --> now at each distance from the center there will be roughly the same amount of stars
         // 1+ --> there will be an extremely increasing amount of stars in the middle with an increasingly low amount of stars in the outerranges 
         const maxRadius = (starCount/(Math.PI*starDensity))**0.5;
-        let locations = [];
+        const locations = [];
 
         do {
             // Try to find the star location X

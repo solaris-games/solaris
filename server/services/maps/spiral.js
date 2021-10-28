@@ -1,5 +1,4 @@
 const simplexNoise = require('simplex-noise');
-const ValidationError = require("../../errors/validation");
 
 module.exports = class SpiralMapService {
 
