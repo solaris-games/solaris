@@ -131,6 +131,10 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWormHoles) }}%</td>
           </tr>
           <tr>
+            <td>Random Nebulas</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
+          </tr>
+          <tr>
             <td>Dark Galaxy</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.darkGalaxy) }}</td>
           </tr>

@@ -179,6 +179,7 @@ module.exports = class GameGalaxyService {
                 ownedByPlayerId: s.ownedByPlayerId,
                 location: s.location,
                 warpGate: false,
+                isNebula: false,
                 wormHoleToStarId: null
             }
         });
@@ -274,6 +275,7 @@ module.exports = class GameGalaxyService {
                     location: s.location,
                     locationNext: s.locationNext,
                     warpGate: false, // Hide warp gates outside of scanning range
+                    isNebula: false, // Hide nebula outside of scanning range
                     wormHoleToStarId: s.wormHoleToStarId
                 }
             }
@@ -301,7 +303,7 @@ module.exports = class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                if (player && !this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                if (player && !this.carrierService.canPlayerSeeCarrierShips(doc, player, c)) {
                     c.ships = null;
                 }
 

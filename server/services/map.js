@@ -84,6 +84,11 @@ module.exports = class MapService {
         if (game.settings.specialGalaxy.randomWormHoles) {
             this.generateWormHoles(stars, game.settings.specialGalaxy.randomWormHoles);
         }
+
+        // If nebulas are enabled, assign random nebulas to start
+        if (game.settings.specialGalaxy.randomNebulas) {
+            this.generateNebulas(stars, game.settings.specialGalaxy.randomNebulas);
+        }
         
         return stars;
     }
@@ -121,6 +126,21 @@ module.exports = class MapService {
                 starB.wormHoleToStarId = starA._id;
             }
         }
+    }
+
+    generateNebulas(stars, percentage) {
+        let count = Math.floor(stars.length / 100 * percentage);
+
+        // Pick stars at random and set them to be nebulas
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.isNebula) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isNebula = true;
+            }
+        } while (count--);
     }
 
     getGalaxyCenter(starLocations) {

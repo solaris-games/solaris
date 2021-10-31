@@ -337,19 +337,39 @@ module.exports = class CarrierService {
         // TODO: Event?
     }
 
-    canPlayerSeeCarrierShips(player, carrier) {
+    canPlayerSeeCarrierShips(game, player, carrier) {
+        const isOwnedByPlayer = carrier.ownedByPlayerId.toString() === player._id.toString();
+
+        if (isOwnedByPlayer) {
+            return true;
+        }
+
+        // Check if the carrier is in orbit of a nebula as nebula always hides ships for other players.
+        if (this.isInOrbitOfNebula(game, carrier)) {
+            return false;
+        }
+
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             // If the carrier has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideShips
-                && carrier.ownedByPlayerId.toString() !== player._id.toString()) {
+            if (specialist.modifiers.special && specialist.modifiers.special.hideShips) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    isInOrbitOfNebula(game, carrier) {
+        if (carrier.orbiting) {
+            const orbitStar = this.starService.getById(game, carrier.orbiting);
+
+            return orbitStar.isNebula;
+        }
+
+        return false;
     }
 
     moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick) {

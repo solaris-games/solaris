@@ -1,6 +1,8 @@
 db.games.updateMany({}, {
     $set: {
-        'game.settings.specialGalaxy.randomWarpGates': 0,
-        'game.settings.specialGalaxy.randomWormHoles': 0
+        'settings.specialGalaxy.randomWarpGates': 0,
+        'settings.specialGalaxy.randomWormHoles': 0,
+        'settings.specialGalaxy.randomNebulas': 0,
+        'galaxy.stars.$[].isNebula': false
     }
 });

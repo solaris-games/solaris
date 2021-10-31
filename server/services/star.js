@@ -328,13 +328,23 @@ module.exports = class StarService extends EventEmitter {
     }
 
     canPlayerSeeStarShips(player, star) {
+        const isOwnedByPlayer = (star.ownedByPlayerId || '').toString() === player._id.toString();
+
+        if (isOwnedByPlayer) {
+            return true;
+        }
+
+        // Nebula always hides ships for other players
+        if (star.isNebula) {
+            return false;
+        }
+
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
             // If the star has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideShips
-                && (star.ownedByPlayerId || '').toString() !== player._id.toString()) {
+            if (specialist.modifiers.special && specialist.modifiers.special.hideShips) {
                 return false;
             }
         }

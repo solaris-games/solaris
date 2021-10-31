@@ -452,7 +452,7 @@ class Star extends EventEmitter {
 
     let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
-    if ((totalKnownShips > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
+    if (this.data.ownedByPlayerId && (totalKnownShips > 0 || this._getStarCarriers().length > 0 || this._hasUnknownShips())) {
       this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
@@ -475,26 +475,32 @@ class Star extends EventEmitter {
     let carrierCount = carriersOrbiting.length
 
     let shipsText = ''
-    let scramblers = 0
-    if (carriersOrbiting) {
-      scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-    }
-    if ( (scramblers == carrierCount) && (this.data.ships == null) ) {
-      shipsText = '???'
-    }
-    else {
-      shipsText = totalKnownShips
-      if( (scramblers > 0) || (this.data.ships == null) ) {
-        shipsText += '*'
+
+    if (this.data.ownedByPlayerId) {
+      let scramblers = 0
+      
+      if (carriersOrbiting) {
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
       }
-    }
 
-    if (carrierCount) {
-      shipsText += '/'
-      shipsText += carrierCount.toString()
+      if (scramblers == carrierCount && this.data.ships == null) {
+        shipsText = '???'
+      }
+      else {
+        shipsText = totalKnownShips
 
-      if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
-        shipsText += '+'
+        if (scramblers > 0 || this.data.ships == null) {
+          shipsText += '*'
+        }
+      }
+
+      if (carrierCount) {
+        shipsText += '/'
+        shipsText += carrierCount.toString()
+
+        if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
+          shipsText += '+'
+        }
       }
     }
 

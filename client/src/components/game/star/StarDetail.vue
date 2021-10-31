@@ -15,6 +15,8 @@
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
+        <p class="mb-0" v-if="star.isNebula">This star is hidden inside a <span class="text-warning">Nebula</span>.</p>
+        <p class="mb-2 text-info" v-if="star.isNebula"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
         <p class="mb-0" v-if="star.wormHoleToStarId && wormHolePairStar">This star is a <strong>Worm Hole</strong> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
         <p class="mb-0" v-if="star.wormHoleToStarId && !wormHolePairStar">This star is a <strong>Worm Hole</strong> to an unknown star.</p>
         <p class="mb-2 text-info" v-if="star.wormHoleToStarId"><small><i>Travel between Worm Holes is instantaneous.</i></small></p>
@@ -30,6 +32,9 @@
           </span>
         </div>
         <div class="col-auto">
+          <span v-if="star.isNebula" title="Ships hidden in Nebula">
+            <i class="fas fa-eye-slash ml-1"></i>
+          </span>
           <span v-if="star.wormHoleToStarId" title="Worm Hole">
             <i class="far fa-sun ml-1"></i>
           </span>

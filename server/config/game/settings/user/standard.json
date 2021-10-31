@@ -24,6 +24,7 @@
         "specialistsCurrency": "creditsSpecialists",
         "randomWarpGates": 0,
         "randomWormHoles": 0,
+        "randomNebulas": 0,
         "darkGalaxy": "disabled",
         "giftCarriers": "enabled",
         "defenderBonus": "enabled",
