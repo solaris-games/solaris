@@ -241,21 +241,17 @@
       </div>
 
       <div class="form-group">
-        <label for="randomWarpGates" class="col-form-label">Random Warp Gates</label>
-        <select class="form-control" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.randomWarpGates" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }} Warp Gates
-          </option>
-        </select>
+        <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isSavingSettings">
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="randomWormHoles" class="col-form-label">Random Worm Holes</label>
-        <select class="form-control" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.randomWormHoles" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }} Worm Holes
-          </option>
-        </select>
+        <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isSavingSettings">
+        </div>
       </div>
 
       <div class="form-group">

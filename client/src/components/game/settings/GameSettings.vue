@@ -124,11 +124,11 @@
           </tr>
           <tr>
             <td>Random Warp Gates</td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWarpGates) }}</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWarpGates) }}%</td>
           </tr>
           <tr>
             <td>Random Worm Holes</td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWormHoles) }}</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWormHoles) }}%</td>
           </tr>
           <tr>
             <td>Dark Galaxy</td>

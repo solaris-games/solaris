@@ -198,7 +198,7 @@ module.exports = class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getByObjectId(game, starId);
 
-                this.setupStarForGameStart(game, star, player); 
+                this.setupStarForGameStart(game, star, player, false); 
             }
         }
     }
@@ -218,24 +218,27 @@ module.exports = class PlayerService extends EventEmitter {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
-                this.setupStarForGameStart(game, s, player);
+                this.setupStarForGameStart(game, s, player, false);
             }
         }
     }
 
     // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game, star, player) {
+    setupStarForGameStart(game, star, player, resetWarpGates) {
         if (player.homeStarId.equals(star._id)) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            star.warpGate = false;
             star.specialistId = null;
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
             star.infrastructure.science = 0;
+
+            if (resetWarpGates) {
+                star.warpGate = false;
+            }
 
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
@@ -257,7 +260,7 @@ module.exports = class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.setupStarForGameStart(game, star, player);
+            this.setupStarForGameStart(game, star, player, true);
         }
 
         // Reset the player's carriers

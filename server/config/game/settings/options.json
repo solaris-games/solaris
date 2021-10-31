@@ -142,34 +142,6 @@
                 "text": "Specialist Tokens"
             }
         ],
-        "randomWarpGates": [
-            {
-            "value": "none",
-            "text": "No"
-            },
-            {
-            "value": "rare",
-            "text": "Rare"
-            },
-            {
-            "value": "common",
-            "text": "Common"
-            }
-        ],
-        "randomWormHoles": [
-            {
-            "value": "none",
-            "text": "No"
-            },
-            {
-            "value": "rare",
-            "text": "Rare"
-            },
-            {
-            "value": "common",
-            "text": "Common"
-            }
-        ],
         "darkGalaxy": [
             {
             "value": "disabled",

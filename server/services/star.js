@@ -171,7 +171,7 @@ module.exports = class StarService extends EventEmitter {
 
         // If worm holes are present, then ensure that any owned star
         // also has its paired star visible.
-        if (game.settings.specialGalaxy.randomWormHoles !== 'none') {
+        if (game.settings.specialGalaxy.randomWormHoles) {
             let wormHoleStars = game.galaxy.stars
                 .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id) && s.wormHoleToStarId)
                 .map(s => {

@@ -76,25 +76,20 @@ module.exports = class MapService {
         }
 
         // If warp gates are enabled, assign random stars to start as warp gates.
-        if (game.settings.specialGalaxy.randomWarpGates !== 'none') {
-            this.generateGates(stars, game.settings.specialGalaxy.randomWarpGates, playerLimit);
+        if (game.settings.specialGalaxy.randomWarpGates) {
+            this.generateGates(stars, game.settings.specialGalaxy.randomWarpGates);
         }
 
         // If worm holes are enabled, assign random warp gates to start as worm hole pairs
-        if (game.settings.specialGalaxy.randomWormHoles !== 'none') {
-            this.generateWormHoles(stars, game.settings.specialGalaxy.randomWormHoles, playerLimit);
+        if (game.settings.specialGalaxy.randomWormHoles) {
+            this.generateWormHoles(stars, game.settings.specialGalaxy.randomWormHoles);
         }
         
         return stars;
     }
 
-    generateGates(stars, type, playerCount) {
-        let gateCount = 0;
-
-        switch(type) {
-            case 'rare': gateCount = playerCount; break;            // 1 per player
-            case 'common': gateCount = Math.floor(stars.length / playerCount); break;  // fucking loads
-        }
+    generateGates(stars, percentage) {
+        let gateCount = Math.floor(stars.length / 100 * percentage);
 
         // Pick stars at random and set them to be warp gates.
         do {
@@ -108,13 +103,8 @@ module.exports = class MapService {
         } while (gateCount--);
     }
 
-    generateWormHoles(stars, type, playerCount) {
-        let wormHoleCount = 0;
-
-        switch(type) {
-            case 'rare': wormHoleCount = playerCount; break;            // 1 per player
-            case 'common': wormHoleCount = Math.floor(stars.length / playerCount); break;  // fucking loads
-        }
+    generateWormHoles(stars, percentage) {
+        let wormHoleCount = Math.floor(stars.length / 2 / 100 * percentage); // Worm homes come in pairs so its half of stars
 
         // Pick stars at random and pair them up with another star to create a worm hole.
         while (wormHoleCount--) {

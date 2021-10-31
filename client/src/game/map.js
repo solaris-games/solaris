@@ -256,7 +256,7 @@ class Map extends EventEmitter {
   }
 
   _isWormHolesEnabled () {
-    return this.game.settings.specialGalaxy.randomWormHoles !== 'none'
+    return this.game.settings.specialGalaxy.randomWormHoles
   }
 
   _setupChunks() {

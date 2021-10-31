@@ -1,8 +1,6 @@
-db.games.find({}).forEach(function(game) {
-    game.settings.specialGalaxy.randomWarpGates = game.settings.specialGalaxy.randomGates;
-    game.settings.specialGalaxy.randomWormHoles = 'none';
-
-    delete game.settings.specialGalaxy.randomGates;
-
-    db.games.save(game);
+db.games.updateMany({}, {
+    $set: {
+        'game.settings.specialGalaxy.randomWarpGates': 0,
+        'game.settings.specialGalaxy.randomWormHoles': 0
+    }
 });
