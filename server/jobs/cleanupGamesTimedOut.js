@@ -3,7 +3,7 @@ module.exports = (container) => {
     return {
 
         async handler(job, done) {
-            let games = await container.gameListService.listCustomGamesTimedOut();
+            let games = await container.gameListService.listGamesTimedOutWaitingForPlayers();
 
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
@@ -14,7 +14,7 @@ module.exports = (container) => {
                 }
 
                 try {
-                    await container.emailService.sendCustomGameRemovedEmail(game);
+                    await container.emailService.sendGameTimedOutEmail(game);
                     await container.gameService.delete(game);
                     await container.historyService.deleteByGameId(game._id);
                     await container.eventService.deleteByGameId(game._id);

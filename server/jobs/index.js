@@ -30,7 +30,7 @@ async function startup() {
 
     const gameTickJob = require('./gameTick')(container);
     const officialGamesCheckJob = require('./officialGamesCheck')(container);
-    const cleanupCustomGamesJob = require('./cleanupCustomGames')(container);
+    const cleanupGamesTimedOutJob = require('./cleanupGamesTimedOut')(container);
     const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
 
     // Set up the agenda instance.
@@ -56,11 +56,11 @@ async function startup() {
     },
     officialGamesCheckJob.handler);
 
-    // Cleanup old custom games that reached timeout
-    agendajs.define('cleanup-old-custom-games', {
+    // Cleanup old games that reached timeout
+    agendajs.define('cleanup-games-timed-out', {
         priority: 'high', concurrency: 1
     },
-    cleanupCustomGamesJob.handler);
+    cleanupGamesTimedOutJob.handler);
 
     // Cleanup old game history
     agendajs.define('cleanup-old-game-history', {
@@ -77,7 +77,7 @@ async function startup() {
     // Start server jobs
     agendajs.every('10 seconds', 'game-tick');
     agendajs.every('5 minutes', 'new-player-game-check');
-    agendajs.every('1 hour', 'cleanup-old-custom-games');
+    agendajs.every('1 hour', 'cleanup-games-timed-out');
     agendajs.every('1 day', 'cleanup-old-game-history');
 }
 

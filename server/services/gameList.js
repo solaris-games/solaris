@@ -148,15 +148,28 @@ module.exports = class GameListService {
         });
     }
 
-    async listCustomGamesTimedOut() {
+    async listGamesTimedOutWaitingForPlayers() {
         let date = moment().subtract(7, 'day');
 
-        let userGames = await this.listUserGames({
+        let games = await this.gameRepo.find({
+            'settings.general.type': { 
+                $in: [
+                    'custom',
+                    'special_dark',
+                    'special_ultraDark',
+                    'special_orbital',
+                    'special_battleRoyale',
+                    'special_homeStar',
+                    'special_anonymous'
+                ]
+            },
+            'state.startDate': { $eq: null }
+        }, {
             'galaxy.stars': 0,
             'galaxy.carriers': 0
         });
-
-        return userGames.filter(g => {
+        
+        return games.filter(g => {
             return moment(g._id.getTimestamp()) <= date;
         });
     }
