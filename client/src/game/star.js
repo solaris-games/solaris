@@ -185,28 +185,23 @@ class Star extends EventEmitter {
     let nebulaTexture = TextureService.getRandomStarNebulaTexture()
     this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
 
+
     let spriteSize = 64* 1.25
     this.nebulaSprite.width = spriteSize
     this.nebulaSprite.height = spriteSize
     this.nebulaSprite.anchor.set(0.5)
-    //this.nebulaSprite.x = -spriteSize/2.0
-    //this.nebulaSprite.y = -spriteSize/2.0
     this.nebulaSprite.rotation = Math.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
     let playerColour = player ? player.colour.value : 0xFFFFFF
     this.nebulaSprite.tint = playerColour
-    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD //PIXI.BLEND_MODES.NORMAL
+    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
     nebulaTexture = TextureService.getRandomStarNebulaTexture()
     let blendSprite = new PIXI.Sprite(nebulaTexture)
-    /*
-    blendSprite.width = spriteSize
-    blendSprite.height = spriteSize
-    */
     blendSprite.anchor.set(0.5)
     blendSprite.rotation = Math.random()*Math.PI*2.0
-    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD //PIXI.BLEND_MODES.NORMAL
+    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
     blendSprite.tint = playerColour
     this.nebulaSprite.addChild(blendSprite)
 
@@ -237,7 +232,6 @@ class Star extends EventEmitter {
   }
 
   hasNebula () {
-    console.log(this.data.isNebula)
     return this.data.isNebula
   }
 
