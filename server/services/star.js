@@ -433,6 +433,15 @@ module.exports = class StarService extends EventEmitter {
 
         game.state.stars--;
 
+        // If the star was paired with a worm hole, then clear the other side.
+        if (star.wormHoleToStarId) {
+            const wormHolePairStar = this.getByObjectId(game, star.wormHoleToStarId);
+
+            if (wormHolePairStar) {
+                wormHolePairStar.wormHoleToStarId = null;
+            }
+        }
+
         // Recalculate how many stars are needed for victory in conquest mode.
         if (game.settings.general.mode === 'conquest') {
             // TODO: Find a better place for this as its shared in the gameCreate service.

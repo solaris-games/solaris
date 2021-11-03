@@ -29,7 +29,7 @@
                         </span>
                     </td>
                     <td v-if="userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !isGameFinished()" class="text-right pl-2 pr-2" style="">
-                        <button title="Edit waypoints" v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary" @click="onEditWaypointsRequested(mapObject.data._id)"><i class="fas fa-plus"></i> </button>
+                        <button title="Edit waypoints" v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary" @click="onEditWaypointsRequested(mapObject.data._id)"><i class="fas fa-map-marker-alt"></i> </button>
                         <button title="Transfer ships" v-if="mapObject.type === 'carrier' && mapObject.data.orbiting && userOwnsStar(mapObject.data.orbiting)" type="button" class="btn btn-primary ml-1" @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
 
                         <button title="Build a carrier" v-if="mapObject.type === 'star' && mapObject.data.ships && hasEnoughCredits(mapObject) && mapObject.data.naturalResources" type="button" class="btn btn-primary" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>

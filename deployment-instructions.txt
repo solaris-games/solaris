@@ -1,8 +1,25 @@
-db.games.updateMany({}, {
+db.games.updateMany({
+    'settings.general.type': 'standard_dark_rt'
+}, {
     $set: {
-        'settings.specialGalaxy.randomWarpGates': 0,
-        'settings.specialGalaxy.randomWormHoles': 0,
-        'settings.specialGalaxy.randomNebulas': 0,
-        'galaxy.stars.$[].isNebula': false
+        'settings.general.type': 'special_dark'
+    }
+});
+
+db.games.updateMany({
+    'settings.general.type': {
+        $in: [
+            'special_dark',
+            'special_ultraDark',
+            'special_orbital',
+            'special_battleRoyale',
+            'special_homeStar',
+            'special_anonymous'
+        ]
+    },
+    'state.startDate': { $eq: null }
+}, {
+    $set: {
+        'settings.general.type': 'custom'
     }
 });
