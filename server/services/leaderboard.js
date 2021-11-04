@@ -642,6 +642,11 @@ module.exports = class LeaderboardService {
                     rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
                 }
 
+                // For special game modes, award x2 positive rank.
+                if (rankIncrease > 0 && this.gameService.isSpecialGameMode(game)) {
+                    rankIncrease *= 2;
+                }
+
                 let currentRank = user.achievements.rank;
                 let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
 

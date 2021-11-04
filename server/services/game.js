@@ -563,6 +563,17 @@ module.exports = class GameService extends EventEmitter {
         return game.settings.general.anonymity === 'extra';
     }
 
+    isSpecialGameMode(game) {
+        return [
+            'special_dark',
+            'special_ultraDark',
+            'special_orbital',
+            'special_battleRoyale',
+            'special_homeStar',
+            'special_anonymous'
+        ].includes(game.settings.general.mode);
+    }
+
     isNewPlayerGame(game) {
         return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
     }

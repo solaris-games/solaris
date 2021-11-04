@@ -84,7 +84,8 @@
                   </h5>
                   <h6 class="card-title card-subtitle special-card-subtitle">
                     {{getGameTypeFriendlyText(games.special)}}
-                    ({{games.special.state.players}}/{{games.special.settings.general.playerLimit}})
+                    ({{games.special.state.players}}/{{games.special.settings.general.playerLimit}}) -
+                    <strong>x2 Rank</strong>
                   </h6>
                 </div>
               </div>
