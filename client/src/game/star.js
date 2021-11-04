@@ -130,11 +130,12 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawNebula()
+    this.drawAsteroidField()
     this.drawTarget()
     this.drawSelectedCircle()
     this.drawStar()
     this.drawSpecialist()
-    this.drawNebula()
     this.drawPlanets()
     this.drawNaturalResourcesRing()
     this.drawColour()
@@ -185,8 +186,7 @@ class Star extends EventEmitter {
     let nebulaTexture = TextureService.getRandomStarNebulaTexture()
     this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
 
-
-    let spriteSize = 64* 1.25
+    let spriteSize = 64
     this.nebulaSprite.width = spriteSize
     this.nebulaSprite.height = spriteSize
     this.nebulaSprite.anchor.set(0.5)
@@ -197,7 +197,6 @@ class Star extends EventEmitter {
     this.nebulaSprite.tint = playerColour
     //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
-    nebulaTexture = TextureService.getRandomStarNebulaTexture()
     let blendSprite = new PIXI.Sprite(nebulaTexture)
     blendSprite.anchor.set(0.5)
     blendSprite.rotation = Math.random()*Math.PI*2.0
@@ -206,6 +205,31 @@ class Star extends EventEmitter {
     this.nebulaSprite.addChild(blendSprite)
 
     this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
+  drawAsteroidField () {
+    if(!this.hasAsteroidField()) {
+      return
+    }
+    if (this.asteroidFieldSprite) {
+      this.container.removeChild(this.asteroidFieldSprite)
+      this.asteroidFieldSprite = null
+    }
+    let texture = TextureService.getRandomStarAsteroidFieldTexture()
+    this.asteroidFieldSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 64
+    this.asteroidFieldSprite.width = spriteSize
+    this.asteroidFieldSprite.height = spriteSize
+    this.asteroidFieldSprite.anchor.set(0.5)
+    this.asteroidFieldSprite.rotation = Math.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.asteroidFieldSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.asteroidFieldSprite)
   }
 
   drawSpecialist () {
@@ -233,6 +257,10 @@ class Star extends EventEmitter {
 
   hasNebula () {
     return this.data.isNebula
+  }
+
+  hasAsteroidField () {
+    return this.data.isAsteroidField
   }
 
   hasSpecialist () {

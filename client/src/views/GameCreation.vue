@@ -262,6 +262,13 @@
       </div>
 
       <div class="form-group">
+        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="darkGalaxy" class="col-form-label">Dark Galaxy</label>
         <select class="form-control" id="darkGalaxy" v-model="settings.specialGalaxy.darkGalaxy" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.darkGalaxy" v-bind:key="opt.value" v-bind:value="opt.value">

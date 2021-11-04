@@ -89,6 +89,11 @@ module.exports = class MapService {
         if (game.settings.specialGalaxy.randomNebulas) {
             this.generateNebulas(stars, game.settings.specialGalaxy.randomNebulas);
         }
+
+        // If asteroid fields are enabled, assign random asteroid fields to start
+        if (game.settings.specialGalaxy.randomAsteroidFields) {
+            this.generateAsteroidFields(game, stars, game.settings.specialGalaxy.randomAsteroidFields);
+        }
         
         return stars;
     }
@@ -139,6 +144,27 @@ module.exports = class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isNebula = true;
+            }
+        } while (count--);
+    }
+
+    generateAsteroidFields(game, stars, percentage) {
+        let count = Math.floor(stars.length / 100 * percentage);
+
+        // Pick stars at random and set them to be asteroid fields
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.isAsteroidField) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isAsteroidField = true;
+
+                // Overwrite the natural resources
+                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);;
             }
         } while (count--);
     }

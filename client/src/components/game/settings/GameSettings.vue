@@ -135,6 +135,10 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
           </tr>
           <tr>
+            <td>Random Asteroid Fields</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
+          </tr>
+          <tr>
             <td>Dark Galaxy</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.darkGalaxy) }}</td>
           </tr>

@@ -177,7 +177,7 @@ module.exports = class TechnologyService {
 
     getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit) {
         let weapons = player.research.weapons.level;
-        let defenderBonus = this.getDefenderBonus(game);
+        let defenderBonus = this.getDefenderBonus(game, star);
 
         let buffs = [];
 
@@ -211,7 +211,9 @@ module.exports = class TechnologyService {
         return Math.max(1, weapons + actualBuff + additionalBuff);
     }   
 
-    getDefenderBonus(game) {
-        return game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
+    getDefenderBonus(game, star) {
+        const bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
+
+        return star.isAsteroidField ? bonus * 2 : bonus;
     }
 }
