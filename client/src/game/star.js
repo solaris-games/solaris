@@ -134,6 +134,7 @@ class Star extends EventEmitter {
     this.drawSelectedCircle()
     this.drawStar()
     this.drawSpecialist()
+    this.drawNebula()
     this.drawPlanets()
     this.drawNaturalResourcesRing()
     this.drawColour()
@@ -173,6 +174,40 @@ class Star extends EventEmitter {
     }
   }
 
+  drawNebula () {
+    if(!this.hasNebula()) {
+      return
+    }
+    if (this.nebulaSprite) {
+      this.container.removeChild(this.nebulaSprite)
+      this.nebulaSprite = null
+    }
+    let nebulaTexture = TextureService.getRandomStarNebulaTexture()
+    this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
+
+
+    let spriteSize = 64* 1.25
+    this.nebulaSprite.width = spriteSize
+    this.nebulaSprite.height = spriteSize
+    this.nebulaSprite.anchor.set(0.5)
+    this.nebulaSprite.rotation = Math.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.nebulaSprite.tint = playerColour
+    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    nebulaTexture = TextureService.getRandomStarNebulaTexture()
+    let blendSprite = new PIXI.Sprite(nebulaTexture)
+    blendSprite.anchor.set(0.5)
+    blendSprite.rotation = Math.random()*Math.PI*2.0
+    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
+    blendSprite.tint = playerColour
+    this.nebulaSprite.addChild(blendSprite)
+
+    this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
   drawSpecialist () {
     if (!this.hasSpecialist()) {
       return
@@ -194,6 +229,10 @@ class Star extends EventEmitter {
     this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
+  }
+
+  hasNebula () {
+    return this.data.isNebula
   }
 
   hasSpecialist () {
