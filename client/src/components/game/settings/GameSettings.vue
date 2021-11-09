@@ -333,6 +333,10 @@
             <td>Banking Reward</td>
             <td class="text-right">{{ getFriendlyText(game.settings.technology.bankingReward) }}</td>
           </tr>
+          <tr>
+            <td>Specialist Token Reward</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.technology.specialistTokenReward) }}</td>
+          </tr>
         </tbody>
       </table>
     </div>

@@ -545,7 +545,17 @@ module.exports = class PlayerService extends EventEmitter {
             return 0;
         }
 
-        return player.research.specialists.level;
+        let starCount = playerStars.length;
+        let specialists = player.research.specialists.level;
+
+        switch (game.settings.technology.specialistTokenReward) {
+            case 'standard':
+                return specialists;
+            case 'experimental':
+                return Math.ceil(Math.min(starCount * specialists * 0.1, specialists));
+        }
+
+        throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
     }
 
     deductCarrierUpkeepCost(game, player) {

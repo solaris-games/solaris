@@ -582,6 +582,15 @@
           </option>
         </select>
       </div>
+
+      <div class="form-group">
+        <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward</label>
+        <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
       
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
