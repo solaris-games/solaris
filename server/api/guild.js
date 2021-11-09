@@ -46,6 +46,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/guild/applications', middleware.authenticate, async (req, res, next) => {
+        try {
+            let result = await container.guildService.listApplications(req.session.userId);
+                
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
         try {
             const result = await container.guildService.detail(req.params.guildId, true, false);
@@ -122,9 +132,9 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/acceptInvite', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/accept/:userId', middleware.authenticate, async (req, res, next) => {
         try {
-            await container.guildService.acceptInvite(req.session.userId, req.params.guildId);
+            await container.guildService.accept(req.params.userId, req.params.guildId, req.session.userId);
                 
             return res.sendStatus(200);
         } catch (err) {
@@ -132,9 +142,49 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/declineInvite', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/accept', middleware.authenticate, async (req, res, next) => {
         try {
-            await container.guildService.declineInvite(req.session.userId, req.params.guildId);
+            await container.guildService.join(req.session.userId, req.params.guildId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.patch('/api/guild/:guildId/decline', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.guildService.decline(req.session.userId, req.params.guildId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/guild/:guildId/apply', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.guildService.apply(req.session.userId, req.params.guildId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.patch('/api/guild/:guildId/withdraw', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.guildService.withdraw(req.session.userId, req.params.guildId);
+                
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.patch('/api/guild/:guildId/reject/:userId', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.guildService.reject(req.params.userId, req.params.guildId, req.session.userId);
                 
             return res.sendStatus(200);
         } catch (err) {

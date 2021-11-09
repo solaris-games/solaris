@@ -25,14 +25,14 @@
         <div v-if="star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field</span>.</p>
-          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional national resources and x2 Defender Bonus.</i></small></p>
+          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus.</i></small></p>
         </div>
         
         <div v-if="star.wormHoleToStarId">
           <hr/>
           <p class="mb-0" v-if="wormHolePairStar">This star is a <strong>Worm Hole</strong> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
           <p class="mb-0" v-if="!wormHolePairStar">This star is a <strong>Worm Hole</strong> to an unknown star.</p>
-          <p class="mb-2 text-info"><small><i>Travel between Worm Holes is instantaneous.</i></small></p>
+          <p class="mb-2 text-info"><small><i>Travel between Worm Holes takes 1 tick.</i></small></p>
         </div>
       </div>
     </div>

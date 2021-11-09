@@ -50,10 +50,13 @@ module.exports = class StarService extends EventEmitter {
         homeStar.ownedByPlayerId = player._id;
         homeStar.shipsActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 star at the home star so that a carrier can be built there.
         homeStar.ships = homeStar.shipsActual;
-        homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
         homeStar.homeStar = true;
         homeStar.warpGate = false;
         homeStar.specialistId = null;
+
+        if (!homeStar.isAsteroidField) {
+            homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
+        }
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
         
@@ -149,6 +152,28 @@ module.exports = class StarService extends EventEmitter {
             }
         }
 
+        // If worm holes are present, then ensure that any owned star
+        // also has its paired star visible.
+        if (game.settings.specialGalaxy.randomWormHoles) {
+            let wormHoleStars = game.galaxy.stars
+                .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id) && s.wormHoleToStarId)
+                .map(s => {
+                    return {
+                        source: s,
+                        destination: this.getByObjectId(game, s.wormHoleToStarId)
+                    };
+                });
+    
+            for (let wormHoleStar of wormHoleStars) {
+                if (starsInRange.find(s => s._id.equals(wormHoleStar.destination._id)) == null) {
+                    starsInRange.push({
+                        _id: wormHoleStar.destination._id,
+                        location: wormHoleStar.destination.location
+                    });
+                }
+            }
+        }
+
         return starsInRange.map(s => this.getByObjectId(game, s._id));
     }
 
@@ -166,25 +191,6 @@ module.exports = class StarService extends EventEmitter {
         for (let transitStar of inTransitStars) {
             if (starsInScanningRange.indexOf(transitStar) < 0) {
                 starsInScanningRange.push(transitStar);
-            }
-        }
-
-        // If worm holes are present, then ensure that any owned star
-        // also has its paired star visible.
-        if (game.settings.specialGalaxy.randomWormHoles) {
-            let wormHoleStars = game.galaxy.stars
-                .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id) && s.wormHoleToStarId)
-                .map(s => {
-                    return {
-                        source: s,
-                        destination: this.getByObjectId(game, s.wormHoleToStarId)
-                    };
-                });
-    
-            for (let wormHoleStar of wormHoleStars) {
-                if (starsInScanningRange.indexOf(wormHoleStar.destination) < 0) {
-                    starsInScanningRange.push(wormHoleStar.destination);
-                }
             }
         }
 

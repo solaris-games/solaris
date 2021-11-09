@@ -17,7 +17,9 @@
             @onPlayerPromoted="onPlayerPromoted"
             @onPlayerDemoted="onPlayerDemoted"
             @onPlayerKicked="onPlayerKicked"
-            @onPlayerUninvited="onPlayerUninvited"></guild-member>
+            @onPlayerUninvited="onPlayerUninvited"
+            @onPlayerApplicationAccepted="onPlayerApplicationAccepted"
+            @onPlayerApplicationRejected="onPlayerApplicationRejected"></guild-member>
         </template>
       </guild-member-list>
 
@@ -31,7 +33,7 @@
     </div>
 
     <div v-if="!isLoading && !guild" class="mb-4">
-      <p>You are not a member of a guild. Accept an invitation to join a guild or found a new one.</p>
+      <p>You are not a member of a guild. Accept an invitation, apply to join or found a new guild.</p>
 
       <div class="text-center">
         <router-link to="/guild/create" class="btn btn-lg btn-success">
@@ -53,6 +55,21 @@
               </tbody>
           </table>
       </div>
+
+      <hr />
+
+      <h4 class="mt-4">Guild Applications</h4>
+
+      <p v-if="!applications.length" class="text-warning">You have not applied to become a member of a guild.</p>
+
+      <div class="table-responsive" v-if="applications.length">
+          <table class="table table-striped table-hover">
+              <tbody> 
+                <guild-application v-for="application in applications" :key="application.guildId" 
+                  :application="application"/>
+              </tbody>
+          </table>
+      </div>
     </div>
   </view-container>
 </template>
@@ -64,6 +81,7 @@ import LoadingSpinner from '../../components/LoadingSpinner'
 import GuildApiService from '../../services/api/guild'
 import GuildNewInvite from './GuildNewInvite'
 import GuildInvite from './GuildInvite'
+import GuildApplication from './GuildApplication'
 import GuildMember from './GuildMember'
 import GuildMemberList from './GuildMemberList'
 
@@ -74,6 +92,7 @@ export default {
     'loading-spinner': LoadingSpinner,
     'guild-new-invite': GuildNewInvite,
     'guild-invite': GuildInvite,
+    'guild-application': GuildApplication,
     'guild-member': GuildMember,
     'guild-member-list': GuildMemberList
   },
@@ -81,7 +100,8 @@ export default {
     return {
       isLoading: false,
       guild: null,
-      invites: []
+      invites: [],
+      applications: []
     }
   },
   async mounted () {
@@ -105,6 +125,12 @@ export default {
           if (response.status === 200) {
             this.invites = response.data
           }
+
+          response = await GuildApiService.listApplications()
+
+          if (response.status === 200) {
+            this.applications = response.data
+          }
         }
       } catch (err) {
         console.error(err)
@@ -120,7 +146,7 @@ export default {
 
       this.loadGuild()
     },
-    // Fuck it.
+    // TODO: Fuck it.
     onInvitationDeclined (e) {
       this.loadGuild()
     },
@@ -134,6 +160,12 @@ export default {
       this.loadGuild()
     },
     onPlayerUninvited (e) {
+      this.loadGuild()
+    },
+    onPlayerApplicationAccepted (e) {
+      this.loadGuild()
+    },
+    onPlayerApplicationRejected (e) {
       this.loadGuild()
     },
     isCurrentUser (userId) {
