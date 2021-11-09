@@ -25,11 +25,11 @@ module.exports = class CombatService extends EventEmitter {
         // Note: This addresses an exploit where players can send out 1 ship carriers to chip away 
         // at incoming carriers.
         if (!isTurnBased) {
-            if (defender.ships <= attackPower) {
+            if (defender.ships <= attacker.weaponsLevel) {
                 defendPower = 1;
             }
             
-            if (attacker.ships <= defendPower) {
+            if (attacker.ships <= defender.weaponsLevel) {
                 attackPower = 1;
             }
         }
