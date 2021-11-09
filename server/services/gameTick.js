@@ -228,77 +228,107 @@ module.exports = class GameTickService extends EventEmitter {
                 };
             });
 
-        for (let i = 0; i < carrierPositions.length; i++) {
-            let friendlyCarrier = carrierPositions[i];
+        const graph = this._getCarrierPositionGraph(carrierPositions);
 
-            if (friendlyCarrier.carrier.ships <= 0) {
+        for (let carrierPath in graph) {
+            let positions = graph[carrierPath];
+
+            if (positions.length <= 1) {
                 continue;
             }
 
-            // First up, get all carriers that are heading from the destination and to the source
-            // and are in front of the carrier.
-            let collisionCarriers = carrierPositions
-                .filter(c => {
-                    // Head to head combat:
-                    return (c.carrier.ships > 0                                                 // Has ships (may have been involved in other combat)
-                            && !c.carrier.isGift                                                // And is not a gift
-                            && c.destination.equals(friendlyCarrier.source)                         // Is heading to where the carrier came from
-                            && c.source.equals(friendlyCarrier.destination)                         // Came from where the carrier is heading to
-                            && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent    // Is currently in front of the carrier
-                            && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext)         // Will be behind the carrier
-                    // Combat from behind:
-                        || (c.carrier.ships > 0
-                            && !c.carrier.isGift                                                // And is not a gift
-                            && c.destination.equals(friendlyCarrier.destination)                    // Is heading in the same direction as the carrier
-                            && c.source.equals(friendlyCarrier.source)
-                            && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent   // Is current behind the carrier
-                            && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext);       // Will be in front of the carrier 
-                });
+            for (let i = 0; i < positions.length; i++) {
+                let friendlyCarrier = positions[i];
 
-            // Filter any carriers that avoid carrier-to-carrier combat.
-            collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
-
-            if (!collisionCarriers.length) {
-                continue;
-            }
-
-            // If all of the carriers that have collided are friendly then no need to do combat.
-            let friendlyCarriers = collisionCarriers
-                .filter(c => c.carrier.ships > 0 && c.carrier.ownedByPlayerId.equals(friendlyCarrier.carrier.ownedByPlayerId));
-
-            // If all other carriers are friendly then skip.
-            if (friendlyCarriers.length === collisionCarriers.length) {
-                continue;
-            }
-
-            let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
-            
-            let combatCarriers = collisionCarriers
-                .map(c => c.carrier)
-                .filter(c => c.ships > 0);
-
-            // Double check that there are carriers that can fight.
-            if (!combatCarriers.length) {
-                continue;
-            }
-
-            // If alliances is enabled then ensure that only enemies fight.
-            // TODO: Alliance combat here is very complicated when more than 2 players are involved.
-            // For now, we will perform normal combat if any participant is an enemy of the others.
-            if (isAlliancesEnabled) {
-                const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId.toString()))];
-
-                const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
-
-                if (isAllPlayersAllied) {
+                if (friendlyCarrier.carrier.ships <= 0) {
                     continue;
                 }
+
+                // First up, get all carriers that are heading from the destination and to the source
+                // and are in front of the carrier.
+                let collisionCarriers = positions
+                    .filter(c => {
+                        return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
+                            && (
+                                // Head to head combat:
+                                (
+                                    c.destination.equals(friendlyCarrier.source)
+                                    && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
+                                    && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
+                                )
+                                ||
+                                // Combat from behind: 
+                                (
+                                    c.destination.equals(friendlyCarrier.destination)
+                                    && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
+                                    && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
+                                )
+                            )
+                    });
+
+                // Filter any carriers that avoid carrier-to-carrier combat.
+                collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
+
+                if (!collisionCarriers.length) {
+                    continue;
+                }
+
+                // If all of the carriers that have collided are friendly then no need to do combat.
+                let friendlyCarriers = collisionCarriers
+                    .filter(c => c.carrier.ships > 0 && c.carrier.ownedByPlayerId.equals(friendlyCarrier.carrier.ownedByPlayerId));
+
+                // If all other carriers are friendly then skip.
+                if (friendlyCarriers.length === collisionCarriers.length) {
+                    continue;
+                }
+
+                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
+                
+                let combatCarriers = collisionCarriers
+                    .map(c => c.carrier)
+                    .filter(c => c.ships > 0);
+
+                // Double check that there are carriers that can fight.
+                if (!combatCarriers.length) {
+                    continue;
+                }
+
+                // If alliances is enabled then ensure that only enemies fight.
+                // TODO: Alliance combat here is very complicated when more than 2 players are involved.
+                // For now, we will perform normal combat if any participant is an enemy of the others.
+                if (isAlliancesEnabled) {
+                    const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId.toString()))];
+
+                    const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
+
+                    if (isAllPlayersAllied) {
+                        continue;
+                    }
+                }
+
+                // TODO: Check for specialists that affect pre-combat.
+
+                this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
             }
-
-            // TODO: Check for specialists that affect pre-combat.
-
-            this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
         }
+    }
+
+    _getCarrierPositionGraph(carrierPositions) {
+        const graph = {};
+
+        for (let carrierPosition of carrierPositions) {
+            const graphKeyA = carrierPosition.destination.toString() + carrierPosition.source.toString();
+            const graphKeyB = carrierPosition.source.toString() + carrierPosition.destination.toString();
+            const graphObj = graph[graphKeyA] || graph[graphKeyB];
+            
+            if (graphObj) {
+                graphObj.push(carrierPosition);
+            } else {
+                graph[graphKeyA] = [ carrierPosition ];
+            }
+        }
+
+        return graph;
     }
 
     _filterAvoidCarrierToCarrierCombatCarriers(carriers) {

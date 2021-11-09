@@ -566,8 +566,10 @@ class Map extends EventEmitter {
   }
 
   drawWormHoles () {
-    this.wormHoleLayer.setup(this.game)
-    this.wormHoleLayer.draw()
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer.setup(this.game)
+      this.wormHoleLayer.draw()
+    }
   }
 
   drawPlayerNames () {
