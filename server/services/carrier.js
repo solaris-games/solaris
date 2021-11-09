@@ -483,13 +483,14 @@ module.exports = class CarrierService {
         }
 
         let nextLocation;
-        let distancePerTick;
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+        let distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
 
-        if (instantSpeed) {
-            distancePerTick = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
+
+        if (instantSpeed || (distancePerTick >= distanceToDestination) ) {
+            distancePerTick = distanceToDestination;
             nextLocation = destinationStar.location;
         } else {
-            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
             nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
         }
 
