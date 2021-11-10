@@ -180,7 +180,7 @@ class Star extends EventEmitter {
       return
     }
     if (this.nebulaSprite) {
-      this.container.removeChild(this.nebulaSprite)
+      this.fixedContainer.removeChild(this.nebulaSprite)
       this.nebulaSprite = null
     }
     let nebulaTexture = TextureService.getRandomStarNebulaTexture()
@@ -212,7 +212,7 @@ class Star extends EventEmitter {
       return
     }
     if (this.asteroidFieldSprite) {
-      this.container.removeChild(this.asteroidFieldSprite)
+      this.fixedContainer.removeChild(this.asteroidFieldSprite)
       this.asteroidFieldSprite = null
     }
     let texture = TextureService.getRandomStarAsteroidFieldTexture()
