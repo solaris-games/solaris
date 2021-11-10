@@ -52,23 +52,58 @@ module.exports = class AIService {
                 await this._setupAi(game, player);
                 player.ai = true;
             }
+            const context = this._createContext(game, player);
+            const orders = await this._gatherOrders(game, player, context);
+            const assignments = await this._gatherAssignments(game, player, context);
+            await this._evaluateOrders(game, player, context, orders, assignments);
         } catch (e) {
             console.error(e);
         }
     }
 
     async _setupAi(game, player) {
+
+    }
+
+    async _createContext(game, player) {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        const starGraph = this._computeStarGraph(game, player, playerStars);
+        return {
+            playerStars
+        }
+    }
+
+    async _evaluateOrders(game, player, context, orders, assignments) {
+
+    }
+
+    async _gatherAssignments(game, player, context) {
+
+    }
+
+    async _gatherOrders(game, player, context) {
+        const defenseOrders = await this._gatherDefenseOrders(game, player, context);
+        const movementOrders = await this._gatherMovementOrders(game, player, context);
+        return defenseOrders.concat(movementOrders);
+    }
+
+    async _gatherDefenseOrders(game, player) {
+        
+    }
+
+    async _gatherMovementOrders(game, player, context) {
+
+        const starGraph = this._computeStarGraph(game, player, context.playerStars);
 
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(game, player, starGraph , playerStars);
+        const logisticsGraph = this._createLogisticsGraph(game, player, starGraph , context.playerStars);
 
         // Graph of current carrier loops
         const existingGraph = this._computeExistingLogisticsGraph(game, player);
 
         const logisticsOrders = this._createCarrierOrders(logisticsGraph, existingGraph);
+
+        return [];
     }
 
     _computeExistingLogisticsGraph(game, player) {
