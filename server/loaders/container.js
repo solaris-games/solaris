@@ -53,7 +53,6 @@ const ConversationService = require('../services/conversation');
 const ReputationService = require('../services/reputation');
 const AIService = require('../services/ai');
 const AITradeService = require('../services/aiTrade');
-const AIOrderService = require('../services/aiOrder');
 const GuildService = require('../services/guild');
 const GuildUserService = require('../services/guildUser');
 const OrbitalMechanicsService = require('../services/orbitalMechanics');
@@ -122,8 +121,7 @@ module.exports = (config, io) => {
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerService);
-    const aiOrderService = new AIOrderService(carrierService, waypointService, starService, starUpgradeService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, aiOrderService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService);
     const historyService = new HistoryService(HistoryModel, historyRepository, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);

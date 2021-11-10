@@ -4,16 +4,14 @@ const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Heap = require('qheap');
 const { getOrInsert, minBy, minElementBy } = require('../utils.js')
-const AIOrderService = require('./aiOrder.js');
 
 module.exports = class AIService {
 
-    constructor(starUpgradeService, carrierService, starService, distanceService, aiOrderService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
-        this.aiOrderService = aiOrderService;
     }
 
     async play(game, player) {
@@ -54,8 +52,6 @@ module.exports = class AIService {
                 await this._setupAi(game, player);
                 player.ai = true;
             }
-
-            await this.aiOrderService.processOrdersForPlayer(game, player, player.scheduledOrders || []);
         } catch (e) {
             console.error(e);
         }
@@ -72,11 +68,7 @@ module.exports = class AIService {
         // Graph of current carrier loops
         const existingGraph = this._computeExistingLogisticsGraph(game, player);
 
-        player.scheduledOrders = null; //Reset currently scheduled orders and begin anew
-
         const logisticsOrders = this._createCarrierOrders(logisticsGraph, existingGraph);
-
-        await this.aiOrderService.processOrdersForPlayer(game, player, logisticsOrders);
     }
 
     _computeExistingLogisticsGraph(game, player) {
@@ -129,7 +121,7 @@ module.exports = class AIService {
             for (let to of destinations) {
                 if (!existingDestinations.has(to)) {
                     orders.push({
-                        orderType: AIOrderService.CREATE_CARRIER_LOOP,
+                        orderType: 'CREATE_CARRIER_LOOP',
                         data: {
                             from,
                             to

@@ -77,13 +77,6 @@ const schema = new Schema({
             score: { type: Types.Number, required: true, default: 0  }
         }
     ],
-    scheduledOrders: [
-        {
-            orderType: { type: Types.String, required: true },
-            data: { type: Types.Mixed, required: false },
-            retryPolicy: { type: Types.String, required: false }
-        }
-    ],
     diplomacy: {
         allies: [{ type: Types.ObjectId, required: true }]
     }
