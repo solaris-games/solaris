@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import gameHelper from '../services/gameHelper'
 
 class Star extends EventEmitter {
 
@@ -100,7 +101,8 @@ class Star extends EventEmitter {
     return !(typeof this.data.infrastructure === 'undefined')
   }
 
-  setup (data, userSettings, players, carriers, lightYearDistance) {
+  setup (game, data, userSettings, players, carriers, lightYearDistance) {
+    this.game = game
     this.data = data
     this.players = players
     this.carriers = carriers
@@ -128,6 +130,8 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawNebula()
+    this.drawAsteroidField()
     this.drawTarget()
     this.drawSelectedCircle()
     this.drawStar()
@@ -171,6 +175,63 @@ class Star extends EventEmitter {
     }
   }
 
+  drawNebula () {
+    if(!this.hasNebula()) {
+      return
+    }
+    if (this.nebulaSprite) {
+      this.fixedContainer.removeChild(this.nebulaSprite)
+      this.nebulaSprite = null
+    }
+    let nebulaTexture = TextureService.getRandomStarNebulaTexture()
+    this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
+
+    let spriteSize = 64
+    this.nebulaSprite.width = spriteSize
+    this.nebulaSprite.height = spriteSize
+    this.nebulaSprite.anchor.set(0.5)
+    this.nebulaSprite.rotation = Math.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.nebulaSprite.tint = playerColour
+    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    let blendSprite = new PIXI.Sprite(nebulaTexture)
+    blendSprite.anchor.set(0.5)
+    blendSprite.rotation = Math.random()*Math.PI*2.0
+    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
+    blendSprite.tint = playerColour
+    this.nebulaSprite.addChild(blendSprite)
+
+    this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
+  drawAsteroidField () {
+    if(!this.hasAsteroidField()) {
+      return
+    }
+    if (this.asteroidFieldSprite) {
+      this.fixedContainer.removeChild(this.asteroidFieldSprite)
+      this.asteroidFieldSprite = null
+    }
+    let texture = TextureService.getRandomStarAsteroidFieldTexture()
+    this.asteroidFieldSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 64
+    this.asteroidFieldSprite.width = spriteSize
+    this.asteroidFieldSprite.height = spriteSize
+    this.asteroidFieldSprite.anchor.set(0.5)
+    this.asteroidFieldSprite.rotation = Math.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.asteroidFieldSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.asteroidFieldSprite)
+  }
+
   drawSpecialist () {
     if (!this.hasSpecialist()) {
       return
@@ -192,6 +253,14 @@ class Star extends EventEmitter {
     this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
+  }
+
+  hasNebula () {
+    return this.data.isNebula
+  }
+
+  hasAsteroidField () {
+    return this.data.isAsteroidField
   }
 
   hasSpecialist () {
@@ -450,7 +519,7 @@ class Star extends EventEmitter {
 
     let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
-    if ((totalKnownShips > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
+    if (this.data.ownedByPlayerId && (totalKnownShips > 0 || this._getStarCarriers().length > 0 || this._hasUnknownShips())) {
       this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
@@ -473,23 +542,33 @@ class Star extends EventEmitter {
     let carrierCount = carriersOrbiting.length
 
     let shipsText = ''
-    let scramblers = 0
-    if (carriersOrbiting) {
-      scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-    }
-    if ( (scramblers == carrierCount) && (this.data.ships == null) ) {
-      shipsText = '???'
-    }
-    else {
-      shipsText = totalKnownShips
-      if( (scramblers > 0) || (this.data.ships == null) ) {
-        shipsText += '*'
-      }
-    }
 
-    if (carrierCount) {
-      shipsText += '/'
-      shipsText += carrierCount.toString()
+    if (this.data.ownedByPlayerId) {
+      let scramblers = 0
+      
+      if (carriersOrbiting) {
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+      }
+
+      if (scramblers == carrierCount && this.data.ships == null) {
+        shipsText = '???'
+      }
+      else {
+        shipsText = totalKnownShips
+
+        if (scramblers > 0 || this.data.ships == null) {
+          shipsText += '*'
+        }
+      }
+
+      if (carrierCount) {
+        shipsText += '/'
+        shipsText += carrierCount.toString()
+
+        if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
+          shipsText += '+'
+        }
+      }
     }
 
     if (shipsText) {
@@ -797,16 +876,21 @@ class Star extends EventEmitter {
   select () {
     this.isSelected = true
     this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
   }
 
   toggleSelected () {
-    this.isSelected = !this.isSelected
-    this.drawSelectedCircle()
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
   }
 
   showIgnoreBulkUpgrade () {

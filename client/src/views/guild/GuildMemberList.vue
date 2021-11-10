@@ -68,6 +68,13 @@ export default {
         this.members.push(invitee);
       });
     }
+
+    if (this.guild.applicants) {
+      this.guild.applicants.forEach(applicant => {
+        applicant.role = 'applicant';
+        this.members.push(applicant);
+      });
+    }
   },
   methods: {
     sortMemberList (key) {

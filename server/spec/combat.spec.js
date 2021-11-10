@@ -372,4 +372,66 @@ describe('combat', () => {
         expect(combatResult.lost.attacker).toBe(10);
     });
 
+    it('should destroy carriers in carrier to carrier combat if they cannot withstand a single blow - defender wins', async () => {
+        const game = { };
+
+        const defenders = [];
+
+        const attackers = [];
+
+        const defenderCarriers = [
+            {
+                ships: 10
+            }
+        ];
+        
+        const attackerCarriers = [
+            {
+                ships: 1
+            }
+        ];
+
+        const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
+
+        expect(combatResult.weapons.defender).toBe(1);
+        expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.before.defender).toBe(10);
+        expect(combatResult.before.attacker).toBe(1);
+        expect(combatResult.after.defender).toBe(9);
+        expect(combatResult.after.attacker).toBe(0);
+        expect(combatResult.lost.defender).toBe(1);
+        expect(combatResult.lost.attacker).toBe(1);
+    });
+
+    it('should destroy carriers in carrier to carrier combat if they cannot withstand a single blow - attacker wins', async () => {
+        const game = { };
+
+        const defenders = [];
+
+        const attackers = [];
+
+        const defenderCarriers = [
+            {
+                ships: 1
+            }
+        ];
+        
+        const attackerCarriers = [
+            {
+                ships: 10
+            }
+        ];
+
+        const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
+
+        expect(combatResult.weapons.defender).toBe(1);
+        expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.before.defender).toBe(1);
+        expect(combatResult.before.attacker).toBe(10);
+        expect(combatResult.after.defender).toBe(0);
+        expect(combatResult.after.attacker).toBe(9);
+        expect(combatResult.lost.defender).toBe(1);
+        expect(combatResult.lost.attacker).toBe(1);
+    });
+
 });

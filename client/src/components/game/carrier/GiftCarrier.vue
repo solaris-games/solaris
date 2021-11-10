@@ -35,7 +35,7 @@ export default {
   mounted () {
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    this.canGiftCarrier = !this.carrier.isGift && !this.carrier.orbiting
+    this.canGiftCarrier = !this.carrier.isGift
   },
   methods: {
     async giftCarrier (e) {

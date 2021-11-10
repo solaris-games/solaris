@@ -195,6 +195,23 @@ describe('warp speed', () => {
         expect(warpSpeed).toBeFalsy();
     });
 
+    it('should not travel at warp speed if source is owned by the player and destination is not owned by the same player and destination is warp scrambler', async () => {
+        destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
+
+        destinationStar.specialistId = 1;
+        starSpecialist = {
+            modifiers: {
+                special: {
+                    lockWarpGates: true
+                }
+            }
+        };
+
+        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
+        
+        expect(warpSpeed).toBeFalsy();
+    });
+
     it('should travel at warp speed if source and destination are not owned by the same player and source is not a warp scrambler', async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();

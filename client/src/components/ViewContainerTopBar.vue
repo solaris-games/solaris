@@ -68,4 +68,8 @@ export default {
 .row {
   padding-bottom: 15px;
 }
+
+.container {
+  font-size: 20px;
+}
 </style>

@@ -115,6 +115,26 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/user/avatars', middleware.authenticate, async (req, res, next) => {
+        try {
+            let avatars = await container.avatarService.listUserAvatars(req.session.userId);
+
+            return res.status(200).json(avatars);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.post('/api/user/avatars/:avatarId/purchase', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.avatarService.purchaseAvatar(req.session.userId, parseInt(req.params.avatarId));
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/user/:id', async (req, res, next) => {
         try {
             let user = await container.userService.getInfoByIdLean(req.params.id);
@@ -265,7 +285,7 @@ module.exports = (router, io, container) => {
     router.delete('/api/user/closeaccount', middleware.authenticate, async (req, res, next) => {
         try {
             await container.gameService.quitAllActiveGames(req.session.userId);
-            await container.guildService.tryLeaveGuild(req.session.userId);
+            await container.guildService.tryLeave(req.session.userId);
             await container.guildService.declineAllInvitations(req.session.userId);
             await container.userService.closeAccount(req.session.userId);
 

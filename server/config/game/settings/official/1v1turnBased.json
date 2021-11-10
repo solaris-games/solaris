@@ -22,7 +22,10 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
-    "randomGates": "none",
+    "randomWarpGates": 0,
+    "randomWormHoles": 0,
+    "randomNebulas": 0,
+    "randomAsteroidFields": 0,
     "darkGalaxy": "disabled",
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
@@ -82,7 +85,8 @@
       "weapons": "none",
       "specialists": "standard"
     },
-    "bankingReward": "standard"
+    "bankingReward": "standard",
+    "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "turnBased",

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import Helpers from './helpers'
 
 class Carrier extends EventEmitter {
 
@@ -91,7 +92,7 @@ class Carrier extends EventEmitter {
         return
     }
 
-    this._rotateCarrierTowardsWaypoint(this.graphics_colour)
+    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_colour)
   }
 
   drawColour () {
@@ -124,7 +125,7 @@ class Carrier extends EventEmitter {
     this.graphics_ship.pivot.set(0, 0)
     this.graphics_ship.scale.set(1)
 
-    this._rotateCarrierTowardsWaypoint(this.graphics_ship)
+    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_ship)
   }
 
   drawShips () {
@@ -205,32 +206,6 @@ class Carrier extends EventEmitter {
     this.graphics_colour.lineTo(2, 3.5)
     this.graphics_colour.lineTo(4, 0)
     this.graphics_colour.closePath()
-  }
-
-  _rotateCarrierTowardsWaypoint (graphics) {
-    // If the carrier has waypoints, get the first one and calculate the angle
-    // between the carrier's current position and the destination.
-    if (this.data.waypoints.length) {
-      let waypoint = this.data.waypoints[0]
-      let starDestination = this.stars.find(s => s.data._id === waypoint.destination)
-
-      if (!starDestination) {
-        const sourceStar = this.stars.find(s => s.data._id === waypoint.source)
-        if (!sourceStar) {
-          return
-        }
-
-        const angle = this.getAngleTowardsLocation(this.data.location, sourceStar.data.location)
-        graphics.angle = (angle * (180 / Math.PI)) - 90
-        return
-      }
-
-      let destination = starDestination.data.location
-
-      let angle = this.getAngleTowardsLocation(this.data.location, destination)
-
-      graphics.angle = (angle * (180 / Math.PI)) + 90
-    }
   }
 
   clearPaths() {
@@ -388,13 +363,6 @@ class Carrier extends EventEmitter {
     this.emit('onCarrierMouseOut', this.data)
   }
 
-  getAngleTowardsLocation (source, destination) {
-    let deltaX = destination.x - source.x
-    let deltaY = destination.y - source.y
-
-    return Math.atan2(deltaY, deltaX)
-  }
-
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
   }
@@ -413,16 +381,21 @@ class Carrier extends EventEmitter {
   select () {
     this.isSelected = true
     this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
   }
 
   toggleSelected () {
-    this.isSelected = !this.isSelected
-    this.drawSelectedCircle()
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
   }
 }
 

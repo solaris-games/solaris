@@ -11,7 +11,7 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
+        <div class="col-auto d-none d-sm-block pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
@@ -23,16 +23,16 @@
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
-            <research-progress class="d-none d-md-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
+            <research-progress class="d-none d-lg-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-md-inline-block ml-3">
+            <span class="d-none d-lg-inline-block ml-3">
                 <i class="fas fa-money-bill-wave text-success mr-1"></i>{{userPlayer.stats.totalEconomy}}
             </span>
-            <span class="d-none d-md-inline-block ml-2">
+            <span class="d-none d-lg-inline-block ml-2">
                 <i class="fas fa-tools text-warning mr-1"></i>{{userPlayer.stats.totalIndustry}}
             </span>
-            <span class="d-none d-md-inline-block ml-2">
+            <span class="d-none d-lg-inline-block ml-2">
                 <i class="fas fa-flask text-info mr-1"></i>{{userPlayer.stats.totalScience}}
             </span>
         </div>
@@ -45,8 +45,12 @@
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': !hasUnread, 'btn-warning': hasUnread}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
-                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="hasUnread">{{this.unreadMessages + this.unreadEvents}}</span>
+            <button class="btn btn-sm ml-1 d-lg-none" v-if="userPlayer" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
+                <i class="fas fa-comments"></i> <span class="ml-1" v-if="unreadMessages">{{unreadMessages}}</span>
+            </button>
+
+            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': !unreadEvents, 'btn-warning': unreadEvents}" v-on:click="setMenuState(MENU_STATES.EVENT_LOG)" title="Event Log (E)">
+                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadEvents">{{unreadEvents}}</span>
             </button>
 
             <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
@@ -226,6 +230,8 @@ export default {
 
         if (response.status === 200) {
           this.unreadMessages = response.data.unread
+
+          this.$store.commit('setUnreadMessages', response.data.unread)
         }
       } catch (err) {
         console.error(err)
@@ -300,6 +306,11 @@ export default {
         return
       }
 
+      // Special case for Inbox shortcut, only do this if the screen is small.
+      if (menuState === MENU_STATES.INBOX && window.innerWidth >= 992) {
+        return
+      }
+
       let menuArguments = menuState.split('|')[1]
       menuState = menuState.split('|')[0]
 
@@ -369,9 +380,6 @@ export default {
     },
     isSpecialistsCurrencyCreditsSpecialists () {
       return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
-    },
-    hasUnread () {
-      return this.unreadMessages > 0 || this.unreadEvents > 0
     },
     isDataCleaned () {
       return this.$store.state.game.state.cleaned

@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center">You have no stars.</p>
+  <p v-if="!tableData.length" class="text-center mt-2 mb-2">You have no stars.</p>
 </div>
 </template>
 

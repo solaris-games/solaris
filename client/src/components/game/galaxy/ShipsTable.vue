@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center">You have no ships.</p>
+  <p v-if="!tableData.length" class="text-center mt-2 mb-2">You have no ships.</p>
 </div>
 </template>
 

@@ -311,7 +311,13 @@ export default {
       return GameHelper.getPlayerStatus(player)
     },
     getAvatarImage (player) {
+      try {
       return require(`../../../assets/avatars/${player.avatar}.png`)
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     }
   },
 

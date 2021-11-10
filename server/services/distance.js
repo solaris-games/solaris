@@ -6,7 +6,8 @@ module.exports = class DistanceService {
         return Math.sqrt(this.getDistanceSquaredBetweenLocations(loc1, loc2));
     }
 
-    getDistanceSquaredBetweenLocations(loc1, loc2) {
+    getDistanceSquaredBetweenLocations(loc1, loc2)
+    {
         let xs = loc2.x - loc1.x,
             ys = loc2.y - loc1.y;
 

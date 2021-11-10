@@ -9,18 +9,40 @@ module.exports = class RandomService {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    getRandomNumberBetweenEXP(min, max, P1 = 0.5) {
+        // P1 is the chance that the result is below half. So if the end result is between 0 and 1, like a Math.random,
+        // P1 describes the chance of the number being between 0 and 0.5, this makes P2 the chance of it being between 0.5 and 1
+        let P2 = 1 - P1;
+        if (P1 <= 0) {
+            return max;
+        } else if (P1 >= 1) {
+            return min;
+        }
+        let t = Math.random()
+        let exp = Math.log(P2) / Math.log(0.5)
+        // t**exp is still a value between 0 and 1, however the odds on each range is not the same, for example, if exp = 2, the odds on t**exp > 0.5 are 75%,
+        return Math.floor(t**exp * (max - min + 1) + min);
+    }
+
     getRandomAngle() {
         return Math.random() * Math.PI * 2;
     }
 
-    getRandomPositionInCircle(radius) {
+    getRandomRadius(maxRadius, offset) {
+        return maxRadius * Math.random()**offset;
+    }
+
+    getRandomRadiusInRange(minRadius, maxRadius){
+        return (Math.random()*(maxRadius**2 - minRadius**2) + minRadius**2)**0.5;
+    }
+
+    getRandomPositionInCircle(maxRadius, offset = 0.5) {
         let angle = this.getRandomAngle();
-        let radiusX = this.getRandomNumber(radius);
-        let radiusY = this.getRandomNumber(radius);
+        let radius = this.getRandomRadius(maxRadius, offset);
 
         return {
-            x: Math.cos(angle) * radiusX,
-            y: Math.sin(angle) * radiusY
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius
         };
     }
 
@@ -32,7 +54,17 @@ module.exports = class RandomService {
 
         return position;
     }
+
+    getRandomPositionInDoughnut(minRadius, maxRadius) {
+        let angle = this.getRandomAngle();
+        let radius = this.getRandomRadiusInRange(minRadius, maxRadius)
     
+        return {
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius
+        };
+    }
+
     generateStarNaturalResources(radius, x, y, minResources, maxResources, fuzzy = false){
         const RS_BASE = 2;
         const RS_EXPONENT = 5.8;

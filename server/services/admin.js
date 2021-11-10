@@ -105,16 +105,6 @@ module.exports = class AdminService {
         });
     }
 
-    async setCredits(userId, credits) {
-        credits = Math.max(credits, 0);
-        
-        await this.userRepo.updateOne({
-            _id: userId
-        }, {
-            'credits': credits
-        });
-    }
-
     async setGameFeatured(gameId, featured) {
         await this.gameRepo.updateOne({
             _id: gameId

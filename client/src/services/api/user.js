@@ -10,6 +10,14 @@ class UserService extends BaseApiService {
     return axios.get(this.BASE_URL + 'user/achievements/' + userId, { withCredentials: true })
   }
 
+  getUserAvatars () {
+    return axios.get(this.BASE_URL + 'user/avatars', { withCredentials: true })
+  }
+
+  purchaseAvatar (avatarId) {
+    return axios.post(this.BASE_URL + 'user/avatars/' + avatarId + '/purchase', {}, { withCredentials: true })
+  }
+
   getGameSettings () {
     return axios.get(this.BASE_URL + 'user/settings', { withCredentials: true })
   }

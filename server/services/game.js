@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameService extends EventEmitter {
 
-    constructor(gameRepo, userService, starService, carrierService, playerService, passwordService, achievementService) {
+    constructor(gameRepo, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService) {
         super();
         
         this.gameRepo = gameRepo;
@@ -14,6 +14,7 @@ module.exports = class GameService extends EventEmitter {
         this.playerService = playerService;
         this.passwordService = passwordService;
         this.achievementService = achievementService;
+        this.avatarService = avatarService;
     }
 
     async getByIdAll(id) {
@@ -159,6 +160,14 @@ module.exports = class GameService extends EventEmitter {
         });
     }
 
+    async getByIdDiplomacyLean(id) {
+        return await this.getByIdLean(id, {
+            'galaxy.players._id': 1,
+            'galaxy.players.userId': 1,
+            'galaxy.players.diplomacy': 1
+        });
+    }
+
     async join(game, userId, playerId, alias, avatar, password) {
         // The player cannot join the game if:
         // 1. The game has finished.
@@ -186,8 +195,7 @@ module.exports = class GameService extends EventEmitter {
         // Perform a new player check if the game is for established players only.
         // If the player is new then they cannot join.
         if (this.isForEstablishedPlayersOnly(game)) {
-            let userAchievements = await this.achievementService.getAchievements(userId);
-            let isEstablishedPlayer = userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
+            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(userId);
             
             // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
             if (!isEstablishedPlayer && !this.isNewPlayerGame(game)) {
@@ -195,9 +203,16 @@ module.exports = class GameService extends EventEmitter {
             }
         }
 
-        let isQuitter = game.quitters.find(x => x.equals(userId));
+        // Verify that the user has purchased the avatar they selected.
+        const userAvatar = await this.avatarService.getUserAvatar(userId, avatar);
+
+        if (!userAvatar.purchased) {
+            throw new ValidationError(`You have not purchased the selected avatar.`);
+        }
 
         // The user cannot rejoin if they quit early.
+        let isQuitter = game.quitters.find(x => x.equals(userId));
+
         if (isQuitter) {
             throw new ValidationError('You cannot rejoin this game.');
         }
@@ -429,7 +444,7 @@ module.exports = class GameService extends EventEmitter {
     }
 
     async getPlayerUserLean(game, playerId) {
-        if (game.settings.general.anonymity === 'extra') {
+        if (this.isAnonymousGame(game)) {
             return null;
         }
         
@@ -533,6 +548,25 @@ module.exports = class GameService extends EventEmitter {
 
     isBattleRoyaleMode(game) {
         return game.settings.general.mode === 'battleRoyale';
+    }
+
+    isOrbitalMode(game) {
+        return game.settings.orbitalMechanics.enabled === 'enabled';
+    }
+
+    isAnonymousGame(game) {
+        return game.settings.general.anonymity === 'extra';
+    }
+
+    isSpecialGameMode(game) {
+        return [
+            'special_dark',
+            'special_ultraDark',
+            'special_orbital',
+            'special_battleRoyale',
+            'special_homeStar',
+            'special_anonymous'
+        ].includes(game.settings.general.mode);
     }
 
     isNewPlayerGame(game) {

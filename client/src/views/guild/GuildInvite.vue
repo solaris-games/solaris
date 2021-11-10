@@ -37,7 +37,7 @@ export default {
       this.isLoading = true
 
       try {
-        let response = await GuildApiService.acceptInvite(this.invite._id)
+        let response = await GuildApiService.accept(this.invite._id)
 
         if (response.status === 200) {
           this.$emit('onInvitationAccepted', this.invite._id)
@@ -56,7 +56,7 @@ export default {
       this.isLoading = true
 
       try {
-        let response = await GuildApiService.declineInvite(this.invite._id)
+        let response = await GuildApiService.decline(this.invite._id)
 
         if (response.status === 200) {
           this.$emit('onInvitationDeclined', this.invite._id)

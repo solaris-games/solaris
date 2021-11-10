@@ -5,6 +5,8 @@ class TextureService {
     DEFAULT_FONT_STYLE = null
 
     STARLESS_NEBULA_TEXTURES = []
+    STAR_NEBULA_TEXTURES = []
+    STAR_ASTEROID_FIELD_TEXTURES = []
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
 
@@ -58,6 +60,16 @@ class TextureService {
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb0-starless.png'))))
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1-starless.png'))))
 
+      // STAR NEBULAS
+      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/star-nebula-0.png'))))
+      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/star-nebula-1.png'))))
+      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/star-nebula-2.png'))))
+
+      // STAR ASTEROID FIELDS
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-0.png'))))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-1.png'))))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-2.png'))))
+
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')
       this._loadSpecialistTexture('mecha-mask')
@@ -98,6 +110,18 @@ class TextureService {
       let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
 
       return this.SPECIALIST_TEXTURES[name]
+    }
+
+    getRandomStarNebulaTexture() {
+      let index = Math.floor(Math.random() * this.STAR_NEBULA_TEXTURES.length)
+
+      return this.STAR_NEBULA_TEXTURES[index]
+    }
+
+    getRandomStarAsteroidFieldTexture() {
+      let index = Math.floor(Math.random() * this.STAR_ASTEROID_FIELD_TEXTURES.length)
+
+      return this.STAR_ASTEROID_FIELD_TEXTURES[index]
     }
 }
 

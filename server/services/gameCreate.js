@@ -30,15 +30,19 @@ module.exports = class GameCreateService {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
+            if (userIsGameMaster && openGames.length > 5) {
+                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
+            }
+
             // Validate that the player cannot create large games.
             if (settings.general.playerLimit > 16 && !userIsGameMaster) {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
             }
 
-            let userAchievements = await this.achievementService.getAchievements(settings.general.createdByUserId);
+            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(settings.general.createdByUserId);
 
             // Disallow new players from creating games if they haven't completed a game yet.
-            if (userAchievements.achievements.completed === 0) {
+            if (!isEstablishedPlayer) {
                 throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }
@@ -68,6 +72,14 @@ module.exports = class GameCreateService {
         if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
             game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
         }
+
+        // Ensure that specialist credits setting defaults token specific settings
+        if (game.settings.specialGalaxy.specialistsCurrency === 'credits') {
+            game.settings.player.startingCreditsSpecialists = 0;
+            game.settings.player.tradeCreditsSpecialists = false;
+            game.settings.technology.startingTechnologyLevel.specialists = 0;
+            game.settings.technology.researchCosts.specialists = 'none';
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -82,9 +94,7 @@ module.exports = class GameCreateService {
         game.galaxy.stars = this.mapService.generateStars(
             game,
             desiredStarCount,
-            game.settings.general.playerLimit,
-            game.settings.specialGalaxy.randomGates);
-
+            game.settings.general.playerLimit);
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);

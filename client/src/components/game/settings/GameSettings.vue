@@ -123,8 +123,20 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistsCurrency) }}</td>
           </tr>
           <tr>
-            <td>Random Gates</td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomGates) }}</td>
+            <td>Random Warp Gates</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWarpGates) }}%</td>
+          </tr>
+          <tr>
+            <td>Random Worm Holes</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWormHoles) }}%</td>
+          </tr>
+          <tr>
+            <td>Random Nebulas</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
+          </tr>
+          <tr>
+            <td>Random Asteroid Fields</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
           </tr>
           <tr>
             <td>Dark Galaxy</td>
@@ -138,7 +150,7 @@
             <td>Defender Bonus</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.defenderBonus) }}</td>
           </tr>
-          <tr v-if="game.settings.orbitalMechanics.enabled === 'disabled'">
+          <tr>
             <td>Carrier-to-Carrier Combat</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
           </tr>
@@ -281,7 +293,7 @@
             <td>Starting Weapons Level</td>
             <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.weapons }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
             <td>Starting Specialists Level</td>
             <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.specialists }}</td>
           </tr>
@@ -320,6 +332,10 @@
           <tr>
             <td>Banking Reward</td>
             <td class="text-right">{{ getFriendlyText(game.settings.technology.bankingReward) }}</td>
+          </tr>
+          <tr>
+            <td>Specialist Token Reward</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.technology.specialistTokenReward) }}</td>
           </tr>
         </tbody>
       </table>

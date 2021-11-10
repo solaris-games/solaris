@@ -79,6 +79,14 @@ export default new Vuex.Store({
     setConfirmationDialogSettings (state, settings) {
       state.confirmationDialog = settings
     },
+
+    setUnreadMessages (state, count) {
+      state.unreadMessages = count
+    },
+    clearUnreadMessages (state) {
+      state.unreadMessages = null
+    },
+
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
@@ -87,9 +95,11 @@ export default new Vuex.Store({
       }
     },
     closeConversation (state) {
-      const id = state.currentConversation.id;
-      state.cachedConversationComposeMessages[id] = state.currentConversation.text
-      state.currentConversation = null
+      if (state.currentConversation) {
+        const id = state.currentConversation.id;
+        state.cachedConversationComposeMessages[id] = state.currentConversation.text
+        state.currentConversation = null
+      }
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data

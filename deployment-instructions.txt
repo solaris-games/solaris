@@ -1,11 +1,25 @@
-db.games.find({}).forEach(function(game) {
-    game.settings.gameTime.afk = {
-        lastSeenTimeout: 2,
-        cycleTimeout: 3,
-        turnTimeout: game.settings.gameTime.missedTurnLimit
-    };
+db.games.updateMany({
+    'settings.general.type': 'standard_dark_rt'
+}, {
+    $set: {
+        'settings.general.type': 'special_dark'
+    }
+});
 
-    delete game.settings.gameTime.missedTurnLimit;
-
-    db.games.save(game);
+db.games.updateMany({
+    'settings.general.type': {
+        $in: [
+            'special_dark',
+            'special_ultraDark',
+            'special_orbital',
+            'special_battleRoyale',
+            'special_homeStar',
+            'special_anonymous'
+        ]
+    },
+    'state.startDate': { $eq: null }
+}, {
+    $set: {
+        'settings.general.type': 'custom'
+    }
 });

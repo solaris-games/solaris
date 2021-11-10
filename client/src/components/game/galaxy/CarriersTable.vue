@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center">You have no carriers.</p>
+  <p v-if="!tableData.length" class="text-center mt-2 mb-2">You have no carriers.</p>
 </div>
 </template>
 

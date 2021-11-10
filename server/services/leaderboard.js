@@ -540,14 +540,17 @@ module.exports = class LeaderboardService {
                 if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
             }
 
-            // If conquest and home star percentage then use the home star total stars as the sort
-            // All other cases use totalStars
-            let totalStarsKey = game.settings.general.mode === 'conquest'
-                && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars'
+            // If its a conquest and home star victory then sort by home stars first, then by total stars.
+            const isHomeStarVictory = game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage';
+
+            if (isHomeStarVictory) {
+                if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
+                if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+            }
 
             // Sort by total stars descending
-            if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
-            if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
+            if (a.stats.totalStars > b.stats.totalStars) return -1;
+            if (a.stats.totalStars < b.stats.totalStars) return 1;
 
             // Then by total ships descending
             if (a.stats.totalShips > b.stats.totalShips) return -1;
@@ -637,6 +640,11 @@ module.exports = class LeaderboardService {
                 // Award extra rank (at least 0) and do not allow a decrease in rank.
                 else if (player.hasFilledAfkSlot) {
                     rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
+                }
+
+                // For special game modes, award x2 positive rank.
+                if (rankIncrease > 0 && this.gameService.isSpecialGameMode(game)) {
+                    rankIncrease *= 2;
                 }
 
                 let currentRank = user.achievements.rank;

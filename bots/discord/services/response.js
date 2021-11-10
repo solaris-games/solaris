@@ -81,7 +81,7 @@ module.exports = class ReponseService {
                 { name: "Carrier Upkeep", value: game.settings.specialGalaxy.carrierUpkeepCost, inline: true },
                 { name: "Carrier Speed", value: game.settings.specialGalaxy.carrierSpeed, inline: true },//next line
                 { name: "Warpgate Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true },
-                { name: "Random Warpgates", value: game.settings.specialGalaxy.randomGates, inline: true },
+                { name: "Random Warpgates (%)", value: game.settings.specialGalaxy.randomWarpGates, inline: true },
                 { name: "Specialist Cost", value: game.settings.specialGalaxy.specialistCost, inline: true },//next line
                 { name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true },
                 { name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true },
@@ -475,13 +475,5 @@ module.exports = class ReponseService {
                 response += 'No focus was specified, make sure to add it to your command.'
         }
         return response;
-    }
-
-    reactThumbsUp(msg) {
-        msg.react('👍');
-    }
-
-    reactThumbsDown(msg) {
-        msg.react('👎');
     }
 }

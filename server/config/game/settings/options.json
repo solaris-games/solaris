@@ -142,20 +142,6 @@
                 "text": "Specialist Tokens"
             }
         ],
-        "randomGates": [
-            {
-            "value": "none",
-            "text": "No"
-            },
-            {
-            "value": "rare",
-            "text": "Rare"
-            },
-            {
-            "value": "common",
-            "text": "Common"
-            }
-        ],
         "darkGalaxy": [
             {
             "value": "disabled",
@@ -596,6 +582,16 @@
                 {
                     "value": "legacy",
                     "text": "Legacy"
+                }
+            ],
+            "specialistTokenReward": [
+                {
+                    "value": "standard",
+                    "text": "Standard"
+                },
+                {
+                    "value": "experimental",
+                    "text": "Experimental"
                 }
             ]
         },

@@ -9,6 +9,7 @@ export default {
   SETTINGS: 'settings',
   HELP: 'help',
   INBOX: 'inbox',
+  EVENT_LOG: 'eventLog',
   CONVERSATION: 'conversation',
   COMBAT_CALCULATOR: 'combatCalculator',
   NEW_MESSAGE: 'newMessage',

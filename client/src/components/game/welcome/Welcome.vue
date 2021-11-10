@@ -94,7 +94,7 @@ export default {
       try {
         this.isJoiningGame = true
 
-        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.avatar, this.password)
+        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.avatar.id, this.password)
 
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.

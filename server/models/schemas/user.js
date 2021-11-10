@@ -158,7 +158,8 @@ const schema = new Schema({
             defaultAmount: { type: Types.Number, required: false, default: 0 },
             confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         }
-    }
+    },
+    avatars: [{ type: Types.Number, required: false }]
 });
 
 module.exports = schema;

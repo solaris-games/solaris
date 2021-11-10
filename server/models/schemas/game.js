@@ -17,13 +17,12 @@ const schema = new Schema({
 				'custom', 
 				'standard_rt', 
 				'standard_tb', 
-				'standard_dark_rt', 
-				'standard_dark_tb', 
 				'1v1_rt', 
 				'1v1_tb', 
 				'new_player_rt', 
 				'new_player_tb', 
 				'32_player_rt',
+				'special_dark',
 				'special_ultraDark',
 				'special_orbital',
 				'special_battleRoyale',
@@ -54,7 +53,10 @@ const schema = new Schema({
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
-			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
+			randomWarpGates: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomWormHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomNebulas: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
@@ -102,7 +104,7 @@ const schema = new Schema({
 				manufacturing: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				banking: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				specialists: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
+				specialists: { type: Types.Number, required: true, min: 0, max: 16, default: 1 }
 			},
 			researchCosts: {
 				terraforming: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
@@ -114,7 +116,8 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
-			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' }
+			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },

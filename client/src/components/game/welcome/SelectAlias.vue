@@ -10,14 +10,14 @@
         <div class="col">
             <form @submit.prevent>
                 <div class="row">
-                  <div class="col-auto">
+                  <div class="col-auto bg-primary">
                     <select-avatar v-on:onAvatarChanged="onAvatarChanged"/>
                   </div>
                   <div class="col pt-3">
-                    <p v-if="!race">Every great story needs both heroes and villians. Which will you be?</p>
+                    <p v-if="!avatar">Every great story needs both heroes and villians. Which will you be?</p>
 
-                    <h5 v-if="race">{{race.name}}</h5>
-                    <p v-if="race"><small class="linebreaks">{{race.description}}</small></p>
+                    <h5 v-if="avatar">{{avatar.name}}</h5>
+                    <p v-if="avatar"><small class="linebreaks">{{avatar.description}}</small></p>
 
                     <div class="form-group">
                       <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
@@ -37,7 +37,6 @@
 <script>
 import UserService from '../../../services/api/user'
 import SelectAvatarVue from './SelectAvatar.vue'
-import RaceHelper from '../../../services/raceHelper'
 
 export default {
   components: {
@@ -46,8 +45,7 @@ export default {
   data () {
     return {
       alias: null,
-      avatar: null,
-      race: null
+      avatar: null
     }
   },
   async mounted () {
@@ -68,8 +66,6 @@ export default {
     },
     onAvatarChanged (e) {
       this.avatar = e
-
-      this.race = RaceHelper.getRace(parseInt(e))
 
       this.$emit('onAvatarChanged', e)
     }

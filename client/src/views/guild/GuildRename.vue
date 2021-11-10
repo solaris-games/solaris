@@ -18,7 +18,7 @@
 
       <form-error-list :errors="errors"/>
 
-      <p><span class="text-warning">Warning</span>: Renaming a guild costs <strong class="text-danger">1 galactic credit</strong>, earn credits by winning official games.</p>
+      <p><span class="text-warning">Warning</span>: Renaming a guild costs <strong class="text-danger">1 Galactic Credit</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
       
       <div class="form-group">
         <div class="row">

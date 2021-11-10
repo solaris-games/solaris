@@ -2,37 +2,7 @@
   <view-container>
     <view-title :title="user ? user.username : 'Achievements'" />
 
-    <div class="row bg-success mb-2" v-if="user && user.roles.contributor">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is a contributor <i class="fas fa-hands-helping"></i>
-        </p>
-      </div>
-    </div>
-
-    <div class="row bg-warning mb-2" v-if="user && user.roles.developer">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is an active developer <i class="fas fa-code"></i>
-        </p>
-      </div>
-    </div>
-
-    <div class="row bg-info mb-2" v-if="user && user.roles.communityManager">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is an active community manager <i class="fas fa-user-friends"></i>
-        </p>
-      </div>
-    </div>
-
-    <div class="row bg-info mb-2" v-if="user && user.roles.gameMaster">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is an active game master <i class="fas fa-dice"></i>
-        </p>
-      </div>
-    </div>
+    <roles :user="user" :displayText="true"/>
 
     <loading-spinner :loading="!user"/>
 
@@ -443,6 +413,7 @@ import PieChart from '../components/game/intel/PieChart.js'
 import PolarArea from '../components/game/intel/PolarAreaChart.js'
 import userService from '../services/api/user'
 import UserGuildInfoVue from './guild/UserGuildInfo'
+import Roles from '../components/game/player/Roles'
 
 export default {
   components: {
@@ -453,7 +424,8 @@ export default {
     'achievements': Achievements,
     'pie-chart': PieChart,
     'polar-area-chart': PolarArea,
-    'user-guild-info': UserGuildInfoVue
+    'user-guild-info': UserGuildInfoVue,
+    'roles': Roles
   },
   data () {
     return {

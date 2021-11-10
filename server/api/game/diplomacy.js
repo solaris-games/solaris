@@ -2,13 +2,26 @@ module.exports = (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
-    router.get('/api/game/:gameId/diplomacy', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/diplomacy', middleware.authenticate, middleware.loadGameDiplomacyLean, middleware.loadPlayer, async (req, res, next) => {
         try {
             let diplomaticStatuses = await container.diplomacyService.getDiplomaticStatusToAllPlayers(
                 req.game,
                 req.player);
 
             return res.status(200).json(diplomaticStatuses);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/:gameId/diplomacy/:toPlayerId', middleware.authenticate, middleware.loadGameDiplomacyLean, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let diplomaticStatus = await container.diplomacyService.getDiplomaticStatusToPlayer(
+                req.game,
+                req.player._id,
+                req.params.toPlayerId);
+
+            return res.status(200).json(diplomaticStatus);
         } catch (err) {
             return next(err);
         }

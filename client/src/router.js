@@ -16,13 +16,16 @@ import GameDetail from './views/GameDetail.vue'
 import GameList from './views/GameList.vue'
 import Home from './views/Home.vue'
 import MainMenu from './views/MainMenu.vue'
-import PremiumStore from './views/PremiumStore.vue'
 import Leaderboard from './views/Leaderboard.vue'
 import MyGuild from './views/guild/MyGuild.vue'
 import GuildCreate from './views/guild/GuildCreate.vue'
 import GuildRename from './views/guild/GuildRename.vue'
 import GuildDetails from './views/guild/GuildDetails.vue'
 import Administration from './views/Administration.vue'
+import Avatars from './views/Avatars.vue'
+import GalacticCreditsShop from './views/shop/GalacticCreditsShop.vue'
+import ShopPurchaseComplete from './views/shop/PurchaseComplete.vue'
+import ShopPurchaseFailed from './views/shop/PurchaseFailed.vue'
 
 Vue.use(Router)
 
@@ -109,11 +112,6 @@ export default new Router({
       component: MainMenu
     },
     {
-      path: '/premium-store',
-      name: 'premium-store',
-      component: PremiumStore
-    },
-    {
       path: '/leaderboard',
       name: 'leaderboard',
       component: Leaderboard
@@ -142,6 +140,26 @@ export default new Router({
       path: '/administration',
       name: 'administration',
       component: Administration
+    },
+    {
+      path: '/avatars',
+      name: 'avatars',
+      component: Avatars
+    },
+    {
+      path: '/shop',
+      name: 'galactic-credits-shop',
+      component: GalacticCreditsShop
+    },
+    {
+      path: '/shop/paymentcomplete',
+      name: 'galactic-credits-shop-payment-complete',
+      component: ShopPurchaseComplete
+    },
+    {
+      path: '/shop/paymentfailed',
+      name: 'galactic-credits-shop-payment-failed',
+      component: ShopPurchaseFailed
     }
   ]
 })
