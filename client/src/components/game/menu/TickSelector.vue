@@ -98,9 +98,10 @@ export default {
           return this.$store.state.game.state.tick
       },
       minimumTick: function () {
-          let min = this.stateTick - 24 // Maximum of 24 ticks ago.
+          return 1
+          // let min = this.stateTick - 24 // Maximum of 24 ticks ago.
 
-          return Math.max(1, min)
+          // return Math.max(1, min)
       }
   }
 }
