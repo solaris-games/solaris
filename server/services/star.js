@@ -37,10 +37,37 @@ module.exports = class StarService extends EventEmitter {
     }
 
     getByObjectId(game, id) {
-        return game.galaxy.stars.find(s => s._id.equals(id));
+        // return game.galaxy.stars.find(s => s._id.equals(id));
+        return this.getByIdBS(game, id); // Experimental
     }
 
     getById(game, id) {
+        // return game.galaxy.stars.find(s => s._id.toString() === id.toString());
+        return this.getByIdBS(game, id); // Experimental
+    }
+
+    getByIdBS(game, id) {
+        let start = 0;
+        let end = game.galaxy.stars.length - 1;
+    
+        while (start <= end) {
+            let middle = Math.floor((start + end) / 2);
+            let star = game.galaxy.stars[middle];
+
+            if (star._id.toString() === id.toString()) {
+                // found the id
+                return star;
+            } else if (star._id.toString() < id.toString()) {
+                // continue searching to the right
+                start = middle + 1;
+            } else {
+                // search searching to the left
+                end = middle - 1;
+            }
+        }
+
+        // id wasn't found
+        // Return the old way
         return game.galaxy.stars.find(s => s._id.toString() === id.toString());
     }
 
