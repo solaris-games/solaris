@@ -182,6 +182,7 @@ module.exports = class GameListService {
         }, {
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.general.type': 1,
             state: 1
         }, {
             'state.startDate': -1
