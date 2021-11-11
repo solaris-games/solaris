@@ -121,7 +121,7 @@ module.exports = (config, io) => {
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService);
     const historyService = new HistoryService(HistoryModel, historyRepository, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);

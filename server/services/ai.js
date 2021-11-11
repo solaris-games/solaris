@@ -6,12 +6,12 @@ const Heap = require('qheap');
 const { getOrInsert, minBy, minElementBy } = require('../utils.js')
 
 module.exports = class AIService {
-
-    constructor(starUpgradeService, carrierService, starService, distanceService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
+        this.waypointService = waypointService;
     }
 
     async play(game, player) {
@@ -68,8 +68,15 @@ module.exports = class AIService {
     async _createContext(game, player) {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
+        const playerStarsById = new Map()
+
+        for (const pstar of playerStars) {
+            playerStarsById.set(pstar._id.toString(), pstar);
+        }
+
         return {
-            playerStars
+            playerStars,
+            playerStarsById
         }
     }
 
@@ -82,13 +89,42 @@ module.exports = class AIService {
     }
 
     async _gatherOrders(game, player, context) {
-        const defenseOrders = await this._gatherDefenseOrders(game, player, context);
+        const defenseOrders = this._gatherDefenseOrders(game, player, context);
         const movementOrders = await this._gatherMovementOrders(game, player, context);
         return defenseOrders.concat(movementOrders);
     }
 
-    async _gatherDefenseOrders(game, player) {
-        
+    _gatherDefenseOrders(game, player, context) {
+        // Find all of our stars that are under attack
+        const incomingCarriers = game.galaxy.carriers
+            .filter(carrier => carrier.ownedByPlayerId.toString() !== player._id.toString())
+            .map(carrier => [carrier, carrier.waypoints.find(wp => context.playerStarsById.has(wp.destination.toString()))])
+            .filter(incoming => Boolean(incoming[1]))
+
+        const starsUnderAttack = new Map();
+
+        for (const [incomingCarrier, incomingWaypoint] of incomingCarriers) {
+            const targetStar = incomingWaypoint.destination.toString();
+            const attacks = getOrInsert(starsUnderAttack, targetStar, () => new Map());
+            const attackInTicks = this.waypointService.calculateWaypointTicksEta(game, incomingCarrier, incomingWaypoint);
+            const simultaneousAttacks = getOrInsert(attacks, attackInTicks, () => []);
+            simultaneousAttacks.push(incomingCarrier);
+        }
+
+        const orders = new Array(starsUnderAttack.size);
+
+        for (const [attackedStarId, attacks] of starsUnderAttack) {
+            for (const [attackInTicks, incomingCarriers] of attacks) {
+                orders.push({
+                    type: 'DEFEND_STAR',
+                    star: attackedStarId,
+                    ticksUntil: attackInTicks,
+                    incomingCarriers
+                })
+            }
+        }
+
+        return orders;
     }
 
     async _gatherMovementOrders(game, player, context) {
