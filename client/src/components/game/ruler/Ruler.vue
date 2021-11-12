@@ -7,22 +7,22 @@
     <div v-if="isCompactUIStyle">
     <div class="row bg-primary pt-2 pb-2">
       <div class="col-3 text-left">
-          <span title="Waypoints">
+          <span title="Total number of waypoints plotted">
            <i class="fas fa-map-marker-alt"></i> {{points.length}}
           </span>
       </div>
       <div class="col-3 text-center">
-          <span title="Distance (ly)">
+          <span title="Total distance (ly)">
             <i class="fas fa-sun"></i> {{distanceLightYears.toFixed(3)}}
           </span>
       </div>
       <div class="col-3 text-center">
-          <span title="Required Scanning Level">
+          <span title="Required scanning evel">
             <i class="fas fa-binoculars"></i> {{scanningLevel}}
           </span>
       </div>
       <div class="col-3 text-right">
-          <span title="Required Hyperspace Level">
+          <span title="Required hyperspace level">
             <i class="fas fa-gas-pump"></i> {{hyperspaceLevel}}
           </span>
       </div>
@@ -33,12 +33,12 @@
           ETA<orbital-mechanics-eta-warning />
       </div>
       <div class="col-5 text-right">
-          <span title="ETA Base Speed">
+          <span title="ETA base speed">
             Base {{totalEta || 'N/A'}}
           </span>
       </div>
       <div class="col-5 text-right">
-          <span title="ETA Warp Speed">
+          <span title="ETA warp speed">
             Warp {{totalEtaWarp || 'N/A'}}
           </span>
       </div>
@@ -51,7 +51,7 @@
               Waypoints
           </div>
           <div class="col-6 text-right">
-              <span title="Waypoints">
+              <span title="Total number of waypoints plotted">
                 <i class="fas fa-map-marker-alt"></i> {{points.length}}
               </span>
           </div>
@@ -62,7 +62,7 @@
              Distance (ly)
           </div>
           <div class="col-6 text-right">
-              <span title="Distance (ly)">
+              <span title="Total distance (ly)">
                 <i class="fas fa-sun"></i> {{distanceLightYears}}
               </span>
           </div>
@@ -73,7 +73,7 @@
               Required Scanning Level
           </div>
           <div class="col-4 text-right">
-              <span title="Required Scanning Level">
+              <span title="Required scanning level">
                 <i class="fas fa-binoculars"></i> {{scanningLevel}}
               </span>
           </div>
@@ -84,7 +84,7 @@
               Required Hyperspace Level
           </div>
           <div class="col-4 text-right">
-              <span title="Required Hyperspace Level">
+              <span title="Required hyperspace level">
                 <i class="fas fa-gas-pump"></i> {{hyperspaceLevel}}
               </span>
           </div>
@@ -95,7 +95,7 @@
               ETA Base Speed
           </div>
           <div class="col-6 text-right">
-              <span title="ETA Base Speed">
+              <span title="ETA base speed">
                 {{totalEta || 'N/A'}}
               </span>
           </div>
@@ -106,7 +106,7 @@
               ETA Warp Speed
           </div>
           <div class="col-6 text-right">
-              <span title="ETA Warp Speed">
+              <span title="ETA warp speed">
                 {{totalEtaWarp || 'N/A'}}
               </span>
           </div>

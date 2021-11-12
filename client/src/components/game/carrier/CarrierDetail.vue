@@ -19,18 +19,18 @@
     <div v-if="isCompactUIStyle">
       <div class="row mt-2">
         <div class="col">
-          <span title="Orbiting" v-if="carrier.orbiting">
+          <span title="The carrier is in orbit" v-if="carrier.orbiting">
             <i class="fas fa-star mr-2"></i>
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
-          <span title="In Transit" v-if="!carrier.orbiting">
-            <a title="Source Star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
+          <span title="The carrier is in transit" v-if="!carrier.orbiting">
+            <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
-            <a title="Destination Star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
+            <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
           </span>
         </div>
         <div class="col-auto">
-          <span title="Ships">
+          <span title="The total number of ships the carrier has">
             {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
           </span>
         </div>
@@ -54,7 +54,7 @@
           </span>
         </div>
         <div class="col-auto">
-          <span title="Waypoints">
+          <span title="The total number of waypoints the carrier has - Plot waypoints to capture stars">
             {{carrier.waypoints.length}} 
             <i class="fas fa-map-marker-alt ml-1" v-if="!carrier.waypointsLooped"></i>
             <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i>

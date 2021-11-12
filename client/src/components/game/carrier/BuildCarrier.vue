@@ -30,12 +30,12 @@
         <div class="col-6">
             <div class="row no-gutters">
                 <div class="col-4">
-                    <button type="button" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
+                    <button type="button" title="Transfer all ships to the star" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
                 </div>
                 <div class="col">
-                    <button type="button" title="1" class="btn btn-primary float-right ml-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
-                    <button type="button" title="10"  class="btn btn-primary ml-1 float-right" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
-                    <button type="button" title="100"  class="btn btn-primary float-right" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
+                    <button type="button" title="Transfer 1 ship to the star" class="btn btn-primary float-right ml-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
+                    <button type="button" title="Transfer 10 ships to the star"  class="btn btn-primary ml-1 float-right" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
+                    <button type="button" title="Transfer 100 ships to the star"  class="btn btn-primary float-right" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
                 </div>
             </div>
         </div>
@@ -43,12 +43,12 @@
         <div class="col-6">
             <div class="row no-gutters">
                 <div class="col">
-                    <button type="button"  title="1" class="btn btn-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
-                    <button type="button" title="10"  class="btn btn-primary ml-1" @click="onTransferRightClicked(10)" :disabled="starShips < 10"><i class="fas fa-angle-double-right"></i></button>
-                    <button type="button" title="100"  class="btn btn-primary ml-1 " @click="onTransferRightClicked(100)" :disabled="starShips < 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
+                    <button type="button" title="Transfer 1 ship to the carrier" class="btn btn-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
+                    <button type="button" title="Transfer 10 ships to the carrier"  class="btn btn-primary ml-1" @click="onTransferRightClicked(10)" :disabled="starShips < 10"><i class="fas fa-angle-double-right"></i></button>
+                    <button type="button" title="Transfer 100 ships to the carrier"  class="btn btn-primary ml-1 " @click="onTransferRightClicked(100)" :disabled="starShips < 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
                 </div>
                 <div class="col-4">
-                    <button type="button" class="btn btn-success btn-block " @click="onMaxShipsClicked">Max</button>
+                    <button type="button" title="Transfer all ships to the carrier" class="btn btn-success btn-block " @click="onMaxShipsClicked">Max</button>
                 </div>
             </div>
         </div>

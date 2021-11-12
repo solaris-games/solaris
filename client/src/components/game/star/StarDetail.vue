@@ -46,13 +46,13 @@
           </span>
         </div>
         <div class="col-auto">
-          <span v-if="star.isNebula" title="Ships hidden in Nebula">
+          <span v-if="star.isNebula" title="Star is obscured inside a nebula - All ship counts are hidden from other players">
             <i class="fas fa-eye-slash ml-1"></i>
           </span>
-          <span v-if="star.isAsteroidField" title="Surrounded by Asteroids">
+          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus">
             <i class="fas fa-meteor ml-1"></i>
           </span>
-          <span v-if="star.wormHoleToStarId" title="Worm Hole">
+          <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
             <i class="far fa-sun ml-1"></i>
           </span>
           <span :title="star.warpGate ? 'Warp Gate':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
@@ -63,18 +63,18 @@
       
       <div class="row mt-2 pb-2">
         <div class="col">
-          <span v-if="star.infrastructure && !isDeadStar" title="Economic Infrastructure">
+          <span v-if="star.infrastructure && !isDeadStar" title="Economic infrastructure">
               <i class="fas fa-money-bill-wave text-success"></i> {{star.infrastructure.economy}}
           </span>
-          <span v-if="star.infrastructure && !isDeadStar" title="Industrial Infrastructure" class="ml-2">
+          <span v-if="star.infrastructure && !isDeadStar" title="Industrial infrastructure" class="ml-2">
               <i class="fas fa-tools text-warning"></i> {{star.infrastructure.industry}}
           </span>
-          <span v-if="star.infrastructure && !isDeadStar" title="Scientific Infrastructure" class="ml-2">
+          <span v-if="star.infrastructure && !isDeadStar" title="Scientific infrastructure" class="ml-2">
               <i class="fas fa-flask text-info"></i> {{star.infrastructure.science}}
           </span>
         </div>
         <div class="col-auto">
-          <span title="Total Known Garrison" v-if="star.ownedByPlayerId && star.infrastructure">
+          <span title="Total known garrison" v-if="star.ownedByPlayerId && star.infrastructure">
             {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ml-1"></i>
           </span>
         </div>
@@ -98,7 +98,7 @@
           </span>
         </div>
         <div class="col-auto">
-          <span v-if="star.ownedByPlayerId && star.manufacturing != null && !isDeadStar" title="Ship Production">
+          <span v-if="star.ownedByPlayerId && star.manufacturing != null && !isDeadStar" title="Ship production per tick">
             {{star.manufacturing}} <i class="fas fa-wrench ml-1"></i>
           </span>
         </div>
@@ -177,7 +177,7 @@
           <i class="fas fa-rocket"></i> {{carrier.ships == null ? '???' : carrier.ships}}
         </div>
         <div class="col-auto pl-0">
-          <a href="javascript:;" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !isGameFinished" title="Transfer ships" @click="onShipTransferRequested(carrier)"><i class="fas fa-exchange-alt"></i></a>
+          <a href="javascript:;" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !isGameFinished" title="Transfer ships between the star and carrier" @click="onShipTransferRequested(carrier)"><i class="fas fa-exchange-alt"></i></a>
         </div>
       </div>
     </div>
