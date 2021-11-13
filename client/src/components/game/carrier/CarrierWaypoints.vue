@@ -1,8 +1,9 @@
 <template>
 	<div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <span class="mr-2">{{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i></span>
-    	<button class="btn btn-sm btn-info" @click="toggleCarrierWaypointsDisplay" title="Toggle Waypoints Display">
+      <span class="mr-2" title="Hyperspace technology level" v-if="userPlayer"><i class="fas fa-gas-pump mr-1"></i>{{userPlayer.research.hyperspace.level}}</span>
+      <span class="mr-2"><i class="fas fa-rocket mr-1"></i>{{carrier.ships == null ? '???' : carrier.ships}}</span>
+    	<button class="btn btn-sm btn-info" @click="toggleCarrierWaypointsDisplay" title="Toggle taypoints display">
         <i class="fas" :class="{'fa-eye-slash':!display,'fa-eye':display}"></i>
       </button>
     </menu-title>
@@ -41,7 +42,7 @@
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->
-		  		<p class="mb-1" :key="new Date().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA: {{totalEtaTimeString}}</p>
+		  		<p class="mb-1" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA<orbital-mechanics-eta-warning />: {{totalEtaTimeString}}</p>
 		  	</div>
 		  	<div class="col">
 		  		<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
@@ -52,7 +53,7 @@
             <i class="fas fa-trash"></i>
             <span class="ml-1 d-none d-sm-inline-block">All</span>
           </button>
-		  		<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop Waypoints">
+		  		<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop the carrier's waypoints">
             <i class="fas fa-sync"></i>
           </button>
 		  	</div>
@@ -78,11 +79,13 @@ import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
 import CarrierApiService from '../../../services/api/carrier'
 import AudioService from '../../../game/audio'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'form-error-list': FormErrorList
+    'form-error-list': FormErrorList,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   props: {
     carrierId: String

@@ -7,16 +7,18 @@
     <div v-if="hasGame">
         <span class="d-none">{{ gameId }}</span>
 
-        <main-bar :menuState="menuState"
-                  :menuArguments="menuArguments"
-                  @onMenuStateChanged="onMenuStateChanged"
-                  @onPlayerSelected="onPlayerSelected"/>
-
         <game-container @onStarClicked="onStarClicked"
                     @onStarRightClicked="onStarRightClicked"
                     @onCarrierClicked="onCarrierClicked"
                     @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
+
+        <main-bar :menuState="menuState"
+                  :menuArguments="menuArguments"
+                  @onMenuStateChanged="onMenuStateChanged"
+                  @onPlayerSelected="onPlayerSelected"/>
+
+        <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
     </div>
   </div>
 </template>
@@ -27,6 +29,7 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
+import Chat from '../components/game/inbox/Chat.vue'
 import GameApiService from '../services/api/game'
 import UserApiService from '../services/api/user'
 import GameHelper from '../services/gameHelper'
@@ -40,7 +43,8 @@ export default {
     'logo': LogoVue,
     'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
-    'main-bar': MainBar
+    'main-bar': MainBar,
+    'chat': Chat
   },
   data () {
     return {
@@ -52,12 +56,11 @@ export default {
     }
   },
   async created () {
-    await this.attemptLogin()
-
     AudioService.loadStore(this.$store)
 
     this.$store.commit('clearGame')
 
+    await this.attemptLogin()
     await this.reloadSettings()
     await this.reloadGame()
 
@@ -92,7 +95,9 @@ export default {
       }
     }
 
-    this.polling = setInterval(this.reloadGameCheck, 10000)
+    let reloadGameCheckInterval = this.$store.state.game.settings.gameTime.speed < 60 ? 5000 : 10000
+
+    this.polling = setInterval(this.reloadGameCheck, reloadGameCheckInterval)
 
     this.$store.dispatch('loadSpecialistData');
   },
@@ -127,8 +132,10 @@ export default {
         let response = await authService.verify()
 
         if (response.status === 200) {
-          if (response.data.id) {
-            this.$store.commit('setUserId', response.data.id)
+          if (response.data._id) {
+            this.$store.commit('setUserId', response.data._id)
+            this.$store.commit('setUsername', response.data.username)
+            this.$store.commit('setRoles', response.data.roles)
           }
         }
       } catch (err) {
@@ -242,6 +249,8 @@ export default {
       this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
       this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
       this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
+      this.sockets.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
+      this.sockets.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
       this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
 
@@ -256,10 +265,16 @@ export default {
       this.sockets.unsubscribe('gamePlayerQuit')
       this.sockets.unsubscribe('gamePlayerReady')
       this.sockets.unsubscribe('gamePlayerNotReady')
+      this.sockets.unsubscribe('gamePlayerReadyToQuit')
+      this.sockets.unsubscribe('gamePlayerNotReadyToQuit')
       this.sockets.unsubscribe('playerDebtSettled')
       this.sockets.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
+      if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
+        return
+      }
+
       let conversationId = e.conversationId
 
       // Show a toast only if the user isn't already in the conversation.
@@ -338,7 +353,8 @@ export default {
       }
 
       // Check if the next tick date has passed, if so check if the server has finished the game tick.
-      let canTick = gameHelper.canTick(this.$store.state.game)
+      // Alternatively if the game is set to 10s ticks then always check.
+      let canTick = this.$store.state.game.settings.gameTime.speed <= 10 || gameHelper.canTick(this.$store.state.game)
 
       if (canTick) {
         try {

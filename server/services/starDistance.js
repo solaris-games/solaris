@@ -8,6 +8,10 @@ module.exports = class StarDistanceService {
         return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);
     }
 
+    getDistanceBetweenStarAndLocation(star, loc){
+        return this.distanceService.getDistanceBetweenLocations(star.location, loc);
+    }
+
     getClosestStar(star, stars) {
         return this.getClosestStars(star, stars, 1)[0];
     }
@@ -135,6 +139,52 @@ module.exports = class StarDistanceService {
             });
     
         return samePositionStars.length > 0;
+    }
+
+    getClosestStarFromLocation(loc, stars){
+        return this.getClosestStarsFromLocation(loc, stars, 1);
+    }
+
+    getClosestStarsFromLocation(loc, stars, amount){
+        let sorted = stars
+        .sort((a, b) => {
+            return this.getDistanceBetweenStarAndLocation(a, loc)
+                - this.getDistanceBetweenStarAndLocation(b, loc);
+        });
+    
+        return sorted.slice(0, amount); 
+    }
+
+    getFurthestStarsFromLocation(loc, stars, amount){
+        let sorted = stars
+        .sort((a, b) => {
+            return this.getDistanceBetweenStarAndLocation(b, loc)
+                - this.getDistanceBetweenStarAndLocation(a, loc);
+        });
+    
+        return sorted.slice(0, amount);
+    }
+
+    getMaxGalaxyDiameter(locations) {
+        const diameter = this.getGalaxyDiameter(locations);
+
+        return diameter.x > diameter.y ? diameter.x : diameter.y;
+    }
+
+    getGalaxyDiameter(locations) {
+        let xArray = locations.map((location) => { return location.x; });
+        let yArray = locations.map((location) => { return location.y; });
+
+        let maxX = Math.max(...xArray);
+        let maxY = Math.max(...yArray);
+
+        let minX = Math.min(...xArray);
+        let minY = Math.min(...yArray);
+
+        return {
+            x: maxX - minX,
+            y: maxY - minY
+        };
     }
     
 };

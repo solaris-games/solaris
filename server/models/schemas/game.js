@@ -14,14 +14,29 @@ const schema = new Schema({
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false },
 			type: { type: Types.String, required: true, enum: [
-				'custom', 'standard_rt', 'standard_tb', 'standard_dark_rt', 'standard_dark_tb', '1v1_rt', '1v1_tb', 'new_player_rt', 'new_player_tb', '32_player_rt'
+				'custom', 
+				'standard_rt', 
+				'standard_tb', 
+				'1v1_rt', 
+				'1v1_tb', 
+				'new_player_rt', 
+				'new_player_tb', 
+				'32_player_rt',
+				'special_dark',
+				'special_ultraDark',
+				'special_orbital',
+				'special_battleRoyale',
+				'special_homeStar',
+				'special_anonymous'
 			], default: 'custom' },
+			mode: { type: Types.String, required: true, enum: [
+				'conquest', 'battleRoyale'
+			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
 			passwordRequired: { type: Types.Boolean, required: false },
-			starVictoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
-			playerType: { type: Types.String, required: true, enum: ['all', 'premium'], default: 'all' },
+			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
@@ -38,8 +53,11 @@ const schema = new Schema({
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
-			randomGates: { type: Types.String, required: true, enum: ['none', 'rare', 'common'], default: 'none' },
-			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'enabled', 'start'], default: 'start' },
+			randomWarpGates: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomWormHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomNebulas: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
+			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
@@ -47,6 +65,15 @@ const schema = new Schema({
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
         },
+		conquest: {
+			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
+			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
+		},
+		orbitalMechanics: {
+			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			orbitSpeed: { type: Types.Number, required: false, enum: [2.5, 5, 10, 25], default: 5 },
+			orbitOrigin: { type: Types.String, required: false, enum: ['galacticCenter', 'galacticCenterOfMass'], default: 'galacticCenter' }
+		},
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
 			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
@@ -65,7 +92,8 @@ const schema = new Schema({
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
-			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
+			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
+			alliances: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
         },
         technology: {
 			startingTechnologyLevel: {
@@ -76,7 +104,7 @@ const schema = new Schema({
 				manufacturing: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				banking: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
 				weapons: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
-				specialists: { type: Types.Number, required: true, min: 1, max: 16, default: 1 }
+				specialists: { type: Types.Number, required: true, min: 0, max: 16, default: 1 }
 			},
 			researchCosts: {
 				terraforming: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
@@ -88,15 +116,20 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
-			bankingReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
+			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
-			speed: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60], default: 30 },
-			startDelay: { type: Types.Number, required: true, enum: [10, 30, 60, 120, 240], default: 30 },
-			turnJumps: { type: Types.Number, required: true, enum: [1, 6, 8, 12, 24], default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 6, 8, 10, 12, 18, 24, 48], default: 24 },
-			missedTurnLimit: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5], default: 3 }
+			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600, 7200], default: 1800 }, // Time in seconds
+			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
+			turnJumps: { type: Types.Number, required: true, enum: [1, 4, 6, 8, 12, 24], default: 8 },
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			afk: {
+				lastSeenTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 6, 7], default: 2}, // Time in days, real time and turn based
+				cycleTimeout: { type: Types.Number, required: true, enum: [3, 4, 5, 6, 7, 8, 9, 10], default: 3}, // Real time games' production cycle limit
+				turnTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 },	// Turn based games' missed turn limit
+			}
 		}
     },
     galaxy: {
@@ -116,14 +149,19 @@ const schema = new Schema({
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
-		winner: { type: Types.ObjectId, required: false }
+		winner: { type: Types.ObjectId, required: false },
+		cleaned: { type: Types.Boolean, required: false }, // Represents if the events and history have been deleted.
 	},
 	constants: {
 		distances: {
 			lightYear: { type: Types.Number, required: true, default: 50 },
 			minDistanceBetweenStars: { type: Types.Number, required: true, default: 50 },
 			maxDistanceBetweenStars: { type: Types.Number, required: true, default: 500 },
-			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 }
+			warpSpeedMultiplier: { type: Types.Number, required: true, default: 3 },
+			galaxyCenterLocation: {
+				x: { type: Types.Number, required: false, default: 0 },
+				y: { type: Types.Number, required: false, default: 0 }
+			}
 		},
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 }

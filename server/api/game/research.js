@@ -14,9 +14,9 @@ module.exports = (router, io, container) => {
 
     router.put('/api/game/:gameId/research/next', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.researchService.updateResearchNext(req.game, req.player, req.body.preference);
+            let eta = await container.researchService.updateResearchNext(req.game, req.player, req.body.preference);
 
-            return res.sendStatus(200);
+            return res.status(200).json(eta);
         } catch (err) {
             return next(err);
         }

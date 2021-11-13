@@ -4,7 +4,7 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService) {
+    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
         this.gameModel = gameModel;
         this.gameListService = gameListService;
         this.nameService = nameService;
@@ -13,6 +13,8 @@ module.exports = class GameCreateService {
         this.passwordService = passwordService;
         this.conversationService = conversationService;
         this.historyService = historyService;
+        this.achievementService = achievementService;
+        this.userService = userService;
     }
 
     async create(settings) {
@@ -22,14 +24,26 @@ module.exports = class GameCreateService {
 
             // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
+            let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
 
-            if (openGames.length) {
+            if (openGames.length && !userIsGameMaster) {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
+            if (userIsGameMaster && openGames.length > 5) {
+                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
+            }
+
             // Validate that the player cannot create large games.
-            if (settings.general.playerLimit > 16) {
-                throw new ValidationError(`Games larger than 16 players are reserved for official games only.`);
+            if (settings.general.playerLimit > 16 && !userIsGameMaster) {
+                throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
+            }
+
+            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(settings.general.createdByUserId);
+
+            // Disallow new players from creating games if they haven't completed a game yet.
+            if (!isEstablishedPlayer) {
+                throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }
         
@@ -53,6 +67,19 @@ module.exports = class GameCreateService {
         if (desiredPlayerStarCount > desiredStarCount) {
             throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
         }
+
+        // Ensure that c2c combat is disabled for orbital games.
+        if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
+            game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
+        }
+
+        // Ensure that specialist credits setting defaults token specific settings
+        if (game.settings.specialGalaxy.specialistsCurrency === 'credits') {
+            game.settings.player.startingCreditsSpecialists = 0;
+            game.settings.player.tradeCreditsSpecialists = false;
+            game.settings.technology.startingTechnologyLevel.specialists = 0;
+            game.settings.technology.researchCosts.specialists = 'none';
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -67,9 +94,7 @@ module.exports = class GameCreateService {
         game.galaxy.stars = this.mapService.generateStars(
             game,
             desiredStarCount,
-            game.settings.general.playerLimit,
-            game.settings.specialGalaxy.randomGates);
-
+            game.settings.general.playerLimit);
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
@@ -77,9 +102,11 @@ module.exports = class GameCreateService {
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
-        game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.general.starVictoryPercentage);
+        game.state.starsForVictory = this._calculateStarsForVictory(game);
 
         this.conversationService.createConversationAllPlayers(game);
+
+        this._setGalaxyCenter(game);
 
         let gameObject = await game.save();
 
@@ -89,5 +116,29 @@ module.exports = class GameCreateService {
         // await this.historyService.log(gameObject);
         
         return gameObject;
+    }
+
+    _setGalaxyCenter(game) {
+        const starLocations = game.galaxy.stars.map(s => s.location);
+
+        game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
+    }
+
+    _calculateStarsForVictory(game) {
+        if (game.settings.general.mode === 'conquest') {
+            // TODO: Find a better place for this as its shared in the star service.
+            switch (game.settings.conquest.victoryCondition) {
+                case 'starPercentage':
+                    return Math.ceil((game.state.stars / 100) * game.settings.conquest.victoryPercentage);
+                case 'homeStarPercentage':
+                    return Math.max(2, Math.ceil((game.settings.general.playerLimit / 100) * game.settings.conquest.victoryPercentage)); // At least 2 home stars needed to win.
+                default:
+                    throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`);
+            }
+        }
+
+        // game.settings.conquest.victoryCondition = 'starPercentage'; // TODO: Default to starPercentage if not in conquest mode?
+
+        return game.galaxy.stars.length;
     }
 }

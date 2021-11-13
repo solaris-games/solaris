@@ -2,33 +2,35 @@
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
       <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-warning"><i class="fas fa-calculator"></i></button>
-      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
+      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && canScuttleCarrier" classText="btn btn-sm btn-secondary ml-1"><i class="fas fa-trash"></i></modalButton>
+      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer && isGameInProgress" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
-    <div class="row bg-secondary">
+    <div class="row bg-secondary" :class="{'bg-warning': carrier.isGift}">
       <div class="col text-center pt-2">
-        <p class="mb-2" v-if="isUserPlayerCarrier">A carrier under your command.</p>
+        <p class="mb-2" v-if="isUserPlayerCarrier && !carrier.isGift">A carrier under your command.</p>
         <p class="mb-2" v-if="isNotUserPlayerCarrier">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
-        <p class="mb-2 text-warning" v-if="carrier.isGift">This carrier is a gift.</p>
+        <p class="mb-2" v-if="carrier.isGift"><strong>This carrier is a gift.</strong></p>
+        <p class="mb-2" v-if="carrier.isGift"><small>When the carrier arrives at another player's star, it will transfer ownership.</small></p>
       </div>
     </div>
 
     <div v-if="isCompactUIStyle">
       <div class="row mt-2">
         <div class="col">
-          <span title="Orbiting" v-if="carrier.orbiting">
+          <span title="The carrier is in orbit" v-if="carrier.orbiting">
             <i class="fas fa-star mr-2"></i>
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
-          <span title="In Transit" v-if="!carrier.orbiting">
-            <a title="Source Star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
+          <span title="The carrier is in transit" v-if="!carrier.orbiting">
+            <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
-            <a title="Destination Star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
+            <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
           </span>
         </div>
         <div class="col-auto">
-          <span title="Ships">
+          <span title="The total number of ships the carrier has">
             {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
           </span>
         </div>
@@ -48,13 +50,11 @@
             <span v-if="carrier.specialist">
               {{carrier.specialist.name}}
             </span>
-            <span v-if="!carrier.specialist">
-              No Specialist
-            </span>
+            <span v-if="!carrier.specialist">No Specialist</span>
           </span>
         </div>
         <div class="col-auto">
-          <span title="Waypoints">
+          <span title="The total number of waypoints the carrier has - Plot waypoints to capture stars">
             {{carrier.waypoints.length}} 
             <i class="fas fa-map-marker-alt ml-1" v-if="!carrier.waypointsLooped"></i>
             <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i>
@@ -113,7 +113,7 @@
         <div class="col">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
-        <div class="col-auto" v-if="!$isHistoricalMode()">
+        <div class="col-auto" v-if="!$isHistoricalMode() && isStarOwnedByUserPlayer">
           <button class="btn btn-sm btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
             <i class="fas fa-exchange-alt"></i> Ship Transfer
           </button>
@@ -135,17 +135,17 @@
 
       <div class="row bg-primary pt-2 pb-0 mb-0" v-if="hasWaypoints">
         <div class="col">
-          <p class="mb-2">ETA: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
+          <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
       </div>
 
       <div v-if="!$isHistoricalMode() && canEditWaypoints && isStandardUIStyle" class="row bg-secondary pt-2 pb-2 mb-0">
         <div class="col">
-          <button class="btn btn-success" :class="{'btn-sm':isCompactUIStyle}" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-sm btn-success" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
             <i class="fas fa-sync"></i>
           </button>
-          <button class="btn btn-danger" :class="{'btn-sm':isCompactUIStyle}" v-if="carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-sm btn-danger" v-if="carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Unloop
             <i class="fas fa-map-marker-alt"></i>
           </button>
@@ -171,6 +171,11 @@
 
       <gift-carrier v-if="canGiftCarrier" :carrierId="carrier._id"/>
     </div>
+
+    <!-- Modals -->
+    <dialogModal modalName="scuttleCarrierModal" titleText="Scuttle Carrier" cancelText="No" confirmText="Yes" @onConfirm="confirmScuttleCarrier">
+      <p>Are you sure you want to scuttle <b>{{carrier.name}}</b>?</p>
+    </dialogModal>
 </div>
 </template>
 
@@ -183,6 +188,10 @@ import WaypointTable from './WaypointTable'
 import CarrierSpecialistVue from './CarrierSpecialist'
 import GiftCarrierVue from './GiftCarrier'
 import SpecialistIconVue from '../specialist/SpecialistIcon'
+import ModalButton from '../../modal/ModalButton'
+import DialogModal from '../../modal/DialogModal'
+import AudioService from '../../../game/audio'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
   components: {
@@ -190,7 +199,10 @@ export default {
     'waypointTable': WaypointTable,
     'carrier-specialist': CarrierSpecialistVue,
     'gift-carrier': GiftCarrierVue,
-    'specialist-icon': SpecialistIconVue
+    'specialist-icon': SpecialistIconVue,
+    'modalButton': ModalButton,
+    'dialogModal': DialogModal,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   props: {
     carrierId: String
@@ -225,7 +237,7 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
       this.recalculateTimeRemaining()
     }
   },
@@ -237,9 +249,6 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
-    },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
@@ -318,7 +327,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     async onConfirmGiftCarrier (e) {
-      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift?`)) {
+      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift? If the carrier has a specialist, it will be retired when it arrives at the destination.`)) {
         return
       }
 
@@ -393,11 +402,37 @@ export default {
       if (this.carrier.ticksEtaTotal) {
         this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal)
       }
+    },
+    async confirmScuttleCarrier (e) {
+      try {
+        let response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
+
+          this.$store.commit('gameCarrierScuttled', {
+            carrierId: this.carrier._id
+          })
+
+          AudioService.leave()
+
+          this.onCloseRequested()
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   },
   computed: {
     canGiftCarrier: function () {
-      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' && this.isUserPlayerCarrier && !this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' 
+        && this.isUserPlayerCarrier 
+        && !this.carrier.isGift 
+        && !this.userPlayer.defeated 
+        && !GameHelper.isGameFinished(this.$store.state.game)
+    },
+    canScuttleCarrier: function () {
+      return this.isOwnedByUserPlayer && !this.userPlayer.defeated && this.isGameInProgress && !this.carrier.isGift
     },
     isUserPlayerCarrier: function () {
       return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id
@@ -409,21 +444,36 @@ export default {
       return this.carrier.waypoints && this.carrier.waypoints.length
     },
     canEditWaypoints: function () {
-      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canTransferShips: function () {
-      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.carrier.isGift && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canShowSpecialist: function () {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist && this.carrier.orbiting && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.canShowSpecialist 
+        && this.carrier.orbiting 
+        && !GameHelper.isGameFinished(this.$store.state.game) 
+        && !this.isDeadStar
+        && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
     },
     isOwnedByUserPlayer: function () {
       let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
 
       return owner && this.userPlayer && owner._id === this.userPlayer._id
+    },
+    isStarOwnedByUserPlayer: function () {
+      let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.getCarrierOrbitingStar())
+
+      return owner && this.userPlayer && owner._id === this.userPlayer._id
+    },
+    isDeadStar: function () {
+      return GameHelper.isDeadStar(this.getCarrierOrbitingStar())
+    },
+    isGameInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
     }
   }
 }

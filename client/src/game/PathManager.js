@@ -4,9 +4,22 @@ import gameHelper from '../services/gameHelper'
 class PathManager {
 
   constructor ( game, userSettings,  map ) {
+    this.map = map
+
+    this.zoomPercent = 100
+
+    this.container = new PIXI.Container()
+
+    this.chunkSize = 512.0
+
+    this.setup(game, userSettings)
+  }
+
+  setup(game, userSettings) {
+
     this.game = game
     this.userSettings = userSettings
-    this.map = map
+    this._loadSettings()
 
     this.paths = Array()
     /*
@@ -18,13 +31,17 @@ class PathManager {
      * }
      *
     */
+    if( this.chunklessContainer ) {
+      this.container.removeChild(this.chunklessContainer)
+    }
+    if( this.chunksContainer ) {
+      this.container.removeChild(this.chunksContainer)
+    }
 
-    this.container = new PIXI.Container()
+    this.chunksContainer = new PIXI.Container()
     this.chunklessContainer = new PIXI.Container()
     this.container.addChild(this.chunklessContainer)
-
-    this.reloadSettings(this.userSettings)
-    this.chunkSize = 512.0
+    this.container.addChild(this.chunksContainer)
 
     let minX = gameHelper.calculateMinStarX(this.game)
     let minY = gameHelper.calculateMinStarY(this.game)
@@ -44,14 +61,27 @@ class PathManager {
       this.chunks[x] = Array(this.chunksYlen)
       for(let y=0; y<this.chunksYlen; y+=1) {
         this.chunks[x][y] = new PIXI.Container()
-        this.container.addChild(this.chunks[x][y])
+        this.chunksContainer.addChild(this.chunks[x][y])
+        if(false)
+        {
+        let chunkVisualizer = new PIXI.Graphics()
+        chunkVisualizer.alpha = 0.5
+        chunkVisualizer.lineStyle(4, 0xFF0000, 1);
+        chunkVisualizer.beginFill(0xDE3249);
+        chunkVisualizer.drawRect(
+          (this.firstChunkX+x)*this.chunkSize, (this.firstChunkY+y)*this.chunkSize,
+          this.chunkSize, this.chunkSize
+        );
+        chunkVisualizer.endFill()
+        this.chunksContainer.addChild(chunkVisualizer)
+        this.chunks[x][y].visualizer = chunkVisualizer
+        }
       }
     }
 
   }
 
-  reloadSettings(userSettings) {
-    this.userSettings = userSettings
+  _loadSettings() {
     this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
     this.baseScale = 1
     this.minScale = this.userSettings.map.objectsMinimumScale/4.0
@@ -82,13 +112,19 @@ class PathManager {
   removeSharedPath( pathID, carrier ) {
     let path = this._findPath(pathID)
     if(path) {
+      let pathGraphics = path.graphics
       let carrierIndex = path.carriers.indexOf(carrier)
       if(carrierIndex>=0) {
         path.carriers.splice(path.carriers.indexOf(carrier), 1)
       }
       path.graphics.alpha = 0.3+path.carriers.length*0.1
       if(path.carriers.length === 0) {
-        this.container.removeChild(path.graphics)
+        if(pathGraphics.chunk) {
+          pathGraphics.chunk.removeChild(pathGraphics)
+        }
+        else {
+          this.chunklessContainer.removeChild( pathGraphics )
+        }
         this.paths.splice(this.paths.indexOf(path), 1)
       }
     }
@@ -110,7 +146,12 @@ class PathManager {
   }
 
   removeUniquePath( path ) {
-    this.container.removeChild( path )
+    if(path.chunk) {
+      path.chunk.removeChild(path)
+    }
+    else {
+      this.chunklessContainer.removeChild( path )
+    }
   }
 
   addPathToChunk(pathGraphics, locA, locB) {
@@ -124,15 +165,17 @@ class PathManager {
       let iy = chunkYA-this.firstChunkY
 
       this.chunks[ix][iy].addChild(pathGraphics)
-      pathGraphics.belongsToChunk = true
+      pathGraphics.chunk = this.chunks[ix][iy]
     }
     else {
       this.chunklessContainer.addChild(pathGraphics)
     }
+    this._updatePathScale(pathGraphics)
   }
 
   onTick( zoomPercent, viewport, zoomChanging ) {
     this.setScale( zoomPercent, viewport, zoomChanging )
+    this.zoomPercent = zoomPercent
   }
 
   setScale( zoomPercent, viewport, zoomChanging ) {
@@ -164,11 +207,19 @@ class PathManager {
         if(
         (ix>=(firstX-this.firstChunkX))&&(ix<=(lastX-this.firstChunkX)) &&
         (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
-        ) {
-          this.chunks[ix][iy].visible = true
-          if( zoomChanging ) {
+        )
+        {
+          if( !this.chunks[ix][iy].visible ) {
+            this.chunks[ix][iy].visible = true
             for( let path of this.chunks[ix][iy].children ) {
               path.scale.y = yscale
+            }
+          }
+          else {
+            if( zoomChanging ) {
+              for( let path of this.chunks[ix][iy].children ) {
+                path.scale.y = yscale
+              }
             }
           }
         }
@@ -177,6 +228,19 @@ class PathManager {
         }
       }
     }
+  }
+
+  _updatePathScale(path) {
+    let yscale = this.baseScale
+    if(this.clampedScaling) {
+      let currentScale = this.zoomPercent/100
+      if (currentScale < this.minScale) {
+        yscale = (1/currentScale)*this.minScale
+      } else if (currentScale > this.maxScale) {
+        yscale = (1/currentScale)*this.maxScale
+      }
+    }
+    path.scale.y = yscale
   }
 
   _createLoopedPathGraphics( objectA, objectB, pathColour ) {

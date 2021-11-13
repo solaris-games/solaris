@@ -2,12 +2,13 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class SpecialistHireService {
 
-    constructor(gameModel, specialistService, achievementService, waypointService, playerService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, specialistService, achievementService, waypointService, playerService, starService) {
+        this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
         this.playerService = playerService;
+        this.starService = starService;
     }
 
     async hireCarrierSpecialist(game, player, carrierId, specialistId) {
@@ -23,6 +24,12 @@ module.exports = class SpecialistHireService {
 
         if (!carrier.orbiting) {
             throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);
+        }
+
+        let star = this.starService.getByObjectId(game, carrier.orbiting);
+
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
         }
 
         const specialist = this.specialistService.getByIdCarrier(specialistId);
@@ -42,10 +49,18 @@ module.exports = class SpecialistHireService {
 
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
+        if (carrier.specialistId) {
+            let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+            if (carrierSpecialist.oneShot) {
+                throw new ValidationError(`The current specialist cannot be replaced.`);
+            }
+        }
+
         carrier.specialistId = specialist.id;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {
@@ -66,7 +81,7 @@ module.exports = class SpecialistHireService {
 
         // TODO: Need to consider local and global effects and update the UI accordingly.
 
-        let waypoints = await this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+        let waypoints = await this.waypointService.cullWaypointsByHyperspaceRangeDB(game, carrier);
 
         let result = {
             game,
@@ -90,6 +105,10 @@ module.exports = class SpecialistHireService {
             throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);
         }
 
+        if (this.starService.isDeadStar(star)) {
+            throw new ValidationError('Cannot hire a specialist on a dead star.');
+        }
+
         const specialist = this.specialistService.getByIdStar(specialistId);
 
         if (!specialist) {
@@ -107,10 +126,18 @@ module.exports = class SpecialistHireService {
 
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
+        if (star.specialistId) {
+            let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
+
+            if (starSpecialist.oneShot) {
+                throw new ValidationError(`The current specialist cannot be replaced.`);
+            }
+        }
+
         star.specialistId = specialist.id;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {

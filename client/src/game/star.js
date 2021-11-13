@@ -1,14 +1,14 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import Map from './map'
+import gameHelper from '../services/gameHelper'
 
 class Star extends EventEmitter {
 
   static culling_margin = 16
   static nameSize = 4
-  static garrisonSmallSize = 6
-  static garrisonBigSize = 10
+  static shipsSmallSize = 6
+  static shipsBigSize = 10
   static maxLod = 4
 
   /*
@@ -42,13 +42,16 @@ class Star extends EventEmitter {
     this.graphics_natural_resources_ring = new Array(Star.maxLod)
     this.graphics_scanningRange = new PIXI.Graphics()
     this.graphics_star = new PIXI.Graphics()
+    this.graphics_targeted = new PIXI.Graphics()
+    this.graphics_selected = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
-    //this.container.addChild(this.graphics_natural_resources_ring)
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
     this.container.addChild(this.graphics_shape_part_warp)
     this.container.addChild(this.graphics_shape_full_warp)
+    this.container.addChild(this.graphics_targeted)
+    this.container.addChild(this.graphics_selected)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -57,10 +60,11 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    this.isSelected = false
+    this.unselect()
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
+    this.showIgnoreBulkUpgradeInfrastructure = false
 
     /**
       Zoomdepth
@@ -88,7 +92,7 @@ class Star extends EventEmitter {
     return carriersAtStar
   }
 
-  _getStarCarrierGarrison () {
+  _getStarCarrierShips () {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
@@ -97,7 +101,8 @@ class Star extends EventEmitter {
     return !(typeof this.data.infrastructure === 'undefined')
   }
 
-  setup (data, userSettings, players, carriers, lightYearDistance) {
+  setup (game, data, userSettings, players, carriers, lightYearDistance) {
+    this.game = game
     this.data = data
     this.players = players
     this.carriers = carriers
@@ -125,6 +130,10 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawNebula()
+    this.drawAsteroidField()
+    this.drawTarget()
+    this.drawSelectedCircle()
     this.drawStar()
     this.drawSpecialist()
     this.drawPlanets()
@@ -133,8 +142,9 @@ class Star extends EventEmitter {
     this.drawScanningRange()
     this.drawHyperspaceRange()
     this.drawName()
-    this.drawGarrison()
+    this.drawShips()
     this.drawInfrastructure()
+    this.drawInfrastructureBulkIgnored()
 
     this.isInScanningRange = this._isInScanningRange()
   }
@@ -154,7 +164,63 @@ class Star extends EventEmitter {
     this.graphics_star.width = 24.0/2.0
     this.graphics_star.height = 24.0/2.0
     this.container.addChild(this.graphics_star)
+  }
 
+  drawNebula () {
+    if(!this.hasNebula()) {
+      return
+    }
+    if (this.nebulaSprite) {
+      this.fixedContainer.removeChild(this.nebulaSprite)
+      this.nebulaSprite = null
+    }
+    let nebulaTexture = TextureService.getRandomStarNebulaTexture()
+    this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
+
+    let spriteSize = 64
+    this.nebulaSprite.width = spriteSize
+    this.nebulaSprite.height = spriteSize
+    this.nebulaSprite.anchor.set(0.5)
+    this.nebulaSprite.rotation = Math.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.nebulaSprite.tint = playerColour
+    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    let blendSprite = new PIXI.Sprite(nebulaTexture)
+    blendSprite.anchor.set(0.5)
+    blendSprite.rotation = Math.random()*Math.PI*2.0
+    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
+    blendSprite.tint = playerColour
+    this.nebulaSprite.addChild(blendSprite)
+
+    this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
+  drawAsteroidField () {
+    if(!this.hasAsteroidField()) {
+      return
+    }
+    if (this.asteroidFieldSprite) {
+      this.fixedContainer.removeChild(this.asteroidFieldSprite)
+      this.asteroidFieldSprite = null
+    }
+    let texture = TextureService.getRandomStarAsteroidFieldTexture()
+    this.asteroidFieldSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 64
+    this.asteroidFieldSprite.width = spriteSize
+    this.asteroidFieldSprite.height = spriteSize
+    this.asteroidFieldSprite.anchor.set(0.5)
+    this.asteroidFieldSprite.rotation = Math.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.asteroidFieldSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.asteroidFieldSprite)
   }
 
   drawSpecialist () {
@@ -175,8 +241,17 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
+    this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
+  }
+
+  hasNebula () {
+    return this.data.isNebula
+  }
+
+  hasAsteroidField () {
+    return this.data.isAsteroidField
   }
 
   hasSpecialist () {
@@ -255,6 +330,7 @@ class Star extends EventEmitter {
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
+        this.graphics_natural_resources_ring[lod].alpha = 0.3
       }
       this.graphics_natural_resources_ring[lod].clear()
 
@@ -308,10 +384,18 @@ class Star extends EventEmitter {
       return
     }
 
-    this.graphics_shape_part.lineStyle(3, player.colour.value)
-    this.graphics_shape_full.lineStyle(3, player.colour.value)
-    this.graphics_shape_part_warp.lineStyle(2, player.colour.value)
-    this.graphics_shape_full_warp.lineStyle(2, player.colour.value)
+    let lineWidthInner = 3
+    let lineWidthOuter = 2
+
+    if (this._isDeadStar()) {
+      lineWidthInner--
+      lineWidthOuter--
+    }
+
+    this.graphics_shape_part.lineStyle(lineWidthInner, player.colour.value)
+    this.graphics_shape_full.lineStyle(lineWidthInner, player.colour.value)
+    this.graphics_shape_part_warp.lineStyle(lineWidthOuter, player.colour.value)
+    this.graphics_shape_full_warp.lineStyle(lineWidthOuter, player.colour.value)
 
     this.container.removeChild(this.graphics_shape_part)
     this.container.removeChild(this.graphics_shape_full)
@@ -364,29 +448,8 @@ class Star extends EventEmitter {
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-      let scrambler = this.data.garrison == null
+      let scrambler = this.data.ships == null
       return ( (scramblers || scrambler) && this._isInScanningRange() )
-  }
-
-  addContainerToChunk(chunks, firstX, firstY) { //TODO maybe obtain a map instance
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].addChild(this.container)
-    chunks[ix][iy].mapObjects.push(this)
-  }
-
-  removeContainerFromChunk(chunks, firstX, firstY) {
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].removeChild(this.container)
-    let index = chunks[ix][iy].mapObjects.indexOf(this)
-    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
   drawName () {
@@ -398,60 +461,78 @@ class Star extends EventEmitter {
       this.container.addChild(this.text_name)
     }
 
-    let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
-    if ((totalKnownGarrison > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
-      this.text_name.y = ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize
+    if (this.data.ownedByPlayerId && (totalKnownShips > 0 || this._getStarCarriers().length > 0 || this._hasUnknownShips())) {
+      this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
     }
   }
 
-  drawGarrison () {
+  drawShips () {
+    if (this.text_ships_small) {
+      this.container.removeChild(this.text_ships_small)
+      this.text_ships_small = null
+    }
+    if (this.text_ships_big) {
+      this.container.removeChild(this.text_ships_big)
+      this.text_ships_big = null
+    }
 
-    let totalKnownGarrison = (this.data.garrison || 0) + this._getStarCarrierGarrison()
+    let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
     let carriersOrbiting = this._getStarCarriers()
     let carrierCount = carriersOrbiting.length
 
-    let garrisonText = ''
-    let scramblers = 0
-    if (carriersOrbiting) {
-      scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-    }
-    if ( (scramblers == carrierCount) && (this.data.garrison == null) ) {
-      garrisonText = '???'
-    }
-    else {
-      garrisonText = totalKnownGarrison
-      if( (scramblers > 0) || (this.data.garrison == null) ) {
-        garrisonText += '*'
+    let shipsText = ''
+
+    if (this.data.ownedByPlayerId) {
+      let scramblers = 0
+      
+      if (carriersOrbiting) {
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+      }
+
+      if (scramblers == carrierCount && this.data.ships == null) {
+        shipsText = '???'
+      }
+      else {
+        shipsText = totalKnownShips
+
+        if (scramblers > 0 || this.data.ships == null) {
+          shipsText += '*'
+        }
+      }
+
+      if (carrierCount) {
+        shipsText += '/'
+        shipsText += carrierCount.toString()
+
+        if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
+          shipsText += '+'
+        }
       }
     }
 
-    if (carrierCount) {
-      garrisonText += '/'
-      garrisonText += carrierCount.toString()
-    }
-
-    if (garrisonText) {
-      if (!this.text_garrison_small) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonSmallSize}
-        this.text_garrison_small = new PIXI.BitmapText(this.data.name, bitmapFont)
-        this.container.addChild(this.text_garrison_small)
-        this.text_garrison_small.x = 5
-        this.text_garrison_small.y = (-this.text_garrison_small.height) +( ( (Star.nameSize+Star.garrisonSmallSize)/2.0 )-Star.nameSize )
+    if (shipsText) {
+      if (!this.text_ships_small) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsSmallSize}
+        this.text_ships_small = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_ships_small)
+        this.text_ships_small.x = 5
+        this.text_ships_small.y = (-this.text_ships_small.height) +( ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize )
       }
 
-      if (!this.text_garrison_big) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.garrisonBigSize}
-        this.text_garrison_big = new PIXI.BitmapText(this.data.name, bitmapFont)
-        this.container.addChild(this.text_garrison_big)
-        this.text_garrison_big.x = 5
-        this.text_garrison_big.y = -this.text_garrison_big.height/2.0
+      if (!this.text_ships_big) {
+        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsBigSize}
+        this.text_ships_big = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.container.addChild(this.text_ships_big)
+        this.text_ships_big.x = 5
+        this.text_ships_big.y = -this.text_ships_big.height/2.0
       }
-      this.text_garrison_small.text = garrisonText
-      this.text_garrison_big.text = garrisonText
+      this.text_ships_small.text = shipsText
+      this.text_ships_big.text = shipsText
     }
   }
 
@@ -459,6 +540,10 @@ class Star extends EventEmitter {
     if ( this.text_infrastructure ) {
       this.container.removeChild(this.text_infrastructure)
       this.text_infrastructure = null
+    }
+
+    if (this.data.infrastructure && (this.data.infrastructure.economy == null || this.data.infrastructure.industry == null || this.data.infrastructure.science == null)) {
+      return
     }
 
     if (!this.text_infrastructure) {
@@ -469,9 +554,33 @@ class Star extends EventEmitter {
         this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
+        this.text_infrastructure.alpha = 0.75;
 
         this.container.addChild(this.text_infrastructure)
       }
+    }
+  }
+
+  drawInfrastructureBulkIgnored () {
+    if (this.text_infrastructureBulkIgnored) {
+      this.container.removeChild(this.text_infrastructureBulkIgnored)
+      this.text_infrastructureBulkIgnored = null
+    }
+
+    if (this.data.ignoreBulkUpgrade == null) {
+      return
+    }
+
+    if (!this.text_infrastructureBulkIgnored) {
+      let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
+
+      let bitmapFont = {fontName: "space-mono", fontSize: 8}
+      this.text_infrastructureBulkIgnored = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+      this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
+      this.text_infrastructureBulkIgnored.y = 12
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+
+      this.container.addChild(this.text_infrastructureBulkIgnored)
     }
   }
 
@@ -481,7 +590,9 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
-    if (!player) { return }
+    if (!player || this._isDeadStar()) { return }
+
+    if (!player.research) { return }
 
     // TODO: Use the game helper instead?
     let techLevel = player.research.scanning.level
@@ -496,7 +607,6 @@ class Star extends EventEmitter {
 
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
-    // this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
@@ -517,6 +627,8 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
+    if (!player.research) { return }
+    
     // TODO: Use the game helper instead?
     let techLevel = player.research.hyperspace.level
 
@@ -538,7 +650,29 @@ class Star extends EventEmitter {
     this.graphics_hyperspaceRange.visible = this.isSelected
   }
 
+  drawTarget () {
+    this.graphics_targeted.clear()
 
+    if (this.data.targeted) {
+      this.graphics_targeted.lineStyle(2, 0xFF0000)
+      this.graphics_targeted.moveTo(9, -9)
+      this.graphics_targeted.lineTo(-9, 9)
+      this.graphics_targeted.moveTo(-9, -9)
+      this.graphics_targeted.lineTo(9, 9)
+      this.graphics_targeted.closePath()
+    }
+  }
+
+  drawSelectedCircle () {
+    this.graphics_selected.clear()
+
+    if (this.isSelected) {
+      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_selected.alpha = 0.3
+      this.graphics_selected.drawCircle(0, 0, 20)
+    }
+  }
+  
   onZoomChanging(zoomPercent) {
     this.zoomPercent = zoomPercent
     this.setScale(zoomPercent)
@@ -567,11 +701,14 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
+    let eventData = e ? e.data : null
+    
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onStarRightClicked', this.data)
+      this.emit('onStarRightClicked', {
+        starData: this.data,
+        eventData
+      })
     } else {
-      let eventData = e ? e.data : null
-
       this.emit('onStarClicked', {
         starData: this.data,
         eventData,
@@ -593,26 +730,36 @@ class Star extends EventEmitter {
     let aparentScale = this.container.scale.x * (this.zoomPercent/100.0)
     let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
     for(let l = 0; l<Star.maxLod; l+= 1) {
-      this.graphics_natural_resources_ring[l].visible = false
+      let ring = this.graphics_natural_resources_ring[l]
+      
+      if (ring) {
+        ring.visible = false
+      }
     }
 
     this.graphics_star.visible = !this.hasSpecialist()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
-    this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+
+    if (this.userSettings.map.naturalResources !== 'planets') {
+      if (this.graphics_natural_resources_ring[lod]) {
+        this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+      }
+    }
+
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
 
-    let small_garrison = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
-    let visible_garrison = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
+    let small_ships = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
+    let visible_ships = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
 
-    if (this.text_garrison_small) this.text_garrison_small.visible = small_garrison && visible_garrison
-    if (this.text_garrison_big) this.text_garrison_big.visible = !small_garrison && visible_garrison
+    if (this.text_ships_small) this.text_ships_small.visible = small_ships && visible_ships
+    if (this.text_ships_big) this.text_ships_big.visible = !small_ships && visible_ships
 
-    let partial_ring = (this.text_garrison_big && this.text_garrison_big.visible)
-      || (this.text_garrison_small && this.text_garrison_small.visible)
+    let partial_ring = (this.text_ships_big && this.text_ships_big.visible)
+      || (this.text_ships_small && this.text_ships_small.visible)
       || (this.text_name && this.text_name.visible)
 
     this.graphics_shape_part.visible = partial_ring
@@ -659,6 +806,51 @@ class Star extends EventEmitter {
 
     //Update everything
     if (this.zoomDepth != old) this.updateVisibility()
+  }
+
+  destroy () {
+    this.container.destroy()
+    this.fixedContainer.destroy()
+  }
+
+  _isDeadStar () {
+    return this.data.naturalResources != null && this.data.naturalResources <= 0
+  }
+
+  select () {
+    this.isSelected = true
+    this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
+  }
+
+  unselect () {
+    this.isSelected = false
+    this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
+  }
+
+  toggleSelected () {
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
+  }
+
+  showIgnoreBulkUpgrade () {
+    this.showIgnoreBulkUpgradeInfrastructure = true
+
+    if (this.text_infrastructureBulkIgnored) {
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+    }
+  }
+
+  hideIgnoreBulkUpgrade () {
+    this.showIgnoreBulkUpgradeInfrastructure = false
+
+    if (this.text_infrastructureBulkIgnored) {
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+    }
   }
 }
 

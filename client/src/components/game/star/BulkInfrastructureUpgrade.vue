@@ -8,39 +8,56 @@
 
     <form-error-list v-bind:errors="errors"/>
 
-    <form class="row no-gutters" @submit.prevent>
-      <div class="form-group input-group col-6 col-sm-4">
-        <div class="input-group-prepend">
-          <span class="input-group-text">$</span>
-        </div>
-        <input v-on:input="resetHasChecked"
-          class="form-control"
-          id="amount"
-          v-model="amount"
-          type="number"
-          required="required"
-        />
-      </div>
-      <div class="form-group col-6 col-sm-4 pl-1 pr-1">
-        <select class="form-control" id="infrastructureType" v-on:change="onInfrastructureSelectionChanged" v-model="selectedType">
-          <option
-            v-for="opt in types"
-            v-bind:key="opt.key"
-            v-bind:value="opt.key"
-          >{{ opt.name }}</option>
+    <form @submit.prevent>
+      <div class="row no-gutters mb-2">
+        <select class="form-control" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
+          <option value="totalCredits">Spend credits</option>
+          <option value="infrastructureAmount">Buy infrastructure amount</option>
+          <option value="belowPrice">Buy below price</option>
         </select>
       </div>
-      <div class="form-group col-12 col-sm-4">
-        <button class="btn btn-success btn-block" v-on:click="doAction"
-                :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ this.hasChecked ? " Upgrade" : " Check" }}</button>
+      <div class="row no-gutters">
+        <div class="form-group input-group col-6 col-sm-4">
+          <div class="input-group-prepend">
+            <span class="input-group-text">{{ upgradeStrategyUnit }}</span>
+          </div>
+          <input v-on:input="resetHasChecked"
+            class="form-control"
+            id="amount"
+            v-model="amount"
+            type="number"
+            required="required"
+            :disabled="isChecking || isUpgrading"
+          />
+        </div>
+        <div class="form-group col-6 col-sm-4 pl-1 pr-1">
+          <select class="form-control" id="infrastructureType" v-on:change="resetPreview" v-model="selectedType" :disabled="isChecking || isUpgrading">
+            <option
+              v-for="opt in types"
+              v-bind:key="opt.key"
+              v-bind:value="opt.key"
+            >{{ opt.name }}</option>
+          </select>
+        </div>
+        <div class="form-group col-12 col-sm-4">
+          <button class="btn btn-success btn-block" v-on:click="doAction"
+                  :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ hasChecked ? " Upgrade" : " Check" }}</button>
+        </div>
       </div>
     </form>
+
     <div v-if="hasChecked" class="row bg-secondary">
       <div class="col text-center pt-3">
-        <p><b class="text-warning">${{this.amount}}</b> budget: <b class="text-success">{{this.upgradeAvailable}}</b> upgrades for <b class="text-danger">${{this.cost}}</b></p>
-        <p v-if="this.ignoredCount"><small>{{this.ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
+        <p v-if="selectedUpgradeStrategy === 'totalCredits'">
+          <b class="text-warning">${{previewAmount}}</b> budget: <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
+        </p>
+        <p v-if="selectedUpgradeStrategy === 'infrastructureAmount' || selectedUpgradeStrategy === 'belowPrice'">
+          <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
+        </p>
+        <p v-if="ignoredCount"><small>{{ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
       </div>
     </div>
+
     <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
       <!-- TODO: This should be a component -->
       <table class="table table-striped table-hover mb-1">
@@ -72,6 +89,7 @@
         </tbody>
       </table>
     </div>
+    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
   </div>
 </template>
 
@@ -82,11 +100,13 @@ import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
 import GameContainer from '../../../game/container'
+import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'form-error-list': FormErrorList
+    'form-error-list': FormErrorList,
+    'star-table': BulkInfrastructureUpgradeStarTableVue
   },
   data () {
     return {
@@ -97,10 +117,12 @@ export default {
       hasChecked: false,
       upgradePreview: null,
       amount: 0,
+      previewAmount: 0,
       upgradeAvailable: 0,
       cost: 0,
       ignoredCount: 0,
       selectedType: 'economy',
+      selectedUpgradeStrategy: 'totalCredits',
       types: [
         {
           key: 'economy',
@@ -118,13 +140,21 @@ export default {
     }
   },
   mounted () {
+    GameContainer.map.showIgnoreBulkUpgrade()
+
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+  },
+  destroyed () {
+    GameContainer.map.hideIgnoreBulkUpgrade()
   },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onInfrastructureSelectionChanged (e) {
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    resetPreview (e) {
       this.hasChecked = false
       this.upgradePreview = null
     },
@@ -156,6 +186,7 @@ export default {
         this.isChecking = true
         let response = await starService.checkBulkUpgradedAmount(
           this.$store.state.game._id,
+          this.selectedUpgradeStrategy,
           this.selectedType,
           this.amount
         )
@@ -164,8 +195,8 @@ export default {
           this.upgradePreview = response.data
           this.upgradeAvailable = response.data.upgraded
           this.cost = response.data.cost
+          this.previewAmount = response.data.budget
           this.ignoredCount = response.data.ignoredCount
-          this.amount = response.data.budget
         }
       } catch (err) {
         this.errors = err.response.data.errors || []
@@ -176,7 +207,7 @@ export default {
     async upgrade () {
       this.errors = []
 
-      if (this.cost <= 0) {
+      if (this.cost <= 0 || this.amount <= 0) {
         return
       }
 
@@ -189,8 +220,9 @@ export default {
 
         let response = await starService.bulkInfrastructureUpgrade(
           this.$store.state.game._id,
+          this.selectedUpgradeStrategy,
           this.selectedType,
-          this.cost
+          this.amount
         )
 
         if (response.status === 200) {
@@ -200,7 +232,9 @@ export default {
           
           this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
 
-          this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+          if (this.selectedUpgradeStrategy === 'totalCredits') {
+            this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+          }
         }
       } catch (err) {
         this.errors = err.response.data.errors || []
@@ -211,6 +245,17 @@ export default {
     },
     getStar(starId) {
       return GameHelper.getStarById(this.$store.state.game, starId)
+    }
+  },
+  computed: {
+    upgradeStrategyUnit () {
+      if (this.selectedUpgradeStrategy === 'totalCredits') {
+        return '$'
+      } else if (this.selectedUpgradeStrategy === 'belowPrice') {
+        return '<$'
+      } else if (this.selectedUpgradeStrategy === 'infrastructureAmount') {
+        return '1'
+      }
     }
   }
 }

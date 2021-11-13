@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
 import gameHelper from '../services/gameHelper'
+import textureService from './texture'
 
 class GameContainer {
 
@@ -32,18 +33,36 @@ class GameContainer {
 
     let fps = 1000.0/elapsed
     if( fps < this.lowest ) { this.lowest = fps }
-    this.fpsNowText.text = ( 'fps: ' + fps.toFixed(0) )
+    if (this.fpsNowText) {
+      this.fpsNowText.text = ( 'fps: ' + fps.toFixed(0) )
+    }
 
     if(this.frames==31) {
       let ma32FPS = 1000.0/ma32DT
-      this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
-      this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
-      this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
-      this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(0) )
+      
+      if (this.fpsMAText) {
+        this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
+      }
+      
+      if (this.fpsMA32Text) {
+        this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
+      }
+      
+      if (this.jitterText) {
+        this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
+      }
+
+      if (this.lowestText) {
+        this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(0) )
+      }
+
+      if (this.zoomText) {
+        this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
+      }
+
       this.frames = 0
       this.lowest = 1000
       this.ma32accum = 0
-      this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
     }
   }
 
@@ -51,15 +70,7 @@ class GameContainer {
     this.store = store
 
     // Cleanup if the app already exists.
-    if (this.app) {
-      this.app.destroy(false, {
-        children: true
-      })
-    }
-
-    if (this.viewport) {
-      this.viewport.destroy()
-    }
+    this.destroy()
 
     let antialiasing = userSettings.map.antiAliasing === 'enabled';
 
@@ -105,6 +116,22 @@ class GameContainer {
 
   }
 
+  destroy () {
+    // Cleanup if the app already exists.
+    if (this.app) {
+      this.app.destroy(false, {
+        children: true
+      })
+
+      this.app = null
+    }
+
+    if (this.viewport) {
+      this.viewport.destroy()
+      this.viewport = null
+    }
+  }
+
   zoomIn () {
     this.viewport.zoomPercent(0.5, true)
   }
@@ -116,10 +143,10 @@ class GameContainer {
   setupViewport (game) {
     this.game = game
 
-    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1000
-    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1000
-    this.starFieldTop = gameHelper.calculateMinStarY(game) - 500
-    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 500
+    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
+    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1500
+    this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
+    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 750
 
     // activate plugins
     this.viewport
@@ -145,11 +172,11 @@ class GameContainer {
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
-    this.viewport.on('mousemove', this.map.onMouseMove.bind(this.map))
   }
 
   setup (game, userSettings) {
     this.userSettings = userSettings
+    textureService.initialize()
 
     this.map.setup(this.game, userSettings)
   }
@@ -157,7 +184,7 @@ class GameContainer {
   draw () {
     this.map.draw()
 
-    if ( process.env.NODE_ENV == 'development') {
+    if ( process.env.NODE_ENV == 'development' && true) {
       let bitmapFont = { fontName: "space-mono", fontSize: 16 }
 
       this.fpsNowText = new PIXI.BitmapText("", bitmapFont)
@@ -204,13 +231,13 @@ class GameContainer {
   reloadStar (star) {
     let starObject = this.map.setupStar(this.game, this.userSettings, star)
     this.map.drawStar(starObject)
-    starObject.addContainerToChunk(this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    this.map.addContainerToChunk(starObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
   }
 
   reloadCarrier (carrier) {
     let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
     this.map.drawCarrier(carrierObject)
-    carrierObject.addContainerToChunk(this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    this.map.addContainerToChunk(carrierObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
   }
 
   undrawCarrier (carrier) {

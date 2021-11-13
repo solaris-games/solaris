@@ -12,14 +12,15 @@
         <div class="col">
         <select class="form-control input-sm" id="intelType" v-model="intelType" v-on:change="fillData" :disabled="history == null">
           <option key="totalStars" value="totalStars">Total Stars</option>
+          <option key="totalHomeStars" value="totalHomeStars">Total Capital Stars</option>
           <option key="totalEconomy" value="totalEconomy">Total Economy</option>
           <option key="totalIndustry" value="totalIndustry">Total Industry</option>
           <option key="totalScience" value="totalScience">Total Science</option>
           <option key="totalShips" value="totalShips">Total Ships</option>
           <option key="totalCarriers" value="totalCarriers">Total Carriers</option>
-          <option key="totalSpecialists" value="totalSpecialists">Total Specialists</option>
-          <option key="totalStarSpecialists" value="totalStarSpecialists">Total Specialists (Stars)</option>
-          <option key="totalCarrierSpecialists" value="totalCarrierSpecialists">Total Specialists (Carriers)</option>
+          <option key="totalSpecialists" value="totalSpecialists" v-if="isSpecialistsEnabled">Total Specialists</option>
+          <option key="totalStarSpecialists" value="totalStarSpecialists" v-if="isSpecialistsEnabled">Total Specialists (Stars)</option>
+          <option key="totalCarrierSpecialists" value="totalCarrierSpecialists" v-if="isSpecialistsEnabled">Total Specialists (Carriers)</option>
           <option key="newShips" value="newShips">New Ships</option>
           <option key="warpgates" value="warpgates">Warpgates</option>
           <option key="weapons" value="weapons">Weapons</option>
@@ -291,8 +292,11 @@ export default {
     }
   },
   computed: {
+    isSpecialistsEnabled () {
+      return GameHelper.isSpecialistsEnabled(this.$store.state.game)
+    },
     isSpecialistsTechnologyEnabled () {
-      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+      return GameHelper.isSpecialistsTechnologyEnabled(this.$store.state.game)
     }
   }
 }

@@ -26,7 +26,7 @@
     </div>
 
     <div class="row bg-secondary pt-1 pb-1">
-      <label for="suggestMentions" class="col-12 col-sm-6 col-form-label">Suggestions for player and star names</label>
+      <label for="suggestMentions" class="col-12 col-sm-6 col-form-label">Autofill chat mentions</label>
       <div class="col-12 col-sm-6">
         <select class="form-control" id="suggestMentions" v-model="settings.interface.suggestMentions" :disabled="isSavingSettings">
           <option value="disabled">Disabled</option>
@@ -45,6 +45,18 @@
       </div>
     </div>
 
+    <h5 class="pt-2">Guild</h5>
+    
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="displayGuildTag" class="col-12 col-sm-6 col-form-label">Display Guild Tag</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="displayGuildTag" v-model="settings.guild.displayGuildTag" :disabled="isSavingSettings">
+          <option value="visible">Visible</option>
+          <option value="hidden">Hidden</option>
+        </select>
+      </div>
+    </div>
+
     <h5 class="pt-2">Map</h5>
 
     <div class="mb-1 pb-1">
@@ -55,7 +67,14 @@
           <select class="form-control" id="territory-style" v-model="settings.map.territoryStyle" :disabled="isSavingSettings">
             <option value="marching-square">Marching Square</option>
             <option value="voronoi">Voronoi</option>
+            <option value="disabled">Disabled</option>
           </select>
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle!=='disabled'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <div class="col">
+          <p class="text-warning mb-0"><small>Warning: Map territories will degrade performance when loading the game, especially in very large galaxies.</small></p>
         </div>
       </div>
 
@@ -77,6 +96,20 @@
         <label for="border-width" class="col-12 col-sm-6 col-form-label">Border Width</label>
         <div class="col-12 col-sm-6">
           <input type="number" min="0" max="8" class="form-control" id="border-width" v-model="settings.map.marchingSquareBorderWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='voronoi'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="grid-size" class="col-12 col-sm-6 col-form-label">Cell Border Width</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="0" max="5" class="form-control" id="grid-size" v-model="settings.map.voronoiCellBorderWidth" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div v-if="settings.map.territoryStyle=='voronoi'" class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="grid-size" class="col-12 col-sm-6 col-form-label">Territory Border Width</label>
+        <div class="col-12 col-sm-6">
+          <input type="number" min="0" max="8" class="form-control" id="grid-size" v-model="settings.map.voronoiTerritoryBorderWidth" :disabled="isSavingSettings">
         </div>
       </div>
 
@@ -161,28 +194,28 @@
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-frequency" class="col col-form-label">Nebula Frequency</label>
         <div class="col">
-            <input type="range" min="0" max="16" step="1" class="form-range" style="width:100%" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
+            <input type="range" min="0" max="16" step="1" class="form-range w-100" id="nebula-frequency" v-model="settings.map.background.nebulaFrequency" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-density" class="col col-form-label">Nebula Density</label>
         <div class="col">
-          <input type="range" min="0" max="8" class="form-range form-control" style="width:100%" id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
+          <input type="range" min="0" max="8" step="1" class="form-range w-100"  id="nebula-density" v-model="settings.map.background.nebulaDensity" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="nebula-opacity" class="col col-form-label">Nebula Opacity</label>
         <div class="col">
-          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range" style="width:100%" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
+          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range w-100" id="nebula-opacity" v-model="settings.map.background.nebulaOpacity" :disabled="isSavingSettings">
         </div>
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="stars-opacity" class="col col-form-label">Stars Opacity</label>
         <div class="col">
-          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range" style="width:100%" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
+          <input type="range" min="0.0" max="1.0" step="0.0625" class="form-range w-100" id="stars-opacity" v-model="settings.map.background.starsOpacity" :disabled="isSavingSettings">
         </div>
       </div>
 
@@ -222,7 +255,7 @@
           <div class="row bg-secondary pt-1 pb-1 ml-1">
             <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
             <div class="col">
-              <input type="range" min="0.0" max="2.0" step="0.125" class="form-range" style="width:100%" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
+              <input type="range" min="0.0" max="2.0" step="0.125" class="form-range w-100" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
             </div>
           </div>
         </div>
@@ -356,6 +389,16 @@
       <label for="carrierDefaultAmount" class="col-12 col-sm-6 col-form-label">Default Amount</label>
       <div class="col-12 col-sm-6">
         <input type="number" class="form-control" id="carrierDefaultAmount" v-model="settings.carrier.defaultAmount" :disabled="isSavingSettings">
+      </div>
+    </div>
+    
+    <div class="row bg-secondary pt-1 pb-1">
+      <label for="confirmBuildCarrier" class="col-12 col-sm-6 col-form-label">Confirm Build Carrier</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildCarrier" v-model="settings.carrier.confirmBuildCarrier" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
       </div>
     </div>
 

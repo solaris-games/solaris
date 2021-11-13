@@ -25,6 +25,16 @@
                         <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
                     </div>
                 </div>
+                <div class="form-group row">
+                  <div class="col-8">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" v-model="isTurnBased" id="chkIsTurnBased">
+                      <label class="form-check-label" for="chkIsTurnBased">
+                        Carrier-to-Star Combat
+                      </label>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-group row" v-if="hasDefenderBonus">
                   <div class="col-8">
                     <div class="form-check">
@@ -61,10 +71,10 @@
 
                 <div class="form-group row">
                   <div class="col-auto col-sm-8">
-                    <button type="button" class="btn btn-info" :disabled="isLoading" title="Swap Defender/Attacker Values" @click="swapValues"><i class="fas fa-exchange-alt"></i></button>
+                    <button type="button" class="btn btn-info" :disabled="isLoading" title="Swap the defender/attacker values" @click="swapValues"><i class="fas fa-exchange-alt"></i></button>
                   </div>
                   <div class="col col-sm-4">
-                      <button type="submit" class="btn btn-success btn-block" :disabled="isLoading" title="Calculate Combat Result"><i class="fas fa-fist-raised"></i> Fight</button>
+                      <button type="submit" class="btn btn-success btn-block" :disabled="isLoading" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
                   </div>
                 </div>
             </form>
@@ -105,6 +115,7 @@ export default {
       errors: [],
       hasDefenderBonus: false,
       includeDefenderBonus: true,
+      isTurnBased: true,
       defender: {
         ships: 0,
         weaponsLevel: 1,
@@ -160,7 +171,7 @@ export default {
 
           if (this.defender.star) { // May be out of scanning range.
             this.defender.player = GameHelper.getStarOwningPlayer(game, this.defender.star)
-            let defenderShips = GameHelper.getStarTotalKnownGarrison(game, this.defender.star)
+            let defenderShips = GameHelper.getStarTotalKnownShips(game, this.defender.star)
 
             this.defender.ships = defenderShips
 
@@ -201,13 +212,12 @@ export default {
 
       try {
         let response = await CarrierApiService.calculateCombat(this.$store.state.game._id, {
-          weaponsLevel: +this.defender.weaponsLevel,
+          weaponsLevel: +this.defender.weaponsLevel + (this.includeDefenderBonus ? 1 : 0),
           ships: +this.defender.ships
         }, {
           weaponsLevel: +this.attacker.weaponsLevel,
           ships: +this.attacker.ships
-        },
-        this.includeDefenderBonus)
+        }, this.isTurnBased)
 
         if (response.status === 200) {
           this.result = response.data

@@ -1,21 +1,20 @@
 module.exports = class UserGuildService {
     
-    constructor(userModel, guildService) {
-        this.userModel = userModel;
+    constructor(userRepo, guildService) {
+        this.userRepo = userRepo;
         this.guildService = guildService;
     }
 
     async listUsersWithGuildTags(userIds) {
-        let users = await this.userModel.find({
+        let users = await this.userRepo.find({
             _id: {
                 $in: userIds
             }
         }, {
             username: 1,
-            guildId: 1
-        })
-        .lean()
-        .exec();
+            guildId: 1,
+            'gameSettings.guild.displayGuildTag': 1
+        });
 
         let guildIds = users.filter(x => x.guildId).map(x => x.guildId);
 
@@ -25,6 +24,7 @@ module.exports = class UserGuildService {
             return {
                 _id: u._id,
                 username: u.username,
+                displayGuildTag: u.gameSettings.guild.displayGuildTag,
                 guild: guilds.find(g => g._id.equals(u.guildId))
             };
         });

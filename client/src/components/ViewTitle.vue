@@ -3,8 +3,21 @@
     <div class="col">
         <h3 class="mb-0">{{ title }}</h3>
     </div>
-    <div class="col-1" v-if="!hideHomeButton">
-        <button v-if="navigation" @click="navigate" id="btnHome" class="btn btn-info float-right"><i v-bind:class="'fas fa-' + icon"></i></button>
+    <div class="col-auto">
+        <slot></slot>
+        <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
+          <i class="fab fa-discord"></i>
+          <span class="d-none d-md-inline-block ml-1">Discord</span>
+        </a>
+        <a v-if="showSocialLinks" class="btn btn-secondary ml-1" href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum">
+          <i class="far fa-comments"></i>
+          <span class="d-none d-md-inline-block ml-1">Forum</span>
+        </a>
+        <a class="btn btn-info ml-1" :href="documentationUrl" target="_blank" title="How to Play">
+          <i class="far fa-question-circle"></i>
+          <span class="d-none d-md-inline-block ml-1">How to Play</span>
+        </a>
+        <button v-if="navigation && !hideHomeButton" @click="navigate" id="btnHome" class="btn btn-info ml-1"><i v-bind:class="'fas fa-' + icon"></i></button>
     </div>
 </div>
 </template>
@@ -17,7 +30,8 @@ export default {
     title: String,
     navigation: { type: String, default: 'main-menu' },
     icon: { type: String, default: 'home' },
-    hideHomeButton: Boolean
+    hideHomeButton: Boolean,
+    showSocialLinks: Boolean
   },
   methods: {
     navigate () {
@@ -31,6 +45,9 @@ export default {
   computed: {
     isLoggedIn () {
       return this.$store.state.userId != null
+    },
+    documentationUrl () {
+      return process.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }

@@ -156,8 +156,28 @@ module.exports = class SpecialistService {
         return this._getStarSpecialValue(star, 'scienceInfrastructureMultiplier', 1);
     }
 
-    getStarCombatAttackingRedirectIfDefeated(carrier) {
-        return this._getCarrierSpecialValue(carrier, 'starCombatAttackingRedirectIfDefeated', false);
+    getCreditsPerTickByScience(star) {
+        return this._getStarSpecialValue(star, 'creditsPerTickByScience', 0);
+    }
+
+    getReigniteDeadStar(carrier) {
+        return this._getCarrierSpecialValue(carrier, 'reigniteDeadStar', false);
+    }
+
+    getReigniteDeadStarNaturalResources(carrier) {
+        return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', 1);
+    }
+
+    getCarrierOrStarHideShips(carrierOrStar) {
+        if (!carrierOrStar.specialist) {
+            return false;
+        }
+
+        const specialist = this.getByIdCarrier(carrierOrStar.specialist.id);
+
+        let result = specialist?.modifiers?.special?.hideShips;
+
+        return result ?? false;
     }
     
 };

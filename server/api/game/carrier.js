@@ -5,12 +5,6 @@ module.exports = (router, io, container) => {
     const middleware = require('../middleware')(container);
 
     router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let report = await container.waypointService.saveWaypoints(
                 req.game,
@@ -84,12 +78,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             await container.carrierService.convertToGift(
                 req.game,
@@ -116,7 +104,20 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, middleware.loadGameLean, middleware.validateGameLocked, (req, res, next) => {
+    router.delete('/api/game/:gameId/carrier/:carrierId/scuttle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.carrierService.scuttle(
+                req.game,
+                req.player,
+                req.params.carrierId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
         let errors = [];
 
         if (req.body.defender.ships == null) {
@@ -151,20 +152,15 @@ module.exports = (router, io, container) => {
             errors.push('attacker.weaponsLevel must be greater than 0.');
         }
 
-        if (req.body.includeDefenderBonus == null) {
-            req.body.includeDefenderBonus = true;
-        }
-
         if (errors.length) {
             throw new ValidationError(errors);
         }
 
         try {
             let result = container.combatService.calculate(
-                req.game,
                 req.body.defender,
                 req.body.attacker,
-                req.body.includeDefenderBonus,
+                req.body.isTurnBased,
                 true);
 
             return res.status(200).json(result);

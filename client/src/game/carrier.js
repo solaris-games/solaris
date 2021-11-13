@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
-import Map from './map'
-import gameHelper from '../services/gameHelper'
+import Helpers from './helpers'
 
 class Carrier extends EventEmitter {
 
@@ -20,12 +19,13 @@ class Carrier extends EventEmitter {
     this.container.buttonMode = true
 
     this.graphics_colour = new PIXI.Graphics()
+    this.graphics_selected = new PIXI.Graphics()
     this.graphics_ship = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_colour)
+    this.container.addChild(this.graphics_selected)
     this.container.addChild(this.graphics_ship)
 
-    // TODO: Make sure these events are unsubscribed (use .off and see CarrierWaypoints.vue as an example)
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
@@ -58,39 +58,22 @@ class Carrier extends EventEmitter {
     this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
-  }
 
-  addContainerToChunk(chunks, firstX, firstY) {
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].addChild(this.container)
-    chunks[ix][iy].mapObjects.push(this)
-  }
-
-  removeContainerFromChunk(chunks, firstX, firstY) {
-    let chunkX = Math.floor(this.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(this.data.location.y/Map.chunkSize)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].removeChild(this.container)
-    let index = chunks[ix][iy].mapObjects.indexOf(this)
-    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
+    this.clearPaths() // clear on setup since this is used to reset waypoints
+    this.enableInteractivity()
   }
 
   draw () {
     this.drawColour()
-    this.drawShip()
-    this.drawGarrison()
+    this.drawSelectedCircle()
+    this.drawCarrier()
+    this.drawShips()
     this.drawSpecialist()
     this.drawCarrierWaypoints()
   }
 
   drawActive () {
-    this.drawGarrison()
+    this.drawShips()
   }
 
   drawShape() {
@@ -116,7 +99,7 @@ class Carrier extends EventEmitter {
         return
     }
 
-    this._rotateCarrierTowardsWaypoint(this.graphics_colour)
+    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_colour)
   }
 
   drawColour () {
@@ -131,51 +114,45 @@ class Carrier extends EventEmitter {
   drawShip () {
     this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
     this.graphics_ship.anchor.set(0.5)
-    this.graphics_ship.width = 12.0 
-    this.graphics_ship.height = 12.0 
+    this.graphics_ship.width = 12.0
+    this.graphics_ship.height = 12.0
     this.container.addChild(this.graphics_ship)
-    return
-    this.graphics_ship.clear()
 
-    // this.graphics_ship.lineStyle(0.3, 0x000000)
-    this.graphics_ship.beginFill(0xFFFFFF)
-
-    // Draw normal carrier
-    this.graphics_ship.moveTo(0, 0 - 4)
-    this.graphics_ship.lineTo(0 + 1.5, 0 + 1)
-    this.graphics_ship.lineTo(0 + 3, 0 + 2)
-    this.graphics_ship.lineTo(0 + 1, 0 + 2)
-    this.graphics_ship.lineTo(0 + 0, 0 + 3)
-    this.graphics_ship.lineTo(0 + -1, 0 + 2)
-    this.graphics_ship.lineTo(0 - 3, 0 + 2)
-    this.graphics_ship.lineTo(0 - 1.5, 0 + 1)
-    this.graphics_ship.lineTo(0, 0 - 4)
-    this.graphics_ship.endFill()
-
-    this.graphics_ship.pivot.set(0, 0)
-    this.graphics_ship.scale.set(1)
-
-    this._rotateCarrierTowardsWaypoint(this.graphics_ship)
+    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_ship)
   }
 
-  drawGarrison () {
-    if (this.text_garrison) {
-      this.container.removeChild(this.text_garrison)
-      this.text_garrison = null
+  drawShips () {
+    if (this.text_ships) {
+      this.container.removeChild(this.text_ships)
+      this.text_ships = null
     }
 
-    if (!this.text_garrison) {
-      let totalGarrison = this.data.ships == null ? '???' : this.data.ships
+    if (!this.text_ships) {
+      let totalShips = this.data.ships == null ? '???' : this.data.ships
 
-      let garrisonText = totalGarrison.toString() + (this.data.isGift ? '🎁' : '')
+      let shipsText = totalShips.toString()
 
       let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
-      this.text_garrison = new PIXI.BitmapText(garrisonText, bitmapFont)
+      this.text_ships = new PIXI.BitmapText(shipsText, bitmapFont)
 
-      this.text_garrison.x = -(this.text_garrison.width / 2.0)
-      this.text_garrison.y = 5
+      this.text_ships.x = -(this.text_ships.width / 2.0)
+      this.text_ships.y = 5
 
-      this.container.addChild(this.text_garrison)
+      this.container.addChild(this.text_ships)
+      if( this.data.isGift ) {
+        let style = new PIXI.TextStyle({
+          fontFamily: `'Space Mono', monospace`,
+          fill: 0xFFFFFF,
+          padding: 3,
+          fontSize: 4,
+          fontWeight: 'bold'
+        })
+        let giftText = new PIXI.Text('🎁', style)
+        giftText.resolution = 12
+        giftText.position.x = this.text_ships.width
+        giftText.position.y = -1
+        this.text_ships.addChild(giftText)
+      }
     }
   }
 
@@ -222,32 +199,6 @@ class Carrier extends EventEmitter {
     this.graphics_colour.lineTo(2, 3.5)
     this.graphics_colour.lineTo(4, 0)
     this.graphics_colour.closePath()
-  }
-
-  _rotateCarrierTowardsWaypoint (graphics) {
-    // If the carrier has waypoints, get the first one and calculate the angle
-    // between the carrier's current position and the destination.
-    if (this.data.waypoints.length) {
-      let waypoint = this.data.waypoints[0]
-      let starDestination = this.stars.find(s => s.data._id === waypoint.destination)
-
-      if (!starDestination) {
-        const sourceStar = this.stars.find(s => s.data._id === waypoint.source)
-        if (!sourceStar) {
-          return
-        }
-
-        const angle = this.getAngleTowardsLocation(this.data.location, sourceStar.data.location)
-        graphics.angle = (angle * (180 / Math.PI)) - 90
-        return
-      }
-
-      let destination = starDestination.data.location
-
-      let angle = this.getAngleTowardsLocation(this.data.location, destination)
-
-      graphics.angle = (angle * (180 / Math.PI)) + 90
-    }
   }
 
   clearPaths() {
@@ -316,9 +267,25 @@ class Carrier extends EventEmitter {
     }
   }
 
+  drawSelectedCircle () {
+    this.graphics_selected.clear()
+
+    if (this.isSelected) {
+      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_selected.alpha = 0.3
+      this.graphics_selected.drawCircle(0, 0, 15)
+    }
+  }
+
   enableInteractivity() {
-   this.container.interactive = true
-   this.container.buttonMode = true
+    // Can only be interactive if its in transit
+    if (!this.data.orbiting) {
+      this.container.interactive = true
+      this.container.buttonMode = true
+    } else {
+      this.container.interactive = false
+      this.container.buttonMode = false
+    }
   }
 
   disableInteractivity() {
@@ -369,7 +336,7 @@ class Carrier extends EventEmitter {
   updateVisibility() {
 
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    if (this.text_garrison) this.text_garrison.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
+    if (this.text_ships) this.text_ships.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
 
   deselectAllText () {
@@ -389,15 +356,39 @@ class Carrier extends EventEmitter {
     this.emit('onCarrierMouseOut', this.data)
   }
 
-  getAngleTowardsLocation (source, destination) {
-    let deltaX = destination.x - source.x
-    let deltaY = destination.y - source.y
-
-    return Math.atan2(deltaY, deltaX)
-  }
-
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
+  }
+
+  cleanupEventHandlers () {
+    this.container.off('pointerup', this.onClicked.bind(this))
+    this.container.off('mouseover', this.onMouseOver.bind(this))
+    this.container.off('mouseout', this.onMouseOut.bind(this))
+  }
+
+  destroy () {
+    this.container.destroy()
+    this.fixedContainer.destroy()
+  }
+
+  select () {
+    this.isSelected = true
+    this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
+  }
+
+  unselect () {
+    this.isSelected = false
+    this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
+  }
+
+  toggleSelected () {
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
   }
 }
 

@@ -53,7 +53,9 @@ class GameHelper {
   }
 
   getCarriersOrbitingStar (game, star) {
-    return game.galaxy.carriers.filter(x => x.orbiting === star._id)
+    return game.galaxy.carriers
+      .filter(x => x.orbiting === star._id)
+      .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0))
   }
 
   isCarrierInTransit (carrier) {
@@ -64,10 +66,10 @@ class GameHelper {
     return carrier.waypoints.indexOf(waypoint) === 0 && this.isCarrierInTransit(carrier)
   }
 
-  getStarTotalKnownGarrison (game, star) {
+  getStarTotalKnownShips (game, star) {
     let carriers = this.getCarriersOrbitingStar(game, star)
 
-    return (star.garrison || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
+    return (star.ships || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
   getHyperspaceDistance (game, player, carrier) {
@@ -94,19 +96,13 @@ class GameHelper {
   }
 
   getDistanceBetweenLocations (loc1, loc2) {
-    let xs = loc2.x - loc1.x
-    let ys = loc2.y - loc1.y
-
-    xs *= xs
-    ys *= ys
-
-    return Math.sqrt(xs + ys)
+    return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
   }
   
   getClosestStar (stars, point) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
-
+    
     for(let star of stars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
 
@@ -116,7 +112,10 @@ class GameHelper {
       }
     }
 
-    return closestStar
+    return {
+      star: closestStar,
+      distance: smallerDistance
+    }
   }
   
   getClosestPlayerStar (stars, point, player) {
@@ -180,7 +179,7 @@ class GameHelper {
     return ticksToProduction
   }
 
-  getCountdownTimeString (game, date, largestUnitOnly = false) {
+  getCountdownTime (game, date) {
     if (date == null) {
       return 'Unknown'
     }
@@ -188,10 +187,24 @@ class GameHelper {
     let relativeTo = moment().utc()
     let t = moment(date).utc() - relativeTo // Deduct the future date from now.
 
+    return t
+  }
+
+  getCountdownTimeString (game, date, largestUnitOnly = false) {
+    if (date == null) {
+      return 'Unknown'
+    }
+
+    let t = this.getCountdownTime(game, date)
+
     return this.getDateToString(t, largestUnitOnly)
   }
 
   getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
+    if (game == null) {
+      return ''
+    }
+    
     if (game.settings.gameTime.gameType === 'realTime') {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 
@@ -223,7 +236,7 @@ class GameHelper {
       str += `${days}d `
       showDays = true
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && hours === 0 && mins === 0 && secs === 0) {
         return str
       }
     }
@@ -232,7 +245,7 @@ class GameHelper {
       str += `${hours}h `
       showHours = true
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && mins === 0 && secs === 0) {
         return str
       }
     }
@@ -240,7 +253,7 @@ class GameHelper {
     if (showHours || mins > 0) {
       str += `${mins}m `
 
-      if (largestUnitOnly) {
+      if (largestUnitOnly && secs === 0) {
         return str
       }
     }
@@ -250,19 +263,37 @@ class GameHelper {
     return str
   }
 
+  getCountdownTimeForProductionCycle (game) {
+    const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
+    
+    return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
+  }
+
+  getCountdownTimeForTurnTimeout (game) {
+    return moment(game.state.lastTickDate).utc().add('minutes', game.settings.gameTime.maxTurnWait)
+  }
+
+  getCountdownTimeStringForTurnTimeout (game) {
+    return this.getCountdownTimeString(game, this.getCountdownTimeForTurnTimeout(game))
+  }
+
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
   calculateWaypointTicks (game, carrier, waypoint) {
-    let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
-    let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
-
     // if the waypoint is going to the same star then it is at least 1
     // tick, plus any delay ticks.
-    if (sourceStar._id === destinationStar._id) {
+    if (waypoint.source === waypoint.destination) {
       return 1 + (waypoint.delayTicks || 0);
     }
 
-    let source = sourceStar.location
+    let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
+    let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
+
+    if (sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)) {
+      return 1
+    }
+
+    let source = sourceStar == null ? carrier.location : sourceStar.location
     let destination = destinationStar.location
 
     // If the carrier is already en-route, then the number of ticks will be relative
@@ -273,7 +304,7 @@ class GameHelper {
 
     let ticks
 
-    if (sourceStar.warpGate && destinationStar.warpGate &&
+    if (sourceStar && sourceStar.warpGate && destinationStar.warpGate &&
       sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
       ticks = this.getTicksBetweenLocations(game, carrier, [source, destination], game.constants.distances.warpSpeedMultiplier)
     } else {
@@ -299,18 +330,18 @@ class GameHelper {
     return totalTicks
   }
 
-  calculateTimeByTicks (ticks, speedInMins, relativeTo = null) {
+  calculateTimeByTicks (ticks, speedInSeconds, relativeTo = null) {
     if (relativeTo == null) {
       relativeTo = moment().utc()
     } else {
       relativeTo = moment(relativeTo).utc()
     }
 
-    return relativeTo.add(ticks * speedInMins, 'm')
+    return relativeTo.add(ticks * speedInSeconds, 'seconds')
   }
 
   canLoop (game, player, carrier) {
-    if (carrier.waypoints.length < 2) {
+    if (carrier.waypoints.length < 2 || carrier.isGift) {
       return false
     }
     
@@ -324,10 +355,29 @@ class GameHelper {
     let firstWaypointStar = this.getStarById(game, firstWaypoint.source)
     let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
 
+    if (firstWaypointStar == null || lastWaypointStar == null) {
+      return false
+    }
+
+    if (this.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
+      return true
+    }
+
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
     let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)
 
     return distanceBetweenStars <= hyperspaceDistance
+  }
+
+  isStarPairWormHole (sourceStar, destinationStar) {
+    return sourceStar.wormHoleToStarId 
+      && destinationStar.wormHoleToStarId 
+      && sourceStar.wormHoleToStarId === destinationStar._id
+      && destinationStar.wormHoleToStarId === sourceStar._id
+  }
+
+  isGameWaitingForPlayers (game) {
+    return game.state.startDate == null
   }
 
   isGamePaused (game) {
@@ -335,15 +385,35 @@ class GameHelper {
   }
 
   isGameInProgress (game) {
-    return !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
+    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
 
   isGamePendingStart (game) {
-    return !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
+    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
   isGameFinished (game) {
     return game.state.endDate != null
+  }
+
+  isDarkModeStandard (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'standard'
+  }
+
+  isDarkModeExtra (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
+  isOrbitalMechanicsEnabled (game) {
+    return game.settings.orbitalMechanics.enabled === 'enabled'
+  }
+
+  isConquestAllStars (game) {
+    return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'starPercentage'
+  }
+
+  isConquestHomeStars (game) {
+    return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
 
   getGameStatusText (game) {
@@ -367,9 +437,11 @@ class GameHelper {
   }
 
   playerHasLowestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
+    const levels = [...new Set(game.galaxy.players
+      .filter(p => p.research != null)
+      .map(p => {
+        return p.research[techKey].level
+      }))]
 
     // If all players have the same level then nobody has the lowest.
     if (levels.length === 1) {
@@ -382,9 +454,11 @@ class GameHelper {
   }
 
   playerHasHighestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players.map(p => {
-      return p.research[techKey].level
-    }))]
+    const levels = [...new Set(game.galaxy.players
+      .filter(p => p.research != null)
+      .map(p => {
+        return p.research[techKey].level
+      }))]
 
     // If all players have the same level then nobody has the highest.
     if (levels.length === 1) {
@@ -425,9 +499,15 @@ class GameHelper {
     // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
+        // If its a conquest and home star victory then sort by home stars first, then by total stars.
+        if (this.isConquestHomeStars(game)) {
+            if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
+            if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+        }
+
         // Sort by total stars descending
-        if (a.stats.totalStars > b.stats.totalStars) return -1
-        if (a.stats.totalStars < b.stats.totalStars) return 1
+        if (a.stats.totalStars > b.stats.totalStars) return -1;
+        if (a.stats.totalStars < b.stats.totalStars) return 1;
 
         // Then by total ships descending
         if (a.stats.totalShips > b.stats.totalShips) return -1
@@ -437,7 +517,13 @@ class GameHelper {
         if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
         if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
 
-        // Then by defeated descending
+        // Then by defeated date descending
+        if (a.defeated && b.defeated) {
+          if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1
+          if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1
+        }
+
+        // Sort defeated players last.
         return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
       })
   }
@@ -510,6 +596,46 @@ class GameHelper {
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
+  calculateMinCarrierX (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => a.location.x - b.location.x)[0].location.x
+  }
+
+  calculateMinCarrierY (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => a.location.y - b.location.y)[0].location.y
+  }
+
+  calculateMaxCarrierX (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => b.location.x - a.location.x)[0].location.x
+  }
+
+  calculateMaxCarrierY (game) {
+    if (!game.galaxy.carriers.length) { return 0 }
+
+    return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+  
+  isSpecialistsEnabled (game) {
+    return game.settings.specialGalaxy.specialistCost !== 'none'
+  }
+
+  isSpecialistsTechnologyEnabled (game) {
+    return game.settings.technology.researchCosts.specialists !== 'none'
+  }
+
+  isSpecialistsCurrencyCredits (game) {
+    return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'credits'
+  }
+
+  isSpecialistsCurrencyCreditsSpecialists (game) {
+    return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+  }
+
   getSpecialistName (type, specialistId) {
     if (type === 'carrier') {
       switch (specialistId) {
@@ -541,6 +667,10 @@ class GameHelper {
           return 'pirate'
         case 14:
           return 'spoutnik'
+        case 15:
+          return 'starfighter'
+        case 16:
+          return 'rocket'
       }
     } else {
       switch (specialistId) {
@@ -566,6 +696,8 @@ class GameHelper {
           return 'ringed-planet'
         case 11:
           return 'observatory'
+        case 12:
+          return 'double-ringed-orb'
       }
     }
   }
@@ -608,6 +740,10 @@ class GameHelper {
     return game.settings.gameTime.gameType === 'turnBased';
   }
 
+  is1v1Game (game) {
+    return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type)
+  }
+
   isAllUndefeatedPlayersReady(game) {
     let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
 
@@ -634,7 +770,7 @@ class GameHelper {
 
     if (this.isRealTimeGame(game)) {
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'm');
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
         // If in turn based mode, then check if all undefeated players are ready.
         // OR the max time wait limit has been reached.
@@ -644,7 +780,7 @@ class GameHelper {
             return true;
         }
 
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'h');
+        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
         throw new Error(`Unsupported game type.`);
     }
@@ -659,6 +795,10 @@ class GameHelper {
 
     if (data.currentResearchTicksEta != null) {
       userPlayer.currentResearchTicksEta = data.currentResearchTicksEta
+    }
+
+    if (data.nextResearchTicksEta != null) {
+      userPlayer.nextResearchTicksEta = data.nextResearchTicksEta
     }
 
     let star = this.getStarById(game, data.starId)
@@ -687,6 +827,89 @@ class GameHelper {
     }
 
     return star
+  }
+
+  isDeadStar(star) {
+    return star.naturalResources != null && star.naturalResources <= 0
+  }
+
+  isInGuild (guild, userId) {
+    return guild.members.find(m => m._id === userId)
+      || guild.officers.find(m => m._id === userId)
+      || (guild.leader && guild.leader._id === userId)
+  }
+
+  isUserSpectatingGame (game) {
+    return this.isGameInProgress(game) && !this.getUserPlayer(game)
+  }
+
+  _getBankingCredits (game, player) {
+    const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
+
+    if (!bankingEnabled || !player.stats.totalStars || !player.research || !player.research.banking) {
+      return 0
+    }
+
+    const bankingLevel = player.research.banking.level
+
+    switch (game.settings.technology.bankingReward) {
+      case 'standard':
+          return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy))
+      case 'legacy':
+          return bankingLevel * 75
+    }
+  }
+
+  _getUpkeepCosts(game, player) {
+    const upkeepCosts = {
+      'none': 0,
+      'cheap': 1,
+      'standard': 3,
+      'expensive': 6
+    };
+
+    const costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+
+    if (!costPerCarrier) {
+        return 0;
+    }
+
+    return player.stats.totalCarriers * costPerCarrier;
+  }
+
+  calculateIncome (game, player) {
+    const fromEconomy = player.stats.totalEconomy * 10
+    const upkeep = this._getUpkeepCosts(game, player);
+    return fromEconomy - upkeep  + this._getBankingCredits(game, player);
+  }
+
+  isStarHasMultiplePlayersInOrbit (game, star) {
+    let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
+    let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
+
+    if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
+      playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
+    }
+    
+    return playerIds.length
+  }
+
+  getGameTypeFriendlyText (game) {
+    return {     
+      'new_player_rt': 'New Players',
+      'standard_rt': 'Standard',
+      'standard_tb': 'Standard - TB',
+      '1v1_rt': '1 vs. 1',
+      '1v1_tb': '1 vs. 1 - TB',
+      '32_player_rt': '32 Players',
+      'custom': 'Custom',
+      'special_dark': 'Dark Galaxy',
+      'special_ultraDark': 'Ultra Dark Galaxy',
+      'special_orbital': 'Orbital',
+      'special_battleRoyale': 'Battle Royale',
+      'special_homeStar': 'Capital Stars',
+      'special_anonymous': 'Anonymous',
+    }[game.settings.general.type]
   }
 }
 

@@ -1,13 +1,14 @@
 {
     "general": {
-        "starVictoryPercentage": [
-            25,
-            33,
-            50,
-            66,
-            75,
-            90,
-            100
+        "mode": [
+            {
+                "value": "conquest",
+                "text": "Conquest"
+            },
+            {
+                "value": "battleRoyale",
+                "text": "Battle Royale"
+            }
         ],
         "playerLimit": [
             2,
@@ -24,7 +25,8 @@
             13,
             14,
             15,
-            16
+            16,
+            32
         ],
         "playerType": [
             {
@@ -32,8 +34,8 @@
             "text": "All Players"
             },
             {
-            "value": "premium",
-            "text": "Premium Players Only"
+            "value": "establishedPlayers",
+            "text": "Established Players Only"
             }
         ],
         "anonymity": [
@@ -140,28 +142,18 @@
                 "text": "Specialist Tokens"
             }
         ],
-        "randomGates": [
-            {
-            "value": "none",
-            "text": "No"
-            },
-            {
-            "value": "rare",
-            "text": "Rare"
-            },
-            {
-            "value": "common",
-            "text": "Common"
-            }
-        ],
         "darkGalaxy": [
             {
             "value": "disabled",
             "text": "Disabled"
             },
             {
-            "value": "enabled",
-            "text": "Enabled"
+            "value": "standard",
+            "text": "Standard"
+            },
+            {
+            "value": "extra",
+            "text": "Extra"
             },
             {
             "value": "start",
@@ -311,6 +303,68 @@
             36
         ]
         },
+        "conquest": {
+            "victoryCondition": [
+                {
+                    "value": "starPercentage",
+                    "text": "Star Percentage"
+                },
+                {
+                    "value": "homeStarPercentage",
+                    "text": "Capital Star Percentage"
+                }
+            ],
+            "victoryPercentage": [
+                25,
+                33,
+                50,
+                66,
+                75,
+                90,
+                100
+            ]
+        },
+        "orbitalMechanics": {
+            "enabled": [
+                {
+                    "value": "enabled",
+                    "text": "Enabled"
+                },
+                {
+                    "value": "disabled",
+                    "text": "Disabled"
+                }
+            ],
+            "orbitSpeed": [
+                {
+                    "value": 2.5,
+                    "text": "Slow"
+                },
+                {
+                    "value": 5,
+                    "text": "Standard"
+                },
+                {
+                    "value": 10,
+                    "text": "Fast"
+                },
+                {
+                    "value": 25,
+                    "text": "Very Fast"
+                }
+            ],
+            "orbitOrigin": [
+                {
+                    "value": "galacticCenter",
+                    "text": "Galactic Center"
+                },
+                {
+                    "value": "galacticCenterOfMass",
+                    "text": "Galactic Center of Mass"
+                }
+            ]
+
+        },
         "player": {
         "startingStars": [
             1,
@@ -444,6 +498,16 @@
             "value": "scanned",
             "text": "Trade with scanned players only"
             }
+        ],
+        "alliances": [
+            {
+            "value": "enabled",
+            "text": "Enabled"
+            },
+            {
+            "value": "disabled",
+            "text": "Disabled"
+            }
         ]
         },
         "technology": {
@@ -516,6 +580,16 @@
                     "text": "Standard"
                 },
                 {
+                    "value": "legacy",
+                    "text": "Legacy"
+                }
+            ],
+            "specialistTokenReward": [
+                {
+                    "value": "standard",
+                    "text": "Standard"
+                },
+                {
                     "value": "experimental",
                     "text": "Experimental"
                 }
@@ -534,27 +608,43 @@
         ],
         "speed": [
             {
-                "value": 1,
-                "text": "Crazy Fast (1 tick = 1 minute)"
-            },
-            {
-                "value": 5,
-                "text": "Very Fast (1 tick = 5 minutes)"
-            },
-            {
-                "value": 10,
-                "text": "Fast (1 tick = 10 minutes)"
-            },
-            {
                 "value": 30,
-                "text": "Normal (1 tick = 30 minutes)"
+                "text": "Ultra Fast (1 tick = 30 seconds)"
             },
             {
                 "value": 60,
+                "text": "Crazy Fast (1 tick = 1 minute)"
+            },
+            {
+                "value": 300,
+                "text": "Very Fast (1 tick = 5 minutes)"
+            },
+            {
+                "value": 600,
+                "text": "Fast (1 tick = 10 minutes)"
+            },
+            {
+                "value": 1800,
+                "text": "Normal (1 tick = 30 minutes)"
+            },
+            {
+                "value": 3600,
                 "text": "Slow (1 tick = 1 hour)"
+            },
+            {
+                "value": 7200,
+                "text": "Very Slow (1 tick = 2 hours)"
             }
         ],
         "startDelay": [
+            {
+                "value": 1,
+                "text": "1 Minute"
+            },
+            {
+                "value": 5,
+                "text": "5 Minutes"
+            },
             {
                 "value": 10,
                 "text": "10 Minutes"
@@ -574,12 +664,36 @@
             {
                 "value": 240,
                 "text": "4 Hours"
+            },
+            {
+                "value": 360,
+                "text": "6 Hours"
+            },
+            {
+                "value": 480,
+                "text": "8 Hours"
+            },
+            {
+                "value": 600,
+                "text": "10 Hours"
+            },
+            {
+                "value": 720,
+                "text": "12 Hours"
+            },
+            {
+                "value": 1440,
+                "text": "1 Day"
             }
         ],
         "turnJumps": [
             {
                 "value": 1,
                 "text": "1 Tick Jumps"
+            },
+            {
+                "value": 4,
+                "text": "4 Tick Jumps"
             },
             {
                 "value": 6,
@@ -601,58 +715,152 @@
         "maxTurnWait": [
             {
                 "value": 1,
-                "text": "1 Hour"
-            },
-            {
-                "value": 6,
-                "text": "6 Hours"
-            },
-            {
-                "value": 8,
-                "text": "8 Hours"
-            },
-            {
-                "value": 10,
-                "text": "10 Hours"
-            },
-            {
-                "value": 12,
-                "text": "12 Hours"
-            },
-            {
-                "value": 18,
-                "text": "18 Hours"
-            },
-            {
-                "value": 24,
-                "text": "24 Hours"
-            },
-            {
-                "value": 48,
-                "text": "48 Hours"
-            }
-        ],
-        "missedTurnLimit": [
-            {
-                "value": 1,
-                "text": "1 Missed Turn"
-            },
-            {
-                "value": 2,
-                "text": "2 Missed Turns"
-            },
-            {
-                "value": 3,
-                "text": "3 Missed Turns"
-            },
-            {
-                "value": 4,
-                "text": "4 Missed Turns"
+                "text": "1 Minute"
             },
             {
                 "value": 5,
-                "text": "5 Missed Turns"
+                "text": "5 Minutes"
+            },
+            {
+                "value": 10,
+                "text": "10 Minutes"
+            },
+            {
+                "value": 30,
+                "text": "30 Minutes"
+            },
+            {
+                "value": 60,
+                "text": "1 Hour"
+            },
+            {
+                "value": 360,
+                "text": "6 Hours"
+            },
+            {
+                "value": 480,
+                "text": "8 Hours"
+            },
+            {
+                "value": 600,
+                "text": "10 Hours"
+            },
+            {
+                "value": 720,
+                "text": "12 Hours"
+            },
+            {
+                "value": 1080,
+                "text": "18 Hours"
+            },
+            {
+                "value": 1440,
+                "text": "24 Hours"
+            },
+            {
+                "value": 2880,
+                "text": "48 Hours"
             }
-        ]
+        ],
+        "afk": {
+            "lastSeenTimeout": [
+                {
+                    "value": 1,
+                    "text": "1 Day"
+                },
+                {
+                    "value": 2,
+                    "text": "2 Days"
+                },
+                {
+                    "value": 3,
+                    "text": "3 Days"
+                },
+                {
+                    "value": 4,
+                    "text": "4 Days"
+                },
+                {
+                    "value": 5,
+                    "text": "5 Days"
+                },
+                {
+                    "value": 6,
+                    "text": "6 Days"
+                },
+                {
+                    "value": 7,
+                    "text": "7 Days"
+                }
+            ],
+            "cycleTimeout": [
+                {
+                    "value": 3,
+                    "text": "3 Cycles"
+                },
+                {
+                    "value": 4,
+                    "text": "4 Cycles"
+                },
+                {
+                    "value": 5,
+                    "text": "5 Cycles"
+                },
+                {
+                    "value": 6,
+                    "text": "6 Cycles"
+                },
+                {
+                    "value": 7,
+                    "text": "7 Cycles"
+                },
+                {
+                    "value": 8,
+                    "text": "8 Cycles"
+                },
+                {
+                    "value": 9,
+                    "text": "9 Cycles"
+                },
+                {
+                    "value": 10,
+                    "text": "10 Cycles"
+                }
+            ],
+            "turnTimeout": [
+                {
+                    "value": 1,
+                    "text": "1 Missed Turn"
+                },
+                {
+                    "value": 2,
+                    "text": "2 Missed Turns"
+                },
+                {
+                    "value": 3,
+                    "text": "3 Missed Turns"
+                },
+                {
+                    "value": 4,
+                    "text": "4 Missed Turns"
+                },
+                {
+                    "value": 5,
+                    "text": "5 Missed Turns"
+                },
+                {
+                    "value": 10,
+                    "text": "10 Missed Turns"
+                },
+                {
+                    "value": 30,
+                    "text": "30 Missed Turns"
+                },
+                {
+                    "value": 60,
+                    "text": "60 Missed Turns"
+                }
+            ]
+        }
     }
 }

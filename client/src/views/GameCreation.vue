@@ -22,10 +22,28 @@
       </div>
 
       <div class="form-group">
-        <label for="starsForVictory" class="col-form-label">Stars For Victory</label>
-        <select class="form-control" id="starsForVictory" v-model="settings.general.starVictoryPercentage" :disabled="isCreatingGame">
-          <option v-for="opt in options.general.starVictoryPercentage" v-bind:key="opt" v-bind:value="opt">
-            {{ opt }}% of all Stars
+        <label for="mode" class="col-form-label">Mode</label>
+        <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame">
+          <option v-for="opt in options.general.mode" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.general.mode === 'conquest'">
+        <label for="conquestVictoryCondition" class="col-form-label">Victory Condition</label>
+        <select class="form-control" id="conquestVictoryCondition" v-model="settings.conquest.victoryCondition" :disabled="isCreatingGame">
+          <option v-for="opt in options.conquest.victoryCondition" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.general.mode === 'conquest'">
+        <label for="conquestVictoryPercentage" class="col-form-label">Stars For Victory</label>
+        <select class="form-control" id="conquestVictoryPercentage" v-model="settings.conquest.victoryPercentage" :disabled="isCreatingGame">
+          <option v-for="opt in options.conquest.victoryPercentage" v-bind:key="opt" v-bind:value="opt">
+            {{ opt }}% of <span v-if="settings.conquest.victoryCondition === 'homeStarPercentage'">Capital</span> Stars
           </option>
         </select>
       </div>
@@ -39,14 +57,14 @@
         </select>
       </div>
 
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label for="playerType" class="col-form-label">Player Type</label>
         <select class="form-control" id="playerType" v-model="settings.general.playerType" :disabled="isCreatingGame">
           <option v-for="opt in options.general.playerType" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
-      </div> -->
+      </div>
 
       <div class="form-group">
         <label for="anonymity" class="col-form-label">Anonymity</label>
@@ -68,9 +86,83 @@
 
       <form-error-list v-bind:errors="errors"/>
 
-      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame">Create Game</button>
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
       <loading-spinner :loading="isCreatingGame"/>
+
+      <view-subtitle title="Game Time Settings"/>
+
+      <div class="form-group">
+        <label for="gameType" class="col-form-label">Game Type</label>
+        <select class="form-control" id="gameType" v-model="settings.gameTime.gameType" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.gameType" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
+        <label for="gameSpeed" class="col-form-label">Game Speed</label>
+        <select class="form-control" id="gameSpeed" v-model="settings.gameTime.speed" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.speed" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
+        <label for="startDelay" class="col-form-label">Start Delay</label>
+        <select class="form-control" id="startDelay" v-model="settings.gameTime.startDelay" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.startDelay" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
+        <label for="turnJumps" class="col-form-label">Turn Jumps</label>
+        <select class="form-control" id="turnJumps" v-model="settings.gameTime.turnJumps" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.turnJumps" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
+        <label for="maxTurnWait" class="col-form-label">Max Turn Wait</label>
+        <select class="form-control" id="maxTurnWait" v-model="settings.gameTime.maxTurnWait" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.maxTurnWait" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit</label>
+        <select class="form-control" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.afk.lastSeenTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
+        <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit</label>
+        <select class="form-control" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.afk.cycleTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
+        <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit</label>
+        <select class="form-control" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
+          <option v-for="opt in options.gameTime.afk.turnTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
 
       <view-subtitle title="Galaxy Settings"/>
 
@@ -149,12 +241,31 @@
       </div>
 
       <div class="form-group">
-        <label for="randomGates" class="col-form-label">Random Gates</label>
-        <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.randomGates" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }} Gates
-          </option>
-        </select>
+        <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isSavingSettings">
+        </div>
       </div>
 
       <div class="form-group">
@@ -184,7 +295,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'disabled'">
         <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat</label>
         <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -215,6 +326,35 @@
         <label for="carrierSpeed" class="col-form-label">Carrier Speed</label>
         <select class="form-control" id="carrierSpeed" v-model="settings.specialGalaxy.carrierSpeed" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.carrierSpeed" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <view-subtitle title="Orbital Mechanics"/>
+
+      <div class="form-group">
+        <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation</label>
+        <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
+          <option v-for="opt in options.orbitalMechanics.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'enabled'">
+        <label for="orbitSpeed" class="col-form-label">Orbit Speed</label>
+        <select class="form-control" id="orbitSpeed" v-model="settings.orbitalMechanics.orbitSpeed" :disabled="isCreatingGame">
+          <option v-for="opt in options.orbitalMechanics.orbitSpeed" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'enabled'">
+        <label for="orbitOrigin" class="col-form-label">Orbit Origin</label>
+        <select class="form-control" id="orbitOrigin" v-model="settings.orbitalMechanics.orbitOrigin" :disabled="isCreatingGame">
+          <option v-for="opt in options.orbitalMechanics.orbitOrigin" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
@@ -333,6 +473,15 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label for="alliances" class="col-form-label">Formal Alliances</label>
+        <select class="form-control" id="alliances" v-model="settings.player.alliances" :disabled="isCreatingGame">
+          <option v-for="opt in options.player.alliances" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
       <view-subtitle title="Technology Settings"/>
 
       <div class="form-group">
@@ -363,7 +512,7 @@
             Level {{ opt }} Manufacturing
           </option>
         </select>
-        <select class="form-control" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame">
+        <select class="form-control" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
           <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
             Level {{ opt }} Specialists
           </option>
@@ -418,7 +567,7 @@
             {{ opt.text }} Weapons Research
           </option>
         </select>
-        <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame">
+        <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
           <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Specialists Research
           </option>
@@ -434,61 +583,16 @@
         </select>
       </div>
 
-      <view-subtitle title="Game Time Settings"/>
-
       <div class="form-group">
-        <label for="gameType" class="col-form-label">Game Type</label>
-        <select class="form-control" id="gameType" v-model="settings.gameTime.gameType" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.gameType" v-bind:key="opt.value" v-bind:value="opt.value">
+        <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward</label>
+        <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
       </div>
-
-      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
-        <label for="gameSpeed" class="col-form-label">Game Speed</label>
-        <select class="form-control" id="gameSpeed" v-model="settings.gameTime.speed" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.speed" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
-        <label for="startDelay" class="col-form-label">Start Delay</label>
-        <select class="form-control" id="startDelay" v-model="settings.gameTime.startDelay" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.startDelay" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
-        <label for="turnJumps" class="col-form-label">Turn Jumps</label>
-        <select class="form-control" id="turnJumps" v-model="settings.gameTime.turnJumps" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.turnJumps" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
-        <label for="maxTurnWait" class="col-form-label">Max Turn Wait</label>
-        <select class="form-control" id="maxTurnWait" v-model="settings.gameTime.maxTurnWait" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.maxTurnWait" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
-        <label for="missedTurnLimit" class="col-form-label">Missed Turn Limit</label>
-        <select class="form-control" id="missedTurnLimit" v-model="settings.gameTime.missedTurnLimit" :disabled="isCreatingGame">
-          <option v-for="opt in options.gameTime.missedTurnLimit" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
+      
+      <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
     </form>
   </view-container>

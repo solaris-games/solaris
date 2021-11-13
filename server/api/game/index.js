@@ -23,7 +23,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/info', middleware.authenticate, middleware.loadGameInfo, async (req, res, next) => {
+    router.get('/api/game/:gameId/info', middleware.loadGameInfo, async (req, res, next) => {
         try {
             return res.status(200).json(req.game);
         } catch (err) {
@@ -31,22 +31,9 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/state', middleware.authenticate, middleware.loadGameState, async (req, res, next) => {
+    router.get('/api/game/:gameId/state', middleware.loadGameState, async (req, res, next) => {
         try {
             return res.status(200).json(req.game);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
-    router.get('/api/game/:gameId/intel', middleware.authenticate, async (req, res, next) => {
-        try {
-            let startTick = +req.query.startTick || 0;
-            let endTick = +req.query.endTick || Number.MAX_VALUE;
-            
-            let result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
-
-            return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }
@@ -68,7 +55,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/official', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/official', async (req, res, next) => {
         try {
             let games = await container.gameListService.listOfficialGames();
 
@@ -78,7 +65,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/user', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/user', async (req, res, next) => {
         try {
             let games = await container.gameListService.listUserGames();
 
@@ -88,7 +75,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/inprogress', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/inprogress', async (req, res, next) => {
         try {
             let games = await container.gameListService.listInProgressGames();
 
@@ -113,6 +100,19 @@ module.exports = (router, io, container) => {
             let games = await container.gameListService.listCompletedGames(req.session.userId);
 
             return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/:gameId/intel', middleware.authenticate, async (req, res, next) => {
+        try {
+            let startTick = +req.query.startTick || 0;
+            let endTick = +req.query.endTick || Number.MAX_VALUE;
+            
+            let result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
+
+            return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }
@@ -194,6 +194,34 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/readyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.declareReadyToQuit(
+                req.game,
+                req.player);
+            
+            res.sendStatus(200);
+
+            container.broadcastService.gamePlayerReadyToQuit(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/notReadyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.undeclareReadyToQuit(
+                req.game,
+                req.player);
+
+            res.sendStatus(200);
+                
+            container.broadcastService.gamePlayerNotReadyToQuit(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
         try {
             let notes = await container.playerService.getGameNotes(
@@ -231,7 +259,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayers, async (req, res, next) => {
+    router.get('/api/game/:gameId/player/:playerId', middleware.loadGamePlayers, async (req, res, next) => {
         try {
             let user = await container.gameService.getPlayerUserLean(
                 req.game,
@@ -239,38 +267,6 @@ module.exports = (router, io, container) => {
             );
 
             return res.status(200).json(user);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
-    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
-        let startTick = +req.query.startTick || 0;
-        
-        try {
-            let events = await container.eventService.getPlayerEvents(
-                req.game._id,
-                req.player,
-                startTick
-            );
-
-            return res.status(200).json(events);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
-    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
-        let startTick = +req.query.startTick || 0;
-        
-        try {
-            let events = await container.eventService.getPlayerTradeEvents(
-                req.game,
-                req.player,
-                startTick
-            );
-
-            return res.status(200).json(events);
         } catch (err) {
             return next(err);
         }
@@ -288,7 +284,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    }, middleware.handleError);    
+    }, middleware.handleError);
 
     return router;
 

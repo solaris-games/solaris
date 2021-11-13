@@ -16,7 +16,7 @@
               v-if="isTechnologyEnabled('scanning')"
               research="scanning"
               iconClass="fa-binoculars"
-              title="Scanning"
+              title="Scanning - Determines how far your star's can see"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -24,7 +24,7 @@
               v-if="isTechnologyEnabled('hyperspace')"
               research="hyperspace"
               iconClass="fa-gas-pump"
-              title="Hyperspace Range"
+              title="Hyperspace Range - Determines how far your carriers can travel in a single jump"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -32,7 +32,7 @@
               v-if="isTechnologyEnabled('terraforming')"
               research="terraforming"
               iconClass="fa-globe-europe"
-              title="Terraforming"
+              title="Terraforming - Determines infrastructure cost. The higher the terraforming level, the lower infrastructure will cost to upgrade"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -40,7 +40,7 @@
               v-if="isTechnologyEnabled('experimentation')"
               research="experimentation"
               iconClass="fa-microscope"
-              title="Experimentation"
+              title="Experimentation - Determines how many research points are awarded at the end of the galactic cycle to a random technology"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -48,7 +48,7 @@
               v-if="isTechnologyEnabled('weapons')"
               research="weapons"
               iconClass="fa-fighter-jet"
-              title="Weapons"
+              title="Weapons - Determines combat strength of your ships"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -56,7 +56,7 @@
               v-if="isTechnologyEnabled('banking')"
               research="banking"
               iconClass="fa-money-bill-alt"
-              title="Banking"
+              title="Banking - Determines how many credits are awarded at the end of the galactic cycle"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -64,7 +64,7 @@
               v-if="isTechnologyEnabled('manufacturing')"
               research="manufacturing"
               iconClass="fa-industry"
-              title="Manufacturing"
+              title="Manufacturing - Determines how many ships are built via industrial infrastructure per tick"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -72,7 +72,7 @@
               v-if="isTechnologyEnabled('specialists')"
               research="specialists"
               iconClass="fa-user-astronaut"
-              title="Specialists"
+              title="Specialists - Determines how many specialist tokens are awarded at the end of the galactic cycle"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>

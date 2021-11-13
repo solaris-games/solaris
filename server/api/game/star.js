@@ -62,6 +62,7 @@ module.exports = (router, io, container) => {
             let summary = await container.starUpgradeService.upgradeBulk(
                 req.game,
                 req.player,
+                req.body.upgradeStrategy,
                 req.body.infrastructure,
                 +req.body.amount);
 
@@ -76,6 +77,7 @@ module.exports = (router, io, container) => {
             let summary = await container.starUpgradeService.generateUpgradeBulkReport(
                 req.game,
                 req.player,
+                req.body.upgradeStrategy,
                 req.body.infrastructure,
                 +req.body.amount);
 
@@ -158,7 +160,22 @@ module.exports = (router, io, container) => {
             await container.starService.toggleIgnoreBulkUpgrade(
                 req.game,
                 req.player,
-                req.body.starId);
+                req.body.starId,
+                req.body.infrastructureType);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/game/:gameId/star/toggleignorebulkupgradeall', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.starService.toggleIgnoreBulkUpgradeAll(
+                req.game,
+                req.player,
+                req.body.starId,
+                req.body.ignoreStatus);
 
             return res.sendStatus(200);
         } catch (err) {

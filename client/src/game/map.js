@@ -10,6 +10,8 @@ import EventEmitter from 'events'
 import gameHelper from '../services/gameHelper'
 import AnimationService from './animation'
 import PathManager from './PathManager'
+import OrbitalLocationLayer from './orbital'
+import WormHoleLayer from './wormHole'
 
 class Map extends EventEmitter {
   static chunkSize = 256
@@ -25,6 +27,7 @@ class Map extends EventEmitter {
     this.store = store
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
+    this.container.sortableChildren = true
 
     this.stars = []
     this.carriers = []
@@ -41,23 +44,29 @@ class Map extends EventEmitter {
 
   _setupContainers () {
     this.backgroundContainer = new PIXI.Container()
+    this.wormHoleContainer = new PIXI.Container()
+    this.orbitalContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.territoryContainer = new PIXI.Container()
+    this.territoryContainer.zIndex = 2
     this.playerNamesContainer = new PIXI.Container()
+    this.playerNamesContainer.zIndex = 3
     this.highlightLocationsContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.pathManager.container)
+    this.container.addChild(this.wormHoleContainer)
+    this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
-    this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.highlightLocationsContainer)
+    this.container.addChild(this.playerNamesContainer)
 
   }
 
@@ -140,11 +149,140 @@ class Map extends EventEmitter {
     this.backgroundContainer.addChild(this.background.starContainer)
     this.background.draw()
 
+    // -----------
+    // Setup Worm Hole Paths
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer = new WormHoleLayer()
+      this.drawWormHoles()
+      this.orbitalContainer.addChild(this.wormHoleLayer.container)
+    }
+
+    // -----------
+    // Setup Orbital Locations
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer = new OrbitalLocationLayer()
+      this.orbitalLayer.setup(game)
+  
+      this.orbitalContainer.addChild(this.orbitalLayer.container)
+    }
+    
     // Setup Chunks
-    let minX = gameHelper.calculateMinStarX(this.game)
-    let minY = gameHelper.calculateMinStarY(this.game)
-    let maxX = gameHelper.calculateMaxStarX(this.game)
-    let maxY = gameHelper.calculateMaxStarY(this.game)
+    this._setupChunks()
+
+  }
+
+  setupStar (game, userSettings, starData) {
+    let star = this.stars.find(x => x.data._id === starData._id)
+
+    if (!star) {
+      star = new Star(this.app)
+      this.stars.push(star)
+
+      this.starContainer.addChild(star.fixedContainer)
+
+      star.on('onStarClicked', this.onStarClicked.bind(this))
+      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
+      star.on('onSelected', this.onStarSelected.bind(this))
+      star.on('onUnselected', this.onStarUnselected.bind(this))
+    }
+
+    star.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+
+    return star
+  }
+
+  setupCarrier (game, userSettings, carrierData) {
+    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
+
+    if (!carrier) {
+      carrier = new Carrier( this.pathManager )
+      this.carriers.push(carrier)
+
+      this.carrierContainer.addChild(carrier.fixedContainer)
+
+      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
+      carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
+      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
+      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+      carrier.on('onSelected', this.onCarrierSelected.bind(this))
+      carrier.on('onUnselected', this.onCarrierUnselected.bind(this))
+    }
+
+    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
+
+    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
+
+    return carrier
+  }
+
+  draw () {
+    this.drawGalaxyCenter()
+
+    if (this.mode === 'waypoints') {
+      this.drawWaypoints()
+    } else {
+      this.drawStars()
+      this.drawCarriers()
+      this.clearWaypoints()
+    }
+
+    if (this.mode === 'ruler') {
+      this.drawRulerPoints()
+    } else {
+      this.clearRulerPoints()
+    }
+  }
+
+  drawGalaxyCenter () {
+    // TODO: Is there any need to display the galaxy center for non orbital games?
+    if (this._isOrbitalMapEnabled() && this.game.constants.distances.galaxyCenterLocation) {
+        let galaxyCenterGraphics = new PIXI.Graphics()
+        let location = this.game.constants.distances.galaxyCenterLocation
+        let size = 10
+
+        galaxyCenterGraphics.lineStyle(2, 0xFFFFFF, 1)
+        galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        galaxyCenterGraphics.alpha = 0.75
+
+        this.starContainer.addChild(galaxyCenterGraphics)
+    }
+  }
+
+  _isOrbitalMapEnabled () {
+    return this.game.constants.distances.galaxyCenterLocation && this.game.settings.orbitalMechanics.enabled === 'enabled'
+  }
+
+  _isWormHolesEnabled () {
+    return this.game.settings.specialGalaxy.randomWormHoles
+  }
+
+  _setupChunks() {
+
+    if(this.chunksContainer) {
+      console.log('resetting chunks')
+      this.container.removeChild(this.chunksContainer)
+    }
+    this.chunksContainer = new PIXI.Container()
+    this.chunksContainer.zIndex = 1
+    this.container.addChild(this.chunksContainer)
+
+    let carrierMinX = gameHelper.calculateMinCarrierX(this.game)
+    let carrierMinY = gameHelper.calculateMinCarrierY(this.game)
+    let carrierMaxX = gameHelper.calculateMaxCarrierX(this.game)
+    let carrierMaxY = gameHelper.calculateMaxCarrierY(this.game)
+
+    let starMinX = gameHelper.calculateMinStarX(this.game)
+    let starMinY = gameHelper.calculateMinStarY(this.game)
+    let starMaxX = gameHelper.calculateMaxStarX(this.game)
+    let starMaxY = gameHelper.calculateMaxStarY(this.game)
+
+    let minX = Math.min(carrierMinX, starMinX)
+    let minY = Math.min(carrierMinY, starMinY)
+    let maxX = Math.max(carrierMaxX, starMaxX)
+    let maxY = Math.max(carrierMaxY, starMaxY)
 
     this.firstChunkX = Math.floor(minX/Map.chunkSize)
     this.firstChunkY = Math.floor(minY/Map.chunkSize)
@@ -163,7 +301,7 @@ class Map extends EventEmitter {
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
         this.chunks[ix][iy] = new PIXI.Container()
-        this.container.addChild(this.chunks[ix][iy])
+        this.chunksContainer.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
         if(false)
         {
@@ -182,79 +320,46 @@ class Map extends EventEmitter {
       }
     }
 
-    this.stars.forEach( s => s.addContainerToChunk(this.chunks, this.firstChunkX, this.firstChunkY) )
-    this.carriers.forEach( c => c.addContainerToChunk(this.chunks, this.firstChunkX, this.firstChunkY) )
-    
+    this.stars.forEach( s => this.addContainerToChunk(s, this.chunks, this.firstChunkX, this.firstChunkY) )
+    this.carriers.forEach( c => this.addContainerToChunk(c, this.chunks, this.firstChunkX, this.firstChunkY) )
   }
 
-  setupStar (game, userSettings, starData) {
-    let star = this.stars.find(x => x.data._id === starData._id)
+  addContainerToChunk (mapObject, chunks, firstX, firstY) { // Star or carrier
+    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
 
-    if (!star) {
-      star = new Star(this.app)
-      this.stars.push(star)
-
-      this.starContainer.addChild(star.fixedContainer)
-
-      star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
-    }
-    else {
-      star.removeContainerFromChunk(this.chunks, this.firstChunkX, this.firstChunkY)
-    }
-
-    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
-    star.refreshZoom(this.zoomPercent)
-
-    return star
+    chunks[ix][iy].addChild(mapObject.container)
+    chunks[ix][iy].mapObjects.push(mapObject)
   }
 
-  setupCarrier (game, userSettings, carrierData) {
-    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
+  removeContainerFromChunk (mapObject, chunks, firstX, firstY) {
+    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
 
-    if (!carrier) {
-      carrier = new Carrier( this.pathManager )
-      this.carriers.push(carrier)
-
-      this.carrierContainer.addChild(carrier.fixedContainer)
-
-      carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-      carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-      carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-      carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
-    }
-    else {
-      carrier.removeContainerFromChunk(this.chunks, this.firstChunkX, this.firstChunkY)
-    }
-
-    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
-
-    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
-    carrier.refreshZoom(this.zoomPercent)
-
-    return carrier
+    chunks[ix][iy].removeChild(mapObject.container)
+    let index = chunks[ix][iy].mapObjects.indexOf(mapObject)
+    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
-  draw () {
-    if (this.mode === 'waypoints') {
-      this.drawWaypoints()
-    } else {
-      this.drawStars()
-      this.drawCarriers()
-      this.clearWaypoints()
-    }
-
-    if (this.mode === 'ruler') {
-      this.drawRulerPoints()
-    } else {
-      this.clearRulerPoints()
+  removeMapObjectFromChunks (mapObject, chunks) {
+    for (let chunkX of chunks) {
+      for (let chunkY of chunkX) {
+        if (chunkY.mapObjects.indexOf(mapObject) > -1) {
+          chunkY.mapObjects.splice(chunkY.mapObjects.indexOf(mapObject), 1)
+          chunkY.removeChild(mapObject.container)
+        }
+      }
     }
   }
 
   reloadGame (game, userSettings) {
     this.game = game
 
-    this.pathManager.reloadSettings(userSettings)
+    this.pathManager.setup(game, userSettings)
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -284,7 +389,7 @@ class Map extends EventEmitter {
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
-        existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+        existing.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       } else {
         existing = this.setupStar(game, userSettings, starData)
       }
@@ -310,10 +415,15 @@ class Map extends EventEmitter {
     }
 
     this.drawTerritories(userSettings)
+    this.drawWormHoles()
     this.drawPlayerNames()
 
     this.background.setup(game, userSettings)
     this.background.draw(game, userSettings)
+
+    this.waypoints.setup(game)
+
+    this._setupChunks()
   }
 
 
@@ -386,7 +496,11 @@ class Map extends EventEmitter {
 
     this.starContainer.removeChild(star.fixedContainer)
 
+    this.removeMapObjectFromChunks(star, this.chunks)
+
     this.stars.splice(this.stars.indexOf(star), 1)
+
+    star.destroy()
   }
 
   drawCarriers () {
@@ -403,17 +517,17 @@ class Map extends EventEmitter {
   }
 
   _undrawCarrier (carrier) {
-    carrier.off('onCarrierClicked', this.onCarrierClicked.bind(this))
-    carrier.off('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-    carrier.off('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-    carrier.off('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
-
+    carrier.removeAllListeners()
+    carrier.cleanupEventHandlers()
     carrier.clearPaths()
-
-    this.carrierContainer.removeChild(carrier.container)
+    
     this.carrierContainer.removeChild(carrier.fixedContainer)
 
+    this.removeMapObjectFromChunks(carrier, this.chunks)
+
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
+
+    carrier.destroy()
   }
 
   undrawCarrier (carrierData) {
@@ -449,6 +563,13 @@ class Map extends EventEmitter {
   drawTerritories (userSettings) {
     this.territories.setup(this.game, userSettings)
     this.territories.draw(userSettings)
+  }
+
+  drawWormHoles () {
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer.setup(this.game)
+      this.wormHoleLayer.draw()
+    }
   }
 
   drawPlayerNames () {
@@ -497,7 +618,7 @@ class Map extends EventEmitter {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
-    star.isSelected = true
+    star.select()
     star.updateVisibility()
   }
 
@@ -505,14 +626,14 @@ class Map extends EventEmitter {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
     carrier.onClicked()
-    carrier.isSelected = true
+    carrier.select()
   }
 
   unselectAllStars () {
     for (let i = 0; i < this.stars.length; i++) {
       let s = this.stars[i]
 
-      s.isSelected = false
+      s.unselect()
       s.updateVisibility() // Should be fine to pass in false for force
     }
   }
@@ -521,7 +642,7 @@ class Map extends EventEmitter {
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
 
-      c.isSelected = false
+      c.unselect()
       c.updateVisibility()
     }
   }
@@ -532,7 +653,7 @@ class Map extends EventEmitter {
       .forEach(s => {
         // Set all other stars to unselected.
         if (s.data._id !== star.data._id) {
-          s.isSelected = false
+          s.unselect()
         }
 
         s.updateVisibility()
@@ -545,36 +666,11 @@ class Map extends EventEmitter {
       .forEach(c => {
         // Set all other carriers to unselected.
         if (c.data._id !== carrier.data._id) {
-          c.isSelected = false
+          c.unselect()
         }
 
         c.updateVisibility()
       })
-  }
-
-  onMouseMove(eventData) {
-    let world_mousePosition = this.gameContainer.viewport.toWorld(eventData.data.global)
-    this.mouseChunkX = Math.floor(world_mousePosition.x/Map.chunkSize)
-    this.mouseChunkY = Math.floor(world_mousePosition.y/Map.chunkSize)
-    this.minMouseChunkX = this.mouseChunkX-1
-    this.maxMouseChunkX = this.mouseChunkX+1
-    this.minMouseChunkY = this.mouseChunkY-1
-    this.maxMouseChunkY = this.mouseChunkY+1
-    for(let ix=0; ix<this.numof_chunkX; ix++) {
-    for(let iy=0; iy<this.numof_chunkY; iy++) {
-      if(
-      (ix>=(this.minMouseChunkX-this.firstChunkX))&&(ix<=(this.maxMouseChunkX-this.firstChunkX)) &&
-      (iy>=(this.minMouseChunkY-this.firstChunkY))&&(iy<=(this.maxMouseChunkY-this.firstChunkY))
-      ) {
-        this.chunks[ix][iy].interactiveChildren = true
-        //this.chunks[ix][iy].visualizer.visible = true
-      }
-      else {
-        this.chunks[ix][iy].interactiveChildren = false
-        //this.chunks[ix][iy].visualizer.visible = false
-      }
-    }
-    }
   }
 
   onTick(deltaTime) {
@@ -608,28 +704,37 @@ class Map extends EventEmitter {
         if(
         (ix>=(firstX-this.firstChunkX))&&(ix<=(lastX-this.firstChunkX)) &&
         (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
-        ) {
-          this.chunks[ix][iy].visible = true
-          //this.chunks[ix][iy].visualizer.visible = true
-
-          if( zoomChanging ) {
+        ) 
+        {
+          if( !this.chunks[ix][iy].visible ) {
+            this.chunks[ix][iy].visible = true
+            this.chunks[ix][iy].interactiveChildren = true
+            //this.chunks[ix][iy].visualizer.visible = true
             for( let mapObject of this.chunks[ix][iy].mapObjects ) {
               mapObject.onZoomChanging(this.zoomPercent)
+            }
+          }
+          else {
+            if( zoomChanging ) {
+              for( let mapObject of this.chunks[ix][iy].mapObjects ) {
+                mapObject.onZoomChanging(this.zoomPercent)
+              }
             }
           }
         }
         else {
           this.chunks[ix][iy].visible = false
+          this.chunks[ix][iy].interactiveChildren = false
           //this.chunks[ix][iy].visualizer.visible = false
         }
       }
     }
 
-    this.lastZoomPercent = this.zoomPercent
     this.pathManager.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
-
     this.background.onTick(deltaTime, viewportData)
-    this.playerNames.onTick(this.zoomPercent)
+    this.playerNames.onTick(this.zoomPercent, zoomChanging)
+
+    this.lastZoomPercent = this.zoomPercent
   }
 
   onViewportPointerDown(e) {
@@ -661,17 +766,19 @@ class Map extends EventEmitter {
         // Clicking stars should only raise events to the UI if in galaxy mode.
         if (this.mode === 'galaxy') {
           let selectedStar = this.stars.find(x => x.data._id === e._id)
-          selectedStar.isSelected = !selectedStar.isSelected
 
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
+          selectedStar.toggleSelected()
+
           if (!this.tryMultiSelect(e.location)) {
             this.emit('onStarClicked', e)
           } else {
-            selectedStar.isSelected = false // If multi-select then do not select the star.
-            selectedStar.updateVisibility()
+            selectedStar.unselect() // If multi-select then do not select the star.
           }
+
+          selectedStar.updateVisibility()
         } else if (this.mode === 'waypoints') {
           this.waypoints.onStarClicked(e)
         } else if (this.mode === 'ruler') {
@@ -682,10 +789,25 @@ class Map extends EventEmitter {
     })
   }
 
-  onStarRightClicked (e) {
-    if (this.mode === 'galaxy') {
-      this.emit('onStarRightClicked', e)
-    }
+  onStarRightClicked (dic) {
+    // ignore clicks if its a drag motion
+    let e = dic.starData
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+
+    let owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData)
+
+    // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
+    this.store.commit('starRightClicked', {
+      star: dic.starData,
+      player: owningPlayer,
+      permitCallback: () => {
+        dic.permitCallback && dic.permitCallback()
+        
+        if (this.mode === 'galaxy') {
+          this.emit('onStarRightClicked', e)
+        }
+      }
+    })
   }
 
   onCarrierClicked (dic) {
@@ -704,15 +826,16 @@ class Map extends EventEmitter {
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
-      selectedCarrier.isSelected = !selectedCarrier.isSelected
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
 
+      selectedCarrier.toggleSelected()
+
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
-        selectedCarrier.isSelected = false
+        selectedCarrier.unselect()
       }
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
@@ -829,6 +952,42 @@ class Map extends EventEmitter {
 
   clearHighlightedLocations () {
     this.highlightLocationsContainer.removeChildren()
+  }
+
+  showIgnoreBulkUpgrade () {
+    for (let star of this.stars) {
+      star.showIgnoreBulkUpgrade()
+    }
+  }
+
+  hideIgnoreBulkUpgrade () {
+    for (let star of this.stars) {
+      star.hideIgnoreBulkUpgrade()
+    }
+  }
+
+  onStarSelected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.drawStar(e)
+    }
+  }
+
+  onStarUnselected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.clear()
+    }
+  }
+
+  onCarrierSelected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.drawCarrier(e)
+    }
+  }
+
+  onCarrierUnselected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.clear()
+    }
   }
 }
 

@@ -1,17 +1,13 @@
 <template>
-  <view-container>
-    <div class="row bg-primary pt-3 pb-2 mb-2">
-      <div class="col">
-          <h3>Welcome to Solaris</h3>
-      </div>
-    </div>
+  <view-container :hideTopBar="true">
+    <view-title title="Welcome to Solaris" :hideHomeButton="true" :showSocialLinks="true" />
 
     <div class="row">
       <div class="col-sm-12 col-md-6 pb-3">
         <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p>Will you conquer the galaxy?</p>
-        <router-link to="/codex">Learn more...</router-link>
+        <a :href="documentationUrl" target="_blank">Learn more...</a>
       </div>
       <div class="col-sm-12 col-md-6">
         <h4>Login</h4>
@@ -22,24 +18,30 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-3">
       <img :src="require('../assets/screenshots/game1.png')" class="img-fluid w-100"/>
     </div>
+
+    <recent-donations :maxLength="null" />
   </view-container>
 </template>
 
 <script>
 import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle'
 import AccountLoginVue from './AccountLogin'
 import ApiAuthService from '../services/api/auth'
 import router from '../router'
 import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import RecentDonationsVue from '../components/game/donate/RecentDonations.vue'
 
 export default {
   components: {
     'view-container': ViewContainer,
+    'view-title': ViewTitle,
     'account-login': AccountLoginVue,
-    'loading-spinner': LoadingSpinnerVue
+    'loading-spinner': LoadingSpinnerVue,
+    'recent-donations': RecentDonationsVue
   },
   data () {
     return {
@@ -53,8 +55,11 @@ export default {
       let response = await ApiAuthService.verify()
 
       if (response.status === 200) {
-        if (response.data.id) {
-          this.$store.commit('setUserId', response.data.id)
+        if (response.data._id) {
+          this.$store.commit('setUserId', response.data._id)
+          this.$store.commit('setUsername', response.data.username)
+          this.$store.commit('setRoles', response.data.roles)
+
           router.push({ name: 'main-menu' })
         }
       }
@@ -63,6 +68,11 @@ export default {
     }
 
     this.isAutoLoggingIn = false
+  },
+  computed: {
+    documentationUrl () {
+      return process.env.VUE_APP_DOCUMENTATION_URL
+    }
   }
 }
 </script>

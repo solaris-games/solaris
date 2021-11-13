@@ -8,31 +8,31 @@
         </div>
         <div class="col pt-1">
             <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText}}</span>
-            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
-            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col pt-1" v-if="isLoggedIn && isTimeMachineEnabled">
+        <div class="col-auto d-none d-sm-block pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
-            <span class="pointer" title="Credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <span v-if="isSpecialistsTechnologyEnabled" title="Specialist Tokens">
+            <span class="pointer" v-if="isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
-            <research-progress class="d-none d-md-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
+            <research-progress class="d-none d-lg-inline-block ml-1" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-md-inline-block ml-3">
+            <span class="d-none d-lg-inline-block ml-3">
                 <i class="fas fa-money-bill-wave text-success mr-1"></i>{{userPlayer.stats.totalEconomy}}
             </span>
-            <span class="d-none d-md-inline-block ml-2">
+            <span class="d-none d-lg-inline-block ml-2">
                 <i class="fas fa-tools text-warning mr-1"></i>{{userPlayer.stats.totalIndustry}}
             </span>
-            <span class="d-none d-md-inline-block ml-2">
+            <span class="d-none d-lg-inline-block ml-2">
                 <i class="fas fa-flask text-info mr-1"></i>{{userPlayer.stats.totalScience}}
             </span>
         </div>
@@ -40,13 +40,17 @@
             <button class="btn btn-sm btn-success" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
-            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
+            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success pulse': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
                 <i class="fas fa-times" v-if="userPlayer.ready"></i>
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': this.unreadMessages === 0, 'btn-warning': this.unreadMessages > 0}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
-                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadMessages">{{this.unreadMessages}}</span>
+            <button class="btn btn-sm ml-1 d-lg-none" v-if="userPlayer" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
+                <i class="fas fa-comments"></i> <span class="ml-1" v-if="unreadMessages">{{unreadMessages}}</span>
+            </button>
+
+            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': !unreadEvents, 'btn-warning': unreadEvents}" v-on:click="setMenuState(MENU_STATES.EVENT_LOG)" title="Event Log (E)">
+                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadEvents">{{unreadEvents}}</span>
             </button>
 
             <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
@@ -60,9 +64,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { setInterval } from 'timers'
 import GameHelper from '../../../services/gameHelper'
 import router from '../../../router'
-import { setInterval } from 'timers'
 import MENU_STATES from '../../data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../data/keyboardShortcuts'
 import GameContainer from '../../../game/container'
@@ -70,6 +75,7 @@ import ServerConnectionStatusVue from './ServerConnectionStatus'
 import ResearchProgressVue from './ResearchProgress'
 import AudioService from '../../../game/audio'
 import ConversationApiService from '../../../services/api/conversation'
+import EventApiService from '../../../services/api/event'
 import GameApiService from '../../../services/api/game'
 import HamburgerMenuVue from './HamburgerMenu'
 import TickSelectorVue from './TickSelector'
@@ -88,13 +94,15 @@ export default {
       MENU_STATES: MENU_STATES,
       timeRemaining: null,
       intervalFunction: null,
-      unreadMessages: 0
+      unreadMessages: 0,
+      unreadEvents: 0
     }
   },
-  mounted () {
+  async mounted () {
     this.setupTimer()
 
-    this.checkForUnreadMessages()
+    await this.checkForUnreadMessages()
+    await this.checkForUnreadEvents()
   },
   created () {
     document.addEventListener('keydown', this.handleKeyDown)
@@ -102,7 +110,8 @@ export default {
     this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
-
+    this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
+    this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
     this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
     this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
@@ -113,9 +122,13 @@ export default {
     clearInterval(this.intervalFunction)
 
     this.sockets.unsubscribe('gameStarted')
+    this.sockets.unsubscribe('gameMessageSent')
+    this.sockets.unsubscribe('gameConversationRead')
+    this.sockets.unsubscribe('playerEventRead')
+    this.sockets.unsubscribe('playerAllEventsRead')
     this.sockets.unsubscribe('playerCreditsReceived')
     this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
-    this.sockets.unsubscribe('gameConversationRead')
+    this.sockets.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     gameStarted () {
@@ -128,7 +141,7 @@ export default {
       this.recalculateTimeRemaining()
 
       if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
         this.recalculateTimeRemaining()
       }
     },
@@ -195,6 +208,10 @@ export default {
       }
     },
     recalculateTimeRemaining () {
+      if (!this.$store.state.game) {
+        return
+      }
+      
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
@@ -213,6 +230,23 @@ export default {
 
         if (response.status === 200) {
           this.unreadMessages = response.data.unread
+
+          this.$store.commit('setUnreadMessages', response.data.unread)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async checkForUnreadEvents () {
+      if (!this.userPlayer) {
+        return
+      }
+
+      try {
+        let response = await EventApiService.getUnreadCount(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.unreadEvents = response.data.unread
         }
       } catch (err) {
         console.error(err)
@@ -246,34 +280,44 @@ export default {
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
-      let keyCode = e.keyCode || e.which
+      let key = e.key
 
       // Check for modifier keys and ignore the keypress if there is one.
-      if (e.altKey || e.shiftKey || e.ctrlKey) {
+      if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
         return
       }
 
       let isLoggedIn = this.$store.state.userId != null
       let isInGame = this.userPlayer != null
 
-      let menuState = KEYBOARD_SHORTCUTS.all[keyCode.toString()]
+      let menuState = KEYBOARD_SHORTCUTS.all[key]
 
       if (isLoggedIn) {
-        menuState = menuState || KEYBOARD_SHORTCUTS.user[keyCode.toString()]
+        menuState = menuState || KEYBOARD_SHORTCUTS.user[key]
       }
 
       // Handle keyboard shortcuts for screens only available for users
       // who are players.
       if (isInGame) {
-        menuState = menuState || KEYBOARD_SHORTCUTS.player[keyCode.toString()]
+        menuState = menuState || KEYBOARD_SHORTCUTS.player[key]
       }
 
       if (!menuState) {
         return
       }
 
+      // Special case for Inbox shortcut, only do this if the screen is small.
+      if (menuState === MENU_STATES.INBOX && window.innerWidth >= 992) {
+        return
+      }
+
       let menuArguments = menuState.split('|')[1]
       menuState = menuState.split('|')[0]
+
+      // Special case for intel, which is not accessible for dark mode extra games.
+      if (menuState === MENU_STATES.INTEL && GameHelper.isDarkModeExtra(this.$store.state.game)) {
+        return
+      }
       
       switch (menuState) {
         case null:
@@ -334,8 +378,16 @@ export default {
     isTimeMachineEnabled () {
       return this.$store.state.game.settings.general.timeMachine === 'enabled'
     },
-    isSpecialistsTechnologyEnabled () {
-      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+    isSpecialistsCurrencyCreditsSpecialists () {
+      return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
+    },
+    isDataCleaned () {
+      return this.$store.state.game.state.cleaned
+    }
+  },
+  watch: {
+    game (newGame, oldGame) {
+      this.checkForUnreadEvents()
     }
   }
 }
@@ -344,5 +396,15 @@ export default {
 <style scoped>
 .pointer {
   cursor:pointer;
+}
+
+.pulse {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
+  }
 }
 </style>

@@ -28,6 +28,13 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  setRoleGameMaster (userId, enabled) {
+    return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/gameMaster', {
+      enabled
+    },
+    { withCredentials: true })
+  }
+
   setCredits (userId, credits) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/credits', {
       credits
@@ -45,8 +52,16 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
-  impersonate (userId) {
-    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {},
+  promoteToEstablishedPlayer (userId) {
+    return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/promoteToEstablishedPlayer', {},
+    { withCredentials: true })
+  }
+
+  impersonate (userId, username, roles) {
+    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {
+      username,
+      roles
+    },
     { withCredentials: true })
   }
 

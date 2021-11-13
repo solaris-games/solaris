@@ -1,3 +1,4 @@
+const config = require('../config');
 const expressLoader = require('./express');
 const mongooseLoader = require('./mongoose');
 const socketLoader = require('./sockets');
@@ -8,16 +9,18 @@ let mongo;
 module.exports = {
   
   async init(expressApp, expressServer) {
-    mongo = await mongooseLoader();
+    mongo = await mongooseLoader(config, {
+      syncIndexes: false
+    });
     console.log('MongoDB Intialized');
     
-    const io = socketLoader(expressServer);
+    const io = socketLoader(config, expressServer);
     console.log('Sockets Initialized');
 
-    const container = containerLoader(io);
+    const container = containerLoader(config, io);
     console.log('Dependency container loaded');
   
-    await expressLoader(expressApp, io, container);
+    await expressLoader(config, expressApp, io, container);
     console.log('Express Intialized');
   },
 

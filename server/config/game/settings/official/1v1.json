@@ -3,10 +3,10 @@
     "name": "[[[RANDOM]]]",
     "description": "Go head to head against a single opponent, this game will be down to pure skill.",
     "type": "1v1_rt",
+    "mode": "conquest",
     "password": null,
-    "starVictoryPercentage": 66,
     "playerLimit": 2,
-    "playerType": "all",
+    "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled"
@@ -22,7 +22,10 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
-    "randomGates": "none",
+    "randomWarpGates": 0,
+    "randomWormHoles": 0,
+    "randomNebulas": 0,
+    "randomAsteroidFields": 0,
     "darkGalaxy": "disabled",
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
@@ -30,6 +33,15 @@
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10
+  },
+  "conquest": {
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 66
+  },
+  "orbitalMechanics": {
+    "enabled": "disabled",
+    "orbitSpeed": 5,
+    "orbitOrigin": "galacticCenter"
   },
   "player": {
     "startingStars": 6,
@@ -49,7 +61,8 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all"
+    "tradeScanning": "all",
+    "alliances": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -72,11 +85,17 @@
       "weapons": "none",
       "specialists": "standard"
     },
-    "bankingReward": "standard"
+    "bankingReward": "standard",
+    "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 30,
-    "startDelay": 30
+    "speed": 1800,
+    "startDelay": 60,
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
   }
 }

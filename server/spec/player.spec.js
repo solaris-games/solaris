@@ -175,15 +175,15 @@ describe('player', () => {
 
             expect(starsOwned.length).toEqual(game.settings.player.startingStars);
 
-            // Assert non-home star garrisons.
+            // Assert non-home star ships.
             starsOwned.filter(x => !x.homeStar).forEach(s => {
-                expect(s.garrison).toEqual(game.settings.player.startingShips);
+                expect(s.ships).toEqual(game.settings.player.startingShips);
             });
 
             // Assert home star.
             const homeStar = allStars.find(x => x._id === newPlayer.homeStarId);
             
-            expect(homeStar.garrison).toEqual(game.settings.player.startingShips);
+            expect(homeStar.ships).toEqual(game.settings.player.startingShips);
         }
 
         //printStars(allStars);

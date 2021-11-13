@@ -4,11 +4,14 @@
 
   <div class="container" v-if="conversation">
     <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-sm btn-info" @click="toggleConversationWindow" title="Toggle Conversation Display">
+      <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
+        <i class="fas fa-thumbtack"></i>
+      </button>
+      <button class="btn btn-sm btn-info ml-1" @click="toggleConversationWindow" title="Toggle conversation display">
         <i class="fas" :class="{'fa-eye-slash':!toggleDisplay,'fa-eye':toggleDisplay}"></i>
       </button>
       <button class="btn btn-sm btn-primary ml-1" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
-      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
+      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
     <p v-if="!toggleDisplay" class="pb-2 text-warning">
@@ -17,14 +20,18 @@
 
     <conversation-participants v-if="toggleDisplay" :conversation="conversation" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-    <div class="pt-0 mb-2 mt-2 messages-container" v-if="toggleDisplay && conversation.messages.length">
-      <div v-for="message in conversation.messages" v-bind:key="message._id" class="mb-1">
-        <conversation-message v-if="message.type === 'message'" :message="message" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-        <conversation-trade-event v-if="message.type !== 'message'" :event="message"/>
+    <div class="messages-container">
+      <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && filteredMessages.length">
+        <div v-for="message in filteredMessages" v-bind:key="message._id" class="mb-1">
+          <conversation-message v-if="message.type === 'message'" :conversation="conversation" :message="message" 
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+            @onMinimizeConversationRequested="toggleConversationWindow"/>
+          <conversation-trade-event v-if="message.type !== 'message'" :event="message"/>
+        </div>
       </div>
     </div>
 
-    <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && !conversation.messages.length">
+    <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && !filteredMessages.length">
         <p class="mb-0 text-center">No messages.</p>
     </div>
 
@@ -34,6 +41,7 @@
 </template>
 
 <script>
+import eventBus from '../../../../eventBus'
 import GameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
@@ -59,13 +67,16 @@ export default {
     return {
       conversation: null,
       userPlayer: null,
-      toggleDisplay: true
+      toggleDisplay: true,
+      pinnedOnly: false
     }
   },
   created () {
     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
     this.sockets.subscribe('gameConversationRead', this.onConversationRead)
     this.sockets.subscribe('gameConversationLeft', this.onConversationLeft)
+    this.sockets.subscribe('gameConversationMessagePinned', this.onConversationMessagePinned)
+    this.sockets.subscribe('gameConversationMessageUnpinned', this.onConversationMessageUnpinned)
     this.sockets.subscribe('playerCreditsReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
@@ -92,7 +103,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
-      this.$emit('onOpenInboxRequested', e)
+      eventBus.$emit('onOpenInboxRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
@@ -128,6 +139,24 @@ export default {
         this.conversation.participants.splice(this.conversation.participants.indexOf(e.playerId), 1)
       }
     },
+    onConversationMessagePinned (e) {
+      if (e.conversationId === this.conversation._id) {
+        let message = this.conversation.messages.find(m => m._id === e.messageId)
+
+        if (message) {
+          message.pinned = true
+        }
+      }
+    },
+    onConversationMessageUnpinned (e) {
+      if (e.conversationId === this.conversation._id) {
+        let message = this.conversation.messages.find(m => m._id === e.messageId)
+
+        if (message) {
+          message.pinned = false
+        }
+      }
+    },
     onTradeEventReceived (e) {
       if (this.conversation.participants.length !== 2) {
         return
@@ -157,6 +186,10 @@ export default {
           await this.markConversationAsRead()
         }
       }, 100)
+    },
+    toggledPinnedOnly () {
+      this.pinnedOnly = !this.pinnedOnly
+      this.scrollToEnd()
     },
     async loadConversation () {
       this.conversation = null
@@ -194,7 +227,13 @@ export default {
     }
   },
   computed: {
-    
+    filteredMessages () {
+      if (!this.pinnedOnly) {
+        return this.conversation.messages
+      } else {
+        return this.conversation.messages.filter(m => m.pinned)
+      }
+    }
   }
 }
 </script>

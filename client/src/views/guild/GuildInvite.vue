@@ -1,11 +1,15 @@
 <template>
   <tr>
-    <td>{{invite.name}}[{{invite.tag}}]</td>
+    <td>
+      <router-link :to="{ name: 'guild-details', params: { guildId: invite._id }}">
+        <span>{{invite.name}} [{{invite.tag}}]</span>
+      </router-link>
+    </td>
     <td class="text-right">
-      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" title="Accept Invitation">
+      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" title="Accept invitation">
         <i class="fas fa-check"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" title="Reject Invitation">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" title="Reject invitation">
         <i class="fas fa-trash"></i>
       </button>
     </td>
@@ -33,7 +37,7 @@ export default {
       this.isLoading = true
 
       try {
-        let response = await GuildApiService.acceptInvite(this.invite._id)
+        let response = await GuildApiService.accept(this.invite._id)
 
         if (response.status === 200) {
           this.$emit('onInvitationAccepted', this.invite._id)
@@ -52,7 +56,7 @@ export default {
       this.isLoading = true
 
       try {
-        let response = await GuildApiService.declineInvite(this.invite._id)
+        let response = await GuildApiService.decline(this.invite._id)
 
         if (response.status === 200) {
           this.$emit('onInvitationDeclined', this.invite._id)

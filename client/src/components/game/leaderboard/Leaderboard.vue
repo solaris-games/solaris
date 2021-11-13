@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container pb-2">
-    <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
+      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+    </menu-title>
 
     <div class="row bg-primary">
         <div class="col">
@@ -10,8 +12,11 @@
 
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
-            <p class="mb-0">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
+            <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
+            <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
         </div>
     </div>
 
@@ -43,12 +48,15 @@
                           <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i v-if="!player.afk" class="fas fa-skull-crossbones"></i>
-                              <i v-if="player.afk" class="fas fa-user-clock"></i>
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
+                            </span>
+                            <span v-if="player.readyToQuit" @click="unconfirmReadyToQuit(player)">
+                              <i class="fas fa-check text-warning" title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
                             </span>
                           </h5>
                       </td>
-                      <td class="fit pt-3 pr-2">
+                      <td class="fit pt-3 pr-2" v-if="isConquestAllStars">
                         <span class="d-xs-block d-sm-none">
                           <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
                         </span>
@@ -56,9 +64,19 @@
                           {{player.stats.totalStars}} Stars
                         </span> 
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame">
-                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()"><i class="fas fa-check text-success" title="This player is ready."></i></h5>
-                        <button class="btn btn-success" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
+                      <td class="fit pt-3 pr-2" v-if="isConquestHomeStars">
+                        <span class="d-xs-block d-sm-none">
+                          <i class="fas fa-star mr-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
+                        </span>
+                        <span class="d-none d-sm-block">
+                          {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Stars
+                        </span> 
+                      </td>
+                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
+                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
+                          <i class="fas fa-check text-success" title="This player has completed their turn"></i>
+                        </h5>
+                        <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -69,20 +87,24 @@
         </div>
     </div>
 
-    <share-link v-if="!game.state.startDate"/>
+    <share-link v-if="!game.state.startDate" message="Invite your friends and take on the Galaxy together!"/>
+    <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!"/>
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
-      <div class="col">
-        <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-sm btn-primary"><i class="fas fa-cog"></i> View Settings</router-link>
+      <div class="col text-right pr-2">
+          <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
+            <i class="fas fa-sign-out-alt"></i> Quit Game
+          </modalButton>
+          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-warning mr-1">
+            <i class="fas fa-times"></i> Declare Ready to Quit
+          </button>
+          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success mr-1">
+            <i class="fas fa-check"></i> Ready to Quit
+          </button>
+          <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
+            <i class="fas fa-skull-crossbones"></i> Concede Defeat
+          </modalButton>
       </div>
-        <div class="col text-right pr-2">
-            <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
-              <i class="fas fa-sign-out-alt"></i> Quit Game
-            </modalButton>
-            <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
-              <i class="fas fa-skull-crossbones"></i> Concede Defeat
-            </modalButton>
-        </div>
     </div>
 
     <!-- Modals -->
@@ -133,8 +155,8 @@ export default {
 
     this.recalculateTimeRemaining()
 
-    if (GameHelper.isGameInProgress(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 200)
+    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
       this.recalculateTimeRemaining()
     }
   },
@@ -147,6 +169,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e._id)
+    },
+    onViewSettingsRequested (e) {
+      this.$emit('onViewSettingsRequested', e)
     },
     panToPlayer (player) {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
@@ -164,17 +189,10 @@ export default {
       return userPlayer && userPlayer._id === player._id
     },
     recalculateTimeRemaining () {
-      if (this.$store.state.game.settings.gameTime.gameType === 'realTime') {
-        let time = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)
-
-        this.timeRemaining = `Next tick: ${time}`
-      } else {
-        // Calculate when the max wait limit date is.
-        let maxWaitLimitDate = moment(this.$store.state.game.state.lastTickDate).utc().add('h', this.$store.state.game.settings.gameTime.maxTurnWait)
-
-        let time = GameHelper.getCountdownTimeString(this.$store.state.game, maxWaitLimitDate)
-
-        this.timeRemaining = `Next turn: ${time}`
+      if (gameHelper.isRealTimeGame(this.$store.state.game)) {
+        this.timeRemaining = `Next tick: ${gameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)}`
+      } else if (gameHelper.isTurnBasedGame(this.$store.state.game)) {
+        this.timeRemaining = `Next turn: ${gameHelper.getCountdownTimeStringForTurnTimeout(this.$store.state.game)}`
       }
     },
     async concedeDefeat () {
@@ -243,6 +261,44 @@ export default {
         console.error(err)
       }
     },
+    async confirmReadyToQuit (player) {
+      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
+        return
+      }
+      
+      if (!await this.$confirm('Ready to Quit?', 'Are you sure you want declare that you are ready to quit? If all active players declare ready to quit then the game will end early.')) {
+        return
+      }
+      
+      try {
+        let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`You have confirmed that you are ready to quit.`, { type: 'success' })
+
+          player.ready = true
+          player.readyToQuit = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async unconfirmReadyToQuit (player) {
+      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
+        return
+      }
+
+      try {
+        let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          player.ready = false
+          player.readyToQuit = false
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -255,7 +311,13 @@ export default {
       return GameHelper.getPlayerStatus(player)
     },
     getAvatarImage (player) {
+      try {
       return require(`../../../assets/avatars/${player.avatar}.png`)
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     }
   },
 
@@ -268,6 +330,18 @@ export default {
     },
     isTurnBasedGame () {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
+    isDarkModeExtra () {
+      return gameHelper.isDarkModeExtra(this.$store.state.game)
+    },
+    isConquestAllStars () {
+      return gameHelper.isConquestAllStars(this.$store.state.game)
+    },
+    isConquestHomeStars () {
+      return gameHelper.isConquestHomeStars(this.$store.state.game)
+    },
+    canEndTurn () {
+      return GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)
     }
   }
 }
@@ -314,6 +388,16 @@ table tr {
   .col-avatar {
     width: 45px;
     padding-top: 0.25rem !important;
+  }
+}
+
+.pulse {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
   }
 }
 </style>

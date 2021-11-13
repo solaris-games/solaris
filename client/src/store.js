@@ -40,6 +40,20 @@ export default new Vuex.Store({
       state.userId = null
     },
 
+    setUsername (state, username) {
+      state.username = username
+    },
+    clearUsername (state) {
+      state.username = null
+    },
+
+    setRoles (state, roles) {
+      state.roles = roles
+    },
+    clearRoles (state) {
+      state.roles = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },
@@ -65,6 +79,14 @@ export default new Vuex.Store({
     setConfirmationDialogSettings (state, settings) {
       state.confirmationDialog = settings
     },
+
+    setUnreadMessages (state, count) {
+      state.unreadMessages = count
+    },
+    clearUnreadMessages (state) {
+      state.unreadMessages = null
+    },
+
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
@@ -73,9 +95,11 @@ export default new Vuex.Store({
       }
     },
     closeConversation (state) {
-      const id = state.currentConversation.id;
-      state.cachedConversationComposeMessages[id] = state.currentConversation.text
-      state.currentConversation = null
+      if (state.currentConversation) {
+        const id = state.currentConversation.id;
+        state.cachedConversationComposeMessages[id] = state.currentConversation.text
+        state.currentConversation = null
+      }
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data
@@ -100,6 +124,13 @@ export default new Vuex.Store({
         data.permitCallback(data.star)
       }
     },
+    starRightClicked (state, data) {
+      if (state.currentConversation && data.player) {
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+      } else {
+        data.permitCallback(data.star)
+      }
+    },
     replaceInConversationText (state, data) {
       MentionHelper.useSuggestion(state.currentConversation, data)
     },
@@ -118,6 +149,7 @@ export default new Vuex.Store({
       player.alias = data.alias
       player.avatar = data.avatar
       player.defeated = false
+      player.defeatedDate = null
       player.afk = false
     },
 
@@ -141,7 +173,23 @@ export default new Vuex.Store({
       player.ready = false
     },
 
+    gamePlayerReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = true
+      player.readyToQuit = true
+    },
+
+    gamePlayerNotReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = false
+      player.readyToQuit = false
+    },
+
     gameStarBulkUpgraded (state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
+
       data.stars.forEach(s => {
         let star = GameHelper.getStarById(state.game, s.starId)
 
@@ -151,11 +199,18 @@ export default new Vuex.Store({
           star.upgradeCosts[data.infrastructureType] = s.infrastructureCost
         }
 
+        if (s.manufacturing != null) {
+          player.stats.newShips -= star.manufacturing // Deduct old value
+          star.manufacturing = s.manufacturing
+          player.stats.newShips += s.manufacturing // Add the new value
+        }
+
         GameContainer.reloadStar(star)
       })
+
+      player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
       
       // Update player total stats.
-      let player = GameHelper.getUserPlayer(state.game)
 
       player.credits -= data.cost
 
@@ -195,7 +250,7 @@ export default new Vuex.Store({
       }
 
       let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
-      star.garrison = data.starGarrison
+      star.ships = data.starShips
 
       let userPlayer = GameHelper.getUserPlayer(state.game)
       userPlayer.credits -= star.upgradeCosts.carriers
@@ -208,7 +263,7 @@ export default new Vuex.Store({
       let star = GameHelper.getStarById(state.game, data.starId)
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
 
-      star.garrison = data.starShips
+      star.ships = data.starShips
       carrier.ships = data.carrierShips
 
       GameContainer.reloadStar(star)
@@ -217,7 +272,7 @@ export default new Vuex.Store({
     gameStarAllShipsTransferred (state, data) {
       let star = GameHelper.getStarById(state.game, data.star._id)
 
-      star.garrison = data.star.garrison
+      star.ships = data.star.ships
 
       data.carriers.forEach(carrier => {
         let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id) 
@@ -232,7 +287,7 @@ export default new Vuex.Store({
       player.stats.totalStars--
 
       star.ownedByPlayerId = null
-      star.garrison = 0
+      star.ships = 0
 
       // Redraw and remove carriers
       let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)
@@ -243,6 +298,25 @@ export default new Vuex.Store({
 
       // Redraw the star
       GameContainer.reloadStar(star)
+    },
+    gameCarrierScuttled (state, data) {
+      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
+      let star = GameHelper.getStarById(state.game, carrier.orbiting)
+      let player = GameHelper.getPlayerById(state.game, carrier.ownedByPlayerId)
+
+      player.stats.totalCarriers--
+
+      if (carrier.specialistId) {
+        player.stats.totalSpecialists--
+      }
+
+      GameContainer.undrawCarrier(carrier)
+
+      state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
+
+      if (star) {
+        GameContainer.reloadStar(star)
+      }
     },
     playerDebtSettled (state, data) {
       let player = GameHelper.getUserPlayer(state.game)
@@ -300,8 +374,9 @@ export default new Vuex.Store({
     },
     async confirm ({ commit, state }, data) {
       const modal = window.$('#confirmModal')
-      const close = () => {
+      const close = async () => {
         modal.modal('toggle')
+        await new Promise(r => setTimeout(r, 400));
       }
       return new Promise((resolve, _reject) => {
         const settings = {
@@ -310,12 +385,12 @@ export default new Vuex.Store({
           hideCancelButton: Boolean(data.hideCancelButton),
           titleText: data.titleText,
           text: data.text,
-          onConfirm: () => {
-            close()
+          onConfirm: async () => {
+            await close()
             resolve(true)
           },
-          onCancel: () => {
-            close()
+          onCancel: async () => {
+            await close()
             resolve(false)
           }
         }

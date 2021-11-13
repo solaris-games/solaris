@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center">You have no stars.</p>
+  <p v-if="!tableData.length" class="text-center mt-2 mb-2">You have no stars.</p>
 </div>
 </template>
 
@@ -126,12 +126,28 @@ export default {
       return this.tableData
         .filter(filterFunction)
         .sort((a, b) => {
-          if (this.sortDirection) { // Ascending
-            return getNestedObject(b, this.sortBy) < getNestedObject(a, this.sortBy) ? 1 : -1
-          }
+          let bo = getNestedObject(b, this.sortBy)
+          let ao = getNestedObject(a, this.sortBy)
 
-          // Descending
-          return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
+          // equal items sort equally
+          if (ao === bo) {
+              return 0;
+          }
+          // nulls sort after anything else
+          else if (ao === null) {
+              return 1;
+          }
+          else if (bo === null) {
+              return -1;
+          }
+          // otherwise, if we're ascending, lowest sorts first
+          else if (this.sortDirection) {
+              return ao < bo ? -1 : 1;
+          }
+          // if descending, highest sorts first
+          else { 
+              return ao < bo ? 1 : -1;
+          }
         })
     },
     isGameFinished: function () {

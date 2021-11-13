@@ -2,41 +2,65 @@
 <div>
     <div class="row avatar-container text-center">
         <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
-        <p v-if="avatar == null" class="text-warning">Select an avatar</p>
+        <p v-if="avatar == null" class="select-avatar-warning text-warning">Select an avatar</p>
+        <p v-if="avatar && !avatar.purchased" class="select-avatar-locked"><i class="fas fa-lock"></i></p>
     </div>
 
-    <div class="row bg-primary">
-        <div class="col pr-0 pl-0">
-            <button class="btn btn-primary" @click="prevAvatar()"><i class="fas fa-chevron-left"></i></button>
-        </div>
-        <div class="col-auto pr-0 pl-0">
-            <button class="btn btn-primary ml-1" @click="nextAvatar()"><i class="fas fa-chevron-right"></i></button>
-        </div>
+    <div class="row mt-1 mb-1">
+      <div class="col pr-0 pl-0">
+        <button class="btn btn-primary" @click="prevAvatar()"><i class="fas fa-chevron-left"></i></button>
+      </div>
+      <div class="col-auto pr-0 pl-0">
+        <button class="btn btn-primary" @click="nextAvatar()"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 pr-2 pl-2 mt-1 mb-1">
+        <router-link :to="{ name: 'avatars'}" class="btn btn-sm btn-block btn-success">
+          <i class="fas fa-shopping-cart"></i> Shop
+        </router-link>
+      </div>
     </div>
 </div>
 </template>
 
 <script>
+import UserApiService from '../../../services/api/user'
+
 export default {
   data () {
     return {
+      isLoading: false,
       avatar: null,
       avatars: []
     }
   },
-  mounted () {
-    // TODO: This should be dynamic.
-    for (let i = 0; i < 42; i++) {
-        this.avatars.push(i.toString())
-    }
+  async mounted () {
+    await this.reloadAvatars()
   },
   methods: {
     onAvatarChanged (e) {
       this.$emit('onAvatarChanged', this.avatar)
     },
+    async reloadAvatars () {
+      this.isLoading = true
+
+      try {
+        let response = await UserApiService.getUserAvatars()
+
+        if (response.status === 200) {
+          this.avatars = response.data
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
     nextAvatar (e) {
       if (this.avatar == null) {
-        this.avatar = '22'
+        this.avatar = this.avatars.find(a => a.id === 21)
       } else {
         let currentIndex = this.avatars.indexOf(this.avatar)
 
@@ -53,7 +77,7 @@ export default {
     },
     prevAvatar (e) {
       if (this.avatar == null) {
-        this.avatar = '22'
+        this.avatar = this.avatars.find(a => a.id === 21)
       } else {
         let currentIndex = this.avatars.indexOf(this.avatar)
 
@@ -69,7 +93,13 @@ export default {
       this.onAvatarChanged(this.avatar)
     },
     getAvatarImage () {
-      return require('../../../assets/avatars/' + this.avatar + '.png')
+      try {
+        return require('../../../assets/avatars/' + this.avatar.id + '.png')
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     }
   }
 }
@@ -81,12 +111,23 @@ export default {
   height: 128px;
 }
 
-p {
+.select-avatar-warning {
   display: table-cell;
   width: 128px;
   height: 128px;
   padding: 20px 0px;
   border: 3px dashed #fff;
   vertical-align: middle;
+}
+
+.select-avatar-locked {
+  display: table-cell;
+  width: 128px;
+  height: 128px;
+  padding: 20px 0px;
+  vertical-align: middle;
+  position: absolute;
+  font-size: 55px;
+  opacity: 0.75;
 }
 </style>

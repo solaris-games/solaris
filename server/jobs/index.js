@@ -6,16 +6,32 @@ const containerLoader = require('../loaders/container');
 let mongo;
 
 async function startup() {
-    const container = containerLoader(null);
+    const container = containerLoader(config, null);
 
-    mongo = await mongooseLoader();
+    mongo = await mongooseLoader(config, {
+        syncIndexes: true,
+        poolSize: 1
+    });
+    
     console.log('MongoDB Intialized');
+
+    // ------------------------------
+    // Jobs that run every time the server restarts.
+
+    console.log('Unlock all games...');
+    await container.gameService.lockAll(false);
+    console.log('All games unlocked');
+
+    // console.log('Recalculating all ELO ratings...');
+    // await container.ratingService.recalculateAllEloRatings(false);
+    // console.log('ELO ratings recalculated');
+
+    // ------------------------------
 
     const gameTickJob = require('./gameTick')(container);
     const officialGamesCheckJob = require('./officialGamesCheck')(container);
-    const cleanupCustomGamesJob = require('./cleanupCustomGames')(container);
-    // const cleanupOldGamesJob = require('./cleanupOldGames')(container);
-    // const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
+    const cleanupGamesTimedOutJob = require('./cleanupGamesTimedOut')(container);
+    const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
 
     // Set up the agenda instance.
     const agendajs = new Agenda()
@@ -40,23 +56,17 @@ async function startup() {
     },
     officialGamesCheckJob.handler);
 
-    // Cleanup old custom games that reached timeout
-    agendajs.define('cleanup-old-custom-games', {
+    // Cleanup old games that reached timeout
+    agendajs.define('cleanup-games-timed-out', {
         priority: 'high', concurrency: 1
     },
-    cleanupCustomGamesJob.handler);
+    cleanupGamesTimedOutJob.handler);
 
-    // Cleanup old games // TODO: Do we really need this?
-    // agendajs.define('cleanup-old-games', {
-    //     priority: 'high', concurrency: 1
-    // },
-    // cleanupOldGamesJob.handler);
-
-    // Cleanup old games history // TODO: Do we really need this?
-    // agendajs.define('cleanup-old-game-history', {
-    //     priority: 'high', concurrency: 1
-    // },
-    // cleanupOldGameHistory.handler);
+    // Cleanup old game history
+    agendajs.define('cleanup-old-game-history', {
+        priority: 'high', concurrency: 1
+    },
+    cleanupOldGameHistory.handler);
 
     // ...
 
@@ -67,7 +77,8 @@ async function startup() {
     // Start server jobs
     agendajs.every('10 seconds', 'game-tick');
     agendajs.every('5 minutes', 'new-player-game-check');
-    agendajs.every('1 hour', 'cleanup-old-custom-games');
+    agendajs.every('1 hour', 'cleanup-games-timed-out');
+    agendajs.every('1 day', 'cleanup-old-game-history');
 }
 
 process.on('SIGINT', async () => {

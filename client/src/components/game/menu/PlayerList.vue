@@ -56,9 +56,9 @@ export default {
 
 @media screen and (max-width: 576px) { 
   .list-group-item {
-      height: 49px;
-      width: 45px;
-      min-width: 45px;
+      height: 40px;
+      width: 35px;
+      min-width: 35px;
   }
 
   .colour-bar {
@@ -70,6 +70,7 @@ ul {
   overflow: visible;
   white-space: nowrap;
   overflow-x: auto;
+  scrollbar-color: #375a7f #303030;
 }
 
 li {

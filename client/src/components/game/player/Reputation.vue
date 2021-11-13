@@ -1,13 +1,25 @@
 <template>
-  <div class="row" v-if="player && player.reputation">
+  <div class="row bg-primary" v-if="player && player.reputation">
     <div class="col">
-      <p>
+      <p class="mb-1">
         <small>
           <i>
             Your reputation with this player is <span :class="{'text-danger':player.reputation.score < 0,'text-success':player.reputation.score > 0}">{{player.reputation.score}}</span>.
-            <br/>
-            Send credits (<span class="text-warning">${{creditsRequired}}</span>)
-            <span v-if="isSpecialistsTechnologyEnabled">specialist tokens (<span class="text-warning">{{creditsSpecialistsRequired}}</span>)</span> or technology to increase your reputation.
+          </i>
+        </small>
+      </p>
+      <p class="mb-1">
+        <small>
+          <i>
+            Send Credits (<span class="text-warning">${{creditsRequired}}</span>)
+            <span v-if="isSpecialistsCurrencyCreditsSpecialists">Specialist Tokens (<span class="text-warning">{{creditsSpecialistsRequired}}</span>)</span> or Technology to increase your reputation.
+          </i>
+        </small>
+      </p>
+      <p class="mb-1" v-if="isFormalAlliancesEnabled">
+        <small>
+          <i>
+            <span>Reputation greater or equal to <span class="text-warning">5</span> will change their diplomatic status to <span class="text-success">Allied</span>.</span>
           </i>
         </small>
       </p>
@@ -37,8 +49,11 @@ export default {
     creditsSpecialistsRequired () {
       return Math.round(this.player.research.specialists.level / 2)
     },
-    isSpecialistsTechnologyEnabled () {
-      return this.$store.state.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
+    isSpecialistsCurrencyCreditsSpecialists () {
+      return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
+    },
+    isFormalAlliancesEnabled () {
+      return this.$store.state.game.settings.player.alliances === 'enabled'
     }
   }
 }

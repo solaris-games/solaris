@@ -23,16 +23,18 @@ class StarService extends BaseApiService {
     { withCredentials: true })
   }
 
-  bulkInfrastructureUpgrade (gameId, infrastructure, amount) {
+  bulkInfrastructureUpgrade (gameId, upgradeStrategy, infrastructure, amount) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/bulk', {
+      upgradeStrategy,
       infrastructure,
       amount
     },
     { withCredentials: true })
   }
 
-  checkBulkUpgradedAmount (gameId, infrastructure, amount) {
+  checkBulkUpgradedAmount (gameId, upgradeStrategy, infrastructure, amount) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/bulkCheck', {
+        upgradeStrategy,  
         infrastructure,
         amount
       },
@@ -75,9 +77,18 @@ class StarService extends BaseApiService {
     { withCredentials: true })
   }
   
-  toggleIgnoreBulkUpgrade(gameId, starId) {
+  toggleIgnoreBulkUpgrade(gameId, starId, infrastructureType) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/toggleignorebulkupgrade', {
-      starId
+      starId,
+      infrastructureType
+    },
+    { withCredentials: true })
+  }
+  
+  toggleIgnoreBulkUpgradeAll(gameId, starId, ignoreStatus) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/toggleignorebulkupgradeall', {
+      starId,
+      ignoreStatus
     },
     { withCredentials: true })
   }

@@ -19,12 +19,15 @@ const schema = new Schema({
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },
     creditsSpecialists: { type: Types.Number, required: true },
-    defeated: { type: Types.Boolean, required: false, default: false },
-    afk: { type: Types.Boolean, required: false, default: false },
+    defeated: { type: Types.Boolean, required: false, default: false }, // TODO: We can remove this in favour of using defeatedDate below.
+    defeatedDate: { type: Types.Date, required: false, default: null },
+    afk: { type: Types.Boolean, required: false, default: false },      // TODO: Same treatment as with defeatedDate.
     renownToGive: { type: Types.Number, required: true, default: 8 },
     ready: { type: Types.Boolean, required: false, default: false },
+    readyToQuit: { type: Types.Boolean, required: false, default: false },
     missedTurns: { type: Types.Number, required: false, default: 0 },
     hasSentTurnReminder: { type: Types.Boolean, required: false, default: false },
+    hasFilledAfkSlot: { type: Types.Boolean, required: false, default: false },
     research: {
         // TODO: This would be arguably better if it was just progress points and remove level
         // and then we can calculate the level before sending it to the client.
@@ -72,7 +75,10 @@ const schema = new Schema({
             playerId: { type: Types.ObjectId, required: true },
             score: { type: Types.Number, required: true, default: 0  }
         }
-    ]
+    ],
+    diplomacy: {
+        allies: [{ type: Types.ObjectId, required: true }]
+    }
 });
 
 module.exports = schema;

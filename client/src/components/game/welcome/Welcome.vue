@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Welcome" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Welcome" @onCloseRequested="onCloseRequested">
+      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+    </menu-title>
 
     <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged"/>
 
@@ -12,7 +14,7 @@
 
     <select-colour v-if="!isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-    <share-link/>
+    <share-link message="Invite your friends and take on the Galaxy together!"/>
 </div>
 </template>
 
@@ -56,6 +58,9 @@ export default {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
+    onViewSettingsRequested (e) {
+      this.$emit('onViewSettingsRequested', e)
+    },
     onAvatarChanged (e) {
       this.avatar = e
     },
@@ -89,7 +94,7 @@ export default {
       try {
         this.isJoiningGame = true
 
-        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.avatar, this.password)
+        let response = await gameService.joinGame(this.$store.state.game._id, playerId, this.alias, this.avatar.id, this.password)
 
         if (response.status === 200) {
           location.reload() // It ain't pretty but it is the easiest way to refresh the game board entirely.
@@ -103,6 +108,11 @@ export default {
       }
 
       this.isJoiningGame = false
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
     }
   }
 }

@@ -7,9 +7,11 @@ const schema = new Schema({
     playerId: { type: Types.ObjectId, required: false },
     tick: { type: Types.Number, required: true },
     type: { type: Types.String, required: true },
-    data: { type: Types.Mixed, required: true }
+    data: { type: Types.Mixed, required: true },
+    read: { type: Types.Boolean, required: false }
 });
 
 schema.index({gameId: 1, tick: 1}, {unique: false});
+schema.index({gameId: 1, playerId: 1}, {unique: false});
 
 module.exports = schema;

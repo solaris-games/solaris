@@ -30,12 +30,12 @@
         <div class="col-6">
             <div class="row no-gutters">
                 <div class="col-4">
-                    <button type="button" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
+                    <button type="button" title="Transfer all ships to the star" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
                 </div>
                 <div class="col">
-                    <button type="button" title="1" class="btn btn-primary float-right ml-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
-                    <button type="button" title="10"  class="btn btn-primary ml-1 float-right" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
-                    <button type="button" title="100"  class="btn btn-primary float-right" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
+                    <button type="button" title="Transfer 1 ship to the star" class="btn btn-primary float-right ml-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
+                    <button type="button" title="Transfer 10 ships to the star"  class="btn btn-primary ml-1 float-right" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
+                    <button type="button" title="Transfer 100 ships to the star"  class="btn btn-primary float-right" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
                 </div>
             </div>
         </div>
@@ -43,12 +43,12 @@
         <div class="col-6">
             <div class="row no-gutters">
                 <div class="col">
-                    <button type="button"  title="1" class="btn btn-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
-                    <button type="button" title="10"  class="btn btn-primary ml-1" @click="onTransferRightClicked(10)" :disabled="starShips < 10"><i class="fas fa-angle-double-right"></i></button>
-                    <button type="button" title="100"  class="btn btn-primary ml-1 " @click="onTransferRightClicked(100)" :disabled="starShips < 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
+                    <button type="button" title="Transfer 1 ship to the carrier" class="btn btn-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
+                    <button type="button" title="Transfer 10 ships to the carrier"  class="btn btn-primary ml-1" @click="onTransferRightClicked(10)" :disabled="starShips < 10"><i class="fas fa-angle-double-right"></i></button>
+                    <button type="button" title="Transfer 100 ships to the carrier"  class="btn btn-primary ml-1 " @click="onTransferRightClicked(100)" :disabled="starShips < 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
                 </div>
                 <div class="col-4">
-                    <button type="button" class="btn btn-success btn-block " @click="onMaxShipsClicked">Max</button>
+                    <button type="button" title="Transfer all ships to the carrier" class="btn btn-success btn-block" @click="onMaxShipsClicked">Max</button>
                 </div>
             </div>
         </div>
@@ -93,7 +93,7 @@ export default {
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
 
-    this.starShips = this.star.garrison
+    this.starShips = this.star.ships
     this.carrierShips = this.carrier.ships
   },
   methods: {
@@ -102,17 +102,17 @@ export default {
     },
     onGameReloaded (data) {
       // When the game ticks there may have been ships built at the star.
-      // Find the star in the tick report and compare the garrison, then add
+      // Find the star in the tick report and compare the ships, then add
       // the difference to the star ships side on the transfer.
 
-      // NOTE: At this stage the star will have the latest data for its garrison
+      // NOTE: At this stage the star will have the latest data for its ships
       // as the store deals with updating the star.
       this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
       this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
 
       // If the game ticks then check to see if any ships have been built at the star.
       let totalInTransfer = this.starShips + this.carrierShips
-      let totalOriginal = this.star.garrison + this.carrier.ships
+      let totalOriginal = this.star.ships + this.carrier.ships
       let difference = totalOriginal - totalInTransfer
 
       // If there is a difference then this means that ship(s) have been built at the star
@@ -123,20 +123,20 @@ export default {
       }
     },
     onStarShipsChanged (e) {
-      let difference = parseInt(this.starShips) - this.star.garrison
+      let difference = parseInt(this.starShips) - this.star.ships
       this.carrierShips = this.carrier.ships - difference
     },
     onCarrierShipsChanged (e) {
       let difference = parseInt(this.carrierShips) - this.carrier.ships
-      this.starShips = this.star.garrison - difference
+      this.starShips = this.star.ships - difference
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
-      this.starShips = this.carrier.ships + this.star.garrison - 1
+      this.starShips = this.carrier.ships + this.star.ships - 1
     },
     onMaxShipsClicked (e) {
       this.starShips = 0
-      this.carrierShips = this.carrier.ships + this.star.garrison
+      this.carrierShips = this.carrier.ships + this.star.ships
     },
     onTransferLeftClicked (e) {
       this.starShips+=e
@@ -186,7 +186,7 @@ export default {
             carrierShips: cShips
           })
 
-          this.star.garrison = sShips
+          this.star.ships = sShips
           this.carrier.ships = cShips
 
           transferred = true

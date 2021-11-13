@@ -9,26 +9,27 @@ class TextureService {
     DEFAULT_FONT_STYLE = null
 
     STARLESS_NEBULA_TEXTURES = []
+    STAR_NEBULA_TEXTURES = []
+    STAR_ASTEROID_FIELD_TEXTURES = []
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
     PLAYER_SYMBOLS = {}
     STAR_SYMBOLS = {}
     CARRIER_TEXTURE = null
 
-    constructor () {
+    initialize () {
       this._loadPlayerSymbols()
       this._loadStarSymbols()
 
       this.CARRIER_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_carrier.svg')))
-
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
-        fontFamily: "'Space Mono', monospace",
+        fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
         padding: 3
       })
 
       this.DEFAULT_FONT_STYLE_BOLD = new PIXI.TextStyle({
-        fontFamily: "'Space Mono', monospace",
+        fontFamily: `'Space Mono', monospace`,
         fill: 0xFFFFFF,
         fontWeight: "bold",
         padding: 3
@@ -70,6 +71,16 @@ class TextureService {
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb0-starless.png'))))
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1-starless.png'))))
 
+      // STAR NEBULAS
+      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/star-nebula-0.png'))))
+      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/star-nebula-1.png'))))
+      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/star-nebula-2.png'))))
+
+      // STAR ASTEROID FIELDS
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-0.png'))))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-1.png'))))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-2.png'))))
+
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')
       this._loadSpecialistTexture('mecha-mask')
@@ -95,6 +106,9 @@ class TextureService {
       this._loadSpecialistTexture('afterburn')
       this._loadSpecialistTexture('pirate')
       this._loadSpecialistTexture('spoutnik')
+      this._loadSpecialistTexture('starfighter')
+      this._loadSpecialistTexture('double-ringed-orb')
+      this._loadSpecialistTexture('rocket')
     }
 
     _loadSpecialistTexture(name) {
@@ -139,6 +153,18 @@ class TextureService {
     _loadStarSymbols() {
       this.STAR_SYMBOLS['scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable.svg')))
       this.STAR_SYMBOLS['unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable.svg')))
+    }
+
+    getRandomStarNebulaTexture() {
+      let index = Math.floor(Math.random() * this.STAR_NEBULA_TEXTURES.length)
+
+      return this.STAR_NEBULA_TEXTURES[index]
+    }
+
+    getRandomStarAsteroidFieldTexture() {
+      let index = Math.floor(Math.random() * this.STAR_ASTEROID_FIELD_TEXTURES.length)
+
+      return this.STAR_ASTEROID_FIELD_TEXTURES[index]
     }
 }
 

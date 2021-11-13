@@ -1,6 +1,6 @@
 <template>
 <div class="text-center pb-2">
-    <p>Invite your friends and take on the Galaxy together!</p>
+    <p>{{message}}</p>
 
     <p class="mb-0">Send them this address:</p>
     <p class="text-info" @click="copyToClipboard"><i class="fas fa-copy"></i> {{fullRoute}}</p>
@@ -9,6 +9,9 @@
 
 <script>
 export default {
+  props: {
+    message: String
+  },
   data () {
     return {
       domain: '',
@@ -23,8 +26,8 @@ export default {
     this.fullRoute = `${this.protocol}//${this.domain}/#${this.$route.fullPath}`
   },
   methods: {
-    copyToClipboard () {
-      navigator.clipboard.writeText(this.fullRoute)
+    async copyToClipboard () {
+      await navigator.clipboard.writeText(this.fullRoute)
 
       this.$toasted.show(`Copied to clipboard.`, { type: 'success' })
     }

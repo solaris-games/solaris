@@ -2,12 +2,16 @@
 
 <div>
     <div @click="toggleDisplay">
-        <span class="user-select-none pointer">
-            Tick {{tick}} <i class="fas d-none d-sm-inline-block" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i>
+        <span class="d-none d-md-inline-block">
+            Tick
         </span>
+        <span class="d-inline-block d-md-none">
+            <i class="fas fa-stopwatch"></i>
+        </span>
+        <span class="user-select-none pointer ml-1">{{tick}} <i class="fas" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i></span>
     </div>
 
-    <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display" style="position:absolute;width:300px;left:-100px;">
+    <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display">
         <div class="row mt-0 pt-2 pb-2">
             <div class="col-12 mb-1">
                 <input type="range" :min="minimumTick" :max="stateTick" class="slider" v-model="tick" @change="onRequestedTickChanged" :disabled="isLoading">
@@ -94,9 +98,10 @@ export default {
           return this.$store.state.game.state.tick
       },
       minimumTick: function () {
-          let min = this.stateTick - 24 // Maximum of 24 ticks ago.
+          return 1
+          // let min = this.stateTick - 24 // Maximum of 24 ticks ago.
 
-          return Math.max(1, min)
+          // return Math.max(1, min)
       }
   }
 }
@@ -143,5 +148,9 @@ export default {
 
 .tick-form {
     border-radius: 6px;
+    z-index: 1;
+    position:absolute;
+    width:300px;
+    left:-110px;
 }
 </style>

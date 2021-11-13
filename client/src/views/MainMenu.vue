@@ -1,20 +1,7 @@
 <template>
 <div>
-  <div class="container col-xs-12 col-sm-10 col-md-10 col-lg-6 pr-1 pl-1">
-    <div class="row no-gutters pb-0 pt-1" v-if="user">
-      <div class="col">
-        <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{user.username}}</router-link>
-      </div>
-      <div class="col-auto">
-        <router-link v-if="user" :to="{ name: 'account-achievements', params: { userId: user._id }}"><i class="fas fa-medal mr-1"></i>Achievements</router-link>
-        <router-link to="/codex" class="ml-3"><i class="fas fa-question mr-1"></i>Help</router-link>
-        <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3"><i class="fas fa-sign-out-alt mr-1"></i>Log Out</a>
-      </div>
-    </div>
-  </div>
-
   <view-container>
-    <view-title title="Main Menu" :hideHomeButton="true"></view-title>
+    <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
     <div class="row pb-0">
       <div class="col-sm-12 col-md-6 col-lg-5">
@@ -28,8 +15,8 @@
       </div>
     </div>
 
-    <div class="row pb-0">
-      <div class="col-sm-12 col-md-8 col-lg-8">
+    <div class="row no-gutters pb-0">
+      <div class="col-sm-12 col-md-6 col-lg-6 pr-1">
         <div class="card bg-dark text-white" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
           <div class="card-img-overlay">
@@ -40,7 +27,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-4 col-lg-4" @click="routeToPath('/game/list')">
+      <div class="col-sm-12 col-md-6 col-lg-6 pl-1" @click="routeToPath('/game/list')">
         <div class="card bg-dark text-white">
           <img class="card-img" :src="require('../assets/screenshots/home-2.png')" alt="Join a game">
           <div class="card-img-overlay">
@@ -51,7 +38,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-6 col-lg-6">
+      <div class="col-sm-12 col-md-4 col-lg-4 pr-1">
         <div class="card bg-dark text-white" @click="routeToPath('/leaderboard')">
           <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
           <div class="card-img-overlay">
@@ -62,7 +49,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-6 col-lg-6">
+      <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1">
         <div class="card bg-dark text-white" @click="routeToPath('/guild')">
           <img class="card-img" :src="require('../assets/screenshots/home-4.png')" alt="Guilds">
           <div class="card-img-overlay">
@@ -73,13 +60,31 @@
           </div>
         </div>
       </div>
+      <div class="col-sm-12 col-md-4 col-lg-4 pl-1">
+        <div class="card bg-dark text-white" @click="routeToPath('/avatars')">
+          <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Shop">
+          <div class="card-img-overlay">
+            <h5 class="card-title card-title-success">
+              <i class="fas fa-shopping-basket"></i>
+              <span class="ml-2">Avatar Shop</span>
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12 col-md-6 embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="col-sm-12 col-md-6">
+        <recent-donations :maxLength="75" />
+      </div>
     </div>
 
     <div class="row pb-0">
       <div class="col d-none d-md-block">
-        <h4>Top 10 Players</h4>
-        <leaderboard-user-table if="leaderboard" :leaderboard="leaderboard"></leaderboard-user-table>
-        <loading-spinner :loading="!leaderboard"></loading-spinner>
+        <leaderboard-user-table :limit="10"></leaderboard-user-table>
       </div>
     </div>
   </view-container>
@@ -95,6 +100,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
 import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
+import RecentDonations from '../components/game/donate/RecentDonations.vue'
 
 export default {
   components: {
@@ -102,19 +108,18 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'leaderboard-user-table': LeaderboardUserTable
+    'leaderboard-user-table': LeaderboardUserTable,
+    'recent-donations': RecentDonations
   },
   data () {
     return {
       user: null,
       achievements: null,
-      leaderboard: null,
       isLoggingOut: false
     }
   },
   mounted () {
     this.loadAchievements()
-    this.loadLeaderboard()
   },
   methods: {
     async logout () {
@@ -123,6 +128,8 @@ export default {
       await authService.logout()
 
       this.$store.commit('clearUserId')
+      this.$store.commit('clearUsername')
+      this.$store.commit('clearRoles')
 
       this.isLoggingOut = false
 
@@ -138,17 +145,13 @@ export default {
         console.error(err)
       }
     },
-    async loadLeaderboard () {
-      try {
-        let response = await userService.getLeaderboard(10, 'rank')
-
-        this.leaderboard = response.data.leaderboard
-      } catch (err) {
-        console.error(err)
-      }
-    },
     routeToPath(path) {
       router.push(path)
+    }
+  },
+  computed: {
+    documentationUrl () {
+      return process.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }
@@ -185,5 +188,9 @@ button {
   padding: 0.25rem;
   display: inline-block;
   border-radius: 3px;
+}
+
+.card-title-success {
+  background-color: #00bc8c;
 }
 </style>

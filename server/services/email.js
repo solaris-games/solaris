@@ -55,23 +55,20 @@ module.exports = class EmailService {
             fileName: 'yourTurnReminder.html',
             subject: 'Solaris - It\'s your turn to play!'
         },
-        CUSTOM_GAME_REMOVED: {
-            fileName: 'customGameRemoved.html',
+        GAME_TIMED_OUT: {
+            fileName: 'gameTimedOut.html',
             subject: 'Solaris - Your game did not start'
         }
     };
 
-    constructor(config, gameService, gameTickService, userService, leaderboardService, playerService) {
+    constructor(config, gameService, userService, leaderboardService, playerService) {
         this.config = config;
         this.gameService = gameService;
-        this.gameTickService = gameTickService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
-        this.gameTickService.on('onGameEnded', (data) => this.sendGameFinishedEmail(data.gameId));
-        this.gameTickService.on('onGameGalacticCycleTicked', (data) => this.sendGameCycleSummaryEmail(data.gameId));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
         this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
     }
@@ -126,9 +123,9 @@ module.exports = class EmailService {
 
         // Replace the default parameters in the file
         // TODO: These should be environment variables.
-        html = html.replace('[{solaris_url}]', 'https://solaris.games');
-        html = html.replace('[{solaris_url_gamelist}]', 'https://solaris.games/#/game/list');
-        html = html.replace('[{solaris_url_resetpassword}]', 'https://solaris.games/#/account/reset-password-external');
+        html = html.replace('[{solaris_url}]', process.env.CLIENT_URL);
+        html = html.replace('[{solaris_url_gamelist}]', `${process.env.CLIENT_URL}/#/game/list`);
+        html = html.replace('[{solaris_url_resetpassword}]', `${process.env.CLIENT_URL}/#/account/reset-password-external`);
         html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
 
         // Replace the parameters in the file
@@ -151,7 +148,7 @@ module.exports = class EmailService {
 
     async sendGameStartedEmail(gameId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -159,8 +156,6 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-                    
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
                         gameName,
                         gameUrl
@@ -172,9 +167,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameFinishedEmail(gameId) {
-        let game = await this.gameService.getById(gameId);
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+    async sendGameFinishedEmail(game) {
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -182,8 +176,6 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-                    
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_FINISHED, [
                         gameName,
                         gameUrl
@@ -195,39 +187,59 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameCycleSummaryEmail(gameId) {      
-        let game = await this.gameService.getById(gameId);  
-        let leaderboard = this.leaderboardService.getLeaderboardRankings(game);
+    async sendGameCycleSummaryEmail(game) {      
+        let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
 
-        let leaderboardHtml = leaderboard.map(l => {
-            return `
-                <tr>
-                    <td><span style="color:#F39C12">${l.player.alias}</span></td>
-                    <td>${l.stats.totalStars} Stars</td>
-                    <td>${l.stats.totalShips} Ships in ${l.stats.totalCarriers} Carriers</td>
-                </tr>
-            `;
-        })
-        .join('');
+        let leaderboardHtml = '';
 
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        // Leaderboard is hidden for ultra dark mode games.
+        if (!this.gameService.isDarkModeExtra(game)) {
+            leaderboardHtml = leaderboard.map(l => {
+                return `
+                    <tr>
+                        <td><span style="color:#F39C12">${l.player.alias}</span></td>
+                        <td>${l.stats.totalStars} Stars</td>
+                        <td>${l.stats.totalShips} Ships in ${l.stats.totalCarriers} Carriers</td>
+                    </tr>
+                `;
+            })
+            .join('');
+        }
+
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+        let winConditionText = '';
+
+        switch (game.settings.general.mode) {
+            case 'conquest':
+                switch (game.settings.conquest.victoryCondition) {
+                    case 'starPercentage':
+                        winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} of ${game.state.stars} stars</span>.`;
+                        break;
+                    case 'homeStarPercentage':
+                        winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} capital stars of ${game.settings.general.playerLimit} stars</span>.`;
+                        break;
+                    default:
+                        throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`);
+                }
+                break;
+            case 'battleRoyale':
+                winConditionText = 'Winner will be the <span style="color:#3498DB;">last man standing</span>.';
+                break;
+        }
 
         for (let player of undefeatedPlayers) {
             let user = await this.userService.getEmailById(player.userId);
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
                         gameName,
                         gameUrl,
-                        game.state.starsForVictory.toString(),
-                        game.state.stars.toString(),
+                        winConditionText,
                         leaderboardHtml
                     ]);
                 } catch (err) {
@@ -263,7 +275,7 @@ module.exports = class EmailService {
             player.hasSentTurnReminder = true;
             await game.save();
 
-            let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+            let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
             let user = await this.userService.getEmailById(player.userId);
@@ -281,7 +293,7 @@ module.exports = class EmailService {
         }
     }
 
-    async sendCustomGameRemovedEmail(gameId) {
+    async sendGameTimedOutEmail(gameId) {
         let game = await this.gameService.getById(gameId);
         let gameName = game.settings.general.name;
 
@@ -290,9 +302,7 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await sleep(2500); // This might work I dunno.
-                    
-                    await this.sendTemplate(user.email, this.TEMPLATES.CUSTOM_GAME_REMOVED, [
+                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_TIMED_OUT, [
                         gameName
                     ]);
                 } catch (err) {

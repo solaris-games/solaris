@@ -2,15 +2,16 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ShipTransferService {
 
-    constructor(gameModel, carrierService, starService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, carrierService, starService) {
+        this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
     }
 
     async transferAllToStar(game, player, starId) {
-        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId);
         let star = this.starService.getById(game, starId);
+        let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
+            .filter(c => c.ownedByPlayerId.equals(player._id));
 
         if (!star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
@@ -25,8 +26,8 @@ module.exports = class ShipTransferService {
             }
         }
 
-        star.garrisonActual += shipsToTransfer;
-        star.garrison = Math.floor(star.garrisonActual);
+        star.shipsActual += shipsToTransfer;
+        star.ships = Math.floor(star.shipsActual);
 
         // Generate an array of all requires DB updates.
         let dbWrites = carriersAtStar.map(c => {
@@ -50,19 +51,19 @@ module.exports = class ShipTransferService {
                     'galaxy.stars._id': star._id
                 },
                 update: {
-                    'galaxy.stars.$.garrisonActual': star.garrisonActual,
-                    'galaxy.stars.$.garrison': star.garrison
+                    'galaxy.stars.$.shipsActual': star.shipsActual,
+                    'galaxy.stars.$.ships': star.ships
                 }
             }
         });
 
         // Update the DB.
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         return {
             star: {
                 _id: star._id,
-                garrison: star.garrison
+                ships: star.ships
             },
             carriers: carriersAtStar.map(c => {
                 return {
@@ -77,11 +78,11 @@ module.exports = class ShipTransferService {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier || !carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        if (!star.ownedByPlayerId.equals(player._id)) {
+        if (!star || !star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 
@@ -94,7 +95,7 @@ module.exports = class ShipTransferService {
         }
 
         let totalTransferShips = carrierShips + starShips;
-        let totalShips = carrier.ships + star.garrison;
+        let totalShips = carrier.ships + star.ships;
 
         if (totalTransferShips != totalShips) {
             throw new ValidationError('The total number of ships in the tranfer does not equal to the total number of ships garrisoned');
@@ -110,13 +111,13 @@ module.exports = class ShipTransferService {
 
         carrier.ships = carrierShips;
 
-        let garrisonFraction = star.garrisonActual - star.garrison; // Keep hold of the fractional amount of garrison so we can add it back later.
+        let shipsFraction = star.shipsActual - star.ships; // Keep hold of the fractional amount of ships so we can add it back later.
         
-        star.garrisonActual = starShips + garrisonFraction;
-        star.garrison = Math.floor(star.garrisonActual);
+        star.shipsActual = starShips + shipsFraction;
+        star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             {
                 updateOne: {
                     filter: {
@@ -124,8 +125,8 @@ module.exports = class ShipTransferService {
                         'galaxy.stars._id': star._id
                     },
                     update: {
-                        'galaxy.stars.$.garrisonActual': star.garrisonActual,
-                        'galaxy.stars.$.garrison': star.garrison
+                        'galaxy.stars.$.shipsActual': star.shipsActual,
+                        'galaxy.stars.$.ships': star.ships
                     }
                 }
             },

@@ -20,13 +20,19 @@ module.exports = (router, io, container) => {
         }
     
         try {
-            let userId = await container.authService.login(req.body.email, req.body.password);
+            let user = await container.authService.login(req.body.email, req.body.password);
     
             // Store the user id in the session.
-            req.session.userId = userId;
+            req.session.userId = user._id;
+            req.session.username = user.username;
+            req.session.roles = user.roles;
             req.session.isImpersonating = false;
 
-            return res.status(200).json({id: userId});
+            return res.status(200).json({
+                _id: user._id,
+                username: user.username,
+                roles: user.roles
+            });
         } catch (err) {
             next(err);
         }
@@ -49,7 +55,9 @@ module.exports = (router, io, container) => {
 
     router.post('/api/auth/verify', (req, res, next) => {
         return res.status(200).json({
-            id: req.session.userId
+            _id: req.session.userId,
+            username: req.session.username,
+            roles: req.session.roles
         });
     });
 

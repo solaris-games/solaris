@@ -43,14 +43,18 @@ class CarrierService extends BaseApiService {
       { withCredentials: true })
   }
 
-  calculateCombat (gameId, defender, attacker, includeDefenderBonus = true) {
+  calculateCombat (gameId, defender, attacker, isTurnBased) {
     return axios.post(this.BASE_URL + 'game/' + gameId + '/carrier/calculateCombat',
       {
         defender,
         attacker,
-        includeDefenderBonus
+        isTurnBased
       },
       { withCredentials: true })
+  }
+  
+  scuttle (gameId, carrierId) {
+    return axios.delete(this.BASE_URL + 'game/' + gameId + '/carrier/' + carrierId + '/scuttle', { withCredentials: true })
   }
 }
 

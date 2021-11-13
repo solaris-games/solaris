@@ -6,9 +6,6 @@
             <i class="fas fa-handshake"></i>
           </button>
         </div>
-        <!-- <div class="col" v-if="!userPlayer">
-          <router-link to="/codex" class="btn"><i class="fas fa-question"></i></router-link>
-        </div> -->
         <div class="col" v-if="userPlayer">
           <button class="btn" @click="panToHomeStar()">
             <i class="fas fa-home"></i>
@@ -24,7 +21,7 @@
             <i class="fas fa-sun"></i>
           </button>
         </div>
-        <div class="col" v-if="isLoggedIn">
+        <div class="col" v-if="isLoggedIn && !isDarkModeExtra">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.INTEL)">
             <i class="fas fa-chart-line"></i>
           </button>
@@ -91,6 +88,9 @@ export default {
     },
     isLoggedIn () {
       return this.$store.state.userId != null
+    },
+    isDarkModeExtra () {
+      return GameHelper.isDarkModeExtra(this.$store.state.game)
     }
   }
 }

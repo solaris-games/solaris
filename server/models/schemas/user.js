@@ -18,18 +18,19 @@ const schema = new Schema({
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
         developer: { type: Types.Boolean, default: false },
-        communityManager: { type: Types.Boolean, default: false }
+        communityManager: { type: Types.Boolean, default: false },
+        gameMaster: { type: Types.Boolean, default: false }
     },
     achievements: {
         victories: { type: Types.Number, default: 0 },
         rank: { type: Types.Number, default: 0 },
+        eloRating: { type: Types.Number, default: null },
         renown: { type: Types.Number, default: 0 },
         joined: { type: Types.Number, default: 0 },
         completed: { type: Types.Number, default: 0 },
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
-        renown: { type: Types.Number, default: 0 },
         combat: {
             kills: {
                 ships: { type: Types.Number, default: 0 },
@@ -42,6 +43,10 @@ const schema = new Schema({
                 specialists: { type: Types.Number, default: 0 },
             },
             stars: {
+                captured: { type: Types.Number, default: 0 },
+                lost: { type: Types.Number, default: 0 },
+            },
+            homeStars: {
                 captured: { type: Types.Number, default: 0 },
                 lost: { type: Types.Number, default: 0 },
             }
@@ -101,15 +106,20 @@ const schema = new Schema({
             uiStyle: { type: Types.String, required: false, enum: ['standard', 'compact'], default: 'standard' },
             suggestMentions: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' }
         },
+        guild: {
+            displayGuildTag: { type: Types.String, required: false, enum: ['visible', 'hidden'], default: 'visible' },
+        },
         map: {
             naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
             carrierLoopStyle: { type: Types.String, required: false, enum: ['solid', 'dashed'], default: 'dashed' },
             carrierPathWidth: { type: Types.Number, required: false, default: 1, min: 1, max: 8 },
             carrierPathDashLength: { type: Types.Number, required: false, default: 6, min: 4, max: 16 },
-            territoryStyle: { type: Types.String, required: false, enum: ['marching-square', 'voronoi'], default: 'marching-square' },
+            territoryStyle: { type: Types.String, required: false, enum: ['disabled', 'marching-square', 'voronoi'], default: 'marching-square' },
             marchingSquareGridSize: { type: Types.Number, required: false, default: 6, min: 2, max: 32 },
             marchingSquareTerritorySize:{ type: Types.Number, required: false, default: 5, min: 2, max: 32 },
             marchingSquareBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 8 },
+            voronoiCellBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 5 },
+            voronoiTerritoryBorderWidth: { type: Types.Number, required: false, default: 4, min: 0, max: 8 },
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8, min: 0, max: 32 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16, min: 12, max: 128 },
@@ -145,9 +155,11 @@ const schema = new Schema({
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison', 'collectPercentage', 'dropPercentage'], default: 'collectAll' },
-            defaultAmount: { type: Types.Number, required: false, default: 0 }
+            defaultAmount: { type: Types.Number, required: false, default: 0 },
+            confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         }
-    }
+    },
+    avatars: [{ type: Types.Number, required: false }]
 });
 
 module.exports = schema;

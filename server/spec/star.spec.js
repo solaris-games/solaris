@@ -96,7 +96,7 @@ describe('star', () => {
         starService.setupHomeStar(game, homeStar, newPlayer, gameSettings);
 
         expect(homeStar.ownedByPlayerId).toBe(newPlayer._id);
-        expect(homeStar.garrison).toEqual(gameSettings.player.startingShips);
+        expect(homeStar.ships).toEqual(gameSettings.player.startingShips);
         expect(homeStar.naturalResources).toEqual(game.constants.star.resources.maxNaturalResources);
         expect(homeStar.infrastructure.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);

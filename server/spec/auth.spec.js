@@ -7,15 +7,15 @@ const fakeBcrypt = {
 };
 
 const fakeUserModel = {
-    findOne(user) {
-        return [
+    async findOne(user) {
+        return Promise.resolve([
             {
                 _id: 1,
                 email: 'test@test.com',
                 username: 'hello',
                 password: 'test'
             }
-        ].find(x => x.email == user.email);
+        ].find(x => x.email == user.email));
     }
 };
 
@@ -26,31 +26,30 @@ describe('auth', () => {
         service = new AuthService(fakeUserModel, fakeBcrypt);
     });
 
-    it('should compare passwords of a user', async (done) => {
+    it('should compare passwords of a user', async () => {
         let result = await service.login('test@test.com', 'test');
 
-        expect(result).toBe(1);
-
-        done();
+        expect(result._id).toBe(1);
     });
 
-    it('should fail if the passwords are not the same', async (done) => {
+    it('should fail if the passwords are not the same', async () => {
         try {
             await service.login('test@test.com', 'hello');
 
-            done('Should have thrown an error');
+            throw new Error('Should have thrown an error');
         } catch (err) {
-            done();
+            
         }
+            
     });
 
-    it('should fail if the email is not valid', async (done) => {
+    it('should fail if the email is not valid', async () => {
         try {
             await service.login('test', 'hello');
 
-            done('Should have thrown an error');
+            throw new Error('Should have thrown an error');
         } catch (err) {
-            done();
+            
         }
     });
 

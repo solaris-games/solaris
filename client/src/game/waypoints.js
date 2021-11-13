@@ -87,6 +87,7 @@ class Waypoints extends EventEmitter {
 
   drawHyperspaceRange () {
     let graphics = new PIXI.Graphics()
+    // TODO: This is causing errors when a star is revealed in dark mode.
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 
@@ -133,11 +134,20 @@ class Waypoints extends EventEmitter {
     let userPlayer = this.game.galaxy.players.find(p => p.userId)
 
     const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
-
-    const lastLocation = this._getLastLocation()
+    
+    const lastLocationStar = this._getLastLocationStar()
+    const lastLocation = lastLocationStar == null ? null : lastLocationStar.location
     const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)
 
-    if (distance <= hyperspaceDistance) {
+    let canCreateWaypoint = distance <= hyperspaceDistance
+
+    if (!canCreateWaypoint && lastLocationStar && lastLocationStar.wormHoleToStarId) {
+      const wormHolePairStar = GameHelper.getStarById(this.game, lastLocationStar.wormHoleToStarId)
+
+      canCreateWaypoint = wormHolePairStar && wormHolePairStar._id === starId
+    }
+
+    if (canCreateWaypoint) {
       let newWaypoint = {
         destination: starId,
         action: 'collectAll',
