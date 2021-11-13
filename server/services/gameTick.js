@@ -319,6 +319,11 @@ module.exports = class GameTickService extends EventEmitter {
         for (let carrierPosition of carrierPositions) {
             const graphKeyA = carrierPosition.destination.toString() + carrierPosition.source.toString();
             const graphKeyB = carrierPosition.source.toString() + carrierPosition.destination.toString();
+
+            if (graphKeyA === graphKeyB) {
+                continue;
+            }
+
             const graphObj = graph[graphKeyA] || graph[graphKeyB];
             
             if (graphObj) {
