@@ -5,15 +5,15 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="svg3135"
+   id="svg8"
    version="1.1"
-   viewBox="0 0 67.733332 67.733335"
+   viewBox="0 0 67.733332 67.733332"
    height="256"
    width="256">
   <defs
-     id="defs3129" />
+     id="defs2" />
   <metadata
-     id="metadata3132">
+     id="metadata5">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -25,17 +25,17 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(0,-229.26665)"
-     id="layer1">
+     transform="matrix(0.81,0,0,0.81,6.4346683,-179.27132)"
+     id="layer1-35">
     <rect
        transform="rotate(-45)"
        ry="0"
        rx="0"
-       y="192.25774"
-       x="-179.86897"
-       height="35.505943"
-       width="35.505943"
-       id="rect4489"
-       style="fill:none;fill-opacity:0.97461925;stroke:#ffffff;stroke-width:3.86834073;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:20;stroke-dasharray:none;stroke-dashoffset:981.35430908;stroke-opacity:1;paint-order:fill markers stroke" />
+       y="190.48242"
+       x="-181.64427"
+       height="39.056538"
+       width="39.056538"
+       id="rect4489-6"
+       style="fill:none;fill-opacity:0.97461925;stroke:#ffffff;stroke-width:7.51285982;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:20;stroke-dasharray:none;stroke-dashoffset:981.35430908;stroke-opacity:1;paint-order:fill markers stroke" />
   </g>
 </svg>
