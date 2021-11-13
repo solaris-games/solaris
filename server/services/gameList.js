@@ -47,6 +47,7 @@ module.exports = class GameListService {
             ]
         }, {
             'settings.general.name': 1,
+            'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             'settings.gametime.speed': 1,
             'settings.gametime.gameType': 1,
@@ -81,6 +82,7 @@ module.exports = class GameListService {
             ]
         }, {
             'settings.general.name': 1,
+            'settings.general.type': 1,
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1,
             'galaxy.players.defeated': 1,
@@ -181,6 +183,7 @@ module.exports = class GameListService {
             'state.paused': { $eq: false }
         }, {
             'settings.general.name': 1,
+            'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             state: 1
         }, {

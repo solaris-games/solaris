@@ -9,15 +9,15 @@
         <th style="width: 5%">#</th>
         <th style="width: 30%">Player</th>
         <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
-        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('rank')" title="Rank" @click="actions.sort('rank')">
+        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('rank')" title="Total rank" @click="actions.sort('rank')">
           <i class="fas fa-star text-info"></i>
           <i v-if="actions.isActive('rank')" class="fas fa-chevron-down ml-2"></i>
         </th>
-        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('victories')" title="Victories" @click="actions.sort('victories')">
+        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('victories')" title="Total victories" @click="actions.sort('victories')">
           <i class="fas fa-trophy text-warning"></i>
           <i v-if="actions.isActive('victories')" class="fas fa-chevron-down ml-2"></i>
         </th>
-        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('renown')" title="Renown" @click="actions.sort('renown')">
+        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('renown')" title="Total renown" @click="actions.sort('renown')">
           <i class="fas fa-heart text-danger"></i>
           <i v-if="actions.isActive('renown')" class="fas fa-chevron-down ml-2"></i>
         </th>

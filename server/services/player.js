@@ -46,25 +46,26 @@ module.exports = class PlayerService extends EventEmitter {
 
     getPlayersWithinScanningRangeOfPlayer(game, players, player) {
         let inRange = [player];
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
-        for (let p of players) {
-            if (inRange.indexOf(p) > -1) {
+        for (let otherPlayer of players) {
+            if (inRange.indexOf(otherPlayer) > -1) {
                 continue;
             }
 
-            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+            let otherPlayerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, otherPlayer._id);
 
             let isInRange = false;
 
-            for (let s of playerStars) {
-                if (this.starService.isStarInScanningRangeOfPlayer(game, s, player)) {
+            for (let s of otherPlayerStars) {
+                if (this.starService.isStarWithinScanningRangeOfStars(game, s, playerStars)) {
                     isInRange = true;
                     break;
                 }
             }
             
             if (isInRange) {
-                inRange.push(p);
+                inRange.push(otherPlayer);
             }
         }
 

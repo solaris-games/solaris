@@ -14,28 +14,28 @@
     <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
     <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
     <td class="text-right">
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="disband()" v-if="isCurrentUser && playerIsLeader" title="Disband Guild">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="disband()" v-if="isCurrentUser && playerIsLeader" title="Disband the guild">
         <i class="fas fa-trash"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="leave()" v-if="isCurrentUser && !playerIsLeader" title="Leave Guild">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="leave()" v-if="isCurrentUser && !playerIsLeader" title="Leave the guild">
         <i class="fas fa-sign-out-alt"></i>
       </button>
-      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="promote()" v-if="canPromote" title="Promote Player">
+      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="promote()" v-if="canPromote" title="Promote this player">
         <i class="fas fa-level-up-alt"></i>
       </button>
-      <button class="btn btn-sm btn-warning ml-1" :disabled="isLoading" @click="demote()" v-if="canDemote" title="Demote Player">
+      <button class="btn btn-sm btn-warning ml-1" :disabled="isLoading" @click="demote()" v-if="canDemote" title="Demote this player">
         <i class="fas fa-level-down-alt"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="kick()" v-if="canKick" title="Kick Player">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="kick()" v-if="canKick" title="Kick this player from the guild">
         <i class="fas fa-ban"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="uninvite()" v-if="canRevokeInvite" title="Revoke Invitation">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="uninvite()" v-if="canRevokeInvite" title="Revoke invitation">
         <i class="fas fa-trash"></i>
       </button>
-      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" v-if="canRevokeApplication" title="Accept Application">
+      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" v-if="canRevokeApplication" title="Accept application">
         <i class="fas fa-check"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" v-if="canRevokeApplication" title="Reject Application">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" v-if="canRevokeApplication" title="Reject application">
         <i class="fas fa-trash"></i>
       </button>
     </td>

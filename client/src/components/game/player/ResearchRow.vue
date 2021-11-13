@@ -1,7 +1,11 @@
 <template>
   <tr>
     <td class="row-icon"><i class="fas" :class="iconClass"></i></td>
-    <td>{{ title }}</td>
+    <td>
+      {{ title }}
+      <br/>
+      <small>{{subtitle}}</small>
+    </td>
     <td class="text-right" :class="playerStyle">
       {{ playerResearchLevel }}
     </td>
@@ -23,6 +27,7 @@ export default {
     userPlayer: Object,
     research: String,
     title: String,
+    subtitle: String,
     iconClass: String,
   },
   computed: {

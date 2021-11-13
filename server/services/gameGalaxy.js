@@ -115,15 +115,15 @@ module.exports = class GameGalaxyService {
     }
 
     _getCachedGalaxy(gameId, userId, requestedTick, currentTick) {
-        // Note: As we are only logging the last 24 ticks we can safely cache everything.
-        // Otherwise we'll need to add in some logic to limit how far back we cache.
-        
-        // if (currentTick - requestedTick > 24) {
-        //     return {
-        //         cacheKey: null,
-        //         galaxy: null
-        //     };
-        // }
+        // Cache up to 24 ticks, any more and its too much memory.
+        // Note: If we limit how much history data is logged we will
+        // need to update this logic.
+        if (currentTick - requestedTick > 24) {
+            return {
+                cacheKey: null,
+                galaxy: null
+            };
+        }
 
         if (!userId) {
             return null;

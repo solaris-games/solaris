@@ -894,6 +894,23 @@ class GameHelper {
     return playerIds.length
   }
 
+  getGameTypeFriendlyText (game) {
+    return {     
+      'new_player_rt': 'New Players',
+      'standard_rt': 'Standard',
+      'standard_tb': 'Standard - TB',
+      '1v1_rt': '1 vs. 1',
+      '1v1_tb': '1 vs. 1 - TB',
+      '32_player_rt': '32 Players',
+      'custom': 'Custom',
+      'special_dark': 'Dark Galaxy',
+      'special_ultraDark': 'Ultra Dark Galaxy',
+      'special_orbital': 'Orbital',
+      'special_battleRoyale': 'Battle Royale',
+      'special_homeStar': 'Capital Stars',
+      'special_anonymous': 'Anonymous',
+    }[game.settings.general.type]
+  }
 }
 
 export default new GameHelper()

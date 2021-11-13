@@ -48,11 +48,11 @@
                           <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
-                              <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
                             </span>
                             <span v-if="player.readyToQuit" @click="unconfirmReadyToQuit(player)">
-                              <i class="fas fa-check text-warning" title="This player is ready to quit"></i>
+                              <i class="fas fa-check text-warning" title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
                             </span>
                           </h5>
                       </td>
@@ -74,7 +74,7 @@
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
-                          <i class="fas fa-check text-success" title="This player is ready."></i>
+                          <i class="fas fa-check text-success" title="This player has completed their turn"></i>
                         </h5>
                         <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>

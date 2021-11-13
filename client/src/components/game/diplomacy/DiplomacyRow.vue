@@ -12,8 +12,8 @@
   </td>
   <td class="fit pt-3 pb-2 pr-2">
     <div class="btn-group">
-      <button class="btn btn-sm btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare Allies"><i class="fas fa-handshake"></i></button>
-      <button class="btn btn-sm btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare Enemies"><i class="fas fa-skull"></i></button>
+      <button class="btn btn-sm btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare this player an ally"><i class="fas fa-handshake"></i></button>
+      <button class="btn btn-sm btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare this player as an enemy"><i class="fas fa-skull"></i></button>
     </div>
   </td>
 </tr>

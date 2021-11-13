@@ -16,7 +16,8 @@
               v-if="isTechnologyEnabled('scanning')"
               research="scanning"
               iconClass="fa-binoculars"
-              title="Scanning"
+              title="Scaning"
+              subtitle="Determines how far your star's can see"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -25,6 +26,7 @@
               research="hyperspace"
               iconClass="fa-gas-pump"
               title="Hyperspace Range"
+              subtitle="Determines how far your carriers can travel in a single jump"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -33,6 +35,7 @@
               research="terraforming"
               iconClass="fa-globe-europe"
               title="Terraforming"
+              subtitle="Determines infrastructure cost. The higher the terraforming level, the lower infrastructure will cost to upgrade"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -41,6 +44,7 @@
               research="experimentation"
               iconClass="fa-microscope"
               title="Experimentation"
+              subtitle="Determines how many research points are awarded at the end of the galactic cycle to a random technology"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -49,6 +53,7 @@
               research="weapons"
               iconClass="fa-fighter-jet"
               title="Weapons"
+              subtitle="Determines combat strength of your ships"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -57,6 +62,7 @@
               research="banking"
               iconClass="fa-money-bill-alt"
               title="Banking"
+              subtitle="Determines how many credits are awarded at the end of the galactic cycle"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -65,6 +71,7 @@
               research="manufacturing"
               iconClass="fa-industry"
               title="Manufacturing"
+              subtitle="Determines how many ships are built via industrial infrastructure per tick"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>
@@ -73,6 +80,7 @@
               research="specialists"
               iconClass="fa-user-astronaut"
               title="Specialists"
+              subtitle="Determines how many specialist tokens are awarded at the end of the galactic cycle"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>

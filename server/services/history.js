@@ -1,8 +1,6 @@
 const cache = require('memory-cache');
 const ValidationError = require('../errors/validation');
 
-const MIN_HISTORY_TICK_OFFSET = 24;
-
 module.exports = class HistoryService {
 
     constructor(historyModel, historyRepo, playerService, gameService) {
@@ -171,12 +169,15 @@ module.exports = class HistoryService {
     async cleanupTimeMachineHistory(game) {
         let maxTick;
 
+        const MIN_HISTORY_TICK_OFFSET = null; // Decide how many ticks to store.
+
         // For games where the time machine is disabled, clear out the all previous tick
         // data to save space as we only need the current tick data for masking.
-        // Otherwise limit normal games to 24 ticks ago to save space.
+        // Otherwise limit normal games to MIN_HISTORY_TICK_OFFSET ticks ago to save space.
         if (game.settings.general.timeMachine === 'disabled') {
             maxTick = game.state.tick;
-        } else {
+        } 
+        else if (MIN_HISTORY_TICK_OFFSET) {
             maxTick = Math.max(0, game.state.tick - MIN_HISTORY_TICK_OFFSET);
         }
 

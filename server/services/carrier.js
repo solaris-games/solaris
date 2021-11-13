@@ -13,12 +13,39 @@ module.exports = class CarrierService {
         this.diplomacyService = diplomacyService;
     }
 
-    getById(game, id) {
-        return game.galaxy.carriers.find(s => s._id.toString() === id);
+    getByObjectId(game, id) {
+        // return game.galaxy.carriers.find(s => s._id.equals(id));
+        return this.getByIdBS(game, id); // Experimental
     }
 
-    getByObjectId(game, id) {
-        return game.galaxy.carriers.find(s => s._id.equals(id));
+    getById(game, id) {
+        // return game.galaxy.carriers.find(s => s._id.toString() === id.toString());
+        return this.getByIdBS(game, id); // Experimental
+    }
+
+    getByIdBS(game, id) {
+        let start = 0;
+        let end = game.galaxy.carriers.length - 1;
+    
+        while (start <= end) {
+            let middle = Math.floor((start + end) / 2);
+            let carrier = game.galaxy.carriers[middle];
+
+            if (carrier._id.toString() === id.toString()) {
+                // found the id
+                return carrier;
+            } else if (carrier._id.toString() < id.toString()) {
+                // continue searching to the right
+                start = middle + 1;
+            } else {
+                // search searching to the left
+                end = middle - 1;
+            }
+        }
+
+        // id wasn't found
+        // Return the old way
+        return game.galaxy.carriers.find(s => s._id.toString() === id.toString());
     }
 
     getCarriersAtStar(game, starId) {
