@@ -417,32 +417,32 @@ class Star extends EventEmitter {
     this.graphics_shape_full.tint = player.colour.value
     this.graphics_shape_part.anchor.set(0.5)
     this.graphics_shape_full.anchor.set(0.5)
-    this.graphics_shape_part.width = 24.0
-    this.graphics_shape_part.height = 24.0
-    this.graphics_shape_full.width = 24.0
-    this.graphics_shape_full.height = 24.0
+    this.graphics_shape_part.width = 28.0
+    this.graphics_shape_part.height = 28.0
+    this.graphics_shape_full.width = 28.0
+    this.graphics_shape_full.height = 28.0
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
   }
 
   _drawColourCircle () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][0+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][2+this.data.warpGate])
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][2+this.data.warpGate])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][0+this.data.warpGate])
   }
 
   _drawColourSquare () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][0+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][2+this.data.warpGate])
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][2+this.data.warpGate])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][0+this.data.warpGate])
   }
 
   _drawColourDiamond () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][0+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][2+this.data.warpGate])
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][2+this.data.warpGate])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][0+this.data.warpGate])
   }
 
   _drawColourHexagon () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][0+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][2+this.data.warpGate])
+    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][2+this.data.warpGate])
+    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][0+this.data.warpGate])
   }
 
   _hasUnknownShips() {
