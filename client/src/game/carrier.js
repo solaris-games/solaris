@@ -111,7 +111,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  drawShip () {
+  drawCarrier () {
     this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
     this.graphics_ship.anchor.set(0.5)
     this.graphics_ship.width = 12.0
