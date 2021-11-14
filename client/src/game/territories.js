@@ -139,24 +139,27 @@ class Territories {
     let startIX, endIX, startIY, endIY, gridLocation, distance, owner;
     let stars = this.game.galaxy.stars
     for (let star of stars) {
-      startIX = Math.ceil((star.location.x - METABALL_RADIUS - minX) / CELL_SIZE);
-      endIX = Math.floor((star.location.x + METABALL_RADIUS - minX) / CELL_SIZE);
+      // This loop goes through all stars, and generates the gridPoints that are within the METABALL_RADIUS
+      // Those points get the value of this star, or keep their previous value (from another star) if that one was closer
+      startIX = Math.ceil((star.location.x - METABALL_RADIUS - minX) / CELL_SIZE); //The minimum ix can be and still be in the METABALL_RADIUS
+      endIX = Math.floor((star.location.x + METABALL_RADIUS - minX) / CELL_SIZE); //The maximum ix can be and still be in the METABALL_RADIUS
       for (let ix = startIX; ix <= endIX; ix++) {
-        startIY = Math.ceil((star.location.y - Math.sqrt((METABALL_RADIUS)**2 - (star.location.x - (ix * CELL_SIZE + minX))**2) - minY) / CELL_SIZE);
-        endIY = Math.floor((star.location.y + Math.sqrt((METABALL_RADIUS)**2 - (star.location.x - (ix * CELL_SIZE + minX))**2) - minY) / CELL_SIZE);
+        startIY = Math.ceil((star.location.y - Math.sqrt((METABALL_RADIUS)**2 - (star.location.x - (ix * CELL_SIZE + minX))**2) - minY) / CELL_SIZE); // The minimum iy can be and still be in the METABALL_RADIUS
+        endIY = Math.floor((star.location.y + Math.sqrt((METABALL_RADIUS)**2 - (star.location.x - (ix * CELL_SIZE + minX))**2) - minY) / CELL_SIZE); // The maximum iy can be and still be in the METABALL_RADIUS
         for (let iy = startIY; iy <= endIY; iy++) {
-          gridLocation = gridToCoord(ix, iy);
-          distance = gameHelper.getDistanceBetweenLocations(gridLocation, star.location);
-          if (samplePoints[ix][iy] && samplePoints[ix][iy].distance < distance) {
+          gridLocation = gridToCoord(ix, iy); // Get the location in x, y of the gridPoint we are currently looping through
+          distance = gameHelper.getDistanceBetweenLocations(gridLocation, star.location); // Get the distance between the gridPoint and the star
+          if (samplePoints[ix][iy] && samplePoints[ix][iy].distance < distance) { // If the gridpoint has a value AND the distance currently logged (from a previous star) is smaller than the current one THEN don't log anything
             // Do nothing, because the grid already has a value from a star that is closer
           } else {
             // Now either the grid doesn't have a value here yet or the star calculated here is closer than the one currently logged in
             owner = this.game.galaxy.players.find(p => p._id === star.ownedByPlayerId)
-            samplePoints[ix][iy] = { distance, owner };
+            samplePoints[ix][iy] = { distance, owner }; // Make this gridPoint the value of the distance from the star so we can compare it with other stars AND make it have the value for the owner (the player)
           }
         }
       }
     }
+    // Loops through all samplePoints, to make the value of the point the owner, instead of {distance, owner} because that is what the next function takes as input.
     for (let ix = 0; ix < samplePoints.length - 1; ix++) {
       for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
         if (samplePoints[ix][iy]) {
