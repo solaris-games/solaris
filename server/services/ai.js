@@ -115,8 +115,12 @@ module.exports = class AIService {
 
         for (const [attackedStarId, attacks] of starsUnderAttack) {
             for (const [attackInTicks, incomingCarriers] of attacks) {
+                const attackedStar = context.playerStarsById.get(attackedStarId);
+                const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
+
                 orders.push({
                     type: 'DEFEND_STAR',
+                    score: starScore,
                     star: attackedStarId,
                     ticksUntil: attackInTicks,
                     incomingCarriers
