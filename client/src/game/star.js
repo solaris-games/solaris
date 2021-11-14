@@ -372,10 +372,10 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
-    this.graphics_shape_part.clear()
-    this.graphics_shape_full.clear()
-    this.graphics_shape_part_warp.clear()
-    this.graphics_shape_full_warp.clear()
+    if (this.graphics_shape_part) {
+      this.container.removeChild(this.graphics_shape_part)
+      this.container.removeChild(this.graphics_shape_full)
+    }
 
     // Get the player who owns the star.
     let player = this._getStarPlayer()
@@ -384,21 +384,6 @@ class Star extends EventEmitter {
       return
     }
 
-    let lineWidthInner = 3
-    let lineWidthOuter = 2
-
-    if (this._isDeadStar()) {
-      lineWidthInner--
-      lineWidthOuter--
-    }
-
-    this.graphics_shape_part.lineStyle(lineWidthInner, player.colour.value)
-    this.graphics_shape_full.lineStyle(lineWidthInner, player.colour.value)
-    this.graphics_shape_part_warp.lineStyle(lineWidthOuter, player.colour.value)
-    this.graphics_shape_full_warp.lineStyle(lineWidthOuter, player.colour.value)
-
-    this.container.removeChild(this.graphics_shape_part)
-    this.container.removeChild(this.graphics_shape_full)
     switch (player.shape) {
       case 'circle':
         this._drawColourCircle()
