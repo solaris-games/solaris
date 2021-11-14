@@ -519,6 +519,15 @@ module.exports = class CarrierService {
             distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
             nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
         }
+
+        return {
+            location: nextLocation,
+            distance: distancePerTick,
+            warpSpeed,
+            instantSpeed,
+            sourceStar,
+            destinationStar
+        };
     }
 
     isInTransit(carrier) {
