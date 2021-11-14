@@ -52,8 +52,6 @@ module.exports = class DistanceService {
     }
 
     getNextLocationTowardsLocation(source, destination, distance) {
-        // SUPER IMPORTANT: This moves the object just in the direction of the destination by the input distance, meaning it can totally overshoot when using this formula!!!
-        // Uses of this formula however catch this case and fix it, but be aware when picking it for a new function. 
         let angle = this.getAngleTowardsLocation(source, destination);
 
         return {
