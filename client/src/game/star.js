@@ -159,6 +159,7 @@ class Star extends EventEmitter {
     }
     else {
       this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
+      this.graphics_star.tint = 0xa0a0a0
     }
     this.graphics_star.anchor.set(0.5)
     this.graphics_star.width = 24.0/2.0
