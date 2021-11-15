@@ -73,15 +73,20 @@ module.exports = class AIService {
     async _createContext(game, player) {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        const playerStarsById = new Map()
+        const starsById = new Map()
 
-        for (const pstar of playerStars) {
-            playerStarsById.set(pstar._id.toString(), pstar);
+        for (const star of galaxy.stars) {
+            starsById.set(star._id.toString(), star);
         }
+
+        const reachableStars = this._computeStarGraph(game, player, playerStars, game.stars);
+        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
 
         return {
             playerStars,
-            playerStarsById
+            starsById,
+            reachableStars,
+            reachablePlayerStars
         }
     }
 
@@ -102,16 +107,14 @@ module.exports = class AIService {
     }
 
     _gatherExpansionOrders(game, player, context) {
-        const reachableStars = this._computeStarGraph(game, player, context.playerStars, game.stars);
-
         const orders = [];
 
-        for (const [fromIdx, reachables] of reachableStars) {
+        for (const [fromIdx, reachables] of context.reachableStars) {
             const claimCandidates = reachables.filter(star => !star.ownedByPlayerId);
             const fromId = context.playerStars[fromIdx]._id;
             for (const candidate of claimCandidates) {
                 orders.push({
-                    type: 'COLONIZE_STAR',
+                    type: 'CLAIM_STAR',
                     score: candidate.naturalResources,
                     star: candidate._id,
                     from: fromId
@@ -126,7 +129,7 @@ module.exports = class AIService {
         // Find all of our stars that are under attack
         const incomingCarriers = game.galaxy.carriers
             .filter(carrier => carrier.ownedByPlayerId.toString() !== player._id.toString())
-            .map(carrier => [carrier, carrier.waypoints.find(wp => context.playerStarsById.has(wp.destination.toString()))])
+            .map(carrier => [carrier, carrier.waypoints.find(wp => context.starsById.has(wp.destination.toString()))])
             .filter(incoming => Boolean(incoming[1]))
 
         const starsUnderAttack = new Map();
@@ -143,7 +146,7 @@ module.exports = class AIService {
 
         for (const [attackedStarId, attacks] of starsUnderAttack) {
             for (const [attackInTicks, incomingCarriers] of attacks) {
-                const attackedStar = context.playerStarsById.get(attackedStarId);
+                const attackedStar = context.starsById.get(attackedStarId);
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
 
                 orders.push({
@@ -160,11 +163,8 @@ module.exports = class AIService {
     }
 
     async _gatherMovementOrders(game, player, context) {
-
-        const starGraph = this._computeStarGraph(game, player, context.playerStars, context.playerStars);
-
         // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(game, player, starGraph , context.playerStars);
+        const logisticsGraph = this._createLogisticsGraph(game, player, context.reachablePlayerStars , context.playerStars);
 
         // Graph of current carrier loops
         const existingGraph = this._computeExistingLogisticsGraph(game, player);
