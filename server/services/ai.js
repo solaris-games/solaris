@@ -81,12 +81,22 @@ module.exports = class AIService {
 
         const reachableStars = this._computeStarGraph(game, player, playerStars, game.stars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
+        const borderStars = [];
+        for (const [from, reachables] of reachableStars) {
+            for (const reachableId of reachables) {
+                const reachable = starsById.get(reachableId);
+                if (!reachable.ownedByPlayerId) {
+                    borderStars.push(from);
+                }
+            }
+        }
 
         return {
             playerStars,
             starsById,
             reachableStars,
-            reachablePlayerStars
+            reachablePlayerStars,
+            borderStars
         }
     }
 
@@ -163,15 +173,7 @@ module.exports = class AIService {
     }
 
     async _gatherMovementOrders(game, player, context) {
-        // Graph of carrier movements for logistics
-        const logisticsGraph = this._createLogisticsGraph(game, player, context.reachablePlayerStars , context.playerStars);
-
-        // Graph of current carrier loops
-        const existingGraph = this._computeExistingLogisticsGraph(game, player);
-
-        const logisticsOrders = this._createCarrierOrders(logisticsGraph, existingGraph);
-
-        return [];
+        //TODO: Let ships flow towards the border
     }
 
     _computeExistingLogisticsGraph(game, player) {
@@ -204,11 +206,11 @@ module.exports = class AIService {
 
             starCandidates.forEach((otherStar, otherStarIdx) => {
                 if (starIdx !== otherStarIdx && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
-                    reachableStars.add(otherStarIdx);
+                    reachableStars.add(otherStar._id);
                 }
             });
 
-            starGraph.set(starIdx, reachableStars);
+            starGraph.set(star._id, reachableStars);
         });
 
         return starGraph;
