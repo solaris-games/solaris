@@ -77,29 +77,34 @@ class Carrier extends EventEmitter {
   }
 
   drawShape() {
-    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][0])
-    this.graphics_colour.anchor.set(0.5)
-    this.graphics_colour.width = 18
-    this.graphics_colour.height = 18
-    this.graphics_colour.tint = this.colour
-    this.container.addChild(this.graphics_colour)
-    return
+    if (this.graphics_colour) {
+      this.container.removeChild(this.graphics_colour)
+      this.graphics_colour = null
+    }
+
     switch(this.player.shape) {
       case 'circle':
         this._drawShapeCircle()
-        return
+        break
       case 'square':
         this._drawShapeSquare()
-        return
+        break
       case 'hexagon':
         this._drawShapeHexagon()
-        return
+        break
       case 'diamond':
         this._drawShapeDiamond()
-        return
+        break
     }
 
-    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_colour)
+    this.graphics_colour.anchor.set(0.5)
+    this.graphics_colour.width = 12
+    this.graphics_colour.height = 12
+    this.graphics_colour.tint = this.colour
+
+    this.container.addChild(this.graphics_colour)
+
+    //Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_colour)
   }
 
   drawColour () {
@@ -176,29 +181,19 @@ class Carrier extends EventEmitter {
   }
 
   _drawShapeDiamond() {
-    this.graphics_colour.moveTo(0, -5)
-    this.graphics_colour.lineTo(5, 0)
-    this.graphics_colour.lineTo(0, 5)
-    this.graphics_colour.lineTo(-5, 0)
-    this.graphics_colour.closePath()
+    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][4])
   }
 
   _drawShapeCircle () {
-    this.graphics_colour.drawCircle(0, 0, 4)
+    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][4])
   }
 
   _drawShapeSquare () {
-    this.graphics_colour.drawRect(-3.5, -3.5, 7, 7)
+    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][4])
   }
 
   _drawShapeHexagon () {
-    this.graphics_colour.moveTo(2, -3.5)
-    this.graphics_colour.lineTo(-2, -3.5)
-    this.graphics_colour.lineTo(-4, 0)
-    this.graphics_colour.lineTo(-2, 3.5)
-    this.graphics_colour.lineTo(2, 3.5)
-    this.graphics_colour.lineTo(4, 0)
-    this.graphics_colour.closePath()
+    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][4])
   }
 
   clearPaths() {

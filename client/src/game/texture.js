@@ -128,25 +128,29 @@ class TextureService {
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle_warp_gate.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle_partial.svg'))),
-        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle_partial_warp_gate.svg')))
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_circle_partial_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_circle_carrier.svg')))
       ]
       this.PLAYER_SYMBOLS['hexagon'] = [
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon_warp_gate.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon_partial.svg'))),
-        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon_partial_warp_gate.svg')))
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_hexagon_partial_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_hexagon_carrier.svg')))
       ]
       this.PLAYER_SYMBOLS['diamond'] = [
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond_warp_gate.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond_partial.svg'))),
-        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond_partial_warp_gate.svg')))
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_diamond_partial_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_diamond_carrier.svg')))
       ]
       this.PLAYER_SYMBOLS['square'] = [
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square_warp_gate.svg'))),
         new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square_partial.svg'))),
-        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square_partial_warp_gate.svg')))
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/256x256_square_partial_warp_gate.svg'))),
+        new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_square_carrier.svg')))
       ]
     }
 
