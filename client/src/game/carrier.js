@@ -77,10 +77,10 @@ class Carrier extends EventEmitter {
   }
 
   drawShape() {
-    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][0])
+    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][0])
     this.graphics_colour.anchor.set(0.5)
-    this.graphics_colour.width = 12.0
-    this.graphics_colour.height = 12.0
+    this.graphics_colour.width = 18
+    this.graphics_colour.height = 18
     this.graphics_colour.tint = this.colour
     this.container.addChild(this.graphics_colour)
     return
@@ -114,8 +114,8 @@ class Carrier extends EventEmitter {
   drawCarrier () {
     this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
     this.graphics_ship.anchor.set(0.5)
-    this.graphics_ship.width = 12.0
-    this.graphics_ship.height = 12.0
+    this.graphics_ship.width = 10
+    this.graphics_ship.height = 10
     this.container.addChild(this.graphics_ship)
 
     Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_ship)
