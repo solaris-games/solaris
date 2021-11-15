@@ -155,7 +155,10 @@ class Star extends EventEmitter {
 
     let isInScanningRange = this._isInScanningRange()
     if (isInScanningRange) {
-      if (this._isDeadStar() ) {
+      if (this.data.homeStar) {
+        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
+      }
+      else if (this._isDeadStar() ) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
       }
       else {
