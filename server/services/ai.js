@@ -56,13 +56,18 @@ module.exports = class AIService {
             const orders = await this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
+            player.markModified('aiState');
+            player.save();
         } catch (e) {
             console.error(e);
         }
     }
 
     async _setupAi(game, player) {
-
+        player.aiState = {
+            knownAttacks: [],
+            startedInvasions: []
+        }
     }
 
     async _createContext(game, player) {
