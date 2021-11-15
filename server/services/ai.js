@@ -90,8 +90,31 @@ module.exports = class AIService {
 
     async _gatherOrders(game, player, context) {
         const defenseOrders = this._gatherDefenseOrders(game, player, context);
+        //For now, just expand to unowned stars. Later, we will launch attacks on other players.
+        const expansionOrders = this._gatherExpansionOrders(game, player, context);
         const movementOrders = await this._gatherMovementOrders(game, player, context);
-        return defenseOrders.concat(movementOrders);
+        return defenseOrders.concat(expansionOrders, movementOrders);
+    }
+
+    _gatherExpansionOrders(game, player, context) {
+        const reachableStars = this._computeStarGraph(game, player, context.playerStars, game.stars);
+
+        const orders = [];
+
+        for (const [fromIdx, reachables] of reachableStars) {
+            const claimCandidates = reachables.filter(star => !star.ownedByPlayerId);
+            const fromId = context.playerStars[fromIdx]._id;
+            for (const candidate of claimCandidates) {
+                orders.push({
+                    type: 'COLONIZE_STAR',
+                    score: candidate.naturalResources,
+                    star: candidate._id,
+                    from: fromId
+                });
+            }
+        }
+
+        return orders;
     }
 
     _gatherDefenseOrders(game, player, context) {
@@ -133,7 +156,7 @@ module.exports = class AIService {
 
     async _gatherMovementOrders(game, player, context) {
 
-        const starGraph = this._computeStarGraph(game, player, context.playerStars);
+        const starGraph = this._computeStarGraph(game, player, context.playerStars, context.playerStars);
 
         // Graph of carrier movements for logistics
         const logisticsGraph = this._createLogisticsGraph(game, player, starGraph , context.playerStars);
@@ -165,7 +188,7 @@ module.exports = class AIService {
         return graph;
     }
 
-    _computeStarGraph(game, player, playerStars) {
+    _computeStarGraph(game, player, playerStars, starCandidates) {
         const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
         const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
 
@@ -174,7 +197,7 @@ module.exports = class AIService {
         playerStars.forEach((star, starIdx) => {
             const reachableStars = new Set();
 
-            playerStars.forEach((otherStar, otherStarIdx) => {
+            starCandidates.forEach((otherStar, otherStarIdx) => {
                 if (starIdx !== otherStarIdx && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
                     reachableStars.add(otherStarIdx);
                 }
