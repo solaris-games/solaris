@@ -18,24 +18,28 @@ module.exports = class CustomMapService {
         //const nameList = new Set()
         const homeStars = []
 
+        // TODO make a file containing the shapes
+        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+        let colours = require('../../config/game/colours').slice();
+
         for (const star of json.stars) {
-            //if (nameList.has(star.name)) continue
 
-            if (!this._checkStarProperty(star?.location, 'x', 'number')) continue
-            if (!this._checkStarProperty(star?.location, 'y', 'number')) continue
-            if (!this._checkStarProperty(star, 'naturalResources', 'number')) continue
-            if (!this._checkStarProperty(star, 'warpGate', 'boolean')) continue
-            if (!this._checkStarProperty(star?.infrastructure, 'economy', 'number')) continue
-            if (!this._checkStarProperty(star?.infrastructure, 'industry', 'number')) continue
-            if (!this._checkStarProperty(star?.infrastructure, 'science', 'number')) continue
-            //if (!this._checkStarProperty(star, 'ships', 'number')) continue
-            if (!this._checkStarProperty(star, 'playerIndex', 'number')) continue
-            if (!this._checkStarProperty(star, 'homeStar', 'boolean')) continue
-            if (!this._checkStarProperty(star, 'specialistId', 'number')) continue
+            this._checkStarProperty(star?.location, 'x', 'number')
+            this._checkStarProperty(star?.location, 'y', 'number')
+            this._checkStarProperty(star, 'naturalResources', 'number')
+            this._checkStarProperty(star, 'warpGate', 'boolean')
+            this._checkStarProperty(star?.infrastructure, 'economy', 'number')
+            this._checkStarProperty(star?.infrastructure, 'industry', 'number')
+            this._checkStarProperty(star?.infrastructure, 'science', 'number')
+            //this._checkStarProperty(star, 'ships', 'number')
+            this._checkStarProperty(star, 'playerIndex', 'number')
+            this._checkStarProperty(star, 'homeStar', 'boolean')
+            this._checkStarProperty(star, 'specialistId', 'number')
 
-            if (star.naturalResources < 0 || star.naturalResources > 100)
-                throw new ValidationError('Illigal starting amount of resources, range needs to be between 10 and 100 inclusive')
-            if (star.playerIndex >= (8*4)) //colours*shapes
+            if (star.naturalResources < 0 || star.naturalResources > 500)
+                throw new ValidationError('Illigal starting amount of resources, range needs to be between 0 and 500 inclusive')
+            
+            if (star.playerIndex >= (colours.length*shapes.length))
                 throw new ValidationError('Invalid playerid')
 
             if (star?.homeStar) {
@@ -43,20 +47,9 @@ module.exports = class CustomMapService {
               star.linkedLocations = []
               if (star.playerIndex >=0) { playerIndexes.push(star.playerIndex) }
             }
-            //nameList.add(star.name)
 
             locations.push(star)
         }
-        /*
-        if (!ownedList.every(array => array.length === starCount / playerCount))
-            throw new ValidationError('Not enough stars per player.')
-
-        if (!homeList.every(array => array.length === 1))
-            throw new ValidationError('Duplicate or players without homeStars.')
-        */
-
-        if (locations.length !== starCount)
-            throw new ValidationError('Not enough stars in json data generated.')
 
         if (homeStars.length === playerIndexes.length) {
           this._linkStars(homeStars, locations)
@@ -87,6 +80,7 @@ module.exports = class CustomMapService {
         return true
     }
 
+     /*link owned stars to their home stars so at a latter stage players will claim the correct stars*/
     _linkStars(homeStars, stars) {
       let commonStars = stars.filter( (star) => { return !star.homeStar })
       for(let homeStar of homeStars) {
