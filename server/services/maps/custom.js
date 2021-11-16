@@ -58,7 +58,7 @@ module.exports = class CustomMapService {
         }
         else {
           if(playerIndexes.length !== 0) {
-            throw new ValidationError('Unequal amount of home stars and players')
+            throw new ValidationError('Unequal amount of home stars and players, or repeated player IDs')
           } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
         }
 
@@ -71,6 +71,8 @@ module.exports = class CustomMapService {
         for(let location of locations) {
           if(location.specialistId === -1) { location.specialistId = null; }
         }
+
+        this._overwriteGameSettings(game, homeStars.length, locations.length/homeStars.length)
 
         return locations
     }
@@ -94,5 +96,11 @@ module.exports = class CustomMapService {
           }
         }
       }
+    }
+
+    //this is to prevent other things that rely on reading these values from breaking
+    _overwriteGameSettings(game, numofHomeStars, starsPerPlayer) {
+      game.settings.general.playerLimit = numofHomeStars
+      game.settings.galaxy.starsPerPlayer = starsPerPlayer
     }
 }
