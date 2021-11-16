@@ -18,7 +18,7 @@ class Carrier extends EventEmitter {
     this.container.interactiveChildren = false
     this.container.buttonMode = true
 
-    this.graphics_colour = new PIXI.Graphics()
+    this.graphics_colour = new PIXI.Sprite()
     this.graphics_selected = new PIXI.Graphics()
     this.graphics_ship = new PIXI.Graphics()
 
@@ -103,20 +103,24 @@ class Carrier extends EventEmitter {
     this.graphics_colour.tint = this.colour
 
     this.container.addChild(this.graphics_colour)
-
-    //Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_colour)
   }
 
   drawColour () {
-    this.graphics_colour.clear()
-
+    if (this.graphics_colour) {
+      this.container.removeChild(this.graphics_colour)
+      this.graphics_colour = null
+    }
+    
     if (!this.data.orbiting) {
-      this.graphics_colour.lineStyle(1, this.colour)
       this.drawShape();
     }
   }
 
   drawCarrier () {
+    if (this.graphics_ship) {
+      this.container.removeChild(this.graphics_ship)
+    }
+
     this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
     this.graphics_ship.anchor.set(0.5)
     this.graphics_ship.width = 10
