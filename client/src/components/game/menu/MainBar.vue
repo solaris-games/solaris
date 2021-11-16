@@ -14,6 +14,8 @@
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
+      <tutorial v-if="menuState == MENU_STATES.TUTORIAL" @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
@@ -137,6 +139,7 @@ import LeaderboardVue from '../leaderboard/Leaderboard.vue'
 import PlayerVue from '../player/Player.vue'
 import TradeVue from '../player/Trade.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
+import TutorialVue from '../tutorial/Tutorial.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
@@ -173,6 +176,7 @@ export default {
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
     'welcome': WelcomeVue,
+    'tutorial': TutorialVue,
     'player-list': PlayerListVue,
     'leaderboard': LeaderboardVue,
     'player': PlayerVue,

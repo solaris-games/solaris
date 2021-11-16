@@ -23,6 +23,24 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.post('/api/game/tutorial', middleware.authenticate, async (req, res, next) => {
+        try {
+            let tutorial = await container.gameListService.getUserTutorial(req.session.userId);
+
+            if (!tutorial) {
+                const settings = require('../../config/game/settings/user/tutorial.json');
+                
+                settings.general.createdByUserId = req.session.userId
+
+                tutorial = await container.gameCreateService.create(settings);
+            }
+
+            return res.status(201).json(tutorial._id);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/info', middleware.loadGameInfo, async (req, res, next) => {
         try {
             return res.status(200).json(req.game);

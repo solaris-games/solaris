@@ -5,7 +5,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class PlayerService extends EventEmitter {
     
-    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService) {
+    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService) {
         super();
         
         this.gameRepo = gameRepo;
@@ -16,6 +16,7 @@ module.exports = class PlayerService extends EventEmitter {
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.gameTypeService = gameTypeService;
     }
 
     getByObjectId(game, playerId) {
@@ -620,6 +621,10 @@ module.exports = class PlayerService extends EventEmitter {
             throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
         }
 
+        if (this.gameTypeService.isTutorialGame(game)) {
+            throw new ValidationError('Cannot declare ready to quit in a tutorial.');
+        }
+
         player.ready = true;
         player.readyToQuit = true;
 
@@ -636,7 +641,11 @@ module.exports = class PlayerService extends EventEmitter {
 
     async undeclareReadyToQuit(game, player) {
         if (game.state.productionTick <= 0) {
-            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
+            throw new ValidationError('Cannot undeclare ready to quit until at least 1 production cycle has completed.');
+        }
+
+        if (this.gameTypeService.isTutorialGame(game)) {
+            throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
         }
         
         player.ready = false;
@@ -711,7 +720,9 @@ module.exports = class PlayerService extends EventEmitter {
             // Reset whether we have sent the player a turn reminder.
             player.hasSentTurnReminder = false;
 
-            player.ready = false;
+            // Reset the ready status for players who have a legit user.
+            // Accounts could be deleted, could be a tutorial etc.
+            player.ready = player.userId == null;
         }
     }
 
@@ -720,6 +731,12 @@ module.exports = class PlayerService extends EventEmitter {
         // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
         // 3. They missed X cycles in a real time game (minimum of 12 hours)
+        
+        // Note: In tutorial games, only legit players can be considered afk.
+        if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
+            return false;
+        }
+
         let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
 
         if (lastSeenMoreThanXDaysAgo) {

@@ -61,12 +61,14 @@ module.exports = class EmailService {
         }
     };
 
-    constructor(config, gameService, userService, leaderboardService, playerService) {
+    constructor(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService) {
         this.config = config;
         this.gameService = gameService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
+        this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
@@ -193,7 +195,7 @@ module.exports = class EmailService {
         let leaderboardHtml = '';
 
         // Leaderboard is hidden for ultra dark mode games.
-        if (!this.gameService.isDarkModeExtra(game)) {
+        if (!this.gameTypeService.isDarkModeExtra(game)) {
             leaderboardHtml = leaderboard.map(l => {
                 return `
                     <tr>
@@ -252,11 +254,11 @@ module.exports = class EmailService {
     async trySendLastPlayerTurnReminder(gameId) {
         let game = await this.gameService.getById(gameId);
 
-        if (!this.gameService.isTurnBasedGame(game)) {
+        if (!this.gameTypeService.isTurnBasedGame(game)) {
             throw new Error('Cannot send a last turn reminder for non turn based games.');
         }
 
-        if (!this.gameService.isInProgress(game)) {
+        if (!this.gameStateService.isInProgress(game)) {
             return;
         }
 
