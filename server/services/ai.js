@@ -173,7 +173,53 @@ module.exports = class AIService {
     }
 
     async _gatherMovementOrders(game, player, context) {
-        //TODO: Let ships flow towards the border
+        const borderStarPriorities = new Map();
+        for (const borderStarId of context.borderStars) {
+            // Really, this should be calculated the other way around, going out from the enemy... but for now this should do it
+            const enemyStars = this._countEnemyStars(game, player, context, context.reachableStars.get(borderStarId));
+            // Maybe include some other properties, like infrastructure/specialists in the priority calculation later
+            borderStarPriorities.set(borderStarId, enemyStars);
+        }
+
+        const visited = new Set();
+        const starPriorities = new Map(borderStarPriorities);
+
+        while (true) {
+            let changed = false;
+
+            for (const [starId, priority] of starPriorities) {
+                if (!visited.has(starId)) {
+                    visited.add(starId);
+                    const reachables = context.reachablePlayerStars.get(starId);
+                    for (const reachableId of reachables) {
+                        const oldPriority = starPriorities.get(reachableId) || 0;
+                        const transitivePriority = priority * 0.5;
+                        const newPriority = Math.max(oldPriority, transitivePriority);
+                        starPriorities.set(reachableId, newPriority);
+                        changed = true;
+                    }
+                }
+            }
+
+            if (!changed) {
+                break;
+            }
+        }
+
+
+    }
+
+    _countEnemyStars(game, player, context, starIds) {
+        let count = 0;
+
+        for (const starId of starIds) {
+            const star = context.starsById.get(starId);
+            if (star.ownedByPlayerId && star.ownedByPlayerId !== player._id) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     _computeExistingLogisticsGraph(game, player) {
