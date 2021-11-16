@@ -14,7 +14,7 @@ module.exports = class CustomMapService {
         }
 
         const locations = [];
-        const playerIndexes = [];
+        let playerIndexes = [];
         //const nameList = new Set()
         const homeStars = []
 
@@ -50,6 +50,8 @@ module.exports = class CustomMapService {
 
             locations.push(star)
         }
+
+        playerIndexes = [...new Set(playerIndexes)] // ignore repeated player indexes
 
         if (homeStars.length === playerIndexes.length) {
           this._linkStars(homeStars, locations)
