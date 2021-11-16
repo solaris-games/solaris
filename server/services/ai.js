@@ -91,8 +91,11 @@ module.exports = class AIService {
             }
         }
 
+        const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+
         return {
             playerStars,
+            playerCarriers,
             starsById,
             reachableStars,
             reachablePlayerStars,
@@ -173,6 +176,10 @@ module.exports = class AIService {
     }
 
     async _gatherMovementOrders(game, player, context) {
+        const starPriorities = this._computeStarPriorities(game, player, context);
+    }
+
+    _computeStarPriorities(game, player, context) {
         const borderStarPriorities = new Map();
         for (const borderStarId of context.borderStars) {
             // Really, this should be calculated the other way around, going out from the enemy... but for now this should do it
@@ -206,7 +213,7 @@ module.exports = class AIService {
             }
         }
 
-
+        return starPriorities;
     }
 
     _countEnemyStars(game, player, context, starIds) {
