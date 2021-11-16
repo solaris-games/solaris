@@ -200,7 +200,7 @@ module.exports = (container) => {
         },
 
         validateGameLocked(req, res, next) {
-            if (container.gameService.isLocked(req.game)) {
+            if (container.gameStateService.isLocked(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is locked by the system. Please try again.');
             }
 
@@ -217,7 +217,7 @@ module.exports = (container) => {
 
         // TODO: Does this need a rework because games can be waiting to start?
         validateGameInProgress(req, res, next) {
-            if (!container.gameService.isInProgress(req.game)) {
+            if (!container.gameStateService.isInProgress(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is not in progress.');
             }
 
@@ -226,7 +226,7 @@ module.exports = (container) => {
 
         // TODO: Does this need a rework because games can be waiting to start?
         validateGameStarted(req, res, next) {
-            if (!container.gameService.isStarted(req.game)) {
+            if (!container.gameStateService.isStarted(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game has not yet started.');
             }
 
@@ -234,7 +234,7 @@ module.exports = (container) => {
         },
 
         validateGameNotFinished(req, res, next) {
-            if (container.gameService.isFinished(req.game)) {
+            if (container.gameStateService.isFinished(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is over.');
             }
 

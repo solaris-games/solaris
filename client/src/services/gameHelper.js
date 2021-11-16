@@ -44,6 +44,10 @@ class GameHelper {
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
+  getPlayerHomeStar (player, stars) {
+    return stars.find(s => s._id === player.homeStarId)
+  }
+
   getCarrierOwningPlayer (game, carrier) {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
@@ -404,6 +408,10 @@ class GameHelper {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
   }
 
+  isTradeEnabled (game) {
+    return game.settings.player.tradeCredits || game.settings.player.tradeCreditsSpecialists || game.settings.player.tradeCost
+  }
+
   isOrbitalMechanicsEnabled (game) {
     return game.settings.orbitalMechanics.enabled === 'enabled'
   }
@@ -414,6 +422,10 @@ class GameHelper {
 
   isConquestHomeStars (game) {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
+  }
+
+  isTutorialGame (game) {
+    return game.settings.general.type === 'tutorial'
   }
 
   getGameStatusText (game) {
@@ -745,7 +757,13 @@ class GameHelper {
   }
 
   isAllUndefeatedPlayersReady(game) {
-    let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+    let undefeatedPlayers
+
+    if (this.isTutorialGame(game)) {
+      undefeatedPlayers = game.galaxy.players.filter(p => p.userId)
+    } else {
+      undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+    }
 
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
   }
@@ -895,7 +913,8 @@ class GameHelper {
   }
 
   getGameTypeFriendlyText (game) {
-    return {     
+    return {
+      'tutorial': 'Tutorial',
       'new_player_rt': 'New Players',
       'standard_rt': 'Standard',
       'standard_tb': 'Standard - TB',
