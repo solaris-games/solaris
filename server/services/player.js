@@ -106,12 +106,15 @@ module.exports = class PlayerService extends EventEmitter {
         let shapes = ['circle', 'square', 'diamond', 'hexagon'];
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
+        const valueIndex = 0
+        const aliasIndex = 1
+        const colourCount = colours.length
+        const shapesCount = shapes.length
 
         if(game.galaxy.playerIndexes.length) {
           for(let index of game.galaxy.playerIndexes) {
-            let colour = colours.splice(index%8, 1)[0];
-            //let colour = colours[index%8][0] // 0 for alias
-            let shape = shapes[Math.floor(index/8)]
+            let colour = colours.splice(index%colourCount, 1)[valueIndex];
+            let shape = shapes[Math.floor(index/colourCount)]
             let player = this.createEmptyPlayer(game, colour, shape)
             this._setDefaultResearchTechnology(game, player);
             players.push(player);
@@ -125,7 +128,7 @@ module.exports = class PlayerService extends EventEmitter {
                   shapeIndex++;
               }
 
-              let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+              let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[valueIndex];
               let shape = shapes[shapeIndex];
 
               let player = this.createEmptyPlayer(game, colour, shape);
