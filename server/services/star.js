@@ -116,6 +116,7 @@ module.exports = class StarService extends EventEmitter {
                 game.galaxy.carriers
                     .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
                     .map(c => c.orbiting.toString())
+                    .filter(s => !this.isDeadStar(this.getById(game, s))) //This makes sure that a dead star with a carrier on it doesn't magicly get scanning
             );
 
             starIds = [...new Set(starIds)];
