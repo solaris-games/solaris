@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper'
+import seededRandom from 'random-seed'
 
 class Star extends EventEmitter {
 
@@ -10,6 +11,7 @@ class Star extends EventEmitter {
   static shipsSmallSize = 6
   static shipsBigSize = 10
   static maxLod = 4
+  static seededRNG = seededRandom.create()
 
   /*
     Defines what zoompercentage correspond to what
@@ -183,14 +185,16 @@ class Star extends EventEmitter {
       this.fixedContainer.removeChild(this.nebulaSprite)
       this.nebulaSprite = null
     }
-    let nebulaTexture = TextureService.getRandomStarNebulaTexture()
+    let seed = this.data.name+(Math.floor(this.data.location.x*this.data.location.y)).toString()
+    Star.seededRNG.seed(seed)
+    let nebulaTexture = TextureService.getRandomStarNebulaTexture(seed)
     this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
 
     let spriteSize = 64
     this.nebulaSprite.width = spriteSize
     this.nebulaSprite.height = spriteSize
     this.nebulaSprite.anchor.set(0.5)
-    this.nebulaSprite.rotation = Math.random()*Math.PI*2.0
+    this.nebulaSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
     let playerColour = player ? player.colour.value : 0xFFFFFF
@@ -199,7 +203,7 @@ class Star extends EventEmitter {
 
     let blendSprite = new PIXI.Sprite(nebulaTexture)
     blendSprite.anchor.set(0.5)
-    blendSprite.rotation = Math.random()*Math.PI*2.0
+    blendSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
     //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
     blendSprite.tint = playerColour
     this.nebulaSprite.addChild(blendSprite)
@@ -215,14 +219,16 @@ class Star extends EventEmitter {
       this.fixedContainer.removeChild(this.asteroidFieldSprite)
       this.asteroidFieldSprite = null
     }
-    let texture = TextureService.getRandomStarAsteroidFieldTexture()
+    let seed = this.data.name+(Math.floor(this.data.location.x*this.data.location.y)).toString()
+    Star.seededRNG.seed(seed)
+    let texture = TextureService.getRandomStarAsteroidFieldTexture(seed)
     this.asteroidFieldSprite = new PIXI.Sprite(texture)
 
     let spriteSize = 64
     this.asteroidFieldSprite.width = spriteSize
     this.asteroidFieldSprite.height = spriteSize
     this.asteroidFieldSprite.anchor.set(0.5)
-    this.asteroidFieldSprite.rotation = Math.random()*Math.PI*2.0
+    this.asteroidFieldSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
     let playerColour = player ? player.colour.value : 0xFFFFFF
