@@ -44,6 +44,10 @@ class GameHelper {
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
+  getPlayerHomeStar (player, stars) {
+    return stars.find(s => s._id === player.homeStarId)
+  }
+
   getCarrierOwningPlayer (game, carrier) {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
@@ -96,13 +100,7 @@ class GameHelper {
   }
 
   getDistanceBetweenLocations (loc1, loc2) {
-    let xs = loc2.x - loc1.x
-    let ys = loc2.y - loc1.y
-
-    xs *= xs
-    ys *= ys
-
-    return Math.sqrt(xs + ys)
+    return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
   }
   
   getClosestStar (stars, point) {
@@ -295,6 +293,10 @@ class GameHelper {
     let sourceStar = game.galaxy.stars.find(x => x._id === waypoint.source)
     let destinationStar = game.galaxy.stars.find(x => x._id === waypoint.destination)
 
+    if (sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)) {
+      return 1
+    }
+
     let source = sourceStar == null ? carrier.location : sourceStar.location
     let destination = destinationStar.location
 
@@ -343,7 +345,7 @@ class GameHelper {
   }
 
   canLoop (game, player, carrier) {
-    if (carrier.waypoints.length < 2) {
+    if (carrier.waypoints.length < 2 || carrier.isGift) {
       return false
     }
     
@@ -361,10 +363,25 @@ class GameHelper {
       return false
     }
 
+    if (this.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
+      return true
+    }
+
     let distanceBetweenStars = this.getDistanceBetweenLocations(firstWaypointStar.location, lastWaypointStar.location)
     let hyperspaceDistance = this.getHyperspaceDistance(game, player, carrier)
 
     return distanceBetweenStars <= hyperspaceDistance
+  }
+
+  isStarPairWormHole (sourceStar, destinationStar) {
+    return sourceStar.wormHoleToStarId 
+      && destinationStar.wormHoleToStarId 
+      && sourceStar.wormHoleToStarId === destinationStar._id
+      && destinationStar.wormHoleToStarId === sourceStar._id
+  }
+
+  isGameWaitingForPlayers (game) {
+    return game.state.startDate == null
   }
 
   isGamePaused (game) {
@@ -372,11 +389,11 @@ class GameHelper {
   }
 
   isGameInProgress (game) {
-    return !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
+    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
 
   isGamePendingStart (game) {
-    return !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
+    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
   isGameFinished (game) {
@@ -391,6 +408,10 @@ class GameHelper {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
   }
 
+  isTradeEnabled (game) {
+    return game.settings.player.tradeCredits || game.settings.player.tradeCreditsSpecialists || game.settings.player.tradeCost
+  }
+
   isOrbitalMechanicsEnabled (game) {
     return game.settings.orbitalMechanics.enabled === 'enabled'
   }
@@ -401,6 +422,10 @@ class GameHelper {
 
   isConquestHomeStars (game) {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
+  }
+
+  isTutorialGame (game) {
+    return game.settings.general.type === 'tutorial'
   }
 
   getGameStatusText (game) {
@@ -486,13 +511,15 @@ class GameHelper {
     // stars they have.
     return [...game.galaxy.players]
       .sort((a, b) => {
-        // If conquest and home star percentage then use the home star total stars as the sort
-        // All other cases use totalStars
-        let totalStarsKey = this.isConquestHomeStars(game) ? 'totalHomeStars' : 'totalStars'
+        // If its a conquest and home star victory then sort by home stars first, then by total stars.
+        if (this.isConquestHomeStars(game)) {
+            if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
+            if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+        }
 
         // Sort by total stars descending
-        if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
-        if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
+        if (a.stats.totalStars > b.stats.totalStars) return -1;
+        if (a.stats.totalStars < b.stats.totalStars) return 1;
 
         // Then by total ships descending
         if (a.stats.totalShips > b.stats.totalShips) return -1
@@ -730,7 +757,13 @@ class GameHelper {
   }
 
   isAllUndefeatedPlayersReady(game) {
-    let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+    let undefeatedPlayers
+
+    if (this.isTutorialGame(game)) {
+      undefeatedPlayers = game.galaxy.players.filter(p => p.userId)
+    } else {
+      undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
+    }
 
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
   }
@@ -831,7 +864,7 @@ class GameHelper {
   _getBankingCredits (game, player) {
     const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
 
-    if (!bankingEnabled || !player.stats.totalStars) {
+    if (!bankingEnabled || !player.stats.totalStars || !player.research || !player.research.banking) {
       return 0
     }
 
@@ -866,6 +899,36 @@ class GameHelper {
     const fromEconomy = player.stats.totalEconomy * 10
     const upkeep = this._getUpkeepCosts(game, player);
     return fromEconomy - upkeep  + this._getBankingCredits(game, player);
+  }
+
+  isStarHasMultiplePlayersInOrbit (game, star) {
+    let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
+    let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
+
+    if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
+      playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
+    }
+    
+    return playerIds.length
+  }
+
+  getGameTypeFriendlyText (game) {
+    return {
+      'tutorial': 'Tutorial',
+      'new_player_rt': 'New Players',
+      'standard_rt': 'Standard',
+      'standard_tb': 'Standard - TB',
+      '1v1_rt': '1 vs. 1',
+      '1v1_tb': '1 vs. 1 - TB',
+      '32_player_rt': '32 Players',
+      'custom': 'Custom',
+      'special_dark': 'Dark Galaxy',
+      'special_ultraDark': 'Ultra Dark Galaxy',
+      'special_orbital': 'Orbital',
+      'special_battleRoyale': 'Battle Royale',
+      'special_homeStar': 'Capital Stars',
+      'special_anonymous': 'Anonymous',
+    }[game.settings.general.type]
   }
 }
 

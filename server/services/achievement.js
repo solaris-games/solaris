@@ -1,21 +1,27 @@
 module.exports = class AchievementService {
     
-    constructor(userModel) {
-        this.userModel = userModel;
+    constructor(userRepo, guildService) {
+        this.userRepo = userRepo;
+        this.guildService = guildService;
     }
 
     async getAchievements(id) {
-        return await this.userModel.findById(id, {
+        const user = await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             achievements: 1,
+            guildId: 1,
             username: 1,
             'roles.contributor': 1,
             'roles.developer': 1,
             'roles.communityManager': 1,
             'roles.gameMaster': 1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
+
+        if (user.guildId) {
+            user.guild = await this.guildService.getInfoById(user.guildId);
+        }
+
+        return user;
     }
 
     async incrementAchievement(userId, achievement, amount = 1) {
@@ -25,11 +31,9 @@ module.exports = class AchievementService {
 
         updateQuery.$inc[achievement] = amount;
 
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
-        },
-        updateQuery)
-        .exec();
+        }, updateQuery);
     }
 
     async incrementSpecialistsHired(userId, amount = 1) {
@@ -38,10 +42,6 @@ module.exports = class AchievementService {
 
     async incrementWarpGatesBuilt(userId, amount = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGates', amount);
-    }
-
-    async incrementWarpGatesDestroyed(userId, amount = 1) {
-        return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGatesDestroyed', amount);
     }
 
     async incrementWarpGatesDestroyed(userId, amount = 1) {
@@ -120,5 +120,11 @@ module.exports = class AchievementService {
 
     async incrementQuit(userId, amount = 1) {
         return await this.incrementAchievement(userId, 'achievements.quit', amount);
+    }
+
+    async isEstablishedPlayer(userId) {
+        let userAchievements = await this.getAchievements(userId);
+
+        return userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
     }
 };

@@ -4,14 +4,14 @@
 
   <div class="container" v-if="conversation">
     <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide Pinned Only" @click="toggledPinnedOnly">
+      <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
         <i class="fas fa-thumbtack"></i>
       </button>
-      <button class="btn btn-sm btn-info ml-1" @click="toggleConversationWindow" title="Toggle Conversation Display">
+      <button class="btn btn-sm btn-info ml-1" @click="toggleConversationWindow" title="Toggle conversation display">
         <i class="fas" :class="{'fa-eye-slash':!toggleDisplay,'fa-eye':toggleDisplay}"></i>
       </button>
       <button class="btn btn-sm btn-primary ml-1" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
-      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave"><i class="fas fa-sign-out-alt"></i></button>
+      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
     <p v-if="!toggleDisplay" class="pb-2 text-warning">
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import eventBus from '../../../../eventBus'
 import GameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
@@ -102,7 +103,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
-      this.$emit('onOpenInboxRequested', e)
+      eventBus.$emit('onOpenInboxRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)

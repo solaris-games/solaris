@@ -16,7 +16,7 @@ module.exports = class MapService {
         this.customMapService = customMapService;
     }
 
-    generateStars(game, settings, starCount, playerLimit, warpGatesSetting) {
+    generateStars(game, settings, starCount, playerLimit) {
         let stars = [];
 
         // Get an array of random star names for however many stars we want.
@@ -97,20 +97,30 @@ module.exports = class MapService {
         }
 
         // If warp gates are enabled, assign random stars to start as warp gates.
-        if (!isCustomGalaxy && warpGatesSetting !== 'none') {
-            this.generateGates(stars, warpGatesSetting, playerLimit);
+        if (game.settings.specialGalaxy.randomWarpGates && !isCustomGalaxy) {
+            this.generateGates(stars, game.settings.specialGalaxy.randomWarpGates);
+        }
+
+        // If worm holes are enabled, assign random warp gates to start as worm hole pairs
+        if (game.settings.specialGalaxy.randomWormHoles) {
+            this.generateWormHoles(stars, game.settings.specialGalaxy.randomWormHoles);
+        }
+
+        // If nebulas are enabled, assign random nebulas to start
+        if (game.settings.specialGalaxy.randomNebulas) {
+            this.generateNebulas(stars, game.settings.specialGalaxy.randomNebulas);
+        }
+
+        // If asteroid fields are enabled, assign random asteroid fields to start
+        if (game.settings.specialGalaxy.randomAsteroidFields) {
+            this.generateAsteroidFields(game, stars, game.settings.specialGalaxy.randomAsteroidFields);
         }
 
         return stars;
     }
 
-    generateGates(stars, type, playerCount) {
-        let gateCount = 0;
-
-        switch (type) {
-            case 'rare': gateCount = playerCount; break;            // 1 per player
-            case 'common': gateCount = stars.length / playerCount; break;  // fucking loads
-        }
+    generateGates(stars, percentage) {
+        let gateCount = Math.floor(stars.length / 100 * percentage);
 
         // Pick stars at random and set them to be warp gates.
         do {
@@ -124,16 +134,60 @@ module.exports = class MapService {
         } while (gateCount--);
     }
 
-    getGalaxyDiameter(stars) {
-        let maxX = stars.sort((a, b) => b.x - a.x)[0].x;
-        let maxY = stars.sort((a, b) => b.y - a.y)[0].y;
-        let minX = stars.sort((a, b) => a.x - b.x)[0].x;
-        let minY = stars.sort((a, b) => a.y - b.y)[0].y;
+    generateWormHoles(stars, percentage) {
+        let wormHoleCount = Math.floor(stars.length / 2 / 100 * percentage); // Worm homes come in pairs so its half of stars
 
-        return {
-            x: Math.abs(minX) + Math.abs(maxX),
-            y: Math.abs(minY) + Math.abs(maxY),
-        };
+        // Pick stars at random and pair them up with another star to create a worm hole.
+        while (wormHoleCount--) {
+            const remaining = stars.filter(s => !s.wormHoleToStarId);
+
+            let starA = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
+            let starB = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
+
+            // Check validity of the ramdom selection.
+            if (starA._id.equals(starB._id) || starA.wormHoleToStarId || starB.wormHoleToStarId) {
+                wormHoleCount++; // Increment because the while loop will decrement.
+            } else {
+                starA.wormHoleToStarId = starB._id;
+                starB.wormHoleToStarId = starA._id;
+            }
+        }
+    }
+
+    generateNebulas(stars, percentage) {
+        let count = Math.floor(stars.length / 100 * percentage);
+
+        // Pick stars at random and set them to be nebulas
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.isNebula) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isNebula = true;
+            }
+        } while (count--);
+    }
+
+    generateAsteroidFields(game, stars, percentage) {
+        let count = Math.floor(stars.length / 100 * percentage);
+
+        // Pick stars at random and set them to be asteroid fields
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.isAsteroidField) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isAsteroidField = true;
+
+                // Overwrite the natural resources
+                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);;
+            }
+        } while (count--);
     }
 
     getGalaxyCenter(starLocations) {

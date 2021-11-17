@@ -55,18 +55,20 @@ module.exports = class EmailService {
             fileName: 'yourTurnReminder.html',
             subject: 'Solaris - It\'s your turn to play!'
         },
-        CUSTOM_GAME_REMOVED: {
-            fileName: 'customGameRemoved.html',
+        GAME_TIMED_OUT: {
+            fileName: 'gameTimedOut.html',
             subject: 'Solaris - Your game did not start'
         }
     };
 
-    constructor(config, gameService, userService, leaderboardService, playerService) {
+    constructor(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService) {
         this.config = config;
         this.gameService = gameService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
+        this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
@@ -123,9 +125,9 @@ module.exports = class EmailService {
 
         // Replace the default parameters in the file
         // TODO: These should be environment variables.
-        html = html.replace('[{solaris_url}]', 'https://solaris.games');
-        html = html.replace('[{solaris_url_gamelist}]', 'https://solaris.games/#/game/list');
-        html = html.replace('[{solaris_url_resetpassword}]', 'https://solaris.games/#/account/reset-password-external');
+        html = html.replace('[{solaris_url}]', process.env.CLIENT_URL);
+        html = html.replace('[{solaris_url_gamelist}]', `${process.env.CLIENT_URL}/#/game/list`);
+        html = html.replace('[{solaris_url_resetpassword}]', `${process.env.CLIENT_URL}/#/account/reset-password-external`);
         html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
 
         // Replace the parameters in the file
@@ -148,7 +150,7 @@ module.exports = class EmailService {
 
     async sendGameStartedEmail(gameId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -168,7 +170,7 @@ module.exports = class EmailService {
     }
 
     async sendGameFinishedEmail(game) {
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -193,7 +195,7 @@ module.exports = class EmailService {
         let leaderboardHtml = '';
 
         // Leaderboard is hidden for ultra dark mode games.
-        if (!this.gameService.isDarkModeExtra(game)) {
+        if (!this.gameTypeService.isDarkModeExtra(game)) {
             leaderboardHtml = leaderboard.map(l => {
                 return `
                     <tr>
@@ -206,7 +208,7 @@ module.exports = class EmailService {
             .join('');
         }
 
-        let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
@@ -252,11 +254,11 @@ module.exports = class EmailService {
     async trySendLastPlayerTurnReminder(gameId) {
         let game = await this.gameService.getById(gameId);
 
-        if (!this.gameService.isTurnBasedGame(game)) {
+        if (!this.gameTypeService.isTurnBasedGame(game)) {
             throw new Error('Cannot send a last turn reminder for non turn based games.');
         }
 
-        if (!this.gameService.isInProgress(game)) {
+        if (!this.gameStateService.isInProgress(game)) {
             return;
         }
 
@@ -275,7 +277,7 @@ module.exports = class EmailService {
             player.hasSentTurnReminder = true;
             await game.save();
 
-            let gameUrl = `https://solaris.games/#/game?id=${game._id}`;
+            let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
             let user = await this.userService.getEmailById(player.userId);
@@ -293,7 +295,7 @@ module.exports = class EmailService {
         }
     }
 
-    async sendCustomGameRemovedEmail(gameId) {
+    async sendGameTimedOutEmail(gameId) {
         let game = await this.gameService.getById(gameId);
         let gameName = game.settings.general.name;
 
@@ -302,7 +304,7 @@ module.exports = class EmailService {
             
             if (user && user.emailEnabled) {
                 try {
-                    await this.sendTemplate(user.email, this.TEMPLATES.CUSTOM_GAME_REMOVED, [
+                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_TIMED_OUT, [
                         gameName
                     ]);
                 } catch (err) {

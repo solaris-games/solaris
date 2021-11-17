@@ -36,6 +36,7 @@
 <script>
 import starService from '../../../services/api/star'
 import GameHelper from '../../../services/gameHelper'
+import GameContainer from '../../../game/container'
 
 export default {
   components: {
@@ -50,10 +51,10 @@ export default {
       this.$emit("bulkIgnoreChanged", { 
         starId: this.starId
       });
+      const star = GameHelper.getStarById(this.$store.state.game, this.starId);
+      GameContainer.reloadStar(star);
     },
     async toggleBulkIgnore (infrastructureType) {
-      this.triggerChanged();
-      
       try {
         let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id, infrastructureType)
         
@@ -65,14 +66,14 @@ export default {
           } else {
             this.$toasted.show(`${this.star.name} ${infrastructureType} is now included in Bulk Upgrade.`)
           }
+          
+          this.triggerChanged();
         }
       } catch (err) {
         console.log(err)
       }
     },
     async toggleBulkIgnoreAll (ignoreStatus) {
-      this.triggerChanged();
-
       try {
         let response = await starService.toggleIgnoreBulkUpgradeAll(this.$store.state.game._id, this.star._id, ignoreStatus)
         
@@ -86,6 +87,8 @@ export default {
           } else {
             this.$toasted.show(`${this.star.name} is now included in Bulk Upgrade.`)
           }
+
+          this.triggerChanged();
         }
       } catch (err) {
         console.log(err)

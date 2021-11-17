@@ -22,7 +22,10 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
-    "randomGates": "none",
+    "randomWarpGates": 0,
+    "randomWormHoles": 0,
+    "randomNebulas": 0,
+    "randomAsteroidFields": 0,
     "darkGalaxy": "disabled",
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
@@ -58,7 +61,8 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all"
+    "tradeScanning": "all",
+    "alliances": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -81,12 +85,17 @@
       "weapons": "none",
       "specialists": "standard"
     },
-    "bankingReward": "standard"
+    "bankingReward": "standard",
+    "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "turnBased",
-    "tickJumps": 6,
+    "turnJumps": 4,
     "maxTurnWait": 1440,
-    "missedTurnLimit": 3
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
   }
 }

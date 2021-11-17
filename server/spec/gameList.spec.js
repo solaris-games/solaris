@@ -1,21 +1,8 @@
 const GameListService = require('../services/gameList');
 
 const fakeGameModel = {
-    // Bit of a pain in the ass to fake this model because mongoose is a dick.
     find() {
-        return {
-            select() {
-                return {
-                    lean() {
-                        return {
-                            exec() {
-                                return 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        return 1;
     }
 };
 

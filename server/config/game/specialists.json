@@ -77,14 +77,15 @@
         {
             "id": 6,
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -1 Weapons to the carrier.",
+            "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
                 "local": {
+                    "speed": 1.5,
                     "hyperspace": 3,
-                    "weapons": -1
+                    "weapons": -3
                 }
             }
         },
@@ -112,7 +113,7 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "hideCarrierShips": true
+                    "hideShips": true
                 }
             }
         },
@@ -228,7 +229,7 @@
         {
             "id": 16,
             "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
+            "description": "Reignites a dead star with 25 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -238,7 +239,7 @@
                 },
                 "special": {
                     "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": 10
+                    "reigniteDeadStarNaturalResources": 25
                 }
             }
         }
@@ -288,22 +289,20 @@
         {
             "id": 4,
             "name": "Orbital Cannon",
-            "description": "Grants +1 Weapons, -1 Scanning, -1 Terraforming to the Star.",
+            "description": "Grants +1 Weapons to the Star.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
                 "local": {
-                    "weapons": 1,
-                    "scanning": -1,
-                    "terraforming": -1
+                    "weapons": 1
                 }
             }
         },
         {
             "id": 5,
             "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent other players from using it. Weapons -1.",
+            "description": "Locks the Warp Gate at the Star to prevent enemy players from using it. Weapons -1.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -336,7 +335,7 @@
         {
             "id": 7,
             "name": "War Machine",
-            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. This specialist retires when the star reaches 0 natural resources.",
+            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. When the star reaches 0 natural resources, the star dies and the specialist retires.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": true,
@@ -359,7 +358,7 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "hideStarShips": true
+                    "hideShips": true
                 }
             }
         },
@@ -415,13 +414,13 @@
         {
             "id": 12,
             "name": "Financial Analyst",
-            "description": "The star produces 1 credit per tick for each point of science on the star.",
+            "description": "The star produces 3 credits per tick for each point of science on the star.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "creditsPerTickByScience": 1
+                    "creditsPerTickByScience": 3
                 }
             }
         }

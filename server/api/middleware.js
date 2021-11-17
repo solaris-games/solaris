@@ -65,93 +65,123 @@ module.exports = (container) => {
                 });
             }
 
-            return next(err);
+            console.error(err.stack);
+
+            return res.status(500).json({
+                errors: ['Something broke. If the problem persists, please contact a developer.']
+            });
         },
 
         async loadGame(req, res, next) {
-            // If the request URL contains a game id then
-            // append it to the request object.
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdGalaxy(req.params.gameId);
+            req.game = await container.gameService.getByIdGalaxy(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameLean(req, res, next) {
-            // If the request URL contains a game id then
-            // append it to the request object.
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdGalaxyLean(req.params.gameId);
+            req.game = await container.gameService.getByIdGalaxyLean(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameAll(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdAll(req.params.gameId);
+            req.game = await container.gameService.getByIdAll(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameInfo(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdInfo(req.params.gameId, req.session.userId);
+            req.game = await container.gameService.getByIdInfo(req.params.gameId, req.session.userId);
 
-                delete req.game.settings.general.password;
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
+
+            delete req.game.settings.general.password;
 
             return next();
         },
 
         async loadGameState(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdState(req.params.gameId, req.session.userId);
+            req.game = await container.gameService.getByIdState(req.params.gameId, req.session.userId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameMessages(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdMessages(req.params.gameId);
+            req.game = await container.gameService.getByIdMessages(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameMessagesLean(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdMessagesLean(req.params.gameId);
+            req.game = await container.gameService.getByIdMessagesLean(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameConversations(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdConversations(req.params.gameId);
+            req.game = await container.gameService.getByIdConversations(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGameConversationsLean(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdConversationsLean(req.params.gameId);
+            req.game = await container.gameService.getByIdConversationsLean(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
+            }
+
+            return next();
+        },
+
+        async loadGameDiplomacyLean(req, res, next) {
+            req.game = await container.gameService.getByIdDiplomacyLean(req.params.gameId);
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
         },
 
         async loadGamePlayers(req, res, next) {
-            if (req.params.gameId) {
-                req.game = await container.gameService.getByIdLean(req.params.gameId, {
-                    'galaxy.players': 1,
-                    'settings': 1
-                });
+            req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                'galaxy.players': 1,
+                'settings': 1
+            });
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
             }
 
             return next();
@@ -170,7 +200,7 @@ module.exports = (container) => {
         },
 
         validateGameLocked(req, res, next) {
-            if (container.gameService.isLocked(req.game)) {
+            if (container.gameStateService.isLocked(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is locked by the system. Please try again.');
             }
 
@@ -187,7 +217,7 @@ module.exports = (container) => {
 
         // TODO: Does this need a rework because games can be waiting to start?
         validateGameInProgress(req, res, next) {
-            if (!container.gameService.isInProgress(req.game)) {
+            if (!container.gameStateService.isInProgress(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is not in progress.');
             }
 
@@ -196,7 +226,7 @@ module.exports = (container) => {
 
         // TODO: Does this need a rework because games can be waiting to start?
         validateGameStarted(req, res, next) {
-            if (!container.gameService.isStarted(req.game)) {
+            if (!container.gameStateService.isStarted(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game has not yet started.');
             }
 
@@ -204,7 +234,7 @@ module.exports = (container) => {
         },
 
         validateGameNotFinished(req, res, next) {
-            if (container.gameService.isFinished(req.game)) {
+            if (container.gameStateService.isFinished(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is over.');
             }
 

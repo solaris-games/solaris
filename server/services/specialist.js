@@ -167,5 +167,17 @@ module.exports = class SpecialistService {
     getReigniteDeadStarNaturalResources(carrier) {
         return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', 1);
     }
+
+    getCarrierOrStarHideShips(carrierOrStar) {
+        if (!carrierOrStar.specialist) {
+            return false;
+        }
+
+        const specialist = this.getByIdCarrier(carrierOrStar.specialist.id);
+
+        let result = specialist?.modifiers?.special?.hideShips;
+
+        return result ?? false;
+    }
     
 };

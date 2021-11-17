@@ -2,8 +2,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class AuthService {
     
-    constructor(userModel, passwordService) {
-        this.userModel = userModel;
+    constructor(userRepo, passwordService) {
+        this.userRepo = userRepo;
         this.passwordService = passwordService;
     }
 
@@ -12,16 +12,14 @@ module.exports = class AuthService {
         email = email.toLowerCase();
 
         // Try to find the user by email
-        let user = await this.userModel.findOne({
+        let user = await this.userRepo.findOne({
             email
         }, {
             username: 1,
             password: 1,
             banned: 1,
             roles: 1
-        })
-        .lean()
-        .exec();
+        });
         
         if (!user) {
             throw new ValidationError('The email address or password is incorrect.');

@@ -140,7 +140,12 @@ export default {
     }
   },
   mounted () {
+    GameContainer.map.showIgnoreBulkUpgrade()
+
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+  },
+  destroyed () {
+    GameContainer.map.hideIgnoreBulkUpgrade()
   },
   methods: {
     onCloseRequested (e) {

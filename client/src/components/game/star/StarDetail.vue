@@ -1,13 +1,13 @@
 <template>
 <div class="menu-page container" v-if="star">
-    <menu-title :title="star.name" @onCloseRequested="onCloseRequested">
-      <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade" :starId="star._id" class="mr-1"/>
+    <menu-title :title="star.name + (star.homeStar ? ' - Capital': '')" @onCloseRequested="onCloseRequested">
+      <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade && isOwnedByUserPlayer" :starId="star._id" class="mr-1"/>
       <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-secondary">
         <i class="fas fa-trash"></i>
       </modalButton>
-      <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button @click="viewOnMap(star)" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
-
+    
     <div class="row bg-secondary">
       <div class="col text-center pt-2">
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
@@ -15,9 +15,27 @@
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
+
+        <div v-if="star.isNebula">
+          <hr/>
+          <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula</span>.</p>
+          <p class="mb-2 text-info"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
+        </div>
+
+        <div v-if="star.isAsteroidField">
+          <hr/>
+          <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field</span>.</p>
+          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus.</i></small></p>
+        </div>
+        
+        <div v-if="star.wormHoleToStarId">
+          <hr/>
+          <p class="mb-0" v-if="wormHolePairStar">This star is a <strong>Worm Hole</strong> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
+          <p class="mb-0" v-if="!wormHolePairStar">This star is a <strong>Worm Hole</strong> to an unknown star.</p>
+          <p class="mb-2 text-info"><small><i>Travel between Worm Holes takes 1 tick.</i></small></p>
+        </div>
       </div>
     </div>
-    
     <div v-if="isCompactUIStyle && star.infrastructure">
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
@@ -28,26 +46,35 @@
           </span>
         </div>
         <div class="col-auto">
+          <span v-if="star.isNebula" title="Star is obscured inside a nebula - All ship counts are hidden from other players">
+            <i class="fas fa-eye-slash ml-1"></i>
+          </span>
+          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus">
+            <i class="fas fa-meteor ml-1"></i>
+          </span>
+          <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
+            <i class="far fa-sun ml-1"></i>
+          </span>
           <span :title="star.warpGate ? 'Warp Gate':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
-            <i class="fas fa-dungeon ml-1"></i>
+            <i class="fas fa-dungeon ml-2"></i>
           </span>
         </div>
       </div>
       
       <div class="row mt-2 pb-2">
         <div class="col">
-          <span v-if="star.infrastructure && !isDeadStar" title="Economic Infrastructure">
+          <span v-if="star.infrastructure && !isDeadStar" title="Economic infrastructure">
               <i class="fas fa-money-bill-wave text-success"></i> {{star.infrastructure.economy}}
           </span>
-          <span v-if="star.infrastructure && !isDeadStar" title="Industrial Infrastructure" class="ml-2">
+          <span v-if="star.infrastructure && !isDeadStar" title="Industrial infrastructure" class="ml-2">
               <i class="fas fa-tools text-warning"></i> {{star.infrastructure.industry}}
           </span>
-          <span v-if="star.infrastructure && !isDeadStar" title="Scientific Infrastructure" class="ml-2">
+          <span v-if="star.infrastructure && !isDeadStar" title="Scientific infrastructure" class="ml-2">
               <i class="fas fa-flask text-info"></i> {{star.infrastructure.science}}
           </span>
         </div>
         <div class="col-auto">
-          <span title="Total Known Garrison" v-if="star.ownedByPlayerId && star.infrastructure">
+          <span title="Total known garrison" v-if="star.ownedByPlayerId && star.infrastructure">
             {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ml-1"></i>
           </span>
         </div>
@@ -71,7 +98,7 @@
           </span>
         </div>
         <div class="col-auto">
-          <span v-if="star.ownedByPlayerId && star.manufacturing != null && !isDeadStar" title="Ship Production">
+          <span v-if="star.ownedByPlayerId && star.manufacturing != null && !isDeadStar" title="Ship production per tick">
             {{star.manufacturing}} <i class="fas fa-wrench ml-1"></i>
           </span>
         </div>
@@ -150,7 +177,7 @@
           <i class="fas fa-rocket"></i> {{carrier.ships == null ? '???' : carrier.ships}}
         </div>
         <div class="col-auto pl-0">
-          <a href="javascript:;" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !isGameFinished" title="Transfer ships" @click="onShipTransferRequested(carrier)"><i class="fas fa-exchange-alt"></i></a>
+          <a href="javascript:;" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !isGameFinished" title="Transfer ships between the star and carrier" @click="onShipTransferRequested(carrier)"><i class="fas fa-exchange-alt"></i></a>
         </div>
       </div>
     </div>
@@ -224,7 +251,7 @@
 
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
       <p>Are you sure you want to abandon <b>{{star.name}}</b>?</p>
-      <p>It's Economy, Industry and Science will remain, but all ships and carriers at this star will be destroyed.</p>
+      <p>Its Economy, Industry and Science will remain, but all ships and carriers at this star will be destroyed.</p>
     </dialogModal>
 </div>
 </template>
@@ -287,9 +314,6 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
-    },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
     },
@@ -320,7 +344,7 @@ export default {
       this.$emit('onBuildCarrierRequested', this.star._id)
     },
     viewOnMap (e) {
-      GameContainer.map.panToStar(this.star)
+      GameContainer.map.panToStar(e)
     },
     async confirmAbandonStar (e) {
       try {
@@ -416,6 +440,13 @@ export default {
     },
     isDeadStar: function () {
       return GameHelper.isDeadStar(this.star)
+    },
+    wormHolePairStar: function () {
+      if (!this.star.wormHoleToStarId) {
+        return null
+      }
+
+      return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
     }
   }
 }

@@ -16,7 +16,7 @@
               v-if="isTechnologyEnabled('scanning')"
               research="scanning"
               iconClass="fa-binoculars"
-              title="Scanning"
+              title="Scaning"
               :player="player"
               :userPlayer="userPlayer"
             ></research-row>

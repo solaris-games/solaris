@@ -10,6 +10,14 @@ class UserService extends BaseApiService {
     return axios.get(this.BASE_URL + 'user/achievements/' + userId, { withCredentials: true })
   }
 
+  getUserAvatars () {
+    return axios.get(this.BASE_URL + 'user/avatars', { withCredentials: true })
+  }
+
+  purchaseAvatar (avatarId) {
+    return axios.post(this.BASE_URL + 'user/avatars/' + avatarId + '/purchase', {}, { withCredentials: true })
+  }
+
   getGameSettings () {
     return axios.get(this.BASE_URL + 'user/settings', { withCredentials: true })
   }
@@ -31,28 +39,28 @@ class UserService extends BaseApiService {
     return axios.put(this.BASE_URL + 'user/changeEmailPreference', {
       enabled
     },
-    { withCredentials: true })
+      { withCredentials: true })
   }
 
   updateEmailAddress (email) {
     return axios.put(this.BASE_URL + 'user/changeEmailAddress', {
       email
     },
-    { withCredentials: true })
+      { withCredentials: true })
   }
 
   updateUsername (username) {
     return axios.put(this.BASE_URL + 'user/changeUsername', {
       username
     },
-    { withCredentials: true })
+      { withCredentials: true })
   }
 
   updatePassword (currentPassword, newPassword) {
     return axios.put(this.BASE_URL + 'user/changePassword', {
       currentPassword, newPassword
     },
-    { withCredentials: true })
+      { withCredentials: true })
   }
 
   requestResetPassword (email) {
@@ -87,7 +95,12 @@ class UserService extends BaseApiService {
 
   closeAccount () {
     return axios.delete(this.BASE_URL + 'user/closeAccount',
-    { withCredentials: true })
+      { withCredentials: true })
+  }
+
+  listRecentDonations() {
+    return axios.get(this.BASE_URL + 'user/donations/recent',
+      { withCredentials: true })
   }
 }
 

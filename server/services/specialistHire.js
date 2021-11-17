@@ -2,13 +2,14 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class SpecialistHireService {
 
-    constructor(gameModel, specialistService, achievementService, waypointService, playerService, starService) {
-        this.gameModel = gameModel;
+    constructor(gameRepo, specialistService, achievementService, waypointService, playerService, starService, gameTypeService) {
+        this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
         this.playerService = playerService;
         this.starService = starService;
+        this.gameTypeService = gameTypeService;
     }
 
     async hireCarrierSpecialist(game, player, carrierId, specialistId) {
@@ -60,7 +61,7 @@ module.exports = class SpecialistHireService {
         carrier.specialistId = specialist.id;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {
@@ -75,7 +76,7 @@ module.exports = class SpecialistHireService {
             }
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementSpecialistsHired(player.userId);
         }
 
@@ -137,7 +138,7 @@ module.exports = class SpecialistHireService {
         star.specialistId = specialist.id;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._deductSpecialistCost(game, player, specialist),
             {
                 updateOne: {
@@ -152,7 +153,7 @@ module.exports = class SpecialistHireService {
             }
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementSpecialistsHired(player.userId);
         }
 

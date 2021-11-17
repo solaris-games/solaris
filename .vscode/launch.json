@@ -1,0 +1,49 @@
+{
+    // Recommended to use PM2 and run [pm2 start pm2.config.js] to
+    // set up development environment.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Jobs",
+            "port": 9230
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to API",
+            "port": 9231
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Jobs",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server/jobs/index.js",
+            "envFile": "${workspaceFolder}/server/.env"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch API",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server/api/index.js",
+            "envFile": "${workspaceFolder}/server/.env"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Bot",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/bots/discord/index.js",
+            "envFile": "${workspaceFolder}/bots/discord/.env"
+        }
+    ]
+}

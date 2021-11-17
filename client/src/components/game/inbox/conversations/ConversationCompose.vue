@@ -61,11 +61,13 @@ export default {
       this.selectedSuggestion = ((newSelected % suggestions) + suggestions) % suggestions
     },
     async onKeyDown (e) {
-      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      const isEnterTabKey = e.key === "Enter" || e.key === "Tab"
+
+      if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
           e.preventDefault()
           await this.send()
       } else if (this.suggestMentions && this.currentMention) {
-        if (e.key === "Enter" && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
+        if (isEnterTabKey && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
           e.preventDefault()
           this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
         } else if (e.key === "ArrowDown" || e.key === "Tab") {

@@ -5,12 +5,6 @@ module.exports = (router, io, container) => {
     const middleware = require('../middleware')(container);
 
     router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let report = await container.waypointService.saveWaypoints(
                 req.game,
@@ -84,12 +78,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             await container.carrierService.convertToGift(
                 req.game,

@@ -2,10 +2,13 @@ const officialGameSettings = [
     require('../config/game/settings/official/newPlayer'),
     require('../config/game/settings/official/standard'),
     require('../config/game/settings/official/32player'), // 32 player games are reserved only for official games.
-    require('../config/game/settings/official/dark'),
     require('../config/game/settings/official/turnBased'),
     require('../config/game/settings/official/1v1'),
     require('../config/game/settings/official/1v1turnBased'),
+];
+
+const specialGameSettings = [
+    require('../config/game/settings/official/special_dark'),
     require('../config/game/settings/official/special_battleRoyale'),
     require('../config/game/settings/official/special_orbital'),
     require('../config/game/settings/official/special_ultraDark'),
@@ -36,6 +39,25 @@ module.exports = (container) => {
                     } catch (e) {
                         console.error(e);
                     }
+                }
+            }
+
+            // Check to see if there is at least 1 special game.
+            // If there isn't one active, then pick a random one and create it.
+            const specialGameTypes = specialGameSettings.map(x => x.general.type);
+            const hasSpecialGame = games.find(x => specialGameTypes.includes(x.settings.general.type)) != null;
+
+            if (!hasSpecialGame) {
+                console.log(`Could not find special game, creating one now...`);
+
+                let settings = specialGameSettings[container.randomService.getRandomNumber(specialGameSettings.length - 1)];
+
+                try {
+                    let newGame = await container.gameCreateService.create(settings);
+    
+                    console.log(`[${newGame.settings.general.name}] special game created.`);
+                } catch (e) {
+                    console.error(e);
                 }
             }
 

@@ -34,10 +34,11 @@ module.exports = class EventService {
         PLAYER_CONVERSATION_LEFT: 'playerConversationLeft'
     }
 
-    constructor(eventModel, broadcastService,
+    constructor(eventModel, eventRepo, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService) {
+        ledgerService, conversationService, combatService, specialistService) {
         this.eventModel = eventModel;
+        this.eventRepo = eventRepo;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.gameTickService = gameTickService;
@@ -48,16 +49,18 @@ module.exports = class EventService {
         this.ledgerService = ledgerService;
         this.conversationService = conversationService;
         this.combatService = combatService;
+        this.specialistService = specialistService;
 
+        this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
         this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.gameId, args.gameTick));
         this.gameService.on('onPlayerQuit', (args) => this.createPlayerQuitEvent(args.gameId, args.gameTick, args.player, args.alias));
         this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
         
         this.combatService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
-            args.gameId, args.gameTick, args.defender, args.attackers, args.star, args.combatResult, args.captureResult));
+            args.gameId, args.gameTick, args.owner, args.defenders, args.attackers, args.star, args.combatResult, args.captureResult));
         this.combatService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
-            args.gameId, args.gameTick, args.defender, args.attackers, args.combatResult));
+            args.gameId, args.gameTick, args.defenders, args.attackers, args.combatResult));
         
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
             args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
@@ -91,10 +94,9 @@ module.exports = class EventService {
     }
 
     async deleteByGameId(gameId) {
-        await this.eventModel.deleteMany({
+        await this.eventRepo.deleteMany({
             gameId
-        })
-        .exec();
+        });
     }
 
     async createGameEvent(gameId, gameTick, type, data) {
@@ -124,7 +126,7 @@ module.exports = class EventService {
     }
 
     async getPlayerEvents(gameId, player, startTick = 0) {
-        let events = await this.eventModel.find({
+        let events = await this.eventRepo.find({
             gameId: gameId,
             tick: { $gte: startTick },
             playerId: {
@@ -133,19 +135,18 @@ module.exports = class EventService {
                     null
                 ]
             }
-        })
-        .sort({
+        },
+        null, // All fields
+        {
             tick: -1, // Sort by tick descending
             _id: -1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
 
         return events;
     }
 
     async getPlayerTradeEvents(gameId, gameTick, player, startTick = 0) {
-        let tradeEvents = await this.eventModel.find({
+        let tradeEvents = await this.eventRepo.find({
             gameId: gameId,
             tick: { $gte: startTick },
             playerId: {
@@ -166,13 +167,12 @@ module.exports = class EventService {
                     this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
                 ]
             }
-        })
-        .sort({
+        },
+        null, // All fields
+        {
             tick: -1, // Sort by tick descending
             _id: -1
-        })
-        .lean({ defaults: true })
-        .exec();
+        });
 
         // Calculate when the event was created.
         // TODO: Is this more efficient than storing the UTC in the document itself?
@@ -184,7 +184,7 @@ module.exports = class EventService {
     }
 
     async markAllEventsAsRead(game, playerId) {
-        await this.eventModel.updateMany({
+        await this.eventRepo.updateMany({
             gameId: game._id,
             playerId: playerId,
             read: false
@@ -192,13 +192,13 @@ module.exports = class EventService {
             $set: {
                 read: true
             }
-        }).exec();
+        });
 
         this.broadcastService.playerAllEventsRead(game, playerId);
     }
 
     async markEventAsRead(game, playerId, eventId) {
-        await this.eventModel.updateOne({
+        await this.eventRepo.updateOne({
             _id: eventId,
             gameId: game._id,
             playerId: playerId,
@@ -207,17 +207,17 @@ module.exports = class EventService {
             $set: {
                 read: true
             }
-        }).exec();
+        });
 
         this.broadcastService.playerEventRead(game, playerId, eventId);
     }
 
     async getUnreadCount(game, playerId) {
-        return await this.eventModel.count({
+        return await this.eventRepo.count({
             gameId: game._id,
             playerId: playerId,
             read: false
-        }).exec();
+        });
     }
 
     /* GLOBAL EVENTS */
@@ -294,35 +294,78 @@ module.exports = class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
-    async createPlayerCombatStarEvent(gameId, gameTick, defender, attackers, star, combatResult, captureResult) {
+    async createPlayerCombatStarEvent(gameId, gameTick, owner, defenders, attackers, star, combatResult, captureResult) {
         let data = {
-            playerIdDefender: defender._id,
+            playerIdOwner: owner._id,
+            playerIdDefenders: defenders.map(p => p._id),
             playerIdAttackers: attackers.map(p => p._id),
             starId: star._id,
             starName: star.name,
-            combatResult,
             captureResult
         };
 
-        await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+        for (let defender of defenders) {
+            let defenderCombatResult = Object.assign({}, combatResult);
+
+            defenderCombatResult.star = this.tryMaskObjectShips(combatResult.star, defender);
+            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender));
+
+            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
+        }
 
         for (let attacker of attackers) {
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, data);
+            let attackerCombatResult = Object.assign({}, combatResult);
+
+            attackerCombatResult.star = this.tryMaskObjectShips(combatResult.star, attacker);
+            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker));
+
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
     }
 
-    async createPlayerCombatCarrierEvent(gameId, gameTick, defender, attackers, combatResult) {
+    async createPlayerCombatCarrierEvent(gameId, gameTick, defenders, attackers, combatResult) {
         let data = {
-            playerIdDefender: defender._id,
+            playerIdDefenders: defenders.map(p => p._id),
             playerIdAttackers: attackers.map(p => p._id),
             combatResult
         };
 
-        await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+        for (let defender of defenders) {
+            let defenderCombatResult = Object.assign({}, combatResult);
+
+            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender));
+
+            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
+        }
 
         for (let attacker of attackers) {
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, data);
+            let attackerCombatResult = Object.assign({}, combatResult);
+
+            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker));
+
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
+    }
+
+    tryMaskObjectShips(carrierOrStar, player) {
+        // If the player doesn't own the object and the object is a scrambler then we need
+        // to mask the before and lost amounts.
+        if (!player._id.equals(carrierOrStar.ownedByPlayerId) && this.specialistService.getCarrierOrStarHideShips(carrierOrStar)) {
+            let clone = Object.assign({}, carrierOrStar);
+
+            clone.before = '???';
+            clone.lost = '???';
+
+            // If the object lost ships and is now dead, then we need to mask the after value too.
+            // Note: Stars can have a 0 ship garrison and be a scrambler so we want to ensure that the 0 ships is still scrambled.
+            if (carrierOrStar.before === 0 || carrierOrStar.after > 0) {
+                clone.after = '???';
+            }
+
+            return clone;
+        }
+
+        return carrierOrStar;
     }
 
     async createResearchCompleteEvent(gameId, gameTick, playerId, technologyKey, technologyLevel, technologyKeyNext, technologyLevelNext) {

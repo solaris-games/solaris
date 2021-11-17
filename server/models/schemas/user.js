@@ -31,7 +31,6 @@ const schema = new Schema({
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
-        renown: { type: Types.Number, default: 0 }, // TODO: Why are there 2 of these?
         combat: {
             kills: {
                 ships: { type: Types.Number, default: 0 },
@@ -119,8 +118,8 @@ const schema = new Schema({
             marchingSquareGridSize: { type: Types.Number, required: false, default: 6, min: 2, max: 32 },
             marchingSquareTerritorySize:{ type: Types.Number, required: false, default: 5, min: 2, max: 32 },
             marchingSquareBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 8 },
-            voronoiCellBorderWidth: { type: Types.Number, required: false, default: 1, min: 0, max: 5 },
-            voronoiTerritoryBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 8 },
+            voronoiCellBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 5 },
+            voronoiTerritoryBorderWidth: { type: Types.Number, required: false, default: 4, min: 0, max: 8 },
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8, min: 0, max: 32 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16, min: 12, max: 128 },
@@ -159,7 +158,8 @@ const schema = new Schema({
             defaultAmount: { type: Types.Number, required: false, default: 0 },
             confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         }
-    }
+    },
+    avatars: [{ type: Types.Number, required: false }]
 });
 
 module.exports = schema;

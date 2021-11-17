@@ -4,8 +4,9 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
+    constructor(gameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
         this.gameModel = gameModel;
+        this.gameService = gameService;
         this.gameListService = gameListService;
         this.nameService = nameService;
         this.mapService = mapService;
@@ -18,30 +19,35 @@ module.exports = class GameCreateService {
     }
 
     async create(settings) {
-        if (settings.general.createdByUserId) {
+        const isTutorial = settings.general.type === 'tutorial';
+
+        // If a legit user (not the system) created the game and it isn't a tutorial
+        // then that game must be set as a custom game.
+        if (settings.general.createdByUserId && !isTutorial) {
             settings.general.type = 'custom'; // All user games MUST be custom type.
             settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
 
             // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
+            let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
 
-            if (openGames.length) {
+            if (openGames.length && !userIsGameMaster) {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
-            // Validate that the player cannot create large games.
-            if (settings.general.playerLimit > 16) {
-                let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
-
-                if (!userIsGameMaster) {
-                    throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
-                }
+            if (userIsGameMaster && openGames.length > 5) {
+                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
             }
 
-            let userAchievements = await this.achievementService.getAchievements(settings.general.createdByUserId);
+            // Validate that the player cannot create large games.
+            if (settings.general.playerLimit > 16 && !userIsGameMaster) {
+                throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
+            }
+
+            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(settings.general.createdByUserId);
 
             // Disallow new players from creating games if they haven't completed a game yet.
-            if (userAchievements.achievements.completed === 0) {
+            if (!isEstablishedPlayer) {
                 throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }
@@ -77,6 +83,14 @@ module.exports = class GameCreateService {
         if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
             game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
         }
+
+        // Ensure that specialist credits setting defaults token specific settings
+        if (game.settings.specialGalaxy.specialistsCurrency === 'credits') {
+            game.settings.player.startingCreditsSpecialists = 0;
+            game.settings.player.tradeCreditsSpecialists = false;
+            game.settings.technology.startingTechnologyLevel.specialists = 0;
+            game.settings.technology.researchCosts.specialists = 'none';
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -93,8 +107,8 @@ module.exports = class GameCreateService {
             game, 
             settings,
             desiredStarCount,
-            game.settings.general.playerLimit,
-            game.settings.specialGalaxy.randomGates);
+            game.settings.general.playerLimit
+        );
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
@@ -104,9 +118,13 @@ module.exports = class GameCreateService {
         game.state.stars = game.galaxy.stars.length;
         game.state.starsForVictory = this._calculateStarsForVictory(game);
 
-        this.conversationService.createConversationAllPlayers(game);
-
         this._setGalaxyCenter(game);
+
+        if (isTutorial) {
+            this._setupTutorialPlayers(game);
+        } else {
+            this.conversationService.createConversationAllPlayers(game);
+        }
 
         let gameObject = await game.save();
 
@@ -114,6 +132,7 @@ module.exports = class GameCreateService {
         // for the very first tick when players join the game. The galaxy masking
         // should only be applied for stars and carriers if its the very first tick.
         // await this.historyService.log(gameObject);
+        // ^ Maybe fire an event for the historyService to capture?
         
         return gameObject;
     }
@@ -140,5 +159,16 @@ module.exports = class GameCreateService {
         // game.settings.conquest.victoryCondition = 'starPercentage'; // TODO: Default to starPercentage if not in conquest mode?
 
         return game.galaxy.stars.length;
+    }
+
+    _setupTutorialPlayers(game) {
+        // Dump the player who created the game straight into the first slot and set the other slots to AI.
+        this.gameService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId, `Player`, 0);
+        
+        for (let i = 1; i < game.galaxy.players.length; i++) {
+            const ai = game.galaxy.players[i];
+
+            this.gameService.assignPlayerToUser(game, ai, null, `Opponent ${i}`, i);
+        }
     }
 }

@@ -13,6 +13,9 @@
             <li class="nav-item">
                 <a class="nav-link" :class="{'active':activeTab === 'ships'}" data-toggle="tab" href="#ships">Ships</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" :class="{'active':activeTab === 'capitals'}" data-toggle="tab" href="#capitals">Capitals</a>
+            </li>
         </ul>
     </div>
 
@@ -30,6 +33,10 @@
               @onOpenStarDetailRequested="onOpenStarDetailRequested"
               @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         </div>
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'capitals'}" id="capitals">
+            <capitals-table
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        </div>
     </div>
 </div>
 </template>
@@ -39,13 +46,15 @@ import MenuTitle from '../MenuTitle'
 import StarsTableVue from './StarsTable'
 import CarriersTableVue from './CarriersTable'
 import ShipsTableVue from './ShipsTable'
+import CapitalsTableVue from './CapitalsTable'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'stars-table': StarsTableVue,
     'carriers-table': CarriersTableVue,
-    'ships-table': ShipsTableVue
+    'ships-table': ShipsTableVue,
+    'capitals-table': CapitalsTableVue
   },
   props: {
     'tab': String
@@ -73,4 +82,7 @@ export default {
 </script>
 
 <style scoped>
+.nav-link {
+  padding: 0.5rem 1.5rem;
+}
 </style>
