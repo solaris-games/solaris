@@ -40,8 +40,32 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
-        const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
+        let terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
+        let obj = {
+            economy: terraformedResources,
+            industry: terraformedResources,
+            science: terraformedResources
+        }
+        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+            let economy = terraformedResources * star.splitResources.economy / star.splitResources.total
+            let industry = terraformedResources * star.splitResources.industry / star.splitResources.total
+            let science = terraformedResources * star.splitResources.science / star.splitResources.total
+            while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < terraformedResources) {
+                if ( economy%1 >= industry%1 && economy%1 >= science%1) {
+                    economy = Math.ceil(economy)
+                } else if (industry%1 >= science%1) {
+                    industry = Math.ceil(industry)
+                } else {
+                    science = Math.ceil(science)
+                }
+            }
+            obj = {
+                economy: Math.floor(economy),
+                industry: Math.floor(industry),
+                science: Math.floor(science)
+            }
+        }
+        const cost = this.calculateWarpGateCost(game, expenseConfig, obj['industry']);
 
         if (player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
@@ -349,7 +373,28 @@ module.exports = class StarUpgradeService extends EventEmitter {
             })
             .map(s => {
                 const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-                const terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, effectiveTechs.terraforming);
+                let terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, effectiveTechs.terraforming);
+
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+                    let economy = terraformedResources * s.splitResources.economy / s.splitResources.total
+                    let industry = terraformedResources * s.splitResources.industry / s.splitResources.total
+                    let science = terraformedResources * s.splitResources.science / s.splitResources.total
+                    while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < terraformedResources) {
+                        if ( economy%1 >= industry%1 && economy%1 >= science%1) {
+                            economy = Math.ceil(economy)
+                        } else if (industry%1 >= science%1) {
+                            industry = Math.ceil(industry)
+                        } else {
+                            science = Math.ceil(science)
+                        }
+                    }
+                    let obj = {
+                        economy: Math.floor(economy),
+                        industry: Math.floor(industry),
+                        science: Math.floor(science)
+                    }
+                    terraformedResources = obj[infrastructureType]
+                }
 
                 return {
                     star: s,
@@ -667,10 +712,35 @@ module.exports = class StarUpgradeService extends EventEmitter {
         };
 
         if (!this.starService.isDeadStar(star)) {
-            star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
-            star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
-            star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
-            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
+            let obj = {
+                economy: star.terraformedResources,
+                industry: star.terraformedResources,
+                science: star.terraformedResources
+            }
+            if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+                let economy = star.terraformedResources * star.splitResources.economy / star.splitResources.total
+                let industry = star.terraformedResources * star.splitResources.industry / star.splitResources.total
+                let science = star.terraformedResources * star.splitResources.science / star.splitResources.total
+                while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < star.terraformedResources) {
+                    if ( economy%1 >= industry%1 && economy%1 >= science%1) {
+                        economy = Math.ceil(economy)
+                    } else if (industry%1 >= science%1) {
+                        industry = Math.ceil(industry)
+                    } else {
+                        science = Math.ceil(science)
+                    }
+                }
+                obj = {
+                    economy: Math.floor(economy),
+                    industry: Math.floor(industry),
+                    science: Math.floor(science)
+                }
+            }
+
+            star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, obj['economy']);
+            star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, obj['industry']);
+            star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, obj['science']);
+            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, obj['warpGate']);
             star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
         }
 

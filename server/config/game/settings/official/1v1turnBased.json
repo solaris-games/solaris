@@ -30,6 +30,7 @@
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
+    "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10

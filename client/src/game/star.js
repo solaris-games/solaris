@@ -346,10 +346,13 @@ class Star extends EventEmitter {
       if (this.userSettings.map.naturalResources !== 'single-ring') {
         return
       }
-
+      let f = 1
+      if(this.game.settings.specialGalaxy.splitResources && this.game.settings.specialGalaxy.splitResources == 'enabled') {
+        f = 3
+      }
       // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
       // TODO: Experimental:
-      let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
+      let ringRadius = this.data.naturalResources / f <= 50 ? this.data.naturalResources / f : this.data.naturalResources / f > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / f / 50) + 50)
 
       ringRadius /= 8.0
       let lineWidht = 1.0/8.0
@@ -368,8 +371,11 @@ class Star extends EventEmitter {
     if (!this.data.naturalResources) {
       return 0
     }
-
-    return Math.min(Math.floor(this.data.naturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
+    let f = 1
+    if(this.game.settings.specialGalaxy.splitResources && this.game.settings.specialGalaxy.splitResources == 'enabled') {
+      f = 3
+    }
+    return Math.min(Math.floor(this.data.naturalResources / 45 / f * 3), 5) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {

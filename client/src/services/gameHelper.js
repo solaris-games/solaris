@@ -833,6 +833,13 @@ class GameHelper {
     return star.naturalResources != null && star.naturalResources <= 0
   }
 
+  splitResources(game) {
+    if (game.settings.specialGalaxy.splitResources) {
+      return (game.settings.specialGalaxy.splitResources == 'enabled')
+    }
+    return false
+  }
+
   isInGuild (guild, userId) {
     return guild.members.find(m => m._id === userId)
       || guild.officers.find(m => m._id === userId)

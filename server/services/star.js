@@ -18,11 +18,26 @@ module.exports = class StarService extends EventEmitter {
         this.diplomacyService = diplomacyService;
     }
 
-    generateUnownedStar(game, name, location, naturalResources) {
+    generateUnownedStar(game, name, location, resources) {
+        if(game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+            return {
+                _id: mongoose.Types.ObjectId(),
+                name,
+                naturalResources: resources.total,
+                splitResources: {
+                    total: resources.total,
+                    economy: resources.economy,
+                    industry: resources.industry,
+                    science: resources.science
+                },
+                location,
+                infrastructure: { }
+            }
+        }
         return {
             _id: mongoose.Types.ObjectId(),
             name,
-            naturalResources,
+            naturalResources: resources,
             location,
             infrastructure: { }
         };
@@ -82,7 +97,17 @@ module.exports = class StarService extends EventEmitter {
         homeStar.specialistId = null;
 
         if (!homeStar.isAsteroidField) {
-            homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
+            if(gameSettings.specialGalaxy.splitResources && gameSettings.specialGalaxy.splitResources == 'enabled') {
+                homeStar.naturalResources = 3 * game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
+                homeStar.splitResources = {
+                    total: 3 * game.constants.star.resources.maxNaturalResources,
+                    economy: game.constants.star.resources.maxNaturalResources,
+                    industry: game.constants.star.resources.maxNaturalResources,
+                    science: game.constants.star.resources.maxNaturalResources
+                };
+            } else {
+                homeStar.naturalResources = game.constants.star.resources.maxNaturalResources;
+            }
         }
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);

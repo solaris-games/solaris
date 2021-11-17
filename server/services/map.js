@@ -160,9 +160,13 @@ module.exports = class MapService {
             } else {
                 star.isAsteroidField = true;
 
+                let f = 1
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+                    f = 3 //This is because in the splitResources, the natural resources is always 3 times higher
+                }
                 // Overwrite the natural resources
-                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+                let minResources = game.constants.star.resources.maxNaturalResources * f * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * f * 3;
 
                 star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);;
             }

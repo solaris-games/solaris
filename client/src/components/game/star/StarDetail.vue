@@ -39,10 +39,13 @@
     <div v-if="isCompactUIStyle && star.infrastructure">
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
-          <span title="Natural Resources / Terraformed Resources">
+          <span v-if="!splitResources" title="Natural Resources">
             <i class="fas fa-globe"></i>
-            {{star.naturalResources == null ? '???' : star.naturalResources}}
-            <span v-if="star.ownedByPlayerId">/ {{star.terraformedResources || '???'}}</span>
+            {{star.naturalResources == null ? '???' : naturalResources}}
+          </span>
+          <span v-if="splitResources" title="Natural Resources: Economy / Industry / Science">
+            <i class="fas fa-globe"></i>
+            {{star.naturalResources == null ? '???' : naturalResources}}
           </span>
         </div>
         <div class="col-auto">
@@ -52,6 +55,21 @@
           <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus">
             <i class="fas fa-meteor ml-1"></i>
           </span>
+        </div>
+      </div>
+      
+      <div class="row mt-2" v-if="!isDeadStar">
+        <div class="col">
+          <span v-if="!splitResources" title="Terraformed Resources">
+            <i class="fas fa-globe"></i>
+            {{star.terraformedResources == null ? '???' : terraformedResources}}
+          </span>
+          <span v-if="splitResources" title="Terraformed Resources: Economy / Industry / Science">
+            <i class="fas fa-globe"></i>
+            {{star.terraformedResources == null ? '???' : terraformedResources}}
+          </span>
+        </div>
+        <div class='col-auto'>
           <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
             <i class="far fa-sun ml-1"></i>
           </span>
@@ -138,7 +156,7 @@
               Natural Resources
           </div>
           <div class="col text-right">
-              {{star.naturalResources == null ? '???' : star.naturalResources}} <i class="fas fa-globe ml-1"></i>
+              {{star.naturalResources == null ? '???' : naturalResources}} <i class="fas fa-globe ml-1"></i>
           </div>
       </div>
 
@@ -147,7 +165,7 @@
               Terraformed Resources
           </div>
           <div class="col text-right">
-              {{star.terraformedResources || '???'}} <i class="fas fa-globe ml-1"></i>
+              {{star.terraformedResources == null ? '???' : terraformedResources}} <i class="fas fa-globe ml-1"></i>
           </div>
       </div>
     </div>
@@ -295,7 +313,8 @@ export default {
       canBuildWarpGates: false,
       isSpecialistsEnabled: false,
       isStandardUIStyle: false,
-      isCompactUIStyle: false
+      isCompactUIStyle: false,
+      splitResources: false
     }
   },
   mounted () {
@@ -306,6 +325,7 @@ export default {
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     
+    this.splitResources = GameHelper.splitResources(this.$store.state.game)
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
@@ -447,6 +467,46 @@ export default {
       }
 
       return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
+    },
+    naturalResources: function() {
+      if(!this.splitResources) {
+        return this.star.naturalResources
+      } else {
+        let economy = this.star.naturalResources * this.star.splitResources.economy / this.star.splitResources.total
+        let industry = this.star.naturalResources * this.star.splitResources.industry / this.star.splitResources.total
+        let science = this.star.naturalResources * this.star.splitResources.science / this.star.splitResources.total
+        while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < this.star.naturalResources) {
+          if ( economy%1 >= industry%1 && economy%1 >= science%1) {
+            economy = Math.ceil(economy)
+          } else if (industry%1 >= science%1) {
+            industry = Math.ceil(industry)
+          } else {
+            science = Math.ceil(science)
+          }
+        }
+        return Math.floor(economy) + ' / ' + Math.floor(industry) + ' / ' + Math.floor(science)
+        }
+      
+    },
+    terraformedResources: function() {
+      if(!this.splitResources) {
+        return this.star.terraformedResources
+      } else {
+        let economy = this.star.terraformedResources * this.star.splitResources.economy / this.star.splitResources.total
+        let industry = this.star.terraformedResources * this.star.splitResources.industry / this.star.splitResources.total
+        let science = this.star.terraformedResources * this.star.splitResources.science / this.star.splitResources.total
+        while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < this.star.terraformedResources) {
+          if ( economy%1 >= industry%1 && economy%1 >= science%1) {
+            economy = Math.ceil(economy)
+          } else if (industry%1 >= science%1) {
+            industry = Math.ceil(industry)
+          } else {
+            science = Math.ceil(science)
+          }
+        }
+        return Math.floor(economy) + ' / ' + Math.floor(industry) + ' / ' + Math.floor(science)
+      }
+      
     }
   }
 }

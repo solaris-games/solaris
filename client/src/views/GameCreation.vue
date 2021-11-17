@@ -305,6 +305,15 @@
       </div>
 
       <div class="form-group">
+        <label for="splitResources" class="col-form-label">Split Resources</label>
+        <select class="form-control" id="splitResources" v-model="settings.specialGalaxy.splitResources" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.splitResources" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="resourceDistribution" class="col-form-label">Resource Distribution</label>
         <select class="form-control" id="resourceDistribution" v-model="settings.specialGalaxy.resourceDistribution" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.resourceDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
