@@ -18,28 +18,13 @@ module.exports = class StarService extends EventEmitter {
         this.diplomacyService = diplomacyService;
     }
 
-    generateUnownedStar(game, name, location, resources) {
-        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
-            return {
-                _id: mongoose.Types.ObjectId(),
-                name,
-                naturalResources: resources.total,
-                splitResources: {
-                    total: resources.total,
-                    economy: resources.economy,
-                    industry: resources.industry,
-                    science: resources.science
-                },
-                location,
-                infrastructure: {}
-            }
-        }
+    generateUnownedStar(game, name, location, naturalResources) {
         return {
             _id: mongoose.Types.ObjectId(),
             name,
-            naturalResources: resources,
+            naturalResources,
             location,
-            infrastructure: {}
+            infrastructure: { }
         };
     }
 
@@ -96,17 +81,29 @@ module.exports = class StarService extends EventEmitter {
         homeStar.warpGate = false;
         homeStar.specialistId = null;
 
-        if (!homeStar.isAsteroidField) {
-            if (gameSettings.specialGalaxy.splitResources && gameSettings.specialGalaxy.splitResources == 'enabled') {
-                homeStar.naturalResources = 3 * game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
-                homeStar.splitResources = {
-                    total: 3 * game.constants.star.resources.maxNaturalResources,
+        if (game.settings.specialGalaxy.splitResources === 'enabled') {
+            homeStar.isAsteroidField = false;
+            homeStar.isNebula = false;
+            if (homeStar.wormHoleToStarId) {
+                homeStar.naturalResources = {
+                    economy: homeStar.naturalResources.economy,
+                    industry: game.constants.star.resources.maxNaturalResources,
+                    science: game.constants.star.resources.maxNaturalResources
+                }
+            } else {
+                homeStar.naturalResources = {
                     economy: game.constants.star.resources.maxNaturalResources,
                     industry: game.constants.star.resources.maxNaturalResources,
                     science: game.constants.star.resources.maxNaturalResources
-                };
-            } else {
-                homeStar.naturalResources = game.constants.star.resources.maxNaturalResources;
+                }
+            }
+        } else {
+            if (!homeStar.isAsteroidField) {
+                homeStar.naturalResources = {
+                    economy: game.constants.star.resources.maxNaturalResources,
+                    industry: game.constants.star.resources.maxNaturalResources,
+                    science: game.constants.star.resources.maxNaturalResources
+                }
             }
         }
 
@@ -276,11 +273,16 @@ module.exports = class StarService extends EventEmitter {
         return isInScanRange;
     }
 
-    calculateTerraformedResources(game, naturalResources, terraforming) {
-        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
-            return (terraforming * 15) + naturalResources;
+    calculateTerraformedResources(naturalResources, terraforming) {
+        return {
+            economy: this.addTerraforming(naturalResources.economy, terraforming),
+            industry: this.addTerraforming(naturalResources.industry, terraforming),
+            science: this.addTerraforming(naturalResources.science, terraforming)
         }
-        return (terraforming * 5) + naturalResources;
+    }
+
+    addTerraforming(resource, terraforming) {
+        return resource + ( 5 * terraforming )
     }
 
     calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1, productionTicks = 24) {
@@ -302,7 +304,7 @@ module.exports = class StarService extends EventEmitter {
         // Destroy the carriers owned by the player who abandoned the star.
         // Note: If an ally is currently in orbit then they will capture the star on the next tick.
         let playerCarriers = game.galaxy.carriers
-            .filter(x =>
+            .filter(x => 
                 x.orbiting
                 && x.orbiting.equals(star._id)
                 && x.ownedByPlayerId.equals(player._id)
@@ -382,8 +384,8 @@ module.exports = class StarService extends EventEmitter {
     }
 
     isStarPairWormHole(sourceStar, destinationStar) {
-        return sourceStar.wormHoleToStarId
-            && destinationStar.wormHoleToStarId
+        return sourceStar.wormHoleToStarId 
+            && destinationStar.wormHoleToStarId 
             && sourceStar.wormHoleToStarId.equals(destinationStar._id)
             && destinationStar.wormHoleToStarId.equals(sourceStar._id);
     }

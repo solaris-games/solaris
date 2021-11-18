@@ -346,13 +346,11 @@ class Star extends EventEmitter {
       if (this.userSettings.map.naturalResources !== 'single-ring') {
         return
       }
-      let f = 1
-      if(this.game.settings.specialGalaxy.splitResources && this.game.settings.specialGalaxy.splitResources == 'enabled') {
-        f = 3
-      }
+
+      let averageNaturalResources = (this.data.naturalResources.economy + this.data.naturalResources.industry + this.data.naturalResources.science ) / 3;
       // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
       // TODO: Experimental:
-      let ringRadius = this.data.naturalResources / f <= 50 ? this.data.naturalResources / f : this.data.naturalResources / f > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / f / 50) + 50)
+      let ringRadius = averageNaturalResources <= 50 ? averageNaturalResources : averageNaturalResources > 400 ? 100 : (12.5 * Math.log2(averageNaturalResources / 50) + 50)
 
       ringRadius /= 8.0
       let lineWidht = 1.0/8.0
@@ -371,11 +369,8 @@ class Star extends EventEmitter {
     if (!this.data.naturalResources) {
       return 0
     }
-    let f = 1
-    if(this.game.settings.specialGalaxy.splitResources && this.game.settings.specialGalaxy.splitResources == 'enabled') {
-      f = 3
-    }
-    return Math.min(Math.floor(this.data.naturalResources / 45 / f * 3), 5) // Anything over 45 gets 3 planets
+    let averageNaturalResources = (this.data.naturalResources.economy + this.data.naturalResources.industry + this.data.naturalResources.science ) / 3;
+    return Math.min(Math.floor(averageNaturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {
@@ -876,7 +871,7 @@ class Star extends EventEmitter {
   }
 
   _isDeadStar () {
-    return this.data.naturalResources != null && this.data.naturalResources <= 0
+    return this.data.naturalResources != null && this.data.naturalResources.economy <= 0 && this.data.naturalResources.industry <= 0 && this.data.naturalResources.science <= 0;
   }
 
   select () {

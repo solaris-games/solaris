@@ -218,7 +218,7 @@ module.exports = class GameGalaxyService {
                 if (s.ownedByPlayerId) {
                     let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
-                    s.terraformedResources = this.starService.calculateTerraformedResources(doc, s.naturalResources, owningPlayerEffectiveTechs.terraforming);
+                    s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayerEffectiveTechs.terraforming);
                 }
 
                 if (isOrbital) {

@@ -5,15 +5,10 @@ const Types = Schema.Types;
 const schema = new Schema({
     ownedByPlayerId: { type: Types.ObjectId, required: false, default: null },
     name: { type: Types.String, required: true },
-    naturalResources: { type: Types.Number, required: true },
-    splitResources: { 
-        type: {
-            total: {type: Types.Number, required: true },
-            economy: { type: Types.Number, required: true },
-            industry: { type: Types.Number, required: true },
-            science: { type: Types.Number, required: true }
-        },
-        required: false
+    naturalResources: {
+        economy: { type: Types.Number, required: true },
+        industry: { type: Types.Number, required: true },
+        science: { type: Types.Number, required: true }
     },
     ships: { type: Types.Number, required: true, default: 0 }, // TODO: ships could be a computed field or instead returned to the client floored.
     shipsActual: { type: Types.Number, required: true, default: 0 },

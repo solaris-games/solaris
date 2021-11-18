@@ -469,44 +469,22 @@ export default {
       return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
     },
     naturalResources: function() {
-      if(!this.splitResources) {
-        return this.star.naturalResources
-      } else {
-        let economy = this.star.naturalResources * this.star.splitResources.economy / this.star.splitResources.total
-        let industry = this.star.naturalResources * this.star.splitResources.industry / this.star.splitResources.total
-        let science = this.star.naturalResources * this.star.splitResources.science / this.star.splitResources.total
-        while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < this.star.naturalResources) {
-          if ( economy%1 >= industry%1 && economy%1 >= science%1) {
-            economy = Math.ceil(economy)
-          } else if (industry%1 >= science%1) {
-            industry = Math.ceil(industry)
-          } else {
-            science = Math.ceil(science)
-          }
-        }
-        return Math.floor(economy) + ' / ' + Math.floor(industry) + ' / ' + Math.floor(science)
-        }
-      
+      if  (!splitResources) {
+        return Math.floor(this.star.naturalResources.economy);
+      }
+      let economy = Math.floor(this.star.naturalResources.economy);
+      let industry = Math.floor(this.star.naturalResources.industry);
+      let science = Math.floor(this.star.naturalResources.science);
+      return Math.floor(economy) + ' / ' + Math.floor(industry) + ' / ' + Math.floor(science);
     },
     terraformedResources: function() {
-      if(!this.splitResources) {
-        return this.star.terraformedResources
-      } else {
-        let economy = this.star.terraformedResources * this.star.splitResources.economy / this.star.splitResources.total
-        let industry = this.star.terraformedResources * this.star.splitResources.industry / this.star.splitResources.total
-        let science = this.star.terraformedResources * this.star.splitResources.science / this.star.splitResources.total
-        while ( Math.floor(economy) + Math.floor(industry) + Math.floor(science) < this.star.terraformedResources) {
-          if ( economy%1 >= industry%1 && economy%1 >= science%1) {
-            economy = Math.ceil(economy)
-          } else if (industry%1 >= science%1) {
-            industry = Math.ceil(industry)
-          } else {
-            science = Math.ceil(science)
-          }
-        }
-        return Math.floor(economy) + ' / ' + Math.floor(industry) + ' / ' + Math.floor(science)
+      if  (!splitResources) {
+        return Math.floor(this.star.terraformedResources.economy);
       }
-      
+      let economy = Math.floor(this.star.terraformedResources.economy);
+      let industry = Math.floor(this.star.terraformedResources.industry);
+      let science = Math.floor(this.star.terraformedResources.science);
+      return economy + ' / ' + industry + ' / ' + science;
     }
   }
 }

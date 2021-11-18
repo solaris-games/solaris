@@ -2,7 +2,7 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, nameService,
+    constructor(randomService, starService, starDistanceService, nameService, 
         circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService) {
         this.randomService = randomService;
         this.starService = starService;
@@ -25,13 +25,13 @@ module.exports = class MapService {
         let starLocations = [];
 
         switch (game.settings.galaxy.galaxyType) {
-            case 'circular':
+            case 'circular': 
                 starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'spiral':
+            case 'spiral': 
                 starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'doughnut':
+            case 'doughnut': 
                 starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'circular-balanced':
@@ -56,9 +56,9 @@ module.exports = class MapService {
                 x: starLocation.x,
                 y: starLocation.y
             };
-
+            
             let star = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], loc, starLocation.resources);
-
+            
             stars.push(star);
 
             if (starLocation.homeStar) {
@@ -82,12 +82,12 @@ module.exports = class MapService {
 
         // If worm holes are enabled, assign random warp gates to start as worm hole pairs
         if (game.settings.specialGalaxy.randomWormHoles) {
-            this.generateWormHoles(stars, game.settings.specialGalaxy.randomWormHoles);
+            this.generateWormHoles(game, stars, game.settings.specialGalaxy.randomWormHoles);
         }
 
         // If nebulas are enabled, assign random nebulas to start
         if (game.settings.specialGalaxy.randomNebulas) {
-            this.generateNebulas(stars, game.settings.specialGalaxy.randomNebulas);
+            this.generateNebulas(game, stars, game.settings.specialGalaxy.randomNebulas);
         }
 
         // If asteroid fields are enabled, assign random asteroid fields to start
@@ -113,7 +113,7 @@ module.exports = class MapService {
         } while (gateCount--);
     }
 
-    generateWormHoles(stars, percentage) {
+    generateWormHoles(game, stars, percentage) {
         let wormHoleCount = Math.floor(stars.length / 2 / 100 * percentage); // Worm homes come in pairs so its half of stars
 
         // Pick stars at random and pair them up with another star to create a worm hole.
@@ -130,21 +130,19 @@ module.exports = class MapService {
                 starA.wormHoleToStarId = starB._id;
                 starB.wormHoleToStarId = starA._id;
 
-                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
-
                 // Overwrite natural resources if splitResources
-                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
-                    star.splitResources.total -= star.splitResources.economy;
-                    star.splitResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.splitResources.total += star.splitResources.economy;
-                    star.naturalResources = star.splitResources.total;
+                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                    let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                    let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                    starA.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    starB.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
                 }
             }
         }
     }
 
-    generateNebulas(stars, percentage) {
+    generateNebulas(game, stars, percentage) {
         let count = Math.floor(stars.length / 100 * percentage);
 
         // Pick stars at random and set them to be nebulas
@@ -156,15 +154,12 @@ module.exports = class MapService {
             } else {
                 star.isNebula = true;
 
-                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
-
                 // Overwrite natural resources if splitResources
-                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
-                    star.splitResources.total -= star.splitResources.science;
-                    star.splitResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.splitResources.total += star.splitResources.science;
-                    star.naturalResources = star.splitResources.total;
+                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                    let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                    let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                    star.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
                 }
             }
         } while (count--);
@@ -186,13 +181,15 @@ module.exports = class MapService {
                 let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
                 // Overwrite natural resources
-                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
-                    star.splitResources.total -= star.splitResources.industry;
-                    star.splitResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.splitResources.total += star.splitResources.industry;
-                    star.naturalResources = star.splitResources.total;
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources === 'enabled') {
+                    star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
                 } else {
-                    star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.naturalResources = {
+                        economy: resources,
+                        industry: resources,
+                        science: resources
+                    };
                 }
             }
         } while (count--);
@@ -224,7 +221,7 @@ module.exports = class MapService {
                 y: 0
             };
         }
-
+        
         let totalX = starLocations.reduce((total, s) => total += s.x, 0);
         let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 

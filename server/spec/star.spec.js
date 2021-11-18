@@ -67,33 +67,32 @@ describe('star', () => {
     });
 
     it('should calculate terraformed resources', () => {
-        const gameInput1 = {
-            settings: {
-                specialGalaxy: {
-                    splitResources: 'disabled'
-                }
-            }
+        const input1 = {
+            economy: 34,
+            industry: 34,
+            science: 34
         };
-        const gameInput2 = {
-            settings: {
-                specialGalaxy: {
-                    splitResources: 'enabled'
-                }
-            }
-        };
-        const gameInput3 = {
-            settings: {
-                specialGalaxy: {}
-            }
-        };
+        const input2 = {
+            economy: 23,
+            industry: 53,
+            science: 10
+        }
 
-        const result1 = starService.calculateTerraformedResources(gameInput1, 10, 5); // Normal resources
-        const result2 = starService.calculateTerraformedResources(gameInput2, 30, 5); // Split resources
-        const result3 = starService.calculateTerraformedResources(gameInput3, 20, 7); // Normal resources
+        const result1 = starService.calculateTerraformedResources(input1, 5); // Normal resources
+        const result2 = starService.calculateTerraformedResources(input2, 2); // Split resources
 
-        expect(result1).toEqual(35);
-        expect(result2).toEqual(105);
-        expect(result3).toEqual(55);
+        expect(result1).toEqual(
+            {
+                economy: 59,
+                industry: 59,
+                science: 59
+            }
+        );
+        expect(result2).toEqual({
+            economy: 33,
+            industry: 63,
+            science: 20
+        });
     });
 
     it('should setup a player\'s home star', () => {
@@ -126,5 +125,5 @@ describe('star', () => {
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);
     });
-
+    
 });
