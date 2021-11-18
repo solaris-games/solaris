@@ -73,14 +73,11 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-sm-12 col-md-6 embed-responsive embed-responsive-16by9">
-        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-      <div class="col-sm-12 col-md-6">
-        <recent-donations :maxLength="75" />
-      </div>
-    </div>
+    <hr/>
+    
+    <tutorial-game />
+
+    <hr/>
 
     <div class="row pb-0">
       <div class="col d-none d-md-block">
@@ -101,6 +98,7 @@ import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
 import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
 import RecentDonations from '../components/game/donate/RecentDonations.vue'
+import TutorialGame from '../components/game/menu/TutorialGame'
 
 export default {
   components: {
@@ -109,7 +107,8 @@ export default {
     'view-title': ViewTitle,
     'achievements': Achievements,
     'leaderboard-user-table': LeaderboardUserTable,
-    'recent-donations': RecentDonations
+    'recent-donations': RecentDonations,
+    'tutorial-game': TutorialGame
   },
   data () {
     return {
