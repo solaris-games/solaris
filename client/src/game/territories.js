@@ -127,32 +127,47 @@ class Territories {
     let gridWidth = (maxX - minX) / CELL_SIZE
     let gridHeight = (maxY - minY) / CELL_SIZE
 
-    let samplePoints = new Array(gridWidth + 1)
+    let samplePoints = Array.from(Array(gridWidth + 1), () => new Array(gridHeight + 1));
 
-    for (let ix = 0; ix < samplePoints.length; ix++) {
-      samplePoints[ix] = new Array(gridHeight + 1)
-      for (let iy = 0; iy < samplePoints[ix].length; iy++) {
-        // find the closest star and its owner
-        let pointLocation = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
-        let closestStar = gameHelper.getClosestStar(this.game.galaxy.stars, pointLocation)
-        let owner = this.game.galaxy.players.find(p => p._id === closestStar.star.ownedByPlayerId)
-        // TODO get the intensity of the metaball composed of all stars of the owner
-        // the owner stars shouold be cached outside this loop
-
-        if (closestStar.distance < METABALL_RADIUS) {
-          samplePoints[ix][iy] = owner
-        }
-        if (false) {
-          let pointGraphics = new PIXI.Graphics()
-          pointGraphics.lineStyle(1, samplePoints[ix][iy], 1.0)
-          pointGraphics.drawStar(0, 0, 5, 5, 5 - 2)
-          pointGraphics.position.x = pointLocation.x
-          pointGraphics.position.y = pointLocation.y
-          this.container.addChild(pointGraphics)
-        }
-
+    const gridToCoord = (ix, iy) => {
+      return {
+        x: ix * CELL_SIZE + minX,
+        y: iy * CELL_SIZE + minY
       }
     }
+
+    let startIX, endIX, startIY, endIY, gridLocation, distance, owner;
+    let stars = this.game.galaxy.stars
+    for (let star of stars) {
+      // This loop goes through all stars, and generates the gridPoints that are within the METABALL_RADIUS
+      // Those points get the value of this star, or keep their previous value (from another star) if that one was closer
+      startIX = Math.ceil((star.location.x - METABALL_RADIUS - minX) / CELL_SIZE); //The minimum ix can be and still be in the METABALL_RADIUS
+      endIX = Math.floor((star.location.x + METABALL_RADIUS - minX) / CELL_SIZE); //The maximum ix can be and still be in the METABALL_RADIUS
+      for (let ix = startIX; ix <= endIX; ix++) {
+        startIY = Math.ceil((star.location.y - Math.sqrt((METABALL_RADIUS)**2 - (star.location.x - (ix * CELL_SIZE + minX))**2) - minY) / CELL_SIZE); // The minimum iy can be and still be in the METABALL_RADIUS
+        endIY = Math.floor((star.location.y + Math.sqrt((METABALL_RADIUS)**2 - (star.location.x - (ix * CELL_SIZE + minX))**2) - minY) / CELL_SIZE); // The maximum iy can be and still be in the METABALL_RADIUS
+        for (let iy = startIY; iy <= endIY; iy++) {
+          gridLocation = gridToCoord(ix, iy); // Get the location in x, y of the gridPoint we are currently looping through
+          distance = gameHelper.getDistanceBetweenLocations(gridLocation, star.location); // Get the distance between the gridPoint and the star
+          if (samplePoints[ix][iy] && samplePoints[ix][iy].distance < distance) { // If the gridpoint has a value AND the distance currently logged (from a previous star) is smaller than the current one THEN don't log anything
+            // Do nothing, because the grid already has a value from a star that is closer
+          } else {
+            // Now either the grid doesn't have a value here yet or the star calculated here is closer than the one currently logged in
+            owner = this.game.galaxy.players.find(p => p._id === star.ownedByPlayerId)
+            samplePoints[ix][iy] = { distance, owner }; // Make this gridPoint the value of the distance from the star so we can compare it with other stars AND make it have the value for the owner (the player)
+          }
+        }
+      }
+    }
+    // Loops through all samplePoints, to make the value of the point the owner, instead of {distance, owner} because that is what the next function takes as input.
+    for (let ix = 0; ix < samplePoints.length - 1; ix++) {
+      for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
+        if (samplePoints[ix][iy]) {
+          samplePoints[ix][iy] = samplePoints[ix][iy].owner;
+        }
+      }
+    }
+
     for (let player of this.game.galaxy.players) {
       let color = player.colour.value
       let territoryPolygons = new PIXI.Graphics()
@@ -281,7 +296,7 @@ class Territories {
         endpointCheck(cell, halfedge.getEndpoint())
       }
     }
-    
+
     // Draw the cells
     for (let cell of diagram.cells) {
       let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);

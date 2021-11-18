@@ -7,7 +7,7 @@
       <div class="col">
         <button class="btn btn-sm btn-primary" @click="onRefreshClicked">Refresh <i class="fas fa-sync"></i></button>
       </div>
-      <div class="col-auto" v-if="!isOneVsOne">
+      <div class="col-auto" v-if="canCreateConversation">
         <!-- <button class="btn btn-sm btn-primary" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button> -->
         <button class="btn btn-sm btn-info ml-1" @click="onCreateNewConversationRequested">
           <i class="fas fa-comments"></i>
@@ -67,8 +67,9 @@ export default {
         }
       });
     },
-    isOneVsOne: function () {
-      return this.$store.state.game.settings.general.playerLimit === 2
+    canCreateConversation: function () {
+      return this.$store.state.game.settings.general.playerLimit > 2
+        && !gameHelper.isTutorialGame(this.$store.state.game)
     }
   },
   mounted () {

@@ -240,7 +240,7 @@
           </tr>
           <tr>
             <td>Trade Credits</td>
-            <td class="text-right" v-if="game.settings.player.tradeCredits">
+            <td class="text-right">
               <span v-if="game.settings.player.tradeCredits">Enabled</span>
               <span v-if="!game.settings.player.tradeCredits">Disabled</span>
             </td>

@@ -4,7 +4,7 @@ const Heap = require('qheap');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(gameRepo, starService, carrierService, achievementService, researchService, technologyService, playerService) {
+    constructor(gameRepo, starService, carrierService, achievementService, researchService, technologyService, playerService, gameTypeService) {
         super();
 
         this.gameRepo = gameRepo;
@@ -14,6 +14,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         this.researchService = researchService;
         this.technologyService = technologyService;
         this.playerService = playerService;
+        this.gameTypeService = gameTypeService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -57,7 +58,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             this._getSetStarWarpGateDBWrite(game, star, true)
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementWarpGatesBuilt(player.userId);
         }
 
@@ -85,7 +86,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             this._getSetStarWarpGateDBWrite(game, star, false)
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementWarpGatesDestroyed(player.userId);
         }
     }
@@ -157,7 +158,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementCarriersBuilt(player.userId);
         }
 
@@ -239,7 +240,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         // Update the DB.
         await this.gameRepo.bulkWrite(dbWrites);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
         }
     }
@@ -441,7 +442,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         // Check for AI control.
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
         }
 

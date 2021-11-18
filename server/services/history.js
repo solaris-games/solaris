@@ -8,6 +8,8 @@ module.exports = class HistoryService {
         this.historyRepo = historyRepo;
         this.playerService = playerService;
         this.gameService = gameService;
+
+        this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
     }
 
     async listIntel(gameId, startTick, endTick) {

@@ -9,15 +9,13 @@ module.exports = (container) => {
                 let game = games[i];
 
                 // Do not delete featured games.
-                if (game.settings.general.featured) {
+                if (container.gameTypeService.isFeaturedGame(game)) {
                     continue;
                 }
 
                 try {
                     await container.emailService.sendGameTimedOutEmail(game);
                     await container.gameService.delete(game);
-                    await container.historyService.deleteByGameId(game._id);
-                    await container.eventService.deleteByGameId(game._id);
                 } catch (e) {
                     console.error(e);
                 }

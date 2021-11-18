@@ -28,7 +28,7 @@
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask mr-2"></i>Research</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i class="fas fa-sun mr-2"></i>Galaxy</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.DIPLOMACY)" title="Diplomacy (D)" v-if="isFormalAlliancesEnabled"><i class="fas fa-globe-americas mr-2"></i>Diplomacy</a>
-                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)" v-if="isTradeEnabled"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
             </div>
             <a v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
@@ -123,6 +123,9 @@ export default {
     },
     isFormalAlliancesEnabled () {
       return this.$store.state.game.settings.player.alliances === 'enabled'
+    },
+    isTradeEnabled () {
+      return GameHelper.isTradeEnabled(this.$store.state.game)
     }
   }
 }
