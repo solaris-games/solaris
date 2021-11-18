@@ -7,7 +7,7 @@ db.games.find({}).forEach(function(game) {
         };
     }
 
-    db.games.remove(game);
+    db.games.save(game);
 });
 
 db.gamehistories.find({

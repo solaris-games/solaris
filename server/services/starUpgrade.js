@@ -357,7 +357,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 return {
                     star: s,
                     terraformedResources,
-                    infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedObject[infrastructureType]),
+                    infrastructureCost: calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType], terraformedResources[infrastructureType]),
                     upgrade: upgradeFunction
                 }
             });
