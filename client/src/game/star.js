@@ -336,6 +336,9 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
+    if (!this.data.naturalResources) {
+      return
+    }
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()

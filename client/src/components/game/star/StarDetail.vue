@@ -469,7 +469,7 @@ export default {
       return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
     },
     naturalResources: function() {
-      if  (!splitResources) {
+      if  (!this.splitResources) {
         return Math.floor(this.star.naturalResources.economy);
       }
       let economy = Math.floor(this.star.naturalResources.economy);
@@ -478,7 +478,7 @@ export default {
       return economy + ' / ' + industry + ' / ' + science;
     },
     terraformedResources: function() {
-      if  (!splitResources) {
+      if  (!this.splitResources) {
         return Math.floor(this.star.terraformedResources.economy);
       }
       let economy = Math.floor(this.star.terraformedResources.economy);
