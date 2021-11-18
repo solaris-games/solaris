@@ -2,7 +2,7 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, nameService, 
+    constructor(randomService, starService, starDistanceService, nameService,
         circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService) {
         this.randomService = randomService;
         this.starService = starService;
@@ -25,13 +25,13 @@ module.exports = class MapService {
         let starLocations = [];
 
         switch (game.settings.galaxy.galaxyType) {
-            case 'circular': 
+            case 'circular':
                 starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'spiral': 
+            case 'spiral':
                 starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'doughnut': 
+            case 'doughnut':
                 starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'circular-balanced':
@@ -56,18 +56,18 @@ module.exports = class MapService {
                 x: starLocation.x,
                 y: starLocation.y
             };
-            
+
             let star = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], loc, starLocation.resources);
-            
+
             stars.push(star);
 
             if (starLocation.homeStar) {
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
-                  let linkedStar = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
-                  stars.push(linkedStar);
-                  linkedStars.push(linkedStar._id);
+                    let linkedStar = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
+                    stars.push(linkedStar);
+                    linkedStars.push(linkedStar._id);
                 }
 
                 game.galaxy.homeStars.push(star._id)
@@ -94,7 +94,7 @@ module.exports = class MapService {
         if (game.settings.specialGalaxy.randomAsteroidFields) {
             this.generateAsteroidFields(game, stars, game.settings.specialGalaxy.randomAsteroidFields);
         }
-        
+
         return stars;
     }
 
@@ -129,6 +129,17 @@ module.exports = class MapService {
             } else {
                 starA.wormHoleToStarId = starB._id;
                 starB.wormHoleToStarId = starA._id;
+
+                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                // Overwrite natural resources if splitResources
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+                    star.splitResources.total -= star.splitResources.economy;
+                    star.splitResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.splitResources.total += star.splitResources.economy;
+                    star.naturalResources = star.splitResources.total;
+                }
             }
         }
     }
@@ -144,6 +155,17 @@ module.exports = class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isNebula = true;
+
+                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                // Overwrite natural resources if splitResources
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+                    star.splitResources.total -= star.splitResources.science;
+                    star.splitResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.splitResources.total += star.splitResources.science;
+                    star.naturalResources = star.splitResources.total;
+                }
             }
         } while (count--);
     }
@@ -160,15 +182,18 @@ module.exports = class MapService {
             } else {
                 star.isAsteroidField = true;
 
-                let f = 1
-                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
-                    f = 3 //This is because in the splitResources, the natural resources is always 3 times higher
-                }
-                // Overwrite the natural resources
-                let minResources = game.constants.star.resources.maxNaturalResources * f * 1.5;
-                let maxResources = game.constants.star.resources.maxNaturalResources * f * 3;
+                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
-                star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);;
+                // Overwrite natural resources
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+                    star.splitResources.total -= star.splitResources.industry;
+                    star.splitResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.splitResources.total += star.splitResources.industry;
+                    star.naturalResources = star.splitResources.total;
+                } else {
+                    star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                }
             }
         } while (count--);
     }
@@ -199,7 +224,7 @@ module.exports = class MapService {
                 y: 0
             };
         }
-        
+
         let totalX = starLocations.reduce((total, s) => total += s.x, 0);
         let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 
