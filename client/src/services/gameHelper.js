@@ -830,7 +830,7 @@ class GameHelper {
   }
 
   isDeadStar(star) {
-    return star.naturalResources != null && star.naturalResources <= 0
+    return star.naturalResources != null && star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0
   }
 
   splitResources(game) {

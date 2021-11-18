@@ -75,7 +75,11 @@ const schema = new Schema({
         {
             starId: { type: Types.ObjectId, required: true },
             ownedByPlayerId: { type: Types.ObjectId, required: false, default: null},
-            naturalResources: { type: Types.Number, required: true },
+            naturalResources: {
+                economy: { type: Types.Number, required: true },
+                industry: { type: Types.Number, required: true },
+                science: { type: Types.Number, required: true }
+            },
             ships: { type: Types.Number, required: true },
             shipsActual: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },

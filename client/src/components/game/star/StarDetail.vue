@@ -475,7 +475,7 @@ export default {
       let economy = Math.floor(this.star.naturalResources.economy);
       let industry = Math.floor(this.star.naturalResources.industry);
       let science = Math.floor(this.star.naturalResources.science);
-      return Math.floor(economy) + ' / ' + Math.floor(industry) + ' / ' + Math.floor(science);
+      return economy + ' / ' + industry + ' / ' + science;
     },
     terraformedResources: function() {
       if  (!splitResources) {

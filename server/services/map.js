@@ -58,7 +58,7 @@ module.exports = class MapService {
             };
             
             let star = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], loc, starLocation.resources);
-            
+
             stars.push(star);
 
             if (starLocation.homeStar) {
@@ -131,7 +131,7 @@ module.exports = class MapService {
                 starB.wormHoleToStarId = starA._id;
 
                 // Overwrite natural resources if splitResources
-                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources === 'enabled') {
                     let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
                     let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
@@ -155,7 +155,7 @@ module.exports = class MapService {
                 star.isNebula = true;
 
                 // Overwrite natural resources if splitResources
-                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources === 'enabled') {
                     let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
                     let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 

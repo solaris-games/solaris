@@ -24,7 +24,7 @@ module.exports = class StarService extends EventEmitter {
             name,
             naturalResources,
             location,
-            infrastructure: { }
+            infrastructure: { a: 'Makes sure it doesnt get deleted'}
         };
     }
 
@@ -81,7 +81,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.warpGate = false;
         homeStar.specialistId = null;
 
-        if (game.settings.specialGalaxy.splitResources === 'enabled') {
+        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources === 'enabled') {
             homeStar.isAsteroidField = false;
             homeStar.isNebula = false;
             if (homeStar.wormHoleToStarId) {
@@ -453,7 +453,9 @@ module.exports = class StarService extends EventEmitter {
 
                     if (specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
-                            star.naturalResources += specialist.modifiers.special.addNaturalResourcesOnTick;
+                            star.naturalResources.economy += specialist.modifiers.special.addNaturalResourcesOnTick;
+                            star.naturalResources.industry += specialist.modifiers.special.addNaturalResourcesOnTick;
+                            star.naturalResources.science += specialist.modifiers.special.addNaturalResourcesOnTick;
                         }
 
                         if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
@@ -466,15 +468,26 @@ module.exports = class StarService extends EventEmitter {
     }
 
     isDeadStar(star) {
-        return star.naturalResources <= 0;
+        return star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0;
     }
 
     deductNaturalResources(star, amount) {
-        star.naturalResources -= amount;
+        star.naturalResources.economy -= amount;
+        star.naturalResources.industry -= amount;
+        star.naturalResources.science -= amount;
 
+        if (Math.floor(star.naturalResources.economy) <= 0) {
+            star.naturalResources.economy = 0;
+        }
+        if (Math.floor(star.naturalResources.industry) <= 0) {
+            star.naturalResources.industry = 0;
+        }
+        if (Math.floor(star.naturalResources.science) <= 0) {
+            star.naturalResources.science = 0;
+        }
+        
         // if the star reaches 0 resources then reduce the star to a dead hunk.
-        if (star.naturalResources <= 0) {
-            star.naturalResources = 0;
+        if(star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0) {
             star.specialistId = null;
             star.warpGate = false;
             star.infrastructure.economy = 0;
@@ -488,7 +501,7 @@ module.exports = class StarService extends EventEmitter {
             throw new Error('The star cannot be reignited, it is not dead.');
         }
 
-        star.naturalResources = naturalResources || 1;
+        star.naturalResources = naturalResources || {economy: 1, industry:1, science:1};
     }
 
     destroyStar(game, star) {
