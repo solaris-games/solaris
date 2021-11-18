@@ -58,10 +58,14 @@ module.exports = class EmailService {
         GAME_TIMED_OUT: {
             fileName: 'gameTimedOut.html',
             subject: 'Solaris - Your game did not start'
+        },
+        GAME_PLAYER_AFK: {
+            fileName: 'gamePlayerAfk.html',
+            subject: 'Solaris - You\'ve gone AFK'
         }
     };
 
-    constructor(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService) {
+    constructor(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService) {
         this.config = config;
         this.gameService = gameService;
         this.userService = userService;
@@ -69,10 +73,15 @@ module.exports = class EmailService {
         this.playerService = playerService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.gameTickService = gameTickService;
 
         this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
         this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
+
+        this.gameTickService.on('onPlayerAfk', (args) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
+        this.gameTickService.on('onGameEnded', (args) => this.sendGameFinishedEmail(args.gameId));
+        this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
     }
 
     _getTransport() {
@@ -169,7 +178,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameFinishedEmail(game) {
+    async sendGameFinishedEmail(gameId) {
+        let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
@@ -189,7 +199,8 @@ module.exports = class EmailService {
         }
     }
 
-    async sendGameCycleSummaryEmail(game) {      
+    async sendGameCycleSummaryEmail(gameId) {      
+        let game = await this.gameService.getById(gameId);
         let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
 
         let leaderboardHtml = '';
@@ -306,6 +317,28 @@ module.exports = class EmailService {
                 try {
                     await this.sendTemplate(user.email, this.TEMPLATES.GAME_TIMED_OUT, [
                         gameName
+                    ]);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    }
+
+    async sendGamePlayerAfkEmail(gameId, playerId) {
+        let game = await this.gameService.getById(gameId);
+        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameName = game.settings.general.name;
+        let player = this.playerService.getById(game, playerId);
+        
+        if (player) {
+            let user = await this.userService.getEmailById(player.userId);
+            
+            if (user && user.emailEnabled) {
+                try {
+                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_PLAYER_AFK, [
+                        gameName,
+                        gameUrl
                     ]);
                 } catch (err) {
                     console.error(err);

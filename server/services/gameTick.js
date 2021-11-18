@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService) {
+        specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService) {
         super();
             
         this.distanceService = distanceService;
@@ -24,7 +24,6 @@ module.exports = class GameTickService extends EventEmitter {
         this.starUpgradeService = starUpgradeService;
         this.reputationService = reputationService;
         this.aiService = aiService;
-        this.emailService = emailService;
         this.battleRoyaleService = battleRoyaleService;
         this.orbitalMechanicsService = orbitalMechanicsService;
         this.diplomacyService = diplomacyService;
@@ -533,7 +532,9 @@ module.exports = class GameTickService extends EventEmitter {
                 this.battleRoyaleService.performBattleRoyaleTick(game);
             }
 
-            await this.emailService.sendGameCycleSummaryEmail(game);
+            this.emit('onGameCycleEnded', {
+                gameId: game._id
+            });
         }
     }
 
@@ -611,14 +612,12 @@ module.exports = class GameTickService extends EventEmitter {
             }
 
             if (!isTutorialGame) {
-                await this.emailService.sendGameFinishedEmail(game);
+                this.emit('onGameEnded', {
+                    gameId: game._id,
+                    gameTick: game.state.tick,
+                    rankingResult: this.gameTypeService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
+                });
             }
-
-            this.emit('onGameEnded', {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                rankingResult: this.gameTypeService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
-            });
 
             return true;
         }

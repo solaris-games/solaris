@@ -184,6 +184,7 @@
 
           <hr/>
 
+          <!-- TODO: Turn this into a component and put it on the main menu as well -->
           <div class="row no-gutters">
             <div class="col-sm-12 col-md-6 col-lg-6 pr-2">
               <div class="card bg-dark text-white tutorial-game" @click="viewTutorial()">
