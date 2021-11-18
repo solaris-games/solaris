@@ -268,6 +268,7 @@
                   <tr class="bg-primary">
                       <th>Name</th>
                       <th class="d-none d-md-table-cell text-center">Players</th>
+                      <th class="d-none d-sm-table-cell text-center">Cycle</th>
                       <th></th>
                   </tr>
               </thead>
@@ -279,6 +280,7 @@
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
                       <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
                             <span class="d-none d-md-block">View</span>
