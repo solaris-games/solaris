@@ -5,7 +5,7 @@ module.exports = class GameGalaxyService {
     constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService) {
+        guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
@@ -27,6 +27,7 @@ module.exports = class GameGalaxyService {
         this.orbitalMechanicsService = orbitalMechanicsService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.diplomacyService = diplomacyService;
     }
 
     async getGalaxy(gameId, userId, tick) {
@@ -426,6 +427,12 @@ module.exports = class GameGalaxyService {
                 research = null;
             }
 
+            let diplomacy = null;
+
+            if (player) {
+                diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);
+            }
+
             // Return a subset of the user, key info only.
             return {
                 _id: p._id,
@@ -449,7 +456,8 @@ module.exports = class GameGalaxyService {
                 isOnline: p.isOnline,
                 guild: playerGuild,
                 hasDuplicateIP: p.hasDuplicateIP,
-                hasFilledAfkSlot: p.hasFilledAfkSlot
+                hasFilledAfkSlot: p.hasFilledAfkSlot,
+                diplomacy
             };
         });
     }
