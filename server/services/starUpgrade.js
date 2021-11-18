@@ -40,7 +40,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
-        let terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
+        let terraformedResources = this.starService.calculateTerraformedResources(game, star.naturalResources, effectiveTechs.terraforming);
         let terraformedObject = this._calculateSplitTerraformedResources(game, terraformedResources, star); //Also checks if it is actually a splitResource game
         const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedObject['industry']);
 
@@ -176,7 +176,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Calculate how much the upgrade will cost.
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
+        const terraformedResources = this.starService.calculateTerraformedResources(game, star.naturalResources, effectiveTechs.terraforming);
         let terraformedObject = this._calculateSplitTerraformedResources(game, terraformedResources, star); //Also checks if it is actually a splitResource game
 
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedObject[economyType]);
@@ -352,7 +352,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             })
             .map(s => {
                 const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-                let terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, effectiveTechs.terraforming);
+                let terraformedResources = this.starService.calculateTerraformedResources(game, s.naturalResources, effectiveTechs.terraforming);
 
                 let terraformedObject = this._calculateSplitTerraformedResources(game, terraformedResources, s); //Also checks if it is actually a splitResource game
                 terraformedResources = terraformedObject[infrastructureType];

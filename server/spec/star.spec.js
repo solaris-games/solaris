@@ -56,7 +56,7 @@ describe('star', () => {
     it('should generate an unowned star', () => {
         const name = 'test star name';
 
-        const newStar = starService.generateUnownedStar(game, name, { x:0, y:0 }, 10);
+        const newStar = starService.generateUnownedStar(game, name, { x: 0, y: 0 }, 10);
 
         expect(newStar).not.toBe(null);
         expect(newStar._id).not.toBe(null);
@@ -67,9 +67,33 @@ describe('star', () => {
     });
 
     it('should calculate terraformed resources', () => {
-        const result = starService.calculateTerraformedResources(10, 5);
+        const gameInput1 = {
+            settings: {
+                specialGalaxy: {
+                    splitResources: 'disabled'
+                }
+            }
+        };
+        const gameInput2 = {
+            settings: {
+                specialGalaxy: {
+                    splitResources: 'enabled'
+                }
+            }
+        };
+        const gameInput3 = {
+            settings: {
+                specialGalaxy: {}
+            }
+        };
 
-        expect(result).toEqual(35);
+        const result1 = starService.calculateTerraformedResources(gameInput1, 10, 5); // Normal resources
+        const result2 = starService.calculateTerraformedResources(gameInput2, 30, 5); // Split resources
+        const result3 = starService.calculateTerraformedResources(gameInput3, 20, 7); // Normal resources
+
+        expect(result1).toEqual(35);
+        expect(result2).toEqual(105);
+        expect(result3).toEqual(55);
     });
 
     it('should setup a player\'s home star', () => {
@@ -102,5 +126,5 @@ describe('star', () => {
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);
     });
-    
+
 });

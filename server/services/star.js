@@ -6,7 +6,7 @@ module.exports = class StarService extends EventEmitter {
 
     constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService) {
         super();
-        
+
         this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.nameService = nameService;
@@ -19,7 +19,7 @@ module.exports = class StarService extends EventEmitter {
     }
 
     generateUnownedStar(game, name, location, resources) {
-        if(game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
             return {
                 _id: mongoose.Types.ObjectId(),
                 name,
@@ -31,7 +31,7 @@ module.exports = class StarService extends EventEmitter {
                     science: resources.science
                 },
                 location,
-                infrastructure: { }
+                infrastructure: {}
             }
         }
         return {
@@ -39,7 +39,7 @@ module.exports = class StarService extends EventEmitter {
             name,
             naturalResources: resources,
             location,
-            infrastructure: { }
+            infrastructure: {}
         };
     }
 
@@ -64,7 +64,7 @@ module.exports = class StarService extends EventEmitter {
     getByIdBS(game, id) {
         let start = 0;
         let end = game.galaxy.stars.length - 1;
-    
+
         while (start <= end) {
             let middle = Math.floor((start + end) / 2);
             let star = game.galaxy.stars[middle];
@@ -97,7 +97,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.specialistId = null;
 
         if (!homeStar.isAsteroidField) {
-            if(gameSettings.specialGalaxy.splitResources && gameSettings.specialGalaxy.splitResources == 'enabled') {
+            if (gameSettings.specialGalaxy.splitResources && gameSettings.specialGalaxy.splitResources == 'enabled') {
                 homeStar.naturalResources = 3 * game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
                 homeStar.splitResources = {
                     total: 3 * game.constants.star.resources.maxNaturalResources,
@@ -111,7 +111,7 @@ module.exports = class StarService extends EventEmitter {
         }
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
-        
+
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
         homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
@@ -135,7 +135,7 @@ module.exports = class StarService extends EventEmitter {
         // - The player owns the star
         // - The player has a carrier in orbit regardless of who owns the star
         let starIds = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
-        
+
         if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
             starIds = starIds.concat(
                 game.galaxy.carriers
@@ -215,7 +215,7 @@ module.exports = class StarService extends EventEmitter {
                         destination: this.getByObjectId(game, s.wormHoleToStarId)
                     };
                 });
-    
+
             for (let wormHoleStar of wormHoleStars) {
                 if (starsInRange.find(s => s._id.equals(wormHoleStar.destination._id)) == null) {
                     starsInRange.push({
@@ -248,7 +248,7 @@ module.exports = class StarService extends EventEmitter {
 
         return starsInScanningRange;
     }
-    
+
     getStarsWithinScanningRangeOfStarByStarIds(game, star, stars) {
         // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
@@ -276,7 +276,10 @@ module.exports = class StarService extends EventEmitter {
         return isInScanRange;
     }
 
-    calculateTerraformedResources(naturalResources, terraforming) {
+    calculateTerraformedResources(game, naturalResources, terraforming) {
+        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources == 'enabled') {
+            return (terraforming * 15) + naturalResources;
+        }
         return (terraforming * 5) + naturalResources;
     }
 
@@ -295,11 +298,11 @@ module.exports = class StarService extends EventEmitter {
         }
 
         this.resetIgnoreBulkUpgradeStatuses(star);
-        
+
         // Destroy the carriers owned by the player who abandoned the star.
         // Note: If an ally is currently in orbit then they will capture the star on the next tick.
         let playerCarriers = game.galaxy.carriers
-            .filter(x => 
+            .filter(x =>
                 x.orbiting
                 && x.orbiting.equals(star._id)
                 && x.ownedByPlayerId.equals(player._id)
@@ -347,7 +350,7 @@ module.exports = class StarService extends EventEmitter {
             // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
             if (carrier.specialistId) {
                 let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-        
+
                 if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
                     return true;
                 }
@@ -379,8 +382,8 @@ module.exports = class StarService extends EventEmitter {
     }
 
     isStarPairWormHole(sourceStar, destinationStar) {
-        return sourceStar.wormHoleToStarId 
-            && destinationStar.wormHoleToStarId 
+        return sourceStar.wormHoleToStarId
+            && destinationStar.wormHoleToStarId
             && sourceStar.wormHoleToStarId.equals(destinationStar._id)
             && destinationStar.wormHoleToStarId.equals(sourceStar._id);
     }
@@ -524,7 +527,7 @@ module.exports = class StarService extends EventEmitter {
 
             if (star.ownedByPlayerId) {
                 let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-    
+
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
                 star.shipsActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
                 star.ships = Math.floor(star.shipsActual);
@@ -616,7 +619,7 @@ module.exports = class StarService extends EventEmitter {
                 oldStarUser.achievements.combat.homeStars.lost++;
             }
         }
-        
+
         if (newStarUser && !newStarPlayer.defeated) {
             newStarUser.achievements.combat.stars.captured++;
 
