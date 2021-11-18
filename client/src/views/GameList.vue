@@ -224,14 +224,14 @@
               <thead>
                   <tr class="bg-primary">
                       <td>Name</td>
-                      <td class="d-none d-md-block text-center">Players</td>
+                      <td class="d-none d-md-table-cell text-center">Players</td>
                       <td></td>
                   </tr>
               </thead>
               <tbody>
                   <tr v-for="game in userGames" v-bind:key="game._id">
                       <td>{{game.settings.general.name}}</td>
-                      <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
                             <span class="d-none d-md-block">View</span>
