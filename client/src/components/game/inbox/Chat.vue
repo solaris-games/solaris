@@ -1,29 +1,25 @@
 <template>
-  <div class="d-none d-lg-block" v-if="isUserInGame">
+  <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
     <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread': unreadMessages}" @click="toggle" title="Inbox (M)">
       <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
     <div id="window" class="bg-dark pt-2" v-if="isExpanded">
-      <conversation-list v-if="menuState === MENU_STATES.INBOX"
-        @onViewConversationRequested="onViewConversationRequested"
-        @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
+      <conversation-list v-if="menuState === MENU_STATES.INBOX"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"
-        @onCloseRequested="toggle"
-        @onOpenInboxRequested="onOpenInboxRequested"
-        @onViewConversationRequested="onViewConversationRequested"/>
+        @onCloseRequested="toggle"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION"
         :conversationId="menuArguments"
         :key="menuArguments"
         @onCloseRequested="toggle"
-        @onOpenInboxRequested="onOpenInboxRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
   </div>
 </template>
 
 <script>
+import eventBus from '../../../eventBus'
 import MENU_STATES from '../../data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../data/keyboardShortcuts'
 import GameHelper from '../../../services/gameHelper'
@@ -47,18 +43,32 @@ export default {
   },
   created () {
     document.addEventListener('keydown', this.handleKeyDown)
+    window.addEventListener('resize', this.handleResize)
 
     this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
   },
   mounted () {
     this.menuState = MENU_STATES.INBOX
+
+    // TODO: These event names should be global constants
+    eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
+    eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
+    eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
   },
   destroyed () {
     document.removeEventListener('keydown', this.handleKeyDown)
+    window.removeEventListener('resize', this.handleResize)
 
     this.sockets.unsubscribe('gameMessageSent')
+    
+    eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
+    eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
+    eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
   },
   methods: {
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
+    },
     toggle () {
       this.isExpanded = !this.isExpanded;
 
@@ -67,6 +77,10 @@ export default {
       }
     },
     onViewConversationRequested (e) {
+      if (!this.canHandleConversationEvents()) {
+        return
+      }
+
       if (e.conversationId) {
         this.menuState = MENU_STATES.CONVERSATION
         this.menuArguments = e.conversationId
@@ -74,20 +88,31 @@ export default {
         this.menuState = MENU_STATES.CREATE_CONVERSATION
         this.menuArguments = e.participantIds
       }
+
+      this.isExpanded = true
     },
     onOpenInboxRequested (e) {
-        this.menuState = MENU_STATES.INBOX
-        this.menuArguments = null
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
+      if (!this.canHandleConversationEvents()) {
+        return
+      }
+      
+      this.menuState = MENU_STATES.INBOX
+      this.menuArguments = null
+
+      this.isExpanded = true
     },
     onCreateNewConversationRequested (e) {
-        this.menuState = MENU_STATES.CREATE_CONVERSATION
-        this.menuArguments = e.participantIds
+      if (!this.canHandleConversationEvents()) {
+        return
+      }
+      
+      this.menuState = MENU_STATES.CREATE_CONVERSATION
+      this.menuArguments = e.participantIds || null
+
+      this.isExpanded = true
     },
     onMessageReceived (e) {
-      if (window.innerWidth < 992) { // Don't do this if the window is too small as this component won't be displayed
+      if (this.canHandleConversationEvents()) { // Don't do this if the window is too small as this component won't be displayed
         return
       }
 
@@ -152,13 +177,23 @@ export default {
       }
 
       // Special case for Inbox shortcut, only do this if the screen is large
-      if (menuState !== MENU_STATES.INBOX || window.innerWidth < 992) {
+      if (menuState !== MENU_STATES.INBOX || !this.canHandleConversationEvents()) {
         return
       }
 
       this.menuState = menuState
       this.menuArguments = null
       this.toggle()
+    },
+    handleResize (e) {
+      if (!this.isExpanded) { // Don't care about this if it is already collapsed
+        return
+      }
+
+      this.isExpanded = this.canHandleConversationEvents()
+    },
+    canHandleConversationEvents () {
+      return window.innerWidth >= 992
     }
   },
   computed: {
@@ -167,6 +202,9 @@ export default {
     },
     isUserInGame () {
       return GameHelper.getUserPlayer(this.$store.state.game) != null
+    },
+    isTutorialGame () {
+      return GameHelper.isTutorialGame(this.$store.state.game)
     }
   }
 }
@@ -182,14 +220,15 @@ export default {
   width: 60px;
   border-radius: 50%;
   cursor: pointer;
+  z-index: 1;
 }
 
 #window {
   position: absolute;
-  right: 20px;
+  right: 0px;
   bottom: 100px;
   width: 473px;
-  top: 60px;
+  top: 45px;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;

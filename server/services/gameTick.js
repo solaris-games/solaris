@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService, diplomacyService) {
+        specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService) {
         super();
             
         this.distanceService = distanceService;
@@ -24,17 +24,18 @@ module.exports = class GameTickService extends EventEmitter {
         this.starUpgradeService = starUpgradeService;
         this.reputationService = reputationService;
         this.aiService = aiService;
-        this.emailService = emailService;
         this.battleRoyaleService = battleRoyaleService;
         this.orbitalMechanicsService = orbitalMechanicsService;
         this.diplomacyService = diplomacyService;
+        this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
     }
 
     async tick(gameId) {
         let game = await this.gameService.getByIdAll(gameId);
 
         // Double check the game isn't locked.
-        if (!this.gameService.isLocked(game)) {
+        if (!this.gameStateService.isLocked(game)) {
             throw new Error(`The game is not locked.`);
         }
 
@@ -67,7 +68,7 @@ module.exports = class GameTickService extends EventEmitter {
         let iterations = 1;
 
         // If we are in turn based mode, we need to repeat the tick X number of times.
-        if (this.gameService.isTurnBasedGame(game)) {
+        if (this.gameTypeService.isTurnBasedGame(game)) {
             iterations = game.settings.gameTime.turnJumps;
 
             // Increment missed turns for players so that they can be kicked for being AFK later.
@@ -81,6 +82,9 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
+
+            await this._transferGiftsInOrbit(game, gameUsers);
+            logTime('Transfer gifts in orbit');
 
             await this._combatCarriers(game, gameUsers);
             logTime('Combat carriers');
@@ -151,10 +155,10 @@ module.exports = class GameTickService extends EventEmitter {
         let lastTick = moment(game.state.lastTickDate).utc();
         let nextTick;
         
-        if (this.gameService.isRealTimeGame(game)) {
+        if (this.gameTypeService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
             nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
-        } else if (this.gameService.isTurnBasedGame(game)) {
+        } else if (this.gameTypeService.isTurnBasedGame(game)) {
             // If in turn based mode, then check if all undefeated players are ready OR all players are ready to quit
             // OR the max time wait limit has been reached.
             let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game) || this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
@@ -225,77 +229,112 @@ module.exports = class GameTickService extends EventEmitter {
                 };
             });
 
-        for (let i = 0; i < carrierPositions.length; i++) {
-            let friendlyCarrier = carrierPositions[i];
+        const graph = this._getCarrierPositionGraph(carrierPositions);
 
-            if (friendlyCarrier.carrier.ships <= 0) {
+        for (let carrierPath in graph) {
+            let positions = graph[carrierPath];
+
+            if (positions.length <= 1) {
                 continue;
             }
 
-            // First up, get all carriers that are heading from the destination and to the source
-            // and are in front of the carrier.
-            let collisionCarriers = carrierPositions
-                .filter(c => {
-                    // Head to head combat:
-                    return (c.carrier.ships > 0                                                 // Has ships (may have been involved in other combat)
-                            && !c.carrier.isGift                                                // And is not a gift
-                            && c.destination.equals(friendlyCarrier.source)                         // Is heading to where the carrier came from
-                            && c.source.equals(friendlyCarrier.destination)                         // Came from where the carrier is heading to
-                            && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent    // Is currently in front of the carrier
-                            && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext)         // Will be behind the carrier
-                    // Combat from behind:
-                        || (c.carrier.ships > 0
-                            && !c.carrier.isGift                                                // And is not a gift
-                            && c.destination.equals(friendlyCarrier.destination)                    // Is heading in the same direction as the carrier
-                            && c.source.equals(friendlyCarrier.source)
-                            && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent   // Is current behind the carrier
-                            && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext);       // Will be in front of the carrier 
-                });
+            for (let i = 0; i < positions.length; i++) {
+                let friendlyCarrier = positions[i];
 
-            // Filter any carriers that avoid carrier-to-carrier combat.
-            collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
-
-            if (!collisionCarriers.length) {
-                continue;
-            }
-
-            // If all of the carriers that have collided are friendly then no need to do combat.
-            let friendlyCarriers = collisionCarriers
-                .filter(c => c.carrier.ships > 0 && c.carrier.ownedByPlayerId.equals(friendlyCarrier.carrier.ownedByPlayerId));
-
-            // If all other carriers are friendly then skip.
-            if (friendlyCarriers.length === collisionCarriers.length) {
-                continue;
-            }
-
-            let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
-            
-            let combatCarriers = collisionCarriers
-                .map(c => c.carrier)
-                .filter(c => c.ships > 0);
-
-            // Double check that there are carriers that can fight.
-            if (!combatCarriers.length) {
-                continue;
-            }
-
-            // If alliances is enabled then ensure that only enemies fight.
-            // TODO: Alliance combat here is very complicated when more than 2 players are involved.
-            // For now, we will perform normal combat if any participant is an enemy of the others.
-            if (isAlliancesEnabled) {
-                const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId.toString()))];
-
-                const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
-
-                if (isAllPlayersAllied) {
+                if (friendlyCarrier.carrier.ships <= 0) {
                     continue;
                 }
+
+                // First up, get all carriers that are heading from the destination and to the source
+                // and are in front of the carrier.
+                let collisionCarriers = positions
+                    .filter(c => {
+                        return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
+                            && (
+                                // Head to head combat:
+                                (
+                                    c.destination.equals(friendlyCarrier.source)
+                                    && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
+                                    && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
+                                )
+                                ||
+                                // Combat from behind: 
+                                (
+                                    c.destination.equals(friendlyCarrier.destination)
+                                    && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
+                                    && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
+                                )
+                            )
+                    });
+
+                // Filter any carriers that avoid carrier-to-carrier combat.
+                collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
+
+                if (!collisionCarriers.length) {
+                    continue;
+                }
+
+                // If all of the carriers that have collided are friendly then no need to do combat.
+                let friendlyCarriers = collisionCarriers
+                    .filter(c => c.carrier.ships > 0 && c.carrier.ownedByPlayerId.equals(friendlyCarrier.carrier.ownedByPlayerId));
+
+                // If all other carriers are friendly then skip.
+                if (friendlyCarriers.length === collisionCarriers.length) {
+                    continue;
+                }
+
+                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
+                
+                let combatCarriers = collisionCarriers
+                    .map(c => c.carrier)
+                    .filter(c => c.ships > 0);
+
+                // Double check that there are carriers that can fight.
+                if (!combatCarriers.length) {
+                    continue;
+                }
+
+                // If alliances is enabled then ensure that only enemies fight.
+                // TODO: Alliance combat here is very complicated when more than 2 players are involved.
+                // For now, we will perform normal combat if any participant is an enemy of the others.
+                if (isAlliancesEnabled) {
+                    const playerIds = [...new Set(combatCarriers.map(x => x.ownedByPlayerId.toString()))];
+
+                    const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
+
+                    if (isAllPlayersAllied) {
+                        continue;
+                    }
+                }
+
+                // TODO: Check for specialists that affect pre-combat.
+
+                await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
+            }
+        }
+    }
+
+    _getCarrierPositionGraph(carrierPositions) {
+        const graph = {};
+
+        for (let carrierPosition of carrierPositions) {
+            const graphKeyA = carrierPosition.destination.toString() + carrierPosition.source.toString();
+            const graphKeyB = carrierPosition.source.toString() + carrierPosition.destination.toString();
+
+            if (graphKeyA === graphKeyB) {
+                continue;
             }
 
-            // TODO: Check for specialists that affect pre-combat.
-
-            this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
+            const graphObj = graph[graphKeyA] || graph[graphKeyB];
+            
+            if (graphObj) {
+                graphObj.push(carrierPosition);
+            } else {
+                graph[graphKeyA] = [ carrierPosition ];
+            }
         }
+
+        return graph;
     }
 
     _filterAvoidCarrierToCarrierCombatCarriers(carriers) {
@@ -390,7 +429,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -426,7 +465,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
+            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
         }
     }
 
@@ -451,7 +490,7 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _sanitiseDarkModeCarrierWaypoints(game) {
-        if (this.gameService.isDarkMode(game)) {
+        if (this.gameTypeService.isDarkMode(game)) {
             this.waypointService.sanitiseAllCarrierWaypointsByScanningRange(game);
         }
     }
@@ -493,7 +532,9 @@ module.exports = class GameTickService extends EventEmitter {
                 this.battleRoyaleService.performBattleRoyaleTick(game);
             }
 
-            await this.emailService.sendGameCycleSummaryEmail(game);
+            this.emit('onGameCycleEnded', {
+                gameId: game._id
+            });
         }
     }
 
@@ -504,7 +545,8 @@ module.exports = class GameTickService extends EventEmitter {
     async _gameLoseCheck(game, gameUsers) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
-        let isTurnBasedGame = this.gameService.isTurnBasedGame(game);
+        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        let isTurnBasedGame = this.gameTypeService.isTurnBasedGame(game);
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         for (let i = 0; i < undefeatedPlayers.length; i++) {
@@ -522,7 +564,7 @@ module.exports = class GameTickService extends EventEmitter {
                     game.afkers.push(player.userId);
             
                     // AFK counts as a defeat as well.
-                    if (user) {
+                    if (user && !isTutorialGame) {
                         user.achievements.defeated++;
                         user.achievements.afk++;
                     }
@@ -534,7 +576,7 @@ module.exports = class GameTickService extends EventEmitter {
                     });
                 }
                 else {
-                    if (user) {
+                    if (user && !isTutorialGame) {
                         user.achievements.defeated++;
                     }
 
@@ -547,33 +589,35 @@ module.exports = class GameTickService extends EventEmitter {
             }
         }
 
-        this.gameService.updateStatePlayerCount(game);
+        this.gameStateService.updateStatePlayerCount(game);
     }
 
     async _gameWinCheck(game, gameUsers) {
+        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
+
         let winner = this.leaderboardService.getGameWinner(game);
 
         if (winner) {
-            this.gameService.finishGame(game, winner);
+            this.gameStateService.finishGame(game, winner);
 
             let rankingResult = null;
 
             // There must have been at least 3 production ticks in order for
             // rankings to be added to players. This is to slow down players
             // should they wish to cheat the system.
-            if (game.state.productionTick > 2) {
+            if (game.state.productionTick > 2 && !isTutorialGame) {
                 let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
                 
                 rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
 
-            await this.emailService.sendGameFinishedEmail(game);
-
-            this.emit('onGameEnded', {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                rankingResult: this.gameService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
-            });
+            if (!isTutorialGame) {
+                this.emit('onGameEnded', {
+                    gameId: game._id,
+                    gameTick: game.state.tick,
+                    rankingResult: this.gameTypeService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
+                });
+            }
 
             return true;
         }
@@ -601,7 +645,7 @@ module.exports = class GameTickService extends EventEmitter {
     }
 
     _orbitGalaxy(game) {
-        if (this.gameService.isOrbitalMode(game)) {
+        if (this.gameTypeService.isOrbitalMode(game)) {
             for (let star of game.galaxy.stars) {
                 this.orbitalMechanicsService.orbitStar(game, star);
             }
@@ -613,6 +657,16 @@ module.exports = class GameTickService extends EventEmitter {
             for (let carrier of game.galaxy.carriers) {
                 this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
             }
+        }
+    }
+
+    _transferGiftsInOrbit(game, gameUsers) {
+        const carriers = this.carrierService.listGiftCarriersInOrbit(game);
+
+        for (let carrier of carriers) {
+            const star = this.starService.getById(game, carrier.orbiting);
+
+            this.carrierService.transferGift(game, gameUsers, star, carrier);
         }
     }
 }

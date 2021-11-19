@@ -478,13 +478,14 @@ module.exports = class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService) {
+    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService) {
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.guildUserService = guildUserService;
         this.ratingService = ratingService;
         this.gameService = gameService;
+        this.gameTypeService = gameTypeService;
     }
 
     async getLeaderboard(limit, sortingKey, skip = 0) {
@@ -540,14 +541,17 @@ module.exports = class LeaderboardService {
                 if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
             }
 
-            // If conquest and home star percentage then use the home star total stars as the sort
-            // All other cases use totalStars
-            let totalStarsKey = game.settings.general.mode === 'conquest'
-                && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars'
+            // If its a conquest and home star victory then sort by home stars first, then by total stars.
+            const isHomeStarVictory = game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage';
+
+            if (isHomeStarVictory) {
+                if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
+                if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+            }
 
             // Sort by total stars descending
-            if (a.stats[totalStarsKey] > b.stats[totalStarsKey]) return -1;
-            if (a.stats[totalStarsKey] < b.stats[totalStarsKey]) return 1;
+            if (a.stats.totalStars > b.stats.totalStars) return -1;
+            if (a.stats.totalStars < b.stats.totalStars) return 1;
 
             // Then by total ships descending
             if (a.stats.totalShips > b.stats.totalShips) return -1;
@@ -587,15 +591,19 @@ module.exports = class LeaderboardService {
     }
 
     async addGameRankings(game, gameUsers, leaderboard) {
-        // Official games are either not user created or featured (featured games can be user created)
-        const isRankedGame = !this.gameService.isNewPlayerGame(game) && (game.settings.general.type != 'custom' || game.settings.general.featured);
-
-        let leaderboardPlayers = leaderboard.map(x => x.player);
-
         let result = {
             ranks: [],
             eloRating: null
         };
+
+        if (this.gameTypeService.isTutorialGame(game)) {
+            return result;
+        }
+
+        // Official games are either not user created or featured (featured games can be user created)
+        const isRankedGame = !this.gameTypeService.isNewPlayerGame(game) && (!this.gameTypeService.isCustomGame(game) || this.gameTypeService.isFeaturedGame(game));
+
+        let leaderboardPlayers = leaderboard.map(x => x.player);
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboardPlayers[i];
@@ -637,6 +645,11 @@ module.exports = class LeaderboardService {
                 // Award extra rank (at least 0) and do not allow a decrease in rank.
                 else if (player.hasFilledAfkSlot) {
                     rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
+                }
+
+                // For special game modes, award x2 positive rank.
+                if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
+                    rankIncrease *= 2;
                 }
 
                 let currentRank = user.achievements.rank;

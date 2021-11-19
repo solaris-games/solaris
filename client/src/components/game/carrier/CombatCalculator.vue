@@ -71,10 +71,10 @@
 
                 <div class="form-group row">
                   <div class="col-auto col-sm-8">
-                    <button type="button" class="btn btn-info" :disabled="isLoading" title="Swap Defender/Attacker Values" @click="swapValues"><i class="fas fa-exchange-alt"></i></button>
+                    <button type="button" class="btn btn-info" :disabled="isLoading" title="Swap the defender/attacker values" @click="swapValues"><i class="fas fa-exchange-alt"></i></button>
                   </div>
                   <div class="col col-sm-4">
-                      <button type="submit" class="btn btn-success btn-block" :disabled="isLoading" title="Calculate Combat Result"><i class="fas fa-fist-raised"></i> Fight</button>
+                      <button type="submit" class="btn btn-success btn-block" :disabled="isLoading" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
                   </div>
                 </div>
             </form>

@@ -15,7 +15,6 @@
     </menu-title>
 
     <overview v-if="player" :playerId="player._id"
-      @onViewConversationRequested="onViewConversationRequested"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"
       @onOpenTradeRequested="onOpenTradeRequested"/>
 
@@ -118,9 +117,6 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
-    },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)

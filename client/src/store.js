@@ -95,9 +95,11 @@ export default new Vuex.Store({
       }
     },
     closeConversation (state) {
-      const id = state.currentConversation.id;
-      state.cachedConversationComposeMessages[id] = state.currentConversation.text
-      state.currentConversation = null
+      if (state.currentConversation) {
+        const id = state.currentConversation.id;
+        state.cachedConversationComposeMessages[id] = state.currentConversation.text
+        state.currentConversation = null
+      }
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data

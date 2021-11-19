@@ -5,7 +5,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class PlayerService extends EventEmitter {
     
-    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService) {
+    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService) {
         super();
         
         this.gameRepo = gameRepo;
@@ -16,6 +16,7 @@ module.exports = class PlayerService extends EventEmitter {
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.gameTypeService = gameTypeService;
     }
 
     getByObjectId(game, playerId) {
@@ -46,25 +47,26 @@ module.exports = class PlayerService extends EventEmitter {
 
     getPlayersWithinScanningRangeOfPlayer(game, players, player) {
         let inRange = [player];
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
-        for (let p of players) {
-            if (inRange.indexOf(p) > -1) {
+        for (let otherPlayer of players) {
+            if (inRange.indexOf(otherPlayer) > -1) {
                 continue;
             }
 
-            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+            let otherPlayerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, otherPlayer._id);
 
             let isInRange = false;
 
-            for (let s of playerStars) {
-                if (this.starService.isStarInScanningRangeOfPlayer(game, s, player)) {
+            for (let s of otherPlayerStars) {
+                if (this.starService.isStarWithinScanningRangeOfStars(game, s, playerStars)) {
                     isInRange = true;
                     break;
                 }
             }
             
             if (isInRange) {
-                inRange.push(p);
+                inRange.push(otherPlayer);
             }
         }
 
@@ -158,7 +160,7 @@ module.exports = class PlayerService extends EventEmitter {
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
         let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
 
-        const distanceFromCenter = this._getPlayerDistanceFromCenter(game, starLocations);
+        const distanceFromCenter = this._getDesiredPlayerDistanceFromCenter(game);
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
@@ -172,17 +174,20 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
-    _getPlayerDistanceFromCenter(game, starLocations) {
+    _getDesiredPlayerDistanceFromCenter(game) {
         let distanceFromCenter;
+        const locations = game.galaxy.stars.map(s => s.location);
 
-        // doughnut galaxies the distance from the center needs to be slightly more than others
+        // doughnut galaxies need the distance from the center needs to be slightly more than others
+        // spiral galaxies need the distance to be slightly less, and they have a different galactic center
         if (game.settings.galaxy.galaxyType === 'doughnut') {
-            distanceFromCenter = this.starDistanceService.getGalaxyDiameter(starLocations).x / 2 / 1.5;
-        }
-        else {
-            // The desired distance from the center is half way from the galaxy center and the edge
-            // for all galaxies other than doughnut.
-            distanceFromCenter = this.starDistanceService.getGalaxyDiameter(starLocations).x / 2 / 2;
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (3/4);
+        } else if(game.settings.galaxy.galaxyType === 'spiral') {
+            distanceFromCenter = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2 / 2;
+        } else{
+            // The desired distance from the center is on two thirds from the galaxy center and the edge
+            // for all galaxies other than doughnut and spiral.
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (2/3);
         }
 
         return distanceFromCenter;
@@ -195,7 +200,7 @@ module.exports = class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getByObjectId(game, starId);
 
-                this.setupStarForGameStart(game, star, player); 
+                this.setupStarForGameStart(game, star, player, false); 
             }
         }
     }
@@ -215,24 +220,27 @@ module.exports = class PlayerService extends EventEmitter {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
-                this.setupStarForGameStart(game, s, player);
+                this.setupStarForGameStart(game, s, player, false);
             }
         }
     }
 
     // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game, star, player) {
+    setupStarForGameStart(game, star, player, resetWarpGates) {
         if (player.homeStarId.equals(star._id)) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            star.warpGate = false;
             star.specialistId = null;
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
             star.infrastructure.science = 0;
+
+            if (resetWarpGates) {
+                star.warpGate = false;
+            }
 
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
@@ -254,7 +262,7 @@ module.exports = class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.setupStarForGameStart(game, star, player);
+            this.setupStarForGameStart(game, star, player, true);
         }
 
         // Reset the player's carriers
@@ -539,7 +547,17 @@ module.exports = class PlayerService extends EventEmitter {
             return 0;
         }
 
-        return player.research.specialists.level;
+        let starCount = playerStars.length;
+        let specialists = player.research.specialists.level;
+
+        switch (game.settings.technology.specialistTokenReward) {
+            case 'standard':
+                return specialists;
+            case 'experimental':
+                return Math.ceil(Math.min(starCount * specialists * 0.1, specialists));
+        }
+
+        throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
     }
 
     deductCarrierUpkeepCost(game, player) {
@@ -603,6 +621,10 @@ module.exports = class PlayerService extends EventEmitter {
             throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
         }
 
+        if (this.gameTypeService.isTutorialGame(game)) {
+            throw new ValidationError('Cannot declare ready to quit in a tutorial.');
+        }
+
         player.ready = true;
         player.readyToQuit = true;
 
@@ -619,7 +641,11 @@ module.exports = class PlayerService extends EventEmitter {
 
     async undeclareReadyToQuit(game, player) {
         if (game.state.productionTick <= 0) {
-            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
+            throw new ValidationError('Cannot undeclare ready to quit until at least 1 production cycle has completed.');
+        }
+
+        if (this.gameTypeService.isTutorialGame(game)) {
+            throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
         }
         
         player.ready = false;
@@ -674,6 +700,11 @@ module.exports = class PlayerService extends EventEmitter {
                 }
             }
         }
+
+        // For the tutorial, prevent players from doing stupid stuff because you KNOW someone's gonna do it.
+        if (!player.defeated && this.gameTypeService.isTutorialGame(game) && game.state.productionTick >= 25) {
+            this.setPlayerAsDefeated(game, player);
+        }
     }
 
     incrementMissedTurns(game) {
@@ -694,7 +725,9 @@ module.exports = class PlayerService extends EventEmitter {
             // Reset whether we have sent the player a turn reminder.
             player.hasSentTurnReminder = false;
 
-            player.ready = false;
+            // Reset the ready status for players who have a legit user.
+            // Accounts could be deleted, could be a tutorial etc.
+            player.ready = player.userId == null;
         }
     }
 
@@ -703,6 +736,12 @@ module.exports = class PlayerService extends EventEmitter {
         // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
         // 3. They missed X cycles in a real time game (minimum of 12 hours)
+        
+        // Note: In tutorial games, only legit players can be considered afk.
+        if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
+            return false;
+        }
+
         let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
 
         if (lastSeenMoreThanXDaysAgo) {

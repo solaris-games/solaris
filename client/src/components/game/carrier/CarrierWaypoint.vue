@@ -64,7 +64,7 @@
           <span class="mr-1">Next</span>
           <i class="fas fa-chevron-right"></i>
         </button>
-				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="$isHistoricalMode() || !canLoop" title="Loop/Unloop Waypoints">
+				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="$isHistoricalMode() || !canLoop" title="Loop/Unloop the carrier's waypoints">
           <i class="fas fa-sync"></i>
         </button>
 			</div>

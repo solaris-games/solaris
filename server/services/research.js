@@ -3,7 +3,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class ResearchService extends EventEmitter {
 
-    constructor(gameRepo, technologyService, randomService, playerService, starService, userService) {
+    constructor(gameRepo, technologyService, randomService, playerService, starService, userService, gameTypeService) {
         super();
         
         this.gameRepo = gameRepo;
@@ -12,6 +12,7 @@ module.exports = class ResearchService extends EventEmitter {
         this.playerService = playerService;
         this.starService = starService;
         this.userService = userService;
+        this.gameTypeService = gameTypeService;
     }
 
     async updateResearchNow(game, player, preference) {
@@ -82,7 +83,7 @@ module.exports = class ResearchService extends EventEmitter {
         tech.progress += totalScience;
 
         // If the player isn't being controlled by AI then increment achievements.
-        if (user && !player.defeated) {
+        if (user && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             user.achievements.research[techKey] += totalScience;
         }
 

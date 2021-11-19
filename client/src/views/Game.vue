@@ -86,7 +86,11 @@ export default {
     let userPlayer = this.getUserPlayer()
     
     if (userPlayer && !userPlayer.defeated) {
-      this.menuState = MENU_STATES.LEADERBOARD
+      if (GameHelper.isTutorialGame(this.$store.state.game)) {
+        this.menuState = MENU_STATES.TUTORIAL
+      } else {
+        this.menuState = MENU_STATES.LEADERBOARD
+      }
     } else {
       if (this.$store.state.userId && GameHelper.gameHasOpenSlots(this.$store.state.game)) {
         this.menuState = MENU_STATES.WELCOME
@@ -95,7 +99,7 @@ export default {
       }
     }
 
-    let reloadGameCheckInterval = this.$store.state.game.settings.gameTime.speed < 60 ? 5000 : 10000
+    let reloadGameCheckInterval = 1000 // 1 second
 
     this.polling = setInterval(this.reloadGameCheck, reloadGameCheckInterval)
 
@@ -361,7 +365,6 @@ export default {
           let response = await GameApiService.getGameState(this.$store.state.game._id)
           
           if (response.status === 200) {
-            
             if (this.$store.state.tick < response.data.state.tick) {
               // If the user is currently using the time machine then only set the state variables.
               // Otherwise reload the current game tick.

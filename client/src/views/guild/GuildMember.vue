@@ -7,28 +7,35 @@
       'text-warning': playerIsLeader,
       'text-info': playerIsOfficer,
       'text-danger': playerIsInvitee,
+      'text-success': playerIsApplicant,
       ...getColumnClass('role')
     }">{{roleName}}</td>
     <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
     <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
     <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
     <td class="text-right">
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="disband()" v-if="isCurrentUser && playerIsLeader" title="Disband Guild">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="disband()" v-if="isCurrentUser && playerIsLeader" title="Disband the guild">
         <i class="fas fa-trash"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="leave()" v-if="isCurrentUser && !playerIsLeader" title="Leave Guild">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="leave()" v-if="isCurrentUser && !playerIsLeader" title="Leave the guild">
         <i class="fas fa-sign-out-alt"></i>
       </button>
-      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="promote()" v-if="canPromote" title="Promote Player">
+      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="promote()" v-if="canPromote" title="Promote this player">
         <i class="fas fa-level-up-alt"></i>
       </button>
-      <button class="btn btn-sm btn-warning ml-1" :disabled="isLoading" @click="demote()" v-if="canDemote" title="Demote Player">
+      <button class="btn btn-sm btn-warning ml-1" :disabled="isLoading" @click="demote()" v-if="canDemote" title="Demote this player">
         <i class="fas fa-level-down-alt"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="kick()" v-if="canKick" title="Kick Player">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="kick()" v-if="canKick" title="Kick this player from the guild">
         <i class="fas fa-ban"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="uninvite()" v-if="canRevokeInvite" title="Revoke Invitation">
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="uninvite()" v-if="canRevokeInvite" title="Revoke invitation">
+        <i class="fas fa-trash"></i>
+      </button>
+      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" v-if="canRevokeApplication" title="Accept application">
+        <i class="fas fa-check"></i>
+      </button>
+      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" v-if="canRevokeApplication" title="Reject application">
         <i class="fas fa-trash"></i>
       </button>
     </td>
@@ -140,6 +147,48 @@ export default {
 
       this.isLoading = false
     },
+    async accept () {
+      if (!await this.$confirm('Accept Application', `Are you sure you want to accept the application from ${this.player.username}?`)) {
+        return
+      }
+
+      this.isLoading = true
+
+      try {
+        let response = await GuildApiService.accept(this.guild._id, this.player._id)
+
+        if (response.status === 200) {
+          this.$emit('onPlayerApplicationAccepted', this.player._id)
+
+          this.$toasted.show(`${this.player.username} application accepted.`)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
+    async reject () {
+      if (!await this.$confirm('Reject Application', `Are you sure you want to reject the application from ${this.player.username}?`)) {
+        return
+      }
+
+      this.isLoading = true
+
+      try {
+        let response = await GuildApiService.reject(this.guild._id, this.player._id)
+
+        if (response.status === 200) {
+          this.$emit('onPlayerApplicationRejected', this.player._id)
+
+          this.$toasted.show(`${this.player.username} application rejected.`)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
     async leave () {
       if (!await this.$confirm('Leave guild', `Are you sure you want to leave the guild?`)) {
         return
@@ -212,6 +261,9 @@ export default {
     playerIsInvitee () {
       return this.guild.invitees.find(x => x._id === this.player._id) != null
     },
+    playerIsApplicant () {
+      return this.guild.applicants.find(x => x._id === this.player._id) != null
+    },
     canPromote () {
       if (this.playerIsOfficer) {
         return this.currentUserIsLeader
@@ -239,6 +291,13 @@ export default {
     },
     canRevokeInvite () {
       if (this.playerIsInvitee) {
+        return this.currentUserIsLeader || this.currentUserIsOfficer
+      } else {
+        return false
+      }
+    },
+    canRevokeApplication () {
+      if (this.playerIsApplicant) {
         return this.currentUserIsLeader || this.currentUserIsOfficer
       } else {
         return false

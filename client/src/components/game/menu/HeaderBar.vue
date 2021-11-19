@@ -8,18 +8,18 @@
         </div>
         <div class="col pt-1">
             <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText}}</span>
-            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next Production Tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
-            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game Starts In"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
+        <div class="col-auto d-none d-sm-block pt-1 mr-4" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
           <tick-selector />
         </div>
         <div class="col-auto text-right pt-1" v-if="userPlayer">
-            <span class="pointer" title="Credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <span class="pointer" v-if="isSpecialistsCurrencyCreditsSpecialists" title="Specialist Tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" v-if="isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
@@ -37,7 +37,12 @@
             </span>
         </div>
         <div class="col-auto ml-1">
-            <button class="btn btn-sm btn-success" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
+            <button class="btn btn-sm btn-warning ml-1" v-if="isTutorialGame" @click="setMenuState(MENU_STATES.TUTORIAL)">
+              <i class="fas fa-user-graduate"></i>
+              <span class="d-none d-md-inline-block ml-1">Tutorial</span>
+            </button>
+
+            <button class="btn btn-sm btn-success ml-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <!-- Ready button -->
             <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success pulse': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
@@ -45,7 +50,7 @@
                 <i class="fas fa-check" v-if="!userPlayer.ready"></i>
             </button>
 
-            <button class="btn btn-sm ml-1 d-lg-none" v-if="userPlayer" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
+            <button class="btn btn-sm ml-1 d-lg-none" v-if="userPlayer && !isTutorialGame" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
                 <i class="fas fa-comments"></i> <span class="ml-1" v-if="unreadMessages">{{unreadMessages}}</span>
             </button>
 
@@ -64,7 +69,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { setInterval } from 'timers'
 import GameHelper from '../../../services/gameHelper'
 import router from '../../../router'
@@ -268,8 +272,12 @@ export default {
           let response = await GameApiService.confirmReady(this.$store.state.game._id)
 
           if (response.status === 200) {
-            this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
-
+            if (this.isTutorialGame) {
+              this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+            } else {
+              this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+            }
+            
             this.userPlayer.ready = true
           }
         }
@@ -383,6 +391,9 @@ export default {
     },
     isDataCleaned () {
       return this.$store.state.game.state.cleaned
+    },
+    isTutorialGame () {
+      return GameHelper.isTutorialGame(this.$store.state.game)
     }
   },
   watch: {

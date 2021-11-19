@@ -14,11 +14,12 @@
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
+      <tutorial v-if="menuState == MENU_STATES.TUTORIAL" @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
-        @onViewConversationRequested="onViewConversationRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenTradeRequested="onOpenTradeRequested"/>
@@ -29,7 +30,6 @@
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onViewConversationRequested="onViewConversationRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -42,7 +42,6 @@
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
-        @onViewConversationRequested="onViewConversationRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -77,9 +76,7 @@
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX"
         @onCloseRequested="onCloseRequested"
-        @onViewConversationRequested="onViewConversationRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -119,14 +116,11 @@
         @onCloseRequested="onCloseRequested"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenInboxRequested="onOpenInboxRequested"
-        @onViewConversationRequested="onViewConversationRequested"/>
+        @onCloseRequested="onCloseRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION"
         :conversationId="menuArguments"
         :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onOpenInboxRequested="onOpenInboxRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
   </div>
@@ -138,12 +132,14 @@
 </template>
 
 <script>
+import eventBus from '../../../eventBus'
 import MENU_STATES from '../../data/menuStates'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
 import PlayerVue from '../player/Player.vue'
 import TradeVue from '../player/Trade.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
+import TutorialVue from '../tutorial/Tutorial.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
@@ -180,6 +176,7 @@ export default {
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
     'welcome': WelcomeVue,
+    'tutorial': TutorialVue,
     'player-list': PlayerListVue,
     'leaderboard': LeaderboardVue,
     'player': PlayerVue,
@@ -221,6 +218,17 @@ export default {
       MENU_STATES: MENU_STATES
     }
   },
+  mounted () {
+    // TODO: These event names should be global constants
+    eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
+    eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
+    eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
+  },
+  destroyed () {
+    eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
+    eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
+    eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
+  },
   methods: {
     changeMenuState (state, args) {
       this.onMenuStateChanged({
@@ -233,13 +241,6 @@ export default {
     },
     onCloseRequested (e) {
       this.changeMenuState(null, null)
-    },
-    onViewConversationRequested (e) {
-      if (e.conversationId) {
-        this.changeMenuState(MENU_STATES.CONVERSATION, e.conversationId)
-      } else if (e.participantIds) {
-        this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
-      }
     },
     onViewCompareIntelRequested (e) {
       this.changeMenuState(MENU_STATES.INTEL, e)
@@ -268,9 +269,6 @@ export default {
     onEditWaypointRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_WAYPOINT_DETAIL, e)
     },
-    onOpenInboxRequested (e) {
-      this.changeMenuState(MENU_STATES.INBOX, e)
-    },
     onViewHireCarrierSpecialistRequested (e) {
       this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_CARRIER, e)
     },
@@ -283,14 +281,33 @@ export default {
     onCarrierRenameRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_RENAME, e)
     },
-    onCreateNewConversationRequested (e) {
-      this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
-    },
     onViewCarrierCombatCalculatorRequested (e) {
       this.changeMenuState(MENU_STATES.COMBAT_CALCULATOR, e)
     },
     onViewSettingsRequested (e) {
       this.changeMenuState(MENU_STATES.SETTINGS, e)
+    },
+    onOpenInboxRequested (e) {
+      if (!this.canHandleConversationEvents()) return
+
+      this.changeMenuState(MENU_STATES.INBOX, e)
+    },
+    onCreateNewConversationRequested (e) {
+      if (!this.canHandleConversationEvents()) return
+
+      this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
+    },
+    onViewConversationRequested (e) {
+      if (!this.canHandleConversationEvents()) return
+
+      if (e.conversationId) {
+        this.changeMenuState(MENU_STATES.CONVERSATION, e.conversationId)
+      } else if (e.participantIds) {
+        this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
+      }
+    },
+    canHandleConversationEvents () {
+      return window.innerWidth < 992
     }
   },
   computed: {
@@ -303,7 +320,7 @@ export default {
     isSpectatingDarkMode () {
       return GameHelper.isUserSpectatingGame(this.game)
         && (GameHelper.isDarkModeStandard(this.game) || GameHelper.isDarkModeExtra(this.game))
-    }
+    },
   }
 }
 </script>
@@ -312,6 +329,7 @@ export default {
 .header-bar {
   position:absolute;
   height: 45px;
+  z-index: 1;
 }
 
 .footer-bar {
@@ -323,8 +341,8 @@ export default {
 .menu {
   position:absolute; /* This is a must otherwise the div overlays the map */
   width: 473px;
-  max-height: 90%; /* TODO: This needs to expand to full height but if at 100% it adds a scroll bar */
-  top: 45px;
+  padding-top: 45px;
+  max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;

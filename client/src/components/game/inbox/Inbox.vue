@@ -4,9 +4,7 @@
       <menu-title title="Inbox" @onCloseRequested="onCloseRequested"/>
   </div>
 
-  <conversation-list class="pt-2"
-    @onViewConversationRequested="onViewConversationRequested"
-    @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
+  <conversation-list class="pt-2" />
 </div>
 </template>
 
@@ -42,17 +40,8 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
-    },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
-    },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onCreateNewConversationRequested (e) {
-      this.$emit('onCreateNewConversationRequested', e)
     },
     async checkForUnreadMessages () {
       try {

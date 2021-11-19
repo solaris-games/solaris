@@ -11,6 +11,7 @@ import gameHelper from '../services/gameHelper'
 import AnimationService from './animation'
 import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
+import WormHoleLayer from './wormHole'
 
 class Map extends EventEmitter {
   static chunkSize = 256
@@ -43,6 +44,7 @@ class Map extends EventEmitter {
 
   _setupContainers () {
     this.backgroundContainer = new PIXI.Container()
+    this.wormHoleContainer = new PIXI.Container()
     this.orbitalContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
@@ -57,6 +59,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.pathManager.container)
+    this.container.addChild(this.wormHoleContainer)
     this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
@@ -145,6 +148,14 @@ class Map extends EventEmitter {
     this.backgroundContainer.addChild(this.background.container)
     this.backgroundContainer.addChild(this.background.starContainer)
     this.background.draw()
+
+    // -----------
+    // Setup Worm Hole Paths
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer = new WormHoleLayer()
+      this.drawWormHoles()
+      this.orbitalContainer.addChild(this.wormHoleLayer.container)
+    }
 
     // -----------
     // Setup Orbital Locations
@@ -242,6 +253,10 @@ class Map extends EventEmitter {
 
   _isOrbitalMapEnabled () {
     return this.game.constants.distances.galaxyCenterLocation && this.game.settings.orbitalMechanics.enabled === 'enabled'
+  }
+
+  _isWormHolesEnabled () {
+    return this.game.settings.specialGalaxy.randomWormHoles
   }
 
   _setupChunks() {
@@ -400,6 +415,7 @@ class Map extends EventEmitter {
     }
 
     this.drawTerritories(userSettings)
+    this.drawWormHoles()
     this.drawPlayerNames()
 
     this.background.setup(game, userSettings)
@@ -547,6 +563,13 @@ class Map extends EventEmitter {
   drawTerritories (userSettings) {
     this.territories.setup(this.game, userSettings)
     this.territories.draw(userSettings)
+  }
+
+  drawWormHoles () {
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer.setup(this.game)
+      this.wormHoleLayer.draw()
+    }
   }
 
   drawPlayerNames () {

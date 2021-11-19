@@ -7,7 +7,7 @@
       <div class="col">
         <button class="btn btn-sm btn-primary" @click="onRefreshClicked">Refresh <i class="fas fa-sync"></i></button>
       </div>
-      <div class="col-auto" v-if="!isOneVsOne">
+      <div class="col-auto" v-if="canCreateConversation">
         <!-- <button class="btn btn-sm btn-primary" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button> -->
         <button class="btn btn-sm btn-info ml-1" @click="onCreateNewConversationRequested">
           <i class="fas fa-comments"></i>
@@ -27,7 +27,6 @@
           :conversation="conversation"
           :isTruncated="true"
           :isFullWidth="true"
-          @onViewConversationRequested="onViewConversationRequested"
           class="mb-2"/>
     </div>
   </div>
@@ -35,6 +34,7 @@
 </template>
 
 <script>
+import eventBus from '../../../../eventBus'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
 import ConversationApiService from '../../../../services/api/conversation'
 import ConversationPreviewVue from './ConversationPreview'
@@ -67,8 +67,9 @@ export default {
         }
       });
     },
-    isOneVsOne: function () {
-      return this.$store.state.game.settings.general.playerLimit === 2
+    canCreateConversation: function () {
+      return this.$store.state.game.settings.general.playerLimit > 2
+        && !gameHelper.isTutorialGame(this.$store.state.game)
     }
   },
   mounted () {
@@ -120,11 +121,8 @@ export default {
     //     console.error(e)
     //   }
     // },
-    onViewConversationRequested (e) {
-      this.$emit('onViewConversationRequested', e)
-    },
     onCreateNewConversationRequested (e) {
-      this.$emit('onCreateNewConversationRequested', e)
+      eventBus.$emit('onCreateNewConversationRequested', e)
     },
     onRefreshClicked (e) {
       this.refreshList()

@@ -15,7 +15,8 @@
   <div class="row pt-2 pb-2 bg-primary" v-if="!(!userPlayer || !gameHasStarted || player.userId)">
     <div class="col">
       <button class="btn btn-success mr-1" @click="onViewConversationRequested"
-        :class="{'btn-warning': conversation && conversation.unreadCount}">
+        :class="{'btn-warning': conversation && conversation.unreadCount}"
+        v-if="canCreateConversation">
         <i class="fas fa-envelope"></i>
         <span v-if="conversation && conversation.unreadCount" class="ml-1">{{conversation.unreadCount}}</span>
       </button>
@@ -25,7 +26,7 @@
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-warning" v-if="!gameHasFinished" @click="onOpenTradeRequested">
+      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled" @click="onOpenTradeRequested">
         <i class="fas fa-handshake"></i>
         Trade
       </button>
@@ -35,6 +36,7 @@
 </template>
 
 <script>
+import eventBus from '../../../eventBus'
 import Statistics from './Statistics'
 import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
@@ -69,11 +71,11 @@ export default {
   methods: {
     onViewConversationRequested (e) {
       if (this.conversation) {
-        this.$emit('onViewConversationRequested', {
+        eventBus.$emit('onViewConversationRequested', {
           conversationId: this.conversation._id
         })
       } else {
-        this.$emit('onViewConversationRequested', {
+        eventBus.$emit('onViewConversationRequested', {
           participantIds: [
             this.userPlayer._id,
             this.player._id
@@ -113,6 +115,13 @@ export default {
   computed: {
     isDarkModeExtra () {
       return gameHelper.isDarkModeExtra(this.$store.state.game)
+    },
+    isTradeEnabled () {
+      return gameHelper.isTradeEnabled(this.$store.state.game)
+    },
+    canCreateConversation: function () {
+      return this.$store.state.game.settings.general.playerLimit > 2
+        && !gameHelper.isTutorialGame(this.$store.state.game)
     }
   }
 }

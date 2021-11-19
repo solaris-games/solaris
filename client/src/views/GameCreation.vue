@@ -241,12 +241,31 @@
       </div>
 
       <div class="form-group">
-        <label for="randomGates" class="col-form-label">Random Gates</label>
-        <select class="form-control" id="randomGates" v-model="settings.specialGalaxy.randomGates" :disabled="isCreatingGame">
-          <option v-for="opt in options.specialGalaxy.randomGates" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }} Gates
-          </option>
-        </select>
+        <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>)</label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isSavingSettings">
+        </div>
       </div>
 
       <div class="form-group">
@@ -493,7 +512,7 @@
             Level {{ opt }} Manufacturing
           </option>
         </select>
-        <select class="form-control" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame">
+        <select class="form-control" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
           <option v-for="opt in options.technology.startingTechnologyLevel" v-bind:key="opt" v-bind:value="opt">
             Level {{ opt }} Specialists
           </option>
@@ -548,7 +567,7 @@
             {{ opt.text }} Weapons Research
           </option>
         </select>
-        <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame">
+        <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
           <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }} Specialists Research
           </option>
@@ -559,6 +578,15 @@
         <label for="bankingReward" class="col-form-label">Banking Reward</label>
         <select class="form-control" id="bankingReward" v-model="settings.technology.bankingReward" :disabled="isCreatingGame">
           <option v-for="opt in options.technology.bankingReward" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward</label>
+        <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
+          <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>

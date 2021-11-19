@@ -12,8 +12,8 @@
 
     <div class="row" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
-            <p class="mb-0" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
-            <p class="mb-0" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
+            <p class="mb-0 text-warning" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
+            <p class="mb-0 text-warning" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
             <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
@@ -48,11 +48,11 @@
                           <h5 class="alias-title">
                             {{player.alias}}
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
-                              <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
+                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
+                              <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
                             </span>
-                            <span v-if="player.readyToQuit" @click="unconfirmReadyToQuit(player)">
-                              <i class="fas fa-check text-warning" title="This player is ready to quit"></i>
+                            <span v-if="canReadyToQuit && player.readyToQuit" @click="unconfirmReadyToQuit(player)">
+                              <i class="fas fa-check text-warning" title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
                             </span>
                           </h5>
                       </td>
@@ -74,7 +74,7 @@
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
                         <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
-                          <i class="fas fa-check text-success" title="This player is ready."></i>
+                          <i class="fas fa-check text-success" title="This player has completed their turn"></i>
                         </h5>
                         <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
                       </td>
@@ -95,14 +95,17 @@
           <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-sign-out-alt"></i> Quit Game
           </modalButton>
-          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-warning mr-1">
+          <button v-if="canReadyToQuit && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-warning mr-1">
             <i class="fas fa-times"></i> Declare Ready to Quit
           </button>
-          <button v-if="game.state.startDate && game.state.productionTick && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success mr-1">
+          <button v-if="canReadyToQuit && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success mr-1">
             <i class="fas fa-check"></i> Ready to Quit
           </button>
-          <modalButton v-if="game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
+          <modalButton v-if="!isTutorialGame && game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-skull-crossbones"></i> Concede Defeat
+          </modalButton>
+          <modalButton v-if="isTutorialGame && game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="exitTutorialModal" classText="btn btn-sm btn-danger">
+            <i class="fas fa-skull-crossbones"></i> Quit Tutorial
           </modalButton>
       </div>
     </div>
@@ -114,6 +117,10 @@
 
     <dialogModal modalName="concedeDefeatModal" titleText="Concede Defeat" cancelText="No" confirmText="Yes" @onConfirm="concedeDefeat">
       <p>Are you sure you want to concede defeat in this game?</p>
+    </dialogModal>
+
+    <dialogModal modalName="exitTutorialModal" titleText="Quit Tutorial" cancelText="No" confirmText="Yes" @onConfirm="concedeDefeat">
+      <p>Are you sure you want to quit the tutorial? All progress will be lost.</p>
     </dialogModal>
 </div>
 </template>
@@ -203,7 +210,11 @@ export default {
 
         if (response.status === 200) {
           AudioService.quit()
-          this.$toasted.show(`You have conceded defeat, better luck next time.`, { type: 'error' })
+
+          if (!this.isTutorialGame) {
+            this.$toasted.show(`You have conceded defeat, better luck next time.`, { type: 'error' })
+          }
+
           router.push({ name: 'main-menu' })
         }
       } catch (err) {
@@ -238,7 +249,12 @@ export default {
         let response = await gameService.confirmReady(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`You have confirmed your move, please wait for other players to ready up.`, { type: 'success' })
+          if (this.isTutorialGame) {
+            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+          } else {
+            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+          }
+          
 
           player.ready = true
         }
@@ -342,6 +358,14 @@ export default {
     },
     canEndTurn () {
       return GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)
+    },
+    isTutorialGame () {
+      return GameHelper.isTutorialGame(this.$store.state.game)
+    },
+    canReadyToQuit () {
+      return !GameHelper.isTutorialGame(this.$store.state.game)
+        && this.$store.state.game.state.startDate 
+        && this.$store.state.game.state.productionTick
     }
   }
 }

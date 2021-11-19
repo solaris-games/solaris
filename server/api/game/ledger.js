@@ -5,12 +5,6 @@ module.exports = (router, io, container) => {
     const middleware = require('../middleware')(container);
 
     router.get('/api/game/:gameId/ledger', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let ledger = await container.ledgerService.getLedger(
                 req.game,
@@ -23,12 +17,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/ledger/forgive/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let newLedger = await container.ledgerService.forgiveDebt(
                 req.game,
@@ -42,12 +30,6 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.put('/api/game/:gameId/ledger/settle/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             let newLedger = await container.ledgerService.settleDebt(
                 req.game,

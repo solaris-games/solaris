@@ -109,6 +109,12 @@ module.exports = class DiplomacyService {
         return true;
     }
 
+    getFilteredDiplomacy(player, forPlayerId) {
+        return {
+            allies: player.diplomacy.allies.filter(a => a.equals(forPlayerId._id))
+        }
+    }
+
     async declareAlly(game, playerId, playerIdTarget) {
         await this.gameRepo.updateOne({
             _id: game._id,
@@ -132,20 +138,52 @@ module.exports = class DiplomacyService {
     }
 
     async declareEnemy(game, playerId, playerIdTarget) {
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': playerId
-        }, {
-            $pull: {
-                'galaxy.players.$.diplomacy.allies': playerIdTarget
+        // When declaring enemies, we need to ensure that both sides are declared
+        // otherwise its possible that players can exploit a player who is not online.
+        let dbWrites = [
+            // Remove alliance for the player to the target.
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': playerId
+                    },
+                    update: {
+                        $pull: {
+                            'galaxy.players.$.diplomacy.allies': playerIdTarget
+                        }
+                    }
+                }
+            },
+            // Remove alliance for the target to the player.
+            {
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.players._id': playerIdTarget
+                    },
+                    update: {
+                        $pull: {
+                            'galaxy.players.$.diplomacy.allies': playerId
+                        }
+                    }
+                }
             }
-        });
+        ];
+        
+        await this.gameRepo.bulkWrite(dbWrites);
 
         // Need to do this so we can calculate the new diplomatic status.
         let player = game.galaxy.players.find(p => p._id.equals(playerId));
 
         if (player.diplomacy.allies.indexOf(playerIdTarget) >= 0) {
             player.diplomacy.allies.splice(player.diplomacy.allies.indexOf(playerIdTarget), 1);
+        }
+
+        let targetPlayer = game.galaxy.players.find(p => p._id.equals(playerIdTarget));
+
+        if (targetPlayer.diplomacy.allies.indexOf(playerId) >= 0) {
+            targetPlayer.diplomacy.allies.splice(targetPlayer.diplomacy.allies.indexOf(playerId), 1);
         }
 
         let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);

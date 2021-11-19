@@ -33,7 +33,9 @@
           <tbody>
               <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
                   <td class="col-6">
-                    {{game.settings.general.name}}
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                    <br/>
+                    <small>{{getGameTypeFriendlyText(game)}}</small>
                     <br/>
                     <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ml-1 badge badge-danger">Defeated</span>
                     <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
@@ -104,8 +106,10 @@
         <tbody>
             <tr v-for="game in completedGames" v-bind:key="game._id">
                 <td>
-                  {{game.settings.general.name}}
+                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
                   <span v-if="game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                  <br/>
+                  <small>{{getGameTypeFriendlyText(game)}}</small>
                 </td>
                 <td class="d-none d-sm-table-cell text-right">{{getEndDateFromNow(game)}}</td>
                 <td>
@@ -205,6 +209,9 @@ export default {
       } else if (GameHelper.isTurnBasedGame(game)) {
         return GameHelper.getCountdownTimeForTurnTimeout(game)
       }
+    },
+    getGameTypeFriendlyText (game) {
+      return GameHelper.getGameTypeFriendlyText(game)
     }
   },
   computed: {

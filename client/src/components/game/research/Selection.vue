@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="form-group row mb-0 bg-primary" v-if="!player.defeated">
-        <label class="col col-form-label" title="Current Research ETA">ETA:</label>
+        <label class="col col-form-label" title="Current research ETA">ETA:</label>
         <div class="col text-right">
             <label class="col-form-label">{{timeRemainingEta}}</label>
         </div>
@@ -37,7 +37,7 @@
         </div>
     </div>
     <div class="form-group row mb-2 bg-primary" v-if="!player.defeated && timeNextRemainingEta">
-        <label class="col col-form-label" title="Next Research ETA">ETA:</label>
+        <label class="col col-form-label" title="Next research ETA">ETA:</label>
         <div class="col text-right">
             <label class="col-form-label">{{timeNextRemainingEta}}</label>
         </div>

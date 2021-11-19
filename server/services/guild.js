@@ -72,7 +72,25 @@ module.exports = class GuildService {
         return guilds;
     }
 
-    async detail(guildId, withUserInfo = false, withInvitations = false) {
+    async listApplications(userId) {
+        let guilds = await this.guildRepo.find({
+            // All guilds
+        }, {
+            name: 1,
+            tag: 1,
+            applicants: 1
+        });
+
+        return guilds.map(g => {
+            g.hasApplied = this._isApplicant(g, userId);
+
+            delete g.applicants;
+
+            return g;
+        });
+    }
+
+    async detail(guildId, withUserInfo = false, withInvitationsAndApplications = false) {
         if (guildId == null) {
             throw new ValidationError("Guild ID is required.");
         }
@@ -99,10 +117,12 @@ module.exports = class GuildService {
             guild.officers = usersInGuild.filter(x => this._isOfficer(guild, x._id));
             guild.members = usersInGuild.filter(x => this._isMember(guild, x._id));
 
-            if (withInvitations) {
+            if (withInvitationsAndApplications) {
                 guild.invitees = await this.userService.listUsers(guild.invitees, userSelectObject);
+                guild.applicants = await this.userService.listUsers(guild.applicants, userSelectObject);
             } else {
                 delete guild.invitees;
+                delete guild.applicants;
             }
 
             guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
@@ -266,6 +286,10 @@ module.exports = class GuildService {
             throw new ValidationError(`The user has already been invited to the guild.`);
         }
 
+        if (this._isApplicant(guild, userId)) {
+            return this.accept(userId, guildId, invitedByUserId);
+        }
+
         if (guild.invitees.length >= this.MAX_INVITE_COUNT) {
             throw new ValidationError(`There is a maximum of ${this.MAX_INVITE_COUNT} invitees at one time.`);
         }
@@ -303,49 +327,7 @@ module.exports = class GuildService {
         });
     }
 
-    async acceptInvite(userId, guildId) {
-        let guild = await this.detail(guildId);
-
-        if (!this._isInvitee(guild, userId)) {
-            throw new ValidationError(`The user is not an invitee of this guild.`);
-        }
-
-        // Remove all invites to this user for any guild.
-        await this.declineAllInvitations(userId);
-
-        // Add the user to the chosen guild.
-        await this.guildRepo.updateOne({
-            _id: guildId
-        }, {
-            $push: {
-                members: userId
-            }
-        });
-
-        // Set the user's guild id
-        await this.userRepo.updateOne({ 
-            _id: userId
-        }, {
-            $set: {
-                guildId
-            }
-        });
-
-        guild.members.push(userId);
-
-        // If maximum members reached, clear pending invites.
-        if (this._totalMemberCount(guild) >= this.MAX_MEMBER_COUNT) {
-            await this.guildRepo.updateOne({
-                _id: guildId
-            }, {
-                $set: {
-                    invitees: []
-                }
-            });
-        }
-    }
-
-    async declineInvite(userId, guildId) {
+    async decline(userId, guildId) {
         let guild = await this.detail(guildId);
 
         if (!this._isInvitee(guild, userId)) {
@@ -373,7 +355,135 @@ module.exports = class GuildService {
         });
     }
 
-    async tryLeaveGuild(userId) {
+    async withdrawAllApplications(userId) {
+        await this.guildRepo.updateMany({
+            applicants: {
+                $in: [userId]
+            }
+        }, {
+            $pull: {
+                applicants: userId
+            }
+        });
+    }
+
+    async apply(userId, guildId) {
+        let isUserInAGuild = await this._isUserInAGuild(userId);
+
+        if (isUserInAGuild) {
+            throw new ValidationError(`Cannot apply to this guild, you are already a member of a guild.`);
+        }
+
+        let guild = await this.detail(guildId);
+
+        if (this._isApplicant(guild, userId)) {
+            throw new ValidationError(`You have already applied to become a member of this guild.`);
+        }
+
+        await this.guildRepo.updateOne({
+            _id: guildId
+        }, {
+            $push: {
+                applicants: userId
+            }
+        });
+    }
+
+    async withdraw(userId, guildId) {
+        let guild = await this.detail(guildId);
+
+        if (!this._isApplicant(guild, userId)) {
+            throw new ValidationError(`You have not applied to become a member of this guild.`);
+        }
+
+        await this.guildRepo.updateOne({
+            _id: guildId
+        }, {
+            $pull: {
+                applicants: userId
+            }
+        });
+    }
+
+    async accept(userId, guildId, acceptedByUserId) {
+        let guild = await this.detail(guildId);
+
+        let hasPermission = this._isLeader(guild, acceptedByUserId) || this._isOfficer(guild, acceptedByUserId);
+
+        if (!hasPermission) {
+            throw new ValidationError(`You do not have the authority to accept applications to the guild.`);
+        }
+
+        await this.join(userId, guildId);
+    }
+
+    async reject(userId, guildId, rejectedByUserId) {
+        let guild = await this.detail(guildId);
+
+        let hasPermission = this._isLeader(guild, rejectedByUserId) || this._isOfficer(guild, rejectedByUserId);
+
+        if (!hasPermission) {
+            throw new ValidationError(`You do not have the authority to reject applications to the guild.`);
+        }
+
+        if (!this._isApplicant(guild, userId)) {
+            throw new ValidationError(`The user has not applied to become a member of the guild.`);
+        }
+
+        await this.guildRepo.updateOne({
+            _id: guildId
+        }, {
+            $pull: {
+                applicants: userId
+            }
+        });
+    }
+
+    async join(userId, guildId) {
+        let guild = await this.detail(guildId);
+
+        if (!this._isApplicant(guild, userId) && !this._isInvitee(guild, userId)) {
+            throw new ValidationError(`The user is not an invitee or applicant of this guild.`);
+        }
+
+        // Remove all invites and applications to this user for any guild.
+        await this.declineAllInvitations(userId);
+        await this.withdrawAllApplications(userId);
+
+        // Add the user to the chosen guild.
+        await this.guildRepo.updateOne({
+            _id: guildId
+        }, {
+            $push: {
+                members: userId
+            }
+        });
+
+        // Set the user's guild id
+        await this.userRepo.updateOne({ 
+            _id: userId
+        }, {
+            $set: {
+                guildId
+            }
+        });
+
+        guild.members.push(userId);
+
+        // If maximum members reached, clear pending invites and applications.
+        if (this._totalMemberCount(guild) >= this.MAX_MEMBER_COUNT) {
+            await this.guildRepo.updateOne({
+                _id: guildId
+            }, {
+                $set: {
+                    invitees: [],
+                    applicants: []
+                }
+            });
+        }
+    }
+
+    async tryLeave(userId) {
         let guild = await this.detailMyGuild(userId, false);
 
         if (guild) {
@@ -524,6 +634,10 @@ module.exports = class GuildService {
 
     _isInvitee(guild, userId) {
         return guild.invitees.find(x => x.equals(userId));
+    }
+
+    _isApplicant(guild, userId) {
+        return guild.applicants.find(x => x.equals(userId));
     }
 
     _totalMemberCount(guild) {
