@@ -39,6 +39,7 @@ import MenuTitle from '../MenuTitle'
 import LoadingSpinner from '../../LoadingSpinner'
 import DiplomacyApiService from '../../../services/api/diplomacy'
 import DiplomacyRowVue from './DiplomacyRow'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
