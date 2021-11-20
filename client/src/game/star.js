@@ -392,9 +392,9 @@ class Star extends EventEmitter {
     if (!player) {
       return
     }
-    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.id)) {
-      this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.id][2+this.data.warpGate])
-      this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.id][0+this.data.warpGate])
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
+      this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
+      this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
     }
     this.graphics_shape_part.tint = player.colour.value
     this.graphics_shape_full.tint = player.colour.value
