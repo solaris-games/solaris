@@ -185,7 +185,7 @@ class Star extends EventEmitter {
       this.fixedContainer.removeChild(this.nebulaSprite)
       this.nebulaSprite = null
     }
-    let seed = this.data.name+(Math.floor(this.data.location.x*this.data.location.y)).toString()
+    let seed = this.data._id
     Star.seededRNG.seed(seed)
     let nebulaTexture = TextureService.getRandomStarNebulaTexture(seed)
     this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
@@ -219,7 +219,7 @@ class Star extends EventEmitter {
       this.fixedContainer.removeChild(this.asteroidFieldSprite)
       this.asteroidFieldSprite = null
     }
-    let seed = this.data.name+(Math.floor(this.data.location.x*this.data.location.y)).toString()
+    let seed = this.data._id
     Star.seededRNG.seed(seed)
     let texture = TextureService.getRandomStarAsteroidFieldTexture(seed)
     this.asteroidFieldSprite = new PIXI.Sprite(texture)
