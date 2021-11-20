@@ -5,7 +5,7 @@ module.exports = class GameTickService extends EventEmitter {
     
     constructor(distanceService, starService, carrierService, 
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
-        specialistService, starUpgradeService, reputationService, aiService, emailService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService) {
+        specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService) {
         super();
             
         this.distanceService = distanceService;
@@ -24,7 +24,6 @@ module.exports = class GameTickService extends EventEmitter {
         this.starUpgradeService = starUpgradeService;
         this.reputationService = reputationService;
         this.aiService = aiService;
-        this.emailService = emailService;
         this.battleRoyaleService = battleRoyaleService;
         this.orbitalMechanicsService = orbitalMechanicsService;
         this.diplomacyService = diplomacyService;
@@ -310,7 +309,7 @@ module.exports = class GameTickService extends EventEmitter {
 
                 // TODO: Check for specialists that affect pre-combat.
 
-                this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
+                await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
             }
         }
     }
@@ -430,7 +429,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -466,7 +465,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
+            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
         }
     }
 
@@ -533,7 +532,9 @@ module.exports = class GameTickService extends EventEmitter {
                 this.battleRoyaleService.performBattleRoyaleTick(game);
             }
 
-            await this.emailService.sendGameCycleSummaryEmail(game);
+            this.emit('onGameCycleEnded', {
+                gameId: game._id
+            });
         }
     }
 
@@ -611,14 +612,12 @@ module.exports = class GameTickService extends EventEmitter {
             }
 
             if (!isTutorialGame) {
-                await this.emailService.sendGameFinishedEmail(game);
+                this.emit('onGameEnded', {
+                    gameId: game._id,
+                    gameTick: game.state.tick,
+                    rankingResult: this.gameTypeService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
+                });
             }
-
-            this.emit('onGameEnded', {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                rankingResult: this.gameTypeService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
-            });
 
             return true;
         }

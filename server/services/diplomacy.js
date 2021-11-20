@@ -109,6 +109,12 @@ module.exports = class DiplomacyService {
         return true;
     }
 
+    getFilteredDiplomacy(player, forPlayerId) {
+        return {
+            allies: player.diplomacy.allies.filter(a => a.equals(forPlayerId._id))
+        }
+    }
+
     async declareAlly(game, playerId, playerIdTarget) {
         await this.gameRepo.updateOne({
             _id: game._id,

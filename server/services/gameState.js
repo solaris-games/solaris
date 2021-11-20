@@ -19,7 +19,11 @@ module.exports = class GameStateService {
     }
 
     updateStatePlayerCount(game) {
-        game.state.players = game.galaxy.players.filter(p => !p.defeated && !p.afk).length;
+        if (game.settings.general.type === 'tutorial') {
+            game.state.players = game.galaxy.players.filter(p => !p.defeated && !p.afk).length;
+        } else {
+            game.state.players = game.galaxy.players.filter(p => p.userId && !p.defeated && !p.afk).length;
+        }
     }
 
     finishGame(game, winnerPlayer) {

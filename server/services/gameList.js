@@ -180,6 +180,7 @@ module.exports = class GameListService {
 
     async listInProgressGames() {
         return await this.gameRepo.find({
+            'settings.general.type': { $nin: ['tutorial'] },
             'state.startDate': { $ne: null },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }

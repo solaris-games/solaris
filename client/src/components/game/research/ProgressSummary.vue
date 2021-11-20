@@ -20,7 +20,7 @@
                       {{getRequiredTotal('scanning')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('scanning')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines how far your stars can see"/>
                     </td>
                 </tr>
@@ -40,7 +40,7 @@
                       {{getRequiredTotal('hyperspace')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('hyperspace')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines how far your carriers can travel in a single jump"/>
                     </td>
                 </tr>
@@ -60,7 +60,7 @@
                       {{getRequiredTotal('terraforming')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('terraforming')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines infrastructure cost. The higher the terraforming level, the lower infrastructure will cost to upgrade"/>
                     </td>
                 </tr>
@@ -80,7 +80,7 @@
                       {{getRequiredTotal('experimentation')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('experimentation')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines how many research points are awarded at the end of the galactic cycle to a random technology"/>
                     </td>
                 </tr>
@@ -100,7 +100,7 @@
                       {{getRequiredTotal('weapons')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('scanning')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines combat strength of your ships"/>
                     </td>
                 </tr>
@@ -120,7 +120,7 @@
                       {{getRequiredTotal('banking')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('banking')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines how many credits are awarded at the end of the galactic cycle"/>
                     </td>
                 </tr>
@@ -140,7 +140,7 @@
                       {{getRequiredTotal('manufacturing')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('manufacturing')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines how many ships are built via industrial infrastructure per tick"/>
                     </td>
                 </tr>
@@ -160,7 +160,7 @@
                       {{getRequiredTotal('specialists')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('specialists')"></td>
-                    <td>
+                    <td class="text-right">
                       <help-tooltip tooltip="Determines how many specialist tokens are awarded at the end of the galactic cycle"/>
                     </td>
                 </tr>

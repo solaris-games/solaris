@@ -122,7 +122,7 @@ export default {
       return process.env.VUE_APP_DOCUMENTATION_URL
     },
     isFormalAlliancesEnabled () {
-      return this.$store.state.game.settings.player.alliances === 'enabled'
+      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
     isTradeEnabled () {
       return GameHelper.isTradeEnabled(this.$store.state.game)

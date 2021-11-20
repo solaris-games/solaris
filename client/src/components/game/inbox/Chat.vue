@@ -177,7 +177,7 @@ export default {
       }
 
       // Special case for Inbox shortcut, only do this if the screen is large
-      if (menuState !== MENU_STATES.INBOX || this.canHandleConversationEvents()) {
+      if (menuState !== MENU_STATES.INBOX || !this.canHandleConversationEvents()) {
         return
       }
 
