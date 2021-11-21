@@ -53,7 +53,7 @@ module.exports = class AIService {
                 player.ai = true;
             }
             const context = this._createContext(game, player);
-            const orders = await this._gatherOrders(game, player, context);
+            const orders = this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
@@ -111,11 +111,11 @@ module.exports = class AIService {
 
     }
 
-    async _gatherOrders(game, player, context) {
+    _gatherOrders(game, player, context) {
         const defenseOrders = this._gatherDefenseOrders(game, player, context);
         //For now, just expand to unowned stars. Later, we will launch attacks on other players.
         const expansionOrders = this._gatherExpansionOrders(game, player, context);
-        const movementOrders = await this._gatherMovementOrders(game, player, context);
+        const movementOrders = this._gatherMovementOrders(game, player, context);
         return defenseOrders.concat(expansionOrders, movementOrders);
     }
 
@@ -175,8 +175,10 @@ module.exports = class AIService {
         return orders;
     }
 
-    async _gatherMovementOrders(game, player, context) {
+    _gatherMovementOrders(game, player, context) {
         const starPriorities = this._computeStarPriorities(game, player, context);
+
+        return [];
     }
 
     _computeStarPriorities(game, player, context) {
@@ -185,7 +187,7 @@ module.exports = class AIService {
             // Really, this should be calculated the other way around, going out from the enemy... but for now this should do it
             const enemyStars = this._countEnemyStars(game, player, context, context.reachableStars.get(borderStarId));
             // Maybe include some other properties, like infrastructure/specialists in the priority calculation later
-            borderStarPriorities.set(borderStarId, enemyStars);
+            borderStarPriorities.set(borderStarId, 1 + enemyStars);
         }
 
         const visited = new Set();
