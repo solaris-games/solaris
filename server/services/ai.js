@@ -181,9 +181,24 @@ module.exports = class AIService {
 
     _gatherMovementOrders(game, player, context) {
         const starPriorities = this._computeStarPriorities(game, player, context);
-        
+        const orders = [];
 
-        return [];
+        for (const [starId, priority] of starPriorities) {
+            const neighbors = context.reachablePlayerStars.get(starId);
+            for (const neighbor of neighbors) {
+                const neighborPriority = starPriorities.get(neighbor);
+                if (neighborPriority < priority) {
+                    orders.push({
+                        type: 'REINFORCE_STAR',
+                        score: priority - neighborPriority,
+                        star: starId,
+                        source: neighbor
+                    });
+                }
+            }
+        }
+
+        return orders;
     }
 
     _computeStarPriorities(game, player, context) {
