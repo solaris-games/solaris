@@ -70,16 +70,16 @@ module.exports = class AIService {
         }
     }
 
-    async _createContext(game, player) {
+    _createContext(game, player) {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         const starsById = new Map()
 
-        for (const star of galaxy.stars) {
+        for (const star of game.galaxy.stars) {
             starsById.set(star._id.toString(), star);
         }
 
-        const reachableStars = this._computeStarGraph(game, player, playerStars, game.stars);
+        const reachableStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const borderStars = [];
         for (const [from, reachables] of reachableStars) {
@@ -122,9 +122,8 @@ module.exports = class AIService {
     _gatherExpansionOrders(game, player, context) {
         const orders = [];
 
-        for (const [fromIdx, reachables] of context.reachableStars) {
-            const claimCandidates = reachables.filter(star => !star.ownedByPlayerId);
-            const fromId = context.playerStars[fromIdx]._id;
+        for (const [fromId, reachables] of context.reachableStars) {
+            const claimCandidates = Array.from(reachables).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 orders.push({
                     type: 'CLAIM_STAR',
@@ -145,12 +144,12 @@ module.exports = class AIService {
             .map(carrier => [carrier, carrier.waypoints.find(wp => context.starsById.has(wp.destination.toString()))])
             .filter(incoming => Boolean(incoming[1]))
 
-        const attacks = new Map();
+        const attacksByStar = new Map();
         const attackedStars = new Set();
 
         for (const [incomingCarrier, incomingWaypoint] of incomingCarriers) {
             const targetStar = incomingWaypoint.destination.toString();
-            const attacks = getOrInsert(attacks, targetStar, () => new Map());
+            const attacks = getOrInsert(attacksByStar, targetStar, () => new Map());
             attackedStars.add(targetStar);
             const attackInTicks = this.waypointService.calculateWaypointTicksEta(game, incomingCarrier, incomingWaypoint);
             const simultaneousAttacks = getOrInsert(attacks, attackInTicks, () => []);
@@ -159,9 +158,9 @@ module.exports = class AIService {
 
         context.attackedStars = attackedStars;
 
-        const orders = new Array(attacks.size);
+        const orders = new Array(attacksByStar.size);
 
-        for (const [attackedStarId, attacks] of attacks) {
+        for (const [attackedStarId, attacks] of attacksByStar) {
             for (const [attackInTicks, incomingCarriers] of attacks) {
                 const attackedStar = context.starsById.get(attackedStarId);
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
@@ -281,11 +280,11 @@ module.exports = class AIService {
 
             starCandidates.forEach((otherStar, otherStarIdx) => {
                 if (starIdx !== otherStarIdx && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
-                    reachableStars.add(otherStar._id);
+                    reachableStars.add(otherStar._id.toString());
                 }
             });
 
-            starGraph.set(star._id, reachableStars);
+            starGraph.set(star._id.toString(), reachableStars);
         });
 
         return starGraph;
