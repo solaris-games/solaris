@@ -57,7 +57,7 @@ module.exports = class AIService {
             const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
-            player.save();
+            game.save();
         } catch (e) {
             console.error(e);
         }
