@@ -123,12 +123,12 @@ module.exports = class AIService {
         const orders = [];
 
         for (const [fromId, reachables] of context.reachableStars) {
-            const claimCandidates = Array.from(reachables).filter(star => !star.ownedByPlayerId);
+            const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 orders.push({
                     type: 'CLAIM_STAR',
                     score: candidate.naturalResources,
-                    star: candidate._id,
+                    star: candidate._id.toString(),
                     from: fromId
                 });
             }
