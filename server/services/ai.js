@@ -145,19 +145,23 @@ module.exports = class AIService {
             .map(carrier => [carrier, carrier.waypoints.find(wp => context.starsById.has(wp.destination.toString()))])
             .filter(incoming => Boolean(incoming[1]))
 
-        const starsUnderAttack = new Map();
+        const attacks = new Map();
+        const attackedStars = new Set();
 
         for (const [incomingCarrier, incomingWaypoint] of incomingCarriers) {
             const targetStar = incomingWaypoint.destination.toString();
-            const attacks = getOrInsert(starsUnderAttack, targetStar, () => new Map());
+            const attacks = getOrInsert(attacks, targetStar, () => new Map());
+            attackedStars.add(targetStar);
             const attackInTicks = this.waypointService.calculateWaypointTicksEta(game, incomingCarrier, incomingWaypoint);
             const simultaneousAttacks = getOrInsert(attacks, attackInTicks, () => []);
             simultaneousAttacks.push(incomingCarrier);
         }
 
-        const orders = new Array(starsUnderAttack.size);
+        context.attackedStars = attackedStars;
 
-        for (const [attackedStarId, attacks] of starsUnderAttack) {
+        const orders = new Array(attacks.size);
+
+        for (const [attackedStarId, attacks] of attacks) {
             for (const [attackInTicks, incomingCarriers] of attacks) {
                 const attackedStar = context.starsById.get(attackedStarId);
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
@@ -177,6 +181,7 @@ module.exports = class AIService {
 
     _gatherMovementOrders(game, player, context) {
         const starPriorities = this._computeStarPriorities(game, player, context);
+        
 
         return [];
     }
