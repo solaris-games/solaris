@@ -716,4 +716,282 @@ describe('technology', () => {
         expect(tech.specialists).toBe(8);
     });
 
+    /* STAR EFFECTIVE TECH LEVELS */
+
+    it('should calculate star effective technology levels - No specialist', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const star = {
+            ownedByPlayerId: '1',
+            specialistId: null
+        };
+
+        setup();
+
+        const tech = service.getStarEffectiveTechnologyLevels(game, star);
+
+        expect(tech.scanning).toBe(1);
+        expect(tech.hyperspace).toBe(1);
+        expect(tech.terraforming).toBe(1);
+        expect(tech.experimentation).toBe(1);
+        expect(tech.weapons).toBe(1);
+        expect(tech.banking).toBe(1);
+        expect(tech.manufacturing).toBe(1);
+        expect(tech.specialists).toBe(1);
+    });
+
+    it('should calculate star effective technology levels - Black hole scanning range buff', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const star = {
+            ownedByPlayerId: '1',
+            specialistId: null,
+            isBlackHole: true
+        };
+
+        setup();
+
+        const tech = service.getStarEffectiveTechnologyLevels(game, star);
+
+        expect(tech.scanning).toBe(4);
+    });
+
+    it('should calculate star effective technology levels - Specialist modifiers', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const star = {
+            ownedByPlayerId: '1',
+            specialistId: 1,
+            isBlackHole: false
+        };
+
+        const specialist = {
+            modifiers: {
+                local: {
+                    scanning: 1,
+                    hyperspace: 2,
+                    terraforming: 3,
+                    experimentation: 4,
+                    weapons: 5,
+                    banking: 6,
+                    manufacturing: 7,
+                    specialists: 8
+                }
+            }
+        };
+
+        setup(specialist, null);
+
+        const tech = service.getStarEffectiveTechnologyLevels(game, star);
+
+        expect(tech.scanning).toBe(2);
+        expect(tech.hyperspace).toBe(3);
+        expect(tech.terraforming).toBe(4);
+        expect(tech.experimentation).toBe(5);
+        expect(tech.weapons).toBe(6);
+        expect(tech.banking).toBe(7);
+        expect(tech.manufacturing).toBe(8);
+        expect(tech.specialists).toBe(9);
+    });
+
+    /* CARRIER EFFECTIVE TECH LEVELS */
+
+    it('should calculate carrier effective technology levels', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const carrier = {
+            ownedByPlayerId: '1',
+            specialistId: null
+        };
+
+        const specialist = {
+            modifiers: {
+                local: {
+                    scanning: 1,
+                    hyperspace: 2,
+                    terraforming: 3,
+                    experimentation: 4,
+                    weapons: 5,
+                    banking: 6,
+                    manufacturing: 7,
+                    specialists: 8,
+                    carrierToStarCombat: {
+                        weapons: 5
+                    },
+                    carrierToCarrierCombat: {
+                        weapons: 5
+                    }
+                }
+            }
+        };
+
+        setup(null, specialist);
+
+        const tech = service.getCarrierEffectiveTechnologyLevels(game, carrier);
+
+        expect(tech.scanning).toBe(1);
+        expect(tech.hyperspace).toBe(1);
+        expect(tech.terraforming).toBe(1);
+        expect(tech.experimentation).toBe(1);
+        expect(tech.weapons).toBe(1);
+        expect(tech.banking).toBe(1);
+        expect(tech.manufacturing).toBe(1);
+        expect(tech.specialists).toBe(1);
+    });
+
+    it('should calculate carrier effective technology levels - Specialist modifiers', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const carrier = {
+            ownedByPlayerId: '1',
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                local: {
+                    scanning: 1,
+                    hyperspace: 2,
+                    terraforming: 3,
+                    experimentation: 4,
+                    weapons: 5,
+                    banking: 6,
+                    manufacturing: 7,
+                    specialists: 8,
+                    carrierToStarCombat: {
+                        weapons: 5
+                    },
+                    carrierToCarrierCombat: {
+                        weapons: 5
+                    }
+                }
+            }
+        };
+
+        setup(null, specialist);
+
+        const tech = service.getCarrierEffectiveTechnologyLevels(game, carrier);
+
+        expect(tech.scanning).toBe(2);
+        expect(tech.hyperspace).toBe(3);
+        expect(tech.terraforming).toBe(4);
+        expect(tech.experimentation).toBe(5);
+        expect(tech.weapons).toBe(6);
+        expect(tech.banking).toBe(7);
+        expect(tech.manufacturing).toBe(8);
+        expect(tech.specialists).toBe(9);
+    });
+
+    it('should calculate carrier effective technology levels - Specialist modifiers - Carrier to star combat', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const carrier = {
+            ownedByPlayerId: '1',
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                local: {
+                    carrierToStarCombat: {
+                        weapons: 1
+                    },
+                    carrierToCarrierCombat: {
+                        weapons: 10
+                    }
+                }
+            }
+        };
+
+        setup(null, specialist);
+
+        const tech = service.getCarrierEffectiveTechnologyLevels(game, carrier, true);
+
+        expect(tech.weapons).toBe(2);
+    });
+
+    it('should calculate carrier effective technology levels - Specialist modifiers - Carrier to carrier combat', () => {
+        const game = {
+            galaxy: {
+                players: [
+                    {
+                        _id: '1'
+                    }
+                ]
+            }
+        };
+
+        const carrier = {
+            ownedByPlayerId: '1',
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                local: {
+                    carrierToStarCombat: {
+                        weapons: 10
+                    },
+                    carrierToCarrierCombat: {
+                        weapons: 1
+                    }
+                }
+            }
+        };
+
+        setup(null, specialist);
+
+        const tech = service.getCarrierEffectiveTechnologyLevels(game, carrier, false);
+
+        expect(tech.weapons).toBe(2);
+    });
+
 })
