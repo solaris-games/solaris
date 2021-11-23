@@ -4,8 +4,10 @@
   "description": "",
   "scripts": {
     "test": "jasmine",
-    "start-api": "node api/index.js",
-    "start-jobs": "node jobs/index.js"
+    "start-api": "ts-node api/index.ts",
+    "start-jobs": "ts-node jobs/index.ts",
+    "tsc": "tsc",
+    "ts-node": "ts-node"
   },
   "author": "",
   "license": "ISC",
@@ -33,6 +35,8 @@
     "socket.io": "^2.4.1"
   },
   "devDependencies": {
-    "jasmine": "^3.7.0"
+    "jasmine": "^3.7.0",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
   }
 }
