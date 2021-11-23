@@ -154,9 +154,16 @@ class Star extends EventEmitter {
   drawStar () {
     this.container.removeChild(this.graphics_star)
 
+    const isGraphics = this.hasBlackHole()
     let isInScanningRange = this._isInScanningRange()
+
     if (isInScanningRange) {
-      if (this.data.homeStar) {
+      if (this.hasBlackHole()) {
+        this.graphics_star = new PIXI.Graphics()
+        this.graphics_star.beginFill(0x000000)
+        this.graphics_star.drawCircle(0, 0, 4)
+        this.graphics_star.endFill()
+      } else if (this.data.homeStar) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
       }
       else if (this._isDeadStar() ) {
@@ -170,9 +177,13 @@ class Star extends EventEmitter {
       this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
       this.graphics_star.tint = 0xa0a0a0
     }
-    this.graphics_star.anchor.set(0.5)
-    this.graphics_star.width = 24.0/2.0
-    this.graphics_star.height = 24.0/2.0
+
+    if (!isGraphics) {
+      this.graphics_star.anchor.set(0.5)
+      this.graphics_star.width = 24.0/2.0
+      this.graphics_star.height = 24.0/2.0
+    }
+
     this.container.addChild(this.graphics_star)
   }
 
@@ -290,6 +301,10 @@ class Star extends EventEmitter {
 
   hasAsteroidField () {
     return this.data.isAsteroidField
+  }
+
+  hasBlackHole () {
+    return this.data.isBlackHole
   }
 
   hasSpecialist () {
@@ -582,7 +597,7 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
-    if (!player || this._isDeadStar()) { return }
+    if (!player || (this._isDeadStar() && !this.hasBlackHole())) { return }
 
     if (!player.research) { return }
 
@@ -591,6 +606,10 @@ class Star extends EventEmitter {
 
     if (this.data.specialist && this.data.specialist.modifiers.local) {
       techLevel += this.data.specialist.modifiers.local.scanning || 0
+    }
+
+    if (this.hasBlackHole()) {
+      techLevel += 3
     }
 
     techLevel = Math.max(1, techLevel)

@@ -94,6 +94,11 @@ module.exports = class MapService {
         if (game.settings.specialGalaxy.randomAsteroidFields) {
             this.generateAsteroidFields(game, stars, game.settings.specialGalaxy.randomAsteroidFields);
         }
+
+        // If black holes are enabled, assign random black holes to start
+        if (game.settings.specialGalaxy.randomBlackHoles) {
+            this.generateBlackHoles(game, stars, game.settings.specialGalaxy.randomBlackHoles);
+        }
         
         return stars;
     }
@@ -165,6 +170,22 @@ module.exports = class MapService {
                 let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
                 star.naturalResources = this.randomService.getRandomNumberBetween(minResources, maxResources);;
+            }
+        } while (count--);
+    }
+
+    generateBlackHoles(game, stars, percentage) {
+        let count = Math.floor(stars.length / 100 * percentage);
+
+        // Pick stars at random and set them to be asteroid fields
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.isBlackHole) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isBlackHole = true;
+                star.naturalResources = 0;
             }
         } while (count--);
     }

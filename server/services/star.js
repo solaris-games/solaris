@@ -102,8 +102,12 @@ module.exports = class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
+    isAlive(star) {
+        return !this.isDeadStar(star) || star.isBlackHole;
+    }
+
     listStarsAliveOwnedByPlayer(stars, playerId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s))
+        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => this.isAlive(s));
     }
 
     listStarsWithScanningRangeByPlayer(game, playerId) {
@@ -117,7 +121,7 @@ module.exports = class StarService extends EventEmitter {
                 game.galaxy.carriers
                     .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
                     .map(c => c.orbiting.toString())
-                    .filter(s => !this.isDeadStar(this.getById(game, s))) //This makes sure that a dead star with a carrier on it doesn't magicly get scanning
+                    .filter(s => this.isAlive(this.getById(game, s)))
             );
 
             starIds = [...new Set(starIds)];

@@ -184,6 +184,7 @@ module.exports = class GameGalaxyService {
                 warpGate: false,
                 isNebula: false,
                 isAsteroidField: false,
+                isBlackHole: false,
                 wormHoleToStarId: null
             }
         });
@@ -281,6 +282,7 @@ module.exports = class GameGalaxyService {
                     warpGate: false, // Hide warp gates outside of scanning range
                     isNebula: false, // Hide nebula outside of scanning range
                     isAsteroidField: false, // Hide asteroid fields outside of scanning range
+                    isBlackHole: false, // Hide outside of scanning range
                     wormHoleToStarId: s.wormHoleToStarId
                 }
             }

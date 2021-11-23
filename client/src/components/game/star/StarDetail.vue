@@ -13,7 +13,7 @@
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
-        <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star.</p>
+        <p class="mb-2 text-danger" v-if="isDeadStar && !star.isBlackHole">This is a dead star.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
 
         <div v-if="star.isNebula">
@@ -34,6 +34,12 @@
           <p class="mb-0" v-if="!wormHolePairStar">This star is a <strong>Worm Hole</strong> to an unknown star.</p>
           <p class="mb-2 text-info"><small><i>Travel between Worm Holes takes 1 tick.</i></small></p>
         </div>
+
+        <div v-if="star.isBlackHole">
+          <hr/>
+          <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole</span>.</p>
+          <p class="mb-2 text-info" v-if="star.isBlackHole"><small><i>Black Holes cannot have infrastructure or specialists but have +3 Scanning Range.</i></small></p>
+        </div>
       </div>
     </div>
     <div v-if="isCompactUIStyle && star.infrastructure">
@@ -51,6 +57,9 @@
           </span>
           <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus">
             <i class="fas fa-meteor ml-1"></i>
+          </span>
+          <span v-if="star.isBlackHole" title="Black Hole - The star has +3 scanning range">
+            <i class="far fa-circle ml-1"></i>
           </span>
           <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
             <i class="far fa-sun ml-1"></i>
