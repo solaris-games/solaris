@@ -4,8 +4,9 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
+    constructor(gameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
         this.gameModel = gameModel;
+        this.gameService = gameService;
         this.gameListService = gameListService;
         this.nameService = nameService;
         this.mapService = mapService;
@@ -18,7 +19,11 @@ module.exports = class GameCreateService {
     }
 
     async create(settings) {
-        if (settings.general.createdByUserId) {
+        const isTutorial = settings.general.type === 'tutorial';
+
+        // If a legit user (not the system) created the game and it isn't a tutorial
+        // then that game must be set as a custom game.
+        if (settings.general.createdByUserId && !isTutorial) {
             settings.general.type = 'custom'; // All user games MUST be custom type.
             settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
 
@@ -100,13 +105,19 @@ module.exports = class GameCreateService {
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
 
+        this.mapService.generateTerrain(game);
+
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
         game.state.starsForVictory = this._calculateStarsForVictory(game);
 
-        this.conversationService.createConversationAllPlayers(game);
-
         this._setGalaxyCenter(game);
+
+        if (isTutorial) {
+            this._setupTutorialPlayers(game);
+        } else {
+            this.conversationService.createConversationAllPlayers(game);
+        }
 
         let gameObject = await game.save();
 
@@ -114,6 +125,7 @@ module.exports = class GameCreateService {
         // for the very first tick when players join the game. The galaxy masking
         // should only be applied for stars and carriers if its the very first tick.
         // await this.historyService.log(gameObject);
+        // ^ Maybe fire an event for the historyService to capture?
         
         return gameObject;
     }
@@ -140,5 +152,16 @@ module.exports = class GameCreateService {
         // game.settings.conquest.victoryCondition = 'starPercentage'; // TODO: Default to starPercentage if not in conquest mode?
 
         return game.galaxy.stars.length;
+    }
+
+    _setupTutorialPlayers(game) {
+        // Dump the player who created the game straight into the first slot and set the other slots to AI.
+        this.gameService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId, `Player`, 0);
+        
+        for (let i = 1; i < game.galaxy.players.length; i++) {
+            const ai = game.galaxy.players[i];
+
+            this.gameService.assignPlayerToUser(game, ai, null, `Opponent ${i}`, i);
+        }
     }
 }

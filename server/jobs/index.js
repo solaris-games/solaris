@@ -32,6 +32,7 @@ async function startup() {
     const officialGamesCheckJob = require('./officialGamesCheck')(container);
     const cleanupGamesTimedOutJob = require('./cleanupGamesTimedOut')(container);
     const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
+    const cleanupOldTutorials = require('./cleanupOldTutorials')(container);
 
     // Set up the agenda instance.
     const agendajs = new Agenda()
@@ -68,6 +69,12 @@ async function startup() {
     },
     cleanupOldGameHistory.handler);
 
+    // Cleanup old tutorials
+    agendajs.define('cleanup-old-tutorials', {
+        priority: 'high', concurrency: 1
+    },
+    cleanupOldTutorials.handler);
+
     // ...
 
     // ------------------------------
@@ -76,9 +83,10 @@ async function startup() {
 
     // Start server jobs
     agendajs.every('10 seconds', 'game-tick');
-    agendajs.every('5 minutes', 'new-player-game-check');
+    agendajs.every('1 minute', 'new-player-game-check');
     agendajs.every('1 hour', 'cleanup-games-timed-out');
     agendajs.every('1 day', 'cleanup-old-game-history');
+    agendajs.every('1 day', 'cleanup-old-tutorials');
 }
 
 process.on('SIGINT', async () => {

@@ -14,6 +14,7 @@ const schema = new Schema({
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false },
 			type: { type: Types.String, required: true, enum: [
+				'tutorial',
 				'custom', 
 				'standard_rt', 
 				'standard_tb', 
@@ -44,7 +45,7 @@ const schema = new Schema({
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular'], default: 'circular' },
-			starsPerPlayer: { type: Types.Number, required: true, enum: [5, 10, 20, 30, 50], default: 20 },
+			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
 			productionTicks: { type: Types.Number, required: true, enum: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
         },
         specialGalaxy: {
@@ -57,6 +58,7 @@ const schema = new Schema({
 			randomWormHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomNebulas: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomBlackHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
@@ -78,10 +80,10 @@ const schema = new Schema({
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
 			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
 			startingCreditsSpecialists: { type: Types.Number, required: true, enum: [0, 1, 3, 5, 10, 25, 50, 100], default: 5 },
-			startingShips: { type: Types.Number, required: true, enum: [0, 10, 50, 100], default: 10 },
+			startingShips: { type: Types.Number, required: true, min: 0, max: 100, default: 10 },
 			startingInfrastructure: {
-				economy: { type: Types.Number, required: true, enum: [0, 5, 10, 20, 30], default: 5 },
-				industry: { type: Types.Number, required: true, enum: [0, 5, 10, 20, 30], default: 5 },
+				economy: { type: Types.Number, required: true, min: 0, max: 30, default: 5 },
+				industry: { type: Types.Number, required: true, min: 0, max: 30, default: 5 },
 				science: { type: Types.Number, required: true, min: 0, max: 5, default: 1 }
 			},
 			developmentCost: {
@@ -122,13 +124,13 @@ const schema = new Schema({
 		gameTime: {
 			gameType: { type: Types.String, required: true, enum: ['realTime', 'turnBased'], default: 'realTime' },
 			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600, 7200], default: 1800 }, // Time in seconds
-			startDelay: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
-			turnJumps: { type: Types.Number, required: true, enum: [1, 4, 6, 8, 12, 24], default: 8 },
+			startDelay: { type: Types.Number, required: true, enum: [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
+			turnJumps: { type: Types.Number, required: true, min: 1, max: 24, default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
 			afk: {
-				lastSeenTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 6, 7], default: 2}, // Time in days, real time and turn based
-				cycleTimeout: { type: Types.Number, required: true, enum: [3, 4, 5, 6, 7, 8, 9, 10], default: 3}, // Real time games' production cycle limit
-				turnTimeout: { type: Types.Number, required: true, enum: [1, 2, 3, 4, 5, 10, 30, 60], default: 3 },	// Turn based games' missed turn limit
+				lastSeenTimeout: { type: Types.Number, required: true, min: 1, max: 7, default: 2}, // Time in days, real time and turn based
+				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 10, default: 3}, // Real time games' production cycle limit
+				turnTimeout: { type: Types.Number, required: true, min: 1, max: 60, default: 3 },	// Turn based games' missed turn limit
 			}
 		}
     },

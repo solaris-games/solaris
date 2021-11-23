@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService) {
+    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService) {
         super();
         
         this.gameRepo = gameRepo;
@@ -16,6 +16,7 @@ module.exports = class StarService extends EventEmitter {
         this.specialistService = specialistService;
         this.userService = userService;
         this.diplomacyService = diplomacyService;
+        this.gameTypeService = gameTypeService;
     }
 
     generateUnownedStar(game, name, location, naturalResources) {
@@ -37,10 +38,37 @@ module.exports = class StarService extends EventEmitter {
     }
 
     getByObjectId(game, id) {
-        return game.galaxy.stars.find(s => s._id.equals(id));
+        // return game.galaxy.stars.find(s => s._id.equals(id));
+        return this.getByIdBS(game, id); // Experimental
     }
 
     getById(game, id) {
+        // return game.galaxy.stars.find(s => s._id.toString() === id.toString());
+        return this.getByIdBS(game, id); // Experimental
+    }
+
+    getByIdBS(game, id) {
+        let start = 0;
+        let end = game.galaxy.stars.length - 1;
+    
+        while (start <= end) {
+            let middle = Math.floor((start + end) / 2);
+            let star = game.galaxy.stars[middle];
+
+            if (star._id.toString() === id.toString()) {
+                // found the id
+                return star;
+            } else if (star._id.toString() < id.toString()) {
+                // continue searching to the right
+                start = middle + 1;
+            } else {
+                // search searching to the left
+                end = middle - 1;
+            }
+        }
+
+        // id wasn't found
+        // Return the old way
         return game.galaxy.stars.find(s => s._id.toString() === id.toString());
     }
 
@@ -74,8 +102,12 @@ module.exports = class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
+    isAlive(star) {
+        return !this.isDeadStar(star) || star.isBlackHole;
+    }
+
     listStarsAliveOwnedByPlayer(stars, playerId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s))
+        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => this.isAlive(s));
     }
 
     listStarsWithScanningRangeByPlayer(game, playerId) {
@@ -89,6 +121,7 @@ module.exports = class StarService extends EventEmitter {
                 game.galaxy.carriers
                     .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
                     .map(c => c.orbiting.toString())
+                    .filter(s => this.isAlive(this.getById(game, s)))
             );
 
             starIds = [...new Set(starIds)];
@@ -375,7 +408,7 @@ module.exports = class StarService extends EventEmitter {
         let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
-        if (carrierUser && !carrierPlayer.defeated) {
+        if (carrierUser && !carrierPlayer.defeated && !this.gameTypeService.isTutorialGame(game)) {
             carrierUser.achievements.combat.stars.captured++;
 
             if (star.homeStar) {
@@ -521,6 +554,8 @@ module.exports = class StarService extends EventEmitter {
     }
 
     captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers) {
+        const isTutorialGame = this.gameTypeService.isTutorialGame(game);
+
         let specialist = this.specialistService.getByIdStar(star.specialistId);
 
         // If the star had a specialist that destroys infrastructure then perform demolition.
@@ -557,19 +592,21 @@ module.exports = class StarService extends EventEmitter {
 
         const oldStarUser = defenderUsers.find(u => u._id.equals(owner.userId));
 
-        if (oldStarUser && !owner.defeated) {
-            oldStarUser.achievements.combat.stars.lost++;
-
-            if (star.homeStar) {
-                oldStarUser.achievements.combat.homeStars.lost++;
+        if (!isTutorialGame) {
+            if (oldStarUser && !owner.defeated) {
+                oldStarUser.achievements.combat.stars.lost++;
+    
+                if (star.homeStar) {
+                    oldStarUser.achievements.combat.homeStars.lost++;
+                }
             }
-        }
-        
-        if (newStarUser && !newStarPlayer.defeated) {
-            newStarUser.achievements.combat.stars.captured++;
-
-            if (star.homeStar) {
-                newStarUser.achievements.combat.homeStars.captured++;
+            
+            if (newStarUser && !newStarPlayer.defeated) {
+                newStarUser.achievements.combat.stars.captured++;
+    
+                if (star.homeStar) {
+                    newStarUser.achievements.combat.homeStars.captured++;
+                }
             }
         }
 

@@ -2,13 +2,14 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class SpecialistHireService {
 
-    constructor(gameRepo, specialistService, achievementService, waypointService, playerService, starService) {
+    constructor(gameRepo, specialistService, achievementService, waypointService, playerService, starService, gameTypeService) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
         this.playerService = playerService;
         this.starService = starService;
+        this.gameTypeService = gameTypeService;
     }
 
     async hireCarrierSpecialist(game, player, carrierId, specialistId) {
@@ -75,7 +76,7 @@ module.exports = class SpecialistHireService {
             }
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementSpecialistsHired(player.userId);
         }
 
@@ -152,7 +153,7 @@ module.exports = class SpecialistHireService {
             }
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementSpecialistsHired(player.userId);
         }
 

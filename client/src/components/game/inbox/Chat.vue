@@ -1,5 +1,5 @@
 <template>
-  <div class="d-none d-lg-block" v-if="isUserInGame">
+  <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
     <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread': unreadMessages}" @click="toggle" title="Inbox (M)">
       <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
@@ -177,7 +177,7 @@ export default {
       }
 
       // Special case for Inbox shortcut, only do this if the screen is large
-      if (menuState !== MENU_STATES.INBOX || this.canHandleConversationEvents()) {
+      if (menuState !== MENU_STATES.INBOX || !this.canHandleConversationEvents()) {
         return
       }
 
@@ -202,6 +202,9 @@ export default {
     },
     isUserInGame () {
       return GameHelper.getUserPlayer(this.$store.state.game) != null
+    },
+    isTutorialGame () {
+      return GameHelper.isTutorialGame(this.$store.state.game)
     }
   }
 }

@@ -184,6 +184,10 @@
 
           <hr/>
 
+          <tutorial-game />
+
+          <hr/>
+
           <h4 class="mb-0">User Created Games</h4>
 
           <p class="mb-2"><small class="text-warning" v-if="userGames.length">Total Games: {{userGames.length}}</small></p>
@@ -198,14 +202,14 @@
               <thead>
                   <tr class="bg-primary">
                       <td>Name</td>
-                      <td class="d-none d-md-block text-center">Players</td>
+                      <td class="d-none d-md-table-cell text-center">Players</td>
                       <td></td>
                   </tr>
               </thead>
               <tbody>
                   <tr v-for="game in userGames" v-bind:key="game._id">
                       <td>{{game.settings.general.name}}</td>
-                      <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
                             <span class="d-none d-md-block">View</span>
@@ -240,15 +244,21 @@
           <table v-if="!isLoading && inProgressGames.length" class="table table-striped table-hover">
               <thead>
                   <tr class="bg-primary">
-                      <td>Name</td>
-                      <td class="d-none d-md-block text-center">Players</td>
-                      <td></td>
+                      <th>Name</th>
+                      <th class="d-none d-md-table-cell text-center">Players</th>
+                      <th class="d-none d-sm-table-cell text-center">Cycle</th>
+                      <th></th>
                   </tr>
               </thead>
               <tbody>
                   <tr v-for="game in inProgressGames" v-bind:key="game._id">
-                      <td>{{game.settings.general.name}}</td>
-                      <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td>
+                        <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br/>
+                        <small>{{getGameTypeFriendlyText(game)}}</small>
+                      </td>
+                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
                             <span class="d-none d-md-block">View</span>
@@ -275,13 +285,16 @@ import router from '../router'
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewTitle from '../components/ViewTitle'
 import ViewContainer from '../components/ViewContainer'
+import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
+import GameHelper from '../services/gameHelper'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
-    'view-title': ViewTitle
+    'view-title': ViewTitle,
+    'tutorial-game': TutorialGame
   },
   data () {
     return {
@@ -360,21 +373,7 @@ export default {
       return this.userGames.find(x => x.settings.general.featured)
     },
     getGameTypeFriendlyText (game) {
-      return {     
-        'new_player_rt': 'New Player Game',
-        'standard_rt': 'Standard',
-        'standard_tb': 'Standard - TB',
-        '1v1_rt': '1 vs. 1',
-        '1v1_tb': '1 vs. 1 - TB',
-        '32_player_rt': '32 Players',
-        'custom': 'Custom Game',
-        'special_dark': 'Dark Galaxy',
-        'special_ultraDark': 'Ultra Dark Galaxy',
-        'special_orbital': 'Orbital',
-        'special_battleRoyale': 'Battle Royale',
-        'special_homeStar': 'Capital Stars',
-        'special_anonymous': 'Anonymous',
-      }[game.settings.general.type]
+      return GameHelper.getGameTypeFriendlyText(game)
     }
   }
 }

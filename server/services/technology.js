@@ -95,6 +95,10 @@ module.exports = class TechnologyService {
             }
         }
 
+        if (star.isBlackHole) {
+            techs.scanning += 3;
+        }
+
         return techs;
     }
 

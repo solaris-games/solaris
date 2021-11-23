@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 
 module.exports = class CombatService extends EventEmitter {
     
-    constructor(technologyService, specialistService, playerService, starService, reputationService, diplomacyService) {
+    constructor(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService) {
         super();
 
         this.technologyService = technologyService;
@@ -11,6 +11,7 @@ module.exports = class CombatService extends EventEmitter {
         this.starService = starService;
         this.reputationService = reputationService;
         this.diplomacyService = diplomacyService;
+        this.gameTypeService = gameTypeService;
     }
 
     calculate(defender, attacker, isTurnBased = true, calculateNeeded = false) {    
@@ -269,7 +270,9 @@ module.exports = class CombatService extends EventEmitter {
         this._distributeDamage(combatResult, attackerCarriers, combatResult.lost.attacker, true);
         this._distributeDamage(combatResult, defenderObjects, combatResult.lost.defender, true);
 
-        this._updatePlayersCombatAchievements(combatResult, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+        if (!this.gameTypeService.isTutorialGame(game)) {
+            this._updatePlayersCombatAchievements(combatResult, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+        }
 
         // Remove any carriers from the game that have been destroyed.
         let destroyedCarriers = game.galaxy.carriers.filter(c => !c.ships);

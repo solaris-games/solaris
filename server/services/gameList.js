@@ -2,16 +2,17 @@ const moment = require('moment');
 
 module.exports = class GameListService {
     
-    constructor(gameRepo, gameService, conversationService, eventService) {
+    constructor(gameRepo, gameService, conversationService, eventService, gameTypeService) {
         this.gameRepo = gameRepo;
         this.gameService = gameService;
         this.conversationService = conversationService;
         this.eventService = eventService;
+        this.gameTypeService = gameTypeService;
     }
 
     async listOfficialGames() {
         return await this.gameRepo.find({
-            'settings.general.type': { $ne: 'custom' },
+            'settings.general.type': { $nin: ['custom', 'tutorial'] },
             'state.startDate': { $eq: null }
         }, {
             'settings.general.type': 1,
@@ -47,6 +48,7 @@ module.exports = class GameListService {
             ]
         }, {
             'settings.general.name': 1,
+            'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             'settings.gametime.speed': 1,
             'settings.gametime.gameType': 1,
@@ -74,6 +76,7 @@ module.exports = class GameListService {
     async listCompletedGames(userId) {
         const games = await this.gameRepo.find({
             'state.endDate': { $ne: null }, // Game is finished
+            'settings.general.type': { $ne: 'tutorial'},
             $or: [
                 // User was active in the game or has been afk'd
                 { 'galaxy.players': { $elemMatch: { userId } } },
@@ -81,6 +84,7 @@ module.exports = class GameListService {
             ]
         }, {
             'settings.general.name': 1,
+            'settings.general.type': 1,
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1,
             'galaxy.players.defeated': 1,
@@ -112,7 +116,7 @@ module.exports = class GameListService {
         if (player) {
             if (includeUnreadConversastions) unreadConversations = this.conversationService.getUnreadCount(game, player._id);
             if (includeUnreadEvents) unreadEvents = await this.eventService.getUnreadCount(game, player._id);
-            if (includeTurnWaiting) turnWaiting = this.gameService.isTurnBasedGame(game) && !player.ready;
+            if (includeTurnWaiting) turnWaiting = this.gameTypeService.isTurnBasedGame(game) && !player.ready;
 
             totalUnread = (unreadConversations || 0) + (unreadEvents || 0);
         }
@@ -176,11 +180,13 @@ module.exports = class GameListService {
 
     async listInProgressGames() {
         return await this.gameRepo.find({
+            'settings.general.type': { $nin: ['tutorial'] },
             'state.startDate': { $ne: null },
             'state.endDate': { $eq: null },
             'state.paused': { $eq: false }
         }, {
             'settings.general.name': 1,
+            'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             state: 1
         }, {
@@ -208,6 +214,38 @@ module.exports = class GameListService {
         return await this.gameRepo.find({
             'settings.general.createdByUserId': { $eq: userId },
             'state.startDate': { $eq: null }
+        });
+    }
+
+    async getUserTutorial(userId) {
+        const tutorial = await this.gameRepo.findOne({
+            'settings.general.type': 'tutorial',
+            'state.endDate': { $eq: null }, // Game is in progress
+            'galaxy.players': { 
+                $elemMatch: { 
+                    userId,
+                    defeated: false
+                } 
+            }
+        }, {
+            _id: 1
+        });
+
+        return tutorial;
+    }
+
+    async listCompletedTutorials() {
+        let date = moment().subtract(1, 'day');
+
+        let games = await this.gameRepo.find({
+            'settings.general.type': 'tutorial',
+            'state.endDate': { $ne: null }
+        }, {
+            _id: 1
+        });
+        
+        return games.filter(g => {
+            return moment(g._id.getTimestamp()) <= date;
         });
     }
 

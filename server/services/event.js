@@ -51,6 +51,7 @@ module.exports = class EventService {
         this.combatService = combatService;
         this.specialistService = specialistService;
 
+        this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
         this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.gameId, args.gameTick));
         this.gameService.on('onPlayerQuit', (args) => this.createPlayerQuitEvent(args.gameId, args.gameTick, args.player, args.alias));
