@@ -130,6 +130,7 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawWormHole()
     this.drawNebula()
     this.drawAsteroidField()
     this.drawTarget()
@@ -205,6 +206,34 @@ class Star extends EventEmitter {
     this.nebulaSprite.addChild(blendSprite)
 
     this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
+  drawWormHole () {
+    if (!this.data.wormHoleToStarId) {
+      return
+    }
+
+    if (this.wormHoleSprite) {
+      this.fixedContainer.removeChild(this.wormHoleSprite)
+      this.wormHoleSprite = null
+    }
+
+    let texture = TextureService.getRandomWormholeTexture()
+    this.wormHoleSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 40
+    this.wormHoleSprite.width = spriteSize
+    this.wormHoleSprite.height = spriteSize
+    this.wormHoleSprite.anchor.set(0.5)
+    this.wormHoleSprite.rotation = Math.random()*Math.PI*2.0
+    this.wormHoleSprite.alpha = 0.35
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.wormHoleSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.wormHoleSprite)
   }
 
   drawAsteroidField () {
