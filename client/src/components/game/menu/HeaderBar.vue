@@ -14,16 +14,16 @@
         <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
           <tick-selector />
         </div>
-        <div class="col text-right pt-1" v-if="userPlayer">
-            <span class="pointer" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+        <div class="col text-right pt-1">
+            <span v-if="userPlayer" class="pointer" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
             </span>
 
-            <span class="pointer" v-if="isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+            <span class="pointer" v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
                 <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
             </span>
 
-            <research-progress class="d-none d-lg-inline-block ml-2" @onViewResearchRequested="onViewResearchRequested"/>
+            <research-progress class="d-none d-lg-inline-block ml-2" v-if="userPlayer" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
             <span class="d-none d-lg-inline-block ml-3">
