@@ -110,7 +110,7 @@ module.exports = class StarService extends EventEmitter {
         return this.listStarsOwnedByPlayer(stars, playerId).filter(s => this.isAlive(s));
     }
 
-    listStarsProtectedByPlayer(game, playerId) {
+    listStarsWithScanningRangeByPlayer(game, playerId) {
         let starIds = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
         if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
@@ -123,11 +123,9 @@ module.exports = class StarService extends EventEmitter {
 
         starIds = [...new Set(starIds)];
 
-        return starIds.map(id => this.getById(game, id));
-    }
-
-    listStarsWithScanningRangeByPlayer(game, playerId) {
-        return this.listStarsProtectedByPlayer(game, playerId).filter(s => this.isAlive(game, s));
+        return starIds
+            .map(id => this.getById(game, id))
+            .filter(s => this.isAlive(game, s));
     }
 
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
@@ -161,7 +159,7 @@ module.exports = class StarService extends EventEmitter {
 
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
+        let starsWithScanning = this.listStarsWithScanningRangeByPlayer(game, player._id);
         let starsToCheck = game.galaxy.stars.map(s => {
             return {
                 _id: s._id,
@@ -169,7 +167,7 @@ module.exports = class StarService extends EventEmitter {
             }
         });
 
-        for (let star of playerStars) {
+        for (let star of starsWithScanning) {
             let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
 
             for (let starId of starIds) {
@@ -188,7 +186,7 @@ module.exports = class StarService extends EventEmitter {
         // If worm holes are present, then ensure that any owned star OR star in orbit
         // also has its paired star visible.
         if (game.settings.specialGalaxy.randomWormHoles) {
-            let wormHoleStars = this.listStarsProtectedByPlayer(game, player._id)
+            let wormHoleStars = starsWithScanning
                 .filter(s => s.wormHoleToStarId)
                 .map(s => {
                     return {
