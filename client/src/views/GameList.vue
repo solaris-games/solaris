@@ -208,7 +208,10 @@
               </thead>
               <tbody>
                   <tr v-for="game in userGames" v-bind:key="game._id">
-                      <td>{{game.settings.general.name}}</td>
+                      <td>
+                        {{game.settings.general.name}}
+                        <span class="badge badge-success" v-if="game.settings.general.featured">Featured</span>
+                      </td>
                       <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
@@ -288,6 +291,7 @@ import ViewContainer from '../components/ViewContainer'
 import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
+import RandomHelper from '../services/randomHelper'
 
 export default {
   components: {
@@ -364,13 +368,13 @@ export default {
       return this.serverGames.find(x => types.includes(x.settings.general.type))
     },
     getFeaturedGame () {
-      let featuredOfficial = this.serverGames.find(x => x.settings.general.featured)
-
-      if (featuredOfficial) {
-        return featuredOfficial
+      let featuredGames = this.serverGames.filter(x => x.settings.general.featured).concat(this.userGames.filter(x => x.settings.general.featured))
+      
+      if (featuredGames.length) {
+        return featuredGames[RandomHelper.getRandomNumberBetween(0, featuredGames.length - 1)]
       }
 
-      return this.userGames.find(x => x.settings.general.featured)
+      return null
     },
     getGameTypeFriendlyText (game) {
       return GameHelper.getGameTypeFriendlyText(game)
