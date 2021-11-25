@@ -77,16 +77,6 @@ li {
   display: inline-block;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #303030;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #375a7f;
-}
-
 .grow .colour-bar { transition: all .1s linear; }
 .grow:hover .colour-bar {
   transform: scale(1.5);
