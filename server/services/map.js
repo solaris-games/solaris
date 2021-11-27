@@ -216,7 +216,11 @@ module.exports = class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isBlackHole = true;
-                star.naturalResources = 0;
+                star.naturalResources = {
+                    economy: 0,
+                    industry: 0,
+                    science: 0
+                };
             }
         } while (count--);
     }
