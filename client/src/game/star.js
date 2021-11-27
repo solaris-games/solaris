@@ -350,7 +350,8 @@ class Star extends EventEmitter {
         return
       }
 
-      let averageNaturalResources = (this.data.naturalResources.economy + this.data.naturalResources.industry + this.data.naturalResources.science ) / 3;
+      let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+
       // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
       // TODO: Experimental:
       let ringRadius = averageNaturalResources <= 50 ? averageNaturalResources : averageNaturalResources > 400 ? 100 : (12.5 * Math.log2(averageNaturalResources / 50) + 50)
@@ -368,6 +369,9 @@ class Star extends EventEmitter {
     }
   }
 
+  _calculateAverageNaturalResources(naturalResources) {
+    return Math.floor((naturalResources.economy + naturalResources.industry + naturalResources.science) / 3);
+  }
   _getPlanetsCount () {
     if (!this.data.naturalResources) {
       return 0

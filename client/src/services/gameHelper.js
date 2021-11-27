@@ -851,11 +851,8 @@ class GameHelper {
     return star.naturalResources != null && star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0
   }
 
-  splitResources(game) {
-    if (game.settings.specialGalaxy.splitResources) {
-      return (game.settings.specialGalaxy.splitResources == 'enabled')
-    }
-    return false
+  isSplitResources(game) {
+    return game.settings.specialGalaxy.splitResources;
   }
 
   isInGuild (guild, userId) {

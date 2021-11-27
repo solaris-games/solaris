@@ -154,7 +154,7 @@
             <td>Carrier-to-Carrier Combat</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
           </tr>
-          <tr v-if="game.settings.specialGalaxy.splitResources != undefined">
+          <tr v-if="game.settings.specialGalaxy.splitResources">
             <td>Split Resources</td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.splitResources) }}</td>
           </tr>

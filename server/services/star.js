@@ -82,7 +82,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.warpGate = false;
         homeStar.specialistId = null;
 
-        if (game.settings.specialGalaxy.splitResources && game.settings.specialGalaxy.splitResources === 'enabled') {
+        if (game.settings.specialGalaxy.splitResources === 'enabled') {
             homeStar.isAsteroidField = false;
             homeStar.isNebula = false;
             if (homeStar.wormHoleToStarId) {
@@ -275,16 +275,24 @@ module.exports = class StarService extends EventEmitter {
         return isInScanRange;
     }
 
-    calculateTerraformedResources(naturalResources, terraforming) {
+    roundNaturalResources(naturalResources) {
         return {
-            economy: this.addTerraforming(naturalResources.economy, terraforming),
-            industry: this.addTerraforming(naturalResources.industry, terraforming),
-            science: this.addTerraforming(naturalResources.science, terraforming)
+            economy: Math.floor(naturalResources.economy),
+            industry: Math.floor(naturalResources.industry),
+            science: Math.floor(naturalResources.science)
         }
     }
 
-    addTerraforming(resource, terraforming) {
-        return resource + ( 5 * terraforming )
+    calculateTerraformedResourcesObject(naturalResources, terraforming) {
+        return {
+            economy: this.calculateTerraformedResources(naturalResources.economy, terraforming),
+            industry: this.calculateTerraformedResources(naturalResources.industry, terraforming),
+            science: this.calculateTerraformedResources(naturalResources.science, terraforming)
+        }
+    }
+
+    calculateTerraformedResources(naturalResource, terraforming) {
+        return Math.floor(naturalResource + ( 5 * terraforming ))
     }
 
     calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1, productionTicks = 24) {
@@ -455,13 +463,21 @@ module.exports = class StarService extends EventEmitter {
 
                     if (specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
-                            star.naturalResources.economy += specialist.modifiers.special.addNaturalResourcesOnTick;
-                            star.naturalResources.industry += specialist.modifiers.special.addNaturalResourcesOnTick;
-                            star.naturalResources.science += specialist.modifiers.special.addNaturalResourcesOnTick;
+                            if(game.settings.specialGalaxy.splitResources === 'enabled') {
+                                let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
+                                star.naturalResources.economy += 3 * specialist.modifiers.special.addNaturalResourcesOnTick * (star.naturalResources.economy / total);
+                                star.naturalResources.industry += 3 * specialist.modifiers.special.addNaturalResourcesOnTick * (star.naturalResources.industry / total);
+                                star.naturalResources.science += 3 * specialist.modifiers.special.addNaturalResourcesOnTick * (star.naturalResources.science / total);
+                            } else {
+                                star.naturalResources.economy += specialist.modifiers.special.addNaturalResourcesOnTick;
+                                star.naturalResources.industry += specialist.modifiers.special.addNaturalResourcesOnTick;
+                                star.naturalResources.science += specialist.modifiers.special.addNaturalResourcesOnTick;
+                            }
                         }
 
                         if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
-                            this.deductNaturalResources(star, specialist.modifiers.special.deductNaturalResourcesOnTick);
+                            let splitResources = (game.settings.specialGalaxy.splitResources === 'enabled')
+                            this.deductNaturalResources(star, specialist.modifiers.special.deductNaturalResourcesOnTick, splitResources);
                         }
                     }
                 }
@@ -473,10 +489,17 @@ module.exports = class StarService extends EventEmitter {
         return star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0;
     }
 
-    deductNaturalResources(star, amount) {
-        star.naturalResources.economy -= amount;
-        star.naturalResources.industry -= amount;
-        star.naturalResources.science -= amount;
+    deductNaturalResources(star, amount, splitResources) {
+        if(splitResources) {
+            let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
+            star.naturalResources.economy -= 3 * amount * (star.naturalResources.economy / total);
+            star.naturalResources.industry -= 3 * amount * (star.naturalResources.industry / total);
+            star.naturalResources.science -= 3 * amount * (star.naturalResources.science / total);
+        } else {
+            star.naturalResources.economy -= amount;
+            star.naturalResources.industry -= amount;
+            star.naturalResources.science -= amount;
+        }
 
         if (Math.floor(star.naturalResources.economy) <= 0) {
             star.naturalResources.economy = 0;
@@ -488,8 +511,8 @@ module.exports = class StarService extends EventEmitter {
             star.naturalResources.science = 0;
         }
         
-        // if the star reaches 0 resources then reduce the star to a dead hunk.
-        if(star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0) {
+        // if the star reaches 0 of all resources then reduce the star to a dead hunk.
+        if(this.isDeadStar(star)) {
             star.specialistId = null;
             star.warpGate = false;
             star.infrastructure.economy = 0;

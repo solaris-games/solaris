@@ -239,7 +239,11 @@
                 },
                 "special": {
                     "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": 25
+                    "reigniteDeadStarNaturalResources": {
+                        "economy": 25,
+                        "industry": 25,
+                        "science": 25
+                    }
                 }
             }
         }

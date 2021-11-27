@@ -78,8 +78,8 @@ describe('star', () => {
             science: 10
         }
 
-        const result1 = starService.calculateTerraformedResources(input1, 5); // Normal resources
-        const result2 = starService.calculateTerraformedResources(input2, 2); // Split resources
+        const result1 = starService.calculateTerraformedResourcesObject(input1, 5); // Normal resources
+        const result2 = starService.calculateTerraformedResourcesObject(input2, 2); // Split resources
 
         expect(result1).toEqual(
             {

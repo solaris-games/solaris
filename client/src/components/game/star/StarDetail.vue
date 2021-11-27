@@ -325,7 +325,7 @@ export default {
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     
-    this.splitResources = GameHelper.splitResources(this.$store.state.game)
+    this.splitResources = GameHelper.isSplitResources(this.$store.state.game)
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
@@ -472,18 +472,18 @@ export default {
       if  (!this.splitResources) {
         return Math.floor(this.star.naturalResources.economy);
       }
-      let economy = Math.floor(this.star.naturalResources.economy);
-      let industry = Math.floor(this.star.naturalResources.industry);
-      let science = Math.floor(this.star.naturalResources.science);
+      let economy = this.star.naturalResources.economy;
+      let industry = this.star.naturalResources.industry;
+      let science = this.star.naturalResources.science;
       return economy + ' / ' + industry + ' / ' + science;
     },
     terraformedResources: function() {
       if  (!this.splitResources) {
         return Math.floor(this.star.terraformedResources.economy);
       }
-      let economy = Math.floor(this.star.terraformedResources.economy);
-      let industry = Math.floor(this.star.terraformedResources.industry);
-      let science = Math.floor(this.star.terraformedResources.science);
+      let economy = this.star.terraformedResources.economy;
+      let industry = this.star.terraformedResources.industry;
+      let science = this.star.terraformedResources.science;
       return economy + ' / ' + industry + ' / ' + science;
     }
   }
