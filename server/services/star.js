@@ -147,7 +147,7 @@ module.exports = class StarService extends EventEmitter {
 
         return starIds
             .map(id => this.getById(game, id))
-            .filter(s => this.isAlive(game, s));
+            .filter(s => this.isAlive(s));
     }
 
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
