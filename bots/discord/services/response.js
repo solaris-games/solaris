@@ -270,7 +270,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
+    leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list) {
         let lowerLimit = (page - 1) * 20 + 1
         let upperLimit = page * 20
         let response = this.baseResponse()
@@ -280,7 +280,20 @@ module.exports = class ReponseService {
             .addFields(
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
-                { name: `${sortingKey}`, value: sortingKey_list, inline: true }
+                { name: sortingKey, value: sortingKey_list, inline: true }
+            );
+        return response;
+    }
+
+    leaderboard_globalMobile(page, sortingKey, data_list) {
+        let lowerLimit = (page - 1) * 20 + 1
+        let upperLimit = page * 20
+        let response = this.baseResponse()
+        response = response
+            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
+            .setURL(`https://solaris.games/#/leaderboard`)
+            .addFields(
+                { name: `position / ${sortingKey} / username`, value: data_list }
             );
         return response;
     }
@@ -295,15 +308,28 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list) {
+    leaderboard_localPC(gameId, tick, sortingKey, position_list, username_list, sortingKey_list) {
         let response = this.baseResponse()
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setDescription(`Currently at tick ${tick}`)
             .addFields(
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
-                { name: `${sortingKey}`, value: sortingKey_list, inline: true }
+                { name: sortingKey, value: sortingKey_list, inline: true }
+            );
+        return response;
+    }
+
+    leaderboard_localMobile(gameId, tick, sortingKey, data_list) {
+        let response = this.baseResponse()
+        response = response
+            .setTitle(`Leaderboard for ${sortingKey}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setDescription(`Currently at tick ${tick}`)
+            .addFields(
+                { name: `position / ${sortingKey} / username`, value: data_list},
             );
         return response;
     }

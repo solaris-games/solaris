@@ -137,36 +137,49 @@ module.exports = class PublicCommandService {
                 (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
-        const generateLeaderboard = async page => {
+        const generateLeaderboard = async (page, isPC) => {
             //determining the message that has to be sent with the given input
             let limit = 20
             let skip = 20 * (page - 1)
             let result = await this.leaderboardService.getLeaderboard(limit, sortingKey, skip);
             let leaderboard = result.leaderboard;
-            let position_list = "";
-            let username_list = "";
-            let sortingKey_list = "";
-            for (let i = 0; i < leaderboard.length; i++) {
-                if (!leaderboard[i]) { break; }
-                position_list += (leaderboard[i].position + (page - 1) * 20) + "\n";
-                username_list += leaderboard[i].username + "\n";
-                sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+            if(isPC){
+                //Generates the response if the response has to be in a format readable to PC users
+                let position_list = "";
+                let username_list = "";
+                let sortingKey_list = "";
+                for (let i = 0; i < leaderboard.length; i++) {
+                    if (!leaderboard[i]) { break; }
+                    position_list += (leaderboard[i].position + (page - 1) * 20) + "\n";
+                    username_list += leaderboard[i].username + "\n";
+                    sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+                }
+                let response = this.botResponseService.leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list)
+                return response;
             }
-            let response = this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
+            //This only runs now if the response is for mobile
+            let data_list = "";
+            for (let i = 0; i<leaderboard.length; i++) {
+                if(!leaderboard[i]) { break; }
+                data_list += (leaderboard[i].position + (page - 1) * 20) + ' / ' + getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
+            }
+            let response = this.botResponseService.leaderboard_globalMobile(page, sortingKey, data_list);
             return response;
         }
 
-        msg.channel.send(await generateLeaderboard(1)).then(async message => {
+        let isPC = true;
+        msg.channel.send(await generateLeaderboard(1, isPC)).then(async message => {
             //reacting with the appropriate reactions so a player can move to the next page
             try {
                 await message.react('➡️')
                 await message.react('⏩')
+                await message.react('📱')
             } catch (error) {
                 console.log('One of the emojis failed to react:', error);
             }
             const collector = message.createReactionCollector(
                 //defining the collector so it only responds to reactions of the right person and the right reaction
-                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩'].includes(reaction.emoji.name) && user.id == msg.author.id, { time: 60000 }
+                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩', '📱'].includes(reaction.emoji.name) && user.id == msg.author.id, { time: 60000 }
             )
 
 
@@ -185,19 +198,24 @@ module.exports = class PublicCommandService {
                         case '➡️':
                             currentPage += 1
                             break;
-                        default:
-                            //⏩
+                        case '⏩':
                             currentPage += 5 // TODO: This should go to the last page?
+                            break;
+                        default:
+                            //📱
+                            isPC = !isPC;
+
                     }
                     if (currentPage < 1) currentPage = 1;
                     if (currentPage > pageCount) currentPage = pageCount;
                     //editing the existing message so the new page is displayed for the discord user
-                    message.edit(await generateLeaderboard(currentPage));
+                    message.edit(await generateLeaderboard(currentPage, isPC));
                     //adding the reactions so the player can go to another page from here
                     if (currentPage > 2) await message.react('⏪');
                     if (currentPage != 1) await message.react('⬅️');
                     if (currentPage != pageCount) await message.react('➡️');
-                    if (currentPage < pageCount - 1) message.react('⏩');
+                    if (currentPage < pageCount - 1) await message.react('⏩');
+                    await message.react('📱');
                 });
             });
         });
@@ -257,6 +275,7 @@ module.exports = class PublicCommandService {
         let position_list = "";
         let username_list = "";
         let sortingKey_list = "";
+        let phone_list = "";
 
         const getNestedObject = (nestedObj, pathArr) => {
             return pathArr.reduce((obj, key) =>
@@ -267,12 +286,43 @@ module.exports = class PublicCommandService {
         for (let i = 0; i < leaderboard.length; i++) {
             position_list += (i + 1) + "\n";
             username_list += leaderboard[i].player.alias + "\n";
-            sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n"
+            sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
+            phone_list += (i + 1) + ' / ' + getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
         }
 
-        response = this.botResponseService.leaderboard_local(gameId, filter, position_list, username_list, sortingKey_list);
+        let isPC = true;
+        response = this.botResponseService.leaderboard_localPC(gameId, game.state.tick, filter, position_list, username_list, sortingKey_list);
 
-        msg.channel.send(response);
+        msg.channel.send(response).then(async message => {
+            try {
+                message.react('📱');
+            } catch (error) {
+                console.log('One of the emojis failed to react:', error);
+            }
+
+            const collector = message.createReactionCollector(
+                (reaction, user) => (reaction.emoji.name === '📱') && (user.id === msg.author.id), { time: 60000 }
+            )
+
+            collector.on('collect', () => {
+                message.reactions.removeAll().then(async () => {
+                    isPC = !isPC
+                    if (isPC) {
+                        let editedResponse = this.botResponseService.leaderboard_localPC(gameId, game.state.tick, filter, position_list, username_list, sortingKey_list);
+                        message.edit(editedResponse);
+                    } else {
+                        let editedResponse = this.botResponseService.leaderboard_localMobile(gameId, game.state.tick, filter, phone_list);
+                        message.edit(editedResponse);
+                    }
+
+                    try {
+                        message.react('📱')
+                    } catch (error) {
+                        console.log('One of the emojis failed to react:', error);
+                    }
+                })
+            })
+        });
     }
 
     async userinfo(msg, directions) {
@@ -308,6 +358,7 @@ module.exports = class PublicCommandService {
             } catch (error) {
                 console.log('One of the emojis failed to react:', error);
             }
+
             const collector = message.createReactionCollector(
                 //defining a collector that checks if the right user reacted with the right reaction
                 (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === msg.author.id, { time: 60000 }
