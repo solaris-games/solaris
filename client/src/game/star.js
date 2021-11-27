@@ -422,6 +422,7 @@ class Star extends EventEmitter {
   _calculateAverageNaturalResources(naturalResources) {
     return Math.floor((naturalResources.economy + naturalResources.industry + naturalResources.science) / 3);
   }
+
   _getPlanetsCount () {
     if (!this.data.naturalResources) {
       return 0
