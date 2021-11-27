@@ -426,7 +426,7 @@ class Star extends EventEmitter {
     if (!this.data.naturalResources) {
       return 0
     }
-    let averageNaturalResources = (this.data.naturalResources.economy + this.data.naturalResources.industry + this.data.naturalResources.science ) / 3;
+    let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
     return Math.min(Math.floor(averageNaturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 

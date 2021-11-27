@@ -2,8 +2,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService,
-        starDistanceService, starUpgradeService, carrierService,
+    constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, 
+        starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
         guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService) {
         this.cacheService = cacheService;
@@ -400,28 +400,28 @@ module.exports = class GameGalaxyService {
             }
 
             let research = {
-                scanning: {
+                scanning: { 
                     level: p.research.scanning.level
                 },
-                hyperspace: {
+                hyperspace: { 
                     level: p.research.hyperspace.level
                 },
-                terraforming: {
+                terraforming: { 
                     level: p.research.terraforming.level
                 },
-                experimentation: {
+                experimentation: { 
                     level: p.research.experimentation.level
                 },
-                weapons: {
+                weapons: { 
                     level: p.research.weapons.level
                 },
-                banking: {
+                banking: { 
                     level: p.research.banking.level
                 },
-                manufacturing: {
+                manufacturing: { 
                     level: p.research.manufacturing.level
                 },
-                specialists: {
+                specialists: { 
                     level: p.research.specialists.level
                 }
             };
@@ -614,7 +614,7 @@ module.exports = class GameGalaxyService {
         if (isHistorical) {
             for (let historyCarrier of history.carriers) {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.equals(historyCarrier.carrierId));
-
+                
                 if (!gameCarrier) {
                     game.galaxy.carriers.push(historyCarrier);
                 }

@@ -19,7 +19,7 @@ module.exports = class StarService extends EventEmitter {
         this.gameTypeService = gameTypeService;
     }
 
-    generateUnownedStar(game, name, location, naturalResources) {
+    generateUnownedStar(name, location, naturalResources) {
         return {
             _id: mongoose.Types.ObjectId(),
             name,

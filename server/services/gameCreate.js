@@ -100,7 +100,7 @@ module.exports = class GameCreateService {
             game,
             desiredStarCount,
             game.settings.general.playerLimit);
-
+        
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);

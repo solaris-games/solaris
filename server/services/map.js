@@ -57,7 +57,7 @@ module.exports = class MapService {
                 y: starLocation.y
             };
             
-            let star = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], loc, starLocation.resources);
+            let star = this.starService.generateUnownedStar(starNames[starNamesIndex++], loc, starLocation.resources);
 
             stars.push(star);
 
@@ -65,7 +65,7 @@ module.exports = class MapService {
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
-                    let linkedStar = this.starService.generateUnownedStar(game, starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
+                    let linkedStar = this.starService.generateUnownedStar(starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
                     stars.push(linkedStar);
                     linkedStars.push(linkedStar._id);
                 }
