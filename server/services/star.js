@@ -124,28 +124,30 @@ module.exports = class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
+    isAlive(star) {
+        return !this.isDeadStar(star) || star.isBlackHole;
+    }
+
     listStarsAliveOwnedByPlayer(stars, playerId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s))
+        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => this.isAlive(s));
     }
 
     listStarsWithScanningRangeByPlayer(game, playerId) {
-        // A player has access to the scanning range of a star if
-        // - The player owns the star
-        // - The player has a carrier in orbit regardless of who owns the star
-        let starIds = this.listStarsAliveOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
+        let starIds = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
         if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
             starIds = starIds.concat(
                 game.galaxy.carriers
                     .filter(c => c.ownedByPlayerId.equals(playerId) && c.orbiting)
                     .map(c => c.orbiting.toString())
-                    .filter(s => !this.isDeadStar(this.getById(game, s))) //This makes sure that a dead star with a carrier on it doesn't magicly get scanning
             );
-
-            starIds = [...new Set(starIds)];
         }
 
-        return starIds.map(id => this.getById(game, id));
+        starIds = [...new Set(starIds)];
+
+        return starIds
+            .map(id => this.getById(game, id))
+            .filter(s => this.isAlive(game, s));
     }
 
     listStarsOwnedByPlayerBulkIgnored(stars, playerId, infrastructureType) {
@@ -179,7 +181,7 @@ module.exports = class StarService extends EventEmitter {
 
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
+        let starsWithScanning = this.listStarsWithScanningRangeByPlayer(game, player._id);
         let starsToCheck = game.galaxy.stars.map(s => {
             return {
                 _id: s._id,
@@ -187,7 +189,7 @@ module.exports = class StarService extends EventEmitter {
             }
         });
 
-        for (let star of playerStars) {
+        for (let star of starsWithScanning) {
             let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
 
             for (let starId of starIds) {
@@ -203,18 +205,18 @@ module.exports = class StarService extends EventEmitter {
             }
         }
 
-        // If worm holes are present, then ensure that any owned star
+        // If worm holes are present, then ensure that any owned star OR star in orbit
         // also has its paired star visible.
         if (game.settings.specialGalaxy.randomWormHoles) {
-            let wormHoleStars = game.galaxy.stars
-                .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id) && s.wormHoleToStarId)
+            let wormHoleStars = starsWithScanning
+                .filter(s => s.wormHoleToStarId)
                 .map(s => {
                     return {
                         source: s,
                         destination: this.getByObjectId(game, s.wormHoleToStarId)
                     };
                 });
-
+                
             for (let wormHoleStar of wormHoleStars) {
                 if (starsInRange.find(s => s._id.equals(wormHoleStar.destination._id)) == null) {
                     starsInRange.push({

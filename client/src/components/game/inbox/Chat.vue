@@ -1,6 +1,6 @@
 <template>
   <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
-    <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread': unreadMessages}" @click="toggle" title="Inbox (M)">
+    <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
       <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
@@ -177,7 +177,7 @@ export default {
       }
 
       // Special case for Inbox shortcut, only do this if the screen is large
-      if (menuState !== MENU_STATES.INBOX || this.canHandleConversationEvents()) {
+      if (menuState !== MENU_STATES.INBOX || !this.canHandleConversationEvents()) {
         return
       }
 
@@ -245,5 +245,22 @@ export default {
 
 .has-read {
   font-size: 30px;
+}
+
+.pulse {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1)
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 </style>

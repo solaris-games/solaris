@@ -5,7 +5,7 @@ module.exports = class GameGalaxyService {
     constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService,
         starDistanceService, starUpgradeService, carrierService,
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService) {
+        guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
@@ -27,6 +27,7 @@ module.exports = class GameGalaxyService {
         this.orbitalMechanicsService = orbitalMechanicsService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.diplomacyService = diplomacyService;
     }
 
     async getGalaxy(gameId, userId, tick) {
@@ -174,18 +175,19 @@ module.exports = class GameGalaxyService {
         }
 
         doc.galaxy.stars = doc.galaxy.stars
-            .map(s => {
-                return {
-                    _id: s._id,
-                    name: s.name,
-                    ownedByPlayerId: s.ownedByPlayerId,
-                    location: s.location,
-                    warpGate: false,
-                    isNebula: false,
-                    isAsteroidField: false,
-                    wormHoleToStarId: null
-                }
-            });
+        .map(s => {
+            return {
+                _id: s._id,
+                name: s.name,
+                ownedByPlayerId: s.ownedByPlayerId,
+                location: s.location,
+                warpGate: false,
+                isNebula: false,
+                isAsteroidField: false,
+                isBlackHole: false,
+                wormHoleToStarId: null
+            }
+        });
     }
 
     _setStarInfoDetailed(doc, player) { 
@@ -283,9 +285,10 @@ module.exports = class GameGalaxyService {
                         warpGate: false, // Hide warp gates outside of scanning range
                         isNebula: false, // Hide nebula outside of scanning range
                         isAsteroidField: false, // Hide asteroid fields outside of scanning range
+                        isBlackHole: false, // Hide outside of scanning range
                         wormHoleToStarId: s.wormHoleToStarId
                     }
-                }
+                };
             });
     }
 
@@ -429,6 +432,12 @@ module.exports = class GameGalaxyService {
                 research = null;
             }
 
+            let diplomacy = null;
+
+            if (player) {
+                diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);
+            }
+
             // Return a subset of the user, key info only.
             return {
                 _id: p._id,
@@ -452,7 +461,8 @@ module.exports = class GameGalaxyService {
                 isOnline: p.isOnline,
                 guild: playerGuild,
                 hasDuplicateIP: p.hasDuplicateIP,
-                hasFilledAfkSlot: p.hasFilledAfkSlot
+                hasFilledAfkSlot: p.hasFilledAfkSlot,
+                diplomacy
             };
         });
     }

@@ -1,16 +1,19 @@
 import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
+import seededRandom from 'random-seed'
 
 class TextureService {
 
     static WARP_GATE_INDEX = 1
     static PARTIAL_STRIDE = 2
+    static seededRNG = seededRandom.create()
 
     DEFAULT_FONT_STYLE = null
 
     STARLESS_NEBULA_TEXTURES = []
     STAR_NEBULA_TEXTURES = []
     STAR_ASTEROID_FIELD_TEXTURES = []
+    STAR_WORMHOLE_TEXTURES = []
     NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
     PLAYER_SYMBOLS = {}
@@ -80,6 +83,8 @@ class TextureService {
       this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-0.png'))))
       this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-1.png'))))
       this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star-asteroid-field-2.png'))))
+
+      this.STAR_WORMHOLE_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/vortex.png'))))
 
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')
@@ -160,16 +165,23 @@ class TextureService {
       this.STAR_SYMBOLS['home'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_home.svg')))
     }
 
-    getRandomStarNebulaTexture() {
-      let index = Math.floor(Math.random() * this.STAR_NEBULA_TEXTURES.length)
+    getRandomStarNebulaTexture(seed) {
+      TextureService.seededRNG.seed(seed+'n')
+      let index = Math.floor(TextureService.seededRNG.random() * this.STAR_NEBULA_TEXTURES.length)
 
       return this.STAR_NEBULA_TEXTURES[index]
     }
 
-    getRandomStarAsteroidFieldTexture() {
-      let index = Math.floor(Math.random() * this.STAR_ASTEROID_FIELD_TEXTURES.length)
+    getRandomStarAsteroidFieldTexture(seed) {
+      TextureService.seededRNG.seed(seed+'a')
+      let index = Math.floor(TextureService.seededRNG.random() * this.STAR_ASTEROID_FIELD_TEXTURES.length)
 
       return this.STAR_ASTEROID_FIELD_TEXTURES[index]
+    }
+
+    getRandomWormholeTexture () {
+      // TODO: More textures?
+      return this.STAR_WORMHOLE_TEXTURES[0]
     }
 }
 

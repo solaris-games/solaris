@@ -184,29 +184,7 @@
 
           <hr/>
 
-          <!-- TODO: Turn this into a component and put it on the main menu as well -->
-          <div class="row no-gutters">
-            <div class="col-sm-12 col-md-6 col-lg-6 pr-2">
-              <div class="card bg-dark text-white tutorial-game" @click="viewTutorial()">
-                <img class="card-img" :src="require('../assets/screenshots/new_player_rt.png')" alt="View Tutorial">
-                <div class="card-img-overlay">
-                  <h5 class="card-title tutorial-card-title">
-                    <i class="fas fa-user-graduate"></i>
-                    <span class="ml-2">Tutorial</span>
-                  </h5>
-                  <h6 class="card-title card-subtitle">
-                    Learn to Play
-                  </h6>
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-12 col-md-6 col-lg-6 pl-2">
-              <h5>Tutorial Game</h5>
-              <p>
-                New to <span class="text-info">Solaris</span>? Learn the basics by completing the tutorial and when you're ready, join a standard game to fight against real players.
-              </p>
-            </div>
-          </div>
+          <tutorial-game />
 
           <hr/>
 
@@ -224,14 +202,17 @@
               <thead>
                   <tr class="bg-primary">
                       <td>Name</td>
-                      <td class="d-none d-md-block text-center">Players</td>
+                      <td class="d-none d-md-table-cell text-center">Players</td>
                       <td></td>
                   </tr>
               </thead>
               <tbody>
                   <tr v-for="game in userGames" v-bind:key="game._id">
-                      <td>{{game.settings.general.name}}</td>
-                      <td class="d-none d-md-block text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td>
+                        {{game.settings.general.name}}
+                        <span class="badge badge-success" v-if="game.settings.general.featured">Featured</span>
+                      </td>
+                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
                             <span class="d-none d-md-block">View</span>
@@ -268,6 +249,7 @@
                   <tr class="bg-primary">
                       <th>Name</th>
                       <th class="d-none d-md-table-cell text-center">Players</th>
+                      <th class="d-none d-sm-table-cell text-center">Cycle</th>
                       <th></th>
                   </tr>
               </thead>
@@ -279,6 +261,7 @@
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
                       <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
                             <span class="d-none d-md-block">View</span>
@@ -305,14 +288,17 @@ import router from '../router'
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewTitle from '../components/ViewTitle'
 import ViewContainer from '../components/ViewContainer'
+import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
+import RandomHelper from '../services/randomHelper'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
-    'view-title': ViewTitle
+    'view-title': ViewTitle,
+    'tutorial-game': TutorialGame
   },
   data () {
     return {
@@ -382,27 +368,16 @@ export default {
       return this.serverGames.find(x => types.includes(x.settings.general.type))
     },
     getFeaturedGame () {
-      let featuredOfficial = this.serverGames.find(x => x.settings.general.featured)
-
-      if (featuredOfficial) {
-        return featuredOfficial
+      let featuredGames = this.serverGames.filter(x => x.settings.general.featured).concat(this.userGames.filter(x => x.settings.general.featured))
+      
+      if (featuredGames.length) {
+        return featuredGames[RandomHelper.getRandomNumberBetween(0, featuredGames.length - 1)]
       }
 
-      return this.userGames.find(x => x.settings.general.featured)
+      return null
     },
     getGameTypeFriendlyText (game) {
       return GameHelper.getGameTypeFriendlyText(game)
-    },
-    async viewTutorial () {
-      try {
-        let response = await gameService.createTutorialGame()
-
-        if (response.status === 201) {
-          router.push({ name: 'game', query: { id: response.data } })
-        }
-      } catch (err) {
-        console.error(err)
-      }
     }
   }
 }
@@ -448,10 +423,6 @@ export default {
   background-color: #f39c12;
 }
 
-.tutorial-card-title {
-  background-color: #3498DB;
-}
-
 .standard-card-title {
   background-color: #00bc8c;
 }
@@ -487,10 +458,6 @@ p.card-subtitle {
 
 .new-player-game {
   border: 3px solid #f39c12;
-}
-
-.tutorial-game {
-  border: 3px solid #3498DB;
 }
 
 .standard-game {

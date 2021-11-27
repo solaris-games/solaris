@@ -309,7 +309,7 @@ module.exports = class GameTickService extends EventEmitter {
 
                 // TODO: Check for specialists that affect pre-combat.
 
-                this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
+                await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
             }
         }
     }
@@ -429,7 +429,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -465,7 +465,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
 
-            this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
+            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
         }
     }
 

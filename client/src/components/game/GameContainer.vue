@@ -151,6 +151,7 @@ Hyperi0n`, 'Donate', 'Dismiss')) {
   top: 0;
   margin: 0;
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 </style>

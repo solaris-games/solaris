@@ -83,7 +83,7 @@ module.exports = class TechnologyService {
     }
 
     getStarEffectiveTechnologyLevels(game, star, sanitize = true) {
-        let player = game.galaxy.players.find(x => x._id.equals(star.ownedByPlayerId));
+        let player = game.galaxy.players.find(x => x._id.toString() === star.ownedByPlayerId.toString());
 
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
@@ -95,11 +95,15 @@ module.exports = class TechnologyService {
             }
         }
 
+        if (star.isBlackHole) {
+            techs.scanning += 3;
+        }
+
         return techs;
     }
 
     getCarrierEffectiveTechnologyLevels(game, carrier, isCarrierToStarCombat, sanitize = true) {
-        let player = game.galaxy.players.find(x => x._id.equals(carrier.ownedByPlayerId));
+        let player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId.toString());
 
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 

@@ -82,19 +82,9 @@ class Carrier extends EventEmitter {
       this.graphics_colour = null
     }
 
-    switch(this.player.shape) {
-      case 'circle':
-        this._drawShapeCircle()
-        break
-      case 'square':
-        this._drawShapeSquare()
-        break
-      case 'hexagon':
-        this._drawShapeHexagon()
-        break
-      case 'diamond':
-        this._drawShapeDiamond()
-        break
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player.shape)) {
+      this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[this.player.shape][4])
+
     }
 
     this.graphics_colour.anchor.set(0.5)
@@ -182,22 +172,6 @@ class Carrier extends EventEmitter {
 
   hasSpecialist () {
     return this.data.specialistId && this.data.specialistId > 0
-  }
-
-  _drawShapeDiamond() {
-    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][4])
-  }
-
-  _drawShapeCircle () {
-    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][4])
-  }
-
-  _drawShapeSquare () {
-    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][4])
-  }
-
-  _drawShapeHexagon () {
-    this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][4])
   }
 
   clearPaths() {

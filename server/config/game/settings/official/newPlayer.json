@@ -26,6 +26,7 @@
     "randomWormHoles": 10,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
+    "randomBlackHoles": 5,
     "darkGalaxy": "disabled",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
