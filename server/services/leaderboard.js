@@ -526,7 +526,7 @@ module.exports = class LeaderboardService {
         let playerStats = game.galaxy.players.map(p => {
             return {
                 player: p,
-                stats: this.playerService.getStats(game, p)
+                stats: p.stats ? p.stats : this.playerService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
             };
         });
 

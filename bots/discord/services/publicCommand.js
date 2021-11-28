@@ -345,7 +345,6 @@ module.exports = class PublicCommandService {
         let gameId = game._id;
         let gameTick = game.state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
-        let fullGame = await this.gameService.getById(gameId); //Treat with extreme care, this may not be given to any player in full, it is used to calculate total infrastructure
 
         const generateResponse = async isPC => {
             if (isPC) {
@@ -358,9 +357,9 @@ module.exports = class PublicCommandService {
             stars: this.leaderboardService.getLeaderboardRankings(game, 'stars'),
             ships: this.leaderboardService.getLeaderboardRankings(game, 'ships'),
             newShips: this.leaderboardService.getLeaderboardRankings(game, 'newShips'),
-            economy: this.leaderboardService.getLeaderboardRankings(fullGame, 'economy'), //This calculates the total infrastructure, and since it isn't extra dark that isnt hidden. Though fullGame must be treated with care
-            industry: this.leaderboardService.getLeaderboardRankings(fullGame, 'industry'), //same as ^^^
-            science: this.leaderboardService.getLeaderboardRankings(fullGame, 'science'), //same as ^^^
+            economy: this.leaderboardService.getLeaderboardRankings(game, 'economy'),
+            industry: this.leaderboardService.getLeaderboardRankings(game, 'industry'),
+            science: this.leaderboardService.getLeaderboardRankings(game, 'science'),
             weapons: this.leaderboardService.getLeaderboardRankings(game, 'weapons'),
             manufacturing: this.leaderboardService.getLeaderboardRankings(game, 'manufacturing'),
             specialists: this.leaderboardService.getLeaderboardRankings(game, 'specialists')
