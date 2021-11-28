@@ -211,25 +211,6 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoError(authorId, reason) {
-        let response;
-        switch (reason) {
-            case 'noFocus':
-                response = `Hey <@${authorId}>,\n` +
-                    `It looks like the focus you specified is not in the list, you can choose between "all", "general", "galaxy", "player", "technology" and "time". If you belief this is a bug, contact @Tristanvds#9505.`
-                break;
-            case 'noGame':
-                response = `Hey <@${authorId}>,\n` +
-                    `No game was found with this name, check if you spelt it correctly`;
-                break;
-            case 'multipleGames':
-                response = `Hey <@${authorId}>,\n` +
-                    `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n` +
-                    `If you do this, add the word "ID" after the filter, as an extra direction.`
-        }
-        return response;
-    }
-
     invite(game) {
         let response = this.baseResponse();
         response = response
@@ -256,16 +237,6 @@ module.exports = class ReponseService {
             response = response.addFields(
                 { name: "Time per Turn", value: game.settings.gameTime.turnJumps + "hours", inline: true }//next line
             );
-        }
-        return response;
-    }
-
-    async inviteError(authorId, reason) {
-        let response = `Hey @<${authorId}>,`
-        switch (reason) {
-            case 'noGame':
-                response += "It seems like the game you wanted to invite people to was not found, check if you used the correct link.\n" +
-                    "If you belief this is a bug, please contact @Tristanvds#9505"
         }
         return response;
     }
@@ -298,16 +269,6 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async leaderboard_globalError(authorId, reason) {
-        let response = `Hey @<${authorId}>,`
-        switch (reason) {
-            case 'invalidSorter':
-                response += 'The filter you specified is not on the list, make sure to check your sorter.\n' +
-                    'If you belief this is a bug, contact Tristanvds#9505'
-        }
-        return response;
-    }
-
     leaderboard_localPC(gameId, tick, sortingKey, position_list, username_list, sortingKey_list) {
         let response = this.baseResponse()
         response = response
@@ -334,26 +295,44 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_localError(authorId, reason) {
-        let response;
-        switch (reason) {
-            case 'noGame':
-                response = `Hey <@${authorId}>,\n` +
-                `No game was found with this name, check if you spelled it correctly`;
-                break;
-            case 'multipleGames':
-                response = `Hey <@${authorId}>,\n` +
-                    `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n` +
-                    `If you do this, add the word "ID" after the filter, as an extra direction.`
-                break;
-            case 'extraDark':
-                response = `Hey <@${authorId}>,\n` +
-                    `The game you looked up is an extra Dark Galaxy, we can't spill you the secrets of those games`;
-                break;
-            case 'notStarted':
-                response = `Hey <@${authorId}>,\n` +
-                    `The game you looked up has not started yet, we can't tell you anything about it now...`;
-        }
+    statusPC(data) {
+        let response = this.baseResponse();
+        response = response
+        .setTitle(`Status of ${data.game.settings.general.name}`)
+        .setURL(`https://solaris.games/#/game?id=${data.game._id}`)
+        .addFields(
+            { name: 'Finished?', value: data.game.state.endDate ? 'Game has ended' : 'Ongoing', inline: true }, //1
+            { name: 'Tick', value: data.game.state.tick, inline: true }, //1
+            { name: 'Living Players', value: data.alive, inline: true }, //1
+            { name: 'Stars Ranking', value: data.leaderboard.stars, inline: true }, //2
+            { name: 'Ships Ranking', value: data.leaderboard.ships, inline: true }, //2
+            { name: 'New Ships Ranking', value: data.leaderboard.newShips, inline: true }, //2
+            { name: 'Economy Ranking', value: data.leaderboard.economy, inline: true }, //3
+            { name: 'Industry Ranking', value: data.leaderboard.industry, inline: true }, //3
+            { name: 'Science Ranking', value: data.leaderboard.science, inline: true }, //3
+            { name: 'Weapons Ranking', value: data.leaderboard.weapons, inline: true }, //4
+            { name: 'Manufacturing Ranking', value: data.leaderboard.manufacturing, inline: true }, //4
+            { name: 'Specialists Ranking', value: data.leaderboard.specialists, inline: true }, //4
+        );
+        return response;
+    }
+
+    statusMobile(data) {
+        let response = this.baseResponse();
+        response = response
+        .setTitle(`Status of ${data.game.settings.general.name}`)
+        .setURL(`https://solaris.games/#/game?id=${data.game._id}`)
+        .addFields(
+            { name: 'Tick', value: data.game.state.tick },
+            { name: 'Stars Ranking', value: data.leaderboard.stars },
+            { name: 'Ships Ranking', value: data.leaderboard.ships },
+            { name: 'Economy Ranking', value: data.leaderboard.economy },
+            { name: 'Industry Ranking', value: data.leaderboard.industry },
+            { name: 'Science Ranking', value: data.leaderboard.science },
+            { name: 'Weapons Ranking', value: data.leaderboard.weapons },
+            { name: 'Manufacturing Ranking', value: data.leaderboard.manufacturing },
+            { name: 'Specialists Ranking', value: data.leaderboard.specialists }
+        );
         return response;
     }
 
@@ -490,16 +469,36 @@ module.exports = class ReponseService {
             );
         return response;
     }
-    
-    async userinfoError (authorId, reason) {
-        let response = `Hey @<${authorId}>,\n`
+
+    error (authorId, reason) {
+        let response = `Something went wrong @<${authorId}>,\n`;
         switch (reason) {
+            case 'noGame':
+                response += 'No game was found with that name, check if you used the right ID/spelled it correctly.';
+                break;
+            case 'multipleGames':
+                response += 'Multiple games were found with that name. Instead of searching by name, you can search by ID, which is in the gamelink: https://solaris.games/#/game?id="GAMEID". Make sure that when you do this, you add "ID" (without the "") behind the command.';
+                break;
             case 'noUser':
-                response += 'No user was found with this name, check if you spelled it correctly.'
+                response += 'No user was found with this name, check if you spelled the name correctly.';
                 break;
             case 'noFocus':
-                response += 'No focus was specified, make sure to add it to your command.'
+                response += 'No focus was specified, make sure to add it in the command.';
+                break;
+            case 'extraDark':
+                response += 'The game you asked about is an Extra Dark game, which means I cannot tell you anything about it.'
+                break;
+            case 'invalidSorter':
+                response += 'The sorter you specified does not exist, make sure you spelled it correctly.'
+                break;
+            case 'notStarted':
+                response += 'The game has not started yet, so no usefull information can be given about it.'
+                break;
+            default:
+                //This should never happen
+                response += 'Something horribly went wrong';
         }
+        response += '\nIf you belief this is a bug, contact Tristanvds';
         return response;
     }
 }

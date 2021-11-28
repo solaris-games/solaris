@@ -22,9 +22,6 @@ let mongo,
     publicCommandService, 
     privateCommandService;
 
-const privateCommands = {
-    // This order (alphabetical) is also the order in which the commands are propgrammed in the other js file
-}
 
 client.once('ready', () => {
     console.log('-----------------------\nBanning Hyperi0n!\n-----------------------');
@@ -66,8 +63,8 @@ async function executeCommand(msg) {
             await publicCommandService[command.cmd](msg, command.directions);
         }
     } else {
-        if (privateCommands[command.cmd]) {
-            await privateCommands[command.cmd](msg, command.directions);
+        if (privateCommandService[command.cmd]) {
+            await privateCommandService[command.cmd](msg, command.directions);
         }
     }
 }

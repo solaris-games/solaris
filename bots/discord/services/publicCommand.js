@@ -19,7 +19,7 @@ module.exports = class PublicCommandService {
             try {
                 game = await this.gameService.getByIdAllLean(directions[0])
             } catch (err) {
-                return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
             }
 
             focus = directions[directions.length - 2]
@@ -38,13 +38,13 @@ module.exports = class PublicCommandService {
         let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
 
         if (!focusArray.includes(focus)) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noFocus'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
         }
 
         if (!game || (Array.isArray(game) && !game.length)) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
         } else if (Array.isArray(game) && game.length > 1) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
         }
 
         if (Array.isArray(game)) {
@@ -99,13 +99,13 @@ module.exports = class PublicCommandService {
             let game = await this.gameService.getByIdSettingsLean(gameId)
 
             if (!game) {
-                return msg.channel.send(this.botResponseService.inviteError(msg.author.id, 'noGame'));
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
             }
 
             let response = this.botResponseService.invite(game);
             msg.channel.send(response);
         } else {
-            return msg.channel.send(this.botResponseService.inviteError(msg.author.id, 'noGame'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
         }
     }
 
@@ -128,13 +128,7 @@ module.exports = class PublicCommandService {
         let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed', 'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost', 'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed', 'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received', 'ships gifted', 'ships-received', 'renown-sent', 'elo-rating'];
         
         if(!sorterArray.includes(sortingKey)){
-            return msg.channel.send(this.botResponseService.leaderboard_globalError(msg.author.id, 'invalidSorter'));
-        }
-
-        //Here be dragons
-        const getNestedObject = (nestedObj, pathArr) => {
-            return pathArr.reduce((obj, key) =>
-                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidSorter'));
         }
 
         const generateLeaderboard = async (page, isPC) => {
@@ -152,7 +146,7 @@ module.exports = class PublicCommandService {
                     if (!leaderboard[i]) { break; }
                     position_list += (leaderboard[i].position + (page - 1) * 20) + "\n";
                     username_list += leaderboard[i].username + "\n";
-                    sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+                    sortingKey_list += this.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
                 }
                 let response = this.botResponseService.leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list)
                 return response;
@@ -161,7 +155,7 @@ module.exports = class PublicCommandService {
             let data_list = "";
             for (let i = 0; i<leaderboard.length; i++) {
                 if(!leaderboard[i]) { break; }
-                data_list += (leaderboard[i].position + (page - 1) * 20) + ' / ' + getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
+                data_list += (leaderboard[i].position + (page - 1) * 20) + ' / ' + this.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
             }
             let response = this.botResponseService.leaderboard_globalMobile(page, sortingKey, data_list);
             return response;
@@ -248,18 +242,18 @@ module.exports = class PublicCommandService {
         let response;
         
         if (!game.length) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
         } else if (game.length > 1) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
         }
 
         game = game[0];
 
         if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
-            return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
         }
         if (!game.state.startDate) {
-            return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
         }
 
         //getting the info from a game that may be public for sure, so we cant accidently spill all the secrets
@@ -277,17 +271,12 @@ module.exports = class PublicCommandService {
         let sortingKey_list = "";
         let phone_list = "";
 
-        const getNestedObject = (nestedObj, pathArr) => {
-            return pathArr.reduce((obj, key) =>
-                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
-        }
-
         //creating the rankings so it fits in one message
         for (let i = 0; i < leaderboard.length; i++) {
             position_list += (i + 1) + "\n";
             username_list += leaderboard[i].player.alias + "\n";
-            sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
-            phone_list += (i + 1) + ' / ' + getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
+            sortingKey_list += this.getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
+            phone_list += (i + 1) + ' / ' + this.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
         }
 
         let isPC = true;
@@ -325,6 +314,71 @@ module.exports = class PublicCommandService {
         });
     }
 
+    async status(msg, directions) {
+        let game;
+        if (directions[directions.length - 1] == "ID") {
+            game = await this.gameService.getByIdAllLean(directions[0])
+        } else {
+            let game_name = "";
+            for (let i = 0; i < directions.length; i++) {
+                game_name += directions[i] + ' ';
+            }
+            game_name = game_name.trim()
+            game = await this.gameService.getByNameStateSettingsLean(game_name);
+        }
+
+        if (!game.length) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+        } else if (game.length > 1) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+        }
+
+        game = game[0];
+
+        if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
+        }
+        if (!game.state.startDate) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
+        }
+
+        let gameId = game._id;
+        let gameTick = game.state.tick;
+        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
+        let fullGame = await this.gameService.getById(gameId); //Treat with extreme care, this may not be given to any player in full, it is used to calculate total infrastructure
+
+        const generateResponse = async isPC => {
+            if (isPC) {
+                return 'statusPC';
+            }
+            return 'statusMobile';
+        }
+
+        let leaderboardData = {
+            stars: this.leaderboardService.getLeaderboardRankings(game, 'stars'),
+            ships: this.leaderboardService.getLeaderboardRankings(game, 'ships'),
+            newShips: this.leaderboardService.getLeaderboardRankings(game, 'newShips'),
+            economy: this.leaderboardService.getLeaderboardRankings(fullGame, 'economy'), //This calculates the total infrastructure, and since it isn't extra dark that isnt hidden. Though fullGame must be treated with care
+            industry: this.leaderboardService.getLeaderboardRankings(fullGame, 'industry'), //same as ^^^
+            science: this.leaderboardService.getLeaderboardRankings(fullGame, 'science'), //same as ^^^
+            weapons: this.leaderboardService.getLeaderboardRankings(game, 'weapons'),
+            manufacturing: this.leaderboardService.getLeaderboardRankings(game, 'manufacturing'),
+            specialists: this.leaderboardService.getLeaderboardRankings(game, 'specialists')
+        }
+        let alive = game.galaxy.players.reduce((val, player) => player.afk || player.defeated ? val : val + 1, 0)
+        let leaderboard = {};
+        let leaderboardSize = game.settings.general.playerLimit <= 3 ? game.settings.general.playerLimit : 3;
+        for(let [key, value] of Object.entries(leaderboardData)){
+            leaderboard[key] = ""
+            for(let i = 0; i < leaderboardSize; i++) {
+                leaderboard[key] += await this.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
+            }
+        }
+        let data = {game, leaderboard, alive};
+        let isPC = true;
+        msg.channel.send(await this.botResponseService[await generateResponse(isPC)](data)).then(message => this.PCorMobile(message, msg, isPC, generateResponse, data));
+    }
+
     async userinfo(msg, directions) {
         //$userinfo <username> <focus>
 
@@ -334,7 +388,7 @@ module.exports = class PublicCommandService {
         let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
 
         if (!focusArray.includes(focus)) {
-            return msg.channel.send(this.botResponseService.userinfoError(msg.author.id, 'noFocus'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
         }
 
         let username = "";
@@ -344,7 +398,7 @@ module.exports = class PublicCommandService {
         username = username.trim();
 
         if (!(await this.userService.usernameExists(username))) {
-            return msg.channel.send(this.botResponseService.userinfoError(msg.author.id, 'noUser'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noUser'));
         }
 
         let user = await this.userService.getByUsernameAchievementsLean(username);
@@ -386,5 +440,36 @@ module.exports = class PublicCommandService {
                 });
             });
         });
+    }
+
+    async PCorMobile(botMessage, userMessage, isPC, responseFunction, responseData) {
+        try {
+            botMessage.react('📱');
+        } catch (error) {
+            console.log('One of the emojis failed to react:', error);
+        }
+
+        const collector = botMessage.createReactionCollector(
+            (reaction, user) => (reaction.emoji.name === '📱') && (user.id === userMessage.author.id), { time: 60000 }
+        )
+
+        collector.on('collect', () => {
+            botMessage.reactions.removeAll().then(async () => {
+                isPC = !isPC
+                let editedResponse = this.botResponseService[await responseFunction(isPC)](responseData);
+                botMessage.edit(editedResponse);
+
+                try {
+                    botMessage.react('📱');
+                } catch (error) {
+                    console.log('One of the emojis failed to react:', error);
+                }
+            })
+        });
+    }
+
+    async getNestedObject(nestedObj, pathArr) {
+        return pathArr.reduce((obj, key) =>
+            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
     }
 }
