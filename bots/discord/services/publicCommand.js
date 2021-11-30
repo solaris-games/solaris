@@ -1,8 +1,9 @@
 module.exports = class PublicCommandService {
 
-    constructor(botResponseService, gameGalaxyService, gameService, leaderboardService, userService) {
-        this.botResponseService = botResponseService
-        this.gameGalaxyService = gameGalaxyService
+    constructor(botResponseService, botHelperService, gameGalaxyService, gameService, leaderboardService, userService) {
+        this.botResponseService = botResponseService;
+        this.botHelperService = botHelperService;
+        this.gameGalaxyService = gameGalaxyService;
         this.gameService = gameService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
@@ -125,17 +126,20 @@ module.exports = class PublicCommandService {
         let leaderboardSize = await this.userService.getUserCount();
         let pageCount = Math.ceil(leaderboardSize / 20)
 
-        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed', 'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost', 'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed', 'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received', 'ships gifted', 'ships-received', 'renown-sent', 'elo-rating'];
+        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed', 'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost', 'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed', 'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received', 'ships-gifted', 'ships-received', 'renown-sent', 'elo-rating'];
         
         if(!sorterArray.includes(sortingKey)){
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidSorter'));
         }
 
-        const generateLeaderboard = async (page, isPC) => {
+        const generateLeaderboard = async (object) => {
+            let page = object.page;
+            let isPC = object.isPC;
+            let key = object.sortingKey
             //determining the message that has to be sent with the given input
             let limit = 20
-            let skip = 20 * (page - 1)
-            let result = await this.leaderboardService.getLeaderboard(limit, sortingKey, skip);
+            let skip = 20 * page // Page 0 is the first page
+            let result = await this.leaderboardService.getLeaderboard(limit, key, skip);
             let leaderboard = result.leaderboard;
             if(isPC){
                 //Generates the response if the response has to be in a format readable to PC users
@@ -144,75 +148,25 @@ module.exports = class PublicCommandService {
                 let sortingKey_list = "";
                 for (let i = 0; i < leaderboard.length; i++) {
                     if (!leaderboard[i]) { break; }
-                    position_list += (leaderboard[i].position + (page - 1) * 20) + "\n";
+                    position_list += (leaderboard[i].position + page * 20) + "\n";
                     username_list += leaderboard[i].username + "\n";
-                    sortingKey_list += this.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+                    sortingKey_list += this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
                 }
                 let response = this.botResponseService.leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list)
                 return response;
             }
-            //This only runs now if the response is for mobile
+            //This only runs now if the response is for mobile/tablet users
             let data_list = "";
             for (let i = 0; i<leaderboard.length; i++) {
                 if(!leaderboard[i]) { break; }
-                data_list += (leaderboard[i].position + (page - 1) * 20) + ' / ' + this.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
+                data_list += (leaderboard[i].position + page * 20) + ' / ' + this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
             }
             let response = this.botResponseService.leaderboard_globalMobile(page, sortingKey, data_list);
             return response;
         }
 
         let isPC = true;
-        msg.channel.send(await generateLeaderboard(1, isPC)).then(async message => {
-            //reacting with the appropriate reactions so a player can move to the next page
-            try {
-                await message.react('➡️')
-                await message.react('⏩')
-                await message.react('📱')
-            } catch (error) {
-                console.log('One of the emojis failed to react:', error);
-            }
-            const collector = message.createReactionCollector(
-                //defining the collector so it only responds to reactions of the right person and the right reaction
-                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩', '📱'].includes(reaction.emoji.name) && user.id == msg.author.id, { time: 60000 }
-            )
-
-
-            let currentPage = 1
-            collector.on('collect', reaction => {
-                //removing all reactions after one was added by the right person
-                message.reactions.removeAll().then(async () => {
-                    //determining which reaction was added, and what change has to be made to the page number
-                    switch (reaction.emoji.name) {
-                        case '⏪':
-                            currentPage -= 5 // TODO: This should go to page 1?
-                            break;
-                        case '⬅️':
-                            currentPage -= 1
-                            break;
-                        case '➡️':
-                            currentPage += 1
-                            break;
-                        case '⏩':
-                            currentPage += 5 // TODO: This should go to the last page?
-                            break;
-                        default:
-                            //📱
-                            isPC = !isPC;
-
-                    }
-                    if (currentPage < 1) currentPage = 1;
-                    if (currentPage > pageCount) currentPage = pageCount;
-                    //editing the existing message so the new page is displayed for the discord user
-                    message.edit(await generateLeaderboard(currentPage, isPC));
-                    //adding the reactions so the player can go to another page from here
-                    if (currentPage > 2) await message.react('⏪');
-                    if (currentPage != 1) await message.react('⬅️');
-                    if (currentPage != pageCount) await message.react('➡️');
-                    if (currentPage < pageCount - 1) await message.react('⏩');
-                    await message.react('📱');
-                });
-            });
-        });
+        msg.channel.send(await generateLeaderboard({page:1, isPC, sortingKey})).then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, generateLeaderboard, {page: 1, isPC, sortingKey}, true));
     }
 
     async leaderboard_local(msg, directions) {
@@ -275,8 +229,8 @@ module.exports = class PublicCommandService {
         for (let i = 0; i < leaderboard.length; i++) {
             position_list += (i + 1) + "\n";
             username_list += leaderboard[i].player.alias + "\n";
-            sortingKey_list += this.getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
-            phone_list += (i + 1) + ' / ' + this.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
+            sortingKey_list += this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
+            phone_list += (i + 1) + ' / ' + this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
         }
 
         let isPC = true;
@@ -370,7 +324,7 @@ module.exports = class PublicCommandService {
         for(let [key, value] of Object.entries(leaderboardData)){
             leaderboard[key] = ""
             for(let i = 0; i < leaderboardSize; i++) {
-                leaderboard[key] += await this.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
+                leaderboard[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
             }
         }
         let data = {game, leaderboard, alive};
@@ -465,10 +419,5 @@ module.exports = class PublicCommandService {
                 }
             })
         });
-    }
-
-    async getNestedObject(nestedObj, pathArr) {
-        return pathArr.reduce((obj, key) =>
-            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
     }
 }

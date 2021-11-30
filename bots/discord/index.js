@@ -7,6 +7,7 @@ const mongooseLoader = require('../../server/loaders/mongoose.js');
 const containerLoader = require('../../server/loaders/container.js');
 
 const BotResponseService = require('./services/response.js')
+const BotHelperService = require('./services/botHelper.js')
 const CommandService = require('./services/command.js')
 const ReactionService = require('./services/reaction.js')
 const PublicCommandService = require('./services/publicCommand.js')
@@ -17,6 +18,7 @@ const prefix = process.env.BOT_PREFIX || '$';
 let mongo,
     container,
     botResponseService,
+    botHelperService,
     commandService,
     reactionService,
     publicCommandService, 
@@ -73,9 +75,10 @@ async function startup() {
     container = containerLoader({}, null);
 
     botResponseService = new BotResponseService();
+    botHelperService = new BotHelperService();
     commandService = new CommandService();
     reactionService = new ReactionService();
-    publicCommandService = new PublicCommandService(botResponseService, 
+    publicCommandService = new PublicCommandService(botResponseService, botHelperService,
         container.gameGalaxyService, container.gameService, 
         container.leaderboardService, container.userService);
     privateCommandService = new PrivateCommandService();
