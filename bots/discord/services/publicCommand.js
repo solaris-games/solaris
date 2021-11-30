@@ -36,9 +36,15 @@ module.exports = class PublicCommandService {
             focus = directions[directions.length - 1]
         }
 
-        let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
+        let focusObject = {
+            general: 0,
+            galaxy: 1,
+            player: 2,
+            technology: 3,
+            time: 4
+        };
 
-        if (!focusArray.includes(focus)) {
+        if (!Object.keys(focusObject).includes(focus)) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
         }
 
@@ -52,41 +58,14 @@ module.exports = class PublicCommandService {
             game = game[0];
         }
 
-        let response = this.botResponseService.gameinfo(game, focus);
-
-        msg.channel.send(response).then(async message => {
-            try {
-                await message.react('⬅️')
-                await message.react('➡️')
-            } catch (error) {
-                console.log('One of the emojis failed to react:', error);
+        const responseFunction = (responseData) => {
+            if(responseData.isPC) {
+                return this.botResponseService.gameinfoPC;
             }
-            const collector = message.createReactionCollector(
-                //checking if the response was from the right person and with the right response
-                (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === msg.author.id, { time: 60000 }
-            );
+            return this.botResponseService.gameinfoMobile;
+        }
 
-            let currentPage = focusArray.indexOf(focus);
-            collector.on('collect', reaction => {
-                //remove all reactions to add the correct ones after the edit
-                message.reactions.removeAll().then(async () => {
-                    //checking what change has to be made to the current message
-                    reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
-                    if (currentPage < 0) currentPage = 4;
-                    if (currentPage > 4) currentPage = 0;
-
-                    let editedResponse = this.botResponseService.gameinfo(game, focusArray[currentPage]);
-
-                    message.edit(editedResponse);
-                    try {
-                        await message.react('⬅️')
-                        await message.react('➡️')
-                    } catch (error) {
-                        console.log('One of the emojis failed to react:', error);
-                    }
-                });
-            });
-        });
+        msg.channel.send(response).then(async message => this.botHelperService.multiPage(message, msg, focusObject.length, true, responseFunction, {game, page: focusObject[focus]}, true));
     }
 
     async invite(msg, directions) {
@@ -166,7 +145,7 @@ module.exports = class PublicCommandService {
         }
 
         let isPC = true;
-        msg.channel.send(await generateLeaderboard({page:1, isPC, sortingKey})).then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, generateLeaderboard, {page: 1, isPC, sortingKey}, true));
+        msg.channel.send(await generateLeaderboard({page:0, isPC, sortingKey})).then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, generateLeaderboard, {page: 0, isPC, sortingKey}, true));
     }
 
     async leaderboard_local(msg, directions) {
@@ -215,57 +194,35 @@ module.exports = class PublicCommandService {
         let gameTick = game.state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
-        //getting the local leaderboards for our chosen sortingkey
-        let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
-        let leaderboard = leaderboardReturn.leaderboard;
-        let fullKey = leaderboardReturn.fullKey;
-
-        let position_list = "";
-        let username_list = "";
-        let sortingKey_list = "";
-        let phone_list = "";
-
-        //creating the rankings so it fits in one message
-        for (let i = 0; i < leaderboard.length; i++) {
-            position_list += (i + 1) + "\n";
-            username_list += leaderboard[i].player.alias + "\n";
-            sortingKey_list += this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
-            phone_list += (i + 1) + ' / ' + this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
-        }
-
-        let isPC = true;
-        response = this.botResponseService.leaderboard_localPC(gameId, game.state.tick, filter, position_list, username_list, sortingKey_list);
-
-        msg.channel.send(response).then(async message => {
-            try {
-                message.react('📱');
-            } catch (error) {
-                console.log('One of the emojis failed to react:', error);
+        const responseFunction = (responseData) => {
+            let game = responseData.game;
+            let filter = responseData.filter;
+            let isPC = responseData.isPC;
+            let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
+            let leaderboard = leaderboardReturn.leaderboard;
+            let fullKey = leaderboardReturn.fullKey;
+            //creating the rankings so it fits in one message
+            if(isPC) {
+                let position_list = "";
+                let username_list = "";
+                let sortingKey_list = "";
+                for (let i = 0; i < leaderboard.length; i++) {
+                    position_list += (i + 1) + "\n";
+                    username_list += leaderboard[i].player.alias + "\n";
+                    sortingKey_list += this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
+                }
+                return this.botResponseService.leaderboard_localPC(game._id, game.state.tick, filter, position_list, username_list, sortingKey_list);
+            } else {
+                let data_list = "";
+                for (let i = 0; i < leaderboard.length; i++) {
+                    data_list += (i + 1) + ' / ' + this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
+                }
+                return this.botResponseService.leaderboard_localMobile(game._id, game.state.tick, filter, data_list);
             }
+        }        
 
-            const collector = message.createReactionCollector(
-                (reaction, user) => (reaction.emoji.name === '📱') && (user.id === msg.author.id), { time: 60000 }
-            )
-
-            collector.on('collect', () => {
-                message.reactions.removeAll().then(async () => {
-                    isPC = !isPC
-                    if (isPC) {
-                        let editedResponse = this.botResponseService.leaderboard_localPC(gameId, game.state.tick, filter, position_list, username_list, sortingKey_list);
-                        message.edit(editedResponse);
-                    } else {
-                        let editedResponse = this.botResponseService.leaderboard_localMobile(gameId, game.state.tick, filter, phone_list);
-                        message.edit(editedResponse);
-                    }
-
-                    try {
-                        message.react('📱')
-                    } catch (error) {
-                        console.log('One of the emojis failed to react:', error);
-                    }
-                })
-            })
-        });
+        let isPC = true; //Standard for now, as you define this with a reaction after the message has been sent
+        msg.channel.send(await responseFunction({game, filter, isPC})).then(async message => this.botHelperService.PCorMobile(message, msg, isPC, responseFunction, {game, filter, isPC}));
     }
 
     async status(msg, directions) {
@@ -300,11 +257,12 @@ module.exports = class PublicCommandService {
         let gameTick = game.state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
-        const generateResponse = async isPC => {
+        const generateResponse = async (responseData) => {
+            let isPC = responseData.isPC;
             if (isPC) {
-                return 'statusPC';
+                return this.botResponseService.statusPC(responseData);
             }
-            return 'statusMobile';
+            return this.botResponseService.statusMobile(responseData);
         }
 
         let leaderboardData = {
@@ -327,9 +285,10 @@ module.exports = class PublicCommandService {
                 leaderboard[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
             }
         }
-        let data = {game, leaderboard, alive};
+
         let isPC = true;
-        msg.channel.send(await this.botResponseService[await generateResponse(isPC)](data)).then(message => this.PCorMobile(message, msg, isPC, generateResponse, data));
+        let data = {game, leaderboard, alive, isPC};
+        msg.channel.send(await generateResponse(data)).then(message => this.PCorMobile(message, msg, generateResponse, data));
     }
 
     async userinfo(msg, directions) {

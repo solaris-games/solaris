@@ -15,15 +15,15 @@ module.exports = class ReponseService {
 
     gameinfo(game, type) {
         switch (type) {
-            case 'general':
+            case 0: //General
                 return this.gameinfoGeneral(game);
-            case 'galaxy':
+            case 1: //Galaxy
                 return this.gameinfoGalaxy(game);
-            case 'player':
+            case 2: //Player
                 return this.gameinfoPlayer(game);
-            case 'technology':
+            case 3: //Technology
                 return this.gameinfoTechnology(game);
-            case 'time':
+            case 4: //Time
                 return this.gameinfoTime(game);
             default:
                 throw new Error('Unknown type: ' + type);

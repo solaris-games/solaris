@@ -9,7 +9,8 @@ module.exports = class BotHelperService {
             (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
     }
 
-    async PCorMobile(botMessage, userMessage, isPC, responseFunction, responseData) {
+    PCorMobile(botMessage, userMessage, responseFunction, responseData) {
+        let isPC = true;
         try {
             botMessage.react('📱');
         } catch (error) {
@@ -22,8 +23,9 @@ module.exports = class BotHelperService {
 
         collector.on('collect', () => {
             botMessage.reactions.removeAll().then(async () => {
-                isPC = !isPC
-                let editedResponse = this.botResponseService[await responseFunction(isPC)](responseData);
+                isPC = !isPC;
+                responseData.isPC = isPC;
+                let editedResponse = await responseFunction(responseData);
                 botMessage.edit(editedResponse);
 
                 try {
@@ -35,7 +37,7 @@ module.exports = class BotHelperService {
         });
     }
 
-    async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true) {
+    async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true /*A variable as long as not all functions have a mobile version*/) {
         let pageNumber = 0;
         let isPC = true;
         this.reactPages(botMessage, looping, pageNumber, pageCount, checkPC);
@@ -82,6 +84,8 @@ module.exports = class BotHelperService {
                     }
                 }
 
+                responseData.isPC = isPC;
+                responseData.page = currentPage;
                 let editedResponse = await responseFunction(responseData) //TODO Fix and complete
                 botMessage.edit(editedResponse)
 
