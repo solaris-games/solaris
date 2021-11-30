@@ -222,13 +222,13 @@
           </div>
         </div>
 
-        <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="canBuildWarpGates">
+        <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="(canBuildWarpGates && !star.warpGate) || (canDestroyWarpGates && star.warpGate)">
           <div class="col-8">
             <p class="mb-2">Build a Warp Gate to accelerate carrier movement.</p>
           </div>
           <div class="col-4">
-            <modalButton v-if="!star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-            <modalButton v-if="star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
+            <modalButton v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+            <modalButton v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
           </div>
         </div>
 
@@ -302,6 +302,7 @@ export default {
       userPlayer: null,
       currentPlayerId: null,
       canBuildWarpGates: false,
+      canDestroyWarpGates: false,
       isSpecialistsEnabled: false,
       isStandardUIStyle: false,
       isCompactUIStyle: false
@@ -314,6 +315,7 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
+    this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
     
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
