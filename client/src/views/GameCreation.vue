@@ -312,7 +312,7 @@
       </div>
 
       <div class="form-group">
-        <label for="splitResources" class="col-form-label">Split Resources</label>
+        <label for="splitResources" class="col-form-label">Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></label>
         <select class="form-control" id="splitResources" v-model="settings.specialGalaxy.splitResources" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.splitResources" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}

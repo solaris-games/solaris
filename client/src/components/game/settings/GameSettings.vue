@@ -159,7 +159,7 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
           </tr>
           <tr v-if="game.settings.specialGalaxy.splitResources">
-            <td>Split Resources</td>
+            <td>Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.splitResources) }}</td>
           </tr>
           <tr>
