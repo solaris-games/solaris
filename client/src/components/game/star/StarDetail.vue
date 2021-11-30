@@ -45,14 +45,7 @@
     <div v-if="isCompactUIStyle && star.infrastructure">
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
-          <span v-if="!splitResources" title="Natural Resources">
-            <i class="fas fa-globe"></i>
-            {{star.naturalResources == null ? '???' : naturalResources}}
-          </span>
-          <span v-if="splitResources" title="Natural Resources: Economy / Industry / Science">
-            <i class="fas fa-globe"></i>
-            {{star.naturalResources == null ? '???' : naturalResources}}
-          </span>
+            <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :iconAlignLeft="true" />
         </div>
         <div class="col-auto">
           <span v-if="star.isNebula" title="Star is obscured inside a nebula - All ship counts are hidden from other players">
@@ -64,21 +57,6 @@
           <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
             <i class="far fa-sun ml-1"></i>
           </span>
-        </div>
-      </div>
-
-      <div class="row mt-2" v-if="!isDeadStar">
-        <div class="col">
-          <span v-if="!splitResources" title="Terraformed Resources">
-            <i class="fas fa-globe"></i>
-            {{star.terraformedResources == null ? '???' : terraformedResources}}
-          </span>
-          <span v-if="splitResources" title="Terraformed Resources: Economy / Industry / Science">
-            <i class="fas fa-globe"></i>
-            {{star.terraformedResources == null ? '???' : terraformedResources}}
-          </span>
-        </div>
-        <div class='col-auto'>
           <span v-if="star.isBlackHole" title="Black Hole - The star has +3 scanning range">
             <i class="far fa-circle ml-1"></i>
           </span>
@@ -156,7 +134,8 @@
               Ships
           </div>
           <div class="col text-right">
-              {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ml-1"></i>
+            <span>{{star.ships == null ? '???' : star.ships}}</span>
+            <i class="fas fa-rocket ml-2"></i>
           </div>
       </div>
 
@@ -165,7 +144,7 @@
               Natural Resources
           </div>
           <div class="col text-right">
-              {{star.naturalResources == null ? '???' : naturalResources}} <i class="fas fa-globe ml-1"></i>
+              <star-resources :resources="star.naturalResources" :iconAlignLeft="false" />
           </div>
       </div>
 
@@ -174,7 +153,7 @@
               Terraformed Resources
           </div>
           <div class="col text-right">
-              {{star.terraformedResources == null ? '???' : terraformedResources}} <i class="fas fa-globe ml-1"></i>
+              <star-resources :resources="star.terraformedResources" :iconAlignLeft="false" />
           </div>
       </div>
     </div>
@@ -298,6 +277,7 @@ import SpecialistIconVue from '../specialist/SpecialistIcon'
 import GameContainer from '../../../game/container'
 import gameHelper from '../../../services/gameHelper'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
+import StarResourcesVue from './StarResources'
 
 export default {
   components: {
@@ -309,7 +289,8 @@ export default {
     'dialogModal': DialogModal,
     'star-specialist': StarSpecialistVue,
     'specialist-icon': SpecialistIconVue,
-    'ignore-bulk-upgrade': IgnoreBulkUpgradeVue
+    'ignore-bulk-upgrade': IgnoreBulkUpgradeVue,
+    'star-resources': StarResourcesVue
   },
   props: {
     starId: String
@@ -323,8 +304,7 @@ export default {
       canDestroyWarpGates: false,
       isSpecialistsEnabled: false,
       isStandardUIStyle: false,
-      isCompactUIStyle: false,
-      splitResources: false
+      isCompactUIStyle: false
     }
   },
   mounted () {
@@ -336,7 +316,6 @@ export default {
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
     
-    this.splitResources = GameHelper.isSplitResources(this.$store.state.game)
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
@@ -478,24 +457,6 @@ export default {
       }
 
       return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
-    },
-    naturalResources: function() {
-      if  (!this.splitResources) {
-        return Math.floor(this.star.naturalResources.economy);
-      }
-      let economy = this.star.naturalResources.economy;
-      let industry = this.star.naturalResources.industry;
-      let science = this.star.naturalResources.science;
-      return economy + ' / ' + industry + ' / ' + science;
-    },
-    terraformedResources: function() {
-      if  (!this.splitResources) {
-        return Math.floor(this.star.terraformedResources.economy);
-      }
-      let economy = this.star.terraformedResources.economy;
-      let industry = this.star.terraformedResources.industry;
-      let science = this.star.terraformedResources.science;
-      return economy + ' / ' + industry + ' / ' + science;
     }
   }
 }

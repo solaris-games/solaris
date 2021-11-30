@@ -936,7 +936,7 @@ class GameHelper {
   }
 
   isSplitResources(game) {
-    return game.settings.specialGalaxy.splitResources;
+    return game.settings.specialGalaxy.splitResources === 'enabled';
   }
 
   isInGuild (guild, userId) {

@@ -3,7 +3,7 @@ const ValidationError = require("../errors/validation");
 module.exports = class MapService {
 
     constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService) {
+        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
@@ -13,6 +13,7 @@ module.exports = class MapService {
         this.doughnutMapService = doughnutMapService;
         this.circularBalancedMapService = circularBalancedMapService;
         this.irregularMapService = irregularMapService;
+        this.gameTypeService = gameTypeService;
     }
 
     generateStars(game, starCount, playerLimit) {
@@ -88,12 +89,12 @@ module.exports = class MapService {
 
         // If worm holes are enabled, assign random warp gates to start as worm hole pairs
         if (game.settings.specialGalaxy.randomWormHoles) {
-            this.generateWormHoles(game, stars, playerCount, game.settings.specialGalaxy.randomWormHoles);
+            this.generateWormHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWormHoles);
         }
 
         // If nebulas are enabled, assign random nebulas to start
         if (game.settings.specialGalaxy.randomNebulas) {
-            this.generateNebulas(game, stars, playerCount, game.settings.specialGalaxy.randomNebulas);
+            this.generateNebulas(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomNebulas);
         }
 
         // If asteroid fields are enabled, assign random asteroid fields to start
@@ -103,7 +104,7 @@ module.exports = class MapService {
 
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
-            this.generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
+            this.generateBlackHoles(game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
         }
     }
 
@@ -132,7 +133,7 @@ module.exports = class MapService {
             let starA = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
             let starB = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
 
-            // Check validity of the ramdom selection.
+            // Check validity of the random selection.
             if (starA.homeStar || starB.homeStar || starA._id.equals(starB._id) || starA.wormHoleToStarId || starB.wormHoleToStarId) {
                 wormHoleCount++; // Increment because the while loop will decrement.
             } else {
@@ -140,7 +141,7 @@ module.exports = class MapService {
                 starB.wormHoleToStarId = starA._id;
 
                 // Overwrite natural resources if splitResources
-                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                if (this.gameTypeService.isSplitResources(game)) {
                     let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
                     let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
@@ -164,7 +165,7 @@ module.exports = class MapService {
                 star.isNebula = true;
 
                 // Overwrite natural resources if splitResources
-                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                if (this.gameTypeService.isSplitResources(game)) {
                     let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
                     let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
@@ -191,10 +192,11 @@ module.exports = class MapService {
                 let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
                 // Overwrite natural resources
-                if (game.settings.specialGalaxy.splitResources === 'enabled') {
+                if (this.gameTypeService.isSplitResources(game)) {
                     star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
                 } else {
                     let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+
                     star.naturalResources = {
                         economy: resources,
                         industry: resources,
@@ -216,6 +218,7 @@ module.exports = class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isBlackHole = true;
+
                 star.naturalResources = {
                     economy: 0,
                     industry: 0,

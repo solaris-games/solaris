@@ -41,8 +41,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
-        let terraformedResources = this.starService.calculateTerraformedResourcesObject(star.naturalResources, effectiveTechs.terraformedResources);
-        const averageTerraformedResources = this.calculateWarpGateTerraformedResources(terraformedResources);
+        const terraformedResources = this.starService.calculateTerraformedResources(star, effectiveTechs.terraforming);
+        const averageTerraformedResources = this.calculateAverageTerraformedResources(terraformedResources);
         const cost = this.calculateWarpGateCost(game, expenseConfig, averageTerraformedResources);
 
         if (player.credits < cost) {
@@ -177,7 +177,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Calculate how much the upgrade will cost.
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources[economyType], effectiveTechs.terraforming);
+        const terraformedResources = this.starService.calculateTerraformedResource(star.naturalResources[economyType], effectiveTechs.terraforming);
 
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
@@ -352,7 +352,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             })
             .map(s => {
                 const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-                const terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources[infrastructureType], effectiveTechs.terraforming);
+                const terraformedResources = this.starService.calculateTerraformedResource(s.naturalResources[infrastructureType], effectiveTechs.terraforming);
 
                 return {
                     star: s,
@@ -627,8 +627,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
 
 
-    calculateWarpGateTerraformedResources(terraformedResources){
-        return Math.floor((terraformedResources.economy + terraformedResources.industry + terraformedResources.science) / 3)
+    calculateAverageTerraformedResources(terraformedResources){
+        return Math.floor((terraformedResources.economy + terraformedResources.industry + terraformedResources.science) / 3);
     }
 
     calculateWarpGateCost(game, expenseConfig, terraformedResources) {
@@ -676,11 +676,12 @@ module.exports = class StarUpgradeService extends EventEmitter {
         };
 
         if (!this.starService.isDeadStar(star)) {
-            let averageTerraformedResources = this.calculateWarpGateTerraformedResources(star.terraformedResources);
+            let averageTerraformedResources = this.calculateAverageTerraformedResources(star.terraformedResources);
+
             star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources.economy);
             star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources.industry);
             star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources.science);
-            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, averageTerraformedResources); // Warpgates in split resources use the cost of industry
+            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, averageTerraformedResources); // Note: Warpgates in split resources use the average of all infrastructure.
             star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
         }
 
