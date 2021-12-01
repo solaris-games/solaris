@@ -124,7 +124,7 @@ module.exports = class MapService {
     }
 
     generateWormHoles(game, stars, playerCount, percentage) {
-        let wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Worm homes come in pairs so its half of stars
+        let wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
 
         // Pick stars at random and pair them up with another star to create a worm hole.
         while (wormHoleCount--) {
