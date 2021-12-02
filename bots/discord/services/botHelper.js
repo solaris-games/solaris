@@ -4,12 +4,12 @@ module.exports = class BotHelperService {
         this.botResponseService = botResponseService;
     }
 
-    getNestedObject(nestedObj, pathArr) {
+    async getNestedObject(nestedObj, pathArr) {
         return pathArr.reduce((obj, key) =>
             (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
     }
 
-    PCorMobile(botMessage, userMessage, responseFunction, responseData) {
+    async PCorMobile(botMessage, userMessage, responseFunction, responseData) {
         let isPC = true;
         try {
             botMessage.react('📱');
@@ -22,7 +22,8 @@ module.exports = class BotHelperService {
         )
 
         collector.on('collect', () => {
-            botMessage.reactions.removeAll().then(async () => {
+            botMessage.reactions.removeAll()
+            .then(async () => {
                 isPC = !isPC;
                 responseData.isPC = isPC;
                 let editedResponse = await responseFunction(responseData);
@@ -40,7 +41,7 @@ module.exports = class BotHelperService {
     async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true /*A variable as long as not all functions have a mobile version*/) {
         let pageNumber = 0;
         let isPC = true;
-        this.reactPages(botMessage, looping, pageNumber, pageCount, checkPC);
+        await this.reactPagesMobile(botMessage, looping, pageNumber, pageCount, checkPC);
 
         let emojiArray = looping ? ['⬅️', '➡️'] : ['⏪', '⬅️', '➡️', '⏩'];
         if(checkPC) emojiArray.push('📱')
@@ -49,8 +50,8 @@ module.exports = class BotHelperService {
             (reaction, user) => emojiArray.includes(reaction.emoji.name) && user.id === userMessage.author.id, {time: 60000}
         )
 
-        collector.on('collect', () => {
-            botMessage.reaction.removeAll().then(async () => {
+        collector.on('collect', (reaction) => {
+            botMessage.reactions.removeAll().then(async () => {
                 switch(reaction.emoji.name) {
                     case '⏪':
                         if(!looping) pageNumber -= 5;
@@ -66,17 +67,18 @@ module.exports = class BotHelperService {
                         break;
                     case '📱':
                         if(checkPC) isPC = !isPC;
+                        break;
                     default:
-                        console.log('Something broke, unidentified emoji...')
+                        console.log('Something broke, unidentified caught emoji...')
                 }
 
-                if(currentPage < 0) {
+                if(pageNumber < 0) {
                     if(looping) {
                         pageNumber = pageCount - pageNumber; //When it loops around, page -1 is the same as the last page, which is pageCount - 1
                     } else {
                         pageNumber = 0; //When it doesn't loop around, any page lower than the 0 page is the 0 page.
                     }
-                } else if(currentPage >= pageCount) {
+                } else if(pageNumber >= pageCount) {
                     if(looping) {
                         pageNumber = pageNumber%pageCount // When it loops around, the page with index pageCount is the same as the one with index 0.
                     } else {
@@ -85,16 +87,16 @@ module.exports = class BotHelperService {
                 }
 
                 responseData.isPC = isPC;
-                responseData.page = currentPage;
+                responseData.page = pageNumber;
                 let editedResponse = await responseFunction(responseData) //TODO Fix and complete
                 botMessage.edit(editedResponse)
 
-                this.reactPagesMobile(botMessage, looping, pageNumber, pageCount, checkPC);
+                await this.reactPagesMobile(botMessage, looping, pageNumber, pageCount, checkPC);
             })
         })
     }
 
-    reactPagesMobile(botMessage, looping, pageNumber, pageCount, mobileCheck) {
+    async reactPagesMobile(botMessage, looping, pageNumber, pageCount, mobileCheck) {
         try {
             if(!looping && pageNumber > 1) await botMessage.react('⏪');
             if(looping || pageNumber > 0) await botMessage.react('⬅️');

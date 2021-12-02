@@ -242,8 +242,8 @@ module.exports = class ReponseService {
     }
 
     leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list) {
-        let lowerLimit = (page - 1) * 20 + 1
-        let upperLimit = page * 20
+        let lowerLimit = page * 20 + 1
+        let upperLimit = (page + 1) * 20
         let response = this.baseResponse()
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
@@ -257,9 +257,9 @@ module.exports = class ReponseService {
     }
 
     leaderboard_globalMobile(page, sortingKey, data_list) {
-        let lowerLimit = (page - 1) * 20 + 1
-        let upperLimit = page * 20
-        let response = this.baseResponse()
+        let lowerLimit = page * 20 + 1;
+        let upperLimit = (page + 1) * 20;
+        let response = this.baseResponse();
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
@@ -336,21 +336,52 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfo(user, type) {
+    userinfo(user, type, isPC) {
+        let response;
+        let sidePages = [];
         switch (type) {
-            case 'games':
-                return this.userinfoGames(user);
-            case 'combat':
-                return this.userinfoCombat(user);
-            case 'infrastructure':
-                return this.userinfoInfrastructure(user);
-            case 'research':
-                return this.userinfoResearch(user);
-            case 'trade':
-                return this.userinfoTrade(user);
+            case 0:
+                response = this.userinfoGames(user);
+                sidePages[0] = 'Trade';
+                sidePages[1] = 'Combat';
+                break;
+            case 1:
+                response = userinfoCombat(user);
+                sidePages[0] = 'Games';
+                sidePages[1] = 'Infrastructure';
+                break;
+            case 2:
+                response = userinfoInfrastructure(user);
+                sidePages[0] = 'Combat';
+                sidePages[1] = 'Research';
+                break;
+            case 3:
+                response = userinfoResearch(user);
+                sidePages[0] = 'Infrastructure';
+                sidePages[1] = 'Trade';
+                break;
+            case 4:
+                response = userinfoTrade(user);
+                sidePages[0] = 'Research';
+                sidePages[1] = 'Games';
+                break;
             default:
                 throw new Error('Unknown type: ' + type);
         }
+        if(isPC) {
+            response = response
+            .addFields(
+                { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: sidePages[1], value: "➡️➡️➡️", inline: true }
+            )
+        } else {
+            response = response
+            .addFields(
+                {name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️"}
+            )
+        }
+        return response;
     }
 
     userinfoGames(user) {
@@ -368,10 +399,7 @@ module.exports = class ReponseService {
                 { name: "Games Defeated", value: user.achievements.defeated, inline: true },//next line
                 { name: "Games Quit", value: user.achievements.quit, inline: true },
                 { name: "Games AFK", value: user.achievements.afk, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Trade", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Combat", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -393,10 +421,7 @@ module.exports = class ReponseService {
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
                 { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },
                 { name: "Capitals Lost", value: user.achievements.combat.homeStars.lost, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Games", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Infrastructure", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -416,10 +441,7 @@ module.exports = class ReponseService {
                 { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true },//next line
                 { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Combat", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Research", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -439,10 +461,7 @@ module.exports = class ReponseService {
                 { name: "Banking", value: user.achievements.research.banking, inline: true },//next line
                 { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true },
                 { name: "Specialists", value: user.achievements.research.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Infrastructure", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Trade", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -462,16 +481,13 @@ module.exports = class ReponseService {
                 { name: "Technologies Received", value: user.achievements.trade.technologyReceived, inline: true },//next line
                 { name: "Ships Gifted", value: user.achievements.trade.giftsSent, inline: true },
                 { name: "Ships Recieved", value: user.achievements.trade.giftsReceived, inline: true },
-                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true },//next line
-                { name: "Research", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Games", value: "➡️➡️➡️", inline: true }
+                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true }
             );
         return response;
     }
 
     error (authorId, reason) {
-        let response = `Something went wrong @<${authorId}>,\n`;
+        let response = `Something went wrong <@${authorId}>,\n`;
         switch (reason) {
             case 'noGame':
                 response += 'No game was found with that name, check if you used the right ID/spelled it correctly.';
