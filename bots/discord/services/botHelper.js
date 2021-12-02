@@ -4,12 +4,11 @@ module.exports = class BotHelperService {
         this.botResponseService = botResponseService;
     }
 
-    async isValidID(id) {
+    isValidID(id) {
         let characters = id.split('')
         const allowedCharacters = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
-        let validCharacters = characters.reduce( (preVal, curVal) => preVal && allowedCharacters.includes(curVal), true);
+        let validCharacters = characters.reduce((preVal, curVal) => preVal && allowedCharacters.includes(curVal), true);
 
-        console.log(validCharacters && id.length === 24)
         return validCharacters && id.length === 24;
     }
 
@@ -19,6 +18,8 @@ module.exports = class BotHelperService {
     }
 
     async PCorMobile(botMessage, userMessage, responseFunction, responseData) {
+        // TODO: I'd be really interested to see whether this variable stays in scope 
+        // when more than 1 command is being reacted to at or near the same time. I expect there might be concurrency issue here?
         let isPC = true;
         try {
             botMessage.react('📱');
@@ -47,6 +48,7 @@ module.exports = class BotHelperService {
         });
     }
 
+    // TODO: Should this be in the responseService? Or maybe a reactService?
     async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true /*A variable as long as not all functions have a mobile version*/) {
         let pageNumber = responseData.page || 0;
         let isPC = true;
@@ -105,6 +107,7 @@ module.exports = class BotHelperService {
         })
     }
 
+    // TODO: Should this be in the responseService? Or maybe a reactService?
     async reactPagesMobile(botMessage, looping, pageNumber, pageCount, mobileCheck) {
         try {
             if(!looping && pageNumber > 1) await botMessage.react('⏪');

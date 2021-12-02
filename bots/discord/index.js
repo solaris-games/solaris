@@ -11,7 +11,6 @@ const BotHelperService = require('./services/botHelper.js')
 const CommandService = require('./services/command.js')
 const ReactionService = require('./services/reaction.js')
 const PublicCommandService = require('./services/publicCommand.js')
-const PrivateCommandService = require('./services/privateCommand.js')
 
 const prefix = process.env.BOT_PREFIX || '$';
 
@@ -21,8 +20,7 @@ let mongo,
     botHelperService,
     commandService,
     reactionService,
-    publicCommandService, 
-    privateCommandService;
+    publicCommandService;
 
 
 client.once('ready', () => {
@@ -60,13 +58,13 @@ async function contentUnrelated(msg) {
 
 async function executeCommand(msg) {
     const command = commandService.identify(msg, prefix);
+
     if (command.type !== 'dm') {
-        if (commandService.isCorrectChannel(msg, command.cmd) && publicCommandService[command.cmd]) {
-            await publicCommandService[command.cmd](msg, command.directions).then(() => msg.delete()); //Executes the command, and then deletes the message that ordered it
-        }
-    } else {
-        if (privateCommandService[command.cmd]) {
-            await privateCommandService[command.cmd](msg, command.directions).then(() => msg.delete()); //Executes the command, and then deletes the message that ordered it
+        if (publicCommandService[command.cmd] && commandService.isCorrectChannel(msg, command.cmd)) {
+            //Executes the command, and then deletes the message that ordered it
+            await publicCommandService[command.cmd](msg, command.directions);
+
+            msg.delete();
         }
     }
 }
@@ -81,7 +79,6 @@ async function startup() {
     publicCommandService = new PublicCommandService(botResponseService, botHelperService,
         container.gameGalaxyService, container.gameService, 
         container.leaderboardService, container.userService);
-    privateCommandService = new PrivateCommandService();
 
     console.log('Container Initialized');
 
