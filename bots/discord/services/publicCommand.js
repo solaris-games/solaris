@@ -25,8 +25,7 @@ module.exports = class PublicCommandService {
 
             focus = directions[directions.length - 2]
         } else {
-            // TODO: I don't think this is going to work correctly. Games can have the same name, I think we should remove this
-            // functionality and stick with ID to simplify things.
+            // Gamename can be searched, as it is filtered for uniqueness and existance later
             if (directions.length === 1) {
                 directions.push('general');
             }
@@ -34,7 +33,7 @@ module.exports = class PublicCommandService {
                 game_name += directions[i] + ' ';
             }
             game_name = game_name.trim()
-            game = await this.gameService.getByNameSettingsLean(game_name); // TODO: The game name is not indexed in this DB so this is going to be slow as shit.
+            game = await this.gameService.getByNameSettingsLean(game_name); // Slow...
             focus = directions[directions.length - 1]
         }
 
@@ -46,7 +45,7 @@ module.exports = class PublicCommandService {
             time: 4
         };
 
-        // TODO: Can we do this check before we get the game above? Doesn't look like it depends on the game at all.
+        // Has to be filtered on here, not earlier, as focus can't be calculated if you dont
         if (!Object.keys(focusObject).includes(focus)) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
         }
@@ -54,10 +53,10 @@ module.exports = class PublicCommandService {
         if (!game || (Array.isArray(game) && !game.length)) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
         } else if (Array.isArray(game) && game.length > 1) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames')); // TODO: As mentioned above, we could probably ditch this functionality.
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
         }
 
-        if (Array.isArray(game)) { // TODO: As mentioned above, we won't need this anymore if we remove search by name.
+        if (Array.isArray(game)) {
             game = game[0];
         }
 
@@ -100,7 +99,7 @@ module.exports = class PublicCommandService {
             let response = this.botResponseService.invite(game);
             msg.channel.send(response);
         } else {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame')); // TODO: Is this the right error? Should be invalidID?
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'));
         }
     }
 
@@ -165,7 +164,7 @@ module.exports = class PublicCommandService {
         }
 
         let isPC = true;
-        msg.channel.send(await responseFunction({page:0, isPC, sortingKey})) // TODO: {page:0, isPC, sortingKey} will be a different JS object on this line than it is on the line below, could have concurrency issues here?
+        msg.channel.send(await responseFunction({page:0, isPC, sortingKey}))
             .then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, {page: 0, isPC, sortingKey}, true));
     }
 
@@ -184,7 +183,6 @@ module.exports = class PublicCommandService {
             }
             filter = directions[directions.length - 2]
         } else {
-            // TODO: As mentioned above, getting games by name isn't valuable, always prefer ID as it ensures uniqueness.
             if (directions.length === 1) {
                 directions.push('stars');
             }
@@ -207,8 +205,7 @@ module.exports = class PublicCommandService {
             game = game[0];
         }
 
-        // TODO: Use the gameStateService for these checks below.
-        if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
+        if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
         }
         if (!game.state.startDate) {
@@ -227,8 +224,6 @@ module.exports = class PublicCommandService {
             let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
             let leaderboard = leaderboardReturn.leaderboard;
             let fullKey = leaderboardReturn.fullKey;
-            // TODO: Would the entire PC vs. Mobile complexity be better as separate commands? (Simple vs. Detailed)?  I'm easy either way as long as there's no concurrency issues with it "remembering" the isPC state between multiple commands.
-            //creating the rankings so it fits in one message.
             if(isPC) {
                 let position_list = "";
                 let username_list = "";
@@ -250,7 +245,6 @@ module.exports = class PublicCommandService {
 
         let isPC = true; //Standard for now, as you define this with a reaction after the message has been sent
 
-        // TODO: Same concurrency issue here with the {game, filter, isPC} objects?
         msg.channel.send(await responseFunction({game, filter, isPC}))
             .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, {game, filter, isPC}));
     }
@@ -264,7 +258,6 @@ module.exports = class PublicCommandService {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
             }
         } else {
-            // TODO: As mentioned above. Ditch this?
             let game_name = "";
             for (let i = 0; i < directions.length; i++) {
                 game_name += directions[i] + ' ';
@@ -276,13 +269,12 @@ module.exports = class PublicCommandService {
         if (!game.length) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
         } else if (game.length > 1) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames')); // TODO: As mentioned above.
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
         }
 
         game = game[0];
 
-        // TODO: gameStateService checks
-        if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
+        if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
         }
         if (!game.state.startDate) {
@@ -315,8 +307,8 @@ module.exports = class PublicCommandService {
             manufacturing: this.leaderboardService.getLeaderboardRankings(game, 'manufacturing'),
             specialists: this.leaderboardService.getLeaderboardRankings(game, 'specialists')
         }
-        // TODO: player.defeated will cover it, you don't need to check afk.
-        let alive = game.galaxy.players.reduce((val, player) => player.afk || player.defeated ? val : val + 1, 0)
+
+        let alive = game.galaxy.players.reduce((val, player) => player.defeated ? val : val + 1, 0)
         let leaderboard = {};
         let leaderboardSize = game.settings.general.playerLimit <= 3 ? game.settings.general.playerLimit : 3;
         for(let [key, value] of Object.entries(leaderboardData)){
@@ -373,7 +365,6 @@ module.exports = class PublicCommandService {
         let pageCount = Object.entries(focusArray).length;
         let user = await this.userService.getByUsernameAchievementsLean(username);
         let isPC = true;
-        // TODO: Concurrency issue with {isPC, page, user}?
         msg.channel.send(await responseFunction({isPC, page, user})).then(async message => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, {page, user, isPC}, true));
     }
 }
