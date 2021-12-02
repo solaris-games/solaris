@@ -113,4 +113,12 @@ module.exports = class AdminService {
         });
     }
 
+    async setGameTimeMachine(gameId, enabled) {
+        await this.gameRepo.updateOne({
+            _id: gameId
+        }, {
+            'settings.general.timeMachine': enabled
+        });
+    }
+
 };
