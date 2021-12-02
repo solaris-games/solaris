@@ -345,7 +345,7 @@
             "oneShot": true,
             "modifiers": {
                 "special": {
-                    "deductNaturalResourcesOnTick": 1
+                    "addNaturalResourcesOnTick": -1
                 },
                 "local": {
                     "manufacturing": 5,

@@ -450,8 +450,6 @@ module.exports = class StarService extends EventEmitter {
                     if (specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
                             this.addNaturalResources(game, star, specialist.modifiers.special.addNaturalResourcesOnTick);
-                        } else if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
-                            this.deductNaturalResources(game, star, specialist.modifiers.special.deductNaturalResourcesOnTick);
                         }
                     }
                 }
@@ -474,20 +472,6 @@ module.exports = class StarService extends EventEmitter {
             star.naturalResources.economy += amount;
             star.naturalResources.industry += amount;
             star.naturalResources.science += amount;
-        }
-    }
-
-    deductNaturalResources(game, star, amount) {
-        if (this.gameTypeService.isSplitResources(game)) {
-            let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
-
-            star.naturalResources.economy -= 3 * amount * (star.naturalResources.economy / total);
-            star.naturalResources.industry -= 3 * amount * (star.naturalResources.industry / total);
-            star.naturalResources.science -= 3 * amount * (star.naturalResources.science / total);
-        } else {
-            star.naturalResources.economy -= amount;
-            star.naturalResources.industry -= amount;
-            star.naturalResources.science -= amount;
         }
 
         // TODO: Allow negative values here so we can keep the ratio.
