@@ -36,7 +36,7 @@ module.exports = class PublicCommandService {
             focus = directions[directions.length - 1]
         }
 
-        let focusObject = {
+        const focusObject = {
             general: 0,
             galaxy: 1,
             player: 2,
@@ -59,13 +59,18 @@ module.exports = class PublicCommandService {
         }
 
         const responseFunction = async (responseData) => {
-            if(responseData.isPC) {
-                return this.botResponseService.gameinfoPC;
-            }
-            return this.botResponseService.gameinfoMobile;
+            let game = responseData.game;
+            let page = responseData.page;
+            let isPC = responseData.isPC;
+            return await this.botResponseService.gameinfo(game, page, isPC);
         }
 
-        msg.channel.send(response).then(async message => this.botHelperService.multiPage(message, msg, focusObject.length, true, responseFunction, {game, page: focusObject[focus]}, true));
+        let responseData = {
+            game,
+            page: focusObject[focus],
+            isPC: true
+        }
+        msg.channel.send(await responseFunction(responseData)).then(async message => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
     }
 
     async invite(msg, directions) {
@@ -160,7 +165,7 @@ module.exports = class PublicCommandService {
             filter = directions[directions.length - 2]
         } else {
             if (directions.length === 1) {
-                directions.push('general');
+                directions.push('stars');
             }
             let game_name = "";
             for (let i = 0; i < directions.length - 1; i++) {
@@ -172,15 +177,14 @@ module.exports = class PublicCommandService {
         }
 
         //checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
-        let response;
-        
-        if (!game.length) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
-        } else if (game.length > 1) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+        if(Array.isArray(game)) {
+            if (Array.isArray(game) && !game.length) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+            } else if (Array.isArray(game) && game.length > 1) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+            }
+            game = game[0];
         }
-
-        game = game[0];
 
         if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))

@@ -62,11 +62,11 @@ async function executeCommand(msg) {
     const command = commandService.identify(msg, prefix);
     if (command.type !== 'dm') {
         if (commandService.isCorrectChannel(msg, command.cmd) && publicCommandService[command.cmd]) {
-            await publicCommandService[command.cmd](msg, command.directions);
+            await publicCommandService[command.cmd](msg, command.directions).then(() => msg.delete()); //Executes the command, and then deletes the message that ordered it
         }
     } else {
         if (privateCommandService[command.cmd]) {
-            await privateCommandService[command.cmd](msg, command.directions);
+            await privateCommandService[command.cmd](msg, command.directions).then(() => msg.delete()); //Executes the command, and then deletes the message that ordered it
         }
     }
 }

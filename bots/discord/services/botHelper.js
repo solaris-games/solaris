@@ -39,7 +39,7 @@ module.exports = class BotHelperService {
     }
 
     async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true /*A variable as long as not all functions have a mobile version*/) {
-        let pageNumber = 0;
+        let pageNumber = responseData.page || 0;
         let isPC = true;
         await this.reactPagesMobile(botMessage, looping, pageNumber, pageCount, checkPC);
 
@@ -88,7 +88,7 @@ module.exports = class BotHelperService {
 
                 responseData.isPC = isPC;
                 responseData.page = pageNumber;
-                let editedResponse = await responseFunction(responseData) //TODO Fix and complete
+                let editedResponse = await responseFunction(responseData)
                 botMessage.edit(editedResponse)
 
                 await this.reactPagesMobile(botMessage, looping, pageNumber, pageCount, checkPC);

@@ -13,21 +13,52 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfo(game, type) {
+    gameinfo(game, type, isPC) {
+        let response;
+        let sidePages = [];
         switch (type) {
             case 0: //General
-                return this.gameinfoGeneral(game);
+                response = this.gameinfoGeneral(game);
+                sidePages[0] = 'Time';
+                sidePages[1] = 'Galaxy';
+                break;
             case 1: //Galaxy
-                return this.gameinfoGalaxy(game);
+                response = this.gameinfoGalaxy(game);
+                sidePages[0] = 'General';
+                sidePages[1] = 'Player';
+                break;
             case 2: //Player
-                return this.gameinfoPlayer(game);
+                response = this.gameinfoPlayer(game);
+                sidePages[0] = 'Galaxy';
+                sidePages[1] = 'Technology';
+                break;
             case 3: //Technology
-                return this.gameinfoTechnology(game);
+                response = this.gameinfoTechnology(game);
+                sidePages[0] = 'Player';
+                sidePages[1] = 'Time';
+                break;
             case 4: //Time
-                return this.gameinfoTime(game);
+                response = this.gameinfoTime(game);
+                sidePages[0] = 'Technology';
+                sidePages[1] = 'General';
+                break;
             default:
                 throw new Error('Unknown type: ' + type);
         }
+        if(isPC) {
+            response = response
+            .addFields(
+                { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: sidePages[1], value: "➡️➡️➡️", inline: true }
+            )
+        } else {
+            response = response
+            .addFields(
+                {name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️"}
+            )
+        }
+        return response;
     }
 
     gameinfoGeneral(game) {
@@ -52,10 +83,7 @@ module.exports = class ReponseService {
                 { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
                 { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },
                 { name: "Time Machine", value: game.settings.general.timeMachine, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Time", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Galaxy", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -88,10 +116,7 @@ module.exports = class ReponseService {
                 { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
                 { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
                 { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },//next line
-                { name: "General", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Player", value: "➡️➡️➡️", inline: true }
+                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true }
             );
         return response;
     }
@@ -124,10 +149,7 @@ module.exports = class ReponseService {
                 { name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true },//next line
                 { name: "Trade Credits", value: game.settings.player.tradeCredits ? "true" : "false", inline: true },
                 { name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true" : "false", inline: true },
-                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true },//next line
-                { name: "Galaxy", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Technology", value: "➡️➡️➡️", inline: true }
+                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true }
             );
         return response;
     }
@@ -166,10 +188,7 @@ module.exports = class ReponseService {
                 { name: "\u200B", value: "\u200B", inline: true },//next line
                 { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Player", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Time", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -203,11 +222,6 @@ module.exports = class ReponseService {
                 { name: "\u200B", value: "\u200B", inline: true }//next line
             );
         }
-        response = response.addFields(
-            { name: "Technology", value: "⬅️⬅️⬅️", inline: true },
-            { name: "\u200B", value: "\u200B", inline: true },
-            { name: "General", value: "➡️➡️➡️", inline: true }
-        );
         return response;
     }
 
