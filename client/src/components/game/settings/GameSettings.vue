@@ -135,7 +135,7 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
           </tr>
           <tr>
-            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus"/></td>
+            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
           </tr>
           <tr>

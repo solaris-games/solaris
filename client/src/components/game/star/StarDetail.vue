@@ -25,7 +25,7 @@
         <div v-if="star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field</span>.</p>
-          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus.</i></small></p>
+          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus (net +2 Weapons).</i></small></p>
         </div>
         
         <div v-if="star.wormHoleToStarId">
@@ -51,7 +51,7 @@
           <span v-if="star.isNebula" title="Star is obscured inside a nebula - All ship counts are hidden from other players">
             <i class="fas fa-eye-slash ml-1"></i>
           </span>
-          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus">
+          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus (net +2 weapons)">
             <i class="fas fa-meteor ml-1"></i>
           </span>
           <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
