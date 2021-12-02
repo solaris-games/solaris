@@ -227,8 +227,8 @@ module.exports = class PublicCommandService {
             let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
             let leaderboard = leaderboardReturn.leaderboard;
             let fullKey = leaderboardReturn.fullKey;
-            // TODO: Would the entire PC vs. Mobile complexity be better as separate commands? (Simple vs. Detailed)?
-            //creating the rankings so it fits in one message. I'm easy either way as long as there's no concurrency issues with it "remembering" the isPC state between multiple commands.
+            // TODO: Would the entire PC vs. Mobile complexity be better as separate commands? (Simple vs. Detailed)?  I'm easy either way as long as there's no concurrency issues with it "remembering" the isPC state between multiple commands.
+            //creating the rankings so it fits in one message.
             if(isPC) {
                 let position_list = "";
                 let username_list = "";
