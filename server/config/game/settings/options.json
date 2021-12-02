@@ -190,6 +190,16 @@
                 "text": "Enabled"
             }
         ],
+        "splitResources": [
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            },
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            }
+        ],
         "resourceDistribution": [
             {
             "value": "random",

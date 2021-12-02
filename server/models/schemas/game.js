@@ -63,6 +63,7 @@ const schema = new Schema({
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			splitResources: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },

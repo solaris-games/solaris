@@ -25,7 +25,7 @@ const game = {
 }
 
 const fakeStarService = {
-    generateUnownedStar(game, name, location) {
+    generateUnownedStar(name, location) {
         return {
             name,
             location

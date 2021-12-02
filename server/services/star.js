@@ -6,7 +6,7 @@ module.exports = class StarService extends EventEmitter {
 
     constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService) {
         super();
-        
+
         this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.nameService = nameService;
@@ -19,13 +19,23 @@ module.exports = class StarService extends EventEmitter {
         this.gameTypeService = gameTypeService;
     }
 
-    generateUnownedStar(game, name, location, naturalResources) {
+    generateUnownedStar(name, location, naturalResources) {
+        naturalResources = naturalResources || {
+            economy: 0,
+            industry: 0,
+            science: 0
+        };
+
         return {
             _id: mongoose.Types.ObjectId(),
             name,
-            naturalResources,
             location,
-            infrastructure: { }
+            naturalResources,
+            infrastructure: {
+                economy: 0,
+                industry: 0,
+                science: 0
+            }
         };
     }
 
@@ -50,7 +60,7 @@ module.exports = class StarService extends EventEmitter {
     getByIdBS(game, id) {
         let start = 0;
         let end = game.galaxy.stars.length - 1;
-    
+
         while (start <= end) {
             let middle = Math.floor((start + end) / 2);
             let star = game.galaxy.stars[middle];
@@ -82,12 +92,8 @@ module.exports = class StarService extends EventEmitter {
         homeStar.warpGate = false;
         homeStar.specialistId = null;
 
-        if (!homeStar.isAsteroidField) {
-            homeStar.naturalResources = game.constants.star.resources.maxNaturalResources; // Home stars should always get max resources.
-        }
-
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
-        
+
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
         homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
@@ -227,7 +233,7 @@ module.exports = class StarService extends EventEmitter {
 
         return starsInScanningRange;
     }
-    
+
     getStarsWithinScanningRangeOfStarByStarIds(game, star, stars) {
         // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
@@ -255,8 +261,24 @@ module.exports = class StarService extends EventEmitter {
         return isInScanRange;
     }
 
-    calculateTerraformedResources(naturalResources, terraforming) {
-        return (terraforming * 5) + naturalResources;
+    calculateActualNaturalResources(star) {
+        return {
+            economy: Math.max(Math.floor(star.naturalResources.economy), 0),
+            industry: Math.max(Math.floor(star.naturalResources.industry), 0),
+            science: Math.max(Math.floor(star.naturalResources.science), 0)
+        }
+    }
+
+    calculateTerraformedResources(star, terraforming) {
+        return {
+            economy: this.calculateTerraformedResource(star.naturalResources.economy, terraforming),
+            industry: this.calculateTerraformedResource(star.naturalResources.industry, terraforming),
+            science: this.calculateTerraformedResource(star.naturalResources.science, terraforming)
+        }
+    }
+
+    calculateTerraformedResource(naturalResource, terraforming) {        
+        return Math.floor(naturalResource + (5 * terraforming));
     }
 
     calculateStarShipsByTicks(techLevel, industryLevel, ticks = 1, productionTicks = 24) {
@@ -274,7 +296,7 @@ module.exports = class StarService extends EventEmitter {
         }
 
         this.resetIgnoreBulkUpgradeStatuses(star);
-        
+
         // Destroy the carriers owned by the player who abandoned the star.
         // Note: If an ally is currently in orbit then they will capture the star on the next tick.
         let playerCarriers = game.galaxy.carriers
@@ -326,7 +348,7 @@ module.exports = class StarService extends EventEmitter {
             // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
             if (carrier.specialistId) {
                 let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-        
+
                 if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
                     return true;
                 }
@@ -427,11 +449,9 @@ module.exports = class StarService extends EventEmitter {
 
                     if (specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
-                            star.naturalResources += specialist.modifiers.special.addNaturalResourcesOnTick;
-                        }
-
-                        if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
-                            this.deductNaturalResources(star, specialist.modifiers.special.deductNaturalResourcesOnTick);
+                            this.addNaturalResources(game, star, specialist.modifiers.special.addNaturalResourcesOnTick);
+                        } else if (specialist.modifiers.special.deductNaturalResourcesOnTick) {
+                            this.deductNaturalResources(game, star, specialist.modifiers.special.deductNaturalResourcesOnTick);
                         }
                     }
                 }
@@ -440,15 +460,51 @@ module.exports = class StarService extends EventEmitter {
     }
 
     isDeadStar(star) {
-        return star.naturalResources <= 0;
+        return star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0;
     }
 
-    deductNaturalResources(star, amount) {
-        star.naturalResources -= amount;
+    addNaturalResources(game, star, amount) {
+        if (this.gameTypeService.isSplitResources(game)) {
+            let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
 
-        // if the star reaches 0 resources then reduce the star to a dead hunk.
-        if (star.naturalResources <= 0) {
-            star.naturalResources = 0;
+            star.naturalResources.economy += 3 * amount * (star.naturalResources.economy / total);
+            star.naturalResources.industry += 3 * amount * (star.naturalResources.industry / total);
+            star.naturalResources.science += 3 * amount * (star.naturalResources.science / total);
+        } else {
+            star.naturalResources.economy += amount;
+            star.naturalResources.industry += amount;
+            star.naturalResources.science += amount;
+        }
+    }
+
+    deductNaturalResources(game, star, amount) {
+        if (this.gameTypeService.isSplitResources(game)) {
+            let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
+
+            star.naturalResources.economy -= 3 * amount * (star.naturalResources.economy / total);
+            star.naturalResources.industry -= 3 * amount * (star.naturalResources.industry / total);
+            star.naturalResources.science -= 3 * amount * (star.naturalResources.science / total);
+        } else {
+            star.naturalResources.economy -= amount;
+            star.naturalResources.industry -= amount;
+            star.naturalResources.science -= amount;
+        }
+
+        // TODO: Allow negative values here so we can keep the ratio.
+        if (Math.floor(star.naturalResources.economy) <= 0) {
+            star.naturalResources.economy = 0;
+        }
+
+        if (Math.floor(star.naturalResources.industry) <= 0) {
+            star.naturalResources.industry = 0;
+        }
+
+        if (Math.floor(star.naturalResources.science) <= 0) {
+            star.naturalResources.science = 0;
+        }
+        
+        // if the star reaches 0 of all resources then reduce the star to a dead hunk.
+        if(this.isDeadStar(star)) {
             star.specialistId = null;
             star.warpGate = false;
             star.infrastructure.economy = 0;
@@ -462,7 +518,7 @@ module.exports = class StarService extends EventEmitter {
             throw new Error('The star cannot be reignited, it is not dead.');
         }
 
-        star.naturalResources = naturalResources || 1;
+        star.naturalResources = naturalResources;
     }
 
     destroyStar(game, star) {
@@ -503,7 +559,7 @@ module.exports = class StarService extends EventEmitter {
 
             if (star.ownedByPlayerId) {
                 let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-    
+
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
                 star.shipsActual += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
                 star.ships = Math.floor(star.shipsActual);

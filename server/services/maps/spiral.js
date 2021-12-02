@@ -208,7 +208,7 @@ module.exports = class SpiralMapService {
 
             for (let i = 0; i < locs.length; i++) {
                 let location = locs[i];
-                let size = location.resources;
+                let size = (location.resources.economy + location.resources.industry + location.resources.science) / 3;
 
                 let x_center = (location.x - x_init) * scale - size / 2
                 let y_center = (location.y - y_init) * scale - size / 2
