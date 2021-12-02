@@ -64,4 +64,8 @@ module.exports = class GameTypeService {
         return game.settings.gameTime.gameType === 'realTime';
     }
 
+    isSplitResources(game) {
+        return game.settings.specialGalaxy.splitResources === 'enabled';
+    }
+
 }

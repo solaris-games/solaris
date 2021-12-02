@@ -27,7 +27,7 @@
       <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canBuildWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
+      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
         <i class="fas fa-trash"></i> <i class="fas fa-dungeon ml-1"></i>
       </button>
       <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
@@ -57,12 +57,14 @@ export default {
       isUpgradingEconomy: false,
       isUpgradingIndustry: false,
       isUpgradingScience: false,
-      canBuildWarpGates: false
+      canBuildWarpGates: false,
+      canDestroyWarpGates: false
     }
   },
   mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
+    this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
   },
   methods: {
     onBuildCarrierRequested () {
