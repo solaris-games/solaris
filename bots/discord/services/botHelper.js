@@ -4,6 +4,15 @@ module.exports = class BotHelperService {
         this.botResponseService = botResponseService;
     }
 
+    async isValidID(id) {
+        let characters = id.split('')
+        const allowedCharacters = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'];
+        let validCharacters = characters.reduce( (preVal, curVal) => preVal && allowedCharacters.includes(curVal), true);
+
+        console.log(validCharacters && id.length === 24)
+        return validCharacters && id.length === 24;
+    }
+
     async getNestedObject(nestedObj, pathArr) {
         return pathArr.reduce((obj, key) =>
             (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
@@ -74,7 +83,7 @@ module.exports = class BotHelperService {
 
                 if(pageNumber < 0) {
                     if(looping) {
-                        pageNumber = pageCount - pageNumber; //When it loops around, page -1 is the same as the last page, which is pageCount - 1
+                        pageNumber = pageCount - pageNumber%pageCount; //When it loops around, page -1 is the same as the last page, which is pageCount - 1
                     } else {
                         pageNumber = 0; //When it doesn't loop around, any page lower than the 0 page is the 0 page.
                     }
@@ -82,7 +91,7 @@ module.exports = class BotHelperService {
                     if(looping) {
                         pageNumber = pageNumber%pageCount // When it loops around, the page with index pageCount is the same as the one with index 0.
                     } else {
-                        pageNumber = pageNumber - 1; // When it doesn't loop around, any page above the maximum is just the maximum page.
+                        pageNumber = pageCount - 1; // When it doesn't loop around, any page above the maximum is just the maximum page.
                     }
                 }
 

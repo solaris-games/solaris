@@ -309,43 +309,43 @@ module.exports = class ReponseService {
         return response;
     }
 
-    statusPC(data) {
+    statusPC(game, leaderboard, alive) {
         let response = this.baseResponse();
         response = response
-        .setTitle(`Status of ${data.game.settings.general.name}`)
-        .setURL(`https://solaris.games/#/game?id=${data.game._id}`)
+        .setTitle(`Status of ${game.settings.general.name}`)
+        .setURL(`https://solaris.games/#/game?id=${game._id}`)
         .addFields(
-            { name: 'Finished?', value: data.game.state.endDate ? 'Game has ended' : 'Ongoing', inline: true }, //1
-            { name: 'Tick', value: data.game.state.tick, inline: true }, //1
-            { name: 'Living Players', value: data.alive, inline: true }, //1
-            { name: 'Stars Ranking', value: data.leaderboard.stars, inline: true }, //2
-            { name: 'Ships Ranking', value: data.leaderboard.ships, inline: true }, //2
-            { name: 'New Ships Ranking', value: data.leaderboard.newShips, inline: true }, //2
-            { name: 'Economy Ranking', value: data.leaderboard.economy, inline: true }, //3
-            { name: 'Industry Ranking', value: data.leaderboard.industry, inline: true }, //3
-            { name: 'Science Ranking', value: data.leaderboard.science, inline: true }, //3
-            { name: 'Weapons Ranking', value: data.leaderboard.weapons, inline: true }, //4
-            { name: 'Manufacturing Ranking', value: data.leaderboard.manufacturing, inline: true }, //4
-            { name: 'Specialists Ranking', value: data.leaderboard.specialists, inline: true }, //4
+            { name: 'Finished?', value: game.state.endDate ? 'Game has ended' : 'Ongoing', inline: true }, //1
+            { name: 'Tick', value: game.state.tick, inline: true }, //1
+            { name: 'Living Players', value: alive, inline: true }, //1
+            { name: 'Stars Ranking', value: leaderboard.stars, inline: true }, //2
+            { name: 'Ships Ranking', value: leaderboard.ships, inline: true }, //2
+            { name: 'New Ships Ranking', value: leaderboard.newShips, inline: true }, //2
+            { name: 'Economy Ranking', value: leaderboard.economy, inline: true }, //3
+            { name: 'Industry Ranking', value: leaderboard.industry, inline: true }, //3
+            { name: 'Science Ranking', value: leaderboard.science, inline: true }, //3
+            { name: 'Weapons Ranking', value: leaderboard.weapons, inline: true }, //4
+            { name: 'Manufacturing Ranking', value: leaderboard.manufacturing, inline: true }, //4
+            { name: 'Specialists Ranking', value: leaderboard.specialists, inline: true }, //4
         );
         return response;
     }
 
-    statusMobile(data) {
+    statusMobile(game, leaderboard) {
         let response = this.baseResponse();
         response = response
-        .setTitle(`Status of ${data.game.settings.general.name}`)
-        .setURL(`https://solaris.games/#/game?id=${data.game._id}`)
+        .setTitle(`Status of ${game.settings.general.name}`)
+        .setURL(`https://solaris.games/#/game?id=${game._id}`)
         .addFields(
-            { name: 'Tick', value: data.game.state.tick },
-            { name: 'Stars Ranking', value: data.leaderboard.stars },
-            { name: 'Ships Ranking', value: data.leaderboard.ships },
-            { name: 'Economy Ranking', value: data.leaderboard.economy },
-            { name: 'Industry Ranking', value: data.leaderboard.industry },
-            { name: 'Science Ranking', value: data.leaderboard.science },
-            { name: 'Weapons Ranking', value: data.leaderboard.weapons },
-            { name: 'Manufacturing Ranking', value: data.leaderboard.manufacturing },
-            { name: 'Specialists Ranking', value: data.leaderboard.specialists }
+            { name: 'Tick', value: game.state.tick },
+            { name: 'Stars Ranking', value: leaderboard.stars },
+            { name: 'Ships Ranking', value: leaderboard.ships },
+            { name: 'Economy Ranking', value: leaderboard.economy },
+            { name: 'Industry Ranking', value: leaderboard.industry },
+            { name: 'Science Ranking', value: leaderboard.science },
+            { name: 'Weapons Ranking', value: leaderboard.weapons },
+            { name: 'Manufacturing Ranking', value: leaderboard.manufacturing },
+            { name: 'Specialists Ranking', value: leaderboard.specialists }
         );
         return response;
     }
@@ -360,22 +360,22 @@ module.exports = class ReponseService {
                 sidePages[1] = 'Combat';
                 break;
             case 1:
-                response = userinfoCombat(user);
+                response = this.userinfoCombat(user);
                 sidePages[0] = 'Games';
                 sidePages[1] = 'Infrastructure';
                 break;
             case 2:
-                response = userinfoInfrastructure(user);
+                response = this.userinfoInfrastructure(user);
                 sidePages[0] = 'Combat';
                 sidePages[1] = 'Research';
                 break;
             case 3:
-                response = userinfoResearch(user);
+                response = this.userinfoResearch(user);
                 sidePages[0] = 'Infrastructure';
                 sidePages[1] = 'Trade';
                 break;
             case 4:
-                response = userinfoTrade(user);
+                response = this.userinfoTrade(user);
                 sidePages[0] = 'Research';
                 sidePages[1] = 'Games';
                 break;
@@ -523,6 +523,9 @@ module.exports = class ReponseService {
                 break;
             case 'notStarted':
                 response += 'The game has not started yet, so no usefull information can be given about it.'
+                break;
+            case 'invalidID':
+                response += 'The ID of the game you gave is invalid, please check if it is correct.'
                 break;
             default:
                 //This should never happen

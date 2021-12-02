@@ -17,10 +17,10 @@ module.exports = class PublicCommandService {
         let focus;
         let game_name = "";
         if (directions[directions.length - 1] == "ID") {
-            try {
+            if(await this.botHelperService.isValidID(directions[0])) {
                 game = await this.gameService.getByIdAllLean(directions[0])
-            } catch (err) {
-                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
             }
 
             focus = directions[directions.length - 2]
@@ -78,10 +78,15 @@ module.exports = class PublicCommandService {
 
         //plain and simple, extract the link to the game, from which we can extract the id from the game, which we then use to find the game
         let gamelink = directions[0];
-        let gameId = gamelink.split('?id=')[1];
+        let gameId = (gamelink.split('?id='))[1];
 
         if (gameId) {
-            let game = await this.gameService.getByIdSettingsLean(gameId)
+            let game;
+            if(await this.botHelperService.isValidID(gameId)) {
+                game = await this.gameService.getByIdSettingsLean(gameId)
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+            }
 
             if (!game) {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
@@ -161,7 +166,11 @@ module.exports = class PublicCommandService {
 
         //checking if the <galaxy_name> is actually the name or just the ID of a game
         if (directions[directions.length - 1] == "ID") {
-            game = await this.gameService.getByIdAllLean(directions[0])
+            if(await this.botHelperService.isValidID(directions[0])) {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+            }
             filter = directions[directions.length - 2]
         } else {
             if (directions.length === 1) {
@@ -232,7 +241,11 @@ module.exports = class PublicCommandService {
     async status(msg, directions) {
         let game;
         if (directions[directions.length - 1] == "ID") {
-            game = await this.gameService.getByIdAllLean(directions[0])
+            if(await this.botHelperService.isValidID(directions[0])) {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+            }
         } else {
             let game_name = "";
             for (let i = 0; i < directions.length; i++) {
@@ -263,10 +276,13 @@ module.exports = class PublicCommandService {
 
         const responseFunction = async (responseData) => {
             let isPC = responseData.isPC;
+            let game = responseData.game;
+            let leaderboard = responseData.leaderboard;
+            let alive = responseData.alive;
             if (isPC) {
-                return this.botResponseService.statusPC(responseData);
+                return this.botResponseService.statusPC(game, leaderboard, alive);
             }
-            return this.botResponseService.statusMobile(responseData);
+            return this.botResponseService.statusMobile(game, leaderboard);
         }
 
         let leaderboardData = {
@@ -313,6 +329,7 @@ module.exports = class PublicCommandService {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
         }
 
+        //getting the username
         let username = "";
         for (let i = 0; i < directions.length - 1; i++) {
             username += directions[i] + ' ';
@@ -328,7 +345,7 @@ module.exports = class PublicCommandService {
             let isPC = responseData.isPC;
             let page = responseData.page;
             let user = responseData.user;
-            return this.botHelperService.userinfo(user, page, isPC);
+            return this.botResponseService.userinfo(user, page, isPC);
         }
 
         let page = focusArray[focus];
