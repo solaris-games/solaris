@@ -8,6 +8,7 @@ You can use the following commands in this discord:
 - `$help <command>` - get a list of all commands, or more specific information about a command when you add a `<command>`.
 - `$leaderboard_global <filter>` - rank players over all games they have played based on certain criteria, like wins, losses, ships killed and more.
 - `$leaderboard_local <galaxy_name> <filter>` - rank players in a galaxy based on a certain criteria, like stars, economy, ships and more.
+- `$status <galaxy_name>` - get accurate information about the current state of the game, with leaderboard in the most important topics.
 - `$userinfo <username> <focus>` - get information about a user, like rank, renown or made economy.
 
 ### Game Info
