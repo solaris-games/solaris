@@ -1,7 +1,7 @@
-module.exports = class PrivateCommandService {	
+module.exports = class PrivateCommandService {
 
-    constructor() {	
+    constructor() {
 
-    }	
+    }
 
 }
