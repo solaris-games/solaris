@@ -99,7 +99,7 @@
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('weapons')}}
                     </td>
-                    <td v-if="!isTechnologyResearchable('scanning')"></td>
+                    <td v-if="!isTechnologyResearchable('weapons')"></td>
                     <td class="text-right">
                       <help-tooltip tooltip="Determines combat strength of your ships"/>
                     </td>

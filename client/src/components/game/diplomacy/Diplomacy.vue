@@ -112,7 +112,7 @@ table tr {
 }
 
 .table-sm td {
-    padding: 0;
+  padding: 0;
 }
 
 .table td.fit,

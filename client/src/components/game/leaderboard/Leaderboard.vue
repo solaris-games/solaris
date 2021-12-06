@@ -375,7 +375,9 @@ export default {
 .col-avatar {
   position:absolute;
   width: 59px;
+  height: 59px;
   cursor: pointer;
+  padding: 0;
 }
 
 .alias-title {
@@ -387,7 +389,7 @@ table tr {
 }
 
 .table-sm td {
-    padding: 0;
+  padding: 0;
 }
 
 .table td.fit,
@@ -411,7 +413,6 @@ table tr {
 
   .col-avatar {
     width: 45px;
-    padding-top: 0.25rem !important;
   }
 }
 

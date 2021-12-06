@@ -1,22 +1,27 @@
 <template>
 
 <div>
-    <div @click="toggleDisplay">
-        <span class="d-none d-md-inline-block">
-            Tick
-        </span>
-        <span class="d-inline-block d-md-none">
+    <div @click="toggleDisplay" class="pointer">
+        <span class="mr-1">
             <i class="fas fa-stopwatch"></i>
         </span>
-        <span class="user-select-none pointer ml-1">{{tick}} <i class="fas" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i></span>
+        <span class="d-none d-md-inline-block mr-1">
+            Tick
+        </span>
+        <span class="d-none d-sm-inline-block user-select-none mr-1">
+            {{tick}}
+        </span>
+        <span>
+            <i class="fas" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i>
+        </span>
     </div>
 
     <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display">
-        <div class="row mt-0 pt-2 pb-2">
+        <div class="row mt-0 pt-2 pb-2 no-gutters">
             <div class="col-12 mb-1">
                 <input type="range" :min="minimumTick" :max="stateTick" class="slider" v-model="tick" @change="onRequestedTickChanged" :disabled="isLoading">
             </div>
-			<div class="col">
+			<div class="col-5">
 				<button class="btn btn-sm btn-secondary" @click="loadPreviousTick(6)" :disabled="isLoading || tick <= minimumTick" title="Jump back 6 ticks">
                     <i class="fas fa-angle-double-left"></i>
                 </button>
@@ -24,7 +29,10 @@
                     <i class="fas fa-angle-left"></i> Prev
                 </button>
 			</div>
-			<div class="col-auto">
+            <div class="col-2 text-center">
+                {{tick}}
+            </div>
+			<div class="col-5 text-right">
 				<button class="btn btn-sm btn-secondary" @click="loadNextTick(1)" :disabled="isLoading || tick >= stateTick" title="Next tick">
                     Next <i class="fas fa-angle-right"></i>
                 </button>
@@ -151,6 +159,6 @@ export default {
     z-index: 1;
     position:absolute;
     width:300px;
-    left:-110px;
+    left:-15px;
 }
 </style>

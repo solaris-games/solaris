@@ -70,7 +70,7 @@
 
       <div class="row pb-2 pt-2 bg-secondary" v-if="!$isHistoricalMode() && (canGiftCarrier || canTransferShips || canEditWaypoints)">
         <div class="col">
-          <button class="btn btn-sm btn-primary" @click="onShipTransferRequested" v-if="canTransferShips">
+          <button class="btn btn-sm btn-primary mr-1" @click="onShipTransferRequested" v-if="canTransferShips">
             Transfer <i class="fas fa-exchange-alt"></i>
           </button>
           <button class="btn btn-sm btn-warning" @click="onConfirmGiftCarrier" v-if="canGiftCarrier">

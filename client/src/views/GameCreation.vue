@@ -243,35 +243,35 @@
       <div class="form-group">
         <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>) <help-tooltip tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"/></label>
         <div class="col">
-          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isSavingSettings">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
         </div>
       </div>
 
       <div class="form-group">
         <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>) <help-tooltip tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"/></label>
         <div class="col">
-          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isSavingSettings">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
         </div>
       </div>
 
       <div class="form-group">
         <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide ships at stars"/></label>
         <div class="col">
-          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isSavingSettings">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
         </div>
       </div>
 
       <div class="form-group">
-        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus"/></label>
+        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></label>
         <div class="col">
-          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isSavingSettings">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
         </div>
       </div>
 
       <div class="form-group">
         <label for="randomBlackHoles" class="col-form-label">Random Black Holes (<span class="text-warning">{{settings.specialGalaxy.randomBlackHoles}}%</span>) <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></label>
         <div class="col">
-          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isSavingSettings">
+          <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
         </div>
       </div>
 
@@ -306,6 +306,15 @@
         <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"/></label>
         <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="splitResources" class="col-form-label">Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></label>
+        <select class="form-control" id="splitResources" v-model="settings.specialGalaxy.splitResources" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.splitResources" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>

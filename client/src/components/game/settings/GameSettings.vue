@@ -135,7 +135,7 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
           </tr>
           <tr>
-            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus"/></td>
+            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
           </tr>
           <tr>
@@ -157,6 +157,10 @@
           <tr>
             <td>Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
+          </tr>
+          <tr v-if="game.settings.specialGalaxy.splitResources">
+            <td>Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.splitResources) }}</td>
           </tr>
           <tr>
             <td>Resource Distribution <help-tooltip tooltip="Determines the shape of distributed natural resources in the galaxy"/></td>

@@ -386,6 +386,9 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
+    if (!this.data.naturalResources) {
+      return
+    }
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
@@ -397,9 +400,11 @@ class Star extends EventEmitter {
         return
       }
 
+      let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+
       // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
       // TODO: Experimental:
-      let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
+      let ringRadius = averageNaturalResources <= 50 ? averageNaturalResources : averageNaturalResources > 400 ? 100 : (12.5 * Math.log2(averageNaturalResources / 50) + 50)
 
       ringRadius /= 8.0
       let lineWidht = 1.0/8.0
@@ -414,12 +419,16 @@ class Star extends EventEmitter {
     }
   }
 
+  _calculateAverageNaturalResources(naturalResources) {
+    return Math.floor((naturalResources.economy + naturalResources.industry + naturalResources.science) / 3);
+  }
+
   _getPlanetsCount () {
     if (!this.data.naturalResources) {
       return 0
     }
-
-    return Math.min(Math.floor(this.data.naturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
+    let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+    return Math.min(Math.floor(averageNaturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {
@@ -831,7 +840,7 @@ class Star extends EventEmitter {
   }
 
   _isDeadStar () {
-    return this.data.naturalResources != null && this.data.naturalResources <= 0
+    return this.data.naturalResources != null && this.data.naturalResources.economy <= 0 && this.data.naturalResources.industry <= 0 && this.data.naturalResources.science <= 0;
   }
 
   select () {
