@@ -44,5 +44,8 @@ module.exports = {
         }
 
         return minEl;
+    },
+    reverseSort (sorter) {
+        return (a, b) => sorter(b, a);
     }
 }

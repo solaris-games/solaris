@@ -3,7 +3,7 @@ const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Heap = require('qheap');
-const { getOrInsert, minBy, minElementBy } = require('../utils.js')
+const { getOrInsert, minBy, minElementBy, reverseSort } = require('../utils.js')
 
 module.exports = class AIService {
     constructor(starUpgradeService, carrierService, starService, distanceService, waypointService) {
@@ -122,14 +122,15 @@ module.exports = class AIService {
     }
 
     async _gatherAssignments(game, player, context, orders) {
-        orders.sort((o1, o2) => {
+        const sorter = (o1, o2) => {
             const categoryPriority = this.priorityFromOrderCategory(o1.type) - this.priorityFromOrderCategory(o2.type);
             if (categoryPriority !== 0) {
                 return categoryPriority;
             } else {
                 return o1.score - o2.score;
             }
-        })
+        };
+        orders.sort(reverseSort(sorter));
     }
 
     _gatherOrders(game, player, context) {
