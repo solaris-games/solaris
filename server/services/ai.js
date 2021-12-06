@@ -54,7 +54,8 @@ module.exports = class AIService {
             }
             const context = this._createContext(game, player);
             const orders = this._gatherOrders(game, player, context);
-            const assignments = await this._gatherAssignments(game, player, context);
+            console.log(orders);
+            const assignments = await this._gatherAssignments(game, player, context, orders);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
             game.save();
@@ -107,8 +108,28 @@ module.exports = class AIService {
 
     }
 
-    async _gatherAssignments(game, player, context) {
+    priorityFromOrderCategory(category) {
+        switch (category) {
+            case 'DEFEND_STAR':
+                return 3;
+            case 'CLAIM_STAR':
+                return 2;
+            case 'REINFORCE_STAR':
+                return 1;
+            default:
+                return 0;
+        }
+    }
 
+    async _gatherAssignments(game, player, context, orders) {
+        orders.sort((o1, o2) => {
+            const categoryPriority = this.priorityFromOrderCategory(o1.type) - this.priorityFromOrderCategory(o2.type);
+            if (categoryPriority !== 0) {
+                return categoryPriority;
+            } else {
+                return o1.score - o2.score;
+            }
+        })
     }
 
     _gatherOrders(game, player, context) {
