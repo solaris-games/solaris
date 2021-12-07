@@ -81,9 +81,9 @@ module.exports = class GameCreateValidationService {
 
         for (let star of game.galaxy.stars) {
             // Assert that all stars in the galaxy have valid natural resources
-            if (star.naturalResources.economy < 0 || star.naturalResources.economy > game.constants.star.resources.maxNaturalResources
-                || star.naturalResources.industry < 0 || star.naturalResources.industry > game.constants.star.resources.maxNaturalResources
-                || star.naturalResources.science < 0 || star.naturalResources.science > game.constants.star.resources.maxNaturalResources) {
+            if (star.naturalResources.economy < 0
+                || star.naturalResources.industry < 0
+                || star.naturalResources.science < 0) {
                     throw new ValidationError(`All stars must have valid natural resources.`);
                 }
 
@@ -118,8 +118,8 @@ module.exports = class GameCreateValidationService {
 
             // Assert that home stars have the correct number of starting ships and infrastructure
             if (star.homeStar && (
-                star.ships !== game.settings.player.startingShips
-                || star.shipsActual !== game.settings.player.startingShips
+                star.ships !== game.settings.player.startingShips - 1
+                || star.shipsActual !== game.settings.player.startingShips - 1
                 || star.infrastructure.economy !== game.settings.player.startingInfrastructure.economy
                 || star.infrastructure.industry !== game.settings.player.startingInfrastructure.industry
                 || star.infrastructure.science !== game.settings.player.startingInfrastructure.science
@@ -145,7 +145,7 @@ module.exports = class GameCreateValidationService {
             }
 
             // Assert that all carriers have valid starting ships.
-            if (carrier.ships < 0 || carrier.ships > game.settings.player.startingShips) {
+            if (carrier.ships !== 1) {
                 throw new ValidationError(`All carriers must start with ${game.settings.player.startingShips} ships.`);
             }
     

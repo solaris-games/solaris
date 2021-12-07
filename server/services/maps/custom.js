@@ -3,11 +3,11 @@ const ValidationError = require("../../errors/validation");
 module.exports = class CustomMapService {
     constructor() { }
 
-    generateLocations(game) {
+    generateLocations(customJSON) {
         let json;
 
         try {
-          json = JSON.parse(game.settings.general.customJSON)
+          json = JSON.parse(customJSON)
         }
         catch (e) {
           throw new ValidationError('The custom map JSON is malformed.')
@@ -23,33 +23,37 @@ module.exports = class CustomMapService {
         let colours = require('../../config/game/colours').slice();
 
         for (const star of json.stars) {
-            this._checkStarProperty(star?.location, 'x', 'number')
-            this._checkStarProperty(star?.location, 'y', 'number')
-            this._checkStarProperty(star?.naturalResources, 'economy', 'number')
-            this._checkStarProperty(star?.naturalResources, 'industry', 'number')
-            this._checkStarProperty(star?.naturalResources, 'science', 'number')
-            this._checkStarProperty(star, 'warpGate', 'boolean')
-            this._checkStarProperty(star?.infrastructure, 'economy', 'number')
-            this._checkStarProperty(star?.infrastructure, 'industry', 'number')
-            this._checkStarProperty(star?.infrastructure, 'science', 'number')
-            // this._checkStarProperty(star, 'ships', 'number')
-            this._checkStarProperty(star, 'playerIndex', 'number')
-            this._checkStarProperty(star, 'homeStar', 'boolean')
-            this._checkStarProperty(star, 'specialistId', 'number')
+          star.specialistId = star.specialistId || null;
+          star.homeStar = star.homeStar == null ? false : star.homeStar;
+          star.playerIndex = star.playerIndex == null ? -1 : star.playerIndex;
 
-            if (star.playerIndex >= (colours.length * shapes.length))
-                throw new ValidationError('Invalid playerIndex');
+          this._checkStarProperty(star?.location, 'x', 'number')
+          this._checkStarProperty(star?.location, 'y', 'number')
+          this._checkStarProperty(star?.naturalResources, 'economy', 'number')
+          this._checkStarProperty(star?.naturalResources, 'industry', 'number')
+          this._checkStarProperty(star?.naturalResources, 'science', 'number')
+          this._checkStarProperty(star, 'warpGate', 'boolean')
+          this._checkStarProperty(star?.infrastructure, 'economy', 'number')
+          this._checkStarProperty(star?.infrastructure, 'industry', 'number')
+          this._checkStarProperty(star?.infrastructure, 'science', 'number')
+          // this._checkStarProperty(star, 'ships', 'number')
+          // this._checkStarProperty(star, 'playerIndex', 'number')
+          this._checkStarProperty(star, 'homeStar', 'boolean')
+          // this._checkStarProperty(star, 'specialistId', 'number')
 
-            if (star?.homeStar) {
-              homeStars.push(star);
-              star.linkedLocations = [];
+          if (star.playerIndex >= (colours.length * shapes.length))
+              throw new ValidationError('Invalid playerIndex');
 
-              if (star.playerIndex >= 0) { 
-                playerIndexes.push(star.playerIndex);
-              }
+          if (star?.homeStar) {
+            homeStars.push(star);
+            star.linkedLocations = [];
+
+            if (star.playerIndex >= 0) { 
+              playerIndexes.push(star.playerIndex);
             }
+          }
 
-            locations.push(star);
+          locations.push(star);
         }
 
         playerIndexes = [...new Set(playerIndexes)]; // ignore repeated player indexes
@@ -59,10 +63,6 @@ module.exports = class CustomMapService {
         } else if (playerIndexes.length !== 0) {
           throw new ValidationError('Unequal amount of home stars and players, or repeated player IDs');
         } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
-
-        for (let location of locations) {
-          location.specialistId = location.specialistId || null;
-        }
 
         return locations;
     }

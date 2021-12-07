@@ -1,0 +1,207 @@
+{
+    "stars": [
+        {
+            "playerIndex": 0,
+            "homeStar": true,
+            "location": {
+                "x": 100,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 50,
+                "industry": 50,
+                "science": 50
+            },
+            "infrastructure": {
+                "economy": 5,
+                "industry": 5,
+                "science": 1
+            },
+            "warpGate": false,
+            "specialistId": 1
+        },
+        {
+            "playerIndex": 0,
+            "homeStar": false,
+            "location": {
+                "x": 100,
+                "y": 25
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+        {
+            "playerIndex": 0,
+            "homeStar": false,
+            "location": {
+                "x": 100,
+                "y": -25
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+        {
+            "playerIndex": 0,
+            "homeStar": false,
+            "location": {
+                "x": 75,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+        {
+            "playerIndex": 0,
+            "homeStar": false,
+            "location": {
+                "x": 125,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+
+
+        
+        {
+            "playerIndex": 1,
+            "homeStar": true,
+            "location": {
+                "x": -100,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 50,
+                "industry": 50,
+                "science": 50
+            },
+            "infrastructure": {
+                "economy": 5,
+                "industry": 5,
+                "science": 1
+            },
+            "warpGate": false,
+            "specialistId": 1
+        },
+        {
+            "playerIndex": 1,
+            "homeStar": false,
+            "location": {
+                "x": -100,
+                "y": 25
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+        {
+            "playerIndex": 1,
+            "homeStar": false,
+            "location": {
+                "x": -100,
+                "y": -25
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+        {
+            "playerIndex": 1,
+            "homeStar": false,
+            "location": {
+                "x": -75,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        },
+        {
+            "playerIndex": 1,
+            "homeStar": false,
+            "location": {
+                "x": -125,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "infrastructure": {
+                "economy": 0,
+                "industry": 0,
+                "science": 0
+            },
+            "warpGate": false,
+            "specialistId": null
+        }
+    ]
+}

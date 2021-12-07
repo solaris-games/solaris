@@ -111,7 +111,8 @@ module.exports = class GameCreateService {
         game.galaxy.stars = this.mapService.generateStars(
             game, 
             desiredStarCount,
-            game.settings.general.playerLimit
+            game.settings.general.playerLimit,
+            settings.galaxy.customJSON
         );
         
         // Setup players and assign to their starting positions.
