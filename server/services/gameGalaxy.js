@@ -498,10 +498,6 @@ module.exports = class GameGalaxyService {
             3. Continue to run through current logic as we do today.
         */
 
-        if (this.gameStateService.isFinished(game)) {
-            return;
-        }
-
         if (!this.gameStateService.isStarted(game) || tick === 0) {
             return;
         }

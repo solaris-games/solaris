@@ -41,6 +41,8 @@
             </div>
         </div>
     </div>
+
+    <p v-if="specialists && !specialists.length" class="text-center pb-2">No specialists available to hire.</p>
 </div>
 </template>
 
@@ -71,7 +73,9 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    this.specialists = this.$store.state.carrierSpecialists;
+    const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.carrier
+
+    this.specialists = this.$store.state.carrierSpecialists.filter(s => banList.indexOf(s.id) < 0)
   },
   methods: {
     onCloseRequested (e) {

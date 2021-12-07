@@ -85,6 +85,14 @@ module.exports = class GameCreateService {
             game.settings.technology.startingTechnologyLevel.specialists = 0;
             game.settings.technology.researchCosts.specialists = 'none';
         }
+
+        // Ensure that specialist bans are cleared if specialists are disabled.
+        if (game.settings.specialGalaxy.specialistCost === 'none') {
+            game.settings.specialGalaxy.specialistBans = {
+                star: [],
+                carrier: []
+            };
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
