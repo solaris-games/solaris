@@ -65,18 +65,13 @@ module.exports = class GameCreateService {
             settings
         });
 
-        let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
-
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
         let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
+        let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
 
-        if (!isCustomGalaxy) {
-            let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
-    
-            if (desiredPlayerStarCount > desiredStarCount) {
-                throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
-            }
+        if (desiredPlayerStarCount > desiredStarCount) {
+            throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
         }
 
         // Ensure that c2c combat is disabled for orbital games.
