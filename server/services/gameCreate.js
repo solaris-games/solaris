@@ -4,7 +4,9 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
+    constructor(gameModel, gameService, gameListService, nameService, 
+        mapService, playerService, passwordService, conversationService, 
+        historyService, achievementService, userService, gameCreateValidationService) {
         this.gameModel = gameModel;
         this.gameService = gameService;
         this.gameListService = gameListService;
@@ -16,6 +18,7 @@ module.exports = class GameCreateService {
         this.historyService = historyService;
         this.achievementService = achievementService;
         this.userService = userService;
+        this.gameCreateValidationService = gameCreateValidationService;
     }
 
     async create(settings) {
@@ -107,7 +110,6 @@ module.exports = class GameCreateService {
         game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
             game, 
-            settings,
             desiredStarCount,
             game.settings.general.playerLimit
         );
@@ -129,6 +131,8 @@ module.exports = class GameCreateService {
         } else {
             this.conversationService.createConversationAllPlayers(game);
         }
+
+        this.gameCreateValidationService.validate(game);
 
         let gameObject = await game.save();
 
