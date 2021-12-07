@@ -33,7 +33,7 @@ module.exports = class AdminService {
 
     async listGames(limit) {
         return await this.gameRepo.find({
-            // All games
+            'settings.general.type': { $ne: 'tutorial' } // Non tutorial games
         }, {
             'settings.general': 1,
             'state': 1
