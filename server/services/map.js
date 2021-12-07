@@ -62,19 +62,15 @@ module.exports = class MapService {
             let starName = starNames[starNamesIndex++];
 
             if (isCustomGalaxy) {
-                star = this.starService.generateStar(game, starName, starLocation);
+                star = this.starService.generateCustomGalaxyStar(starName, starLocation);
             }
             else {
-                star = this.starService.generateUnownedStar(starNames[starNamesIndex++], loc, starLocation.resources);
+                star = this.starService.generateUnownedStar(starName, loc, starLocation.resources);
             }
             
             stars.push(star);
 
             if (starLocation.homeStar) {
-                if (starLocation.playerIndex != null) {
-                  game.galaxy.playerIndexes.push(starLocation.playerIndex)
-                }
-
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
@@ -82,10 +78,10 @@ module.exports = class MapService {
                   let linkedStarName = starNames[starNamesIndex++];
 
                   if (isCustomGalaxy) {
-                    linkedStar = this.starService.generateStar(game, linkedStarName, linkedLocation)
+                    linkedStar = this.starService.generateCustomGalaxyStar(linkedStarName, linkedLocation)
                   }
                   else {
-                    linkedStar = this.starService.generateUnownedStar(starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
+                    linkedStar = this.starService.generateUnownedStar(linkedStarName, linkedLocation, linkedLocation.resources);
                   }
 
                   stars.push(linkedStar);

@@ -39,7 +39,7 @@ module.exports = class StarService extends EventEmitter {
         };
     }
 
-    generateStar(game, name, star) {
+    generateCustomGalaxyStar(name, star) {
       return {
         _id: mongoose.Types.ObjectId(),
         name: name,

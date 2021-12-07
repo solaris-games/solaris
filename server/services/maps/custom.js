@@ -45,7 +45,7 @@ module.exports = class CustomMapService {
             if (star?.homeStar) {
               homeStars.push(star)
               star.linkedLocations = []
-              if (star.playerIndex >=0) { playerIndexes.push(star.playerIndex) }
+              if (star.playerIndex >= 0) { playerIndexes.push(star.playerIndex) }
             }
 
             locations.push(star)
@@ -55,12 +55,9 @@ module.exports = class CustomMapService {
 
         if (homeStars.length === playerIndexes.length) {
           this._linkStars(homeStars, locations)
-        }
-        else {
-          if(playerIndexes.length !== 0) {
-            throw new ValidationError('Unequal amount of home stars and players, or repeated player IDs')
-          } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
-        }
+        } else if (playerIndexes.length !== 0) {
+          throw new ValidationError('Unequal amount of home stars and players, or repeated player IDs')
+        } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
 
         let commonStarAmount = homeStars[0].linkedLocations.length
         for (let homeStar of homeStars) {
