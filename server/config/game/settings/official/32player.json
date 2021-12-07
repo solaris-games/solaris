@@ -26,13 +26,19 @@
     "randomWormHoles": 5,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
+    "randomBlackHoles": 5,
     "darkGalaxy": "standard",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
+    "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 20
+    "carrierSpeed": 20,
+    "specialistBans": {
+      "star": [],
+      "carrier": []
+    }
   },
   "conquest": {
     "victoryCondition": "starPercentage",

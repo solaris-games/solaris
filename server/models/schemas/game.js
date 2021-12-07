@@ -58,13 +58,19 @@ const schema = new Schema({
 			randomWormHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomNebulas: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomBlackHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			splitResources: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
+			specialistBans: {
+				star: [{ type: Types.Number, required: false }],
+				carrier: [{ type: Types.Number, required: false }]
+			},
         },
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },

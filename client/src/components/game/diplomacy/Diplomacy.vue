@@ -39,6 +39,7 @@ import MenuTitle from '../MenuTitle'
 import LoadingSpinner from '../../LoadingSpinner'
 import DiplomacyApiService from '../../../services/api/diplomacy'
 import DiplomacyRowVue from './DiplomacyRow'
+import GameHelper from '../../../services/gameHelper'
 
 export default {
   components: {
@@ -99,7 +100,7 @@ export default {
   },
   computed: {
     isFormalAlliancesEnabled () {
-      return this.$store.state.game.settings.player.alliances === 'enabled'
+      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
     }
   }
 }
@@ -111,7 +112,7 @@ table tr {
 }
 
 .table-sm td {
-    padding: 0;
+  padding: 0;
 }
 
 .table td.fit,

@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     isFormalAlliancesEnabled () {
-      return this.$store.state.game.settings.player.alliances === 'enabled'
+      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
     }
   }
 }

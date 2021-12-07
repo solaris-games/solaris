@@ -123,6 +123,8 @@
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
+
+    <div class="spacing-footer d-block d-sm-none"></div>
   </div>
 
   <footer-bar class="footer-bar d-xs-block d-sm-none" 
@@ -339,13 +341,19 @@ export default {
 }
 
 .menu {
-  position:absolute; /* This is a must otherwise the div overlays the map */
+  /* This is a must otherwise the div overlays the map */
+  position:absolute;
   width: 473px;
   padding-top: 45px;
   max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+}
+
+.spacing-footer {
+  height: 52px;
+  pointer-events: none;
 }
 
 ::-webkit-scrollbar {

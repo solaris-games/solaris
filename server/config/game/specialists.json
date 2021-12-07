@@ -239,7 +239,11 @@
                 },
                 "special": {
                     "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": 25
+                    "reigniteDeadStarNaturalResources": {
+                        "economy": 25,
+                        "industry": 25,
+                        "science": 25
+                    }
                 }
             }
         }
@@ -341,7 +345,7 @@
             "oneShot": true,
             "modifiers": {
                 "special": {
-                    "deductNaturalResourcesOnTick": 1
+                    "addNaturalResourcesOnTick": -1
                 },
                 "local": {
                     "manufacturing": 5,

@@ -26,7 +26,7 @@ class OrbitalLocationLayer {
         let alpha = 0.2
         let starPoints = star.homeStar ? 9 : 6
 
-        let isDeadStar = star.naturalResources != null && star.naturalResources <= 0
+        let isDeadStar = star.naturalResources != null && star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 &&star.naturalResources.science <= 0
         let fillStar = !isDeadStar
         let lineWidth = isDeadStar ? 0.5 : 1
 

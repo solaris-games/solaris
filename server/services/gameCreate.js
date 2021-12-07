@@ -91,6 +91,14 @@ module.exports = class GameCreateService {
             game.settings.technology.startingTechnologyLevel.specialists = 0;
             game.settings.technology.researchCosts.specialists = 'none';
         }
+
+        // Ensure that specialist bans are cleared if specialists are disabled.
+        if (game.settings.specialGalaxy.specialistCost === 'none') {
+            game.settings.specialGalaxy.specialistBans = {
+                star: [],
+                carrier: []
+            };
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -113,6 +121,8 @@ module.exports = class GameCreateService {
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
+
+        this.mapService.generateTerrain(game);
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;

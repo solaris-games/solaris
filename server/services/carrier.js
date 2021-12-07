@@ -429,7 +429,8 @@ module.exports = class CarrierService {
         }
 
         // Reignite dead stars if applicable
-        if (this.starService.isDeadStar(destinationStar) && !carrier.isGift && this.specialistService.getReigniteDeadStar(carrier)) {
+        // Note: Black holes cannot be reignited.
+        if (!carrier.isGift && !destinationStar.isBlackHole && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
             this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
@@ -460,6 +461,13 @@ module.exports = class CarrierService {
 
     async moveCarrier(game, gameUsers, carrier) {
         let waypoint = carrier.waypoints[0];
+
+        // If the carrier is just about to launch, make damn sure the waypoint source is correct.
+        // Note: This is a plaster over an issue with the saving waypoint logic that doesn't validate waypoints correctly.
+        if (this.isLaunching(carrier)) {
+            waypoint.source = carrier.orbiting;
+        }
+
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));

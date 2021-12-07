@@ -26,7 +26,7 @@
                 <th>Name</th>
                 <th>Type</th>
                 <th>Players</th>
-                <th>Featured</th>
+                <th>Settings</th>
                 <th>Started</th>
                 <th>Ended</th>
                 <th>Tick</th>
@@ -45,8 +45,10 @@
                   {{game.state.players}}/{{game.settings.general.playerLimit}}
                 </td>
                 <td>
-                  <i class="clickable fas" :class="{'fa-check text-success':game.settings.general.featured,'fa-times text-danger':!game.settings.general.featured}"
-                    @click="toggleFeaturedGame(game)"></i>
+                  <i class="clickable fas" :class="{'fa-star text-success':game.settings.general.featured,'fa-star text-danger':!game.settings.general.featured}"
+                    @click="toggleFeaturedGame(game)" title="Featured"></i>
+                  <i class="clickable ml-1 fas" :class="{'fa-clock text-success':game.settings.general.timeMachine === 'enabled','fa-clock text-danger':game.settings.general.timeMachine === 'disabled'}"
+                    @click="toggleTimeMachineGame(game)" v-if="isAdministrator" title="Time Machine"></i>
                 </td>
                 <td><i class="fas" :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}" :title="game.state.startDate"></i></td>
                 <td><i class="fas" :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}" :title="game.state.endDate"></i></td>
@@ -249,6 +251,19 @@ export default {
         game.settings.general.featured = !game.settings.general.featured
 
         await AdminApiService.setGameFeatured(game._id, game.settings.general.featured)
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async toggleTimeMachineGame (game) {
+      try {
+        if (game.settings.general.timeMachine === 'enabled') {
+          game.settings.general.timeMachine = 'disabled'
+        } else {
+          game.settings.general.timeMachine = 'enabled'
+        }
+
+        await AdminApiService.setGameTimeMachine(game._id, game.settings.general.timeMachine)
       } catch (err) {
         console.error(err)
       }
