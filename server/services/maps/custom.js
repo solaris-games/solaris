@@ -32,16 +32,13 @@ module.exports = class CustomMapService {
             this._checkStarProperty(star?.infrastructure, 'economy', 'number')
             this._checkStarProperty(star?.infrastructure, 'industry', 'number')
             this._checkStarProperty(star?.infrastructure, 'science', 'number')
-            //this._checkStarProperty(star, 'ships', 'number')
+            // this._checkStarProperty(star, 'ships', 'number')
             this._checkStarProperty(star, 'playerIndex', 'number')
             this._checkStarProperty(star, 'homeStar', 'boolean')
             this._checkStarProperty(star, 'specialistId', 'number')
 
-            if (star.naturalResources < 0 || star.naturalResources > game.constants.star.resources.maxNaturalResources)
-                throw new ValidationError(`Illegal starting amount of resources, range needs to be between 0 and ${game.constants.star.resources.maxNaturalResources} inclusive`);
-            
             if (star.playerIndex >= (colours.length * shapes.length))
-                throw new ValidationError('Invalid playerIndex')
+                throw new ValidationError('Invalid playerIndex');
 
             if (star?.homeStar) {
               homeStars.push(star);

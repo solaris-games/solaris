@@ -9,7 +9,14 @@ module.exports = class GameCreateValidationService {
         this.specialistService = specialistService;
     }
 
+    // Note: The reason why this isn't in a unit test is because custom galaxies
+    // need to run through this validation.
     validate(game) {
+        // Assert that there is the correct number of players.
+        if (game.galaxy.players.length !== game.settings.general.playerLimit) {
+            throw new ValidationError(`The game must have ${game.settings.general.playerLimit} players.`);
+        }
+
         for (let player of game.galaxy.players) {
             // Assert that all players have the correct number of stars.
             let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
@@ -33,11 +40,35 @@ module.exports = class GameCreateValidationService {
                 throw new ValidationError(`All players must have a unique colour/shape combination.`);
             }
 
+            // Assert that the player has the correct amount of starting credits
+            if (player.credits !== game.settings.player.startingCredits) {
+                throw new ValidationError(`All players must start with ${game.settings.player.startingCredits} credits.`);
+            }
+
+            // Assert that the player has the correct amount of starting tokens
+            if (player.creditsSpecialists !== game.settings.player.startingCreditsSpecialists) {
+                throw new ValidationError(`All players must start with ${game.settings.player.startingCreditsSpecialists} specialist tokens.`);
+            }
+
             // Assert that all players start with 1 carrier.
             let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
             if (carriers.length !== 1) {
                 throw new ValidationError(`All players must have 1 carrier.`);
+            }
+
+            // Assert that all players have the correct starting technology levels.
+            if (
+                player.research.terraforming.level !== game.settings.technology.startingTechnologyLevel.terraforming ||
+                player.research.experimentation.level !== game.settings.technology.startingTechnologyLevel.experimentation ||
+                player.research.scanning.level !== game.settings.technology.startingTechnologyLevel.scanning ||
+                player.research.hyperspace.level !== game.settings.technology.startingTechnologyLevel.hyperspace ||
+                player.research.manufacturing.level !== game.settings.technology.startingTechnologyLevel.manufacturing ||
+                player.research.banking.level !== game.settings.technology.startingTechnologyLevel.banking ||
+                player.research.weapons.level !== game.settings.technology.startingTechnologyLevel.weapons ||
+                player.research.specialists.level !== game.settings.technology.startingTechnologyLevel.specialists
+            ) {
+                throw new ValidationError(`All players must start with valid starting technology levels.`);
             }
         }
 
@@ -83,6 +114,17 @@ module.exports = class GameCreateValidationService {
             // Assert that all stars have valid specialists.
             if (star.specialistId && !this.specialistService.getByIdStar(star.specialistId)) {
                 throw new ValidationError(`All stars with specialists must have a valid specialist.`);
+            }
+
+            // Assert that home stars have the correct number of starting ships and infrastructure
+            if (star.homeStar && (
+                star.ships !== game.settings.player.startingShips
+                || star.shipsActual !== game.settings.player.startingShips
+                || star.infrastructure.economy !== game.settings.player.startingInfrastructure.economy
+                || star.infrastructure.industry !== game.settings.player.startingInfrastructure.industry
+                || star.infrastructure.science !== game.settings.player.startingInfrastructure.science
+            )) {
+                throw new ValidationError(`All capital stars must start with valid ships and infrastructure.`);
             }
         }
 
