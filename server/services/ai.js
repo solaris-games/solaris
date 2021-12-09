@@ -49,9 +49,10 @@ module.exports = class AIService {
         // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
         try {
             if (isFirstTick || !player.ai) {
-                await this._setupAi(game, player);
+                this._setupAi(game, player);
                 player.ai = true;
             }
+            this._updateState(game, player);
             const context = this._createContext(game, player);
             const orders = this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context, orders);
@@ -63,10 +64,24 @@ module.exports = class AIService {
         }
     }
 
-    async _setupAi(game, player) {
+    _setupAi(game, player) {
         player.aiState = {
             knownAttacks: [],
             startedInvasions: []
+        }
+    }
+
+    _updateState(game, player) {
+        if (!player.aiState) {
+            return;
+        }
+
+        if (player.aiState.knownAttacks) {
+            player.aiState.knownAttacks = player.aiState.knownAttacks.filter(attack => attack.arrivalTick > game.state.tick);
+        }
+
+        if (player.aiState.startedInvasions) {
+            player.aiState.startedInvasions = player.aiState.startedInvasions.filter(invasion => invasion.arrivalTick > game.state.tick);
         }
     }
 
@@ -145,7 +160,7 @@ module.exports = class AIService {
     }
 
     _invasionInProgress(player, starId) {
-        return player.aiState && player.aiState.startedInvasions && player.aiState.startedInvasions.find(starId);
+        return player.aiState && player.aiState.startedInvasions && player.aiState.startedInvasions.find(invasion => invasion.star === starId.toString());
     }
 
     _gatherExpansionOrders(game, player, context) {
