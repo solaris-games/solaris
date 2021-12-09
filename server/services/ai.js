@@ -54,7 +54,6 @@ module.exports = class AIService {
             }
             const context = this._createContext(game, player);
             const orders = this._gatherOrders(game, player, context);
-            console.log(orders);
             const assignments = await this._gatherAssignments(game, player, context, orders);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
@@ -131,6 +130,10 @@ module.exports = class AIService {
             }
         };
         orders.sort(reverseSort(sorter));
+
+        console.log(orders);
+
+
     }
 
     _gatherOrders(game, player, context) {
@@ -141,22 +144,45 @@ module.exports = class AIService {
         return defenseOrders.concat(expansionOrders, movementOrders);
     }
 
+    _invasionInProgress(player, starId) {
+        return player.aiState && player.aiState.startedInvasions && player.aiState.startedInvasions.find(starId);
+    }
+
     _gatherExpansionOrders(game, player, context) {
         const orders = [];
 
         for (const [fromId, reachables] of context.reachableStars) {
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
-                orders.push({
-                    type: 'CLAIM_STAR',
-                    score: candidate.naturalResources,
-                    star: candidate._id.toString(),
-                    from: fromId
-                });
+                if (!this._invasionInProgress(player, candidate._id)) {
+                    orders.push({
+                        type: 'CLAIM_STAR',
+                        score: candidate.naturalResources,
+                        star: candidate._id.toString(),
+                        from: fromId
+                    });
+                }
             }
         }
 
         return orders;
+    }
+
+    _isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers) {
+        if (!player.aiState || !player.aiState.knownAttacks) {
+            return false;
+        }
+
+        const attackAbsoluteTick = game.state.tick + attackInTicks;
+        const attackData = player.aiState.knownAttacks.find(attack => attack.starId === attackedStarId.toString() && attack.arrivalTick === attackAbsoluteTick);
+
+        if (!attackData) {
+            return false;
+        }
+
+        // TODO: Try to find out if allocated defense is sufficient
+
+        return false;
     }
 
     _gatherDefenseOrders(game, player, context) {
@@ -187,13 +213,15 @@ module.exports = class AIService {
                 const attackedStar = context.starsById.get(attackedStarId);
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
 
-                orders.push({
-                    type: 'DEFEND_STAR',
-                    score: starScore,
-                    star: attackedStarId,
-                    ticksUntil: attackInTicks,
-                    incomingCarriers
-                })
+                if (!this._isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers)) {
+                    orders.push({
+                        type: 'DEFEND_STAR',
+                        score: starScore,
+                        star: attackedStarId,
+                        ticksUntil: attackInTicks,
+                        incomingCarriers
+                    });
+                }
             }
         }
 
