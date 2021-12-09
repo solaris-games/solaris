@@ -91,7 +91,8 @@ function generateStarGrid() {
                 location: {
                     x, y
                 },
-                infrastructure: {}
+                infrastructure: {},
+                naturalResources: {}
             });
         }
     }
