@@ -65,7 +65,7 @@ module.exports = class MapService {
                 star = this.starService.generateCustomGalaxyStar(starName, starLocation);
             }
             else {
-                star = this.starService.generateUnownedStar(starName, loc, starLocation.resources);
+                star = this.starService.generateUnownedStar(starName, starLocation, starLocation.resources);
             }
             
             stars.push(star);

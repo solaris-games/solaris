@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const ValidationError = require("../../errors/validation");
 
 module.exports = class CustomMapService {
@@ -14,7 +15,7 @@ module.exports = class CustomMapService {
         }
 
         const locations = [];
-        let playerIndexes = [];
+        let playerIds = [];
         //const nameList = new Set()
         const homeStars = [];
 
@@ -23,54 +24,80 @@ module.exports = class CustomMapService {
         let colours = require('../../config/game/colours').slice();
 
         for (const star of json.stars) {
-          star.specialistId = star.specialistId || null;
+          // Fill in optional setting values.
+          star.id = star.id == null ? null : +star.id;
           star.homeStar = star.homeStar == null ? false : star.homeStar;
-          star.playerIndex = star.playerIndex == null ? -1 : star.playerIndex;
+          star.playerId = star.playerId == null ? null : +star.playerId;
+          star.warpGate = star.warpGate == null ? false : star.warpGate;
+          star.isNebula = star.isNebula == null ? false : star.isNebula;
+          star.isAsteroidField = star.isAsteroidField == null ? false : star.isAsteroidField;
+          star.isBlackHole = star.isBlackHole == null ? false : star.isBlackHole;
+          star.wormHoleToStarId = star.wormHoleToStarId == null ? null : +star.wormHoleToStarId;
+          star.specialistId = star.specialistId == null ? null : +star.specialistId;
 
-          this._checkStarProperty(star?.location, 'x', 'number')
-          this._checkStarProperty(star?.location, 'y', 'number')
-          this._checkStarProperty(star?.naturalResources, 'economy', 'number')
-          this._checkStarProperty(star?.naturalResources, 'industry', 'number')
-          this._checkStarProperty(star?.naturalResources, 'science', 'number')
-          this._checkStarProperty(star, 'warpGate', 'boolean')
-          this._checkStarProperty(star?.infrastructure, 'economy', 'number')
-          this._checkStarProperty(star?.infrastructure, 'industry', 'number')
-          this._checkStarProperty(star?.infrastructure, 'science', 'number')
-          // this._checkStarProperty(star, 'ships', 'number')
-          // this._checkStarProperty(star, 'playerIndex', 'number')
-          this._checkStarProperty(star, 'homeStar', 'boolean')
-          // this._checkStarProperty(star, 'specialistId', 'number')
-
-          if (star.playerIndex >= (colours.length * shapes.length))
-              throw new ValidationError('Invalid playerIndex');
+          // Dont trust the user as far as you can throw him.
+          this._checkStarProperty(star, 'id', 'number', false);
+          this._checkStarProperty(star, 'playerId', 'number', true);
+          this._checkStarProperty(star?.location, 'x', 'number', false);
+          this._checkStarProperty(star?.location, 'y', 'number', false);
+          this._checkStarProperty(star?.naturalResources, 'economy', 'number', false);
+          this._checkStarProperty(star?.naturalResources, 'industry', 'number', false);
+          this._checkStarProperty(star?.naturalResources, 'science', 'number', false);
+          this._checkStarProperty(star, 'warpGate', 'boolean', true);
+          this._checkStarProperty(star, 'isNebula', 'boolean', true);
+          this._checkStarProperty(star, 'isAsteroidField', 'boolean', true);
+          this._checkStarProperty(star, 'isBlackHole', 'boolean', true);
+          this._checkStarProperty(star, 'wormHoleToStarId', 'number', true);
+          this._checkStarProperty(star, 'homeStar', 'boolean', true);
+          this._checkStarProperty(star, 'specialistId', 'number', true);
+          // this._checkStarProperty(star, 'ships', 'number');
 
           if (star?.homeStar) {
             homeStars.push(star);
             star.linkedLocations = [];
 
-            if (star.playerIndex >= 0) { 
-              playerIndexes.push(star.playerIndex);
+            if (star.playerId != null) { 
+              playerIds.push(star.playerId);
             }
           }
 
           locations.push(star);
         }
 
-        playerIndexes = [...new Set(playerIndexes)]; // ignore repeated player indexes
+        playerIds = [...new Set(playerIds)]; // ignore repeated player indexes
 
-        if (homeStars.length === playerIndexes.length) {
+        if (homeStars.length === playerIds.length) {
           this._linkStars(homeStars, locations);
-        } else if (playerIndexes.length !== 0) {
+        } else if (playerIds.length !== 0) {
           throw new ValidationError('Unequal amount of home stars and players, or repeated player IDs');
         } // its fine to have all stars without players, in this case the other parts of game generation will asign players and initial stars
+
+        // Populate actual IDs for all stars
+        for (let loc of locations) {
+          loc._id = mongoose.Types.ObjectId();
+        }
+
+        // Populate worm hole IDs of stars
+        for (let loc of locations.filter(l => l.wormHoleToStarId != null)) {
+          loc.wormHoleToStarId = locations.find(l => l.id === loc.wormHoleToStarId)?._id;
+
+          if (!loc.wormHoleToStarId || loc.wormHoleToStarId.equals(loc._id)) {
+            throw new ValidationError(`Worm hole to star id is invalid for ${JSON.stringify(loc)}`);
+          }
+        }
 
         return locations;
     }
 
-    _checkStarProperty(star, property, type) {
-        if (star === undefined) throw new ValidationError(`Missing property location or infrastructure of star ${star}`);
-        if (star?.[property] === undefined) throw new ValidationError(`Missing property ${property} of star ${star}`);
-        if (typeof star[property] !== type) throw new ValidationError(`Invalid type property ${property} of star ${star}`);
+    _checkStarProperty(star, property, type, allowNull) {
+        if (star === undefined) throw new ValidationError(`Missing property of star ${star}`);
+        if (star?.[property] === undefined) throw new ValidationError(`Missing property ${property} of star ${JSON.stringify(star)}`);
+
+        if (allowNull && star[property] === null) {
+          return true;
+        }
+
+        if (typeof star[property] !== type) throw new ValidationError(`Invalid type property ${property} of star ${JSON.stringify(star)}`);
 
         return true;
     }
@@ -83,7 +110,7 @@ module.exports = class CustomMapService {
         homeStar.linkedLocations = [];
 
         for (let commonStar of commonStars) {
-          if (commonStar.playerIndex === homeStar.playerIndex) {
+          if (commonStar.playerId === homeStar.playerId) {
             homeStar.linkedLocations.push(commonStar);
             commonStar.linked = true;
           }
