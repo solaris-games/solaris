@@ -14,7 +14,7 @@
     "galaxy":{
        "galaxyType":"custom",
        "customJSON":"<INSERT ESCAPED JSON HERE>",
-       "starsPerPlayer":5,
+       "starsPerPlayer":6,
        "productionTicks":20
     },
     "specialGalaxy":{

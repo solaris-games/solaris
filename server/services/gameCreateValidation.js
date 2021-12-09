@@ -2,8 +2,8 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameCreateValidationService {
     
-    constructor(starService,
-        carrierService, specialistService) {
+    constructor(playerService, starService, carrierService, specialistService) {
+        this.playerService = playerService;
         this.starService = starService;
         this.carrierService = carrierService;
         this.specialistService = specialistService;
@@ -79,13 +79,33 @@ module.exports = class GameCreateValidationService {
             throw new ValidationError(`The galaxy must have a total of ${noOfStars} stars.`);
         }
 
+        // Assert that there are the correct number of home stars.
+        if (game.galaxy.stars.filter(s => s.homeStar).length !== game.settings.general.playerLimit) {
+            throw new ValidationError(`The galaxy must have a total of ${game.settings.general.playerLimit} capital stars.`);
+        }
+
         for (let star of game.galaxy.stars) {
+            // Assert that home stars are owned by players.
+            if (star.homeStar && (
+                !star.ownedByPlayerId || !this.playerService.getById(game, star.ownedByPlayerId)
+            )) {
+                throw new ValidationError(`All capital stars must be owned by a player.`);
+            }
+
             // Assert that all stars in the galaxy have valid natural resources
             if (star.naturalResources.economy < 0
                 || star.naturalResources.industry < 0
                 || star.naturalResources.science < 0) {
                     throw new ValidationError(`All stars must have valid natural resources.`);
                 }
+
+            // Assert that the natural resources are correct based on normal vs. split resources setting.
+            if (game.settings.specialGalaxy.splitResources === 'disabled' && (
+                star.naturalResources.economy !== star.naturalResources.industry
+                && star.naturalResources.economy !== star.naturalResources.science
+            )) {
+                throw new ValidationError(`All stars must have equal natural resources for non-split resources.`);
+            }
 
             // Assert that all stars in the galaxy have valid infrastructure
             if (star.infrastructure.economy < 0
@@ -94,6 +114,22 @@ module.exports = class GameCreateValidationService {
                     throw new ValidationError(`All stars must have valid infrastructure.`);
                 }
 
+            if (star.homeStar && (
+                star.infrastructure.economy !== game.settings.player.startingInfrastructure.economy
+                || star.infrastructure.industry !== game.settings.player.startingInfrastructure.industry
+                || star.infrastructure.science !== game.settings.player.startingInfrastructure.science
+            )) {
+                throw new ValidationError(`All capital stars must start with valid starting infrastructure.`);
+            }
+
+            if (!star.homeStar && (
+                star.infrastructure.economy > 0
+                || star.infrastructure.industry > 0
+                || star.infrastructure.science > 0
+            )) {
+                throw new ValidationError(`All non capital stars must start with 0 starting infrastructure.`);
+            }
+
             // Assert that dead stars have valid infrastructure
             if (this.starService.isDeadStar(star)
                 && (
@@ -101,7 +137,7 @@ module.exports = class GameCreateValidationService {
                     || star.infrastructure.industry > 0
                     || star.infrastructure.science > 0
                     || star.specialistId
-                    || star.warpGate
+                    // || star.warpGate // TODO: This is a bug, dead stars cannot have warp gates however the map gen sometimes assigns them which is incorrect.
                 )) {
                     throw new ValidationError(`All dead stars must have 0 infrastructure, no specialists and no warp gates.`);
                 }
@@ -109,6 +145,13 @@ module.exports = class GameCreateValidationService {
             // Assert that all stars have valid starting ships
             if (star.ships < 0 || star.shipsActual < 0) {
                 throw new ValidationError(`All stars must have 0 or greater ships.`);
+            }
+
+            if (!star.homeStar && star.ownedByPlayerId && (
+                star.ships !== game.settings.player.startingShips
+                || star.shipsActual !== game.settings.player.startingShips
+            )) {
+                throw new ValidationError(`All non capital stars owned by players must have ${game.settings.player.startingShips} ships.`);
             }
     
             // Assert that all stars have valid specialists.
@@ -125,6 +168,11 @@ module.exports = class GameCreateValidationService {
                 || star.infrastructure.science !== game.settings.player.startingInfrastructure.science
             )) {
                 throw new ValidationError(`All capital stars must start with valid ships and infrastructure.`);
+            }
+
+            // Assert that the worm home IDs are valid
+            if (star.wormHoleToStarId && !this.starService.getById(game, star.wormHoleToStarId)) {
+                throw new ValidationError(`All worm holes must be paired with a valid star.`);
             }
         }
 

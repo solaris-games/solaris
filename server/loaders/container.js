@@ -143,7 +143,7 @@ module.exports = (config, io) => {
         ledgerService, conversationService, combatService, specialistService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
-    const gameCreateValidationService = new GameCreateValidationService(starService, carrierService, specialistService);
+    const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService);
     const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService);
 
     return {
