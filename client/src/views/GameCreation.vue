@@ -177,7 +177,7 @@
 
       <div class="form-group" v-if="settings.galaxy.galaxyType == 'custom'">
         <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
-        <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON'></textarea>
+        <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
       </div>
 
       <div class="form-group">
@@ -245,35 +245,35 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>) <help-tooltip tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"/></label>
         <div class="col">
           <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>) <help-tooltip tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"/></label>
         <div class="col">
           <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide ships at stars"/></label>
         <div class="col">
           <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></label>
         <div class="col">
           <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="randomBlackHoles" class="col-form-label">Random Black Holes (<span class="text-warning">{{settings.specialGalaxy.randomBlackHoles}}%</span>) <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></label>
         <div class="col">
           <input type="range" min="0" max="50" step="5" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
@@ -325,7 +325,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="resourceDistribution" class="col-form-label">Resource Distribution <help-tooltip tooltip="Determines the shape of distributed natural resources in the galaxy"/></label>
         <select class="form-control" id="resourceDistribution" v-model="settings.specialGalaxy.resourceDistribution" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.resourceDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -334,7 +334,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="playerDistribution" class="col-form-label">Player Distribution <help-tooltip tooltip="Determines where player home stars are located at the start of the game"/></label>
         <select class="form-control" id="playerDistribution" v-model="settings.specialGalaxy.playerDistribution" :disabled="isCreatingGame">
           <option v-for="opt in options.specialGalaxy.playerDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -621,6 +621,8 @@
         <specialist-ban-list-selection @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged" />
       </div>
       
+      <form-error-list v-bind:errors="errors"/>
+
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
 
     </form>
