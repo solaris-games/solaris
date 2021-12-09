@@ -109,7 +109,8 @@ describe('star', () => {
 
         const homeStar = {
             _id: 2,
-            infrastructure: {}
+            infrastructure: {},
+            naturalResources: {}
         };
 
         const gameSettings = {

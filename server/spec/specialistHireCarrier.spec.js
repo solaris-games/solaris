@@ -28,7 +28,11 @@ describe('specialistHire - Carrier', () => {
                 settings: {
                     specialGalaxy: {
                         specialistCost: 'standard',
-                        specialistsCurrency: 'credits'
+                        specialistsCurrency: 'credits',
+                        specialistBans: {
+                            star: [],
+                            carrier: []
+                        }
                     }
                 },
                 galaxy: {
@@ -113,6 +117,22 @@ describe('specialistHire - Carrier', () => {
         } catch (err) {
             hasError = true;
             expect(err.message).toContain('disabled the hiring of specialists');
+        }
+        
+        expect(hasError).toBeTruthy();
+    });
+
+    it('should throw an error if the specialist is banned', async () => {
+        let testObj = setup();
+        let hasError = false;
+
+        testObj.game.settings.specialGalaxy.specialistBans.carrier.push(testObj.specialistId);
+
+        try {
+            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+        } catch (err) {
+            hasError = true;
+            expect(err.message).toContain('banned');
         }
         
         expect(hasError).toBeTruthy();

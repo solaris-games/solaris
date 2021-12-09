@@ -1,19 +1,20 @@
 {
     "general":{
-       "name":null,
+       "name":"Test Custom Galaxy Game",
        "description":null,
        "type":"custom",
        "mode":"conquest",
        "password":null,
-       "playerLimit":8,
+       "playerLimit":2,
        "playerType":"establishedPlayers",
        "anonymity":"normal",
        "playerOnlineStatus":"hidden",
        "timeMachine":"disabled"
     },
     "galaxy":{
-       "galaxyType":"circular",
-       "starsPerPlayer":20,
+       "galaxyType":"custom",
+       "customJSON":"<INSERT ESCAPED JSON HERE>",
+       "starsPerPlayer":6,
        "productionTicks":20
     },
     "specialGalaxy":{
@@ -22,11 +23,11 @@
        "warpgateCost":"standard",
        "specialistCost":"standard",
        "specialistsCurrency":"creditsSpecialists",
-       "randomWarpGates":10,
-       "randomWormHoles":5,
-       "randomNebulas":15,
-       "randomAsteroidFields":10,
-       "randomBlackHoles":5,
+       "randomWarpGates":0,
+       "randomWormHoles":0,
+       "randomNebulas":0,
+       "randomAsteroidFields":0,
+       "randomBlackHoles":0,
        "darkGalaxy":"disabled",
        "giftCarriers":"enabled",
        "defenderBonus":"enabled",
@@ -42,7 +43,7 @@
     },
     "conquest":{
        "victoryCondition":"starPercentage",
-       "victoryPercentage":50
+       "victoryPercentage":100
     },
     "orbitalMechanics":{
        "enabled":"disabled",
@@ -50,7 +51,7 @@
        "orbitOrigin":"galacticCenter"
     },
     "player":{
-       "startingStars":6,
+       "startingStars":5,
        "startingCredits":500,
        "startingCreditsSpecialists":5,
        "startingShips":10,

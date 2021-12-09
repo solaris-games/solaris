@@ -33,7 +33,11 @@
     "carrierToCarrierCombat": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 10
+    "carrierSpeed": 10,
+    "specialistBans": {
+      "star": [],
+      "carrier": []
+    }
   },
   "conquest": {
     "victoryCondition": "starPercentage",

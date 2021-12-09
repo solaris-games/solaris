@@ -79,7 +79,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayer(game, colour, shape) {
-        return {
+        let player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
@@ -100,6 +100,10 @@ module.exports = class PlayerService extends EventEmitter {
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             }
         };
+
+        this._setDefaultResearchTechnology(game, player);
+
+        return player;
     }
 
     createEmptyPlayers(game) {
@@ -109,20 +113,17 @@ module.exports = class PlayerService extends EventEmitter {
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
-        for(let i = 0; i < game.settings.general.playerLimit; i++) {
+        for (let i = 0; i < game.settings.general.playerLimit; i++) {
             // Get a random colour to assign to the player.
             if (!colours.length) {
                 colours = require('../config/game/colours').slice();
                 shapeIndex++;
             }
 
-            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+            let colour = this._getRandomColour(colours);
             let shape = shapes[shapeIndex];
 
-            let player = this.createEmptyPlayer(game, colour, shape);
-
-            this._setDefaultResearchTechnology(game, player);
-            players.push(player);
+            players.push(this.createEmptyPlayer(game, colour, shape));
         }
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
@@ -141,8 +142,12 @@ module.exports = class PlayerService extends EventEmitter {
         return players;
     }
 
+    _getRandomColour(colours) {
+        return colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+    }
+
     _distributePlayerLinkedHomeStars(game, players) {
-        for(let player of players) {
+        for (let player of players) {
             let homeStarId = game.galaxy.homeStars.pop();
 
             // Set up the home star
@@ -233,10 +238,12 @@ module.exports = class PlayerService extends EventEmitter {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            star.specialistId = null;
-            star.infrastructure.economy = 0;
-            star.infrastructure.industry = 0;
-            star.infrastructure.science = 0;
+            
+            star.warpGate = star.warpGate ?? false;
+            star.specialistId = star.specialistId ?? null;
+            star.infrastructure.economy = star.infrastructure.economy ?? 0;
+            star.infrastructure.industry = star.infrastructure.industry ?? 0;
+            star.infrastructure.science = star.infrastructure.science ?? 0;
 
             if (resetWarpGates) {
                 star.warpGate = false;

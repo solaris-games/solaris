@@ -257,6 +257,7 @@ class Map extends EventEmitter {
 
   _isWormHolesEnabled () {
     return this.game.settings.specialGalaxy.randomWormHoles
+      || this.game.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
   _setupChunks() {

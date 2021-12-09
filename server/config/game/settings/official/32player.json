@@ -34,7 +34,11 @@
     "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 20
+    "carrierSpeed": 20,
+    "specialistBans": {
+      "star": [],
+      "carrier": []
+    }
   },
   "conquest": {
     "victoryCondition": "starPercentage",

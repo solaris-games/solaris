@@ -352,17 +352,24 @@
         </tbody>
       </table>
     </div>
+
+    <div v-if="game && game.settings.specialGalaxy.specialistCost !== 'none'">
+      <view-subtitle title="Specialist Bans"/>
+      <specialist-ban-list :game="game"/>
+    </div>
   </div>
 </template>
 
 <script>
 import ViewSubtitle from '../../ViewSubtitle.vue'
 import HelpTooltip from '../../HelpTooltip'
+import SpecialistBanList from '../specialist/SpecialistBanList'
 
 export default {
   components: {
     'view-subtitle': ViewSubtitle,
-    'help-tooltip': HelpTooltip
+    'help-tooltip': HelpTooltip,
+    'specialist-ban-list': SpecialistBanList
   },
   props: {
     game: Object

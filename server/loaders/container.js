@@ -26,6 +26,7 @@ const EmailService = require('../services/email');
 const EventService = require('../services/event');
 const LeaderboardService = require('../services/leaderboard');
 const GameService = require('../services/game');
+const GameCreateValidationService = require('../services/gameCreateValidation');
 const GameCreateService = require('../services/gameCreate');
 const GameGalaxyService = require('../services/gameGalaxy');
 const GameListService = require('../services/gameList');
@@ -72,6 +73,7 @@ const CircularBalancedMapService = require('../services/maps/circularBalanced');
 const SpiralMapService = require('../services/maps/spiral');
 const DoughnutMapService = require('../services/maps/doughnut');
 const IrregularMapService = require('../services/maps/irregular');
+const CustomMapService = require('../services/maps/custom');
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -113,7 +115,8 @@ module.exports = (config, io) => {
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService, resourceService);
     const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService, resourceService);
     const irregularMapService = new IrregularMapService(randomService, starService, starDistanceService, distanceService, resourceService);
-    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService);
+    const customMapService = new CustomMapService();
+    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService);
     const ledgerService = new LedgerService(gameRepository, playerService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService);
@@ -140,7 +143,8 @@ module.exports = (config, io) => {
         ledgerService, conversationService, combatService, specialistService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService);
+    const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService);
+    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService);
 
     return {
         adminService,
@@ -154,6 +158,7 @@ module.exports = (config, io) => {
         eventService,
         leaderboardService,
         gameService,
+        gameCreateValidationService,
         gameCreateService,
         gameGalaxyService,
         gameListService,
