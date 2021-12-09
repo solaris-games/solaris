@@ -109,7 +109,7 @@ module.exports = class PlayerService extends EventEmitter {
     createEmptyPlayers(game) {
         let players = [];
 
-        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+        let shapes = require('../config/game/shapes').map(s => s.name);
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 

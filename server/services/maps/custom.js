@@ -19,7 +19,7 @@ module.exports = class CustomMapService {
         const homeStars = [];
 
         // TODO make a file containing the shapes
-        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+        let shapes = require('../../config/game/shapes').map(s => s.name);
         let colours = require('../../config/game/colours').slice();
 
         for (const star of json.stars) {
