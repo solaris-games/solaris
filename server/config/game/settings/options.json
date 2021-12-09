@@ -272,6 +272,10 @@
           {
              "value":"circular-balanced",
              "text":"Circular Balanced"
+          },
+          {
+             "value": "custom",
+             "text": "Custom"
           }
        ],
        "starsPerPlayer":[

@@ -175,8 +175,13 @@
         </select>
       </div>
 
+      <div class="form-group" v-if="settings.galaxy.galaxyType == 'custom'">
+        <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
+        <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON'></textarea>
+      </div>
+
       <div class="form-group">
-        <label for="starsPerPlayer" class="col-form-label">Stars Per Player <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></label>
+        <label for="starsPerPlayer" class="col-form-label">Stars per Player <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></label>
         <select class="form-control" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
           <option v-for="opt in options.galaxy.starsPerPlayer" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}

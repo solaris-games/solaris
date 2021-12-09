@@ -39,6 +39,23 @@ module.exports = class StarService extends EventEmitter {
         };
     }
 
+    generateCustomGalaxyStar(name, star) {
+      return {
+        _id: star._id,
+        name: name,
+        naturalResources: star.naturalResources,
+        location: star.location,
+        infrastructure: star.infrastructure,
+        homeStar: star.homeStar,
+        warpGate: star.warpGate,
+        isNebula: star.isNebula,
+        isAsteroidField: star.isAsteroidField,
+        isBlackHole: star.isBlackHole,
+        wormHoleToStarId: star.wormHoleToStarId,
+        specialistId: star.specialistId
+      }
+    }
+
     generateStarPosition(game, originX, originY, radius) {
         if (radius == null) {
             radius = game.constants.distances.maxDistanceBetweenStars;
@@ -97,6 +114,7 @@ module.exports = class StarService extends EventEmitter {
         homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
         homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
         homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
+
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
         homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;

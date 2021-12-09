@@ -4,7 +4,9 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
     
-    constructor(gameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService) {
+    constructor(gameModel, gameService, gameListService, nameService, 
+        mapService, playerService, passwordService, conversationService, 
+        historyService, achievementService, userService, gameCreateValidationService) {
         this.gameModel = gameModel;
         this.gameService = gameService;
         this.gameListService = gameListService;
@@ -16,6 +18,7 @@ module.exports = class GameCreateService {
         this.historyService = historyService;
         this.achievementService = achievementService;
         this.userService = userService;
+        this.gameCreateValidationService = gameCreateValidationService;
     }
 
     async create(settings) {
@@ -65,7 +68,8 @@ module.exports = class GameCreateService {
             settings
         });
 
-        // Calculate how many stars we need.
+        // For non-custom galaxies we need to check that the player has actually provided
+        // enough stars for each player.
         let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
         let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
 
@@ -105,9 +109,11 @@ module.exports = class GameCreateService {
         game.galaxy.homeStars = [];
         game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
-            game,
+            game, 
             desiredStarCount,
-            game.settings.general.playerLimit);
+            game.settings.general.playerLimit,
+            settings.galaxy.customJSON
+        );
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
@@ -126,6 +132,8 @@ module.exports = class GameCreateService {
         } else {
             this.conversationService.createConversationAllPlayers(game);
         }
+
+        this.gameCreateValidationService.validate(game);
 
         let gameObject = await game.save();
 
