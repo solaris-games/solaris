@@ -46,7 +46,7 @@ const schema = new Schema({
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
-			productionTicks: { type: Types.Number, required: true, enum: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
+			productionTicks: { type: Types.Number, required: true, min: 10, max: 36, default: 24 }
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -83,8 +83,8 @@ const schema = new Schema({
 		},
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
-			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
-			startingCreditsSpecialists: { type: Types.Number, required: true, enum: [0, 1, 3, 5, 10, 25, 50, 100], default: 5 },
+			startingCredits: { type: Types.Number, required: true, min: 25, max: 3000, default: 500 },
+			startingCreditsSpecialists: { type: Types.Number, required: true, min: 0, max: 100, default: 5 },
 			startingShips: { type: Types.Number, required: true, min: 0, max: 100, default: 10 },
 			startingInfrastructure: {
 				economy: { type: Types.Number, required: true, min: 0, max: 30, default: 5 },

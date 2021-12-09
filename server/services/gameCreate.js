@@ -97,6 +97,14 @@ module.exports = class GameCreateService {
                 carrier: []
             };
         }
+
+        if (game.settings.galaxy.galaxyType === 'custom') {
+            game.settings.specialGalaxy.randomWarpGates = 0;
+            game.settings.specialGalaxy.randomWormHoles = 0;
+            game.settings.specialGalaxy.randomNebulas = 0;
+            game.settings.specialGalaxy.randomAsteroidFields = 0;
+            game.settings.specialGalaxy.randomBlackHoles = 0;
+        }
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {

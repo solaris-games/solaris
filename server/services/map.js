@@ -43,7 +43,7 @@ module.exports = class MapService {
                 starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             case 'custom':
-                starLocations = this.customMapService.generateLocations(customJSON);
+                starLocations = this.customMapService.generateLocations(customJSON, playerLimit);
                 break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
