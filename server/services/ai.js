@@ -5,6 +5,10 @@ const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 const Heap = require('qheap');
 const { getOrInsert, minBy, minElementBy, reverseSort } = require('../utils.js')
 
+const DEFEND_STAR_ACTION = 'DEFEND_STAR';
+const CLAIM_STAR_ACTION = 'CLAIM_STAR';
+const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
+
 module.exports = class AIService {
     constructor(starUpgradeService, carrierService, starService, distanceService, waypointService) {
         this.starUpgradeService = starUpgradeService;
@@ -56,7 +60,6 @@ module.exports = class AIService {
             const context = this._createContext(game, player);
             const orders = this._gatherOrders(game, player, context);
             const assignments = this._gatherAssignments(game, player, context);
-            console.log(assignments);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
             game.save();
@@ -130,16 +133,23 @@ module.exports = class AIService {
         };
         orders.sort(reverseSort(sorter));
 
-        console.log(orders);
+        // For now, process orders in order of importance and try to find the best assignment possible for each order.
+        // Later, a different scoring process could be used to maximize overall scores.
+
+        for (const order of orders) {
+            if (order.type === DEFEND_STAR_ACTION) {
+                const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil);
+            }
+        }
     }
 
     priorityFromOrderCategory(category) {
         switch (category) {
-            case 'DEFEND_STAR':
+            case DEFEND_STAR_ACTION:
                 return 3;
-            case 'CLAIM_STAR':
+            case CLAIM_STAR_ACTION:
                 return 2;
-            case 'REINFORCE_STAR':
+            case REINFORCE_STAR_ACTION:
                 return 1;
             default:
                 return 0;
@@ -190,7 +200,7 @@ module.exports = class AIService {
             for (const candidate of claimCandidates) {
                 if (!this._invasionInProgress(player, candidate._id)) {
                     orders.push({
-                        type: 'CLAIM_STAR',
+                        type: CLAIM_STAR_ACTION,
                         score: candidate.naturalResources,
                         star: candidate._id.toString(),
                         from: fromId
@@ -202,13 +212,17 @@ module.exports = class AIService {
         return orders;
     }
 
-    _isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers) {
+    _getAttackData(game, player, context, attackedStarId, attackInTicks) {
         if (!player.aiState || !player.aiState.knownAttacks) {
-            return false;
+            return null;
         }
 
         const attackAbsoluteTick = game.state.tick + attackInTicks;
-        const attackData = player.aiState.knownAttacks.find(attack => attack.starId === attackedStarId.toString() && attack.arrivalTick === attackAbsoluteTick);
+        return player.aiState.knownAttacks.find(attack => attack.starId === attackedStarId.toString() && attack.arrivalTick === attackAbsoluteTick);
+    }
+
+    _isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers) {
+        const attackData = this._getAttackData(game, player, context, attackedStarId, attackInTicks);
 
         if (!attackData) {
             return false;
@@ -249,7 +263,7 @@ module.exports = class AIService {
 
                 if (!this._isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers)) {
                     orders.push({
-                        type: 'DEFEND_STAR',
+                        type: DEFEND_STAR_ACTION,
                         score: starScore,
                         star: attackedStarId,
                         ticksUntil: attackInTicks,
@@ -272,7 +286,7 @@ module.exports = class AIService {
                 const neighborPriority = starPriorities.get(neighbor);
                 if (neighborPriority < priority) {
                     orders.push({
-                        type: 'REINFORCE_STAR',
+                        type: REINFORCE_STAR_ACTION,
                         score: priority - neighborPriority,
                         star: starId,
                         source: neighbor
