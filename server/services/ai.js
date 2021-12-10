@@ -10,12 +10,13 @@ const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
 module.exports = class AIService {
-    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.waypointService = waypointService;
+        this.combatService = combatService;
     }
 
     async play(game, player) {
@@ -112,13 +113,28 @@ module.exports = class AIService {
 
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
+        const carriersOrbiting = new Map();
+        for (const carrier of playerCarriers) {
+            if ((!carrier.waypoints || carrier.waypoints.length === 0) && carrier.orbiting) {
+                const carriersInOrbit = getOrInsert(carriersOrbiting, carrier.orbiting.toString(), () => []);
+                carriersInOrbit.push(carrier);
+            }
+        }
+
+        const carriersById = new Map();
+        for (const carrier of game.galaxy.carriers) {
+            carriersById.set(carrier._id.toString(), carrier);
+        }
+
         return {
             playerStars,
             playerCarriers,
             starsById,
             reachableStars,
             reachablePlayerStars,
-            borderStars
+            borderStars,
+            carriersOrbiting,
+            carriersById
         }
     }
 
@@ -138,9 +154,34 @@ module.exports = class AIService {
 
         for (const order of orders) {
             if (order.type === DEFEND_STAR_ACTION) {
+                // Later, take weapons level and specialists into account
+                // TODO: Default attack data and write it back correctly
                 const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil);
+                const defendingStar = context.starsById.get(order.star);
+                const requiredAdditionallyForDefense = this._calculateRequiredShipsForDefense(game, player, context, attackData, order.incomingCarriers, defendingStar);
             }
         }
+    }
+
+    _calculateRequiredShipsForDefense(game, player, context, attackData, attackingCarriers, defendingStar) {
+        const attackerIds = new Set();
+        const attackers = [];
+
+        for (const attackingCarrier of attackingCarriers) {
+            const attacker = game.players.find(player => player._id.toString() === attackingCarrier.ownedByPlayerId.toString());
+            const attackerId = attacker._id.toString();
+            if (!attackerIds.has(attackerId)) {
+                attackerIds.add(attackerId);
+                attackers.push(attacker);
+            }
+        }
+
+        const defenseCarriersAtStar = context.carriersOrbiting.get(defendingStar._id.toString()) || [];
+        const defenseCarriersOnTheWay = (attackData && attackData.carriersOnTheWay.filter(carrierId => !defenseCarriersAtStar.find(carrier => carrier._id.toString() === carrierId.toString())).map(carrierId => context.carriersById.get(carrierId.toString()))) || [];
+        const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
+        const result = this.combatService.calculateStar(game, defendingStar, player, [player], attackers, defenseCarriers, attackingCarriers);
+        //TODO
+        return 0;
     }
 
     priorityFromOrderCategory(category) {
@@ -159,16 +200,8 @@ module.exports = class AIService {
     _gatherAssignments(game, player, context) {
         const assignments = new Map();
 
-        const carriersOrbiting = new Map();
-        for (const carrier of context.playerCarriers) {
-            if ((!carrier.waypoints || carrier.waypoints.length === 0) && carrier.orbiting) {
-                const carriersInOrbit = getOrInsert(carriersOrbiting, carrier.orbiting.toString(), () => []);
-                carriersInOrbit.push(carrier);
-            }
-        }
-
         for (const playerStar of context.playerStars) {
-            const carriersHere = carriersOrbiting.get(playerStar._id.toString()) || [];
+            const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
             const totalShips = playerStar.ships + carriersHere.map(carrier => carrier.ships).reduce((a, b) => a + b, 0);
             assignments.set(playerStar._id.toString(), {
                 carriers: carriersHere,
