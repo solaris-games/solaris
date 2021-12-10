@@ -418,13 +418,13 @@
         {
             "id": 12,
             "name": "Financial Analyst",
-            "description": "The star produces 3 credits per tick for each point of science on the star.",
+            "description": "The star produces 2 credits per tick for each point of science on the star.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "creditsPerTickByScience": 3
+                    "creditsPerTickByScience": 2
                 }
             }
         }
