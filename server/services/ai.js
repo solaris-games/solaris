@@ -55,7 +55,8 @@ module.exports = class AIService {
             this._updateState(game, player);
             const context = this._createContext(game, player);
             const orders = this._gatherOrders(game, player, context);
-            const assignments = await this._gatherAssignments(game, player, context, orders);
+            const assignments = this._gatherAssignments(game, player, context);
+            console.log(assignments);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
             game.save();
@@ -119,7 +120,17 @@ module.exports = class AIService {
     }
 
     async _evaluateOrders(game, player, context, orders, assignments) {
+        const sorter = (o1, o2) => {
+            const categoryPriority = this.priorityFromOrderCategory(o1.type) - this.priorityFromOrderCategory(o2.type);
+            if (categoryPriority !== 0) {
+                return categoryPriority;
+            } else {
+                return o1.score - o2.score;
+            }
+        };
+        orders.sort(reverseSort(sorter));
 
+        console.log(orders);
     }
 
     priorityFromOrderCategory(category) {
@@ -135,20 +146,28 @@ module.exports = class AIService {
         }
     }
 
-    async _gatherAssignments(game, player, context, orders) {
-        const sorter = (o1, o2) => {
-            const categoryPriority = this.priorityFromOrderCategory(o1.type) - this.priorityFromOrderCategory(o2.type);
-            if (categoryPriority !== 0) {
-                return categoryPriority;
-            } else {
-                return o1.score - o2.score;
+    _gatherAssignments(game, player, context) {
+        const assignments = new Map();
+
+        const carriersOrbiting = new Map();
+        for (const carrier of context.playerCarriers) {
+            if ((!carrier.waypoints || carrier.waypoints.length === 0) && carrier.orbiting) {
+                const carriersInOrbit = getOrInsert(carriersOrbiting, carrier.orbiting.toString(), () => []);
+                carriersInOrbit.push(carrier);
             }
-        };
-        orders.sort(reverseSort(sorter));
+        }
 
-        console.log(orders);
+        for (const playerStar of context.playerStars) {
+            const carriersHere = carriersOrbiting.get(playerStar._id.toString()) || [];
+            const totalShips = playerStar.ships + carriersHere.map(carrier => carrier.ships).reduce((a, b) => a + b, 0);
+            assignments.set(playerStar._id.toString(), {
+                carriers: carriersHere,
+                star: playerStar,
+                totalShips
+            });
+        }
 
-
+        return assignments;
     }
 
     _gatherOrders(game, player, context) {
@@ -244,8 +263,8 @@ module.exports = class AIService {
     }
 
     _gatherMovementOrders(game, player, context) {
-        const starPriorities = this._computeStarPriorities(game, player, context);
         const orders = [];
+        const starPriorities = this._computeStarPriorities(game, player, context);
 
         for (const [starId, priority] of starPriorities) {
             const neighbors = context.reachablePlayerStars.get(starId);
