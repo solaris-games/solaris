@@ -149,17 +149,36 @@ module.exports = class AIService {
         };
         orders.sort(reverseSort(sorter));
 
+        const newKnownAttacks = [];
+
         // For now, process orders in order of importance and try to find the best assignment possible for each order.
         // Later, a different scoring process could be used to maximize overall scores.
 
         for (const order of orders) {
             if (order.type === DEFEND_STAR_ACTION) {
                 // Later, take weapons level and specialists into account
-                // TODO: Default attack data and write it back correctly
-                const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil);
+                const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData();
                 const defendingStar = context.starsById.get(order.star);
                 const requiredAdditionallyForDefense = this._calculateRequiredShipsForDefense(game, player, context, attackData, order.incomingCarriers, defendingStar);
+                if (requiredAdditionallyForDefense === 0) {
+                    // We're going to be fine
+                    newKnownAttacks.push(attackData);
+                } else {
+                    // TODO: Find assignments for reinforcement
+                }
             }
+        }
+
+        player.aiState.knownAttacks = newKnownAttacks;
+    }
+
+    _createDefaultAttackData(game, starId, ticksUntil) {
+        const arrivalTick = game.state.tick + ticksUntil;
+
+        return {
+            starId,
+            arrivalTick,
+            carriersOnTheWay: []
         }
     }
 
