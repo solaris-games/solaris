@@ -256,18 +256,6 @@ module.exports = class AIService {
         return player.aiState.knownAttacks.find(attack => attack.starId === attackedStarId.toString() && attack.arrivalTick === attackAbsoluteTick);
     }
 
-    _isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers) {
-        const attackData = this._getAttackData(game, player, context, attackedStarId, attackInTicks);
-
-        if (!attackData) {
-            return false;
-        }
-
-        // TODO: Try to find out if allocated defense is sufficient
-
-        return false;
-    }
-
     _gatherDefenseOrders(game, player, context) {
         // Find all of our stars that are under attack
         const incomingCarriers = game.galaxy.carriers
@@ -296,15 +284,13 @@ module.exports = class AIService {
                 const attackedStar = context.starsById.get(attackedStarId);
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
 
-                if (!this._isDefenseSufficient(game, player, context, attackedStarId, attackInTicks, incomingCarriers)) {
-                    orders.push({
-                        type: DEFEND_STAR_ACTION,
-                        score: starScore,
-                        star: attackedStarId,
-                        ticksUntil: attackInTicks,
-                        incomingCarriers
-                    });
-                }
+                orders.push({
+                    type: DEFEND_STAR_ACTION,
+                    score: starScore,
+                    star: attackedStarId,
+                    ticksUntil: attackInTicks,
+                    incomingCarriers
+                });
             }
         }
 
