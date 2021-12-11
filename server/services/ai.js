@@ -182,8 +182,11 @@ module.exports = class AIService {
         const sides = this.combatService.constructSidesStar(game, defendingStar, player, [player], attackers, defenseCarriers, attackingCarriers);
         const result = this.combatService.calculate(sides.defender, sides.attacker, true, true);
 
-        //TODO
-        return 0;
+        if (result.after.defender <= 0) {
+            return result.needed.defender - result.before.defender;
+        } else {
+            return 0;
+        }
     }
 
     priorityFromOrderCategory(category) {
