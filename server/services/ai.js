@@ -179,7 +179,9 @@ module.exports = class AIService {
         const defenseCarriersAtStar = context.carriersOrbiting.get(defendingStar._id.toString()) || [];
         const defenseCarriersOnTheWay = (attackData && attackData.carriersOnTheWay.filter(carrierId => !defenseCarriersAtStar.find(carrier => carrier._id.toString() === carrierId.toString())).map(carrierId => context.carriersById.get(carrierId.toString()))) || [];
         const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
-        const result = this.combatService.calculateStar(game, defendingStar, player, [player], attackers, defenseCarriers, attackingCarriers);
+        const sides = this.combatService.constructSidesStar(game, defendingStar, player, [player], attackers, defenseCarriers, attackingCarriers);
+        const result = this.combatService.calculate(sides.defender, sides.attacker, true, true);
+
         //TODO
         return 0;
     }

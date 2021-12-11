@@ -93,7 +93,7 @@ module.exports = class CombatService extends EventEmitter {
         return result;
     }
 
-    calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers) {
+    constructSidesStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers) {
         // Calculate the combined combat result taking into account
         // the star ships and all defenders vs. all attackers
         let totalDefenders = Math.floor(star.shipsActual) + defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
@@ -101,7 +101,7 @@ module.exports = class CombatService extends EventEmitter {
 
         // Calculate the weapons tech levels based on any specialists present at stars or carriers.
         let defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, owner, star, defenderCarriers);
-        
+
         // Use the highest weapons tech of the attacking players to calculate combat result.
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, true);
 
@@ -113,15 +113,22 @@ module.exports = class CombatService extends EventEmitter {
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
         attackerWeaponsTechLevel = Math.max(attackerWeaponsTechLevel - attackerWeaponsDeduction, 1);
 
-        let combatResult = this.calculate({
-            weaponsLevel: defenderWeaponsTechLevel,
-            ships: totalDefenders
-        }, {
-            weaponsLevel: attackerWeaponsTechLevel,
-            ships: totalAttackers
-        }, true);
+        return {
+            defender: {
+                weaponsLevel: defenderWeaponsTechLevel,
+                ships: totalDefenders
+            },
+            attacker: {
+                weaponsLevel: attackerWeaponsTechLevel,
+                ships: totalAttackers
+            }
+        }
+    }
 
-        return combatResult;
+    calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers) {
+        const sides = this.constructSidesStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers);
+
+        return this.calculate(sides.defender, sides.attacker, true);
     }
 
     calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers) {
