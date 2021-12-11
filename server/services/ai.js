@@ -256,9 +256,12 @@ module.exports = class AIService {
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 if (!this._invasionInProgress(player, candidate._id)) {
+                    // Account for stars without scanning data
+                    const score = Math.max(candidate.naturalResources + 0, 1);
+
                     orders.push({
                         type: CLAIM_STAR_ACTION,
-                        score: candidate.naturalResources,
+                        score,
                         star: candidate._id.toString(),
                         from: fromId
                     });
