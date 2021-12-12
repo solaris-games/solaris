@@ -172,13 +172,19 @@ module.exports = class AIService {
                     // We're going to be fine
                     newKnownAttacks.push(attackData);
                 } else {
-                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil);
+                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(game, player));
+
                     // TODO: Find assignments for reinforcement
                 }
             }
         }
 
         player.aiState.knownAttacks = newKnownAttacks;
+    }
+
+    _canAffordCarrier(game, player) {
+        const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
+        return player.credits >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
     _searchAssignments(starGraph, assignments, fittingAssignments, nextFilter, assignmentFilter, currentStarId, trace) {
@@ -201,7 +207,7 @@ module.exports = class AIService {
         }
     }
 
-    _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, ticksLimit) {
+    _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, ticksLimit, allowCarrierPurchase) {
         const fittingAssignments = [];
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
@@ -212,8 +218,13 @@ module.exports = class AIService {
             return ticksRequired <= ticksLimit;
         }
 
+        const assignmentFilter = assignment => {
+            const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
+            return allowCarrierPurchase || hasCarriers;
+        }
+
         // TODO: Assignment filter: carrier cost etc
-        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, nextFilter, () => true, destinationId, [destinationId]);
+        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, nextFilter, assignmentFilter, destinationId, [destinationId]);
 
         return fittingAssignments;
     }
