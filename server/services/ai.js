@@ -149,6 +149,14 @@ module.exports = class AIService {
         };
         orders.sort(reverseSort(sorter));
 
+        // This is a hack to ensure that ships are never assigned from a star where they are needed for defense.
+        // Later, with an improved scoring system, this should not be necessary
+        for (const order of orders) {
+            if (order.type === DEFEND_STAR_ACTION) {
+                assignments.delete(order.star);
+            }
+        }
+
         const newKnownAttacks = [];
 
         // For now, process orders in order of importance and try to find the best assignment possible for each order.
@@ -345,6 +353,11 @@ module.exports = class AIService {
     }
 
     _computeStarPriorities(game, player, context) {
+        // TODO: Improve priority computation
+        // Take into account empty adjacent stars
+        // and distance from capital
+        // to push reinforcements towards the border even on dark games etc
+
         const borderStarPriorities = new Map();
         for (const borderStarId of context.borderStars) {
             // Really, this should be calculated the other way around, going out from the enemy... but for now this should do it
