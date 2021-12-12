@@ -10,13 +10,14 @@ const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
 module.exports = class AIService {
-    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.waypointService = waypointService;
         this.combatService = combatService;
+        this.shipTransferService = shipTransferService;
     }
 
     async play(game, player) {
@@ -174,12 +175,60 @@ module.exports = class AIService {
                 } else {
                     const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(game, player));
 
-                    // TODO: Find assignments for reinforcement
+                    let shipsNeeded = requiredAdditionallyForDefense;
+                    const usedAssignments = [];
+
+                    // TODO: Better assignment finding with better scoring system
+                    // TODO: Use partial assignments
+                    for (const possibleAssignment of allPossibleAssignments) {
+                        usedAssignments.push(possibleAssignment);
+                        shipsNeeded -= possibleAssignment.assignment.totalShips;
+                        if (shipsNeeded < 0) {
+                            break;
+                        }
+                    }
+
+                    for (const usedAssignment of usedAssignments) {
+                        const starId = usedAssignment.assignment.star._id.toString();
+                        // Fine for now until we get partial assignments
+                        assignments.delete(starId);
+                        await this.shipTransferService.transferAllToStar(game, player, starId);
+                        let carrier = usedAssignment.assignment.carriers && usedAssignment.assignment.carriers[0];
+                        if (!carrier) {
+                            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, usedAssignment.assignment.totalShips);
+                            carrier = buildResult.carrier;
+                        }
+                        await this.shipTransferService.transfer(game, player, carrier._id, usedAssignment.assignment.totalShips, starId, 0);
+                        const waypoints = this._createWaypointsFromTrace(usedAssignment.trace);
+                        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
+                    }
                 }
             }
         }
 
         player.aiState.knownAttacks = newKnownAttacks;
+    }
+
+    _createWaypointsFromTrace(trace) {
+        const waypoints = [];
+
+        if (trace.length <= 1) {
+            return null;
+        }
+
+        let last = trace[0];
+        for (let i = 1; i < trace.length; i++) {
+            waypoints.push({
+                source: last,
+                destination: trace[i],
+                action: 'nothing',
+                actionShips: 0,
+                delayTicks: 0
+            });
+            last = trace[i];
+        }
+
+        return waypoints;
     }
 
     _canAffordCarrier(game, player) {
@@ -193,7 +242,7 @@ module.exports = class AIService {
         if (currentStarAssignment && assignmentFilter(currentStarAssignment)) {
             fittingAssignments.push({
                 assignment: currentStarAssignment,
-                trace
+                trace: trace.reverse()
             });
         }
 
@@ -223,7 +272,6 @@ module.exports = class AIService {
             return allowCarrierPurchase || hasCarriers;
         }
 
-        // TODO: Assignment filter: carrier cost etc
         this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, nextFilter, assignmentFilter, destinationId, [destinationId]);
 
         return fittingAssignments;

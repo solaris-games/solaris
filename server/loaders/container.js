@@ -128,14 +128,14 @@ module.exports = (config, io) => {
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService, gameTypeService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerService, gameTypeService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService);
+    const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService);
     const historyService = new HistoryService(HistoryModel, historyRepository, playerService, gameService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);
     const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService);
-    const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService, diplomacyService);
     const donateService = new DonateService(cacheService);
 
