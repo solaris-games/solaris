@@ -172,12 +172,42 @@ module.exports = class AIService {
                     // We're going to be fine
                     newKnownAttacks.push(attackData);
                 } else {
+                    const allFittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, requiredAdditionallyForDefense, order.ticksUntil);
                     // TODO: Find assignments for reinforcement
                 }
             }
         }
 
         player.aiState.knownAttacks = newKnownAttacks;
+    }
+
+    _searchAssignments(starGraph, assignments, fittingAssignments, nextFilter, assignmentFilter, currentStarId, trace) {
+        const currentStarAssignment = assignments.get(currentStarId);
+
+        if (currentStarAssignment && assignmentFilter(currentStarAssignment)) {
+            fittingAssignments.push({
+                assignment: currentStarAssignment,
+                trace
+            });
+        }
+
+        const nextCandidates = starGraph.get(currentStarId);
+        if (nextCandidates) {
+            const fittingCandidates = Array.from(nextCandidates).filter(candidate => nextFilter(trace, candidate));
+
+            for (const fittingCandidate of fittingCandidates) {
+                this._searchAssignments(starGraph, assignments, fittingAssignments, nextFilter, assignmentFilter, fittingCandidate, trace.concat([currentStarId]));
+            }
+        }
+    }
+
+    _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, requiredShips, ticksLimit) {
+        const fittingAssignments = [];
+
+        // TODO: Filters, carrier cost etc
+        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, () => true, () => true, destinationId, trace);
+
+        return fittingAssignments;
     }
 
     _createDefaultAttackData(game, starId, ticksUntil) {
