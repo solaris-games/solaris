@@ -172,7 +172,7 @@ module.exports = class AIService {
                     // We're going to be fine
                     newKnownAttacks.push(attackData);
                 } else {
-                    const allFittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, requiredAdditionallyForDefense, order.ticksUntil);
+                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil);
                     // TODO: Find assignments for reinforcement
                 }
             }
@@ -201,7 +201,7 @@ module.exports = class AIService {
         }
     }
 
-    _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, requiredShips, ticksLimit) {
+    _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, ticksLimit) {
         const fittingAssignments = [];
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
@@ -213,7 +213,7 @@ module.exports = class AIService {
         }
 
         // TODO: Assignment filter: carrier cost etc
-        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, () => true, nextFilter, destinationId, [destinationId]);
+        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, nextFilter, () => true, destinationId, [destinationId]);
 
         return fittingAssignments;
     }
