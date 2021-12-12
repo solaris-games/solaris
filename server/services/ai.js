@@ -203,9 +203,17 @@ module.exports = class AIService {
 
     _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, requiredShips, ticksLimit) {
         const fittingAssignments = [];
+        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
-        // TODO: Filters, carrier cost etc
-        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, () => true, () => true, destinationId, trace);
+        const nextFilter = (trace, nextStarId) => {
+            const entireTrace = trace.concat([nextStarId]).map(starId => context.starsById.get(starId));
+            const entireDistance = this.distanceService.getDistanceAlongLocationList(entireTrace);
+            const ticksRequired = Math.ceil(entireDistance / distancePerTick);
+            return ticksRequired <= ticksLimit;
+        }
+
+        // TODO: Assignment filter: carrier cost etc
+        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, () => true, nextFilter, destinationId, [destinationId]);
 
         return fittingAssignments;
     }

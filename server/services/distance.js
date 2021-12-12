@@ -6,6 +6,23 @@ module.exports = class DistanceService {
         return Math.sqrt(this.getDistanceSquaredBetweenLocations(loc1, loc2));
     }
 
+    getDistanceAlongLocationList(locations) {
+        if (!locations || locations.length < 2) {
+            return null;
+        }
+
+        let distance = 0;
+        let last = locations[0];
+
+        for (let i = 1; i < locations.length; i++) {
+            const current = locations[i];
+            distance += this.getDistanceBetweenLocations(last, current);
+            last = current;
+        }
+
+        return distance;
+    }
+
     getDistanceSquaredBetweenLocations(loc1, loc2)
     {
         let xs = loc2.x - loc1.x,
