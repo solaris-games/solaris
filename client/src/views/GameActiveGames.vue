@@ -175,7 +175,7 @@ export default {
       this.isLoadingCompletedGames = true
 
       try {
-        let response = await gameService.listCompletedGames()
+        let response = await gameService.listMyCompletedGames()
 
         this.completedGames = response.data
       } catch (err) {
