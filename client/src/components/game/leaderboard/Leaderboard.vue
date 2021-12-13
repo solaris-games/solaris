@@ -88,6 +88,7 @@
     </div>
 
     <share-link v-if="!game.state.startDate" message="Invite your friends and take on the Galaxy together!"/>
+    <share-link v-if="game.state.startDate && !game.state.endDate" message="Share this game with your friends to spectate, no sign-up required!"/>
     <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!"/>
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
