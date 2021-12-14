@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import Helpers from './helpers'
 
 class Carrier extends EventEmitter {
 
@@ -17,10 +18,12 @@ class Carrier extends EventEmitter {
     this.container.interactiveChildren = false
     this.container.buttonMode = true
 
-    this.graphics_colour = new PIXI.Graphics()
+    this.graphics_colour = new PIXI.Sprite()
+    this.graphics_selected = new PIXI.Graphics()
     this.graphics_ship = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_colour)
+    this.container.addChild(this.graphics_selected)
     this.container.addChild(this.graphics_ship)
 
     this.container.on('pointerup', this.onClicked.bind(this))
@@ -57,10 +60,12 @@ class Carrier extends EventEmitter {
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
     this.clearPaths() // clear on setup since this is used to reset waypoints
+    this.enableInteractivity()
   }
 
   draw () {
     this.drawColour()
+    this.drawSelectedCircle()
     this.drawCarrier()
     this.drawShips()
     this.drawSpecialist()
@@ -72,55 +77,47 @@ class Carrier extends EventEmitter {
   }
 
   drawShape() {
-    switch(this.player.shape) {
-      case 'circle':
-        this._drawShapeCircle()
-        return
-      case 'square':
-        this._drawShapeSquare()
-        return
-      case 'hexagon':
-        this._drawShapeHexagon()
-        return
-      case 'diamond':
-        this._drawShapeDiamond()
-        return
+    if (this.graphics_colour) {
+      this.container.removeChild(this.graphics_colour)
+      this.graphics_colour = null
     }
 
-    this._rotateCarrierTowardsWaypoint(this.graphics_colour)
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player.shape)) {
+      this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[this.player.shape][4])
+
+    }
+
+    this.graphics_colour.anchor.set(0.5)
+    this.graphics_colour.width = 12
+    this.graphics_colour.height = 12
+    this.graphics_colour.tint = this.colour
+
+    this.container.addChild(this.graphics_colour)
   }
 
   drawColour () {
-    this.graphics_colour.clear()
-
+    if (this.graphics_colour) {
+      this.container.removeChild(this.graphics_colour)
+      this.graphics_colour = null
+    }
+    
     if (!this.data.orbiting) {
-      this.graphics_colour.lineStyle(1, this.colour)
       this.drawShape();
     }
   }
 
   drawCarrier () {
-    this.graphics_ship.clear()
+    if (this.graphics_ship) {
+      this.container.removeChild(this.graphics_ship)
+    }
 
-    // this.graphics_ship.lineStyle(0.3, 0x000000)
-    this.graphics_ship.beginFill(0xFFFFFF)
+    this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
+    this.graphics_ship.anchor.set(0.5)
+    this.graphics_ship.width = 10
+    this.graphics_ship.height = 10
+    this.container.addChild(this.graphics_ship)
 
-    // Draw normal carrier
-    this.graphics_ship.moveTo(0, 0 - 4)
-    this.graphics_ship.lineTo(0 + 1.5, 0 + 1)
-    this.graphics_ship.lineTo(0 + 3, 0 + 2)
-    this.graphics_ship.lineTo(0 + 1, 0 + 2)
-    this.graphics_ship.lineTo(0 + 0, 0 + 3)
-    this.graphics_ship.lineTo(0 + -1, 0 + 2)
-    this.graphics_ship.lineTo(0 - 3, 0 + 2)
-    this.graphics_ship.lineTo(0 - 1.5, 0 + 1)
-    this.graphics_ship.lineTo(0, 0 - 4)
-    this.graphics_ship.endFill()
-
-    this.graphics_ship.pivot.set(0, 0)
-    this.graphics_ship.scale.set(1)
-
-    this._rotateCarrierTowardsWaypoint(this.graphics_ship)
+    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_ship)
   }
 
   drawShips () {
@@ -175,58 +172,6 @@ class Carrier extends EventEmitter {
 
   hasSpecialist () {
     return this.data.specialistId && this.data.specialistId > 0
-  }
-
-  _drawShapeDiamond() {
-    this.graphics_colour.moveTo(0, -5)
-    this.graphics_colour.lineTo(5, 0)
-    this.graphics_colour.lineTo(0, 5)
-    this.graphics_colour.lineTo(-5, 0)
-    this.graphics_colour.closePath()
-  }
-
-  _drawShapeCircle () {
-    this.graphics_colour.drawCircle(0, 0, 4)
-  }
-
-  _drawShapeSquare () {
-    this.graphics_colour.drawRect(-3.5, -3.5, 7, 7)
-  }
-
-  _drawShapeHexagon () {
-    this.graphics_colour.moveTo(2, -3.5)
-    this.graphics_colour.lineTo(-2, -3.5)
-    this.graphics_colour.lineTo(-4, 0)
-    this.graphics_colour.lineTo(-2, 3.5)
-    this.graphics_colour.lineTo(2, 3.5)
-    this.graphics_colour.lineTo(4, 0)
-    this.graphics_colour.closePath()
-  }
-
-  _rotateCarrierTowardsWaypoint (graphics) {
-    // If the carrier has waypoints, get the first one and calculate the angle
-    // between the carrier's current position and the destination.
-    if (this.data.waypoints.length) {
-      let waypoint = this.data.waypoints[0]
-      let starDestination = this.stars.find(s => s.data._id === waypoint.destination)
-
-      if (!starDestination) {
-        const sourceStar = this.stars.find(s => s.data._id === waypoint.source)
-        if (!sourceStar) {
-          return
-        }
-
-        const angle = this.getAngleTowardsLocation(this.data.location, sourceStar.data.location)
-        graphics.angle = (angle * (180 / Math.PI)) - 90
-        return
-      }
-
-      let destination = starDestination.data.location
-
-      let angle = this.getAngleTowardsLocation(this.data.location, destination)
-
-      graphics.angle = (angle * (180 / Math.PI)) + 90
-    }
   }
 
   clearPaths() {
@@ -295,9 +240,25 @@ class Carrier extends EventEmitter {
     }
   }
 
+  drawSelectedCircle () {
+    this.graphics_selected.clear()
+
+    if (this.isSelected) {
+      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_selected.alpha = 0.3
+      this.graphics_selected.drawCircle(0, 0, 15)
+    }
+  }
+
   enableInteractivity() {
-   this.container.interactive = true
-   this.container.buttonMode = true
+    // Can only be interactive if its in transit
+    if (!this.data.orbiting) {
+      this.container.interactive = true
+      this.container.buttonMode = true
+    } else {
+      this.container.interactive = false
+      this.container.buttonMode = false
+    }
   }
 
   disableInteractivity() {
@@ -368,18 +329,11 @@ class Carrier extends EventEmitter {
     this.emit('onCarrierMouseOut', this.data)
   }
 
-  getAngleTowardsLocation (source, destination) {
-    let deltaX = destination.x - source.x
-    let deltaY = destination.y - source.y
-
-    return Math.atan2(deltaY, deltaX)
-  }
-
   refreshZoom (zoomPercent) {
     this.zoomPercent = zoomPercent
   }
 
-  cleanup () {
+  cleanupEventHandlers () {
     this.container.off('pointerup', this.onClicked.bind(this))
     this.container.off('mouseover', this.onMouseOver.bind(this))
     this.container.off('mouseout', this.onMouseOut.bind(this))
@@ -388,6 +342,26 @@ class Carrier extends EventEmitter {
   destroy () {
     this.container.destroy()
     this.fixedContainer.destroy()
+  }
+
+  select () {
+    this.isSelected = true
+    this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
+  }
+
+  unselect () {
+    this.isSelected = false
+    this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
+  }
+
+  toggleSelected () {
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
   }
 }
 

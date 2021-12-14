@@ -5,7 +5,6 @@
     "type": "standard_tb",
     "mode": "conquest",
     "password": null,
-    "starVictoryPercentage": 50,
     "playerLimit": 8,
     "playerType": "establishedPlayers",
     "anonymity": "normal",
@@ -23,14 +22,32 @@
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
-    "randomGates": "none",
+    "randomWarpGates": 10,
+    "randomWormHoles": 5,
+    "randomNebulas": 15,
+    "randomAsteroidFields": 10,
+    "randomBlackHoles": 5,
     "darkGalaxy": "start",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
+    "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 10
+    "carrierSpeed": 10,
+    "specialistBans": {
+      "star": [],
+      "carrier": []
+    }
+  },
+  "conquest": {
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 50
+  },
+  "orbitalMechanics": {
+    "enabled": "disabled",
+    "orbitSpeed": 5,
+    "orbitOrigin": "galacticCenter"
   },
   "player": {
     "startingStars": 6,
@@ -50,7 +67,8 @@
     "tradeCredits": true,
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
-    "tradeScanning": "scanned"
+    "tradeScanning": "scanned",
+    "alliances": "enabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -73,12 +91,17 @@
       "weapons": "standard",
       "specialists": "standard"
     },
-    "bankingReward": "standard"
+    "bankingReward": "standard",
+    "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "turnBased",
-    "tickJumps": 6,
+    "turnJumps": 6,
     "maxTurnWait": 1440,
-    "missedTurnLimit": 3
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
   }
 }

@@ -7,15 +7,15 @@ module.exports = class BroadcastService {
     }
 
     roomExists(socketId) {
-        return this.io.sockets.adapter.rooms[socketId.toString()] != null;
+        return this.io && this.io.sockets.adapter.rooms[socketId.toString()] != null;
     }
 
     gameRoomExists(game) {
-        return this.io.sockets.adapter.rooms[roomId._id.toString()] != null;
+        return this.io && this.io.sockets.adapter.rooms[roomId._id.toString()] != null;
     }
 
     playerRoomExists(player) {
-        return this.io.sockets.adapter.rooms[player._id.toString()] != null;
+        return this.io && this.io.sockets.adapter.rooms[player._id.toString()] != null;
     }
 
     getOnlinePlayers(game) {
@@ -54,6 +54,18 @@ module.exports = class BroadcastService {
         });
     }
 
+    gamePlayerReadyToQuit(game, player) {
+        this.io.to(game.id).emit('gamePlayerReadyToQuit', {
+            playerId: player.id
+        });
+    }
+
+    gamePlayerNotReadyToQuit(game, player) {
+        this.io.to(game.id).emit('gamePlayerNotReadyToQuit', {
+            playerId: player.id
+        });
+    }
+
     gameMessageSent(game, message) {
         message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
     }
@@ -69,6 +81,20 @@ module.exports = class BroadcastService {
         conversation.participants.forEach(p => this.io.to(p).emit('gameConversationLeft', {
             conversationId: conversation._id,
             playerId
+        }));
+    }
+
+    gameConversationMessagePinned(game, conversation, messageId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessagePinned', {
+            conversationId: conversation._id,
+            messageId: messageId
+        }));
+    }
+
+    gameConversationMessageUnpinned(game, conversation, messageId) {
+        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessageUnpinned', {
+            conversationId: conversation._id,
+            messageId: messageId
         }));
     }
 
@@ -169,6 +195,15 @@ module.exports = class BroadcastService {
 
         this.io.to(debtorPlayerId).emit('playerDebtSettled', data);
         this.io.to(creditorPlayerId).emit('playerDebtSettled', data);
+    }
+
+    gamePlayerDiplomaticStatusChanged(playerIdFrom, playerIdTo, diplomaticStatus) {
+        let data = {
+            diplomaticStatus
+        };
+
+        this.io.to(playerIdFrom).emit('playerDiplomaticStatusChanged', data);
+        this.io.to(playerIdTo).emit('playerDiplomaticStatusChanged', data);
     }
 
     // userRenownReceived(game, toUserId, renown) {

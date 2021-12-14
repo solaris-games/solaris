@@ -4,19 +4,18 @@
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
     <td class="text-right">
-      <span v-if="star.infrastructure" class="text-success mr-2" title="Economy">{{star.infrastructure.economy}}</span>
-      <span v-if="star.infrastructure" class="text-warning mr-2" title="Industry">{{star.infrastructure.industry}}</span>
-      <span v-if="star.infrastructure" class="text-info" title="Science">{{star.infrastructure.science}}</span>
+      <span v-if="star.infrastructure" class="text-success mr-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
+      <span v-if="star.infrastructure" class="text-warning mr-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
+      <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
     </td>
     <td class="last">
-      <ignore-bulk-upgrade :starId="star._id"/>
+      <ignore-bulk-upgrade :starId="star._id" :highlightIgnoredInfrastructure="highlightIgnoredInfrastructure" @bulkIgnoreChanged="onBulkIgnoreChanged"/>
     </td>
 </tr>
 </template>
 
 <script>
 import gameContainer from '../../../game/container'
-import gameHelper from '../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
 
@@ -26,7 +25,8 @@ export default {
     'ignore-bulk-upgrade': IgnoreBulkUpgradeVue
   },
   props: {
-    star: Object
+    star: Object,
+    highlightIgnoredInfrastructure: String
   },
   data () {
     return {
@@ -34,6 +34,9 @@ export default {
     }
   },
   methods: {
+    onBulkIgnoreChanged (e) {
+      this.$emit('bulkIgnoreChanged', e);
+    },
     clickStar (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },

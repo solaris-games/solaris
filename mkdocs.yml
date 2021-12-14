@@ -7,3 +7,21 @@ theme: readthedocs
 extra_css: [
     _styles/style.css
 ]
+
+repo_url: 'https://github.com/mike-eason/solaris'
+
+nav:
+  - Home: 'index.md'
+  - Stars: 'stars.md'
+  - Carriers: 'carriers.md'
+  - Technology: 'technology.md'
+  - Diplomacy: 'diplomacy.md'
+  - Trade: 'trade.md'
+  - Specialists: 'specialists.md'
+  - Territories: 'territories.md'
+  - Combat: 'combat.md'
+  - GameTypes: 'gameTypes.md'
+  - GameTickEvents: 'gameTick.md'
+  - Rankings: 'rankings.md'
+  - Achievements: 'achievements.md'
+  - CustomGalaxies: 'customGalaxies.md'

@@ -1,12 +1,12 @@
-const cache = require('memory-cache');
 const ValidationError = require('../errors/validation');
 
 module.exports = class GameGalaxyService {
 
-    constructor(broadcastService, gameService, mapService, playerService, starService, distanceService, 
+    constructor(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, 
         starDistanceService, starUpgradeService, carrierService, 
         waypointService, researchService, specialistService, technologyService, reputationService,
-        guildUserService, historyService, battleRoyaleService) {
+        guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService) {
+        this.cacheService = cacheService;
         this.broadcastService = broadcastService;
         this.gameService = gameService;
         this.mapService = mapService;
@@ -24,11 +24,19 @@ module.exports = class GameGalaxyService {
         this.guildUserService = guildUserService;
         this.historyService = historyService;
         this.battleRoyaleService = battleRoyaleService;
+        this.orbitalMechanicsService = orbitalMechanicsService;
+        this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
+        this.diplomacyService = diplomacyService;
     }
 
     async getGalaxy(gameId, userId, tick) {
         // Try loading the game for the user from the cache for historical ticks.
         let gameStateTick = await this.gameService.getGameStateTick(gameId);
+
+        if (gameStateTick == null) {
+            throw new ValidationError('Game not found.', 404);
+        }
 
         let isHistorical = tick != null && tick !== gameStateTick; // Indicates whether we are requesting a specific tick and not the CURRENT state of the galaxy.
 
@@ -52,7 +60,7 @@ module.exports = class GameGalaxyService {
 
         // Check if the user is playing in this game.
         let player = this._getUserPlayer(game, userId);
-        
+
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
@@ -65,14 +73,14 @@ module.exports = class GameGalaxyService {
         // Append the destruction flag before doing any scanning culling because
         // we need to ensure that the flag is set based on ALL stars in the galaxy instead
         // of culled stars (for example dark galaxy star culling)
-        if (this.gameService.isBattleRoyaleMode(game) && !this.gameService.isFinished(game)) {
+        if (this.gameTypeService.isBattleRoyaleMode(game) && !this.gameStateService.isFinished(game)) {
             this._appendStarsPendingDestructionFlag(game);
         }
 
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
-        if (!player && !this.gameService.isFinished(game)) {
+        if (!player && !this.gameStateService.isFinished(game)) {
             this._setStarInfoBasic(game);
 
             // Also remove all carriers from players.
@@ -93,27 +101,32 @@ module.exports = class GameGalaxyService {
         // can't see and therefore global stats should display what the current player can see
         // instead of their actual values.
         // TODO: Better to not overwrite, but just not do it above in the first place.
-        if (this.gameService.isDarkModeExtra(game)) {
+        if (this.gameTypeService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
         }
 
+        // If any kind of dark mode, remove the galaxy center from the constants.
+        if (this.gameTypeService.isDarkMode(game)) {
+            delete game.constants.distances.galaxyCenterLocation;
+        }
+
         if (isHistorical && cached) {
-            cache.put(cached.cacheKey, game, 1200000); // 20 minutes.
+            this.cacheService.put(cached.cacheKey, game, 1200000); // 20 minutes.
         }
 
         return game;
     }
 
     _getCachedGalaxy(gameId, userId, requestedTick, currentTick) {
-        // Note: As we are only logging the last 24 ticks we can safely cache everything.
-        // Otherwise we'll need to add in some logic to limit how far back we cache.
-        
-        // if (currentTick - requestedTick > 24) {
-        //     return {
-        //         cacheKey: null,
-        //         galaxy: null
-        //     };
-        // }
+        // Cache up to 24 ticks, any more and its too much memory.
+        // Note: If we limit how much history data is logged we will
+        // need to update this logic.
+        if (currentTick - requestedTick > 24) {
+            return {
+                cacheKey: null,
+                galaxy: null
+            };
+        }
 
         if (!userId) {
             return null;
@@ -122,7 +135,7 @@ module.exports = class GameGalaxyService {
         let cacheKey = `galaxy_${gameId}_${userId}_${requestedTick}`;
         let galaxy = null;
 
-        let cached = cache.get(cacheKey);
+        let cached = this.cacheService.get(cacheKey);
 
         if (cached) {
             galaxy = cached;
@@ -138,7 +151,7 @@ module.exports = class GameGalaxyService {
         if (!userId) {
             return null;
         }
-        
+
         return doc.galaxy.players.find(x => x.userId === userId.toString());
     }
 
@@ -153,8 +166,8 @@ module.exports = class GameGalaxyService {
         // Work out whether we are in dark galaxy mode.
         // This is true if the dark galaxy setting is enabled,
         // OR if its "start only" and the game has not yet started.
-        const isDarkStart = this.gameService.isDarkStart(doc);
-        const isDarkMode = this.gameService.isDarkMode(doc);
+        const isDarkStart = this.gameTypeService.isDarkStart(doc);
+        const isDarkMode = this.gameTypeService.isDarkMode(doc);
 
         // If its a dark galaxy start then return no stars.
         if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
@@ -168,15 +181,20 @@ module.exports = class GameGalaxyService {
                 name: s.name,
                 ownedByPlayerId: s.ownedByPlayerId,
                 location: s.location,
-                warpGate: false
+                warpGate: false,
+                isNebula: false,
+                isAsteroidField: false,
+                isBlackHole: false,
+                wormHoleToStarId: null
             }
         });
     }
 
     _setStarInfoDetailed(doc, player) { 
-        const isFinished = this.gameService.isFinished(doc);
-        const isDarkStart = this.gameService.isDarkStart(doc);
-        const isDarkMode = this.gameService.isDarkMode(doc);
+        const isFinished = this.gameStateService.isFinished(doc);
+        const isDarkStart = this.gameTypeService.isDarkStart(doc);
+        const isDarkMode = this.gameTypeService.isDarkMode(doc);
+        const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
@@ -197,76 +215,90 @@ module.exports = class GameGalaxyService {
 
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = doc.galaxy.stars
-        .map(s => {
-            delete s.shipsActual; // Don't need to send this back.
+            .map(s => {
+                delete s.shipsActual; // Don't need to send this back.
 
-            // Calculate the star's terraformed resources.
-            if (s.ownedByPlayerId) {
-                let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
+                // Calculate the star's terraformed resources.
+                if (s.ownedByPlayerId) {
+                    let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
-                s.terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, owningPlayerEffectiveTechs.terraforming);
-            }
-
-            // If the star is dead then it has no infrastructure.
-            if (this.starService.isDeadStar(s)) {
-                s.infrastructure.economy = null;
-                s.infrastructure.industry = null;
-                s.infrastructure.science = null;
-            }
-
-            // Ignore stars the player owns, they will always be visible.
-            let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
-
-            if (isOwnedByCurrentPlayer) {
-                // Calculate infrastructure upgrades for the star.
-                this.starUpgradeService.setUpgradeCosts(doc, s);
-                
-                if (s.specialistId) {
-                    s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                    s.terraformedResources = this.starService.calculateTerraformedResources(s, owningPlayerEffectiveTechs.terraforming);
                 }
 
-                s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || this.starService.resetIgnoreBulkUpgradeStatuses(s);
+                // Round the Natural Resources
+                s.naturalResources = this.starService.calculateActualNaturalResources(s);
 
-                return s;
-            } else {
-                // Remove fields that the user player shouldn't see.
-                delete s.ignoreBulkUpgrade;
-            }
-
-            // Get the closest player star to this star.
-            let inRange = isFinished || this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
-
-            // If its in range then its all good, send the star back as is.
-            // Otherwise only return a subset of the data.
-            if (inRange) {
-                if (s.specialistId) {
-                    s.specialist = this.specialistService.getByIdStar(s.specialistId);
-                }
-                
-                let canSeeStarShips = isFinished || (player && this.starService.canPlayerSeeStarShips(player, s));
-
-                if (!canSeeStarShips) {
-                    s.ships = null;
+                if (isOrbital) {
+                    s.locationNext = this.orbitalMechanicsService.getNextLocation(doc, s);
                 }
 
-                return s;
-            } else {
-                return {
-                    _id: s._id,
-                    name: s.name,
-                    ownedByPlayerId: s.ownedByPlayerId,
-                    location: s.location,
-                    warpGate: false // Hide warp gates outside of scanning range.
+                // If the star is dead then it has no infrastructure.
+                if (this.starService.isDeadStar(s)) {
+                    s.infrastructure.economy = null;
+                    s.infrastructure.industry = null;
+                    s.infrastructure.science = null;
                 }
-            }
-        });
+
+                // Ignore stars the player owns, they will always be visible.
+                let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
+
+                if (isOwnedByCurrentPlayer) {
+                    // Calculate infrastructure upgrades for the star.
+                    this.starUpgradeService.setUpgradeCosts(doc, s);
+
+                    if (s.specialistId) {
+                        s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                    }
+
+                    s.ignoreBulkUpgrade = s.ignoreBulkUpgrade || this.starService.resetIgnoreBulkUpgradeStatuses(s);
+
+                    return s;
+                } else {
+                    // Remove fields that the user player shouldn't see.
+                    delete s.ignoreBulkUpgrade;
+                }
+
+                // Get the closest player star to this star.
+                let inRange = isFinished || this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
+
+                // If its in range then its all good, send the star back as is.
+                // Otherwise only return a subset of the data.
+                if (inRange) {
+                    if (s.specialistId) {
+                        s.specialist = this.specialistService.getByIdStar(s.specialistId);
+                    }
+
+                    let canSeeStarShips = isFinished || (player && this.starService.canPlayerSeeStarShips(player, s));
+
+                    if (!canSeeStarShips) {
+                        s.ships = null;
+                    }
+
+                    return s;
+                } else {
+                    return {
+                        _id: s._id,
+                        name: s.name,
+                        ownedByPlayerId: s.ownedByPlayerId,
+                        location: s.location,
+                        locationNext: s.locationNext,
+                        warpGate: false, // Hide warp gates outside of scanning range
+                        isNebula: false, // Hide nebula outside of scanning range
+                        isAsteroidField: false, // Hide asteroid fields outside of scanning range
+                        isBlackHole: false, // Hide outside of scanning range
+                        wormHoleToStarId: s.wormHoleToStarId
+                    }
+                };
+            });
     }
-        
+
     _setCarrierInfoDetailed(doc, player) {
+        const isOrbital = this.gameTypeService.isOrbitalMode(doc);
+
         // If the game hasn't finished we need to filter and sanitize carriers.
-        if (!this.gameService.isFinished(doc)) {
+        if (!this.gameStateService.isFinished(doc)) {
             doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, player);
-        
+
             // Remove all waypoints (except those in transit) for all carriers that do not belong
             // to the player.
             doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, player);
@@ -276,34 +308,38 @@ module.exports = class GameGalaxyService {
         doc.galaxy.carriers
             .forEach(c => {
                 this.waypointService.populateCarrierWaypointEta(doc, c);
-                
+
                 if (c.specialistId) {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                if (player && !this.carrierService.canPlayerSeeCarrierShips(player, c)) {
+                if (player && !this.carrierService.canPlayerSeeCarrierShips(doc, player, c)) {
                     c.ships = null;
+                }
+
+                if (isOrbital) {
+                    c.locationNext = this.orbitalMechanicsService.getNextLocation(doc, c);
                 }
             });
     }
 
     async _setPlayerInfoBasic(doc, player) {
-        const isFinished = this.gameService.isFinished(doc);
-        const isDarkModeExtra = this.gameService.isDarkModeExtra(doc);
+        const isFinished = this.gameStateService.isFinished(doc);
+        const isDarkModeExtra = this.gameTypeService.isDarkModeExtra(doc);
 
         let onlinePlayers = this.broadcastService.getOnlinePlayers(doc); // Need this for later.
 
         // Get the list of all guilds associated to players, we'll need this later.
         let guildUsers = [];
 
-        if (doc.settings.general.anonymity === 'normal') {
+        if (!this.gameTypeService.isAnonymousGame(doc)) {
             let userIds = doc.galaxy.players.filter(x => x.userId).map(x => x.userId);
             guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds)
         }
 
         // Calculate which players are in scanning range.
         let playersInRange = [];
-        
+
         if (player) {
             playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player);
         }
@@ -311,7 +347,7 @@ module.exports = class GameGalaxyService {
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
 
         this._populatePlayerHasDuplicateIPs(doc);
-        
+
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
@@ -322,10 +358,10 @@ module.exports = class GameGalaxyService {
 
             if (p.userId) {
                 let guildUser = guildUsers.find(u => u._id.toString() === p.userId.toString());
-                
+
                 if (guildUser && guildUser.displayGuildTag === 'visible') {
                     playerGuild = guildUser.guild;
-    
+
                     if (playerGuild) {
                         p.alias += `[${playerGuild.tag}]`;
                     }
@@ -396,6 +432,12 @@ module.exports = class GameGalaxyService {
                 research = null;
             }
 
+            let diplomacy = null;
+
+            if (player) {
+                diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);
+            }
+
             // Return a subset of the user, key info only.
             return {
                 _id: p._id,
@@ -409,6 +451,7 @@ module.exports = class GameGalaxyService {
                 defeatedDate: p.defeatedDate,
                 afk: p.afk,
                 ready: p.ready,
+                readyToQuit: p.readyToQuit,
                 missedTurns: p.missedTurns,
                 alias: p.alias,
                 avatar: p.avatar,
@@ -417,7 +460,9 @@ module.exports = class GameGalaxyService {
                 lastSeen: p.lastSeen,
                 isOnline: p.isOnline,
                 guild: playerGuild,
-                hasDuplicateIP: p.hasDuplicateIP
+                hasDuplicateIP: p.hasDuplicateIP,
+                hasFilledAfkSlot: p.hasFilledAfkSlot,
+                diplomacy
             };
         });
     }
@@ -453,7 +498,7 @@ module.exports = class GameGalaxyService {
             3. Continue to run through current logic as we do today.
         */
 
-        if (!this.gameService.isStarted(game) || tick === 0) {
+        if (!this.gameStateService.isStarted(game) || tick === 0) {
             return;
         }
 
@@ -477,7 +522,7 @@ module.exports = class GameGalaxyService {
         if (isHistorical) {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let gamePlayer = game.galaxy.players[i];
-                
+
                 let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
 
                 if (historyPlayer) {
@@ -493,20 +538,21 @@ module.exports = class GameGalaxyService {
                     gamePlayer.afk = historyPlayer.afk;
                     gamePlayer.research = historyPlayer.research;
                     gamePlayer.ready = historyPlayer.ready;
+                    gamePlayer.readyToQuit = historyPlayer.readyToQuit;
                 }
             }
         }
-        
+
         // Apply previous tick's data to all STARS the player does not own.
         // If historical mode, then its all star data in the requested tick.
         // If not historical mode, then replace non-player owned star data.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let gameStar = game.galaxy.stars[i];
-            
+
             if (!isHistorical && player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.equals(player._id)) {
                 continue;
             }
-            
+
             let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
 
             if (historyStar) {
@@ -521,9 +567,11 @@ module.exports = class GameGalaxyService {
                 gameStar.ships = historyStar.ships;
                 gameStar.shipsActual = historyStar.shipsActual;
                 gameStar.specialistId = historyStar.specialistId;
+                gameStar.homeStar = historyStar.homeStar;
                 gameStar.warpGate = historyStar.warpGate;
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
                 gameStar.infrastructure = historyStar.infrastructure;
+                gameStar.location = historyStar.location == null || (historyStar.location.x == null || historyStar.location.y == null) ? gameStar.location : historyStar.location; // TODO: May not have history for the star (BR Mode). Can delete this in a few months after the history is cleaned.
             }
         }
 
@@ -545,7 +593,7 @@ module.exports = class GameGalaxyService {
                 i--;
                 continue;
             }
-            
+
             gameCarrier.ownedByPlayerId = historyCarrier.ownedByPlayerId;
             gameCarrier.name = historyCarrier.name;
             gameCarrier.orbiting = historyCarrier.orbiting;
@@ -562,7 +610,7 @@ module.exports = class GameGalaxyService {
         if (isHistorical) {
             for (let historyCarrier of history.carriers) {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.equals(historyCarrier.carrierId));
-    
+                
                 if (!gameCarrier) {
                     game.galaxy.carriers.push(historyCarrier);
                 }

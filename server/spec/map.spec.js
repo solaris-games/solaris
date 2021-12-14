@@ -25,7 +25,7 @@ const game = {
 }
 
 const fakeStarService = {
-    generateUnownedStar(game, name, location) {
+    generateUnownedStar(name, location) {
         return {
             name,
             location
@@ -75,6 +75,10 @@ const fakeStarNameService = {
     }
 };
 
+const fakeResourceService = {
+    distribute() { }
+};
+
 describe('map', () => {
 
     const starCount = 10;
@@ -85,7 +89,7 @@ describe('map', () => {
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
-        starMapService = new CircularMapService(randomService, fakeStarService, fakeStarDistanceService, fakeDistanceService);
+        starMapService = new CircularMapService(randomService, fakeStarService, fakeStarDistanceService, fakeDistanceService, fakeResourceService);
         mapService = new MapService(randomService, fakeStarService, fakeStarDistanceService, fakeStarNameService, starMapService);
     });
 

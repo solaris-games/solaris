@@ -5,29 +5,29 @@
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"
               :disabled="$isHistoricalMode() || isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"
-              title="Upgrade Economy">
+              title="Upgrade economic infrastructure">
         <i class="fas fa-money-bill-wave mr-1"></i>${{economy}}
       </button>
       <button class="btn btn-sm mr-1"
               :class="{'btn-success': availableCredits >= industry, 'btn-primary': availableCredits < industry}"
               :disabled="$isHistoricalMode() || isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"
-              title="Upgrade Industry">
+              title="Upgrade industrial infrastructure">
         <i class="fas fa-tools mr-1"></i>${{industry}}
       </button>
       <button class="btn btn-sm"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
               :disabled="$isHistoricalMode() || isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
-              title="Upgrade Science">
+              title="Upgrade scientific infrastructure">
         <i class="fas fa-flask mr-1"></i>${{science}}
       </button>
     </div>
     <div class="col-auto pl-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a Warp Gate" @click="confirmBuildWarpGate">
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canBuildWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy Warp Gate">
+      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
         <i class="fas fa-trash"></i> <i class="fas fa-dungeon ml-1"></i>
       </button>
       <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
@@ -57,12 +57,14 @@ export default {
       isUpgradingEconomy: false,
       isUpgradingIndustry: false,
       isUpgradingScience: false,
-      canBuildWarpGates: false
+      canBuildWarpGates: false,
+      canDestroyWarpGates: false
     }
   },
   mounted () {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
+    this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
   },
   methods: {
     onBuildCarrierRequested () {

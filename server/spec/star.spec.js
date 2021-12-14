@@ -56,20 +56,50 @@ describe('star', () => {
     it('should generate an unowned star', () => {
         const name = 'test star name';
 
-        const newStar = starService.generateUnownedStar(game, name, { x:0, y:0 }, 10);
+        const newStar = starService.generateUnownedStar(name, { x: 0, y: 0 }, {
+            economy: 10,
+            industry: 10,
+            science: 10
+        });
 
         expect(newStar).not.toBe(null);
         expect(newStar._id).not.toBe(null);
         expect(newStar.name).toEqual(name);
-        expect(newStar.naturalResources).toBeGreaterThanOrEqual(game.constants.star.resources.minNaturalResources);
-        expect(newStar.naturalResources).toBeLessThanOrEqual(game.constants.star.resources.maxNaturalResources);
+        expect(newStar.naturalResources.economy).toBeGreaterThanOrEqual(game.constants.star.resources.minNaturalResources);
+        expect(newStar.naturalResources.economy).toBeLessThanOrEqual(game.constants.star.resources.maxNaturalResources);
+        expect(newStar.naturalResources.industry).toBeGreaterThanOrEqual(game.constants.star.resources.minNaturalResources);
+        expect(newStar.naturalResources.industry).toBeLessThanOrEqual(game.constants.star.resources.maxNaturalResources);
+        expect(newStar.naturalResources.science).toBeGreaterThanOrEqual(game.constants.star.resources.minNaturalResources);
+        expect(newStar.naturalResources.science).toBeLessThanOrEqual(game.constants.star.resources.maxNaturalResources);
         expect(newStar.location).not.toBe(null);
     });
 
     it('should calculate terraformed resources', () => {
-        const result = starService.calculateTerraformedResources(10, 5);
+        const star1 = {
+            naturalResources: {
+                economy: 34,
+                industry: 34,
+                science: 34
+            }
+        };
+        const star2 = {
+            naturalResources: {
+                economy: 23,
+                industry: 53,
+                science: 10
+            }
+        }
 
-        expect(result).toEqual(35);
+        const result1 = starService.calculateTerraformedResources(star1, 5); // Normal resources
+        const result2 = starService.calculateTerraformedResources(star2, 2); // Split resources
+
+        expect(result1.economy).toBe(59);
+        expect(result1.industry).toBe(59);
+        expect(result1.science).toBe(59);
+
+        expect(result2.economy).toBe(33);
+        expect(result2.industry).toBe(63);
+        expect(result2.science).toBe(20);
     });
 
     it('should setup a player\'s home star', () => {
@@ -79,7 +109,8 @@ describe('star', () => {
 
         const homeStar = {
             _id: 2,
-            infrastructure: {}
+            infrastructure: {},
+            naturalResources: {}
         };
 
         const gameSettings = {
@@ -97,7 +128,6 @@ describe('star', () => {
 
         expect(homeStar.ownedByPlayerId).toBe(newPlayer._id);
         expect(homeStar.ships).toEqual(gameSettings.player.startingShips);
-        expect(homeStar.naturalResources).toEqual(game.constants.star.resources.maxNaturalResources);
         expect(homeStar.infrastructure.economy).toEqual(gameSettings.player.startingInfrastructure.economy);
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);

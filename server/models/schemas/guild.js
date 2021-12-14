@@ -8,7 +8,8 @@ const schema = new Schema({
     leader: { type: Types.ObjectId, required: true },
     officers: [{ type: Types.ObjectId }],
     members: [{ type: Types.ObjectId }],
-    invitees: [{ type: Types.ObjectId }]
+    invitees: [{ type: Types.ObjectId }],
+    applicants: [{ type: Types.ObjectId }]
 });
 
 module.exports = schema;

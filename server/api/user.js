@@ -8,7 +8,7 @@ module.exports = (router, io, container) => {
         try {
             const limit = +req.query.limit || null;
             const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey);
-                
+
             return res.status(200).json(result);
         } catch (err) {
             return next(err);
@@ -17,6 +17,7 @@ module.exports = (router, io, container) => {
 
     router.post('/api/user/', async (req, res, next) => {
         let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        let recaptchaEnabled = container.recaptchaService.isEnabled();
 
         try {
             let errors = [];
@@ -31,6 +32,10 @@ module.exports = (router, io, container) => {
 
             if (!req.body.password) {
                 errors.push('Password is a required field');
+            }
+
+            if (recaptchaEnabled && !req.body.recaptchaToken) {
+                errors.push('Recaptcha token is required');
             }
 
             if (errors.length) {
@@ -57,6 +62,17 @@ module.exports = (router, io, container) => {
                 throw new ValidationError(errors);
             }
 
+            // Before we create a new account, verify that the user is not a robot.
+            if (recaptchaEnabled) {
+                try {
+                    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+                    await container.recaptchaService.verify(ip, req.body.recaptchaToken);
+                } catch (err) {
+                    throw new ValidationError(['Recaptcha is invalid']);
+                }
+            }
+
             let userId = await container.userService.create({
                 email: email,
                 username,
@@ -68,7 +84,7 @@ module.exports = (router, io, container) => {
             return next(err);
         }
     }, middleware.handleError);
-    
+
     router.get('/api/user/settings', async (req, res, next) => {
         try {
             let settings = await container.userService.getGameSettings(req.session.userId);
@@ -77,7 +93,7 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
         try {
@@ -87,13 +103,33 @@ module.exports = (router, io, container) => {
         } catch (err) {
             return next(err);
         }
-    });
+    }, middleware.handleError);
 
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {
             let user = await container.userService.getMe(req.session.userId);
 
             return res.status(200).json(user);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/user/avatars', middleware.authenticate, async (req, res, next) => {
+        try {
+            let avatars = await container.avatarService.listUserAvatars(req.session.userId);
+
+            return res.status(200).json(avatars);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.post('/api/user/avatars/:avatarId/purchase', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.avatarService.purchaseAvatar(req.session.userId, parseInt(req.params.avatarId));
+
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
@@ -122,7 +158,7 @@ module.exports = (router, io, container) => {
     router.put('/api/user/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
         try {
             await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
-            
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -186,10 +222,10 @@ module.exports = (router, io, container) => {
 
         try {
             await container.userService.updatePassword(
-                req.session.userId, 
+                req.session.userId,
                 req.body.currentPassword,
                 req.body.newPassword);
-                
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -199,7 +235,7 @@ module.exports = (router, io, container) => {
     router.post('/api/user/requestResetPassword', async (req, res, next) => {
         try {
             let token = await container.userService.requestResetPassword(req.body.email);
-            
+
             try {
                 await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
             } catch (emailError) {
@@ -221,7 +257,7 @@ module.exports = (router, io, container) => {
 
         try {
             await container.userService.resetPassword(req.body.token, req.body.newPassword);
-            
+
             return res.sendStatus(200);
         } catch (err) {
             return next(err);
@@ -231,7 +267,7 @@ module.exports = (router, io, container) => {
     router.post('/api/user/requestUsername', async (req, res, next) => {
         try {
             let username = await container.userService.getUsernameByEmail(req.body.email);
-            
+
             try {
                 await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
             } catch (emailError) {
@@ -249,7 +285,7 @@ module.exports = (router, io, container) => {
     router.delete('/api/user/closeaccount', middleware.authenticate, async (req, res, next) => {
         try {
             await container.gameService.quitAllActiveGames(req.session.userId);
-            await container.guildService.tryLeaveGuild(req.session.userId);
+            await container.guildService.tryLeave(req.session.userId);
             await container.guildService.declineAllInvitations(req.session.userId);
             await container.userService.closeAccount(req.session.userId);
 
@@ -258,9 +294,19 @@ module.exports = (router, io, container) => {
                 if (err) {
                     return next(err);
                 }
-    
+
                 return res.sendStatus(200);
             });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/user/donations/recent', async (req, res, next) => {
+        try {
+            let result = await container.donateService.listRecentDonations(3);
+
+            return res.status(200).json(result);
         } catch (err) {
             return next(err);
         }

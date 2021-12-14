@@ -16,7 +16,7 @@
     </div>
 
     <div class="row no-gutters pb-0">
-      <div class="col-sm-12 col-md-8 col-lg-8 pr-1">
+      <div class="col-sm-12 col-md-6 col-lg-6 pr-1">
         <div class="card bg-dark text-white" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
           <div class="card-img-overlay">
@@ -27,7 +27,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-4 col-lg-4 pl-1" @click="routeToPath('/game/list')">
+      <div class="col-sm-12 col-md-6 col-lg-6 pl-1" @click="routeToPath('/game/list')">
         <div class="card bg-dark text-white">
           <img class="card-img" :src="require('../assets/screenshots/home-2.png')" alt="Join a game">
           <div class="card-img-overlay">
@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-6 col-lg-6 pr-1">
+      <div class="col-sm-12 col-md-4 col-lg-4 pr-1">
         <div class="card bg-dark text-white" @click="routeToPath('/leaderboard')">
           <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
           <div class="card-img-overlay">
@@ -49,7 +49,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-6 col-lg-6 pl-1">
+      <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1">
         <div class="card bg-dark text-white" @click="routeToPath('/guild')">
           <img class="card-img" :src="require('../assets/screenshots/home-4.png')" alt="Guilds">
           <div class="card-img-overlay">
@@ -60,7 +60,24 @@
           </div>
         </div>
       </div>
+      <div class="col-sm-12 col-md-4 col-lg-4 pl-1">
+        <div class="card bg-dark text-white" @click="routeToPath('/avatars')">
+          <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Shop">
+          <div class="card-img-overlay">
+            <h5 class="card-title card-title-success">
+              <i class="fas fa-shopping-basket"></i>
+              <span class="ml-2">Avatar Shop</span>
+            </h5>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <hr/>
+    
+    <tutorial-game />
+
+    <hr/>
 
     <div class="row pb-0">
       <div class="col d-none d-md-block">
@@ -80,6 +97,8 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
 import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
+import RecentDonations from '../components/game/donate/RecentDonations.vue'
+import TutorialGame from '../components/game/menu/TutorialGame'
 
 export default {
   components: {
@@ -87,7 +106,9 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'leaderboard-user-table': LeaderboardUserTable
+    'leaderboard-user-table': LeaderboardUserTable,
+    'recent-donations': RecentDonations,
+    'tutorial-game': TutorialGame
   },
   data () {
     return {
@@ -107,6 +128,7 @@ export default {
 
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
+      this.$store.commit('clearRoles')
 
       this.isLoggingOut = false
 
@@ -165,5 +187,9 @@ button {
   padding: 0.25rem;
   display: inline-block;
   border-radius: 3px;
+}
+
+.card-title-success {
+  background-color: #00bc8c;
 }
 </style>

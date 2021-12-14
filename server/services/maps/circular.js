@@ -2,101 +2,45 @@ const ValidationError = require("../../errors/validation");
 
 module.exports = class CircularMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.resourceService = resourceService;
     }
 
     generateLocations(game, starCount, resourceDistribution) {
+        // These two values should probably be ingame constants but they can for now just be plugged in here
+        const starDensity = 1.3 * 10**-4
+        const offset = 0.5
+        // There are a few options to tweak the offset:
+        // 0.5- --> now the outerranges will contain more stars than the inner ones || 0.5 --> roughly the entire map has the same star density
+        // 0.5-1 --> now the inner ranges will get more stars than the outer || 1 --> now at each distance from the center there will be roughly the same amount of stars
+        // 1+ --> there will be an extremely increasing amount of stars in the middle with an increasingly low amount of stars in the outerranges 
+        const maxRadius = (starCount/(Math.PI*starDensity))**0.5;
         const locations = [];
 
-        // To generate locations we do the following:
-        // - Try to create a location at a random angle and distance from the center
-        // - If after X number of tries, we can't generate a location, increment the current radius.
-        let currentRadius = game.constants.distances.minDistanceBetweenStars;
-        let radiusStep = game.constants.distances.minDistanceBetweenStars;
-        let maxTries = 5;
-
         do {
-            let createdLocation = false;
-
-            // Try to find the star location X number of times.
-            for (let i = 0; i < maxTries; i++) {
-                const location = this.starService.generateStarPosition(game, 0, 0, currentRadius);
+            // Try to find the star location X
+            while (true) {
+                let location = this.randomService.getRandomPositionInCircle(maxRadius, offset);
 
                 // Stars must not be too close to eachother.
-                if (this.isLocationTooCloseToOthers(game, location, locations))
-                    continue;
-
-                locations.push(location);
-                createdLocation = true;
-                break;
-            }
-
-            // If we didn't find a valid location, increase radius.
-            if (!createdLocation) {
-                currentRadius += radiusStep;
+                if (!this.isLocationTooCloseToOthers(game, location, locations)) {
+                    locations.push(location)
+                    break;
+                }
             }
         } while (locations.length < starCount)
 
-        this.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
 
         return locations;
     }
 
-    setResources(game, locations, resourceDistribution) {
-        switch (resourceDistribution) {
-            case 'random': 
-                this.setResourcesRandom(game, locations);
-                break;
-            case 'weightedCenter': 
-                this.setResourcesWeightedCenter(game, locations);
-                break;
-            default:
-                throw new ValidationError(`Unsupported resource distribution type: ${resourceDistribution}`);
-        }
-    }
-
-    setResourcesRandom(game, locations) { 
-        // Allocate random resources.
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-
-        for (let location of locations) {
-            let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
-
-            location.resources = Math.floor(r);
-        }
-    }
-
-    setResourcesWeightedCenter(game, locations) {
-        // Work out how large the radius of the circle used to determine natural resources.
-        // The closer to the center of the galaxy, the more likely to find stars with higher resources.
-        const resourceRadius = this.getGalaxyDiameter(locations).x / 3;
-        
-        for (let location of locations) {
-            let resources = this.randomService.generateStarNaturalResources(resourceRadius, location.x, location.y, 
-                game.constants.star.resources.minNaturalResources, game.constants.star.resources.maxNaturalResources, true);
-            
-            location.resources = resources;
-        }
-    }
-
-    getGalaxyDiameter(locations) {
-        let maxX = locations.sort((a, b) => b.x - a.x)[0].x;
-        let maxY = locations.sort((a, b) => b.y - a.y)[0].y;
-        let minX = locations.sort((a, b) => a.x - b.x)[0].x;
-        let minY = locations.sort((a, b) => a.y - b.y)[0].y;
-
-        return {
-            x: Math.abs(minX) + Math.abs(maxX),
-            y: Math.abs(minY) + Math.abs(maxY),
-        };
-    }
-
     isLocationTooCloseToOthers(game, location, locations) {
+        // Return False if there are no stars in range, True if there is a star in range
         return locations.find(l => this.starDistanceService.isLocationTooClose(game, location, l)) != null;
     }
 

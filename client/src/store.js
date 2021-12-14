@@ -47,6 +47,13 @@ export default new Vuex.Store({
       state.username = null
     },
 
+    setRoles (state, roles) {
+      state.roles = roles
+    },
+    clearRoles (state) {
+      state.roles = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },
@@ -72,6 +79,14 @@ export default new Vuex.Store({
     setConfirmationDialogSettings (state, settings) {
       state.confirmationDialog = settings
     },
+
+    setUnreadMessages (state, count) {
+      state.unreadMessages = count
+    },
+    clearUnreadMessages (state) {
+      state.unreadMessages = null
+    },
+
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
@@ -80,9 +95,11 @@ export default new Vuex.Store({
       }
     },
     closeConversation (state) {
-      const id = state.currentConversation.id;
-      state.cachedConversationComposeMessages[id] = state.currentConversation.text
-      state.currentConversation = null
+      if (state.currentConversation) {
+        const id = state.currentConversation.id;
+        state.cachedConversationComposeMessages[id] = state.currentConversation.text
+        state.currentConversation = null
+      }
     },
     updateCurrentConversationText (state, data) {
       state.currentConversation.text = data
@@ -103,6 +120,13 @@ export default new Vuex.Store({
     starClicked (state, data) {
       if (state.currentConversation) {
         MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
+      } else {
+        data.permitCallback(data.star)
+      }
+    },
+    starRightClicked (state, data) {
+      if (state.currentConversation && data.player) {
+        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
       } else {
         data.permitCallback(data.star)
       }
@@ -149,6 +173,20 @@ export default new Vuex.Store({
       player.ready = false
     },
 
+    gamePlayerReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = true
+      player.readyToQuit = true
+    },
+
+    gamePlayerNotReadyToQuit (state, data) {
+      let player = GameHelper.getPlayerById(state.game, data.playerId)
+
+      player.ready = false
+      player.readyToQuit = false
+    },
+
     gameStarBulkUpgraded (state, data) {
       let player = GameHelper.getUserPlayer(state.game)
 
@@ -162,12 +200,15 @@ export default new Vuex.Store({
         }
 
         if (s.manufacturing != null) {
+          player.stats.newShips -= star.manufacturing // Deduct old value
           star.manufacturing = s.manufacturing
-          player.stats.newShips = Math.round((player.stats.newShips + s.manufacturing + Number.EPSILON) * 100) / 100
+          player.stats.newShips += s.manufacturing // Add the new value
         }
 
         GameContainer.reloadStar(star)
       })
+
+      player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
       
       // Update player total stats.
 

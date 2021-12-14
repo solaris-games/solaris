@@ -24,13 +24,13 @@ const schema = new Schema({
     achievements: {
         victories: { type: Types.Number, default: 0 },
         rank: { type: Types.Number, default: 0 },
+        eloRating: { type: Types.Number, default: null },
         renown: { type: Types.Number, default: 0 },
         joined: { type: Types.Number, default: 0 },
         completed: { type: Types.Number, default: 0 },
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
-        renown: { type: Types.Number, default: 0 }, // TODO: Why are there 2 of these?
         combat: {
             kills: {
                 ships: { type: Types.Number, default: 0 },
@@ -43,6 +43,10 @@ const schema = new Schema({
                 specialists: { type: Types.Number, default: 0 },
             },
             stars: {
+                captured: { type: Types.Number, default: 0 },
+                lost: { type: Types.Number, default: 0 },
+            },
+            homeStars: {
                 captured: { type: Types.Number, default: 0 },
                 lost: { type: Types.Number, default: 0 },
             }
@@ -114,6 +118,8 @@ const schema = new Schema({
             marchingSquareGridSize: { type: Types.Number, required: false, default: 6, min: 2, max: 32 },
             marchingSquareTerritorySize:{ type: Types.Number, required: false, default: 5, min: 2, max: 32 },
             marchingSquareBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 8 },
+            voronoiCellBorderWidth: { type: Types.Number, required: false, default: 2, min: 0, max: 5 },
+            voronoiTerritoryBorderWidth: { type: Types.Number, required: false, default: 4, min: 0, max: 8 },
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8, min: 0, max: 32 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16, min: 12, max: 128 },
@@ -153,6 +159,7 @@ const schema = new Schema({
             confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         }
     },
+    avatars: [{ type: Types.Number, required: false }],
     oauth: {
         discord: {
             userId: { type: Types.String, required: false },

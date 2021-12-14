@@ -10,6 +10,8 @@ import EventEmitter from 'events'
 import gameHelper from '../services/gameHelper'
 import AnimationService from './animation'
 import PathManager from './PathManager'
+import OrbitalLocationLayer from './orbital'
+import WormHoleLayer from './wormHole'
 
 class Map extends EventEmitter {
   static chunkSize = 256
@@ -42,6 +44,8 @@ class Map extends EventEmitter {
 
   _setupContainers () {
     this.backgroundContainer = new PIXI.Container()
+    this.wormHoleContainer = new PIXI.Container()
+    this.orbitalContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
@@ -55,6 +59,8 @@ class Map extends EventEmitter {
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.pathManager.container)
+    this.container.addChild(this.wormHoleContainer)
+    this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.starContainer)
@@ -143,6 +149,23 @@ class Map extends EventEmitter {
     this.backgroundContainer.addChild(this.background.starContainer)
     this.background.draw()
 
+    // -----------
+    // Setup Worm Hole Paths
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer = new WormHoleLayer()
+      this.drawWormHoles()
+      this.orbitalContainer.addChild(this.wormHoleLayer.container)
+    }
+
+    // -----------
+    // Setup Orbital Locations
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer = new OrbitalLocationLayer()
+      this.orbitalLayer.setup(game)
+  
+      this.orbitalContainer.addChild(this.orbitalLayer.container)
+    }
+    
     // Setup Chunks
     this._setupChunks()
 
@@ -159,9 +182,11 @@ class Map extends EventEmitter {
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
+      star.on('onSelected', this.onStarSelected.bind(this))
+      star.on('onUnselected', this.onStarUnselected.bind(this))
     }
 
-    star.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -179,6 +204,8 @@ class Map extends EventEmitter {
       carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
       carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
       carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+      carrier.on('onSelected', this.onCarrierSelected.bind(this))
+      carrier.on('onUnselected', this.onCarrierUnselected.bind(this))
     }
 
     let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
@@ -189,6 +216,8 @@ class Map extends EventEmitter {
   }
 
   draw () {
+    this.drawGalaxyCenter()
+
     if (this.mode === 'waypoints') {
       this.drawWaypoints()
     } else {
@@ -202,6 +231,33 @@ class Map extends EventEmitter {
     } else {
       this.clearRulerPoints()
     }
+  }
+
+  drawGalaxyCenter () {
+    // TODO: Is there any need to display the galaxy center for non orbital games?
+    if (this._isOrbitalMapEnabled() && this.game.constants.distances.galaxyCenterLocation) {
+        let galaxyCenterGraphics = new PIXI.Graphics()
+        let location = this.game.constants.distances.galaxyCenterLocation
+        let size = 10
+
+        galaxyCenterGraphics.lineStyle(2, 0xFFFFFF, 1)
+        galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        galaxyCenterGraphics.alpha = 0.75
+
+        this.starContainer.addChild(galaxyCenterGraphics)
+    }
+  }
+
+  _isOrbitalMapEnabled () {
+    return this.game.constants.distances.galaxyCenterLocation && this.game.settings.orbitalMechanics.enabled === 'enabled'
+  }
+
+  _isWormHolesEnabled () {
+    return this.game.settings.specialGalaxy.randomWormHoles
+      || this.game.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
   _setupChunks() {
@@ -334,7 +390,7 @@ class Map extends EventEmitter {
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
-        existing.setup(starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+        existing.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       } else {
         existing = this.setupStar(game, userSettings, starData)
       }
@@ -360,6 +416,7 @@ class Map extends EventEmitter {
     }
 
     this.drawTerritories(userSettings)
+    this.drawWormHoles()
     this.drawPlayerNames()
 
     this.background.setup(game, userSettings)
@@ -462,7 +519,7 @@ class Map extends EventEmitter {
 
   _undrawCarrier (carrier) {
     carrier.removeAllListeners()
-    carrier.cleanup()
+    carrier.cleanupEventHandlers()
     carrier.clearPaths()
     
     this.carrierContainer.removeChild(carrier.fixedContainer)
@@ -507,6 +564,13 @@ class Map extends EventEmitter {
   drawTerritories (userSettings) {
     this.territories.setup(this.game, userSettings)
     this.territories.draw(userSettings)
+  }
+
+  drawWormHoles () {
+    if (this._isWormHolesEnabled()) {
+      this.wormHoleLayer.setup(this.game)
+      this.wormHoleLayer.draw()
+    }
   }
 
   drawPlayerNames () {
@@ -555,7 +619,7 @@ class Map extends EventEmitter {
     let star = this.stars.find(s => s.data._id === starId)
 
     star.onClicked()
-    star.isSelected = true
+    star.select()
     star.updateVisibility()
   }
 
@@ -563,14 +627,14 @@ class Map extends EventEmitter {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
     carrier.onClicked()
-    carrier.isSelected = true
+    carrier.select()
   }
 
   unselectAllStars () {
     for (let i = 0; i < this.stars.length; i++) {
       let s = this.stars[i]
 
-      s.isSelected = false
+      s.unselect()
       s.updateVisibility() // Should be fine to pass in false for force
     }
   }
@@ -579,7 +643,7 @@ class Map extends EventEmitter {
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
 
-      c.isSelected = false
+      c.unselect()
       c.updateVisibility()
     }
   }
@@ -590,7 +654,7 @@ class Map extends EventEmitter {
       .forEach(s => {
         // Set all other stars to unselected.
         if (s.data._id !== star.data._id) {
-          s.isSelected = false
+          s.unselect()
         }
 
         s.updateVisibility()
@@ -603,7 +667,7 @@ class Map extends EventEmitter {
       .forEach(c => {
         // Set all other carriers to unselected.
         if (c.data._id !== carrier.data._id) {
-          c.isSelected = false
+          c.unselect()
         }
 
         c.updateVisibility()
@@ -703,17 +767,19 @@ class Map extends EventEmitter {
         // Clicking stars should only raise events to the UI if in galaxy mode.
         if (this.mode === 'galaxy') {
           let selectedStar = this.stars.find(x => x.data._id === e._id)
-          selectedStar.isSelected = !selectedStar.isSelected
 
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
+          selectedStar.toggleSelected()
+
           if (!this.tryMultiSelect(e.location)) {
             this.emit('onStarClicked', e)
           } else {
-            selectedStar.isSelected = false // If multi-select then do not select the star.
-            selectedStar.updateVisibility()
+            selectedStar.unselect() // If multi-select then do not select the star.
           }
+
+          selectedStar.updateVisibility()
         } else if (this.mode === 'waypoints') {
           this.waypoints.onStarClicked(e)
         } else if (this.mode === 'ruler') {
@@ -724,10 +790,25 @@ class Map extends EventEmitter {
     })
   }
 
-  onStarRightClicked (e) {
-    if (this.mode === 'galaxy') {
-      this.emit('onStarRightClicked', e)
-    }
+  onStarRightClicked (dic) {
+    // ignore clicks if its a drag motion
+    let e = dic.starData
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+
+    let owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData)
+
+    // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
+    this.store.commit('starRightClicked', {
+      star: dic.starData,
+      player: owningPlayer,
+      permitCallback: () => {
+        dic.permitCallback && dic.permitCallback()
+        
+        if (this.mode === 'galaxy') {
+          this.emit('onStarRightClicked', e)
+        }
+      }
+    })
   }
 
   onCarrierClicked (dic) {
@@ -746,15 +827,16 @@ class Map extends EventEmitter {
       }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
-      selectedCarrier.isSelected = !selectedCarrier.isSelected
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
 
+      selectedCarrier.toggleSelected()
+
       if (!this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
-        selectedCarrier.isSelected = false
+        selectedCarrier.unselect()
       }
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
@@ -871,6 +953,42 @@ class Map extends EventEmitter {
 
   clearHighlightedLocations () {
     this.highlightLocationsContainer.removeChildren()
+  }
+
+  showIgnoreBulkUpgrade () {
+    for (let star of this.stars) {
+      star.showIgnoreBulkUpgrade()
+    }
+  }
+
+  hideIgnoreBulkUpgrade () {
+    for (let star of this.stars) {
+      star.hideIgnoreBulkUpgrade()
+    }
+  }
+
+  onStarSelected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.drawStar(e)
+    }
+  }
+
+  onStarUnselected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.clear()
+    }
+  }
+
+  onCarrierSelected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.drawCarrier(e)
+    }
+  }
+
+  onCarrierUnselected (e) {
+    if (this._isOrbitalMapEnabled()) {
+      this.orbitalLayer.clear()
+    }
   }
 }
 

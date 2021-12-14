@@ -1,6 +1,8 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
+import gameHelper from '../services/gameHelper'
+import seededRandom from 'random-seed'
 
 class Star extends EventEmitter {
 
@@ -9,6 +11,7 @@ class Star extends EventEmitter {
   static shipsSmallSize = 6
   static shipsBigSize = 10
   static maxLod = 4
+  static seededRNG = seededRandom.create()
 
   /*
     Defines what zoompercentage correspond to what
@@ -42,6 +45,7 @@ class Star extends EventEmitter {
     this.graphics_scanningRange = new PIXI.Graphics()
     this.graphics_star = new PIXI.Graphics()
     this.graphics_targeted = new PIXI.Graphics()
+    this.graphics_selected = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
@@ -49,6 +53,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_part_warp)
     this.container.addChild(this.graphics_shape_full_warp)
     this.container.addChild(this.graphics_targeted)
+    this.container.addChild(this.graphics_selected)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -57,10 +62,11 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    this.isSelected = false
+    this.unselect()
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
+    this.showIgnoreBulkUpgradeInfrastructure = false
 
     /**
       Zoomdepth
@@ -97,7 +103,8 @@ class Star extends EventEmitter {
     return !(typeof this.data.infrastructure === 'undefined')
   }
 
-  setup (data, userSettings, players, carriers, lightYearDistance) {
+  setup (game, data, userSettings, players, carriers, lightYearDistance) {
+    this.game = game
     this.data = data
     this.players = players
     this.carriers = carriers
@@ -125,7 +132,11 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawWormHole()
+    this.drawNebula()
+    this.drawAsteroidField()
     this.drawTarget()
+    this.drawSelectedCircle()
     this.drawStar()
     this.drawSpecialist()
     this.drawPlanets()
@@ -136,34 +147,135 @@ class Star extends EventEmitter {
     this.drawName()
     this.drawShips()
     this.drawInfrastructure()
+    this.drawInfrastructureBulkIgnored()
 
     this.isInScanningRange = this._isInScanningRange()
   }
 
 
   drawStar () {
-    this.graphics_star.clear()
+    this.container.removeChild(this.graphics_star)
 
+    const isGraphics = this.hasBlackHole()
     let isInScanningRange = this._isInScanningRange()
-    let radius = 4
-    let alpha = isInScanningRange ? 1 : 0.5
-    let starPoints = 6
 
-    let isDeadStar = this._isDeadStar()
-    let fillStar = isInScanningRange && !isDeadStar
-    let lineWidth = isDeadStar ? 0.5 : 1
-
-    this.graphics_star.lineStyle(lineWidth, 0xFFFFFF, alpha)
-
-    if (fillStar) {
-      this.graphics_star.beginFill(0xFFFFFF, alpha)
+    if (isInScanningRange) {
+      if (this.hasBlackHole()) {
+        this.graphics_star = new PIXI.Graphics()
+        this.graphics_star.beginFill(0x000000)
+        this.graphics_star.drawCircle(0, 0, 4)
+        this.graphics_star.endFill()
+      } else if (this.data.homeStar) {
+        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
+      }
+      else if (this._isDeadStar() ) {
+        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
+      }
+      else {
+        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['scannable'])
+      }
+    }
+    else {
+      this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
+      this.graphics_star.tint = 0xa0a0a0
     }
 
-    this.graphics_star.drawStar(0, 0, starPoints, radius, radius - 2)
-
-    if (fillStar) {
-      this.graphics_star.endFill()
+    if (!isGraphics) {
+      this.graphics_star.anchor.set(0.5)
+      this.graphics_star.width = 24.0/2.0
+      this.graphics_star.height = 24.0/2.0
     }
+
+    this.container.addChild(this.graphics_star)
+  }
+
+  drawNebula () {
+    if(!this.hasNebula()) {
+      return
+    }
+    if (this.nebulaSprite) {
+      this.fixedContainer.removeChild(this.nebulaSprite)
+      this.nebulaSprite = null
+    }
+    let seed = this.data._id
+    Star.seededRNG.seed(seed)
+    let nebulaTexture = TextureService.getRandomStarNebulaTexture(seed)
+    this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
+
+    let spriteSize = 64
+    this.nebulaSprite.width = spriteSize
+    this.nebulaSprite.height = spriteSize
+    this.nebulaSprite.anchor.set(0.5)
+    this.nebulaSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.nebulaSprite.tint = playerColour
+    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    let blendSprite = new PIXI.Sprite(nebulaTexture)
+    blendSprite.anchor.set(0.5)
+    blendSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
+    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
+    blendSprite.tint = playerColour
+    this.nebulaSprite.addChild(blendSprite)
+
+    this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
+  drawWormHole () {
+    if (!this.data.wormHoleToStarId) {
+      return
+    }
+
+    if (this.wormHoleSprite) {
+      this.fixedContainer.removeChild(this.wormHoleSprite)
+      this.wormHoleSprite = null
+    }
+
+    let texture = TextureService.getRandomWormholeTexture()
+    this.wormHoleSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 40
+    this.wormHoleSprite.width = spriteSize
+    this.wormHoleSprite.height = spriteSize
+    this.wormHoleSprite.anchor.set(0.5)
+    this.wormHoleSprite.rotation = Math.random()*Math.PI*2.0
+    this.wormHoleSprite.alpha = 0.35
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.wormHoleSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.wormHoleSprite)
+  }
+
+  drawAsteroidField () {
+    if(!this.hasAsteroidField()) {
+      return
+    }
+    if (this.asteroidFieldSprite) {
+      this.fixedContainer.removeChild(this.asteroidFieldSprite)
+      this.asteroidFieldSprite = null
+    }
+    let seed = this.data._id
+    Star.seededRNG.seed(seed)
+    let texture = TextureService.getRandomStarAsteroidFieldTexture(seed)
+    this.asteroidFieldSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 64
+    this.asteroidFieldSprite.width = spriteSize
+    this.asteroidFieldSprite.height = spriteSize
+    this.asteroidFieldSprite.anchor.set(0.5)
+    this.asteroidFieldSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.asteroidFieldSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.asteroidFieldSprite)
   }
 
   drawSpecialist () {
@@ -184,9 +296,20 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
-    this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
+  }
+
+  hasNebula () {
+    return this.data.isNebula
+  }
+
+  hasAsteroidField () {
+    return this.data.isAsteroidField
+  }
+
+  hasBlackHole () {
+    return this.data.isBlackHole
   }
 
   hasSpecialist () {
@@ -262,10 +385,14 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
+    if (!this.data.naturalResources) {
+      return
+    }
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
         this.graphics_natural_resources_ring[lod].alpha = 0.3
+        this.graphics_natural_resources_ring[lod].zIndex = -1
       }
       this.graphics_natural_resources_ring[lod].clear()
 
@@ -273,9 +400,11 @@ class Star extends EventEmitter {
         return
       }
 
+      let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+
       // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
       // TODO: Experimental:
-      let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
+      let ringRadius = averageNaturalResources <= 50 ? averageNaturalResources : averageNaturalResources > 400 ? 100 : (12.5 * Math.log2(averageNaturalResources / 50) + 50)
 
       ringRadius /= 8.0
       let lineWidht = 1.0/8.0
@@ -290,12 +419,16 @@ class Star extends EventEmitter {
     }
   }
 
+  _calculateAverageNaturalResources(naturalResources) {
+    return Math.floor((naturalResources.economy + naturalResources.industry + naturalResources.science) / 3);
+  }
+
   _getPlanetsCount () {
     if (!this.data.naturalResources) {
       return 0
     }
-
-    return Math.min(Math.floor(this.data.naturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
+    let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+    return Math.min(Math.floor(averageNaturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {
@@ -307,10 +440,10 @@ class Star extends EventEmitter {
   }
 
   drawColour () {
-    this.graphics_shape_part.clear()
-    this.graphics_shape_full.clear()
-    this.graphics_shape_part_warp.clear()
-    this.graphics_shape_full_warp.clear()
+    if (this.graphics_shape_part) {
+      this.container.removeChild(this.graphics_shape_part)
+      this.container.removeChild(this.graphics_shape_full)
+    }
 
     // Get the player who owns the star.
     let player = this._getStarPlayer()
@@ -318,113 +451,20 @@ class Star extends EventEmitter {
     if (!player) {
       return
     }
-
-    let lineWidthInner = 3
-    let lineWidthOuter = 2
-
-    if (this._isDeadStar()) {
-      lineWidthInner--
-      lineWidthOuter--
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
+      this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
+      this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
     }
-
-    this.graphics_shape_part.lineStyle(lineWidthInner, player.colour.value)
-    this.graphics_shape_full.lineStyle(lineWidthInner, player.colour.value)
-    this.graphics_shape_part_warp.lineStyle(lineWidthOuter, player.colour.value)
-    this.graphics_shape_full_warp.lineStyle(lineWidthOuter, player.colour.value)
-
-    switch (player.shape) {
-      case 'circle':
-        this._drawColourCircle()
-        break
-      case 'square':
-        this._drawColourSquare()
-        break
-      case 'diamond':
-        this._drawColourDiamond()
-        break;
-      case 'hexagon':
-        this._drawColourHexagon()
-        break;
-    }
-  }
-
-  _drawColourCircle () {
-    this.graphics_shape_part.arc(0, 0, 7, 0.785398, -0.785398)
-    this.graphics_shape_full.drawCircle(0, 0, 7)
-
-    this.graphics_shape_part_warp.arc(0, 0, 10, 0.785398, -0.785398)
-    this.graphics_shape_full_warp.drawCircle(0, 0, 10)
-  }
-
-  _drawColourSquare () {
-    this.graphics_shape_part.moveTo(7, -7)
-    this.graphics_shape_part.lineTo(-7, -7)
-    this.graphics_shape_part.lineTo(-7, 7)
-    this.graphics_shape_part.lineTo(7, 7)
-
-    this.graphics_shape_full.drawRect(-7, -7, 14, 14)
-
-    this.graphics_shape_part_warp.moveTo(7, -10)
-    this.graphics_shape_part_warp.lineTo(-10, -10)
-    this.graphics_shape_part_warp.lineTo(-10, 10)
-    this.graphics_shape_part_warp.lineTo(7, 10)
-
-    this.graphics_shape_full_warp.drawRect(-10, -10, 20, 20)
-  }
-
-  _drawColourDiamond () {
-    let s = 9;
-    let w = 14;
-
-    this.graphics_shape_part.moveTo(0, -s)
-    this.graphics_shape_part.lineTo(-s, 0)
-    this.graphics_shape_part.lineTo(0, s)
-
-    this.graphics_shape_full.moveTo(0, -s)
-    this.graphics_shape_full.lineTo(-s, 0)
-    this.graphics_shape_full.lineTo(0, s)
-    this.graphics_shape_full.lineTo(s, 0)
-    this.graphics_shape_full.closePath()
-
-    this.graphics_shape_part_warp.moveTo(0, -w)
-    this.graphics_shape_part_warp.lineTo(-w, 0)
-    this.graphics_shape_part_warp.lineTo(0, w)
-
-    this.graphics_shape_full_warp.moveTo(0, -w)
-    this.graphics_shape_full_warp.lineTo(-w, 0)
-    this.graphics_shape_full_warp.lineTo(0, w)
-    this.graphics_shape_full_warp.lineTo(w, 0)
-    this.graphics_shape_full_warp.closePath()
-  }
-
-  _drawColourHexagon () {
-    this.graphics_shape_part.moveTo(4, -7)
-    this.graphics_shape_part.lineTo(-4, -7)
-    this.graphics_shape_part.lineTo(-8, 0)
-    this.graphics_shape_part.lineTo(-4, 7)
-    this.graphics_shape_part.lineTo(4, 7)
-
-    this.graphics_shape_full.moveTo(4, -7)
-    this.graphics_shape_full.lineTo(-4, -7)
-    this.graphics_shape_full.lineTo(-8, 0)
-    this.graphics_shape_full.lineTo(-4, 7)
-    this.graphics_shape_full.lineTo(4, 7)
-    this.graphics_shape_full.lineTo(8, 0)
-    this.graphics_shape_full.closePath()
-
-    this.graphics_shape_part_warp.moveTo(6.5, -10.5)
-    this.graphics_shape_part_warp.lineTo(-6.5, -10.5)
-    this.graphics_shape_part_warp.lineTo(-12, 0)
-    this.graphics_shape_part_warp.lineTo(-6.5, 10.5)
-    this.graphics_shape_part_warp.lineTo(6.5, 10.5)
-
-    this.graphics_shape_full_warp.moveTo(6.5, -10.5)
-    this.graphics_shape_full_warp.lineTo(-6.5, -10.5)
-    this.graphics_shape_full_warp.lineTo(-12, 0)
-    this.graphics_shape_full_warp.lineTo(-6.5, 10.5)
-    this.graphics_shape_full_warp.lineTo(6.5, 10.5)
-    this.graphics_shape_full_warp.lineTo(12, 0)
-    this.graphics_shape_full_warp.closePath()
+    this.graphics_shape_part.tint = player.colour.value
+    this.graphics_shape_full.tint = player.colour.value
+    this.graphics_shape_part.anchor.set(0.5)
+    this.graphics_shape_full.anchor.set(0.5)
+    this.graphics_shape_part.width = 28.0
+    this.graphics_shape_part.height = 28.0
+    this.graphics_shape_full.width = 28.0
+    this.graphics_shape_full.height = 28.0
+    this.container.addChild(this.graphics_shape_part)
+    this.container.addChild(this.graphics_shape_full)
   }
 
   _hasUnknownShips() {
@@ -445,7 +485,7 @@ class Star extends EventEmitter {
 
     let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
 
-    if ((totalKnownShips > 0) || (this._getStarCarriers().length > 0) || this._hasUnknownShips()) {
+    if (this.data.ownedByPlayerId && (totalKnownShips > 0 || this._getStarCarriers().length > 0 || this._hasUnknownShips())) {
       this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
@@ -468,23 +508,33 @@ class Star extends EventEmitter {
     let carrierCount = carriersOrbiting.length
 
     let shipsText = ''
-    let scramblers = 0
-    if (carriersOrbiting) {
-      scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
-    }
-    if ( (scramblers == carrierCount) && (this.data.ships == null) ) {
-      shipsText = '???'
-    }
-    else {
-      shipsText = totalKnownShips
-      if( (scramblers > 0) || (this.data.ships == null) ) {
-        shipsText += '*'
-      }
-    }
 
-    if (carrierCount) {
-      shipsText += '/'
-      shipsText += carrierCount.toString()
+    if (this.data.ownedByPlayerId) {
+      let scramblers = 0
+      
+      if (carriersOrbiting) {
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+      }
+
+      if (scramblers == carrierCount && this.data.ships == null) {
+        shipsText = '???'
+      }
+      else {
+        shipsText = totalKnownShips
+
+        if (scramblers > 0 || this.data.ships == null) {
+          shipsText += '*'
+        }
+      }
+
+      if (carrierCount) {
+        shipsText += '/'
+        shipsText += carrierCount.toString()
+
+        if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
+          shipsText += '+'
+        }
+      }
     }
 
     if (shipsText) {
@@ -526,9 +576,33 @@ class Star extends EventEmitter {
         this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
+        this.text_infrastructure.alpha = 0.75;
 
         this.container.addChild(this.text_infrastructure)
       }
+    }
+  }
+
+  drawInfrastructureBulkIgnored () {
+    if (this.text_infrastructureBulkIgnored) {
+      this.container.removeChild(this.text_infrastructureBulkIgnored)
+      this.text_infrastructureBulkIgnored = null
+    }
+
+    if (this.data.ignoreBulkUpgrade == null) {
+      return
+    }
+
+    if (!this.text_infrastructureBulkIgnored) {
+      let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
+
+      let bitmapFont = {fontName: "space-mono", fontSize: 8}
+      this.text_infrastructureBulkIgnored = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+      this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
+      this.text_infrastructureBulkIgnored.y = 12
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+
+      this.container.addChild(this.text_infrastructureBulkIgnored)
     }
   }
 
@@ -538,7 +612,10 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
-    if (!player) { return }
+    // Dead stars do not have scanning range unless they are black holes
+    if (!player || (this._isDeadStar() && !this.hasBlackHole())) { return }
+
+    if (!player.research) { return }
 
     // TODO: Use the game helper instead?
     let techLevel = player.research.scanning.level
@@ -547,13 +624,16 @@ class Star extends EventEmitter {
       techLevel += this.data.specialist.modifiers.local.scanning || 0
     }
 
+    if (this.hasBlackHole()) {
+      techLevel += 3
+    }
+
     techLevel = Math.max(1, techLevel)
 
     let radius = ((techLevel || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
-    // this.graphics_scanningRange.drawStar(this.data.location.x, this.data.location.y, radius, radius, radius - 2)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
@@ -574,6 +654,8 @@ class Star extends EventEmitter {
 
     if (!player) { return }
 
+    if (!player.research) { return }
+    
     // TODO: Use the game helper instead?
     let techLevel = player.research.hyperspace.level
 
@@ -608,7 +690,16 @@ class Star extends EventEmitter {
     }
   }
 
+  drawSelectedCircle () {
+    this.graphics_selected.clear()
 
+    if (this.isSelected) {
+      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_selected.alpha = 0.3
+      this.graphics_selected.drawCircle(0, 0, 20)
+    }
+  }
+  
   onZoomChanging(zoomPercent) {
     this.zoomPercent = zoomPercent
     this.setScale(zoomPercent)
@@ -637,11 +728,14 @@ class Star extends EventEmitter {
   }
 
   onClicked (e) {
+    let eventData = e ? e.data : null
+    
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onStarRightClicked', this.data)
+      this.emit('onStarRightClicked', {
+        starData: this.data,
+        eventData
+      })
     } else {
-      let eventData = e ? e.data : null
-
       this.emit('onStarClicked', {
         starData: this.data,
         eventData,
@@ -670,7 +764,7 @@ class Star extends EventEmitter {
       }
     }
 
-    this.graphics_star.visible = !this.hasSpecialist()
+    this.graphics_star.visible = !this.hasSpecialist() || this.hasBlackHole()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
 
@@ -747,7 +841,43 @@ class Star extends EventEmitter {
   }
 
   _isDeadStar () {
-    return this.data.naturalResources != null && this.data.naturalResources <= 0
+    return this.data.naturalResources != null && this.data.naturalResources.economy <= 0 && this.data.naturalResources.industry <= 0 && this.data.naturalResources.science <= 0;
+  }
+
+  select () {
+    this.isSelected = true
+    this.drawSelectedCircle()
+    this.emit('onSelected', this.data)
+  }
+
+  unselect () {
+    this.isSelected = false
+    this.drawSelectedCircle()
+    this.emit('onUnselected', this.data)
+  }
+
+  toggleSelected () {
+    if (this.isSelected) {
+      this.unselect()
+    } else {
+      this.select()
+    }
+  }
+
+  showIgnoreBulkUpgrade () {
+    this.showIgnoreBulkUpgradeInfrastructure = true
+
+    if (this.text_infrastructureBulkIgnored) {
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+    }
+  }
+
+  hideIgnoreBulkUpgrade () {
+    this.showIgnoreBulkUpgradeInfrastructure = false
+
+    if (this.text_infrastructureBulkIgnored) {
+      this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
+    }
   }
 }
 

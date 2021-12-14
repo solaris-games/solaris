@@ -89,8 +89,7 @@
         </tbody>
       </table>
     </div>
-    
-    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" />
+    <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
   </div>
 </template>
 
@@ -141,7 +140,12 @@ export default {
     }
   },
   mounted () {
+    GameContainer.map.showIgnoreBulkUpgrade()
+
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+  },
+  destroyed () {
+    GameContainer.map.hideIgnoreBulkUpgrade()
   },
   methods: {
     onCloseRequested (e) {

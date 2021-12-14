@@ -1,13 +1,13 @@
 const simplexNoise = require('simplex-noise');
-const ValidationError = require("../../errors/validation");
 
 module.exports = class SpiralMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
+        this.resourceService = resourceService;
     }
 
     generateLocations(game, count, resourceDistribution) {
@@ -26,7 +26,8 @@ module.exports = class SpiralMapService {
         // This service should be responsible for plotting where player home stars are as
         // the current logic doesn't really work well when galaxies are stretched.
         //this.applyQuadraticStretch(locations);
-        this.setResources(game, locations, resourceDistribution);
+        this.resourceService.distribute(game, locations, resourceDistribution);
+
         this.applyNoise(locations);
         this.applyPadding(locations);
 
@@ -140,55 +141,6 @@ module.exports = class SpiralMapService {
         }
     }
 
-    setResources(game, locations, resourceDistribution) {
-        switch (resourceDistribution) {
-            case 'random': 
-                this.setResourcesRandom(game, locations);
-                break;
-            case 'weightedCenter': 
-                this.setResourcesWeightedCenter(game, locations);
-                break;
-            default:
-                throw new ValidationError(`Unsupported resource distribution type: ${resourceDistribution}`);
-        }
-    }
-
-    setResourcesRandom(game, locations) {
-        // Allocate random resources.
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RMAX = game.constants.star.resources.maxNaturalResources;
-
-        for (let location of locations) {
-            let r = this.randomService.getRandomNumberBetween(RMIN, RMAX);
-
-            location.resources = Math.floor(r);
-        }
-    }
-
-    setResourcesWeightedCenter(game, locations) {
-        let RMIN = game.constants.star.resources.minNaturalResources;
-        let RRANGE = game.constants.star.resources.maxNaturalResources - RMIN;
-        let RADIUS = 3;
-
-        let BASE = 2;
-        let EXP = 2;
-        let EXP2 = 2;
-
-        for (let i = 0; i < locations.length; i++){
-            let location = locations[i];
-
-            let x_init = location.x;
-            let y_init = location.y;
-
-            let vector = Math.hypot(x_init, y_init);
-            let vectorScale = (RADIUS - vector) / RADIUS;
-
-            let r = (RMIN + (RRANGE * Math.pow(BASE, EXP * Math.pow(vectorScale, EXP2)))) / RADIUS;
-
-            location.resources = Math.floor(r);
-        }
-    }
-
     applyPadding(locations) {
         let MIN_D = 0.2,
             REPOS = 0.01,
@@ -256,7 +208,7 @@ module.exports = class SpiralMapService {
 
             for (let i = 0; i < locs.length; i++) {
                 let location = locs[i];
-                let size = location.resources;
+                let size = (location.resources.economy + location.resources.industry + location.resources.science) / 3;
 
                 let x_center = (location.x - x_init) * scale - size / 2
                 let y_center = (location.y - y_init) * scale - size / 2

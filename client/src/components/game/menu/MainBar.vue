@@ -5,8 +5,6 @@
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
   <div class="menu">
-    <div class="header-buffer"></div>
-
     <not-logged-in-bar v-if="!isLoggedIn"/>
     <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
 
@@ -14,11 +12,14 @@
 
     <div class="menu-content bg-dark" v-if="menuState">
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewSettingsRequested="onViewSettingsRequested"/>
+      <tutorial v-if="menuState == MENU_STATES.TUTORIAL" @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewSettingsRequested="onViewSettingsRequested"/>
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
-        @onViewConversationRequested="onViewConversationRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenTradeRequested="onOpenTradeRequested"/>
@@ -29,7 +30,6 @@
       <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
       <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onViewConversationRequested="onViewConversationRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -42,7 +42,6 @@
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
-        @onViewConversationRequested="onViewConversationRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
@@ -77,11 +76,10 @@
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <inbox v-if="menuState == MENU_STATES.INBOX"
         @onCloseRequested="onCloseRequested"
-        @onViewConversationRequested="onViewConversationRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        @onCreateNewConversationRequested="onCreateNewConversationRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
         :tab="menuArguments"
@@ -101,6 +99,7 @@
         @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
       <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <diplomacy v-if="menuState == MENU_STATES.DIPLOMACY" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"
@@ -113,18 +112,19 @@
         @onCloseRequested="onCloseRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
         @onCloseRequested="onCloseRequested"/>
+      <settings v-if="menuState == MENU_STATES.SETTINGS"
+        @onCloseRequested="onCloseRequested"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenInboxRequested="onOpenInboxRequested"
-        @onViewConversationRequested="onViewConversationRequested"/>
+        @onCloseRequested="onCloseRequested"/>
       <conversation v-if="menuState == MENU_STATES.CONVERSATION"
         :conversationId="menuArguments"
         :key="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onOpenInboxRequested="onOpenInboxRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
+
+    <div class="spacing-footer d-block d-sm-none"></div>
   </div>
 
   <footer-bar class="footer-bar d-xs-block d-sm-none" 
@@ -134,12 +134,14 @@
 </template>
 
 <script>
+import eventBus from '../../../eventBus'
 import MENU_STATES from '../../data/menuStates'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
 import PlayerVue from '../player/Player.vue'
 import TradeVue from '../player/Trade.vue'
 import WelcomeVue from '../welcome/Welcome.vue'
+import TutorialVue from '../tutorial/Tutorial.vue'
 import ResearchVue from '../research/Research.vue'
 import StarDetailVue from '../star/StarDetail.vue'
 import CarrierDetailVue from '../carrier/CarrierDetail.vue'
@@ -149,6 +151,7 @@ import CarrierRenameVue from '../carrier/CarrierRename.vue'
 import ShipTransferVue from '../carrier/ShipTransfer.vue'
 import BuildCarrierVue from '../carrier/BuildCarrier.vue'
 import InboxVue from '../inbox/Inbox.vue'
+import EventLogVue from '../eventLog/EventLog.vue'
 import IntelVue from '../intel/Intel.vue'
 import GalaxyVue from '../galaxy/Galaxy.vue'
 import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
@@ -158,10 +161,12 @@ import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
 import LedgerVue from '../ledger/Ledger.vue'
+import DiplomacyVue from '../diplomacy/Diplomacy.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
 import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
 import GameNotesVue from '../notes/GameNotes.vue'
 import OptionsVue from './Options.vue'
+import SettingsVue from '../settings/Settings.vue'
 import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 import FooterBarVue from './FooterBar.vue'
@@ -173,6 +178,7 @@ export default {
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
     'welcome': WelcomeVue,
+    'tutorial': TutorialVue,
     'player-list': PlayerListVue,
     'leaderboard': LeaderboardVue,
     'player': PlayerVue,
@@ -187,20 +193,23 @@ export default {
     'ship-transfer': ShipTransferVue,
     'build-carrier': BuildCarrierVue,
     'inbox': InboxVue,
+    'event-log': EventLogVue,
     'intel': IntelVue,
     'galaxy': GalaxyVue,
     'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
     'map-object-selector': MapObjectSelectorVue,
     'ruler': RulerVue,
     'ledger': LedgerVue,
+    'diplomacy': DiplomacyVue,
     'hire-specialist-carrier': HireSpecialistCarrierVue,
     'hire-specialist-star': HireSpecialistStarVue,
     'game-notes': GameNotesVue,
     'options': OptionsVue,
+    'settings': SettingsVue,
     'create-conversation': ConversationCreateVue,
     'conversation': ConversationDetailVue,
     'not-logged-in-bar': NotLoggedInBarVue,
-    'dark-mode-warning-bar': DarkModeWarningBarVue
+    'dark-mode-warning-bar': DarkModeWarningBarVue,
   },
   props: {
     menuState: String,
@@ -210,6 +219,17 @@ export default {
     return {
       MENU_STATES: MENU_STATES
     }
+  },
+  mounted () {
+    // TODO: These event names should be global constants
+    eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
+    eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
+    eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
+  },
+  destroyed () {
+    eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
+    eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
+    eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
   },
   methods: {
     changeMenuState (state, args) {
@@ -223,13 +243,6 @@ export default {
     },
     onCloseRequested (e) {
       this.changeMenuState(null, null)
-    },
-    onViewConversationRequested (e) {
-      if (e.conversationId) {
-        this.changeMenuState(MENU_STATES.CONVERSATION, e.conversationId)
-      } else if (e.participantIds) {
-        this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
-      }
     },
     onViewCompareIntelRequested (e) {
       this.changeMenuState(MENU_STATES.INTEL, e)
@@ -258,9 +271,6 @@ export default {
     onEditWaypointRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_WAYPOINT_DETAIL, e)
     },
-    onOpenInboxRequested (e) {
-      this.changeMenuState(MENU_STATES.INBOX, e)
-    },
     onViewHireCarrierSpecialistRequested (e) {
       this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_CARRIER, e)
     },
@@ -273,11 +283,33 @@ export default {
     onCarrierRenameRequested (e) {
       this.changeMenuState(MENU_STATES.CARRIER_RENAME, e)
     },
-    onCreateNewConversationRequested (e) {
-      this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
-    },
     onViewCarrierCombatCalculatorRequested (e) {
       this.changeMenuState(MENU_STATES.COMBAT_CALCULATOR, e)
+    },
+    onViewSettingsRequested (e) {
+      this.changeMenuState(MENU_STATES.SETTINGS, e)
+    },
+    onOpenInboxRequested (e) {
+      if (!this.canHandleConversationEvents()) return
+
+      this.changeMenuState(MENU_STATES.INBOX, e)
+    },
+    onCreateNewConversationRequested (e) {
+      if (!this.canHandleConversationEvents()) return
+
+      this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
+    },
+    onViewConversationRequested (e) {
+      if (!this.canHandleConversationEvents()) return
+
+      if (e.conversationId) {
+        this.changeMenuState(MENU_STATES.CONVERSATION, e.conversationId)
+      } else if (e.participantIds) {
+        this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
+      }
+    },
+    canHandleConversationEvents () {
+      return window.innerWidth < 992
     }
   },
   computed: {
@@ -290,7 +322,7 @@ export default {
     isSpectatingDarkMode () {
       return GameHelper.isUserSpectatingGame(this.game)
         && (GameHelper.isDarkModeStandard(this.game) || GameHelper.isDarkModeExtra(this.game))
-    }
+    },
   }
 }
 </script>
@@ -306,20 +338,22 @@ export default {
   position: fixed;
   height: 52px;
   bottom: 0px;
-  z-index: 1;
-}
-
-.header-buffer {
-  height: 45px;
 }
 
 .menu {
-  position:absolute; /* This is a must otherwise the div overlays the map */
+  /* This is a must otherwise the div overlays the map */
+  position:absolute;
   width: 473px;
+  padding-top: 45px;
   max-height: 100%;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+}
+
+.spacing-footer {
+  height: 52px;
+  pointer-events: none;
 }
 
 ::-webkit-scrollbar {

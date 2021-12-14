@@ -4,18 +4,17 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(gameModel, userService, playerService, ledgerService, achievementService, reputationService) {
+    constructor(gameRepo, userService, playerService, ledgerService, achievementService, reputationService, gameTypeService) {
         super();
 
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.ledgerService = ledgerService;
         this.achievementService = achievementService;
         this.reputationService = reputationService;
+        this.gameTypeService = gameTypeService;
     }
-
-    // TODO: Specialist token trading
 
     isTradingCreditsDisabled(game) {
         return game.settings.player.tradeCredits === false;
@@ -61,16 +60,19 @@ module.exports = class TradeService extends EventEmitter {
             await this.playerService.addCredits(game, toPlayer, amount, false)
         ];
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
 
-        if (!fromPlayer.defeated) {
-            await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
-        }
+        if (!this.gameTypeService.isTutorialGame(game)) {
+            if (!fromPlayer.defeated) {
+                await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
+            }
+    
+            if (!toPlayer.defeated && toPlayer.userId) {
+                await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
+            }
 
-        if (!toPlayer.defeated && toPlayer.userId) {
-            await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
         }
 
         let reputation = await this.reputationService.tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount);
@@ -123,14 +125,16 @@ module.exports = class TradeService extends EventEmitter {
             await this.playerService.addCreditsSpecialists(game, toPlayer, amount, false)
         ];
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
-        if (!fromPlayer.defeated) {
-            await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
-        }
-
-        if (!toPlayer.defeated && toPlayer.userId) {
-            await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
+        if (!this.gameTypeService.isTutorialGame(game)) {
+            if (!fromPlayer.defeated) {
+                await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
+            }
+    
+            if (!toPlayer.defeated && toPlayer.userId) {
+                await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
+            }
         }
 
         let reputation = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount);
@@ -191,7 +195,7 @@ module.exports = class TradeService extends EventEmitter {
 
         // Note: AI will never ever send renown so no need to check
         // if players are AI controlled here.
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': fromPlayer._id
         }, {
@@ -200,8 +204,10 @@ module.exports = class TradeService extends EventEmitter {
             }
         });
 
-        await this.achievementService.incrementRenownSent(fromPlayer.userId, amount);
-        await this.achievementService.incrementRenownReceived(toPlayer.userId, amount); // Note we have already checked for null user id above.
+        if (!this.gameTypeService.isTutorialGame(game)) {
+            await this.achievementService.incrementRenownSent(fromPlayer.userId, amount);
+            await this.achievementService.incrementRenownReceived(toPlayer.userId, amount); // Note we have already checked for null user id above.
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -273,18 +279,20 @@ module.exports = class TradeService extends EventEmitter {
             }
         ];
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
         await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
 
-        // Need to assert that the trading players aren't controlled by AI
-        // and the player user has an account.
-        if (!toPlayer.defeated && toPlayer.userId) {
-            await this.achievementService.incrementTradeTechnologyReceived(toPlayer.userId, 1);
-        }
+        if (!this.gameTypeService.isTutorialGame(game)) {
+            // Need to assert that the trading players aren't controlled by AI
+            // and the player user has an account.
+            if (!toPlayer.defeated && toPlayer.userId) {
+                await this.achievementService.incrementTradeTechnologyReceived(toPlayer.userId, 1);
+            }
 
-        if (!fromPlayer.defeated) {
-            await this.achievementService.incrementTradeTechnologySent(fromPlayer.userId, 1);
+            if (!fromPlayer.defeated) {
+                await this.achievementService.incrementTradeTechnologySent(fromPlayer.userId, 1);
+            }
         }
 
         let eventTechnology = {

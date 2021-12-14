@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 
 module.exports = class CombatService extends EventEmitter {
     
-    constructor(technologyService, specialistService, playerService, starService, reputationService) {
+    constructor(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService) {
         super();
 
         this.technologyService = technologyService;
@@ -10,16 +10,33 @@ module.exports = class CombatService extends EventEmitter {
         this.playerService = playerService;
         this.starService = starService;
         this.reputationService = reputationService;
+        this.diplomacyService = diplomacyService;
+        this.gameTypeService = gameTypeService;
     }
 
     calculate(defender, attacker, isTurnBased = true, calculateNeeded = false) {    
         let defenderShipsRemaining = defender.ships;
         let attackerShipsRemaining = attacker.ships;
 
-        const defendPower = defender.weaponsLevel;
-        const attackPower = attacker.weaponsLevel;
+        let defendPower = defender.weaponsLevel;
+        let attackPower = attacker.weaponsLevel;
+
+        // If in non-turn based mode the attacker/defender cannot survive a single blow
+        // then they should outright be destroyed without delivering a blow to the opposition.
+        // Note: This addresses an exploit where players can send out 1 ship carriers to chip away 
+        // at incoming carriers.
+        if (!isTurnBased) {
+            if (defender.ships <= attacker.weaponsLevel) {
+                defendPower = 1;
+            }
+            
+            if (attacker.ships <= defender.weaponsLevel) {
+                attackPower = 1;
+            }
+        }
+
         const defenderAdditionalTurns = isTurnBased ? 1 : 0;
-        
+
         const defenderTurns = Math.ceil(attacker.ships / defendPower);
         const attackerTurns = Math.ceil(defender.ships / attackPower);
 
@@ -49,7 +66,7 @@ module.exports = class CombatService extends EventEmitter {
 
         attackerShipsRemaining = Math.max(0, attackerShipsRemaining);
         defenderShipsRemaining = Math.max(0, defenderShipsRemaining);
-
+        
         let result = {
             weapons: {
                 defender: defendPower,
@@ -76,18 +93,15 @@ module.exports = class CombatService extends EventEmitter {
         return result;
     }
 
-    calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers) {
+    calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers) {
         // Calculate the combined combat result taking into account
         // the star ships and all defenders vs. all attackers
         let totalDefenders = Math.floor(star.shipsActual) + defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
         let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
 
         // Calculate the weapons tech levels based on any specialists present at stars or carriers.
-        let defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defender, star, defenderCarriers);
+        let defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, owner, star, defenderCarriers);
         
-        // Add the defender bonus if applicable.
-        defenderWeaponsTechLevel += this.getDefenderBonus(game);
-
         // Use the highest weapons tech of the attacking players to calculate combat result.
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, true);
 
@@ -110,12 +124,12 @@ module.exports = class CombatService extends EventEmitter {
         return combatResult;
     }
 
-    calculateCarrier(game, defender, attackers, defenderCarriers, attackerCarriers) {
+    calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers) {
         let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
         let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
 
         // Calculate the weapons tech levels
-        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, [defender], defenderCarriers, false);
+        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, false);
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, false);
         
         // Check for deductions to weapons.
@@ -137,17 +151,24 @@ module.exports = class CombatService extends EventEmitter {
         return combatResult;
     }
 
-    getDefenderBonus(game) {
-        return game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
-    }
-
-    async performCombat(game, gameUsers, player, star, carriers) {
+    async performCombat(game, gameUsers, defender, star, carriers) {
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
+
+        // Allies of the defender will be on the defending side.
+        let defenderAllies = [];
+
+        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            defenderAllies = this.diplomacyService.getAlliesOfPlayer(game, defender);
+        }
 
         // Get all defender carriers ordered by most carriers present descending.
         // Carriers who have the most ships will be target first in combat.
         let defenderCarriers = carriers
-            .filter(c => c.ships > 0 && !c.isGift && c.ownedByPlayerId.equals(player._id))
+            .filter(c => 
+                c.ships > 0
+                && !c.isGift
+                && (c.ownedByPlayerId.equals(defender._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId)))  // Either owned by the defender or owned by an ally
+            )
             .sort((a, b) => b.ships - a.ships);
 
         // If in carrier-to-carrier combat, verify that there are carriers that can fight.
@@ -157,7 +178,12 @@ module.exports = class CombatService extends EventEmitter {
 
         // Get all attacker carriers.
         let attackerCarriers = carriers
-            .filter(c => c.ships > 0 && !c.isGift && !c.ownedByPlayerId.equals(player._id))
+            .filter(c => 
+                c.ships > 0 
+                && !c.isGift 
+                && !c.ownedByPlayerId.equals(defender._id)    // Not owned by the player and
+                && !defenderAllies.find(a => a._id.equals(c.ownedByPlayerId))   // Not owned by an ally
+            )
             .sort((a, b) => b.ships - a.ships);
 
         // Double check that the attacking carriers can fight.
@@ -166,26 +192,41 @@ module.exports = class CombatService extends EventEmitter {
         }
 
         // Get the players for the defender and all attackers.
+        let defenderPlayerIds = defenderCarriers.map(c => c.ownedByPlayerId.toString());
+        defenderPlayerIds.push(defender._id.toString());
+        defenderPlayerIds = [...new Set(defenderPlayerIds)];
+
         let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
 
-        let defender = player;
+        let defenders = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
         let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
 
-        let defenderUser = gameUsers.find(u => u._id.equals(defender.userId));
+        let defenderUsers = [];
         let attackerUsers = [];
         
+        for (let defender of defenders) {
+            let user = gameUsers.find(u => u._id.equals(defender.userId));
+            
+            if (user) {
+                defenderUsers.push(user);
+            }
+        }
+        
         for (let attacker of attackers) {
-            let attackerUser = gameUsers.find(u => u._id.equals(attacker.userId));
-            attackerUsers.push(attackerUser);
+            let user = gameUsers.find(u => u._id.equals(attacker.userId));
+            
+            if (user) {
+                attackerUsers.push(user);
+            }
         }
 
         // Perform combat at the star.
         let combatResult;
         
         if (star) {
-            combatResult = this.calculateStar(game, star, defender, attackers, defenderCarriers, attackerCarriers);
+            combatResult = this.calculateStar(game, star, defender, defenders, attackers, defenderCarriers, attackerCarriers);
         } else {
-            combatResult = this.calculateCarrier(game, defender, attackers, defenderCarriers, attackerCarriers);
+            combatResult = this.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
         }
 
         // Add all of the carriers to the combat result with a snapshot of
@@ -211,6 +252,7 @@ module.exports = class CombatService extends EventEmitter {
             // Do the same with the star.
             combatResult.star = {
                 _id: star._id,
+                ownedByPlayerId: star.ownedByPlayerId,
                 specialist,
                 before: Math.floor(star.shipsActual),
                 lost: 0,
@@ -225,10 +267,12 @@ module.exports = class CombatService extends EventEmitter {
         }
 
         // Distribute damage evenly across all objects that are involved in combat.
-        this._distributeDamage(combatResult, attackerCarriers, combatResult.lost.attacker);
-        this._distributeDamage(combatResult, defenderObjects, combatResult.lost.defender);
+        this._distributeDamage(combatResult, attackerCarriers, combatResult.lost.attacker, true);
+        this._distributeDamage(combatResult, defenderObjects, combatResult.lost.defender, true);
 
-        this._updatePlayersCombatAchievements(combatResult, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+        if (!this.gameTypeService.isTutorialGame(game)) {
+            this._updatePlayersCombatAchievements(combatResult, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+        }
 
         // Remove any carriers from the game that have been destroyed.
         let destroyedCarriers = game.galaxy.carriers.filter(c => !c.ships);
@@ -247,14 +291,18 @@ module.exports = class CombatService extends EventEmitter {
 
         // If the defender has been eliminated at the star then the attacker who travelled the shortest distance in the last tick
         // captures the star. Repeat star combat until there is only one player remaining.
+        let captureResult = null;
+
         if (star) {
-            this._starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+            captureResult = this._starDefeatedCheck(game, star, defender, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers);
         }
 
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
-        for (let attacker of attackers) {
-            await this.reputationService.decreaseReputation(game, defender, attacker, true, false);
-            await this.reputationService.decreaseReputation(game, attacker, defender, true, false);
+        for (let defenderPlayer of defenders) {
+            for (let attackerPlayer of attackers) {
+                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
+                await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, true, false);
+            }
         }
 
         // Log the combat event
@@ -262,16 +310,18 @@ module.exports = class CombatService extends EventEmitter {
             this.emit('onPlayerCombatStar', {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                defender,
+                owner: defender,
+                defenders,
                 attackers,
                 star,
-                combatResult
+                combatResult,
+                captureResult
             });
         } else {
             this.emit('onPlayerCombatCarrier', {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                defender,
+                defenders,
                 attackers,
                 combatResult
             });
@@ -283,45 +333,84 @@ module.exports = class CombatService extends EventEmitter {
         if (attackerPlayerIds.length > 1) {
             // Get the next player to act as the defender.
             if (star) {
-                player = this.playerService.getById(game, star.ownedByPlayerId);
+                defender = this.playerService.getById(game, star.ownedByPlayerId);
             } else {
-                player = this.playerService.getById(game, attackerPlayerIds[0]);
+                defender = this.playerService.getById(game, attackerPlayerIds[0]);
             }
 
-            await this.performCombat(game, gameUsers, player, star, attackerCarriers);
+            await this.performCombat(game, gameUsers, defender, star, attackerCarriers);
         }
 
         return combatResult;
     }
 
-    _starDefeatedCheck(game, star, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers) {
+    _starDefeatedCheck(game, star, owner, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers) {
         let starDefenderDefeated = star && !Math.floor(star.shipsActual) && !defenderCarriers.length;
         let hasAttackersRemaining = attackerCarriers.reduce((sum, c) => sum + c.ships, 0) > 0;
+        let hasCapturedStar = starDefenderDefeated && hasAttackersRemaining;
 
-        if (starDefenderDefeated && hasAttackersRemaining) {
-            this.starService.captureStar(game, star, defender, defenderUser, attackers, attackerUsers, attackerCarriers);
+        if (hasCapturedStar) {
+            return this.starService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers);
         }
+
+        return null;
     }
 
-    _distributeDamage(combatResult, damageObjects, shipsToKill) {
+    _distributeDamage(combatResult, damageObjects, shipsToKill, destroyCarriers = true) {
         while (shipsToKill) {
-            let objectsToDeduct = damageObjects.filter(c => c.ships);
+            let objectsToDeduct = damageObjects
+                .filter(c => 
+                    c.ships > 0 &&
+                    // Is the star 
+                    // OR allow destroying carriers
+                    // OR if NOT destroying carriers then carriers that have more than 1 ship.
+                    (c.shipsActual != null || destroyCarriers || c.ships > 1)
+                )
+                .sort((a, b) => {
+                    // Sort by specialist (kill objects without specialists first)
+                    if (a.specialistId == null && b.specialistId != null) {
+                        return -1;
+                    } else if (a.specialistId != null && b.specialistId == null) {
+                        return 1;
+                    }
+
+                    // Sort by ships descending (kill objects with the most ships first)
+                    if (a.ships > b.ships) return -1;
+                    if (a.ships < b.ships) return 1;
+
+                    return 0; // Both are the same.
+                });
+            
+            if (!objectsToDeduct.length) {
+                return shipsToKill;
+            }
 
             // Try to distribute damage evenly across all objects, minimum of 1.
             let shipsPerObject = Math.max(1, Math.floor(shipsToKill / objectsToDeduct.length));
 
             for (let obj of objectsToDeduct) {
+                let isCarrier = obj.shipsActual == null;
                 let combatObject = combatResult.carriers.find(c => c._id.equals(obj._id)) || combatResult.star;
 
                 // Calculate how many ships to kill, capped to however many ships the object has.
-                let killed = Math.min(obj.ships, shipsPerObject);
+                let killed;
+
+                // If we are not destroying carriers then we need to keep
+                // at least 1 ship on the carrier, otherwise just kill them all.
+                if (!destroyCarriers && isCarrier) {
+                    killed = Math.min(obj.ships - 1, shipsPerObject);
+                } else {
+                    killed = Math.min(obj.ships, shipsPerObject);
+                }
+
+                killed = Math.max(0, killed); // Just in case.
 
                 combatObject.after -= killed;
                 combatObject.lost += killed;
                 shipsToKill -= killed;
 
                 // Apply damage to the carrier or star.
-                if (obj.shipsActual == null) {
+                if (isCarrier) {
                     obj.ships -= killed;
                 } else {
                     obj.shipsActual -= killed;
@@ -335,23 +424,35 @@ module.exports = class CombatService extends EventEmitter {
                 }
             }
         }
+
+        return shipsToKill;
     }
 
-    _updatePlayersCombatAchievements(combatResult, defender, defenderUser, defenderCarriers, attackers, attackerUsers, attackerCarriers) {
+    _updatePlayersCombatAchievements(combatResult, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers) {
         let defenderCarriersDestroyed = defenderCarriers.filter(c => !c.ships).length;
         let defenderSpecialistsDestroyed = defenderCarriers.filter(c => !c.ships && c.specialistId).length;
 
+        let attackerCarriersDestroyed = attackerCarriers.filter(c => !c.ships).length;
+        let attackerSpecialistsDestroyed = attackerCarriers.filter(c => !c.ships && c.specialistId).length;
+
         // Add combat result stats to defender achievements.
-        if (defenderUser && !defender.defeated) {
-            defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
-            defenderUser.achievements.combat.kills.carriers += attackerCarriers.filter(c => !c.ships).length;
-            defenderUser.achievements.combat.kills.specialists += attackerCarriers.filter(c => !c.ships && c.specialistId).length;
-            
-            defenderUser.achievements.combat.losses.ships += combatResult.lost.defender;
-            defenderUser.achievements.combat.losses.carriers += defenderCarriersDestroyed;
-            defenderUser.achievements.combat.losses.specialists += defenderSpecialistsDestroyed;
+        for (let defenderUser of defenderUsers) {
+            let defender = defenders.find(u => u.userId === defenderUser._id.toString());
+
+            if (defender && !defender.defeated) {
+                let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId.equals(defender._id));
+
+                defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
+                defenderUser.achievements.combat.kills.carriers += attackerCarriersDestroyed;
+                defenderUser.achievements.combat.kills.specialists += attackerSpecialistsDestroyed;
+                
+                defenderUser.achievements.combat.losses.ships += combatResult.lost.defender; // TODO: This will not be correct in combat where its more than 2 players.
+                defenderUser.achievements.combat.losses.carriers += playerCarriers.filter(c => !c.ships).length;
+                defenderUser.achievements.combat.losses.specialists += playerCarriers.filter(c => !c.ships && c.specialistId).length;
+            }
         }
 
+        // Add combat result stats to attacker achievements.
         for (let attackerUser of attackerUsers) {
             let attacker = attackers.find(u => u.userId === attackerUser._id.toString());
 

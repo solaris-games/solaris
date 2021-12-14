@@ -6,7 +6,9 @@
             <tbody>
                 <tr v-if="isTechnologyEnabled('scanning')">
                     <td class="row-icon"><i :class="getIcon('scanning')"></i></td>
-                    <td>Scanning</td>
+                    <td>
+                      Scanning
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.scanning.level}}
@@ -18,10 +20,15 @@
                       {{getRequiredTotal('scanning')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('scanning')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines how far your stars can see"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('hyperspace')">
                     <td class="row-icon"><i :class="getIcon('hyperspace')"></i></td>
-                    <td>Hyperspace Range</td>
+                    <td>
+                      <span class="label label-default" v-tooltip:bottom="'Determines how far your carriers can travel in a single jump'">Hyperspace Range</span>
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.hyperspace.level}}
@@ -33,10 +40,15 @@
                       {{getRequiredTotal('hyperspace')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('hyperspace')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines how far your carriers can travel in a single jump"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('terraforming')">
                     <td class="row-icon"><i :class="getIcon('terraforming')"></i></td>
-                    <td>Terraforming</td>
+                    <td>
+                      Terraforming
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.terraforming.level}}
@@ -48,10 +60,15 @@
                       {{getRequiredTotal('terraforming')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('terraforming')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines infrastructure cost. The higher the terraforming level, the lower infrastructure will cost to upgrade"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('experimentation')">
                     <td class="row-icon"><i :class="getIcon('experimentation')"></i></td>
-                    <td>Experimentation</td>
+                    <td>
+                      Experimentation
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.experimentation.level}}
@@ -63,10 +80,15 @@
                       {{getRequiredTotal('experimentation')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('experimentation')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines how many research points are awarded at the end of the galactic cycle to a random technology"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('weapons')">
                     <td class="row-icon"><i :class="getIcon('weapons')"></i></td>
-                    <td>Weapons</td>
+                    <td>
+                      Weapons
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.weapons.level}}
@@ -77,11 +99,16 @@
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('weapons')}}
                     </td>
-                    <td v-if="!isTechnologyResearchable('scanning')"></td>
+                    <td v-if="!isTechnologyResearchable('weapons')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines combat strength of your ships"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('banking')">
                     <td class="row-icon"><i :class="getIcon('banking')"></i></td>
-                    <td>Banking</td>
+                    <td>
+                      Banking
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.banking.level}}
@@ -93,10 +120,15 @@
                       {{getRequiredTotal('banking')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('banking')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines how many credits are awarded at the end of the galactic cycle"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('manufacturing')">
                     <td class="row-icon"><i :class="getIcon('manufacturing')"></i></td>
-                    <td>Manufacturing</td>
+                    <td>
+                      Manufacturing
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.manufacturing.level}}
@@ -108,10 +140,15 @@
                       {{getRequiredTotal('manufacturing')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('manufacturing')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines how many ships are built via industrial infrastructure per tick"/>
+                    </td>
                 </tr>
                 <tr v-if="isTechnologyEnabled('specialists')">
                     <td class="row-icon"><i :class="getIcon('specialists')"></i></td>
-                    <td>Specialists</td>
+                    <td>
+                      Specialists
+                    </td>
                     <td>
                       <span class="level-label">Level</span>
                       {{research.specialists.level}}
@@ -123,6 +160,9 @@
                       {{getRequiredTotal('specialists')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('specialists')"></td>
+                    <td class="text-right">
+                      <help-tooltip tooltip="Determines how many specialist tokens are awarded at the end of the galactic cycle"/>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -132,10 +172,14 @@
 </template>
 
 <script>
+import HelpTooltip from '../../HelpTooltip'
 import GameHelper from '../../../services/gameHelper'
 import TechnologyHelper from '../../../services/technologyHelper'
 
 export default {
+  components: {
+    'help-tooltip': HelpTooltip
+  },
   methods: {
     getRequiredTotal (technologyKey) {
       const game = this.$store.state.game

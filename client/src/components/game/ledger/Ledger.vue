@@ -2,9 +2,9 @@
 <div class="menu-page container">
     <menu-title title="Ledger" @onCloseRequested="onCloseRequested"/>
 
-    <p>Debts that you owe are in <span class="text-danger">red</span>. Use the <b>Settle Debt</b> button to send credits and settle the debt.</p>
+    <p><small>Debts that you owe are in <span class="text-danger">red</span>. Use the <b>Settle Debt</b> button to send credits and settle the debt.</small></p>
 
-    <p>Debts that are owed to you are in <span class="text-success">green</span>. Use the <b>Forgive Debt</b> button to write off the debt.</p>
+    <p><small>Debts that are owed to you are in <span class="text-success">green</span>. Use the <b>Forgive Debt</b> button to write off the debt.</small></p>
 
     <loading-spinner :loading="isLoadingLedger"/>
 
@@ -99,7 +99,7 @@ table tr {
 }
 
 .table-sm td {
-    padding: 0;
+  padding: 0;
 }
 
 .table td.fit,

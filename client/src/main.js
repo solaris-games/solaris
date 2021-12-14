@@ -53,6 +53,18 @@ Vue.prototype.$isHistoricalMode = function() {
   return this.$store.state.tick !== this.$store.state.game.state.tick
 }
 
+Vue.prototype.$isMobile = function () {
+  return window.matchMedia("only screen and (max-width: 576px)").matches
+}
+
+Vue.directive('tooltip', function(el, binding){
+  $(el).tooltip({
+    title: binding.value,
+    placement: binding.arg,
+    trigger: 'hover'             
+  })
+})
+
 new Vue({
   router,
   store,

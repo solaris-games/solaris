@@ -1,12 +1,14 @@
 module.exports = class AdminService {
     
-    constructor(userModel, gameModel) {
-        this.userModel = userModel;
-        this.gameModel = gameModel;
+    constructor(userRepo, gameRepo) {
+        this.userRepo = userRepo;
+        this.gameRepo = gameRepo;
     }
 
-    async listUsers() {
-        return await this.userModel.find({}, {
+    async listUsers(limit) {
+        let users = await this.userRepo.find({
+            // All users
+        }, {
             username: 1,
             email: 1,
             credits: 1,
@@ -15,88 +17,108 @@ module.exports = class AdminService {
             emailEnabled: 1,
             resetPasswordToken: 1,
             lastSeen: 1,
-            lastSeenIP: 1
-        })
-        .sort({
+            lastSeenIP: 1,
+            'achievements.rank': 1,
+            'achievements.completed': 1
+        }, {
             lastSeen: -1
-        })
-        .lean({defaults: true})
-        .exec();
+        }, limit);
+
+        for (let user of users) {
+            user.isEstablishedPlayer = user.achievements.rank > 0 || user.achievements.completed > 0;
+        }
+
+        return users;
     }
 
-    async listGames() {
-        return await this.gameModel.find({}, {
+    async listGames(limit) {
+        return await this.gameRepo.find({
+            'settings.general.type': { $ne: 'tutorial' } // Non tutorial games
+        }, {
             'settings.general': 1,
             'state': 1
-        })
-        .lean({defaults: true})
-        .exec();
+        }, {
+            _id: -1
+        },
+        limit);
     }
 
     async setRoleContributor(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.contributor': enabled
-        }).exec();
+        });
     }
 
     async setRoleDeveloper(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.developer': enabled
-        }).exec();
+        });
     }
 
     async setRoleCommunityManager(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.communityManager': enabled
-        }).exec();
+        });
     }
 
     async setRoleGameMaster(userId, enabled = true) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'roles.gameMaster': enabled
-        }).exec();
+        });
     }
 
     async ban(userId) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'banned': true
-        }).exec();
+        });
     }
 
     async unban(userId) {
-        await this.userModel.updateOne({
+        await this.userRepo.updateOne({
             _id: userId
         }, {
             'banned': false
-        }).exec();
+        });
     }
 
-    async setCredits(userId, credits) {
-        credits = Math.max(credits, 0);
-        
-        await this.userModel.updateOne({
-            _id: userId
+    async promoteToEstablishedPlayer(userId) {
+        await this.userRepo.updateOne({
+            _id: userId,
+            $and: [
+                { 'achievements.rank': { $eq: 0 }},
+                { 'achievements.completed': { $eq: 0 }}
+            ]
         }, {
-            'credits': credits
-        }).exec();
+            $inc: {
+                'achievements.completed': 1
+            }
+        });
     }
 
     async setGameFeatured(gameId, featured) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId
         }, {
             'settings.general.featured': featured
-        }).exec();
+        });
+    }
+
+    async setGameTimeMachine(gameId, enabled) {
+        await this.gameRepo.updateOne({
+            _id: gameId
+        }, {
+            'settings.general.timeMachine': enabled
+        });
     }
 
 };

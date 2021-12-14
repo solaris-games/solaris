@@ -16,12 +16,14 @@
                 <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="mr-2">
                   <i class="fab fa-discord"></i>
                 </a>
-                <a href="https://forum.solaris.games" target="_blank" title="Forum" class="mr-2">
+                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="mr-2">
                   <i class="far fa-comments"></i>
                 </a>
             </div>
             <div class="col-auto">
-                <a href="https://www.redbubble.com/shop/ap/82527983" target="_blank" class="text-info"><i class="fas fa-tshirt mr-1"></i>Shop</a>
+                <router-link :to="{ name: 'galactic-credits-shop'}" class="text-success"><i class="fas fa-shopping-basket mr-1"></i>Shop</router-link>
+                |
+                <a href="https://www.redbubble.com/shop/ap/82527983" target="_blank" class="text-info"><i class="fas fa-tshirt mr-1"></i>Swag</a>
                 |
                 <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="text-warning"><i class="fas fa-coffee mr-1"></i>Donate</a>
             </div>

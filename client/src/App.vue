@@ -32,9 +32,14 @@ body {
   animation-duration: 0.3s;
 }
 
-@media(max-width: 473px) {
-    .menu-page {
-      margin-bottom:52px; /* This is to cater for the bottom bar */
-    }
+/* Scroll Bar */
+/* Track */
+::-webkit-scrollbar-track {
+  background: #303030;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #375a7f;
 }
 </style>

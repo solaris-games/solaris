@@ -2,39 +2,11 @@
   <view-container>
     <view-title :title="user ? user.username : 'Achievements'" />
 
-    <div class="row bg-success mb-2" v-if="user && user.roles.contributor">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is a contributor <i class="fas fa-hands-helping"></i>
-        </p>
-      </div>
-    </div>
-
-    <div class="row bg-warning mb-2" v-if="user && user.roles.developer">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is an active developer <i class="fas fa-code"></i>
-        </p>
-      </div>
-    </div>
-
-    <div class="row bg-info mb-2" v-if="user && user.roles.communityManager">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is an active community manager <i class="fas fa-user-friends"></i>
-        </p>
-      </div>
-    </div>
-
-    <div class="row bg-info mb-2" v-if="user && user.roles.gameMaster">
-      <div class="col text-center">
-        <p class="mt-1 mb-1">
-          This player is an active game master <i class="fas fa-dice"></i>
-        </p>
-      </div>
-    </div>
+    <roles :user="user" :displayText="true"/>
 
     <loading-spinner :loading="!user"/>
+
+    <user-guild-info :user="user" />
 
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
@@ -48,6 +20,10 @@
           <tr>
             <td>Victories</td>
             <td class="text-right">{{ user.achievements.victories }}</td>
+          </tr>
+          <tr>
+            <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
+            <td class="text-right">{{ user.achievements.eloRating || 1200 }}</td>
           </tr>
           <tr>
             <td>Joined</td>
@@ -113,6 +89,14 @@
             <tr>
               <td>Stars Lost</td>
               <td class="text-right">{{ user.achievements.combat.stars.lost }}</td>
+            </tr>
+            <tr>
+              <td>Capital Stars Captured</td>
+              <td class="text-right">{{ user.achievements.combat.homeStars.captured }}</td>
+            </tr>
+            <tr>
+              <td>Capital Stars Lost</td>
+              <td class="text-right">{{ user.achievements.combat.homeStars.lost }}</td>
             </tr>
           </tbody>
         </table>
@@ -428,6 +412,8 @@ import Achievements from '../components/game/player/Achievements'
 import PieChart from '../components/game/intel/PieChart.js'
 import PolarArea from '../components/game/intel/PolarAreaChart.js'
 import userService from '../services/api/user'
+import UserGuildInfoVue from './guild/UserGuildInfo'
+import Roles from '../components/game/player/Roles'
 
 export default {
   components: {
@@ -437,11 +423,15 @@ export default {
     'view-subtitle': ViewSubtitle,
     'achievements': Achievements,
     'pie-chart': PieChart,
-    'polar-area-chart': PolarArea
+    'polar-area-chart': PolarArea,
+    'user-guild-info': UserGuildInfoVue,
+    'roles': Roles
   },
   data () {
     return {
       user: null,
+      gamesChartData: null,
+      tradeChartData: null,
       achievements: null,
       militaryChartData: null,
       infrastructureChartData: null,

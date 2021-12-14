@@ -6,6 +6,7 @@
             "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -20,6 +21,7 @@
             "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "weapons": 1,
@@ -33,6 +35,7 @@
             "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "weapons": 2,
@@ -47,6 +50,7 @@
             "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "weapons": 3,
@@ -61,6 +65,7 @@
             "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 2,
@@ -72,13 +77,15 @@
         {
             "id": 6,
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, -1 Weapons to the carrier.",
+            "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "local": {
+                    "speed": 1.5,
                     "hyperspace": 3,
-                    "weapons": -1
+                    "weapons": -3
                 }
             }
         },
@@ -88,6 +95,7 @@
             "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the carrier.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "hyperspace": -3,
@@ -102,9 +110,10 @@
             "description": "Prevents other players from seeing how many ships the carrier has.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "special": {
-                    "hideCarrierShips": true
+                    "hideShips": true
                 }
             }
         },
@@ -114,6 +123,7 @@
             "description": "When participating in combat, the enemy fights with -1 Weapons.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "special": {
                     "deductEnemyWeapons": 1
@@ -126,6 +136,7 @@
             "description": "Warp Scramblers do not affect the carrier.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "special": {
                     "unlockWarpGates": true
@@ -138,6 +149,7 @@
             "description": "Carrier travels at x2 Speed, -2 Weapons. The carrier is awarded x2 star capture rewards for destroying infrastructure.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 2,
@@ -154,6 +166,7 @@
             "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 2
@@ -169,6 +182,7 @@
             "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -187,6 +201,7 @@
             "description": "Grants +1 Hyperspace Range to the carrier.",
             "baseCostCredits": 50,
             "baseCostCreditsSpecialists": 1,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "hyperspace": 1
@@ -199,6 +214,7 @@
             "description": "The carrier does not participate in carrier-to-carrier combat. x1.5 Speed, -2 Hyperspace Range, -1 Weapons.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -213,16 +229,21 @@
         {
             "id": 16,
             "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 10 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
+            "description": "Reignites a dead star with 25 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
+            "baseCostCredits": 300,
+            "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 0.5
                 },
                 "special": {
                     "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": 10
+                    "reigniteDeadStarNaturalResources": {
+                        "economy": 25,
+                        "industry": 25,
+                        "science": 25
+                    }
                 }
             }
         }
@@ -234,6 +255,7 @@
             "description": "Grants +1 Scanning Range to the Star.",
             "baseCostCredits": 50,
             "baseCostCreditsSpecialists": 1,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "scanning": 1
@@ -246,6 +268,7 @@
             "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "manufacturing": 2,
@@ -259,6 +282,7 @@
             "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "terraforming": 3,
@@ -269,23 +293,23 @@
         {
             "id": 4,
             "name": "Orbital Cannon",
-            "description": "Grants +1 Weapons, -1 Scanning, -1 Terraforming to the Star.",
+            "description": "Grants +1 Weapons to the Star.",
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 2,
+            "oneShot": false,
             "modifiers": {
                 "local": {
-                    "weapons": 1,
-                    "scanning": -1,
-                    "terraforming": -1
+                    "weapons": 1
                 }
             }
         },
         {
             "id": 5,
             "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent other players from using it. Weapons -1.",
+            "description": "Locks the Warp Gate at the Star to prevent enemy players from using it. Weapons -1.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "weapons": -1
@@ -301,6 +325,7 @@
             "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
+            "oneShot": false,
             "modifiers": {
                 "special": {
                     "addNaturalResourcesOnTick": 1
@@ -314,12 +339,13 @@
         {
             "id": 7,
             "name": "War Machine",
-            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. This specialist retires if the star reaches 0 natural resources.",
+            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. When the star reaches 0 natural resources, the star dies and the specialist retires.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": true,
             "modifiers": {
                 "special": {
-                    "deductNaturalResourcesOnTick": 1
+                    "addNaturalResourcesOnTick": -1
                 },
                 "local": {
                     "manufacturing": 5,
@@ -333,9 +359,10 @@
             "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "special": {
-                    "hideStarShips": true
+                    "hideShips": true
                 }
             }
         },
@@ -343,8 +370,9 @@
             "id": 9,
             "name": "Demolition Controller",
             "description": "If the Star is captured, all infrastructure is destroyed.",
-            "baseCostCredits": 500,
-            "baseCostCreditsSpecialists": 5,
+            "baseCostCredits": 300,
+            "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
             "modifiers": {
                 "special": {
                     "destroyInfrastructureOnLoss": true
@@ -357,6 +385,7 @@
             "description": "The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "terraforming": -5,
@@ -374,6 +403,7 @@
             "description": "The Star's Science infrastructure contributes x2 to research. -3 Terraforming, -3 Weapons, +1 Scanning.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
             "modifiers": {
                 "local": {
                     "terraforming": -3,
@@ -388,12 +418,13 @@
         {
             "id": 12,
             "name": "Financial Analyst",
-            "description": "The star produces 1 credit per tick for each point of science on the star.",
+            "description": "The star produces 2 credits per tick for each point of science on the star.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
+            "oneShot": false,
             "modifiers": {
                 "special": {
-                    "creditsPerTickByScience": 1
+                    "creditsPerTickByScience": 2
                 }
             }
         }

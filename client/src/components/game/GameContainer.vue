@@ -147,11 +147,11 @@ Hyperi0n`, 'Donate', 'Dismiss')) {
 <style scoped>
 #gameContainer {
   position: absolute;
-  z-index: -1;
   left: 0;
   top: 0;
   margin: 0;
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 </style>

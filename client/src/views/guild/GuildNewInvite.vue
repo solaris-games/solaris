@@ -60,7 +60,7 @@ export default {
         let response = await GuildApiService.invite(this.guildId, this.username)
 
         if (response.status === 200) {
-          this.$toasted.show(`ou invited ${this.username} to the guild.`, { type: 'success' })
+          this.$toasted.show(`You invited ${this.username} to the guild.`, { type: 'success' })
 
           this.$emit('onUserInvited', response.data)
 

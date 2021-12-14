@@ -21,6 +21,10 @@ class GuildService extends BaseApiService {
     return axios.get(this.BASE_URL + 'guild/invites', { withCredentials: true })
   }
 
+  listApplications () {
+    return axios.get(this.BASE_URL + 'guild/applications', { withCredentials: true })
+  }
+
   details (guildId) {
     return axios.get(this.BASE_URL + 'guild/' + guildId, {
       withCredentials: true
@@ -33,6 +37,13 @@ class GuildService extends BaseApiService {
 
   create (name, tag) {
     return axios.post(this.BASE_URL + 'guild', {
+      name,
+      tag
+    }, { withCredentials: true })
+  }
+
+  rename (name, tag) {
+    return axios.patch(this.BASE_URL + 'guild', {
       name,
       tag
     }, { withCredentials: true })
@@ -56,14 +67,38 @@ class GuildService extends BaseApiService {
       { withCredentials: true })
   }
 
-  acceptInvite (guildId) {
-    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/acceptInvite', 
+  accept (guildId, userId = null) {
+    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/accept/' + (userId || ''), 
       {}, 
       { withCredentials: true })
   }
 
-  declineInvite (guildId) {
-    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/declineInvite', 
+  withdraw (guildId) {
+    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/withdraw', 
+      {}, 
+      { withCredentials: true })
+  }
+
+  decline (guildId) {
+    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/decline', 
+      {}, 
+      { withCredentials: true })
+  }
+
+  apply (guildId) {
+    return axios.put(this.BASE_URL + 'guild/' + guildId + '/apply', 
+      {}, 
+      { withCredentials: true })
+  }
+
+  withdraw (guildId) {
+    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/withdraw', 
+      {}, 
+      { withCredentials: true })
+  }
+
+  reject (guildId, userId) {
+    return axios.patch(this.BASE_URL + 'guild/' + guildId + '/reject/' + userId, 
       {}, 
       { withCredentials: true })
   }

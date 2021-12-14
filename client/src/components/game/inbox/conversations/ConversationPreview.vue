@@ -43,8 +43,8 @@
 </template>
 
 <script>
+import eventBus from '../../../../eventBus'
 import GameHelper from '../../../../services/gameHelper'
-import moment from 'moment'
 import PlayerIconVue from '../../player/PlayerIcon.vue'
 import mentionHelper from '../../../../services/mentionHelper'
 
@@ -68,7 +68,7 @@ export default {
       return GameHelper.getFriendlyColour(colour)
     },
     openConversation () {
-      this.$emit('onViewConversationRequested', {
+      eventBus.$emit('onViewConversationRequested', {
         conversationId: this.conversation._id
       })
     }

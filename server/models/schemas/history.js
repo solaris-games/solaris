@@ -12,6 +12,7 @@ const schema = new Schema({
             playerId: { type: Types.ObjectId, required: true },
             statistics: {
                 totalStars: { type: Types.Number, required: true, default: 0 },
+                totalHomeStars: { type: Types.Number, required: true, default: 0 },
                 totalEconomy: { type: Types.Number, required: true, default: 0 },
                 totalIndustry: { type: Types.Number, required: true, default: 0 },
                 totalScience: { type: Types.Number, required: true, default: 0 },
@@ -33,6 +34,7 @@ const schema = new Schema({
             defeatedDate: { type: Types.Date, required: false, default: null },
             afk: { type: Types.Boolean, required: true },
             ready: { type: Types.Boolean, required: false, default: false },
+            readyToQuit: { type: Types.Boolean, required: false, default: false },
             research: {
                 scanning: {
                     level: { type: Types.Number, required: true, default: 1  },
@@ -73,10 +75,15 @@ const schema = new Schema({
         {
             starId: { type: Types.ObjectId, required: true },
             ownedByPlayerId: { type: Types.ObjectId, required: false, default: null},
-            naturalResources: { type: Types.Number, required: true },
+            naturalResources: {
+                economy: { type: Types.Number, required: true },
+                industry: { type: Types.Number, required: true },
+                science: { type: Types.Number, required: true }
+            },
             ships: { type: Types.Number, required: true },
             shipsActual: { type: Types.Number, required: true },
             specialistId: { type: Types.Number, required: false, default: null },
+            homeStar: { type: Types.Boolean, required: false, default: false },
             warpGate: { type: Types.Boolean, required: true },
             ignoreBulkUpgrade: {
                 economy: { type: Types.Boolean, required: false, default: false },
@@ -87,6 +94,10 @@ const schema = new Schema({
                 economy: { type: Types.Number, required: true },
                 industry: { type: Types.Number, required: true },
                 science: { type: Types.Number, required: true }
+            },
+            location: {
+                x: { type: Types.Number, required: true },
+                y: { type: Types.Number, required: true }
             }
         }
     ],

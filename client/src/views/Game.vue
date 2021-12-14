@@ -7,16 +7,18 @@
     <div v-if="hasGame">
         <span class="d-none">{{ gameId }}</span>
 
-        <main-bar :menuState="menuState"
-                  :menuArguments="menuArguments"
-                  @onMenuStateChanged="onMenuStateChanged"
-                  @onPlayerSelected="onPlayerSelected"/>
-
         <game-container @onStarClicked="onStarClicked"
                     @onStarRightClicked="onStarRightClicked"
                     @onCarrierClicked="onCarrierClicked"
                     @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
+
+        <main-bar :menuState="menuState"
+                  :menuArguments="menuArguments"
+                  @onMenuStateChanged="onMenuStateChanged"
+                  @onPlayerSelected="onPlayerSelected"/>
+
+        <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
     </div>
   </div>
 </template>
@@ -27,6 +29,7 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import GameContainer from '../components/game/GameContainer.vue'
 import MENU_STATES from '../components/data/menuStates'
 import MainBar from '../components/game/menu/MainBar.vue'
+import Chat from '../components/game/inbox/Chat.vue'
 import GameApiService from '../services/api/game'
 import UserApiService from '../services/api/user'
 import GameHelper from '../services/gameHelper'
@@ -40,7 +43,8 @@ export default {
     'logo': LogoVue,
     'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
-    'main-bar': MainBar
+    'main-bar': MainBar,
+    'chat': Chat
   },
   data () {
     return {
@@ -82,7 +86,11 @@ export default {
     let userPlayer = this.getUserPlayer()
     
     if (userPlayer && !userPlayer.defeated) {
-      this.menuState = MENU_STATES.LEADERBOARD
+      if (GameHelper.isTutorialGame(this.$store.state.game)) {
+        this.menuState = MENU_STATES.TUTORIAL
+      } else {
+        this.menuState = MENU_STATES.LEADERBOARD
+      }
     } else {
       if (this.$store.state.userId && GameHelper.gameHasOpenSlots(this.$store.state.game)) {
         this.menuState = MENU_STATES.WELCOME
@@ -91,7 +99,7 @@ export default {
       }
     }
 
-    let reloadGameCheckInterval = this.$store.state.game.settings.gameTime.speed < 60 ? 5000 : 10000
+    let reloadGameCheckInterval = 1000 // 1 second
 
     this.polling = setInterval(this.reloadGameCheck, reloadGameCheckInterval)
 
@@ -131,6 +139,7 @@ export default {
           if (response.data._id) {
             this.$store.commit('setUserId', response.data._id)
             this.$store.commit('setUsername', response.data.username)
+            this.$store.commit('setRoles', response.data.roles)
           }
         }
       } catch (err) {
@@ -244,6 +253,8 @@ export default {
       this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
       this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
       this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
+      this.sockets.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
+      this.sockets.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
       this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
       this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
 
@@ -258,10 +269,16 @@ export default {
       this.sockets.unsubscribe('gamePlayerQuit')
       this.sockets.unsubscribe('gamePlayerReady')
       this.sockets.unsubscribe('gamePlayerNotReady')
+      this.sockets.unsubscribe('gamePlayerReadyToQuit')
+      this.sockets.unsubscribe('gamePlayerNotReadyToQuit')
       this.sockets.unsubscribe('playerDebtSettled')
       this.sockets.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
+      if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
+        return
+      }
+
       let conversationId = e.conversationId
 
       // Show a toast only if the user isn't already in the conversation.
@@ -348,7 +365,6 @@ export default {
           let response = await GameApiService.getGameState(this.$store.state.game._id)
           
           if (response.status === 200) {
-            
             if (this.$store.state.tick < response.data.state.tick) {
               // If the user is currently using the time machine then only set the state variables.
               // Otherwise reload the current game tick.

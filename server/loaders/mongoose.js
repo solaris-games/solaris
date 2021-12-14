@@ -5,6 +5,7 @@ const GameModel = require('../models/Game');
 const GuildModel = require('../models/Guild');
 const HistoryModel = require('../models/History');
 const UserModel = require('../models/User');
+const PaymentModel = require('../models/Payment');
 
 async function unlockAgendaJobs(db) {
     try {
@@ -35,6 +36,7 @@ async function syncIndexes() {
     await GuildModel.syncIndexes();
     await HistoryModel.syncIndexes();
     await UserModel.syncIndexes();
+    await PaymentModel.syncIndexes();
     console.log('Indexes synced.');
 }
 
@@ -46,13 +48,16 @@ module.exports = async (config, options) => {
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
     options.syncIndexes = options.syncIndexes == null ? false : options.syncIndexes;
+    options.poolSize = options.poolSize || 5;
 
     console.log(`Connecting to database: ${options.connectionString}`);
 
     const db = await mongoose.connect(options.connectionString, {
+        useUnifiedTopology: true,
         useNewUrlParser: true,
         useCreateIndex: true,
-        keepAlive: true
+        keepAlive: true,
+        poolSize: options.poolSize
     });
 
     await unlockAgendaJobs(db);

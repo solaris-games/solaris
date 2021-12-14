@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
+const ValidationError = require('../errors/validation');
 
 module.exports = class PlayerService extends EventEmitter {
     
-    constructor(gameModel, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService) {
+    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService) {
         super();
         
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
@@ -15,6 +16,7 @@ module.exports = class PlayerService extends EventEmitter {
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.gameTypeService = gameTypeService;
     }
 
     getByObjectId(game, playerId) {
@@ -45,25 +47,26 @@ module.exports = class PlayerService extends EventEmitter {
 
     getPlayersWithinScanningRangeOfPlayer(game, players, player) {
         let inRange = [player];
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
-        for (let p of players) {
-            if (inRange.indexOf(p) > -1) {
+        for (let otherPlayer of players) {
+            if (inRange.indexOf(otherPlayer) > -1) {
                 continue;
             }
 
-            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, p._id);
+            let otherPlayerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, otherPlayer._id);
 
             let isInRange = false;
 
-            for (let s of playerStars) {
-                if (this.starService.isStarInScanningRangeOfPlayer(game, s, player)) {
+            for (let s of otherPlayerStars) {
+                if (this.starService.isStarWithinScanningRangeOfStars(game, s, playerStars)) {
                     isInRange = true;
                     break;
                 }
             }
             
             if (isInRange) {
-                inRange.push(p);
+                inRange.push(otherPlayer);
             }
         }
 
@@ -76,7 +79,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayer(game, colour, shape) {
-        return {
+        let player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
@@ -97,6 +100,10 @@ module.exports = class PlayerService extends EventEmitter {
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             }
         };
+
+        this._setDefaultResearchTechnology(game, player);
+
+        return player;
     }
 
     createEmptyPlayers(game) {
@@ -106,20 +113,17 @@ module.exports = class PlayerService extends EventEmitter {
         let shapeIndex = 0;
         let colours = require('../config/game/colours').slice();
 
-        for(let i = 0; i < game.settings.general.playerLimit; i++) {
+        for (let i = 0; i < game.settings.general.playerLimit; i++) {
             // Get a random colour to assign to the player.
             if (!colours.length) {
                 colours = require('../config/game/colours').slice();
                 shapeIndex++;
             }
 
-            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+            let colour = this._getRandomColour(colours);
             let shape = shapes[shapeIndex];
 
-            let player = this.createEmptyPlayer(game, colour, shape);
-
-            this._setDefaultResearchTechnology(game, player);
-            players.push(player);
+            players.push(this.createEmptyPlayer(game, colour, shape));
         }
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
@@ -138,8 +142,12 @@ module.exports = class PlayerService extends EventEmitter {
         return players;
     }
 
+    _getRandomColour(colours) {
+        return colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+    }
+
     _distributePlayerLinkedHomeStars(game, players) {
-        for(let player of players) {
+        for (let player of players) {
             let homeStarId = game.galaxy.homeStars.pop();
 
             // Set up the home star
@@ -157,7 +165,7 @@ module.exports = class PlayerService extends EventEmitter {
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
         let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
 
-        const distanceFromCenter = this._getPlayerDistanceFromCenter(game, starLocations);
+        const distanceFromCenter = this._getDesiredPlayerDistanceFromCenter(game);
 
         let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
@@ -171,17 +179,20 @@ module.exports = class PlayerService extends EventEmitter {
         }
     }
 
-    _getPlayerDistanceFromCenter(game, starLocations) {
+    _getDesiredPlayerDistanceFromCenter(game) {
         let distanceFromCenter;
+        const locations = game.galaxy.stars.map(s => s.location);
 
-        // doughnut galaxies the distance from the center needs to be slightly more than others
+        // doughnut galaxies need the distance from the center needs to be slightly more than others
+        // spiral galaxies need the distance to be slightly less, and they have a different galactic center
         if (game.settings.galaxy.galaxyType === 'doughnut') {
-            distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 1.5;
-        }
-        else {
-            // The desired distance from the center is half way from the galaxy center and the edge
-            // for all galaxies other than doughnut.
-            distanceFromCenter = this.mapService.getGalaxyDiameter(starLocations).x / 2 / 2;
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (3/4);
+        } else if(game.settings.galaxy.galaxyType === 'spiral') {
+            distanceFromCenter = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2 / 2;
+        } else{
+            // The desired distance from the center is on two thirds from the galaxy center and the edge
+            // for all galaxies other than doughnut and spiral.
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (2/3);
         }
 
         return distanceFromCenter;
@@ -194,7 +205,7 @@ module.exports = class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getByObjectId(game, starId);
 
-                this.setupStarForGameStart(game, star, player); 
+                this.setupStarForGameStart(game, star, player, false); 
             }
         }
     }
@@ -214,24 +225,29 @@ module.exports = class PlayerService extends EventEmitter {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
-                this.setupStarForGameStart(game, s, player);
+                this.setupStarForGameStart(game, s, player, false);
             }
         }
     }
 
     // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game, star, player) {
+    setupStarForGameStart(game, star, player, resetWarpGates) {
         if (player.homeStarId.equals(star._id)) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            star.warpGate = false;
-            star.specialistId = null;
-            star.infrastructure.economy = 0;
-            star.infrastructure.industry = 0;
-            star.infrastructure.science = 0;
+            
+            star.warpGate = star.warpGate ?? false;
+            star.specialistId = star.specialistId ?? null;
+            star.infrastructure.economy = star.infrastructure.economy ?? 0;
+            star.infrastructure.industry = star.infrastructure.industry ?? 0;
+            star.infrastructure.science = star.infrastructure.science ?? 0;
+
+            if (resetWarpGates) {
+                star.warpGate = false;
+            }
 
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
@@ -244,6 +260,7 @@ module.exports = class PlayerService extends EventEmitter {
         player.credits = game.settings.player.startingCredits;
         player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
         player.ready = false;
+        player.readyToQuit = false;
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);
@@ -252,7 +269,7 @@ module.exports = class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.setupStarForGameStart(game, star, player);
+            this.setupStarForGameStart(game, star, player, true);
         }
 
         // Reset the player's carriers
@@ -328,8 +345,6 @@ module.exports = class PlayerService extends EventEmitter {
     _setDefaultResearchTechnology(game, player) {
         let enabledTechs = this.technologyService.getEnabledTechnologies(game);
 
-        // TODO: Should we select a random enabled technology instead of the first enabled one?
-
         player.researchingNow = enabledTechs[0] || 'weapons';
         player.researchingNext = player.researchingNow;
     }
@@ -365,6 +380,10 @@ module.exports = class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
         return playerStars.length;
+    }
+
+    calculateTotalHomeStars(playerStars) {
+        return playerStars.filter(s => s.homeStar).length;
     }
 
     calculateTotalShips(ownedStars, ownedCarriers) {
@@ -444,6 +463,7 @@ module.exports = class PlayerService extends EventEmitter {
         let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
         let totalStars = playerStars.length;
+        let totalHomeStars = this.calculateTotalHomeStars(playerStars);
 
         // In BR mode, the player star count is based on living stars only.
         if (game.settings.general.mode === 'battleRoyale') {
@@ -452,6 +472,7 @@ module.exports = class PlayerService extends EventEmitter {
 
         return {
             totalStars: totalStars,
+            totalHomeStars: totalHomeStars,
             totalCarriers: playerCarriers.length,
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
             totalEconomy: this.calculateTotalEconomy(playerStars),
@@ -461,7 +482,7 @@ module.exports = class PlayerService extends EventEmitter {
             warpgates: this.calculateWarpgates(playerStars),
             totalStarSpecialists,
             totalCarrierSpecialists,
-            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists
+            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists,
         };
     }
 
@@ -470,7 +491,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     async updateLastSeenLean(gameId, userId, ipAddress) {
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: gameId,
             'galaxy.players.userId': userId
         }, {
@@ -489,7 +510,7 @@ module.exports = class PlayerService extends EventEmitter {
         let creditsFromEconomy = totalEco * 10;
         let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
         let creditsTotal = creditsFromEconomy + creditsFromBanking;
-        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player);
+        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player, playerStars);
 
         player.credits += creditsTotal;
         player.creditsSpecialists += creditsFromSpecialistsTechnology;
@@ -521,7 +542,11 @@ module.exports = class PlayerService extends EventEmitter {
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
     }
 
-    _getCreditsSpecialistsReward(game, player) {
+    _getCreditsSpecialistsReward(game, player, playerStars) {
+        if (!playerStars.length) {
+            return 0;
+        }
+
         let isSpecialistsCreditsEnabled = this.technologyService.isTechnologyEnabled(game, 'specialists');
         let isCreditsSpecialistsCurrency = game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists';
 
@@ -529,7 +554,17 @@ module.exports = class PlayerService extends EventEmitter {
             return 0;
         }
 
-        return player.research.specialists.level;
+        let starCount = playerStars.length;
+        let specialists = player.research.specialists.level;
+
+        switch (game.settings.technology.specialistTokenReward) {
+            case 'standard':
+                return specialists;
+            case 'experimental':
+                return Math.ceil(Math.min(starCount * specialists * 0.1, specialists));
+        }
+
+        throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
     }
 
     deductCarrierUpkeepCost(game, player) {
@@ -560,7 +595,7 @@ module.exports = class PlayerService extends EventEmitter {
     async declareReady(game, player) {
         player.ready = true;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -578,12 +613,58 @@ module.exports = class PlayerService extends EventEmitter {
     async undeclareReady(game, player) {
         player.ready = false;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
             $set: {
                 'galaxy.players.$.ready': false
+            }
+        });
+    }
+
+    async declareReadyToQuit(game, player) {
+        if (game.state.productionTick <= 0) {
+            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
+        }
+
+        if (this.gameTypeService.isTutorialGame(game)) {
+            throw new ValidationError('Cannot declare ready to quit in a tutorial.');
+        }
+
+        player.ready = true;
+        player.readyToQuit = true;
+
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': true,
+                'galaxy.players.$.readyToQuit': true
+            }
+        });
+    }
+
+    async undeclareReadyToQuit(game, player) {
+        if (game.state.productionTick <= 0) {
+            throw new ValidationError('Cannot undeclare ready to quit until at least 1 production cycle has completed.');
+        }
+
+        if (this.gameTypeService.isTutorialGame(game)) {
+            throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
+        }
+        
+        player.ready = false;
+        player.readyToQuit = false;
+
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': false,
+                'galaxy.players.$.readyToQuit': false
             }
         });
     }
@@ -595,7 +676,7 @@ module.exports = class PlayerService extends EventEmitter {
     async updateGameNotes(game, player, notes) {
         player.notes = notes;
 
-        await this.gameModel.updateOne({
+        await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
@@ -626,12 +707,17 @@ module.exports = class PlayerService extends EventEmitter {
                 }
             }
         }
+
+        // For the tutorial, prevent players from doing stupid stuff because you KNOW someone's gonna do it.
+        if (!player.defeated && this.gameTypeService.isTutorialGame(game) && game.state.productionTick >= 25) {
+            this.setPlayerAsDefeated(game, player);
+        }
     }
 
     incrementMissedTurns(game) {
         for (let player of game.galaxy.players) {
             // If the player isn't ready, increase their number of missed turns.
-            if (!player.ready) {
+            if (!player.ready && !player.defeated) {
                 player.missedTurns++;
             }
             else {
@@ -646,46 +732,45 @@ module.exports = class PlayerService extends EventEmitter {
             // Reset whether we have sent the player a turn reminder.
             player.hasSentTurnReminder = false;
 
-            player.ready = false;
+            // Reset the ready status for players who have a legit user.
+            // Accounts could be deleted, could be a tutorial etc.
+            player.ready = player.userId == null;
         }
     }
 
     isAfk(game, player, isTurnBasedGame) {
         // The player is afk if:
-        // 1. The afk threshold date is less than the last seen date
-        // 2. The number of missed turns is greater or equal to the missed turn liimt
-        // 3. The game is RT and the first cycle has completed and the player has not been seen since the start of the game
-        // 4. The game is TB and the first turn has been missed.
+        // 1. They haven't been seen for X days.
+        // 2. They missed the turn limit in a turn based game.
+        // 3. They missed X cycles in a real time game (minimum of 12 hours)
+        
+        // Note: In tutorial games, only legit players can be considered afk.
+        if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
+            return false;
+        }
 
-        let seconds3Cycles = 3 * game.settings.galaxy.productionTicks * game.settings.gameTime.speed;
-        let lastSeenMoreThan3CyclesAgo = moment(player.lastSeen).utc() < moment().utc().subtract(seconds3Cycles, 'seconds');
+        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
+
+        if (lastSeenMoreThanXDaysAgo) {
+            return true;
+        }
 
         if (isTurnBasedGame) {
-            // Calculate what turn this is.
-            let isFirstTurn = game.state.tick <= game.settings.gameTime.turnJumps;
-
-            if (isFirstTurn) {
-                return player.missedTurns > 0; // Missed the first turn
-            } else {
-                return player.missedTurns >= game.settings.gameTime.missedTurnLimit || lastSeenMoreThan3CyclesAgo; // Reached turn limit or 3 cycles
-            }
-        } else {
-            // If we have reached the first production tick then check here to see if
-            // the player has been active during the first 2 cycles, this is normally 24h.
-            let isWithinCycle = game.state.tick === (game.settings.galaxy.productionTicks * 2);
-
-            if (isWithinCycle) {
-                return moment(player.lastSeen).utc() <= moment(game.state.startDate).utc(); // Not seen for 2 cycles
-            } else {
-                return lastSeenMoreThan3CyclesAgo; // Reached 3 cycles
-            }
+            return player.missedTurns >= game.settings.gameTime.afk.turnTimeout;
         }
+
+        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
+        let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
+        let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() < moment().utc().subtract(secondsToAfk, 'seconds');
+
+        return lastSeenMoreThanXSecondsAgo;
     }
 
     setPlayerAsDefeated(game, player) {
         player.defeated = true;
         player.defeatedDate = moment().utc();
         player.researchingNext = 'random'; // Set up the AI for random research.
+        player.diplomacy.allies = []; // Set all players to enemies.
 
         // Auto-ready the player so they don't hold up the game.
         if (game.settings.gameTime.gameType === 'turnBased') {
@@ -737,7 +822,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
         
         if (commit) {
-            await this.gameModel.bulkWrite([query]);
+            await this.gameRepo.bulkWrite([query]);
         }
         
         return query;
@@ -761,7 +846,7 @@ module.exports = class PlayerService extends EventEmitter {
         }
         
         if (commit) {
-            await this.gameModel.bulkWrite([query]);
+            await this.gameRepo.bulkWrite([query]);
         }
         
         return query;

@@ -16,6 +16,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
+  createTutorialGame () {
+    return axios.post(this.BASE_URL + 'game/tutorial', null,
+      { withCredentials: true })
+  }
+
   getGameInfo (id) {
     return axios.get(this.BASE_URL + 'game/' + id + '/info',
       { withCredentials: true })
@@ -63,8 +68,13 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  listCompletedGames () {
+  listRecentlyCompletedGames () {
     return axios.get(this.BASE_URL + 'game/list/completed',
+      { withCredentials: true })
+  }
+
+  listMyCompletedGames () {
+    return axios.get(this.BASE_URL + 'game/list/completed/user',
       { withCredentials: true })
   }
 
@@ -97,6 +107,16 @@ class GameService extends BaseApiService {
 
   unconfirmReady (gameId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/notready', null,
+      { withCredentials: true })
+  }
+
+  confirmReadyToQuit (gameId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/readytoquit', null,
+      { withCredentials: true })
+  }
+
+  unconfirmReadyToQuit (gameId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/notreadytoquit', null,
       { withCredentials: true })
   }
 

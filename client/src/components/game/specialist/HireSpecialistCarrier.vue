@@ -32,14 +32,17 @@
                 </h5>
             </div>
             <div class="col-auto mt-2">
-                <button class="btn btn-sm btn-success" v-if="!(carrier.specialistId && carrier.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || canAffordSpecialist(specialist)" @click="hireSpecialist(specialist)">Hire for {{getSpecialistActualCostString(specialist)}}</button>
+                <button class="btn btn-sm btn-success" v-if="!(carrier.specialistId && carrier.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot" @click="hireSpecialist(specialist)">Hire for {{getSpecialistActualCostString(specialist)}}</button>
                 <span class="badge badge-primary" v-if="carrier.specialistId && carrier.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
                 <p>{{specialist.description}}</p>
+                <p v-if="specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
             </div>
         </div>
     </div>
+
+    <p v-if="specialists && !specialists.length" class="text-center pb-2">No specialists available to hire.</p>
 </div>
 </template>
 
@@ -70,7 +73,9 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    this.specialists = this.$store.state.carrierSpecialists;
+    const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.carrier
+
+    this.specialists = this.$store.state.carrierSpecialists.filter(s => banList.indexOf(s.id) < 0)
   },
   methods: {
     onCloseRequested (e) {
@@ -81,7 +86,11 @@ export default {
     },
     async hireSpecialist (specialist) {
         if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for ${this.getSpecialistActualCostString(specialist)}?`)) {
-            return
+          return
+        }
+
+        if (this.carrier.specialistId && !await this.$confirm('Replace specialist', `Are you sure you want to replace the existing specialist ${this.carrier.specialist.name} for a ${specialist.name}?`)) {
+          return
         }
         
         this.isHiringSpecialist = true
@@ -127,8 +136,13 @@ export default {
           return `${actualCost} token${actualCost > 1 ? 's' : ''}`
       }
     },
-    canAffordSpecialist (specialist) {
+    cantAffordSpecialist (specialist) {
         return this.userPlayer[this.$store.state.game.settings.specialGalaxy.specialistsCurrency] < this.getSpecialistActualCost(specialist)
+    }
+  },
+  computed: {
+    isCurrentSpecialistOneShot () {
+      return this.carrier.specialist && this.carrier.specialist.oneShot
     }
   }
 }

@@ -2,7 +2,7 @@
 <div class="menu-page container">
     <menu-title title="Research" @onCloseRequested="onCloseRequested"/>
 
-    <p>Each point of science on your stars contributes 1 point of research every tick towards your chosen technology.</p>
+    <p><small>Each point of science on your stars contributes <span class="text-info">1 point</span> of research every tick towards your chosen technology.</small></p>
 
     <selection/>
 

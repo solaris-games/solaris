@@ -1,9 +1,9 @@
 <template>
   <tr>
     <td class="row-icon"><i class="fas" :class="iconClass"></i></td>
-    <td>{{ title }}</td>
+    <td>{{title}}</td>
     <td class="text-right" :class="playerStyle">
-      {{ playerResearchLevel }}
+      Level {{ playerResearchLevel }}
     </td>
     <td
       v-if="userPlayer && player != userPlayer"
@@ -72,4 +72,7 @@ export default {
 };
 </script>
 <style scoped>
+.row-icon {
+  width: 1%;
+}
 </style>

@@ -69,19 +69,23 @@ module.exports = class SpecialistService {
         // as the specs are being loaded from a file.
         let specialistsList = JSON.parse(JSON.stringify(specialists));
 
-        if (game.settings.specialGalaxy.specialistCost === 'none') {
+        if (game && game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
         
         let specs = specialistsList[type];
 
-        for (let spec of specs) {
-            spec.cost = this.getSpecialistActualCost(game, spec);
+        if (game) {
+            for (let spec of specs) {
+                spec.cost = this.getSpecialistActualCost(game, spec);
+            }
+
+            let currency = game.settings.specialGalaxy.specialistsCurrency;
+    
+            return specs.sort((a, b) => a.cost[currency] - b.cost[currency]);
         }
 
-        let currency = game.settings.specialGalaxy.specialistsCurrency;
-
-        return specs.sort((a, b) => a.cost[currency] - b.cost[currency]);
+        return specs.sort((a, b) => a.name - b.name);
     }
 
     listCarrier(game) {
@@ -166,6 +170,18 @@ module.exports = class SpecialistService {
 
     getReigniteDeadStarNaturalResources(carrier) {
         return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', 1);
+    }
+
+    getCarrierOrStarHideShips(carrierOrStar) {
+        if (!carrierOrStar.specialist) {
+            return false;
+        }
+
+        const specialist = this.getByIdCarrier(carrierOrStar.specialist.id);
+
+        let result = specialist?.modifiers?.special?.hideShips;
+
+        return result ?? false;
     }
     
 };

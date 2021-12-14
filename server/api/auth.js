@@ -26,11 +26,13 @@ module.exports = (router, io, container) => {
             // Store the user id in the session.
             req.session.userId = user._id;
             req.session.username = user.username;
+            req.session.roles = user.roles;
             req.session.isImpersonating = false;
 
             return res.status(200).json({
                 _id: user._id,
-                username: user.username
+                username: user.username,
+                roles: user.roles
             });
         } catch (err) {
             next(err);
@@ -55,7 +57,8 @@ module.exports = (router, io, container) => {
     router.post('/api/auth/verify', (req, res, next) => {
         return res.status(200).json({
             _id: req.session.userId,
-            username: req.session.username
+            username: req.session.username,
+            roles: req.session.roles
         });
     });
 

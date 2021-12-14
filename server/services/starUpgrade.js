@@ -4,16 +4,17 @@ const Heap = require('qheap');
 
 module.exports = class StarUpgradeService extends EventEmitter {
 
-    constructor(gameModel, starService, carrierService, achievementService, researchService, technologyService, playerService) {
+    constructor(gameRepo, starService, carrierService, achievementService, researchService, technologyService, playerService, gameTypeService) {
         super();
-        
-        this.gameModel = gameModel;
+
+        this.gameRepo = gameRepo;
         this.starService = starService;
         this.carrierService = carrierService;
         this.achievementService = achievementService;
         this.researchService = researchService;
         this.technologyService = technologyService;
         this.playerService = playerService;
+        this.gameTypeService = gameTypeService;
     }
 
     async buildWarpGate(game, player, starId) {
@@ -40,8 +41,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
-        const cost = this.calculateWarpGateCost(game, expenseConfig, terraformedResources);
+        const terraformedResources = this.starService.calculateTerraformedResources(star, effectiveTechs.terraforming);
+        const averageTerraformedResources = this.calculateAverageTerraformedResources(terraformedResources);
+        const cost = this.calculateWarpGateCost(game, expenseConfig, averageTerraformedResources);
 
         if (player.credits < cost) {
             throw new ValidationError(`The player does not own enough credits to afford to upgrade.`);
@@ -51,21 +53,14 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= cost;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             this._getSetStarWarpGateDBWrite(game, star, true)
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementWarpGatesBuilt(player.userId);
         }
-
-        this.emit('onPlayerWarpGateBuilt', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            star
-        });
 
         return {
             starId: star._id,
@@ -87,20 +82,13 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             this._getSetStarWarpGateDBWrite(game, star, false)
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementWarpGatesDestroyed(player.userId);
         }
-
-        this.emit('onPlayerWarpGateDestroyed', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            star
-        });
     }
 
     async buildCarrier(game, player, starId, ships) {
@@ -142,7 +130,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= cost;
 
         // Update the DB.
-        await this.gameModel.bulkWrite([
+        await this.gameRepo.bulkWrite([
             await this._getDeductPlayerCreditsDBWrite(game, player, cost),
             {
                 updateOne: {
@@ -170,7 +158,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
         ]);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementCarriersBuilt(player.userId);
         }
 
@@ -189,7 +177,8 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         // Calculate how much the upgrade will cost.
         const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[expenseConfigKey];
-        const terraformedResources = this.starService.calculateTerraformedResources(star.naturalResources, effectiveTechs.terraforming);
+        const terraformedResources = this.starService.calculateTerraformedResource(star.naturalResources[economyType], effectiveTechs.terraforming);
+
         const cost = calculateCostCallback(game, expenseConfig, star.infrastructure[economyType], terraformedResources);
 
         return cost;
@@ -249,9 +238,9 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
 
         // Update the DB.
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
 
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
         }
     }
@@ -279,7 +268,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
 
         if (writeToDB) {
             player.credits -= cost;
-            
+
             await this._upgradeInfrastructureUpdateDB(game, player, star, cost, economyType);
         }
 
@@ -363,7 +352,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
             })
             .map(s => {
                 const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-                const terraformedResources = this.starService.calculateTerraformedResources(s.naturalResources, effectiveTechs.terraforming);
+                const terraformedResources = this.starService.calculateTerraformedResource(s.naturalResources[infrastructureType], effectiveTechs.terraforming);
 
                 return {
                     star: s,
@@ -449,11 +438,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
             }
 
             // Update the DB.
-            await this.gameModel.bulkWrite(dbWrites);
+            await this.gameRepo.bulkWrite(dbWrites);
         }
 
         // Check for AI control.
-        if (!player.defeated) {
+        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
         }
 
@@ -504,7 +493,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
                 infrastructureCurrent: upgradeStar.star.infrastructure[infrastructureType],
                 infrastructureCostTotal: 0
             }
-    
+
             upgradeSummary.stars.push(summaryStar);
         }
 
@@ -636,6 +625,12 @@ module.exports = class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
+
+
+    calculateAverageTerraformedResources(terraformedResources){
+        return Math.floor((terraformedResources.economy + terraformedResources.industry + terraformedResources.science) / 3);
+    }
+
     calculateWarpGateCost(game, expenseConfig, terraformedResources) {
         return this._calculateInfrastructureCost(game.constants.star.infrastructureCostMultipliers.warpGate, expenseConfig, 0, terraformedResources);
     }
@@ -653,7 +648,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
     }
 
     _calculateInfrastructureCost(baseCost, expenseConfig, current, terraformedResources) {
-        return Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100));
+        return Math.max(1, Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)));
     }
 
     calculateCarrierCost(game, expenseConfig) {
@@ -664,7 +659,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         if (star.terraformedResources == null) {
             throw new Error(`terraformedResources must be set before calling setUpgradeCosts`);
         }
-        
+
         const economyExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
         const industryExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
         const scienceExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
@@ -681,10 +676,12 @@ module.exports = class StarUpgradeService extends EventEmitter {
         };
 
         if (!this.starService.isDeadStar(star)) {
-            star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources);
-            star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources);
-            star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources);
-            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, star.terraformedResources);
+            let averageTerraformedResources = this.calculateAverageTerraformedResources(star.terraformedResources);
+
+            star.upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy, star.terraformedResources.economy);
+            star.upgradeCosts.industry = this.calculateIndustryCost(game, industryExpenseConfig, star.infrastructure.industry, star.terraformedResources.industry);
+            star.upgradeCosts.science = this.calculateScienceCost(game, scienceExpenseConfig, star.infrastructure.science, star.terraformedResources.science);
+            star.upgradeCosts.warpGate = this.calculateWarpGateCost(game, warpGateExpenseConfig, averageTerraformedResources); // Note: Warpgates in split resources use the average of all infrastructure.
             star.upgradeCosts.carriers = this.calculateCarrierCost(game, carrierExpenseConfig);
         }
 

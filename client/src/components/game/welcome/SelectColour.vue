@@ -19,8 +19,8 @@
                         <h5 class="alias-title" style="vertical-align: middle;">
                           {{player.alias}}
                           <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                            <i v-if="!player.afk" class="fas fa-skull-crossbones" title="Defeated"></i>
-                            <i v-if="player.afk" class="fas fa-user-clock" title="AFK"></i>
+                            <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
+                            <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
                           </span>
                         </h5>
                     </td>
@@ -68,7 +68,13 @@ export default {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
     },
     getAvatarImage (player) {
-      return require(`../../../assets/avatars/${player.avatar}.png`)
+      try {
+        return require(`../../../assets/avatars/${player.avatar}.png`)
+      } catch (err) {
+        console.error(err)
+        
+        return null
+      }
     },
     getPlayerStatus (player) {
       return gameHelper.getPlayerStatus(player)
@@ -85,7 +91,9 @@ img {
 .col-avatar {
   position:absolute;
   width: 59px;
+  height: 59px;
   cursor: pointer;
+  padding: 0;
 }
 
 .alias-title {
@@ -97,7 +105,7 @@ table tr {
 }
 
 .table-sm td {
-    padding: 0;
+  padding: 0;
 }
 
 .table td.fit,
@@ -117,7 +125,6 @@ table tr {
 
   .col-avatar {
     width: 45px;
-    padding-top: 0.25rem !important;
   }
 }
 </style>

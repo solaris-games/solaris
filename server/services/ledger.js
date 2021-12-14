@@ -3,10 +3,10 @@ const EventEmitter = require('events');
 
 module.exports = class LedgerService extends EventEmitter {
 
-    constructor(gameModel, playerService) {
+    constructor(gameRepo, playerService) {
         super();
 
-        this.gameModel = gameModel;
+        this.gameRepo = gameRepo;
         this.playerService = playerService;
     }
 
@@ -162,7 +162,7 @@ module.exports = class LedgerService extends EventEmitter {
             });
         }
 
-        await this.gameModel.bulkWrite(dbWrites);
+        await this.gameRepo.bulkWrite(dbWrites);
     }
 
 };

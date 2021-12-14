@@ -3,13 +3,8 @@ const moment = require('moment');
 module.exports = class DistanceService {
 
     getDistanceBetweenLocations(loc1, loc2) {
-        let xs = loc2.x - loc1.x,
-            ys = loc2.y - loc1.y;
-
-        xs *= xs;
-        ys *= ys;
-
-        return Math.sqrt(xs + ys);
+        // Math.hypot returns the root of the squared values of its variables. So this is sqrt( (x2 - x1)^2 + (y2 - y1)^2 ), much shorter than the older version
+        return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
     }
 
     getClosestLocations(loc, locs, amount) {
