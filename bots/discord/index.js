@@ -85,7 +85,7 @@ async function startup() {
     reactionService = new ReactionService();
     publicCommandService = new PublicCommandService(botResponseService, botHelperService,
         container.gameGalaxyService, container.gameService, 
-        container.leaderboardService, container.userService);
+        container.leaderboardService, container.userService, container.gameTypeService);
     privateCommandService = new PrivateCommandService();
 
     console.log('Container Initialized');

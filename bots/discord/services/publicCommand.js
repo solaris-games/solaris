@@ -1,12 +1,13 @@
 module.exports = class PublicCommandService {
 
-    constructor(botResponseService, botHelperService, gameGalaxyService, gameService, leaderboardService, userService) {
+    constructor(botResponseService, botHelperService, gameGalaxyService, gameService, leaderboardService, userService, gameTypeService) {
         this.botResponseService = botResponseService;
         this.botHelperService = botHelperService;
         this.gameGalaxyService = gameGalaxyService;
         this.gameService = gameService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
+        this.gameTypeService = gameTypeService;
     }
 
     async gameinfo(msg, directions) {
