@@ -17,7 +17,7 @@ module.exports = class PublicCommandService {
         let focus;
         let game_name = "";
         if (directions[directions.length - 1] == "ID") {
-            if(this.botHelperService.isValidID(directions[0])) {
+            if (this.botHelperService.isValidID(directions[0])) {
                 game = await this.gameService.getByIdAllLean(directions[0])
             } else {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
@@ -95,7 +95,7 @@ module.exports = class PublicCommandService {
 
         // This checks if the gameID is valid and fetches the game with that ID if it exists
         if (gameId) {
-            if(this.botHelperService.isValidID(gameId)) {
+            if (this.botHelperService.isValidID(gameId)) {
                 game = await this.gameService.getByIdSettingsLean(gameId)
             } else {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
@@ -130,15 +130,15 @@ module.exports = class PublicCommandService {
         let pageCount = Math.ceil(leaderboardSize / 20)
 
         // All possible and allowed sorters that can be used
-        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed', 
-            'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost', 
-            'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed', 
-            'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 
-            'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received', 
+        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed',
+            'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost',
+            'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed',
+            'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking',
+            'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received',
             'ships-gifted', 'ships-received', 'renown-sent', 'elo-rating'];
-        
+
         // Checking if the sorter that the player specified is actually allowed
-        if (!sorterArray.includes(sortingKey)){
+        if (!sorterArray.includes(sortingKey)) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidSorter'));
         }
 
@@ -156,7 +156,7 @@ module.exports = class PublicCommandService {
             let skip = 20 * page // Page 0 is the first page
             let result = await this.leaderboardService.getLeaderboard(limit, key, skip);
             let leaderboard = result.leaderboard;
-            if(isPC){
+            if (isPC) {
                 // Generates the response if the response has to be in a format optimised for PC users
                 let position_list = "";
                 let username_list = "";
@@ -173,8 +173,8 @@ module.exports = class PublicCommandService {
             // This only runs now if the response is for mobile/tablet users
             // It is made to generate a response that makes sense to those users
             let data_list = "";
-            for (let i = 0; i<leaderboard.length; i++) {
-                if(!leaderboard[i]) { break; }
+            for (let i = 0; i < leaderboard.length; i++) {
+                if (!leaderboard[i]) { break; }
                 data_list += (leaderboard[i].position + page * 20) + ' / ' + await this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
             }
             let response = this.botResponseService.leaderboard_globalMobile(page, sortingKey, data_list);
@@ -202,7 +202,7 @@ module.exports = class PublicCommandService {
         // Checking if the <galaxy_name> is actually the name or just the ID of a game
         // And when that has been determined, extract the game and ID
         if (directions[directions.length - 1] == "ID") {
-            if(this.botHelperService.isValidID(directions[0])) {
+            if (this.botHelperService.isValidID(directions[0])) {
                 game = await this.gameService.getByIdAllLean(directions[0])
             } else {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
@@ -222,7 +222,7 @@ module.exports = class PublicCommandService {
         }
 
         // Checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
-        if(Array.isArray(game)) {
+        if (Array.isArray(game)) {
             if (!game.length) {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
             } else if (game.length > 1) {
@@ -259,7 +259,7 @@ module.exports = class PublicCommandService {
             let fullKey = leaderboardReturn.fullKey;
 
             // Turning the leaderboard in a message format
-            if(isPC) {
+            if (isPC) {
                 // Generating the format for the PC users
                 let position_list = "";
                 let username_list = "";
@@ -277,7 +277,7 @@ module.exports = class PublicCommandService {
                 data_list += (i + 1) + ' / ' + await this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
             }
             return this.botResponseService.leaderboard_localMobile(game._id, game.state.tick, filter, data_list);
-        }        
+        }
 
         // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
         let responseData = {
@@ -313,7 +313,7 @@ module.exports = class PublicCommandService {
         }
 
         // Checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
-        if(Array.isArray(game)) {
+        if (Array.isArray(game)) {
             if (game.length) {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
             } else if (game.length > 1) {
@@ -369,11 +369,11 @@ module.exports = class PublicCommandService {
         let alive = game.galaxy.players.reduce((val, player) => player.defeated ? val : val + 1, 0)
         let leaderboard = {};
         let leaderboardSize = game.settings.general.playerLimit <= 3 ? game.settings.general.playerLimit : 3;
-        
+
         // Generating the leaderboard in the right format
-        for(let [key, value] of Object.entries(leaderboardData)){
+        for (let [key, value] of Object.entries(leaderboardData)) {
             leaderboard[key] = ""
-            for(let i = 0; i < leaderboardSize; i++) {
+            for (let i = 0; i < leaderboardSize; i++) {
                 leaderboard[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
             }
         }

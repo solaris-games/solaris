@@ -45,18 +45,18 @@ module.exports = class ReponseService {
             default:
                 throw new Error('Unknown type: ' + type);
         }
-        if(isPC) {
+        if (isPC) {
             response = response
-            .addFields(
-                { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: sidePages[1], value: "➡️➡️➡️", inline: true }
-            )
+                .addFields(
+                    { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
+                    { name: "\u200B", value: "\u200B", inline: true },
+                    { name: sidePages[1], value: "➡️➡️➡️", inline: true }
+                )
         } else {
             response = response
-            .addFields(
-                {name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️"}
-            )
+                .addFields(
+                    { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
+                )
         }
         return response;
     }
@@ -304,7 +304,7 @@ module.exports = class ReponseService {
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
             .setDescription(`Currently at tick ${tick}`)
             .addFields(
-                { name: `position / ${sortingKey} / username`, value: data_list},
+                { name: `position / ${sortingKey} / username`, value: data_list },
             );
         return response;
     }
@@ -312,41 +312,41 @@ module.exports = class ReponseService {
     statusPC(game, leaderboard, alive) {
         let response = this.baseResponse();
         response = response
-        .setTitle(`Status of ${game.settings.general.name}`)
-        .setURL(`https://solaris.games/#/game?id=${game._id}`)
-        .addFields(
-            { name: 'Finished?', value: game.state.endDate ? 'Game has ended' : 'Ongoing', inline: true }, //1
-            { name: 'Tick', value: game.state.tick, inline: true }, //1
-            { name: 'Living Players', value: alive, inline: true }, //1
-            { name: 'Stars Ranking', value: leaderboard.stars, inline: true }, //2
-            { name: 'Ships Ranking', value: leaderboard.ships, inline: true }, //2
-            { name: 'New Ships Ranking', value: leaderboard.newShips, inline: true }, //2
-            { name: 'Economy Ranking', value: leaderboard.economy, inline: true }, //3
-            { name: 'Industry Ranking', value: leaderboard.industry, inline: true }, //3
-            { name: 'Science Ranking', value: leaderboard.science, inline: true }, //3
-            { name: 'Weapons Ranking', value: leaderboard.weapons, inline: true }, //4
-            { name: 'Manufacturing Ranking', value: leaderboard.manufacturing, inline: true }, //4
-            { name: 'Specialists Ranking', value: leaderboard.specialists, inline: true }, //4
-        );
+            .setTitle(`Status of ${game.settings.general.name}`)
+            .setURL(`https://solaris.games/#/game?id=${game._id}`)
+            .addFields(
+                { name: 'Finished?', value: game.state.endDate ? 'Game has ended' : 'Ongoing', inline: true }, //1
+                { name: 'Tick', value: game.state.tick, inline: true }, //1
+                { name: 'Living Players', value: alive, inline: true }, //1
+                { name: 'Stars Ranking', value: leaderboard.stars, inline: true }, //2
+                { name: 'Ships Ranking', value: leaderboard.ships, inline: true }, //2
+                { name: 'New Ships Ranking', value: leaderboard.newShips, inline: true }, //2
+                { name: 'Economy Ranking', value: leaderboard.economy, inline: true }, //3
+                { name: 'Industry Ranking', value: leaderboard.industry, inline: true }, //3
+                { name: 'Science Ranking', value: leaderboard.science, inline: true }, //3
+                { name: 'Weapons Ranking', value: leaderboard.weapons, inline: true }, //4
+                { name: 'Manufacturing Ranking', value: leaderboard.manufacturing, inline: true }, //4
+                { name: 'Specialists Ranking', value: leaderboard.specialists, inline: true }, //4
+            );
         return response;
     }
 
     statusMobile(game, leaderboard) {
         let response = this.baseResponse();
         response = response
-        .setTitle(`Status of ${game.settings.general.name}`)
-        .setURL(`https://solaris.games/#/game?id=${game._id}`)
-        .addFields(
-            { name: 'Tick', value: game.state.tick },
-            { name: 'Stars Ranking', value: leaderboard.stars },
-            { name: 'Ships Ranking', value: leaderboard.ships },
-            { name: 'Economy Ranking', value: leaderboard.economy },
-            { name: 'Industry Ranking', value: leaderboard.industry },
-            { name: 'Science Ranking', value: leaderboard.science },
-            { name: 'Weapons Ranking', value: leaderboard.weapons },
-            { name: 'Manufacturing Ranking', value: leaderboard.manufacturing },
-            { name: 'Specialists Ranking', value: leaderboard.specialists }
-        );
+            .setTitle(`Status of ${game.settings.general.name}`)
+            .setURL(`https://solaris.games/#/game?id=${game._id}`)
+            .addFields(
+                { name: 'Tick', value: game.state.tick },
+                { name: 'Stars Ranking', value: leaderboard.stars },
+                { name: 'Ships Ranking', value: leaderboard.ships },
+                { name: 'Economy Ranking', value: leaderboard.economy },
+                { name: 'Industry Ranking', value: leaderboard.industry },
+                { name: 'Science Ranking', value: leaderboard.science },
+                { name: 'Weapons Ranking', value: leaderboard.weapons },
+                { name: 'Manufacturing Ranking', value: leaderboard.manufacturing },
+                { name: 'Specialists Ranking', value: leaderboard.specialists }
+            );
         return response;
     }
 
@@ -382,18 +382,18 @@ module.exports = class ReponseService {
             default:
                 throw new Error('Unknown type: ' + type);
         }
-        if(isPC) {
+        if (isPC) {
             response = response
-            .addFields(
-                { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: sidePages[1], value: "➡️➡️➡️", inline: true }
-            )
+                .addFields(
+                    { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
+                    { name: "\u200B", value: "\u200B", inline: true },
+                    { name: sidePages[1], value: "➡️➡️➡️", inline: true }
+                )
         } else {
             response = response
-            .addFields(
-                {name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️"}
-            )
+                .addFields(
+                    { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
+                )
         }
         return response;
     }
@@ -500,7 +500,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    error (authorId, reason) {
+    error(authorId, reason) {
         let response = `Something went wrong <@${authorId}>,\n`;
         switch (reason) {
             case 'noGame':
