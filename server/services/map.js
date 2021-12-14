@@ -121,7 +121,7 @@ module.exports = class MapService {
 
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
-            this.generateBlackHoles(game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
+            this.generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
         }
     }
 
@@ -224,7 +224,7 @@ module.exports = class MapService {
         } while (count--);
     }
 
-    generateBlackHoles(stars, playerCount, percentage) {
+    generateBlackHoles(game, stars, playerCount, percentage) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be asteroid fields
@@ -236,11 +236,24 @@ module.exports = class MapService {
             } else {
                 star.isBlackHole = true;
 
-                star.naturalResources = {
-                    economy: 0,
-                    industry: 0,
-                    science: 0
-                };
+                // Overwrite the natural resources
+                let minResources = 1;
+                let maxResources = game.constants.star.resources.minNaturalResources;
+
+                // Overwrite natural resources
+                if (this.gameTypeService.isSplitResources(game)) {
+                    star.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                } else {
+                    let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+
+                    star.naturalResources = {
+                        economy: resources,
+                        industry: resources,
+                        science: resources
+                    };
+                }
             }
         } while (count--);
     }
