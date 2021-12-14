@@ -1,8 +1,9 @@
 module.exports = class PublicCommandService {
 
-    constructor(botResponseService, gameGalaxyService, gameService, leaderboardService, userService) {
-        this.botResponseService = botResponseService
-        this.gameGalaxyService = gameGalaxyService
+    constructor(botResponseService, botHelperService, gameGalaxyService, gameService, leaderboardService, userService) {
+        this.botResponseService = botResponseService;
+        this.botHelperService = botHelperService;
+        this.gameGalaxyService = gameGalaxyService;
         this.gameService = gameService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
@@ -11,19 +12,20 @@ module.exports = class PublicCommandService {
     async gameinfo(msg, directions) {
         //!gameinfo <galaxy_name> <focus> ("ID")
 
-        //getting the gameObject from the database
+        // This checks if the gameID/name is valid and fetches the game with that ID/name if it exists
         let game = [];
         let focus;
         let game_name = "";
         if (directions[directions.length - 1] == "ID") {
-            try {
+            if (this.botHelperService.isValidID(directions[0])) {
                 game = await this.gameService.getByIdAllLean(directions[0])
-            } catch (err) {
-                return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
             }
 
             focus = directions[directions.length - 2]
         } else {
+            // Gamename can be searched, as it is filtered for uniqueness and existance later
             if (directions.length === 1) {
                 directions.push('general');
             }
@@ -31,82 +33,84 @@ module.exports = class PublicCommandService {
                 game_name += directions[i] + ' ';
             }
             game_name = game_name.trim()
-            game = await this.gameService.getByNameSettingsLean(game_name); // TODO: The game name is not indexed in this DB so this is going to be slow as shit.
+            game = await this.gameService.getByNameSettingsLean(game_name); // Slow...
             focus = directions[directions.length - 1]
         }
 
-        let focusArray = ['general', 'galaxy', 'player', 'technology', 'time'];
+        const focusObject = {
+            general: 0,
+            galaxy: 1,
+            player: 2,
+            technology: 3,
+            time: 4
+        };
 
-        if (!focusArray.includes(focus)) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noFocus'));
-        }
-
+        // Checking if a game was found with the specified ID or name
         if (!game || (Array.isArray(game) && !game.length)) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
         } else if (Array.isArray(game) && game.length > 1) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
         }
 
+        // Checking if the focus exists, which must be done after the game has been verified
+        if (!Object.keys(focusObject).includes(focus)) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
+        }
+
+        // When searching games on name, the return is an array of all games with that name.
+        // The previous check made sure only 1 game is in here, this turns the array into the actual gameObject
         if (Array.isArray(game)) {
             game = game[0];
         }
 
-        let response = this.botResponseService.gameinfo(game, focus);
+        // This function is used to calculate from the responsedata what the response looks like
+        // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
+        // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
+        const responseFunction = async (responseData) => {
+            let game = responseData.game;
+            let page = responseData.page;
+            let isPC = responseData.isPC;
+            return await this.botResponseService.gameinfo(game, page, isPC);
+        }
 
-        msg.channel.send(response).then(async message => {
-            try {
-                await message.react('⬅️')
-                await message.react('➡️')
-            } catch (error) {
-                console.log('One of the emojis failed to react:', error);
-            }
-            const collector = message.createReactionCollector(
-                //checking if the response was from the right person and with the right response
-                (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === msg.author.id, { time: 60000 }
-            );
+        // This is the response data previously discussed that gets passed into the multiPage and the response function
+        let responseData = {
+            game,
+            page: focusObject[focus],
+            isPC: true
+        };
 
-            let currentPage = focusArray.indexOf(focus);
-            collector.on('collect', reaction => {
-                //remove all reactions to add the correct ones after the edit
-                message.reactions.removeAll().then(async () => {
-                    //checking what change has to be made to the current message
-                    reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
-                    if (currentPage < 0) currentPage = 4;
-                    if (currentPage > 4) currentPage = 0;
-
-                    let editedResponse = this.botResponseService.gameinfo(game, focusArray[currentPage]);
-
-                    message.edit(editedResponse);
-                    try {
-                        await message.react('⬅️')
-                        await message.react('➡️')
-                    } catch (error) {
-                        console.log('One of the emojis failed to react:', error);
-                    }
-                });
-            });
-        });
+        // Sending the message, and activating the multiPage function, as the gameinfo has 5 looping pages
+        msg.channel.send(await responseFunction(responseData))
+            .then(async message => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
     }
 
     async invite(msg, directions) {
-        //$invite <gamelink>
+        // $invite <gamelink>
 
-        //plain and simple, extract the link to the game, from which we can extract the id from the game, which we then use to find the game
+        // Plain and simple, extract the link to the game, from which we can extract the id from the game, which we then use to find the game
         let gamelink = directions[0];
-        let gameId = gamelink.split('?id=')[1];
+        let gameId = (gamelink.split('?id='))[1];
+        let game;
 
+        // This checks if the gameID is valid and fetches the game with that ID if it exists
         if (gameId) {
-            let game = await this.gameService.getByIdSettingsLean(gameId)
-
-            if (!game) {
-                return msg.channel.send(this.botResponseService.inviteError(msg.author.id, 'noGame'));
+            if (this.botHelperService.isValidID(gameId)) {
+                game = await this.gameService.getByIdSettingsLean(gameId)
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
             }
 
-            let response = this.botResponseService.invite(game);
-            msg.channel.send(response);
+            if (!game) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+            }
+
         } else {
-            return msg.channel.send(this.botResponseService.inviteError(msg.author.id, 'noGame'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'));
         }
+
+        // Sending the final message
+        return msg.channel.send(this.botResponseService.invite(game))
     }
 
     async help(msg, directions) {
@@ -120,87 +124,73 @@ module.exports = class PublicCommandService {
         //$leaderboard_global <filter> (<page>)
         // Calculating how the leaderboard looks
 
-        //determining basic values for the leaderboard, which will be used much later in the program
+        // Determining basic values for the leaderboard, which will be used much later in the program
         let sortingKey = directions[0];
         let leaderboardSize = await this.userService.getUserCount();
         let pageCount = Math.ceil(leaderboardSize / 20)
 
-        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed', 'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost', 'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed', 'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received', 'ships gifted', 'ships-received', 'renown-sent', 'elo-rating'];
-        
-        if(!sorterArray.includes(sortingKey)){
-            return msg.channel.send(this.botResponseService.leaderboard_globalError(msg.author.id, 'invalidSorter'));
+        // All possible and allowed sorters that can be used
+        let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed',
+            'carriers-killed', 'specialists-killed', 'ships-lost', 'carriers-lost', 'specialists-lost', 'stars-captured', 'stars-lost',
+            'home-stars-captured', 'home-stars-lost', 'economy', 'industry', 'science', 'warpgates-built', 'warpgates-destroyed',
+            'carriers-built', 'specialists-hired', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking',
+            'manufacturing', 'specialists', 'credits-sent', 'credits-received', 'technologies-sent', 'technologies-received',
+            'ships-gifted', 'ships-received', 'renown-sent', 'elo-rating'];
+
+        // Checking if the sorter that the player specified is actually allowed
+        if (!sorterArray.includes(sortingKey)) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidSorter'));
         }
 
-        //Here be dragons
-        const getNestedObject = (nestedObj, pathArr) => {
-            return pathArr.reduce((obj, key) =>
-                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
-        }
+        // This function is used to calculate from the responsedata what the response looks like
+        // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
+        // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
+        const responseFunction = async (responseData) => {
+            // Calculating the basic variables that set all others from the responseData
+            let page = responseData.page;
+            let isPC = responseData.isPC;
+            let key = responseData.sortingKey;
 
-        const generateLeaderboard = async page => {
-            //determining the message that has to be sent with the given input
+            // Getting all the actual detailed information from the global leaderboard
             let limit = 20
-            let skip = 20 * (page - 1)
-            let result = await this.leaderboardService.getLeaderboard(limit, sortingKey, skip);
+            let skip = 20 * page // Page 0 is the first page
+            let result = await this.leaderboardService.getLeaderboard(limit, key, skip);
             let leaderboard = result.leaderboard;
-            let position_list = "";
-            let username_list = "";
-            let sortingKey_list = "";
+            if (isPC) {
+                // Generates the response if the response has to be in a format optimised for PC users
+                let position_list = "";
+                let username_list = "";
+                let sortingKey_list = "";
+                for (let i = 0; i < leaderboard.length; i++) {
+                    if (!leaderboard[i]) { break; }
+                    position_list += (leaderboard[i].position + page * 20) + "\n";
+                    username_list += leaderboard[i].username + "\n";
+                    sortingKey_list += await this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+                }
+                let response = this.botResponseService.leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list)
+                return response;
+            }
+            // This only runs now if the response is for mobile/tablet users
+            // It is made to generate a response that makes sense to those users
+            let data_list = "";
             for (let i = 0; i < leaderboard.length; i++) {
                 if (!leaderboard[i]) { break; }
-                position_list += (leaderboard[i].position + (page - 1) * 20) + "\n";
-                username_list += leaderboard[i].username + "\n";
-                sortingKey_list += getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+                data_list += (leaderboard[i].position + page * 20) + ' / ' + await this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
             }
-            let response = this.botResponseService.leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list)
+            let response = this.botResponseService.leaderboard_globalMobile(page, sortingKey, data_list);
             return response;
         }
 
-        msg.channel.send(await generateLeaderboard(1)).then(async message => {
-            //reacting with the appropriate reactions so a player can move to the next page
-            try {
-                await message.react('➡️')
-                await message.react('⏩')
-            } catch (error) {
-                console.log('One of the emojis failed to react:', error);
-            }
-            const collector = message.createReactionCollector(
-                //defining the collector so it only responds to reactions of the right person and the right reaction
-                (reaction, user) => ['⏪', '⬅️', '➡️', '⏩'].includes(reaction.emoji.name) && user.id == msg.author.id, { time: 60000 }
-            )
+        // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
+        let responseData = {
+            page: 0,
+            isPC: true,
+            sortingKey
+        }
 
-
-            let currentPage = 1
-            collector.on('collect', reaction => {
-                //removing all reactions after one was added by the right person
-                message.reactions.removeAll().then(async () => {
-                    //determining which reaction was added, and what change has to be made to the page number
-                    switch (reaction.emoji.name) {
-                        case '⏪':
-                            currentPage -= 5 // TODO: This should go to page 1?
-                            break;
-                        case '⬅️':
-                            currentPage -= 1
-                            break;
-                        case '➡️':
-                            currentPage += 1
-                            break;
-                        default:
-                            //⏩
-                            currentPage += 5 // TODO: This should go to the last page?
-                    }
-                    if (currentPage < 1) currentPage = 1;
-                    if (currentPage > pageCount) currentPage = pageCount;
-                    //editing the existing message so the new page is displayed for the discord user
-                    message.edit(await generateLeaderboard(currentPage));
-                    //adding the reactions so the player can go to another page from here
-                    if (currentPage > 2) await message.react('⏪');
-                    if (currentPage != 1) await message.react('⬅️');
-                    if (currentPage != pageCount) await message.react('➡️');
-                    if (currentPage < pageCount - 1) message.react('⏩');
-                });
-            });
-        });
+        // Sending the message, and activating the multiPage function, as the global leaderboard has tons and tons of non-looping pages
+        msg.channel.send(await responseFunction(responseData))
+            .then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, responseData, true));
     }
 
     async leaderboard_local(msg, directions) {
@@ -209,13 +199,18 @@ module.exports = class PublicCommandService {
         let filter;
         let game = [];
 
-        //checking if the <galaxy_name> is actually the name or just the ID of a game
+        // Checking if the <galaxy_name> is actually the name or just the ID of a game
+        // And when that has been determined, extract the game and ID
         if (directions[directions.length - 1] == "ID") {
-            game = await this.gameService.getByIdAllLean(directions[0])
+            if (this.botHelperService.isValidID(directions[0])) {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+            }
             filter = directions[directions.length - 2]
         } else {
             if (directions.length === 1) {
-                directions.push('general');
+                directions.push('stars');
             }
             let game_name = "";
             for (let i = 0; i < directions.length - 1; i++) {
@@ -226,53 +221,174 @@ module.exports = class PublicCommandService {
             filter = directions[directions.length - 1]
         }
 
-        //checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
-        let response;
-        
-        if (!game.length) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'noGame'));
-        } else if (game.length > 1) {
-            return msg.channel.send(this.botResponseService.gameinfoError(msg.author.id, 'multipleGames'));
+        // Checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
+        if (Array.isArray(game)) {
+            if (!game.length) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+            } else if (game.length > 1) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+            }
+            game = game[0];
         }
 
-        game = game[0];
-
-        if (game.settings.specialGalaxy.darkGalaxy == 'extra' && !game.state.endDate) {
-            return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'extraDark'))
+        // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
+        if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
         }
         if (!game.state.startDate) {
-            return msg.channel.send(this.botResponseService.leaderboard_localError(msg.author.id, 'notStarted'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
         }
 
-        //getting the info from a game that may be public for sure, so we cant accidently spill all the secrets
+        // Getting the game from a neutral observer with the getGalaxy function, this makes sure that all info that goes in will be public for sure
         let gameId = game._id;
         let gameTick = game.state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
-        //getting the local leaderboards for our chosen sortingkey
-        let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
-        let leaderboard = leaderboardReturn.leaderboard;
-        let fullKey = leaderboardReturn.fullKey;
+        // This function is used to calculate from the responsedata what the response looks like
+        // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
+        // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
+        const responseFunction = async (responseData) => {
+            // Getting the basic info that we'll need from the responseData
+            let game = responseData.game;
+            let filter = responseData.filter;
+            let isPC = responseData.isPC;
 
-        let position_list = "";
-        let username_list = "";
-        let sortingKey_list = "";
+            // Generating a leaderboard in the official format
+            let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, filter);
+            let leaderboard = leaderboardReturn.leaderboard;
+            let fullKey = leaderboardReturn.fullKey;
 
-        const getNestedObject = (nestedObj, pathArr) => {
-            return pathArr.reduce((obj, key) =>
-                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+            // Turning the leaderboard in a message format
+            if (isPC) {
+                // Generating the format for the PC users
+                let position_list = "";
+                let username_list = "";
+                let sortingKey_list = "";
+                for (let i = 0; i < leaderboard.length; i++) {
+                    position_list += (i + 1) + "\n";
+                    username_list += leaderboard[i].player.alias + "\n";
+                    sortingKey_list += await this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + "\n";
+                }
+                return this.botResponseService.leaderboard_localPC(game._id, game.state.tick, filter, position_list, username_list, sortingKey_list);
+            }
+            // Generating the format for mobile/tablet users
+            let data_list = "";
+            for (let i = 0; i < leaderboard.length; i++) {
+                data_list += (i + 1) + ' / ' + await this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
+            }
+            return this.botResponseService.leaderboard_localMobile(game._id, game.state.tick, filter, data_list);
         }
 
-        //creating the rankings so it fits in one message
-        for (let i = 0; i < leaderboard.length; i++) {
-            position_list += (i + 1) + "\n";
-            username_list += leaderboard[i].player.alias + "\n";
-            sortingKey_list += getNestedObject(leaderboard[i], fullKey.split('.')) + "\n"
+        // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
+        let responseData = {
+            game,
+            filter,
+            isPC: true
         }
 
-        response = this.botResponseService.leaderboard_local(gameId, filter, position_list, username_list, sortingKey_list);
+        // Sending the message, and activating the PCorMobile function, as the local leaderboard is usable for both mobile and PC users
+        msg.channel.send(await responseFunction(responseData))
+            .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
+    }
 
-        msg.channel.send(response);
+    async status(msg, directions) {
+        // $status <galaxy_name> ("ID")
+
+        // Checking if the <galaxy_name> is actually the name or just the ID of a game
+        // And when that has been determined, extract the game and ID
+        let game;
+        if (directions[directions.length - 1] == "ID") {
+            if (this.botHelperService.isValidID(directions[0])) {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } else {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+            }
+        } else {
+            let game_name = "";
+            for (let i = 0; i < directions.length; i++) {
+                game_name += directions[i] + ' ';
+            }
+            game_name = game_name.trim()
+            game = await this.gameService.getByNameStateSettingsLean(game_name);
+        }
+
+        // Checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
+        if (Array.isArray(game)) {
+            if (game.length) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+            } else if (game.length > 1) {
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+            }
+            game = game[0];
+        }
+
+        // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
+        if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
+        }
+        if (!game.state.startDate) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
+        }
+
+        // Getting the game from a neutral observer with the getGalaxy function, this makes sure that all info that goes in will be public for sure
+        let gameId = game._id;
+        let gameTick = game.state.tick;
+        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
+
+        // This function is used to calculate from the responsedata what the response looks like
+        // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
+        // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
+        const responseFunction = async (responseData) => {
+            // Getting the basic info that we'll need from the responseData
+            let isPC = responseData.isPC;
+            let game = responseData.game;
+            let leaderboard = responseData.leaderboard;
+            let alive = responseData.alive;
+            if (isPC) {
+                // Generating the format for PC users
+                return this.botResponseService.statusPC(game, leaderboard, alive);
+            }
+            // Generating the format for mobile/tablet users
+            return this.botResponseService.statusMobile(game, leaderboard);
+        }
+
+        // Generating the local leaderboards for the requested game
+        let leaderboardData = {
+            stars: this.leaderboardService.getLeaderboardRankings(game, 'stars'),
+            ships: this.leaderboardService.getLeaderboardRankings(game, 'ships'),
+            newShips: this.leaderboardService.getLeaderboardRankings(game, 'newShips'),
+            economy: this.leaderboardService.getLeaderboardRankings(game, 'economy'),
+            industry: this.leaderboardService.getLeaderboardRankings(game, 'industry'),
+            science: this.leaderboardService.getLeaderboardRankings(game, 'science'),
+            weapons: this.leaderboardService.getLeaderboardRankings(game, 'weapons'),
+            manufacturing: this.leaderboardService.getLeaderboardRankings(game, 'manufacturing'),
+            specialists: this.leaderboardService.getLeaderboardRankings(game, 'specialists')
+        }
+
+        // Calculating the count of living players
+        let alive = game.galaxy.players.reduce((val, player) => player.defeated ? val : val + 1, 0)
+        let leaderboard = {};
+        let leaderboardSize = game.settings.general.playerLimit <= 3 ? game.settings.general.playerLimit : 3;
+
+        // Generating the leaderboard in the right format
+        for (let [key, value] of Object.entries(leaderboardData)) {
+            leaderboard[key] = ""
+            for (let i = 0; i < leaderboardSize; i++) {
+                leaderboard[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
+            }
+        }
+
+        // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
+        let responseData = {
+            game,
+            leaderboard,
+            alive,
+            isPC: true
+        };
+
+        // Sending the message, and activating the PCorMobile function, as the status is usable for both mobile and PC users
+        msg.channel.send(await responseFunction(responseData))
+            .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
     async userinfo(msg, directions) {
@@ -281,59 +397,51 @@ module.exports = class PublicCommandService {
         //getting the basic values, like the focus and more importantly the username of the person we want to find
         let focus = directions[directions.length - 1];
 
-        let focusArray = ['games', 'combat', 'infrastructure', 'research', 'trade'];
+        let focusArray = {
+            games: 0,
+            combat: 1,
+            infrastructure: 2,
+            research: 3,
+            trade: 4
+        };
 
-        if (!focusArray.includes(focus)) {
-            return msg.channel.send(this.botResponseService.userinfoError(msg.author.id, 'noFocus'));
+        // Checking if the focus exists
+        if (!Object.keys(focusArray).includes(focus)) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
         }
 
+        // Getting the username
         let username = "";
         for (let i = 0; i < directions.length - 1; i++) {
             username += directions[i] + ' ';
         }
         username = username.trim();
 
+        // Checking if the user exists
         if (!(await this.userService.usernameExists(username))) {
-            return msg.channel.send(this.botResponseService.userinfoError(msg.author.id, 'noUser'));
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noUser'));
         }
 
-        let user = await this.userService.getByUsernameAchievementsLean(username);
+        // This function is used to calculate from the responsedata what the response looks like
+        // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
+        // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
+        const responseFunction = async (responseData) => {
+            let isPC = responseData.isPC;
+            let page = responseData.page;
+            let user = responseData.user;
+            return this.botResponseService.userinfo(user, page, isPC);
+        }
 
-        let response = this.botResponseService.userinfo(user, focus);
+        // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
+        let pageCount = Object.entries(focusArray).length;
+        let responseData = {
+            user: await this.userService.getByUsernameAchievementsLean(username),
+            page: focusArray[focus],
+            isPC: true
+        }
 
-        msg.channel.send(response).then(async message => {
-            try {
-                await message.react('⬅️')
-                await message.react('➡️')
-            } catch (error) {
-                console.log('One of the emojis failed to react:', error);
-            }
-            const collector = message.createReactionCollector(
-                //defining a collector that checks if the right user reacted with the right reaction
-                (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === msg.author.id, { time: 60000 }
-            );
-
-            let currentPage = focusArray.indexOf(focus);
-            collector.on('collect', reaction => {
-                //removing all reactions to add them later, so the user his reaction is also removed
-                message.reactions.removeAll().then(async () => {
-                    //determining which reaction was used and with that checking what page we have to turn to
-                    reaction.emoji.name === '⬅️' ? currentPage -= 1 : currentPage += 1;
-                    if (currentPage < 0) currentPage = 4;
-                    if (currentPage > 4) currentPage = 0;
-
-                    let editedResponse = this.botResponseService.userinfo(user, focusArray[currentPage]);
-
-                    message.edit(editedResponse);
-
-                    try {
-                        await message.react('⬅️')
-                        await message.react('➡️')
-                    } catch (error) {
-                        console.log('One of the emojis failed to react:', error);
-                    }
-                });
-            });
-        });
+        // Sending the message, and activating the multiPage function, as the userinfo has 5 looping pages
+        msg.channel.send(await responseFunction(responseData))
+            .then(async message => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, responseData, true));
     }
 }

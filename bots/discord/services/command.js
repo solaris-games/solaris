@@ -9,7 +9,16 @@ module.exports = class CommandService {
     }
 
     isCorrectChannel(msg, cmd) {
-        return ((cmd === 'invite') && (msg.channel.id === process.env.CHAT_ID_LOOKING_TO_PLAY)) || ((cmd !== 'invite') && (msg.channel.id === process.env.CHAT_ID_BOTS));
+        const channelArray = [
+            process.env.CHAT_ID_BOTS,
+            process.env.CHAT_ID_ACTIVE_GAMES,
+            process.env.CHAT_ID_GUILD_CHAT,
+            process.env.CHAT_ID_TOURNAMENTS
+        ];
+        if (cmd === 'invite') {
+            return msg.channel.id === process.env.CHAT_ID_LOOKING_TO_PLAY;
+        }
+        return channelArray.includes(msg.channel.id);
     }
 
     identify(msg, prefix) {
