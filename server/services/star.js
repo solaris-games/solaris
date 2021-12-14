@@ -130,7 +130,7 @@ module.exports = class StarService extends EventEmitter {
     }
 
     isAlive(star) {
-        return !this.isDeadStar(star);
+        return !this.isDeadStar(star) || star.isBlackHole;
     }
 
     listStarsAliveOwnedByPlayer(stars, playerId) {
