@@ -32,7 +32,7 @@
                         <button title="Edit carrier waypoints" v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary" @click="onEditWaypointsRequested(mapObject.data._id)"><i class="fas fa-map-marker-alt"></i> </button>
                         <button title="Transfer ships between carrier and star" v-if="mapObject.type === 'carrier' && mapObject.data.orbiting && userOwnsStar(mapObject.data.orbiting)" type="button" class="btn btn-primary ml-1" @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
 
-                        <button title="Build a new carrier" v-if="mapObject.type === 'star' && mapObject.data.ships && hasEnoughCredits(mapObject) && mapObject.data.naturalResources" type="button" class="btn btn-primary" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>
+                        <button title="Build a new carrier" v-if="mapObject.type === 'star' && mapObject.data.ships && hasEnoughCredits(mapObject) && mapObject.data.naturalResources && mapObject.data.naturalResources.economy && mapObject.data.naturalResources.industry && mapObject.data.naturalResources.science" type="button" class="btn btn-primary" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>
                         <button title="Transfer all ships to the star" v-if="mapObject.type === 'star' && hasCarriersInOrbit(mapObject)" type="button" class="btn btn-primary ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
                     </td>
                 </tr>

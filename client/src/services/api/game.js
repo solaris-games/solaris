@@ -68,8 +68,13 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  listCompletedGames () {
+  listRecentlyCompletedGames () {
     return axios.get(this.BASE_URL + 'game/list/completed',
+      { withCredentials: true })
+  }
+
+  listMyCompletedGames () {
+    return axios.get(this.BASE_URL + 'game/list/completed/user',
       { withCredentials: true })
   }
 

@@ -296,7 +296,6 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
-    this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
   }
@@ -393,6 +392,7 @@ class Star extends EventEmitter {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
         this.graphics_natural_resources_ring[lod].alpha = 0.3
+        this.graphics_natural_resources_ring[lod].zIndex = -1
       }
       this.graphics_natural_resources_ring[lod].clear()
 
@@ -612,6 +612,7 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
+    // Dead stars do not have scanning range unless they are black holes
     if (!player || (this._isDeadStar() && !this.hasBlackHole())) { return }
 
     if (!player.research) { return }
@@ -763,7 +764,7 @@ class Star extends EventEmitter {
       }
     }
 
-    this.graphics_star.visible = !this.hasSpecialist()
+    this.graphics_star.visible = !this.hasSpecialist() || this.hasBlackHole()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
 

@@ -122,23 +122,23 @@
             <td>Specialist Currency <help-tooltip tooltip="Determines the type of currency used to hire specialists"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistsCurrency) }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Random Warp Gates <help-tooltip tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWarpGates) }}%</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Random Worm Holes <help-tooltip tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWormHoles) }}%</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Random Nebulas <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide ships at stars"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Random Black Holes <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomBlackHoles) }}%</td>
           </tr>
@@ -162,11 +162,11 @@
             <td>Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.splitResources) }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Resource Distribution <help-tooltip tooltip="Determines the shape of distributed natural resources in the galaxy"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.resourceDistribution) }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Player Distribution <help-tooltip tooltip="Determines where player home stars are located at the start of the game"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.playerDistribution) }}</td>
           </tr>
@@ -352,17 +352,24 @@
         </tbody>
       </table>
     </div>
+
+    <div v-if="game && game.settings.specialGalaxy.specialistCost !== 'none'">
+      <view-subtitle title="Specialist Bans"/>
+      <specialist-ban-list :game="game"/>
+    </div>
   </div>
 </template>
 
 <script>
 import ViewSubtitle from '../../ViewSubtitle.vue'
 import HelpTooltip from '../../HelpTooltip'
+import SpecialistBanList from '../specialist/SpecialistBanList'
 
 export default {
   components: {
     'view-subtitle': ViewSubtitle,
-    'help-tooltip': HelpTooltip
+    'help-tooltip': HelpTooltip,
+    'specialist-ban-list': SpecialistBanList
   },
   props: {
     game: Object

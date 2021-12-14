@@ -127,6 +127,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/admin/game/:gameId/timeMachine', middleware.authenticateAdmin, async (req, res, next) => {
+        try {
+            await container.adminService.setGameTimeMachine(req.params.gameId, req.body.timeMachine);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

@@ -3,11 +3,21 @@ import BaseApiService from './base'
 
 class SpecialistService extends BaseApiService {
   getCarrierSpecialists (gameId) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/specialists/carrier',
+    if (gameId) {
+      return axios.get(this.BASE_URL + 'game/' + gameId + '/specialists/carrier',
+        { withCredentials: true })
+    }
+
+    return axios.get(this.BASE_URL + 'game/specialists/carrier',
       { withCredentials: true })
   }
   getStarSpecialists (gameId) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/specialists/star',
+    if (gameId) {
+      return axios.get(this.BASE_URL + 'game/' + gameId + '/specialists/star',
+        { withCredentials: true })
+    }
+
+    return axios.get(this.BASE_URL + 'game/specialists/star',
       { withCredentials: true })
   }
 

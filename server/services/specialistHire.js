@@ -17,6 +17,10 @@ module.exports = class SpecialistHireService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
+        if (this._isCarrierSpecialistBanned(game, specialistId)) {
+            throw new ValidationError('This specialist has been banned from this game.');
+        }
+
         let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.equals(player._id) && x._id.toString() === carrierId.toString());
 
         if (!carrier) {
@@ -100,6 +104,10 @@ module.exports = class SpecialistHireService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
+        if (this._isStarSpecialistBanned(game, specialistId)) {
+            throw new ValidationError('This specialist has been banned from this game.');
+        }
+
         let star = game.galaxy.stars.find(x => x.ownedByPlayerId && x.ownedByPlayerId.equals(player._id) && x._id.toString() === starId.toString());
 
         if (!star) {
@@ -178,6 +186,14 @@ module.exports = class SpecialistHireService {
             default:
                 throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
         }
+    }
+
+    _isStarSpecialistBanned(game, specialistId) {
+        return game.settings.specialGalaxy.specialistBans.star.indexOf(specialistId) > -1;
+    }
+
+    _isCarrierSpecialistBanned(game, specialistId) {
+        return game.settings.specialGalaxy.specialistBans.carrier.indexOf(specialistId) > -1;
     }
 
     async _deductSpecialistCost(game, player, specialist) {

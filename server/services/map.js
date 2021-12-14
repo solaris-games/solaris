@@ -3,7 +3,7 @@ const ValidationError = require("../errors/validation");
 module.exports = class MapService {
 
     constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService) {
+        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
@@ -14,9 +14,10 @@ module.exports = class MapService {
         this.circularBalancedMapService = circularBalancedMapService;
         this.irregularMapService = irregularMapService;
         this.gameTypeService = gameTypeService;
+        this.customMapService = customMapService;
     }
 
-    generateStars(game, starCount, playerLimit) {
+    generateStars(game, starCount, playerLimit, customJSON) {
         let stars = [];
 
         // Get an array of random star names for however many stars we want.
@@ -26,13 +27,13 @@ module.exports = class MapService {
         let starLocations = [];
 
         switch (game.settings.galaxy.galaxyType) {
-            case 'circular': 
+            case 'circular':
                 starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'spiral': 
+            case 'spiral':
                 starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
-            case 'doughnut': 
+            case 'doughnut':
                 starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
                 break;
             case 'circular-balanced':
@@ -41,34 +42,50 @@ module.exports = class MapService {
             case 'irregular':
                 starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
+            case 'custom':
+                starLocations = this.customMapService.generateLocations(customJSON, playerLimit);
+                break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
 
-        // Iterate over all star locations
+        let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
         let starNamesIndex = 0;
 
         let unlinkedStars = starLocations.filter(l => !l.linked);
 
+        // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
             let starLocation = unlinkedStars[i];
-
-            let loc = {
-                x: starLocation.x,
-                y: starLocation.y
-            };
             
-            let star = this.starService.generateUnownedStar(starNames[starNamesIndex++], loc, starLocation.resources);
+            let star;
+            let starName = starNames[starNamesIndex++];
 
+            if (isCustomGalaxy) {
+                star = this.starService.generateCustomGalaxyStar(starName, starLocation);
+            }
+            else {
+                star = this.starService.generateUnownedStar(starName, starLocation, starLocation.resources);
+            }
+            
             stars.push(star);
 
             if (starLocation.homeStar) {
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
-                    let linkedStar = this.starService.generateUnownedStar(starNames[starNamesIndex++], linkedLocation, linkedLocation.resources);
-                    stars.push(linkedStar);
-                    linkedStars.push(linkedStar._id);
+                  let linkedStar;
+                  let linkedStarName = starNames[starNamesIndex++];
+
+                  if (isCustomGalaxy) {
+                    linkedStar = this.starService.generateCustomGalaxyStar(linkedStarName, linkedLocation)
+                  }
+                  else {
+                    linkedStar = this.starService.generateUnownedStar(linkedStarName, linkedLocation, linkedLocation.resources);
+                  }
+
+                  stars.push(linkedStar);
+                  linkedStars.push(linkedStar._id);
                 }
 
                 game.galaxy.homeStars.push(star._id)
@@ -104,7 +121,7 @@ module.exports = class MapService {
 
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
-            this.generateBlackHoles(game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
+            this.generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
         }
     }
 
@@ -207,7 +224,7 @@ module.exports = class MapService {
         } while (count--);
     }
 
-    generateBlackHoles(stars, playerCount, percentage) {
+    generateBlackHoles(game, stars, playerCount, percentage) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be asteroid fields
@@ -219,11 +236,24 @@ module.exports = class MapService {
             } else {
                 star.isBlackHole = true;
 
-                star.naturalResources = {
-                    economy: 0,
-                    industry: 0,
-                    science: 0
-                };
+                // Overwrite the natural resources
+                let minResources = 1;
+                let maxResources = game.constants.star.resources.minNaturalResources;
+
+                // Overwrite natural resources
+                if (this.gameTypeService.isSplitResources(game)) {
+                    star.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                    star.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                } else {
+                    let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+
+                    star.naturalResources = {
+                        economy: resources,
+                        industry: resources,
+                        science: resources
+                    };
+                }
             }
         } while (count--);
     }
@@ -254,7 +284,7 @@ module.exports = class MapService {
                 y: 0
             };
         }
-        
+
         let totalX = starLocations.reduce((total, s) => total += s.x, 0);
         let totalY = starLocations.reduce((total, s) => total += s.y, 0);
 

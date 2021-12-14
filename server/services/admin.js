@@ -33,7 +33,7 @@ module.exports = class AdminService {
 
     async listGames(limit) {
         return await this.gameRepo.find({
-            // All games
+            'settings.general.type': { $ne: 'tutorial' } // Non tutorial games
         }, {
             'settings.general': 1,
             'state': 1
@@ -110,6 +110,14 @@ module.exports = class AdminService {
             _id: gameId
         }, {
             'settings.general.featured': featured
+        });
+    }
+
+    async setGameTimeMachine(gameId, enabled) {
+        await this.gameRepo.updateOne({
+            _id: gameId
+        }, {
+            'settings.general.timeMachine': enabled
         });
     }
 

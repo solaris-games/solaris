@@ -37,6 +37,8 @@
             </div>
         </div>
     </div>
+
+    <p v-if="specialists && !specialists.length" class="text-center pb-2">No specialists available to hire.</p>
 </div>
 </template>
 
@@ -67,7 +69,9 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
-    this.specialists = this.$store.state.starSpecialists;
+    const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.star
+
+    this.specialists = this.$store.state.starSpecialists.filter(s => banList.indexOf(s.id) < 0)
   },
   methods: {
     onCloseRequested (e) {

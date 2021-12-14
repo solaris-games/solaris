@@ -430,7 +430,7 @@ module.exports = class CarrierService {
 
         // Reignite dead stars if applicable
         // Note: Black holes cannot be reignited.
-        if (!carrier.isGift && !destinationStar.isBlackHole && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
+        if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
             this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
