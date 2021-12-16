@@ -1,8 +1,8 @@
 - Set up user model for badges - Done
 - Migration script - Done
-- Set up json document for badges
-- Service for purchasing badges - game / player / from player / badge key
-- API endpoints - Wire up to UI services
+- Set up json document for badges - Need descriptions
+- Service for purchasing badges - Done
+- API endpoints - Wire up to UI services - Done
 - Component to display on player profile to display badges
 - Award badge button on player profile -> Buy badge
 - Component to display badges earned on player achievements page
