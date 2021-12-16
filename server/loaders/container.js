@@ -66,6 +66,7 @@ const DonateService = require('../services/donate');
 const DiplomacyService = require('../services/diplomacy');
 const AvatarService = require('../services/avatar');
 const PaypalService = require('../services/paypal');
+const BadgeService = require('../services/badge');
 
 const ResourceService = require('../services/resource')
 const CircularMapService = require('../services/maps/circular');
@@ -138,6 +139,7 @@ module.exports = (config, io) => {
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService, diplomacyService);
     const donateService = new DonateService(cacheService);
+    const badgeService = new BadgeService(userRepo, userService, playerService);
 
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService);
@@ -198,5 +200,6 @@ module.exports = (config, io) => {
         diplomacyService,
         avatarService,
         paypalService,
+        badgeService,
     };
 };

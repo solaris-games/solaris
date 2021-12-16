@@ -18,6 +18,8 @@
         <game-player-quit :event="event" v-if="event.type === 'gamePlayerQuit'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <game-started :event="event" v-if="event.type === 'gameStarted'"/>
+        <game-player-badge-purchased :event="event" v-if="event.type === 'gamePlayerBadgePurchased'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
@@ -61,6 +63,7 @@ import GameEndedVue from './GameEnded'
 import GamePausedVue from './GamePaused'
 import GamePlayerAFKVue from './GamePlayerAFK'
 import GamePlayerDefeatedVue from './GamePlayerDefeated'
+import GamePlayerBadgePurchasedVue from './GamePlayerBadgePurchased'
 import GamePlayerJoinedVue from './GamePlayerJoined'
 import GamePlayerQuitVue from './GamePlayerQuit'
 import GameStartedVue from './GameStarted'
@@ -92,6 +95,7 @@ export default {
     'game-paused': GamePausedVue,
     'game-player-afk': GamePlayerAFKVue,
     'game-player-defeated': GamePlayerDefeatedVue,
+    'game-player-badge-purchased': GamePlayerBadgePurchasedVue,
     'game-player-joined': GamePlayerJoinedVue,
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,

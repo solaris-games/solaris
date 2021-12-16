@@ -12,7 +12,7 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            const result = await container.badgeService.listBadges();
+            const result = container.badgeService.listBadges();
             
             return res.status(200).json(result);
         } catch (err) {
@@ -42,17 +42,17 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            const result = await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
+            await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
             
-            return res.status(200).json(result);
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
     }, middleware.handleError);
 
-    router.get('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req, res, next) => {
         try {
-            const result = await container.badgeService.listBadgesByPlayer(req.params.gameId, req.params.playerId);
+            const result = await container.badgeService.listBadgesByPlayer(req.game, req.params.playerId);
             
             return res.status(200).json(result);
         } catch (err) {
@@ -60,7 +60,7 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req, res, next) => {
         let errors = [];
 
         if (!req.body.badgeKey) {
@@ -72,9 +72,9 @@ module.exports = (router, io, container) => {
         }
 
         try {
-            const result = await container.badgeService.purchaseBadgeForPlayer(req.session.userId, req.params.gameId, req.params.playerId, req.body.badgeKey);
+            await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);
             
-            return res.status(200).json(result);
+            return res.sendStatus(200);
         } catch (err) {
             return next(err);
         }
