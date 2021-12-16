@@ -1,5 +1,5 @@
-- Set up user model for badges
-- Migration script
+- Set up user model for badges - Done
+- Migration script - Done
 - Set up json document for badges
 - Service for purchasing badges - game / player / from player / badge key
 - API endpoints - Wire up to UI services

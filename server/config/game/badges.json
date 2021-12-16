@@ -1,0 +1,44 @@
+[
+    {
+        "key": "ally",
+        "name": "Team Player",
+        "description": "",
+        "price": 1
+    },
+    {
+        "key": "enemy",
+        "name": "Worthy Adversary",
+        "description": "",
+        "price": 1
+    },
+    {
+        "key": "diplomat",
+        "name": "Diplomat",
+        "description": "",
+        "price": 1
+    },
+    {
+        "key": "strategist",
+        "name": "Master Strategist",
+        "description": "",
+        "price": 1
+    },
+    {
+        "key": "roleplay",
+        "name": "Masquerade",
+        "description": "",
+        "price": 1
+    },
+    {
+        "key": "dauntless",
+        "name": "Dauntless",
+        "description": "",
+        "price": 1
+    },
+    {
+        "key": "sleepless",
+        "name": "Sleepless",
+        "description": "",
+        "price": 1
+    }
+]
