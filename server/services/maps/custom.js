@@ -4,7 +4,7 @@ const ValidationError = require("../../errors/validation");
 module.exports = class CustomMapService {
     constructor() { }
 
-    generateLocations(customJSON) {
+    generateLocations(customJSON, playerLimit) {
         let json;
 
         try {
@@ -65,6 +65,10 @@ module.exports = class CustomMapService {
         }
 
         playerIds = [...new Set(playerIds)]; // ignore repeated player indexes
+
+        if (homeStars.length !== playerLimit) {
+          throw new ValidationError(`Must have ${playerLimit} capital stars in the custom map.`);
+        }
 
         if (homeStars.length === playerIds.length) {
           this._linkStars(homeStars, locations);

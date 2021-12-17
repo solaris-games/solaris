@@ -73,7 +73,25 @@ module.exports = class GameListService {
         }));
     }
 
-    async listCompletedGames(userId) {
+    async listRecentlyCompletedGames(select) {
+        select = select || {
+            'settings.general.type': 1,
+            'settings.general.featured': 1,
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        };
+
+        return await this.gameRepo.find({
+            'state.endDate': { $ne: null }, // Game is finished
+            'settings.general.type': { $ne: 'tutorial'}
+        },
+        select,
+        { 'state.endDate': -1 },
+        10);
+    }
+
+    async listUserCompletedGames(userId) {
         const games = await this.gameRepo.find({
             'state.endDate': { $ne: null }, // Game is finished
             'settings.general.type': { $ne: 'tutorial'},

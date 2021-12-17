@@ -556,7 +556,8 @@ module.exports = class GameService extends EventEmitter {
             _id: gameId
         }, {
             $set: {
-                'state.cleaned': true
+                'state.cleaned': true,
+                'settings.general.timeMachine': 'disabled'
             }
         });
     }

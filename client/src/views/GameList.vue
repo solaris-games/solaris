@@ -9,6 +9,9 @@
       <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#inProgressGames">In Progress</a>
       </li>
+      <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#recentlyCompletedGames">Recent</a>
+      </li>
     </ul>
 
     <div class="tab-content pt-2">
@@ -279,6 +282,48 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
+        
+        <div class="tab-pane fade" id="recentlyCompletedGames">
+          <h4>Recently Completed Games</h4>
+
+          <loading-spinner :loading="isLoading"/>
+
+          <p v-if="!isLoading && !recentlyCompletedGames.length" class="text-danger mb-2">
+            There are no recent games to display.
+          </p>
+
+          <table v-if="!isLoading && recentlyCompletedGames.length" class="table table-striped table-hover">
+              <thead>
+                  <tr class="bg-primary">
+                      <th>Name</th>
+                      <th class="d-none d-md-table-cell text-center">Ended</th>
+                      <th class="d-none d-sm-table-cell text-center">Cycles</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="game in recentlyCompletedGames" v-bind:key="game._id">
+                      <td>
+                        <router-link :to="{ path: '/game', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br/>
+                        <small>{{getGameTypeFriendlyText(game)}}</small>
+                      </td>
+                      <td class="d-none d-md-table-cell text-center">{{getFriendlyDate(game.state.endDate)}}</td>
+                      <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
+                      <td>
+                          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                            <span>View</span>
+                          </router-link>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <div class="text-right" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          </div>
+        </div>
     </div>
   </view-container>
 </template>
@@ -292,6 +337,7 @@ import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import RandomHelper from '../services/randomHelper'
+import * as moment from 'moment'
 
 export default {
   components: {
@@ -305,6 +351,7 @@ export default {
       serverGames: [],
       userGames: [],
       inProgressGames: [],
+      recentlyCompletedGames: [],
       isLoading: true,
       games: {
         featured: null,
@@ -325,7 +372,8 @@ export default {
       let requests = [
         gameService.listOfficialGames(),
         gameService.listUserGames(),
-        gameService.listInProgressGames()
+        gameService.listInProgressGames(),
+        gameService.listRecentlyCompletedGames()
       ]
 
       let responses = await Promise.all(requests)
@@ -333,6 +381,7 @@ export default {
       this.serverGames = responses[0].data
       this.userGames = responses[1].data
       this.inProgressGames = responses[2].data
+      this.recentlyCompletedGames = responses[3].data
 
       this.games.featured = this.getFeaturedGame()
       this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
@@ -378,6 +427,9 @@ export default {
     },
     getGameTypeFriendlyText (game) {
       return GameHelper.getGameTypeFriendlyText(game)
+    },
+    getFriendlyDate(date) {
+      return moment(date).utc().fromNow()
     }
   }
 }

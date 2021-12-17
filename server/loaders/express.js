@@ -6,7 +6,9 @@ const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 module.exports = async (config, app, io, container) => {
-    app.use(require('body-parser').json());
+    app.use(require('body-parser').json({
+        limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
+    }));
 
     // ---------------
     // Set up MongoDB session store

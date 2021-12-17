@@ -102,7 +102,7 @@ module.exports = class GameCreateValidationService {
             // Assert that the natural resources are correct based on normal vs. split resources setting.
             if (game.settings.specialGalaxy.splitResources === 'disabled' && (
                 star.naturalResources.economy !== star.naturalResources.industry
-                && star.naturalResources.economy !== star.naturalResources.science
+                || star.naturalResources.economy !== star.naturalResources.science
             )) {
                 throw new ValidationError(`All stars must have equal natural resources for non-split resources.`);
             }
