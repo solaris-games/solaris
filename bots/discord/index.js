@@ -80,7 +80,7 @@ async function startup() {
     container = containerLoader({}, null);
 
     botResponseService = new BotResponseService();
-    botHelperService = new BotHelperService();
+    botHelperService = new BotHelperService(botResponseService);
     commandService = new CommandService();
     reactionService = new ReactionService();
     publicCommandService = new PublicCommandService(botResponseService, botHelperService,

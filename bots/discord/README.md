@@ -93,7 +93,7 @@ The second direction, the `<filter>`, is what the leaderboard will be sorted on.
 - total `economy`
 - total `industry`
 - total `science`
-- `newShip` production
+- `newShips` production
 - total `warpgates`
 - total `starSpecialists`
 - total `carrierSpecialists`

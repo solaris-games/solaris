@@ -16,6 +16,28 @@ module.exports = class BotHelperService {
         return validCharacters && id.length === 24;
     }
 
+    isValidGame(game, msg) {
+        if (Array.isArray(game)) {
+            if (!game.length) { 
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+                return false;
+            } else if (game.length > 1) {
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+                return false;
+            }
+            game = game[0];
+        }
+        return game;
+    }
+
+    isValidFocus(focus, focusArray, msg) {
+        if (!focusArray.includes(focus)) {
+            msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
+            return false;
+        }
+        return true;
+    }
+
     async getNestedObject(nestedObj, pathArr) {
         // Here be dragons
         // This function gets data out of an object, where we know the path we have to take to get to the data
