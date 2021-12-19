@@ -392,6 +392,9 @@ module.exports = class AIService {
         for (const playerStar of context.playerStars) {
             const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
             const totalShips = playerStar.ships + carriersHere.map(carrier => carrier.ships).reduce((a, b) => a + b, 0);
+            if (totalShips < 1) {
+                continue;
+            }
             assignments.set(playerStar._id.toString(), {
                 carriers: carriersHere,
                 star: playerStar,
