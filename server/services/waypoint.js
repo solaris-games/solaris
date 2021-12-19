@@ -2,7 +2,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class WaypointService {
 
-    constructor(gameRepo, carrierService, starService, distanceService, 
+    constructor(gameRepo, carrierService, starService, distanceService,
         starDistanceService, technologyService, gameService, playerService) {
         this.gameRepo = gameRepo;
         this.carrierService = carrierService;
@@ -18,9 +18,9 @@ module.exports = class WaypointService {
         if (looped == null) {
             looped = false;
         }
-        
+
         let carrier = this.carrierService.getById(game, carrierId);
-        
+
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
@@ -35,11 +35,11 @@ module.exports = class WaypointService {
             let currentWaypoint = carrier.waypoints[0];
             let newFirstWaypoint = waypoints[0];
 
-            if (!newFirstWaypoint 
+            if (!newFirstWaypoint
                 || currentWaypoint.source.toString() !== newFirstWaypoint.source
                 || currentWaypoint.destination.toString() !== newFirstWaypoint.destination) {
-                    throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
-                }
+                throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
+            }
 
             if (+newFirstWaypoint.delayTicks) {
                 throw new ValidationError('The first waypoint cannot have delay ticks if mid-flight.');
@@ -51,8 +51,9 @@ module.exports = class WaypointService {
             let waypoint = waypoints[i];
 
             let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-            let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
-
+            if (sourceStar === undefined) sourceStar = this.carrierService.getByObjectId(game, waypoint.source);
+            let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)): game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        
             let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
 
             // Make sure the user isn't being a dumbass.
@@ -65,7 +66,7 @@ module.exports = class WaypointService {
 
             // Make damn sure there is a delay ticks defined.
             waypoint.delayTicks = waypoint.delayTicks || 0;
-            
+
             if (waypoint.delayTicks == null || waypoint.delayTicks == '' || +waypoint.delayTicks < 0) {
                 waypoint.delayTicks = 0;
             }
@@ -90,7 +91,7 @@ module.exports = class WaypointService {
                 throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
             }
         }
-        
+
         carrier.waypoints = waypoints;
 
         // If the waypoints are not a valid loop then throw an error.
@@ -126,8 +127,9 @@ module.exports = class WaypointService {
 
     _waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint) {
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
-
+        if (sourceStar === undefined) sourceStar = this.carrierService.getByObjectId(game, waypoint.source);
+        let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)): game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        
         // Stars may have been destroyed.
         if (sourceStar == null || destinationStar == null) {
             return false;
@@ -143,8 +145,9 @@ module.exports = class WaypointService {
 
     _waypointRouteIsBetweenWormHoles(game, waypoint) {
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
-
+        if (sourceStar === undefined) sourceStar = this.carrierService.getByObjectId(game, waypoint.source);
+        let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)): game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        
         // Stars may have been destroyed.
         if (sourceStar == null || destinationStar == null) {
             return false;
@@ -209,11 +212,11 @@ module.exports = class WaypointService {
 
     async loopWaypoints(game, player, carrierId, loop) {
         let carrier = this.carrierService.getById(game, carrierId);
-        
+
         if (!carrier.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
-        
+
         if (carrier.isGift) {
             throw new ValidationError('Cannot loop waypoints of a carrier that is a gift.');
         }
@@ -227,7 +230,7 @@ module.exports = class WaypointService {
                 throw new ValidationError('The last waypoint star is out of hyperspace range of the first waypoint star.');
             }
         }
-        
+
         // Update the DB.
         await this.gameRepo.updateOne({
             _id: game._id,
@@ -242,6 +245,12 @@ module.exports = class WaypointService {
     canLoop(game, player, carrier) {
         if (carrier.waypoints.length < 2 || carrier.isGift) {
             return false;
+        }
+
+        for (let carrierWaypoint of carrier.waypoints) {
+            if (carrierWaypoint.isCarrier) {
+                return false;
+            }
         }
 
         let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
@@ -279,7 +288,8 @@ module.exports = class WaypointService {
         }
 
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+        if (sourceStar === undefined) sourceStar = this.carrierService.getByObjectId(game, waypoint.source);
+        let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)): game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
 
         // If the carrier can travel instantly then it'll take 1 tick + any delay.
         let instantSpeed = sourceStar && this.starService.isStarPairWormHole(sourceStar, destinationStar);
@@ -296,7 +306,7 @@ module.exports = class WaypointService {
         if (!carrier.orbiting && carrier.waypoints[0]._id.toString() === waypoint._id.toString()) {
             source = carrier.location;
         }
-        
+
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
@@ -318,7 +328,7 @@ module.exports = class WaypointService {
 
         for (let i = 0; i < carrier.waypoints.length; i++) {
             let cwaypoint = carrier.waypoints[i];
-            
+
             totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint);
 
             if (cwaypoint._id.toString() === waypoint._id.toString()) {
@@ -405,7 +415,7 @@ module.exports = class WaypointService {
             this._performWaypointActionDropAll(carrier, star, waypoint);
         }
     }
-    
+
     performWaypointActionsDrops(game, waypoints) {
         this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut', 'dropPercentage']);
     }
@@ -503,7 +513,7 @@ module.exports = class WaypointService {
     }
 
     _performFilteredWaypointActions(game, waypoints, waypointTypes) {
-        let actionWaypoints = waypoints.filter(w => 
+        let actionWaypoints = waypoints.filter(w =>
             waypointTypes.indexOf(w.waypoint.action) > -1
             && w.carrier.ownedByPlayerId.equals(w.star.ownedByPlayerId) // The carrier must be owned by the player who owns the star.
         );

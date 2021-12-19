@@ -3,22 +3,22 @@ import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
 
 class Waypoints extends EventEmitter {
-  constructor () {
+  constructor() {
     super()
 
     this.container = new PIXI.Container()
   }
 
-  setup (game) {
+  setup(game) {
     this.game = game
     this.lightYearDistance = game.constants.distances.lightYear
   }
 
-  clear () {
+  clear() {
     this.container.removeChildren()
   }
 
-  draw (carrier) {
+  draw(carrier) {
     this.clear()
 
     this.carrier = carrier
@@ -29,16 +29,16 @@ class Waypoints extends EventEmitter {
     this.drawPaths()
   }
 
-  drawLastWaypoint () {
+  drawLastWaypoint() {
     // If there are no waypoints at all
     // then deem the current location as the waypoint.
     let lastLocation = this._getLastLocation()
 
     // Draw a big selected highlight around the last waypoint.
-    this._highlightLocation(lastLocation, 0.8)
+    this._highlightStarLocation(lastLocation, 0.8)
   }
 
-  drawNextWaypoints () {
+  drawNextWaypoints() {
     // Draw all of the available waypoints that the last waypoint can reach.
     let lastLocation = this._getLastLocation()
     let userPlayer = this.game.galaxy.players.find(p => p.userId)
@@ -52,25 +52,33 @@ class Waypoints extends EventEmitter {
       let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
 
       if (distance <= hyperspaceDistance) {
-        this._highlightLocation(s.location, 0.3)
+        this._highlightStarLocation(s.location, 0.3)
       }
     }
 
     // Pirate extra targets
-    if (this.carrier.specialist && this.carrier.specialist.modifiers.special && this.carrier.specialist.modifiers.special.targetCarriers) {
+    if (this._canTargetCarrier()) {
       for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
         let c = this.game.galaxy.carriers[i]
+
+        if (c.orbiting) {
+          continue
+        }
+
+        if (this._ignoresCombat(c)) {
+          continue
+        }
 
         let distance = GameHelper.getDistanceBetweenLocations(lastLocation, c.location)
 
         if (distance <= hyperspaceDistance) {
-          this._highlightLocation(c.location, 0.3)
+          this._highlightCarrierLocation(c.location, 0.6)
         }
       }
     }
   }
 
-  drawPaths () {
+  drawPaths() {
     if (!this.carrier.waypoints.length) {
       return
     }
@@ -90,7 +98,7 @@ class Waypoints extends EventEmitter {
     // Draw a line to each destination along the waypoints.
     for (let i = 0; i < this.carrier.waypoints.length; i++) {
       let waypoint = this.carrier.waypoints[i]
-      star = this.game.galaxy.stars.find(s => s._id === waypoint.destination)
+      star = waypoint.isCarrier ? this.game.galaxy.carriers.find(c => c._id === waypoint.targetId) : this.game.galaxy.stars.find(s => s._id === waypoint.targetId)
 
       graphics.lineTo(star.location.x, star.location.y)
     }
@@ -98,7 +106,7 @@ class Waypoints extends EventEmitter {
     this.container.addChild(graphics)
   }
 
-  drawHyperspaceRange () {
+  drawHyperspaceRange() {
     let graphics = new PIXI.Graphics()
     // TODO: This is causing errors when a star is revealed in dark mode.
     let lastLocationStar = this._getLastLocationStar()
@@ -106,7 +114,7 @@ class Waypoints extends EventEmitter {
 
     // TODO: Use the game helper instead?
     let techLevel = player.research.hyperspace.level
-    
+
     if (this.carrier.specialist && this.carrier.specialist.modifiers.local) {
       techLevel += this.carrier.specialist.modifiers.local.hyperspace || 0
     }
@@ -123,7 +131,7 @@ class Waypoints extends EventEmitter {
     this.container.addChild(graphics)
   }
 
-  _highlightLocation (location, opacity) {
+  _highlightStarLocation(location, opacity) {
     let graphics = new PIXI.Graphics()
     let radius = 12
 
@@ -133,23 +141,56 @@ class Waypoints extends EventEmitter {
     this.container.addChild(graphics)
   }
 
-  onStarClicked (e) {
+  _highlightCarrierLocation(location, opacity) {
+    let graphics = new PIXI.Graphics()
+    let radius = 10
+
+    graphics.lineStyle(1, 0xFFFFFF, opacity)
+    graphics.drawStar(location.x, location.y, radius, radius, radius - 3)
+
+    this.container.addChild(graphics)
+  }
+
+  onStarClicked(e) {
     if (!this.carrier) {
       return
     }
 
-    this._createWaypoint(e.location, e._id)
+    this._createStarWaypoint(e.location, e._id)
   }
 
-  _createWaypoint (desiredLocation, starId) {
+  onCarrierClicked(e) {
+    if (!this._canTargetCarrier()) {
+      return
+    }
+    if (!this.carrier) {
+      return
+    }
+
+    this._createCarrierWaypoint(e.location, e._id)
+  }
+
+  _canTargetCarrier() {
+    return this.carrier.specialist && this.carrier.specialist.modifiers.special && this.carrier.specialist.modifiers.special.targetCarriers
+  }
+
+  _ignoresCombat(carrier) {
+    if (!this.game.settings.specialGalaxy.carrierToCarrierCombat) {
+      return true
+    }
+    return carrier.specialist && carrier.specialist.modifiers.special && carrier.specialist.modifiers.special.avoidCombatCarrierToCarrier
+  }
+
+  _createStarWaypoint(desiredLocation, starId) {
     // If the star that was clicked is within hyperspace range then append
     // a new waypoint to this star.
     let userPlayer = this.game.galaxy.players.find(p => p.userId)
 
     const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
-    
+
     const lastLocationStar = this._getLastLocationStar()
     const lastLocation = lastLocationStar == null ? null : lastLocationStar.location
+
     const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)
 
     let canCreateWaypoint = distance <= hyperspaceDistance
@@ -163,6 +204,7 @@ class Waypoints extends EventEmitter {
     if (canCreateWaypoint) {
       let newWaypoint = {
         destination: starId,
+        isCarrier: false,
         action: 'collectAll',
         actionShips: 0,
         delayTicks: 0
@@ -190,11 +232,55 @@ class Waypoints extends EventEmitter {
     }
   }
 
-  _getLastWaypoint () {
+  _createCarrierWaypoint(desiredLocation, carrierId) {
+    // If the carrier that was clicked is within hyperspace range then append
+    // a new waypoint to this carrier.
+    let userPlayer = this.game.galaxy.players.find(p => p.userId)
+
+    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
+
+    const lastLocationStar = this._getLastLocationStar()
+    const lastLocation = lastLocationStar == null ? null : lastLocationStar.location
+
+    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)
+
+    let canCreateWaypoint = distance <= hyperspaceDistance
+
+    if (canCreateWaypoint) {
+      let newWaypoint = {
+        destination: carrierId,
+        isCarrier: true,
+        action: 'collectAll',
+        actionShips: 0,
+        delayTicks: 0
+      }
+
+      if (this.carrier.waypoints.length) {
+        const lastWaypoint = this._getLastWaypoint()
+
+        // // The waypoint cannot be the same as the previous waypoint.
+        // if (newWaypoint.destination === lastWaypoint.destination) {
+        //   return
+        // }
+
+        newWaypoint.source = lastWaypoint.destination
+      } else { // Otherwise use the current orbiting star
+        newWaypoint.source = this.carrier.orbiting
+      }
+
+      this.carrier.waypoints.push(newWaypoint)
+
+      this.draw(this.carrier)
+
+      this.emit('onWaypointCreated', newWaypoint)
+    }
+  }
+
+  _getLastWaypoint() {
     return this.carrier.waypoints[this.carrier.waypoints.length - 1]
   }
 
-  _getLastLocation () {
+  _getLastLocation() {
     let lastLocationStar = this._getLastLocationStar()
 
     if (lastLocationStar) {
@@ -204,11 +290,13 @@ class Waypoints extends EventEmitter {
     return null
   }
 
-  _getLastLocationStar () {
+  _getLastLocationStar() {
     if (this.carrier.waypoints.length) {
       let lastWaypointStarId = this.carrier.waypoints[this.carrier.waypoints.length - 1].destination
 
-      return this.game.galaxy.stars.find(s => s._id === lastWaypointStarId)
+      let target = this.game.galaxy.stars.find(s => s._id === lastWaypointStarId)
+      if (target) return target
+      return this.game.galaxy.carriers.find(c => c._id === lastWaypointStarId)
     } else {
       return this.game.galaxy.stars.find(s => s._id === this.carrier.orbiting)
     }

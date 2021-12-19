@@ -295,7 +295,7 @@ class GameHelper {
     }
 
     let sourceStar = this.getStarById(game, waypoint.source)
-    let destinationStar = this.getStarById(game, waypoint.destination)
+    let destinationStar = waypoint.isCarrier ? this.getCarrierById(game, waypoint.destination) : this.getStarById(game, waypoint.destination)
 
     // If the carrier can travel instantly then it'll take 1 tick + any delay.
     let instantSpeed = sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)
@@ -421,8 +421,8 @@ class GameHelper {
         let specialist = carrier.specialist
 
         if (specialist.modifiers.local) {
-            distanceModifier *= (specialist.modifiers.local.speed || 1)
-        }
+          distanceModifier *= (specialist.modifiers.local.speed || 1);
+      }
     }
 
     return game.settings.specialGalaxy.carrierSpeed * distanceModifier;

@@ -186,6 +186,7 @@
             "modifiers": {
                 "local": {
                     "speed": 1.5,
+                    "toCarrierSpeed": 4,
                     "carrierToCarrierCombat": {
                         "weapons": 3
                     },

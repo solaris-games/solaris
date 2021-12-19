@@ -143,7 +143,11 @@ export default {
       this.$emit('onOpenStarDetailRequested', e)
     },
     getStarName (starId) {
-      return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
+      let target = this.$store.state.game.galaxy.stars.find(s => s._id === starId)
+      if (target === undefined) {
+        target = this.$store.state.game.galaxy.carriers.find(c => c._id === starId)
+      }
+      return target.name
     },
     getWaypointsString () {
       if (!this.carrier.waypoints.length) {

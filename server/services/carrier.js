@@ -26,7 +26,7 @@ module.exports = class CarrierService {
     getByIdBS(game, id) {
         let start = 0;
         let end = game.galaxy.carriers.length - 1;
-    
+
         while (start <= end) {
             let middle = Math.floor((start + end) / 2);
             let carrier = game.galaxy.carriers[middle];
@@ -49,7 +49,7 @@ module.exports = class CarrierService {
     }
 
     getCarriersAtStar(game, starId) {
-      return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
+        return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
     }
 
     createAtStar(star, carriers, ships = 1) {
@@ -86,7 +86,7 @@ module.exports = class CarrierService {
     generateCarrierName(star, carriers) {
         let i = 1;
         let name = `${star.name} ${i++}`;
-        
+
         while (carriers.find(c => c.name == name)) {
             name = `${star.name} ${i++}`;
         }
@@ -157,30 +157,30 @@ module.exports = class CarrierService {
         // Filter all waypoints (except those in transit) for all carriers that do not belong
         // to the player.
         return game.galaxy.carriers
-        .map(c => {
-            if (c.ownedByPlayerId.equals(player._id)) {
-                return c;
-            }
+            .map(c => {
+                if (c.ownedByPlayerId.equals(player._id)) {
+                    return c;
+                }
 
-            // Return only key data about the carrier and the waypoints
-            // if the carrier does not belong to the given player.
-            let carrierData = {
-                _id: c._id,
-                ownedByPlayerId: c.ownedByPlayerId,
-                orbiting: c.orbiting,
-                name: c.name,
-                ships: c.ships,
-                location: c.location,
-                waypoints: c.waypoints,
-                isGift: c.isGift,
-                specialistId: c.specialistId,
-                specialist: null
-            };
+                // Return only key data about the carrier and the waypoints
+                // if the carrier does not belong to the given player.
+                let carrierData = {
+                    _id: c._id,
+                    ownedByPlayerId: c.ownedByPlayerId,
+                    orbiting: c.orbiting,
+                    name: c.name,
+                    ships: c.ships,
+                    location: c.location,
+                    waypoints: c.waypoints,
+                    isGift: c.isGift,
+                    specialistId: c.specialistId,
+                    specialist: null
+                };
 
-            carrierData.waypoints = this.clearCarrierWaypointsNonTransit(c, true);
+                carrierData.waypoints = this.clearCarrierWaypointsNonTransit(c, true);
 
-            return carrierData;
-        });
+                return carrierData;
+            });
     }
 
     clearCarrierWaypointsNonTransit(carrier, obfuscateFirstWaypoint = false) {
@@ -205,7 +205,7 @@ module.exports = class CarrierService {
 
         return waypoints;
     }
-    
+
     clearPlayerCarrierWaypointsNonTransit(game, player) {
         let carriers = this.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -213,7 +213,7 @@ module.exports = class CarrierService {
             carrier.waypoints = this.clearCarrierWaypointsNonTransit(carrier);
         }
     }
-    
+
     clearPlayerCarrierWaypointsLooped(game, player) {
         let carriers = this.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -294,8 +294,8 @@ module.exports = class CarrierService {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }
 
-        let carrierName = name.trim().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-        
+        let carrierName = name.trim().replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+
         await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrierId
@@ -324,7 +324,7 @@ module.exports = class CarrierService {
             if (starUser && !starPlayer.defeated) {
                 starUser.achievements.trade.giftsReceived += carrier.ships;
             }
-    
+
             if (carrierUser && !carrierPlayer.defeated) {
                 carrierUser.achievements.trade.giftsSent += carrier.ships;
             }
@@ -469,11 +469,14 @@ module.exports = class CarrierService {
         }
 
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
-        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)) : game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+
+        if (sourceStar === undefined) sourceStar = game.galaxy.carriers.find(c => c._id.equals(waypoint.source));
+
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
         let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed); // Null signifies instant travel
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeedtoCarrier); // Null signifies instant travel
 
         let carrierMovementReport = {
             carrier,
@@ -487,10 +490,10 @@ module.exports = class CarrierService {
             combatRequiredStar: false,
             arrivedAtStar: false
         };
-        
+
         if (instantSpeed || carrier.distanceToDestination <= distancePerTick) {
             let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrier, destinationStar);
-            
+
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
             carrierMovementReport.arrivedAtStar = true;
@@ -506,12 +509,14 @@ module.exports = class CarrierService {
     getNextLocationToWaypoint(game, carrier) {
         let waypoint = carrier.waypoints[0];
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
-        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
+        let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)) : game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+
+        if (sourceStar === undefined) sourceStar = game.galaxy.carriers.find(c => c._id.equals(waypoint.source));
 
         let warpSpeed = false;
         let instantSpeed = false;
-        
+
         if (sourceStar) {
             warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
             instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
@@ -530,7 +535,7 @@ module.exports = class CarrierService {
             if (distancePerTick >= distanceToDestination) {
                 distancePerTick = distanceToDestination;
                 nextLocation = destinationStar.location;
-            } else{
+            } else {
                 nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
             }
         }
@@ -560,9 +565,9 @@ module.exports = class CarrierService {
     destroyCarrier(game, carrier) {
         game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
     }
-    
+
     getCarriersEnRouteToStar(game, star) {
-        return game.galaxy.carriers.filter(c => 
+        return game.galaxy.carriers.filter(c =>
             c.waypoints && c.waypoints.length && c.waypoints.find(w => w.destination.equals(star._id)) != null
         );
     }

@@ -42,7 +42,11 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.waypoint.destination)
     },
     getStarName (starId) {
-      return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
+      let target = this.$store.state.game.galaxy.stars.find(s => s._id === starId)
+      if (target === undefined) {
+        target = this.$store.state.game.galaxy.carriers.find(c => c._id === starId)
+      }
+      return target.name
     },
     editWaypoint (e) {
       this.$emit('onEditWaypointRequested', this.waypoint)
