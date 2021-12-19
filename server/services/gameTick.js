@@ -2,12 +2,12 @@ const EventEmitter = require('events');
 const moment = require('moment');
 
 module.exports = class GameTickService extends EventEmitter {
-
+    
     constructor(distanceService, starService, carrierService,
         researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService,
         specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService) {
         super();
-
+            
         this.distanceService = distanceService;
         this.starService = starService;
         this.carrierService = carrierService;
@@ -103,7 +103,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             await this._playAI(game);
             logTime('AI controlled players turn');
-
+            
             await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
 
@@ -154,7 +154,7 @@ module.exports = class GameTickService extends EventEmitter {
 
         let lastTick = moment(game.state.lastTickDate).utc();
         let nextTick;
-
+        
         if (this.gameTypeService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
             nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
@@ -162,7 +162,7 @@ module.exports = class GameTickService extends EventEmitter {
             // If in turn based mode, then check if all undefeated players are ready OR all players are ready to quit
             // OR the max time wait limit has been reached.
             let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game) || this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
-
+            
             if (isAllPlayersReady) {
                 return true;
             }
@@ -171,7 +171,7 @@ module.exports = class GameTickService extends EventEmitter {
         } else {
             throw new Error(`Unsupported game type.`);
         }
-
+    
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
@@ -185,7 +185,7 @@ module.exports = class GameTickService extends EventEmitter {
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
         let carrierPositions = game.galaxy.carriers
-            .filter(x =>
+            .filter(x => 
                 this.carrierService.isInTransit(x)           // Carrier is already in transit
                 || this.carrierService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
             )
@@ -241,7 +241,7 @@ module.exports = class GameTickService extends EventEmitter {
 
             for (let i = 0; i < positions.length; i++) {
                 let friendlyCarrier = positions[i];
-
+                
                 if (friendlyCarrier.carrier.ships <= 0) {
                     continue;
                 }
@@ -327,11 +327,11 @@ module.exports = class GameTickService extends EventEmitter {
             }
 
             const graphObj = graph[graphKeyA] || graph[graphKeyB];
-
+            
             if (graphObj) {
                 graphObj.push(carrierPosition);
             } else {
-                graph[graphKeyA] = [carrierPosition];
+                graph[graphKeyA] = [ carrierPosition ];
             }
         }
 
@@ -342,7 +342,7 @@ module.exports = class GameTickService extends EventEmitter {
         return carriers.filter(c => {
             let specialist = this.specialistService.getByIdCarrier(c.carrier.specialistId);
 
-            if (specialist && specialist.modifiers && specialist.modifiers.special
+            if (specialist && specialist.modifiers && specialist.modifiers.special 
                 && specialist.modifiers.special.avoidCombatCarrierToCarrier) {
                 return false;
             }
@@ -402,7 +402,7 @@ module.exports = class GameTickService extends EventEmitter {
 
         for (let i = 0; i < carriers.length; i++) {
             let carrier = carriers[i];
-
+        
             let carrierMovementReport = await this.carrierService.moveCarrier(game, gameUsers, carrier);
 
             // If the carrier has arrived at the star then
@@ -516,8 +516,8 @@ module.exports = class GameTickService extends EventEmitter {
                     this.emit('onPlayerGalacticCycleCompleted', {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player,
-                        creditsEconomy: creditsResult.creditsFromEconomy,
+                        player, 
+                        creditsEconomy: creditsResult.creditsFromEconomy, 
                         creditsBanking: creditsResult.creditsFromBanking,
                         creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
                         experimentTechnology: experimentResult.technology,
@@ -563,7 +563,7 @@ module.exports = class GameTickService extends EventEmitter {
                 if (player.afk) {
                     // Keep a log of players who have been afk so they cannot rejoin.
                     game.afkers.push(player.userId);
-
+        
                     // AFK counts as a defeat as well.
                     if (user && !isTutorialGame) {
                         user.achievements.defeated++;
@@ -608,7 +608,7 @@ module.exports = class GameTickService extends EventEmitter {
             // should they wish to cheat the system.
             if (game.state.productionTick > 2 && !isTutorialGame) {
                 let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
-
+                
                 rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
             }
 
@@ -635,7 +635,7 @@ module.exports = class GameTickService extends EventEmitter {
     _awardCreditsPerTick(game) {
         for (let player of game.galaxy.players) {
             let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
-                .filter(s => !this.starService.isDeadStar(s));
+                                .filter(s => !this.starService.isDeadStar(s));
 
             for (let star of playerStars) {
                 let creditsByScience = this.specialistService.getCreditsPerTickByScience(star);
