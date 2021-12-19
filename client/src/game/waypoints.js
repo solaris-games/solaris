@@ -65,7 +65,7 @@ class Waypoints extends EventEmitter {
           continue
         }
 
-        if (this._ignoresCombat(c)) {
+        if (this._ignoresCombat(c) || c.isGift) {
           continue
         }
 
