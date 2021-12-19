@@ -176,20 +176,20 @@ module.exports = class AIService {
                     const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(game, player));
 
                     let shipsNeeded = requiredAdditionallyForDefense;
-                    const usedAssignments = [];
 
-                    // TODO: Better assignment finding with better scoring system
-                    // TODO: Use partial assignments
-                    for (const possibleAssignment of allPossibleAssignments) {
-                        usedAssignments.push(possibleAssignment);
-                        shipsNeeded -= possibleAssignment.assignment.totalShips;
+                    for (const {assignment, trace} of allPossibleAssignments) {
+                        // Skip assignments that we cannot afford to fulfill
+                        if ((!assignment.carriers || assignment.carriers.length === 0) && !this._canAffordCarrier(game, player)) {
+                            continue;
+                        }
+
+                        shipsNeeded -= assignment.assignment.totalShips;
+
+                        await this._useAssignment(context, game, player, assignments, assignment, trace, assignment.totalShips);
+
                         if (shipsNeeded < 0) {
                             break;
                         }
-                    }
-
-                    for (const usedAssignment of usedAssignments) {
-                        await this._useAssignment(context, game, player, assignments, usedAssignment.assignment, usedAssignment.trace, usedAssignment.assignment.totalShips);
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
@@ -199,7 +199,7 @@ module.exports = class AIService {
                 }
                 await this._useAssignment(context, game, player, assignments, found.assignment, found.trace, 1);
             } else if (order.type === REINFORCE_STAR_ACTION) {
-
+                // TODO: Determine if reinforcement is actually needed
             }
         }
 
