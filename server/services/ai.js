@@ -236,28 +236,47 @@ module.exports = class AIService {
         return player.credits >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
-    _searchAssignments(starGraph, assignments, fittingAssignments, nextFilter, assignmentFilter, currentStarId, trace) {
-        const currentStarAssignment = assignments.get(currentStarId);
+    _searchAssignments(starGraph, assignments, nextFilter, assignmentFilter, startStarId) {
+        const queue = [{
+            trace: [startStarId],
+            starId: startStarId
+        }];
 
-        if (currentStarAssignment && assignmentFilter(currentStarAssignment)) {
-            fittingAssignments.push({
-                assignment: currentStarAssignment,
-                trace: trace.reverse()
-            });
-        }
+        const fittingAssignments = [];
 
-        const nextCandidates = starGraph.get(currentStarId);
-        if (nextCandidates) {
-            const fittingCandidates = Array.from(nextCandidates).filter(candidate => nextFilter(trace, candidate));
+        while (queue.length > 0) {
+            const {starId, trace} = queue.shift();
 
-            for (const fittingCandidate of fittingCandidates) {
-                this._searchAssignments(starGraph, assignments, fittingAssignments, nextFilter, assignmentFilter, fittingCandidate, trace.concat([currentStarId]));
+            const currentStarAssignment = assignments.get(starId);
+
+            if (currentStarAssignment && assignmentFilter(currentStarAssignment)) {
+                fittingAssignments.push({
+                    assignment: currentStarAssignment,
+                    trace
+                });
+            }
+
+            const nextCandidates = starGraph.get(starId);
+            if (nextCandidates) {
+                const fittingCandidates = Array.from(nextCandidates).filter(candidate => nextFilter(trace, candidate));
+
+                for (const fittingCandidate of fittingCandidates) {
+                    queue.push({
+                        starId: fittingCandidate,
+                        trace: [fittingCandidate].concat(trace)
+                    });
+                }
             }
         }
+
+        return fittingAssignments;
+    }
+
+    _findClosestAssignment(game, player, context, assignments, destinationId, allowCarrierPurchase) {
+
     }
 
     _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, ticksLimit, allowCarrierPurchase) {
-        const fittingAssignments = [];
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
         const nextFilter = (trace, nextStarId) => {
@@ -272,9 +291,7 @@ module.exports = class AIService {
             return allowCarrierPurchase || hasCarriers;
         }
 
-        this._searchAssignments(context.reachablePlayerStars, assignments, fittingAssignments, nextFilter, assignmentFilter, destinationId, [destinationId]);
-
-        return fittingAssignments;
+        return this._searchAssignments(context.reachablePlayerStars, assignments, nextFilter, assignmentFilter, destinationId);
     }
 
     _createDefaultAttackData(game, starId, ticksUntil) {
