@@ -238,10 +238,12 @@ module.exports = class CarrierService {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist.modifiers.local) {
-                if (!specialist.modifiers.local.toCarrierSpeed && !isCarrier)
+                if (!isCarrier)
                     distanceModifier *= (specialist.modifiers.local.speed || 1);
-                else
+                else if (specialist.modifiers.local.toCarrierSpeed)
                     distanceModifier *= (specialist.modifiers.local.toCarrierSpeed || 1);
+                else
+                    distanceModifier *= (specialist.modifiers.local.speed || 1);
             }
         }
 
