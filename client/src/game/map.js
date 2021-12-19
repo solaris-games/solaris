@@ -549,7 +549,7 @@ class Map extends EventEmitter {
 
       if (disabledCarriers !== undefined)
         if (!this.game.settings.specialGalaxy.carrierToCarrierCombat)
-          if (!c.specialist && !c.specialist.modifiers.special && !c.specialist.modifiers.special.avoidCombatCarrierToCarrier)
+          if ((!c.specialist && !c.specialist.modifiers.special && !c.specialist.modifiers.special.avoidCombatCarrierToCarrier) && !c.isGift)
             disabledCarriers.find(x => x.data === c.data).enableInteractivity()
 
       c.drawCarrierWaypoints()
