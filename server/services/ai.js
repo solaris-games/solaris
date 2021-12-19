@@ -198,6 +198,8 @@ module.exports = class AIService {
                     continue;
                 }
                 await this._useAssignment(context, game, player, assignments, found.assignment, found.trace, 1);
+            } else if (order.type === REINFORCE_STAR_ACTION) {
+
             }
         }
 
@@ -207,11 +209,11 @@ module.exports = class AIService {
     async _useAssignment(context, game, player, assignments, assignment, trace, ships) {
         let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
-        // TODO: partial assignments
-        assignments.delete(starId);
         await this.shipTransferService.transferAllToStar(game, player, starId);
         let carrier = assignment.carriers && assignment.carriers[0];
-        if (!carrier) {
+        if (carrier) {
+            assignment.carriers.shift();
+        } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1);
             shipsToTransfer -= 1;
             carrier = buildResult.carrier;
@@ -221,6 +223,13 @@ module.exports = class AIService {
         }
         const waypoints = this._createWaypointsFromTrace(trace);
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
+        let remainingShips = assignment.totalShips - shipsToTransfer;
+        const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
+        if (!carrierRemaining && assignment.totalShips === 0) {
+            assignments.delete(starId);
+        } else {
+            assignment.totalShips = remainingShips;
+        }
     }
 
     _createWaypointsFromTrace(trace) {
