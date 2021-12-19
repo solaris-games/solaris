@@ -61,11 +61,7 @@ class Waypoints extends EventEmitter {
       for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
         let c = this.game.galaxy.carriers[i]
 
-        if (c.orbiting) {
-          continue
-        }
-
-        if (this._ignoresCombat(c) || c.isGift) {
+        if (c.orbiting || this._ignoresCombat(c) || c.isGift) {
           continue
         }
 
