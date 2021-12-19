@@ -192,6 +192,9 @@
                     "carrierToStarCombat": {
                         "weapons": -2
                     }
+                },
+                "special": {
+                    "targetCarriers": true
                 }
             }
         },

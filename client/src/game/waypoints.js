@@ -55,6 +55,19 @@ class Waypoints extends EventEmitter {
         this._highlightLocation(s.location, 0.3)
       }
     }
+
+    // Pirate extra targets
+    if (this.carrier.specialist && this.carrier.specialist.modifiers.special && this.carrier.specialist.modifiers.special.targetCarriers) {
+      for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
+        let c = this.game.galaxy.carriers[i]
+
+        let distance = GameHelper.getDistanceBetweenLocations(lastLocation, c.location)
+
+        if (distance <= hyperspaceDistance) {
+          this._highlightLocation(c.location, 0.3)
+        }
+      }
+    }
   }
 
   drawPaths () {
