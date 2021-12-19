@@ -189,7 +189,7 @@ module.exports = class AIService {
                     }
 
                     for (const usedAssignment of usedAssignments) {
-                        await this._useAssignment(context, game, player, assignments, usedAssignment.assignment, usedAssignment.trace);
+                        await this._useAssignment(context, game, player, assignments, usedAssignment.assignment, usedAssignment.trace, usedAssignment.assignment.totalShips);
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
@@ -197,24 +197,28 @@ module.exports = class AIService {
                 if (!found) {
                     continue;
                 }
-                await this._useAssignment(context, game, player, assignments, found.assignment, found.trace);
+                await this._useAssignment(context, game, player, assignments, found.assignment, found.trace, 1);
             }
         }
 
         player.aiState.knownAttacks = newKnownAttacks;
     }
 
-    async _useAssignment(context, game, player, assignments, assignment, trace) {
+    async _useAssignment(context, game, player, assignments, assignment, trace, ships) {
+        let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
-        // Fine for now until we get partial assignments
+        // TODO: partial assignments
         assignments.delete(starId);
         await this.shipTransferService.transferAllToStar(game, player, starId);
         let carrier = assignment.carriers && assignment.carriers[0];
         if (!carrier) {
-            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, assignment.totalShips);
+            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1);
+            shipsToTransfer -= 1;
             carrier = buildResult.carrier;
         }
-        await this.shipTransferService.transfer(game, player, carrier._id, assignment.totalShips, starId, 0);
+        if (shipsToTransfer > 0) {
+            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer, starId, assignment.totalShips - shipsToTransfer);
+        }
         const waypoints = this._createWaypointsFromTrace(trace);
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
     }
