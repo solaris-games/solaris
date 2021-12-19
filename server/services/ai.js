@@ -189,24 +189,34 @@ module.exports = class AIService {
                     }
 
                     for (const usedAssignment of usedAssignments) {
-                        const starId = usedAssignment.assignment.star._id.toString();
-                        // Fine for now until we get partial assignments
-                        assignments.delete(starId);
-                        await this.shipTransferService.transferAllToStar(game, player, starId);
-                        let carrier = usedAssignment.assignment.carriers && usedAssignment.assignment.carriers[0];
-                        if (!carrier) {
-                            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, usedAssignment.assignment.totalShips);
-                            carrier = buildResult.carrier;
-                        }
-                        await this.shipTransferService.transfer(game, player, carrier._id, usedAssignment.assignment.totalShips, starId, 0);
-                        const waypoints = this._createWaypointsFromTrace(usedAssignment.trace);
-                        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
+                        await this._useAssignment(context, game, player, assignments, usedAssignment.assignment, usedAssignment.trace);
                     }
                 }
+            } else if (order.type === CLAIM_STAR_ACTION) {
+                const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(game, player));
+                if (!found) {
+                    continue;
+                }
+                await this._useAssignment(context, game, player, assignments, found.assignment, found.trace);
             }
         }
 
         player.aiState.knownAttacks = newKnownAttacks;
+    }
+
+    async _useAssignment(context, game, player, assignments, assignment, trace) {
+        const starId = assignment.star._id.toString();
+        // Fine for now until we get partial assignments
+        assignments.delete(starId);
+        await this.shipTransferService.transferAllToStar(game, player, starId);
+        let carrier = assignment.carriers && assignment.carriers[0];
+        if (!carrier) {
+            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, assignment.totalShips);
+            carrier = buildResult.carrier;
+        }
+        await this.shipTransferService.transfer(game, player, carrier._id, assignment.totalShips, starId, 0);
+        const waypoints = this._createWaypointsFromTrace(trace);
+        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
     }
 
     _createWaypointsFromTrace(trace) {
@@ -236,29 +246,34 @@ module.exports = class AIService {
         return player.credits >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
-    _searchAssignments(starGraph, assignments, nextFilter, assignmentFilter, startStarId) {
+    _searchAssignments(context, starGraph, assignments, nextFilter, onAssignment, startStarId) {
         const queue = [{
             trace: [startStarId],
             starId: startStarId
         }];
-
-        const fittingAssignments = [];
 
         while (queue.length > 0) {
             const {starId, trace} = queue.shift();
 
             const currentStarAssignment = assignments.get(starId);
 
-            if (currentStarAssignment && assignmentFilter(currentStarAssignment)) {
-                fittingAssignments.push({
-                    assignment: currentStarAssignment,
-                    trace
-                });
+            if (currentStarAssignment) {
+                if (!onAssignment(currentStarAssignment, trace)) {
+                    return;
+                }
             }
 
             const nextCandidates = starGraph.get(starId);
             if (nextCandidates) {
-                const fittingCandidates = Array.from(nextCandidates).filter(candidate => nextFilter(trace, candidate));
+                const star = context.starsById.get(starId);
+
+                const fittingCandidates = Array.from(nextCandidates)
+                    .filter(candidate => nextFilter(trace, candidate))
+                    .sort((a, b) => {
+                        const distToA = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(a));
+                        const distToB = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(b));
+                        return distToA - distToB;
+                    });
 
                 for (const fittingCandidate of fittingCandidates) {
                     queue.push({
@@ -268,12 +283,27 @@ module.exports = class AIService {
                 }
             }
         }
-
-        return fittingAssignments;
     }
 
     _findClosestAssignment(game, player, context, assignments, destinationId, allowCarrierPurchase) {
+        let result = null;
+        this._searchAssignments(context, context.reachablePlayerStars, assignments, () => true, (assignment, trace) => {
+            if (this._filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase)) {
+                result = {
+                    assignment,
+                    trace
+                };
+                return false;
+            } else {
+                return true;
+            }
+        }, destinationId);
+        return result;
+    }
 
+    _filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase) {
+        const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
+        return allowCarrierPurchase || hasCarriers;
     }
 
     _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, ticksLimit, allowCarrierPurchase) {
@@ -286,12 +316,21 @@ module.exports = class AIService {
             return ticksRequired <= ticksLimit;
         }
 
-        const assignmentFilter = assignment => {
-            const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
-            return allowCarrierPurchase || hasCarriers;
+        const fittingAssignments = [];
+
+        const onAssignment = (assignment, trace) => {
+            if (this._filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase)) {
+                fittingAssignments.push({
+                    assignment,
+                    trace
+                });
+            }
+            return true;
         }
 
-        return this._searchAssignments(context.reachablePlayerStars, assignments, nextFilter, assignmentFilter, destinationId);
+        this._searchAssignments(context, context.reachablePlayerStars, assignments, nextFilter, onAssignment, destinationId)
+
+        return fittingAssignments;
     }
 
     _createDefaultAttackData(game, starId, ticksUntil) {
