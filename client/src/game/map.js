@@ -171,7 +171,7 @@ class Map extends EventEmitter {
 
   }
 
-  setupStar(game, userSettings, starData) {
+  setupStar (game, userSettings, starData) {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
@@ -295,23 +295,23 @@ class Map extends EventEmitter {
     this.numof_chunkY = this.lastChunkY-this.firstChunkY+1
 
     let chunkColumns = Array(this.numof_chunkX)
-    for (let i = 0; i<this.numof_chunkX; i++) { chunkColumns[i] = Array(this.numof_chunkY) }
+    for(let i = 0; i<this.numof_chunkX; i++) { chunkColumns[i] = Array(this.numof_chunkY) }
 
     this.chunks = chunkColumns
 
-    for (let ix=0; ix<this.numof_chunkX; ix++) {
-      for (let iy=0; iy<this.numof_chunkY; iy++) {
+    for(let ix=0; ix<this.numof_chunkX; ix++) {
+      for(let iy=0; iy<this.numof_chunkY; iy++) {
         this.chunks[ix][iy] = new PIXI.Container()
         this.chunksContainer.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
-        if (false) 
+        if(false)
         {
         let chunkVisualizer = new PIXI.Graphics()
         chunkVisualizer.alpha = 0.5
         chunkVisualizer.lineStyle(4, 0xFF0000, 1);
         chunkVisualizer.beginFill(0xDE3249);
         chunkVisualizer.drawRect(
-          (this.firstChunkX + ix) * Map.chunkSize, (this.firstChunkY + iy) * Map.chunkSize,
+          (this.firstChunkX+ix)*Map.chunkSize, (this.firstChunkY+iy)*Map.chunkSize,
           Map.chunkSize, Map.chunkSize
         );
         chunkVisualizer.endFill();
@@ -336,17 +336,17 @@ class Map extends EventEmitter {
   }
 
   removeContainerFromChunk (mapObject, chunks, firstX, firstY) {
-    let chunkX = Math.floor(mapObject.data.location.x / Map.chunkSize)
-    let chunkY = Math.floor(mapObject.data.location.y / Map.chunkSize)
-    let ix = chunkX - firstX
-    let iy = chunkY - firstY
+    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
+    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let ix = chunkX-firstX
+    let iy = chunkY-firstY
 
     chunks[ix][iy].removeChild(mapObject.container)
     let index = chunks[ix][iy].mapObjects.indexOf(mapObject)
     if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
-  removeMapObjectFromChunks(mapObject, chunks) {
+  removeMapObjectFromChunks (mapObject, chunks) {
     for (let chunkX of chunks) {
       for (let chunkY of chunkX) {
         if (chunkY.mapObjects.indexOf(mapObject) > -1) {
@@ -481,7 +481,7 @@ class Map extends EventEmitter {
     this.rulerPoints.removeLastRulerPoint()
   }
 
-  drawStars() {
+  drawStars () {
     for (let i = 0; i < this.stars.length; i++) {
       let star = this.stars[i]
 
@@ -698,7 +698,7 @@ class Map extends EventEmitter {
 
     let viewportCenter = this.gameContainer.viewport.center
 
-    this.zoomPercent = (this.gameContainer.viewport.screenWidth / viewportWidth) * 100
+    this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -826,7 +826,7 @@ class Map extends EventEmitter {
     })
   }
 
-  onCarrierClicked(dic) {
+  onCarrierClicked (dic) {
     // ignore clicks if its a drag motion
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
@@ -968,7 +968,7 @@ class Map extends EventEmitter {
     this.highlightLocationsContainer.addChild(graphics)
   }
 
-  clearHighlightedLocations() {
+  clearHighlightedLocations () {
     this.highlightLocationsContainer.removeChildren()
   }
 
