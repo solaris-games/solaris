@@ -227,7 +227,7 @@ module.exports = class CarrierService {
             || !c.ownedByPlayerId.equals(player._id));
     }
 
-    getCarrierDistancePerTick(game, carrier, warpSpeed = false, instantSpeed = false) {
+    getCarrierDistancePerTick(game, carrier, warpSpeed = false, instantSpeed = false, isCarrier = false) {
         if (instantSpeed) {
             return null;
         }
@@ -238,7 +238,10 @@ module.exports = class CarrierService {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist.modifiers.local) {
-                distanceModifier *= (specialist.modifiers.local.speed || 1);
+                if (!specialist.modifiers.local.toCarrierSpeed && !isCarrier)
+                    distanceModifier *= (specialist.modifiers.local.speed || 1);
+                else
+                    distanceModifier *= (specialist.modifiers.local.toCarrierSpeed || 1);
             }
         }
 
@@ -413,47 +416,58 @@ module.exports = class CarrierService {
             waypoint: currentWaypoint,
             combatRequiredStar: false
         };
+        if (!currentWaypoint.isCarrier) {
+            carrier.orbiting = destinationStar._id;
+            carrier.location = destinationStar.location;
 
-        carrier.orbiting = destinationStar._id;
-        carrier.location = destinationStar.location;
+            // If the carrier waypoints are looped then append the
+            // carrier waypoint back onto the waypoint stack.
+            if (carrier.waypointsLooped) {
+                carrier.waypoints.push(currentWaypoint);
+            }
 
-        // If the carrier waypoints are looped then append the
-        // carrier waypoint back onto the waypoint stack.
-        if (carrier.waypointsLooped) {
-            carrier.waypoints.push(currentWaypoint);
-        }
+            // If the star is unclaimed, then claim it.
+            if (destinationStar.ownedByPlayerId == null) {
+                await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
+            }
 
-        // If the star is unclaimed, then claim it.
-        if (destinationStar.ownedByPlayerId == null) {
-            await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
-        }
+            // Reignite dead stars if applicable
+            // Note: Black holes cannot be reignited.
+            if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
+                let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
-        // Reignite dead stars if applicable
-        // Note: Black holes cannot be reignited.
-        if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
-            let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
+                this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
 
-            this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
+                carrier.specialistId = null;
+            }
 
-            carrier.specialistId = null;
-        }
+            // If the star is owned by another player, then perform combat.
+            if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
+                // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
+                // Otherwise, perform combat.
+                if (carrier.isGift) {
+                    await this.transferGift(game, gameUsers, destinationStar, carrier);
+                } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+                    let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
 
-        // If the star is owned by another player, then perform combat.
-        if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
-            // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
-            // Otherwise, perform combat.
-            if (carrier.isGift) {
-                await this.transferGift(game, gameUsers, destinationStar, carrier);
-            } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
-
-                report.combatRequiredStar = !isAllied;
+                    report.combatRequiredStar = !isAllied;
+                } else {
+                    report.combatRequiredStar = true;
+                }
             } else {
-                report.combatRequiredStar = true;
+                // Make sure the carrier gift is reset if the star is owned by the same player.
+                carrier.isGift = false;
             }
         } else {
-            // Make sure the carrier gift is reset if the star is owned by the same player.
-            carrier.isGift = false;
+            if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
+                if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+                    let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
+                    report.combatRequiredStar = !isAllied;
+                } else {
+                    report.combatRequiredStar = true;
+                }
+            }
+            report.isCarrier = true;
         }
 
         return report;
@@ -476,7 +490,7 @@ module.exports = class CarrierService {
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
         let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeedtoCarrier); // Null signifies instant travel
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed, waypoint.toCarrier); // Null signifies instant travel
 
         let carrierMovementReport = {
             carrier,

@@ -317,7 +317,7 @@ class GameHelper {
     let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar)
 
     // Calculate how far the carrier will move per tick.
-    let tickDistance = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)
+    let tickDistance = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed, waypoint.isCarrier)
     let ticks = 1
 
     if (tickDistance) {
@@ -410,7 +410,7 @@ class GameHelper {
     return false
   }
 
-  getCarrierDistancePerTick(game, carrier, warpSpeed = false, instantSpeed = false) {
+  getCarrierDistancePerTick(game, carrier, warpSpeed = false, instantSpeed = false, isCarrier = false) {
     if (instantSpeed) {
         return null
     }
@@ -421,7 +421,10 @@ class GameHelper {
         let specialist = carrier.specialist
 
         if (specialist.modifiers.local) {
-          distanceModifier *= (specialist.modifiers.local.speed || 1);
+          if (!specialist.modifiers.local.toCarrierSpeed && !isCarrier)
+            distanceModifier *= (specialist.modifiers.local.speed || 1);
+          else
+            distanceModifier *= (specialist.modifiers.local.toCarrierSpeed || 1);
       }
     }
 

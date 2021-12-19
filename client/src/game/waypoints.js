@@ -94,7 +94,7 @@ class Waypoints extends EventEmitter {
     // Draw a line to each destination along the waypoints.
     for (let i = 0; i < this.carrier.waypoints.length; i++) {
       let waypoint = this.carrier.waypoints[i]
-      star = waypoint.isCarrier ? this.game.galaxy.carriers.find(c => c._id === waypoint.targetId) : this.game.galaxy.stars.find(s => s._id === waypoint.targetId)
+      star = waypoint.isCarrier ? this.game.galaxy.carriers.find(c => c._id === waypoint.destination) : this.game.galaxy.stars.find(s => s._id === waypoint.destination)
 
       graphics.lineTo(star.location.x, star.location.y)
     }
