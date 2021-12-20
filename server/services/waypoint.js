@@ -54,6 +54,25 @@ module.exports = class WaypointService {
             if (sourceStar === undefined) sourceStar = this.carrierService.getByObjectId(game, waypoint.source);
             let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)): game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         
+            if (waypoint.isCarrier) {
+                // if it cannot target a carrier, this should be false
+                let specialist = carrier.specialist;
+                if (specialist) {
+                    if (specialist.modifiers && specialist.modifiers.special) {
+                        if (!specialist.modifiers.special.targetCarriers) {
+                            throw new ValidationError('Carrier cannot target carriers.');
+                        }
+                    }
+                }
+                if (i !== 0) {
+                    // previous waypoint cannot have a carrier as target
+                    let previousWaypoint = waypoints[i - 1];
+                    if (previousWaypoint.isCarrier) {
+                        throw new ValidationError('Carrier cannot target carriers after carriers.');
+                    }
+                }
+            }
+
             let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
 
             // Make sure the user isn't being a dumbass.
