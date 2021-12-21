@@ -71,6 +71,24 @@ module.exports = class WaypointService {
                         throw new ValidationError('Carrier cannot target carriers after carriers.');
                     }
                 }
+                if (destinationStar === undefined) {
+                    waypoints.splice(i, 1);
+                    i--;
+                    if (waypoints.length > i) {
+                        waypoints[i].sourceStar = carrier._id;
+                    } else {
+                        // add a waypoint from the carrier to the closest allied star
+                        let closestAlliedStar = this.starService.getClosestPlayerStar(game, carrier, player);
+                        waypoints.push({
+                            source: carrier._id,
+                            destination: closestAlliedStar._id,
+                            isCarrier: false,
+                            action: 'collectAll',
+                            delayTicks: 0
+                        });
+                    }
+                    continue;
+                }
             }
 
             let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.

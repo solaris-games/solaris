@@ -57,6 +57,7 @@ class Waypoints extends EventEmitter {
     }
 
     // Pirate extra targets
+    let pirateTargets = []
     if (this._canTargetCarrier()) {
       for (let i = 0; i < this.game.galaxy.carriers.length; i++) {
         let c = this.game.galaxy.carriers[i]
@@ -69,9 +70,12 @@ class Waypoints extends EventEmitter {
 
         if (distance <= hyperspaceDistance) {
           this._highlightCarrierLocation(c.location, 0.6)
+          pirateTargets.push(c)
         }
       }
     }
+
+    if (pirateTargets.length) return pirateTargets
   }
 
   drawPaths() {
