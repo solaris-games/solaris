@@ -46,7 +46,9 @@ export default {
   },
   methods: {
     onOpenPurchasePlayerBadgeRequested () {
-        this.$emit('onOpenPurchasePlayerBadgeRequested', this.playerId)
+        if (this.playerId !== this.userPlayer._id) {
+            this.$emit('onOpenPurchasePlayerBadgeRequested', this.playerId)
+        }
     },
     async loadPlayerBadges () {
         this.isLoading = true
