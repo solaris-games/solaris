@@ -42,9 +42,9 @@
     <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
-    <h4 class="mt-2" v-if="player && userPlayer && isValidUser && player != userPlayer">Badges</h4>
+    <h4 class="mt-2" v-if="player && isValidUser">Badges</h4>
 
-    <player-badges v-if="player && userPlayer && isValidUser && player != userPlayer" 
+    <player-badges v-if="player && isValidUser" 
       :playerId="player._id"
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 </div>

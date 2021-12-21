@@ -1,12 +1,12 @@
 <template>
 <div>
     <loading-spinner :loading="isLoading" />
-<!-- 
+
     <div class="row bg-primary" v-if="!isLoading || !userHasBadges">
         <div v-if="!userHasBadges" class="col text-center pt-3">
             <p class="mb-3">This player has no badges.</p>
         </div>
-    </div> -->
+    </div>
 
     <div class="row bg-secondary" v-if="!isLoading && userPlayer && playerId !== userPlayer._id">
         <div class="col text-center pt-3">
