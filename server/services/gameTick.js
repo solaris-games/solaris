@@ -398,6 +398,7 @@ module.exports = class GameTickService extends EventEmitter {
         // will land first. This is important for unclaimed stars and defender bonuses.
 
         let combatStars = [];
+        let combatPirateCarriers = [];
         let actionWaypoints = [];
 
         for (let i = 0; i < carriers.length; i++) {
@@ -419,6 +420,19 @@ module.exports = class GameTickService extends EventEmitter {
             if (carrierMovementReport.combatRequiredStar && combatStars.indexOf(carrierMovementReport.destinationStar) < 0) {
                 combatStars.push(carrierMovementReport.destinationStar);
             }
+
+            if (carrierMovementReport.isCarrier && carrierMovementReport.arrivedAtStar) {
+                combatPirateCarriers.push({pirateCarrier: carrier, carrier: carrierMovementReport.destinationStar});
+            }
+        }
+
+        for (let i = 0; i < combatPirateCarriers.length; i++) {
+            let combatCarrier = combatPirateCarriers[i];
+
+            let pirateOwner = this.playerService.getById(game, combatCarrier.pirateCarrier.ownedByPlayerId);
+            let targetOwner = this.playerService.getById(game, combatCarrier.carrier.ownedByPlayerId);
+
+            await this.combatService.performCombat(game, gameUsers, pirateOwner, targetOwner, [combatCarrier.pirateCarrier, combatCarrier.carrier]);
         }
 
         // 3. Now that all carriers have finished moving, perform combat.
