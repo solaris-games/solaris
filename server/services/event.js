@@ -10,6 +10,7 @@ module.exports = class EventService {
         GAME_STARTED: 'gameStarted',
         GAME_ENDED: 'gameEnded',
         GAME_PAUSED: 'gamePaused',
+        GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
 
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
@@ -36,7 +37,7 @@ module.exports = class EventService {
 
     constructor(eventModel, eventRepo, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService, specialistService) {
+        ledgerService, conversationService, combatService, specialistService, badgeService) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
         this.broadcastService = broadcastService;
@@ -50,6 +51,7 @@ module.exports = class EventService {
         this.conversationService = conversationService;
         this.combatService = combatService;
         this.specialistService = specialistService;
+        this.badgeService = badgeService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
@@ -91,6 +93,8 @@ module.exports = class EventService {
         this.conversationService.on('onConversationCreated', (args) => this.createPlayerConversationCreated(args.gameId, args.gameTick, args.convo));
         this.conversationService.on('onConversationInvited', (args) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
+
+        this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
     }
 
     async deleteByGameId(gameId) {
@@ -556,6 +560,19 @@ module.exports = class EventService {
         };
 
         await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
+    }
+
+    async createGamePlayerBadgePurchased(gameId, gameTick, purchasedByPlayerId, purchasedByPlayerAlias, purchasedForPlayerId, purchasedForPlayerAlias, badgeKey, badgeName) {
+        let data = {
+            purchasedByPlayerId,
+            purchasedByPlayerAlias,
+            purchasedForPlayerId,
+            purchasedForPlayerAlias,
+            badgeKey,
+            badgeName
+        };
+
+        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
 };

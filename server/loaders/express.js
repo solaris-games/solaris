@@ -89,6 +89,7 @@ module.exports = async (config, app, io, container) => {
     const event = require('../api/game/event')(router, io, container);
     const diplomacy = require('../api/game/diplomacy')(router, io, container);
     const shop = require('../api/shop')(router, io, container);
+    const badges = require('../api/badges')(router, io, container);
 
     app.use(auth);
     app.use(admin);
@@ -105,6 +106,7 @@ module.exports = async (config, app, io, container) => {
     app.use(event);
     app.use(diplomacy);
     app.use(shop);
+    app.use(badges);
 
     return app;
 };

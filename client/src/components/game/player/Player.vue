@@ -42,11 +42,11 @@
     <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
-    <!--
-    <h4 class="mt-2">Badges</h4>
+    <h4 class="mt-2" v-if="player && userPlayer && isValidUser && player != userPlayer">Badges</h4>
 
-    <badges v-if="user" :user="user"/>
-    -->
+    <player-badges v-if="player && userPlayer && isValidUser && player != userPlayer" 
+      :playerId="player._id"
+      @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 </div>
 </template>
 
@@ -59,7 +59,7 @@ import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
-import Badges from './Badges'
+import PlayerBadges from '../badges/PlayerBadges'
 import Reputation from './Reputation'
 import PlayerTradeVue from './PlayerTrade'
 import EloRating from './EloRating'
@@ -77,7 +77,7 @@ export default {
     'research': Research,
     'achievements': Achievements,
     'sendRenown': SendRenown,
-    'badges': Badges,
+    'player-badges': PlayerBadges,
     'reputation': Reputation,
     'player-trade': PlayerTradeVue,
     'elo-rating': EloRating
@@ -123,6 +123,9 @@ export default {
     },
     onOpenTradeRequested (e) {
       this.$emit('onOpenTradeRequested', this.playerId)
+    },
+    onOpenPurchasePlayerBadgeRequested (e) {
+      this.$emit('onOpenPurchasePlayerBadgeRequested', e)
     },
     panToPlayer (e) {
       GameContainer.map.panToPlayer(this.$store.state.game, this.player)
