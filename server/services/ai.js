@@ -127,6 +127,23 @@ module.exports = class AIService {
             carriersById.set(carrier._id.toString(), carrier);
         }
 
+        const incomingCarriers = game.galaxy.carriers
+            .filter(carrier => carrier.ownedByPlayerId.toString() !== player._id.toString())
+            .map(carrier => [carrier, carrier.waypoints.find(wp => context.starsById.has(wp.destination.toString()))])
+            .filter(incoming => Boolean(incoming[1]))
+
+        const attacksByStarId = new Map();
+        const attackedStarIds = new Set();
+
+        for (const [incomingCarrier, incomingWaypoint] of incomingCarriers) {
+            const targetStar = incomingWaypoint.destination.toString();
+            const attacks = getOrInsert(attacksByStarId, targetStar, () => new Map());
+            attackedStarIds.add(targetStar);
+            const attackInTicks = this.waypointService.calculateWaypointTicksEta(game, incomingCarrier, incomingWaypoint);
+            const simultaneousAttacks = getOrInsert(attacks, attackInTicks, () => []);
+            simultaneousAttacks.push(incomingCarrier);
+        }
+
         return {
             playerStars,
             playerCarriers,
@@ -135,7 +152,9 @@ module.exports = class AIService {
             reachablePlayerStars,
             borderStars,
             carriersOrbiting,
-            carriersById
+            carriersById,
+            attacksByStarId,
+            attackedStarIds
         }
     }
 
@@ -459,29 +478,9 @@ module.exports = class AIService {
     }
 
     _gatherDefenseOrders(game, player, context) {
-        // Find all of our stars that are under attack
-        const incomingCarriers = game.galaxy.carriers
-            .filter(carrier => carrier.ownedByPlayerId.toString() !== player._id.toString())
-            .map(carrier => [carrier, carrier.waypoints.find(wp => context.starsById.has(wp.destination.toString()))])
-            .filter(incoming => Boolean(incoming[1]))
+        const orders = new Array(context.attacksByStarId.size);
 
-        const attacksByStar = new Map();
-        const attackedStars = new Set();
-
-        for (const [incomingCarrier, incomingWaypoint] of incomingCarriers) {
-            const targetStar = incomingWaypoint.destination.toString();
-            const attacks = getOrInsert(attacksByStar, targetStar, () => new Map());
-            attackedStars.add(targetStar);
-            const attackInTicks = this.waypointService.calculateWaypointTicksEta(game, incomingCarrier, incomingWaypoint);
-            const simultaneousAttacks = getOrInsert(attacks, attackInTicks, () => []);
-            simultaneousAttacks.push(incomingCarrier);
-        }
-
-        context.attackedStars = attackedStars;
-
-        const orders = new Array(attacksByStar.size);
-
-        for (const [attackedStarId, attacks] of attacksByStar) {
+        for (const [attackedStarId, attacks] of context.attacksByStarId) {
             for (const [attackInTicks, incomingCarriers] of attacks) {
                 const attackedStar = context.starsById.get(attackedStarId);
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
@@ -499,6 +498,10 @@ module.exports = class AIService {
         return orders;
     }
 
+    _isUnderAttack(context, starId) {
+        return context.attackedStarIds.has(starId);
+    }
+
     _gatherMovementOrders(game, player, context) {
         const orders = [];
         const starPriorities = this._computeStarPriorities(game, player, context);
@@ -506,6 +509,10 @@ module.exports = class AIService {
         for (const [starId, priority] of starPriorities) {
             const neighbors = context.reachablePlayerStars.get(starId);
             for (const neighbor of neighbors) {
+                if (this._isUnderAttack(context, neighbor)) {
+                    continue;
+                }
+
                 const neighborPriority = starPriorities.get(neighbor);
                 if (neighborPriority < priority) {
                     orders.push({
