@@ -1,15 +1,35 @@
-- Set up user model for badges - Done
-- Migration script - Done
-- Set up json document for badges - Need descriptions
-- Service for purchasing badges - Done
-- API endpoints - Wire up to UI services - Done
-- Component to display on player profile to display badges
-- Award badge button on player profile -> Buy badge
-- Component to display badges earned on player achievements page
+db.users.updateMany({}, {
+    $unset: {
+        'achievements.badges': {
+            ally: undefined,
+            conqueror: undefined,
+            cutthroatPirate: undefined,
+            dauntless: undefined,
+            deadSetBadass: undefined,
+            diplomat: undefined,
+            enemy: undefined,
+            ironborn: undefined,
+            lionheart: undefined,
+            luckyDevil: undefined,
+            madScientist: undefined,
+            masterStrategist: undefined,
+            quickDraw: undefined,
+            roleplay: undefined,
+            sentinel: undefined,
+            sleepless: undefined,
+            sliceOfCheese: undefined,
+            strangeOne: undefined,
+            strategist: undefined,
+            topAlly: undefined,
+            toxic: undefined,
+            wordsmith: undefined
+        }
+    }
+});
 
 db.users.updateMany({}, {
     $set: {
-        badges: {
+        'achievements.badges': {
             ally: 0,
             enemy: 0,
             diplomat: 0,

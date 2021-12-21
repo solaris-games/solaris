@@ -139,10 +139,10 @@ module.exports = (config, io) => {
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService, diplomacyService);
     const donateService = new DonateService(cacheService);
-    const badgeService = new BadgeService(userRepo, userService, playerService);
+    const badgeService = new BadgeService(userRepository, userService, playerService);
 
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService, specialistService);
+        ledgerService, conversationService, combatService, specialistService, badgeService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService);

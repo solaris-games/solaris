@@ -18,9 +18,9 @@ module.exports = class BadgeService extends EventEmitter {
     async listBadgesByUser(userId) {
         const badges = this.listBadges();
 
-        const playerBadges = await this.userService.getById(userId, {
-            badges: 1
-        }).badges;
+        const playerBadges = (await this.userService.getById(userId, {
+            'achievements.badges': 1
+        })).achievements.badges;
 
         for (let badge of badges) {
             badge.awarded = playerBadges[badge.key] || 0;
@@ -40,11 +40,15 @@ module.exports = class BadgeService extends EventEmitter {
             return null;
         }
 
-        return this.listBadgesByUser(player.userId);
+        return await this.listBadgesByUser(player.userId);
     }
 
     async purchaseBadgeForUser(purchasedByUserId, purchasedForUserId, badgeKey) {
-        const badge = this.listBadges()[badgeKey];
+        if (purchasedByUserId.toString() === purchasedForUserId.toString()) {
+            throw new ValidationError(`Cannot purchased a badge for yourself.`);
+        }
+
+        const badge = this.listBadges().find(b => b.key === badgeKey);
 
         if (!badge) {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
@@ -63,44 +67,24 @@ module.exports = class BadgeService extends EventEmitter {
             throw new ValidationError(`You cannot afford to purchase this badge.`);
         }
 
-        const dbWrites = [
-            // Purchase the badge
-            {
-                updateOne: {
-                    filter: {
-                        _id: purchasedByUserId
-                    },
-                    update: {
-                        credits: {
-                            $inc: -badge.price
-                        }
-                    }
-                }
-            },
-            // Add the badge to the recipient
-            {
-                updateOne: {
-                    filter: {
-                        _id: purchasedForUserId
-                    },
-                    update: {
-                        badges: {
-                            // Temporary, value is set below.
-                        }
-                    }
-                }
-            }
-        ];
+        // TODO: This would be better in a bulk update.
+        await this.userService.incrementCredits(purchasedByUserId, -1);
 
-        dbWrites[1].updateOne.update.badges[badgeKey] = { $inc: 1 }; // magic
+        let updateQuery = {
+            $inc: {}
+        };
 
-        await this.userRepo.bulkWrite(dbWrites);
+        updateQuery.$inc['achievements.badges.' + badgeKey] = 1;
+
+        await this.userRepo.updateOne({
+            _id: purchasedForUserId
+        }, updateQuery);
 
         return badge;
     }
 
     async purchaseBadgeForPlayer(game, purchasedByUserId, purchasedForPlayerId, badgeKey) {
-        let buyer = this.playerService.getById(game, purchasedByUserId);
+        let buyer = this.playerService.getByUserId(game, purchasedByUserId);
         let recipient = this.playerService.getById(game, purchasedForPlayerId);
 
         if (!recipient) {
