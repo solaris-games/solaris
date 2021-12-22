@@ -375,6 +375,11 @@ module.exports = class GameTickService extends EventEmitter {
 
             let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
             if (destinationStar === undefined) destinationStar = game.galaxy.carriers.find(c => c._id.equals(waypoint.destination));
+            if (destinationStar === undefined) {
+                destinationStar = this.starService.getClosestPlayerStar(game, carrier.location, carrier.ownedByPlayerId)
+                carrier.waypoints[0].destination = destinationStar._id;
+                carrier.waypoints[0].isCarrier = false;
+            };
             // If we are currently in orbit then this is the first movement, we
             // need to set the transit fields
             // Also double check that the waypoint isn't travelling to the current star
@@ -433,6 +438,16 @@ module.exports = class GameTickService extends EventEmitter {
             let targetOwner = this.playerService.getById(game, combatCarrier.carrier.ownedByPlayerId);
 
             await this.combatService.performCombat(game, gameUsers, pirateOwner, targetOwner, [combatCarrier.pirateCarrier, combatCarrier.carrier]);
+
+            if (combatCarrier.pirateCarrier.ships > 0 && combatCarrier.pirateCarrier.waypoints.length === 0) {
+                combatCarrier.pirateCarrier.waypoints = [{
+                    destination: this.starService.getClosestPlayerStar(game, combatCarrier.pirateCarrier.location),
+                    isCarrier: false,
+                    action: 'collectAll',
+                    actionShips: 0,
+                    delayTicks: 0
+                }];
+            }
         }
 
         // 3. Now that all carriers have finished moving, perform combat.

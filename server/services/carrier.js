@@ -504,7 +504,8 @@ module.exports = class CarrierService {
             distancePerTick,
             waypoint,
             combatRequiredStar: false,
-            arrivedAtStar: false
+            arrivedAtStar: false,
+            isCarrier: false
         };
 
         if (instantSpeed || carrier.distanceToDestination <= distancePerTick) {
