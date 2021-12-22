@@ -22,7 +22,8 @@
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenTradeRequested="onOpenTradeRequested"/>
+        @onOpenTradeRequested="onOpenTradeRequested"
+        @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
       <trade v-if="menuState == MENU_STATES.TRADE" 
         @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onOpenTradeRequested="onOpenTradeRequested"
@@ -122,6 +123,10 @@
         :key="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <player-badge-shop v-if="menuState == MENU_STATES.PLAYER_BADGE_SHOP"
+        :recipientPlayerId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
@@ -172,6 +177,7 @@ import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue
 import FooterBarVue from './FooterBar.vue'
 import NotLoggedInBarVue from './NotLoggedInBar'
 import DarkModeWarningBarVue from './DarkModeWarningBar.vue'
+import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
 
 export default {
   components: {
@@ -210,6 +216,7 @@ export default {
     'conversation': ConversationDetailVue,
     'not-logged-in-bar': NotLoggedInBarVue,
     'dark-mode-warning-bar': DarkModeWarningBarVue,
+    'player-badge-shop': PlayerBadgeShopVue,
   },
   props: {
     menuState: String,
@@ -307,6 +314,9 @@ export default {
       } else if (e.participantIds) {
         this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
       }
+    },
+    onOpenPurchasePlayerBadgeRequested (e) {
+      this.changeMenuState(MENU_STATES.PLAYER_BADGE_SHOP, e)
     },
     canHandleConversationEvents () {
       return window.innerWidth < 992

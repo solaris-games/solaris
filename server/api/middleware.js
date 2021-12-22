@@ -187,6 +187,19 @@ module.exports = (container) => {
             return next();
         },
 
+        async loadGamePlayersState(req, res, next) {
+            req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                'galaxy.players': 1,
+                'state': 1
+            });
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
+            }
+
+            return next();
+        },
+
         async loadPlayer(req, res, next) {
             let player = container.playerService.getByUserId(req.game, req.session.userId);
 

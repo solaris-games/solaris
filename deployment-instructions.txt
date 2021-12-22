@@ -1,7 +1,42 @@
-db.games.updateMany({
-    'state.cleaned': true
-}, {
+db.users.updateMany({}, {
+    $unset: {
+        'achievements.badges': {
+            ally: undefined,
+            conqueror: undefined,
+            cutthroatPirate: undefined,
+            dauntless: undefined,
+            deadSetBadass: undefined,
+            diplomat: undefined,
+            enemy: undefined,
+            ironborn: undefined,
+            lionheart: undefined,
+            luckyDevil: undefined,
+            madScientist: undefined,
+            masterStrategist: undefined,
+            quickDraw: undefined,
+            roleplay: undefined,
+            sentinel: undefined,
+            sleepless: undefined,
+            sliceOfCheese: undefined,
+            strangeOne: undefined,
+            strategist: undefined,
+            topAlly: undefined,
+            toxic: undefined,
+            wordsmith: undefined
+        }
+    }
+});
+
+db.users.updateMany({}, {
     $set: {
-        'settings.general.timeMachine': 'disabled'
+        'achievements.badges': {
+            ally: 0,
+            enemy: 0,
+            diplomat: 0,
+            strategist: 0,
+            roleplay: 0,
+            dauntless: 0,
+            sleepless: 0,
+        }
     }
 });
