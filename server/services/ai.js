@@ -204,7 +204,7 @@ module.exports = class AIService {
 
                         shipsNeeded -= assignment.assignment.totalShips;
 
-                        await this._useAssignment(context, game, player, assignments, assignment, trace, assignment.totalShips);
+                        await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), assignment.totalShips);
 
                         if (shipsNeeded < 0) {
                             break;
@@ -216,8 +216,33 @@ module.exports = class AIService {
                 if (!found) {
                     continue;
                 }
-                await this._useAssignment(context, game, player, assignments, found.assignment, found.trace, 1);
+                await this._useAssignment(context, game, player, assignments, found.assignment, this._createWaypointsFromTrace(found.trace), 1);
             } else if (order.type === REINFORCE_STAR_ACTION) {
+                const assignment = assignments.get(order.source);
+                if (!assignment) {
+                    continue;
+                }
+                const hasCarrier = assignment.carriers && assignments.carriers.length > 0;
+                if (hasCarrier) {
+                    // Since a carrier is standing around, we might as well use it
+                    const waypoints = [
+                        {
+                            source: order.source,
+                            destination: order.star,
+                            action: 'dropAll',
+                            actionShips: 0,
+                            delayTicks: 0
+                        },
+                        {
+                            source: order.star,
+                            destination: order.source,
+                            action: 'nothing',
+                            actionShips: 0,
+                            delayTicks: 0
+                        }
+                    ];
+                    await this._useAssignment(context, game, player, assignments, assignment, waypoints, assignment.totalShips);
+                }
                 // TODO: Determine if reinforcement is actually needed
             }
         }
@@ -225,7 +250,7 @@ module.exports = class AIService {
         player.aiState.knownAttacks = newKnownAttacks;
     }
 
-    async _useAssignment(context, game, player, assignments, assignment, trace, ships) {
+    async _useAssignment(context, game, player, assignments, assignment, waypoints, ships) {
         let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
         await this.shipTransferService.transferAllToStar(game, player, starId);
@@ -240,7 +265,6 @@ module.exports = class AIService {
         if (shipsToTransfer > 0) {
             await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer, starId, assignment.totalShips - shipsToTransfer);
         }
-        const waypoints = this._createWaypointsFromTrace(trace);
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
         let remainingShips = assignment.totalShips - shipsToTransfer;
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
