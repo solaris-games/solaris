@@ -10,7 +10,7 @@ const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
 module.exports = class AIService {
-    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
@@ -18,6 +18,7 @@ module.exports = class AIService {
         this.waypointService = waypointService;
         this.combatService = combatService;
         this.shipTransferService = shipTransferService;
+        this.technologyService = technologyService;
     }
 
     async play(game, player) {
@@ -223,8 +224,8 @@ module.exports = class AIService {
                     continue;
                 }
                 const hasCarrier = assignment.carriers && assignments.carriers.length > 0;
-                if (hasCarrier) {
-                    // Since a carrier is standing around, we might as well use it
+
+                const reinforce = async () => {
                     const waypoints = [
                         {
                             source: order.source,
@@ -243,7 +244,20 @@ module.exports = class AIService {
                     ];
                     await this._useAssignment(context, game, player, assignments, assignment, waypoints, assignment.totalShips);
                 }
-                // TODO: Determine if reinforcement is actually needed
+
+                if (hasCarrier) {
+                    // Since a carrier is standing around, we might as well use it
+                    await reinforce();
+                } else {
+                    // TODO: We want to be smarter about reinforcements. Maybe sort the orders by the number of ships involved?
+                    const source = context.starsById.get(order.source);
+                    const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, source);
+                    const shipProductionPerTick = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, source.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
+                    const ticksProduced = assignment.totalShips / shipProductionPerTick;
+                    if (ticksProduced > (game.settings.galaxy.productionTicks * 0.5) && this._canAffordCarrier(game, player)) {
+                        await reinforce();
+                    }
+                }
             }
         }
 
