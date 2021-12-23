@@ -213,11 +213,14 @@ module.exports = class AIService {
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
-                const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(game, player));
+                const found = this._findClosestAssignment(game, player, context, assignments, order.from, this._canAffordCarrier(game, player));
                 if (!found) {
                     continue;
                 }
-                await this._useAssignment(context, game, player, assignments, found.assignment, this._createWaypointsFromTrace(found.trace), 1);
+                await this._useAssignment(context, game, player, assignments, found.assignment, this._createWaypointsFromTrace(found.trace.concat([order.from])), 1);
+                player.aiState.startedInvasions.push({
+                    star: order.star
+                });
             } else if (order.type === REINFORCE_STAR_ACTION) {
                 const assignment = assignments.get(order.source);
                 if (!assignment) {
