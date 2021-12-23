@@ -116,7 +116,7 @@ module.exports = class WaypointService {
 
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.
-        let reportCarrier = carrier.toObject();
+        const reportCarrier = Boolean(carrier.toObject) ? carrier.toObject() : carrier;
 
         this.populateCarrierWaypointEta(game, reportCarrier);
 
@@ -277,7 +277,7 @@ module.exports = class WaypointService {
 
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
-        if (waypoint.source.equals(waypoint.destination)) {
+        if (waypoint.source.toString() === waypoint.destination.toString()) {
             return 1 + delayTicks;
         }
 

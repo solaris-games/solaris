@@ -98,15 +98,15 @@ module.exports = class ShipTransferService {
         let totalShips = carrier.ships + star.ships;
 
         if (totalTransferShips != totalShips) {
-            throw new ValidationError('The total number of ships in the tranfer does not equal to the total number of ships garrisoned');
+            throw new ValidationError('The total number of ships in the transfer does not equal to the total number of ships garrisoned');
         }
 
         if (carrierShips <= 0) {
-            throw new ValidationError('The number of carrier ships in the tranfer must be greater than 0. Carriers must have at least 1 ship.');
+            throw new ValidationError('The number of carrier ships in the transfer must be greater than 0. Carriers must have at least 1 ship.');
         }
 
         if (starShips < 0) {
-            throw new ValidationError('The number of carrier ships in the tranfer must be 0 or greater.');
+            throw new ValidationError('The number of carrier ships in the transfer must be 0 or greater.');
         }
 
         carrier.ships = carrierShips;
