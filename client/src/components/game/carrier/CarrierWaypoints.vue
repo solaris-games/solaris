@@ -37,13 +37,16 @@
 
       <form-error-list v-bind:errors="errors" class="mt-2"/>
 
-		  <div class="row bg-secondary pt-2 pb-2 mt-2">
+		  <div class="row bg-primary pt-2 pb-2 mt-2">
 		  	<div class="col-12">
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->
-		  		<p class="mb-1" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA<orbital-mechanics-eta-warning />: {{totalEtaTimeString}}</p>
+		  		<p class="mb-0" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA<orbital-mechanics-eta-warning />: {{totalEtaTimeString}}</p>
 		  	</div>
+      </div>
+
+      <div class="row bg-secondary pt-2 pb-2">
 		  	<div class="col">
 		  		<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
             <i class="fas fa-undo"></i>

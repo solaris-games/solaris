@@ -11,7 +11,7 @@
             <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
             <p v-if="carrier.specialist && carrier.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
             <p class="mb-2" v-if="!carrier.specialistId">
-                This carrier does not have a specialist assigned.
+                <i>This carrier does not have a specialist assigned.</i>
             </p>
         </div>
     </div>
