@@ -485,11 +485,14 @@ module.exports = class AIService {
 
     _gatherExpansionOrders(game, player, context) {
         const orders = [];
+        const used = new Set();
 
         for (const [fromId, reachables] of context.reachableStars) {
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
-                if (!this._invasionInProgress(player, candidate._id)) {
+                const candidateId = candidate._id.toString();
+                if (!this._invasionInProgress(player, candidateId) && !used.has(candidateId)) {
+                    used.add(candidateId);
                     // Account for stars without scanning data
                     const score = Math.max(candidate.naturalResources + 0, 1);
 
