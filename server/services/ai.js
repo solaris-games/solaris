@@ -277,7 +277,7 @@ module.exports = class AIService {
             carrier = buildResult.carrier;
         }
         if (shipsToTransfer > 0) {
-            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer, starId, assignment.totalShips - shipsToTransfer + 1);
+            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, assignment.totalShips - shipsToTransfer);
         }
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
         let remainingShips = assignment.totalShips - shipsToTransfer;
