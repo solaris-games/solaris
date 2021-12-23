@@ -277,7 +277,7 @@ module.exports = class AIService {
             carrier = buildResult.carrier;
         }
         if (shipsToTransfer > 0) {
-            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer, starId, assignment.totalShips - shipsToTransfer);
+            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer, starId, assignment.totalShips - shipsToTransfer + 1);
         }
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
         let remainingShips = assignment.totalShips - shipsToTransfer;
@@ -457,7 +457,7 @@ module.exports = class AIService {
 
         for (const playerStar of context.playerStars) {
             const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
-            const totalShips = playerStar.ships + carriersHere.map(carrier => carrier.ships).reduce((a, b) => a + b, 0);
+            const totalShips = playerStar.ships + carriersHere.map(carrier => carrier.ships - 1).reduce((a, b) => a + b, 0);
             if (totalShips < 1) {
                 continue;
             }
