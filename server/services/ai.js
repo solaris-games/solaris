@@ -223,7 +223,7 @@ module.exports = class AIService {
                 if (!assignment) {
                     continue;
                 }
-                const hasCarrier = assignment.carriers && assignments.carriers.length > 0;
+                const hasCarrier = assignment.carriers && assignment.carriers.length > 0;
 
                 const reinforce = async () => {
                     const waypoints = [
