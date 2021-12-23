@@ -494,7 +494,10 @@ module.exports = class AIService {
                 if (!this._invasionInProgress(player, candidateId) && !used.has(candidateId)) {
                     used.add(candidateId);
                     // Account for stars without scanning data
-                    const score = Math.max(candidate.naturalResources + 0, 1);
+                    let score = 1;
+                    if (candidate.naturalResources) {
+                        score = candidate.naturalResources.economy + candidate.naturalResources.industry + candidate.naturalResources.science;
+                    }
 
                     orders.push({
                         type: CLAIM_STAR_ACTION,
