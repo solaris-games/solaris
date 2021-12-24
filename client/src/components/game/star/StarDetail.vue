@@ -139,7 +139,7 @@
           </div>
       </div>
 
-      <div class="row pt-1 pb-1 bg-secondary" v-if="star.infrastructure && !isDeadStar">
+      <div v-if="star.infrastructure && !isDeadStar" class="row pt-1 pb-1 bg-secondary">
           <div class="col">
               Natural Resources
           </div>
@@ -148,12 +148,22 @@
           </div>
       </div>
 
-      <div v-if="star.ownedByPlayerId && star.infrastructure && !isDeadStar" class="row mb-2 pt-1 pb-1 bg-secondary">
+      <div v-if="star.ownedByPlayerId && star.infrastructure && !isDeadStar" class="row pt-1 pb-1 bg-secondary">
           <div class="col">
               Terraformed Resources
           </div>
           <div class="col text-right">
               <star-resources :resources="star.terraformedResources" :iconAlignLeft="false" />
+          </div>
+      </div>
+
+      <div v-if="star.ownedByPlayerId && star.manufacturing != null" class="row pt-1 pb-1 bg-secondary">
+          <div class="col">
+              Ship Production
+          </div>
+          <div class="col text-right" title="Ship production per tick">
+            <span>{{star.manufacturing}}</span>
+            <i class="fas fa-wrench ml-2"></i>
           </div>
       </div>
     </div>
@@ -189,7 +199,7 @@
     </div>
 
     <div v-if="isStandardUIStyle && !isDeadStar">
-      <div v-if="star.infrastructure">
+      <div v-if="star.infrastructure" class="mb-2">
         <h4 class="pt-2">Infrastructure</h4>
 
         <infrastructure :starId="star._id"/>
@@ -202,30 +212,32 @@
           :science="star.upgradeCosts.science"/>
       </div>
 
-      <div class="row bg-secondary mt-2 mb-2" v-if="star.ownedByPlayerId && star.manufacturing != null">
-        <div class="col text-center pt-3">
-          <p>This star builds <b>{{star.manufacturing}}</b> ships every tick.</p>
-        </div>
-      </div>
-
       <!-- TODO: Turn these into components -->
-      <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
+      <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null">
         <div class="row bg-secondary pt-2 pb-0 mb-1">
           <div class="col-8">
-            <p class="mb-2">Build a carrier to transport ships through hyperspace.</p>
+            <p class="mt-1 mb-2">Build a <strong>Carrier</strong> to transport ships through hyperspace.</p>
           </div>
           <div class="col-4">
-            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-block btn-primary mb-2" @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
+            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" 
+              class="btn btn-block btn-success mb-2" 
+              @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
           </div>
         </div>
 
         <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="(canBuildWarpGates && !star.warpGate) || (canDestroyWarpGates && star.warpGate)">
           <div class="col-8">
-            <p class="mb-2">Build a Warp Gate to accelerate carrier movement.</p>
+            <p class="mt-1 mb-2">Build a <strong>Warp Gate</strong> to accelerate carrier movement.</p>
           </div>
           <div class="col-4">
-            <modalButton v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-            <modalButton v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
+            <modalButton v-if="canBuildWarpGates && !star.warpGate" 
+              :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" 
+              modalName="buildWarpGateModal" 
+              classText="btn btn-block btn-success mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+            <modalButton v-if="canDestroyWarpGates && star.warpGate" 
+              :disabled="$isHistoricalMode() || isGameFinished" 
+              modalName="destroyWarpGateModal"
+              classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
           </div>
         </div>
 

@@ -24,7 +24,7 @@ module.exports = class GameTypeService {
             'special_battleRoyale',
             'special_homeStar',
             'special_anonymous'
-        ].includes(game.settings.general.mode);
+        ].includes(game.settings.general.type);
     }
 
     isAnonymousGame(game) {
