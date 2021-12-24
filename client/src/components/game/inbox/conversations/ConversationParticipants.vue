@@ -7,7 +7,7 @@
       {{getPlayer(participant).alias}}
     </span>
   </p>
-  <p v-if="!isPartialPlayers && !isOneVsOne" class="text-info">
+  <p v-if="!isPartialPlayers && !isOneVsOne" class="text-info mb-0">
     <i>This conversation is for <strong>all</strong> players.</i>
   </p>
   <!-- {{getPlayersString()}} -->

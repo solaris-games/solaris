@@ -4,6 +4,14 @@
     :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer}">
     <div class="row mt-0" :style="{'background-color': getFromPlayerColour()}" style="height:6px;"></div>
     <div class="row mt-0 bg-secondary">
+      <div class="col"></div>
+      <div class="col-auto">
+        <p class="mt-0 mb-0">
+          <small><em>{{getDateString(event.sentDate)}}</em></small>
+        </p>
+      </div>
+    </div>
+    <div class="row mt-0 bg-secondary">
       <div class="col mt-1">
         <p v-if="event.data.renown" class="mb-1">
             <em>Sent <span class="text-warning">{{event.data.renown}}</span> renown.</em>
@@ -16,11 +24,6 @@
         </p>
         <p v-if="event.data.technology" class="mb-1">
             <em>Sent <span class="text-warning">Level {{event.data.technology.level}} {{getTechnologyFriendlyName(event.data.technology.name)}}</span>.</em>
-        </p>
-      </div>
-      <div class="col-auto">
-        <p class="mt-0 mb-0">
-          <small><em>{{getDateString(event.sentDate)}}</em></small>
         </p>
       </div>
     </div>
