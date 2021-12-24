@@ -326,8 +326,11 @@ module.exports = class AIService {
             starId: startStarId
         }];
 
+        const visited = new Set();
+
         while (queue.length > 0) {
             const {starId, trace} = queue.shift();
+            visited.add(starId);
 
             const currentStarAssignment = assignments.get(starId);
 
@@ -350,10 +353,12 @@ module.exports = class AIService {
                     });
 
                 for (const fittingCandidate of fittingCandidates) {
-                    queue.push({
-                        starId: fittingCandidate,
-                        trace: [fittingCandidate].concat(trace)
-                    });
+                    if (!visited.has(fittingCandidate)) {
+                        queue.push({
+                            starId: fittingCandidate,
+                            trace: [fittingCandidate].concat(trace)
+                        });
+                    }
                 }
             }
         }
