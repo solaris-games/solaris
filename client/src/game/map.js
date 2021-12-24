@@ -219,7 +219,7 @@ class Map extends EventEmitter {
     this.drawGalaxyCenter()
 
     if (this.mode === 'waypoints') {
-      this.drawWaypoints(this._getAllCarriers())
+      this.drawWaypoints(this.carriers)
     } else {
       this.drawStars()
       this.drawCarriers()
@@ -444,10 +444,6 @@ class Map extends EventEmitter {
     }
   }
 
-  _getAllCarriers() {
-    return this.carriers
-  }
-
   setMode (mode, args) {
     let wasWaypoints = this.mode === 'waypoints'
 
@@ -461,7 +457,7 @@ class Map extends EventEmitter {
 
     if (this.mode === 'waypoints') {
       this._disableCarriersInteractivity()
-      this.drawWaypoints(this._getAllCarriers())
+      this.drawWaypoints(this.carriers)
     }
 
     if (wasWaypoints) {
@@ -549,8 +545,7 @@ class Map extends EventEmitter {
       let c = this.carriers[i]
 
       let pirateTargets = c.drawCarrierWaypoints()
-      if (pirateTargets) {
-        if (disabledCarriers !== undefined) {
+      if (pirateTargets && disabledCarriers) {
           let currentCarrier = disabledCarriers.find(x => x.data === c.data)
           let toggle = true;
             if (this.game.settings.specialGalaxy.carrierToCarrierCombat) {
@@ -562,7 +557,6 @@ class Map extends EventEmitter {
               if (!c.isGift && toggle) currentCarrier.enableInteractivity()
             }
           }
-      }
     }
   }
 

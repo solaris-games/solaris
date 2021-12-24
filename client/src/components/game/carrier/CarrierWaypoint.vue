@@ -137,7 +137,7 @@ export default {
     },
     getStarName (starId) {
       let target = this.$store.state.game.galaxy.stars.find(s => s._id === starId)
-      if (target === undefined) {
+      if (!target) {
         target = this.$store.state.game.galaxy.carriers.find(c => c._id === starId)
       }
       return target.name
