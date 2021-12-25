@@ -184,6 +184,7 @@ module.exports = class AIService {
         // Later, a different scoring process could be used to maximize overall scores.
 
         for (const order of orders) {
+            console.log(order);
             if (order.type === DEFEND_STAR_ACTION) {
                 // Later, take weapons level and specialists into account
                 const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData();
@@ -193,6 +194,7 @@ module.exports = class AIService {
                     // We're going to be fine
                     newKnownAttacks.push(attackData);
                 } else {
+                    console.log("Performing defense on: " + defendingStar.name);
                     const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(game, player));
 
                     let shipsNeeded = requiredAdditionallyForDefense;
@@ -213,10 +215,19 @@ module.exports = class AIService {
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
-                const found = this._findClosestAssignment(game, player, context, assignments, order.from, this._canAffordCarrier(game, player));
+                let found = null;
+                for (const start of order.startingPoints) {
+                    found = this._findClosestAssignment(game, player, context, assignments, start.fromId, this._canAffordCarrier(game, player));
+                    if (found) {
+                        break;
+                    }
+                }
+
                 if (!found) {
+                    console.log("Claiming star: " + context.starsById.get(order.star).name + " failed. No assignments found.");
                     continue;
                 }
+                console.log("Claiming star: " + context.starsById.get(order.star).name + " from: " + found.assignment.star.name);
                 const waypoints = this._createWaypointsFromTrace(found.trace.concat([order.star]));
                 await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 0);
                 player.aiState.startedInvasions.push({
@@ -230,6 +241,7 @@ module.exports = class AIService {
                 const hasCarrier = assignment.carriers && assignment.carriers.length > 0;
 
                 const reinforce = async () => {
+                    console.log("Reinforcing star " +  context.starsById.get(order.star).name +  " from " + context.starsById.get(order.source).name)
                     const waypoints = [
                         {
                             source: order.source,
@@ -493,29 +505,44 @@ module.exports = class AIService {
     }
 
     _gatherExpansionOrders(game, player, context) {
-        const orders = [];
-        const used = new Set();
+        const expansions = new Map();
+        const scores = new Map();
 
         for (const [fromId, reachables] of context.reachableStars) {
+            const from = context.starsById.get(fromId);
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 const candidateId = candidate._id.toString();
-                if (!this._invasionInProgress(player, candidateId) && !used.has(candidateId)) {
-                    used.add(candidateId);
-                    // Account for stars without scanning data
-                    let score = 1;
-                    if (candidate.naturalResources) {
-                        score = candidate.naturalResources.economy + candidate.naturalResources.industry + candidate.naturalResources.science;
+                if (!this._invasionInProgress(player, candidateId)) {
+                    const distance = this.distanceService.getDistanceBetweenLocations(candidate.location, from.location);
+
+                    if (!scores.has(candidateId)) {
+                        let score = 1;
+                        if (candidate.naturalResources) {
+                            score = candidate.naturalResources.economy + candidate.naturalResources.industry + candidate.naturalResources.science;
+                        }
+                        scores.set(candidateId, score);
                     }
 
-                    orders.push({
-                        type: CLAIM_STAR_ACTION,
-                        score,
-                        star: candidate._id.toString(),
-                        from: fromId
+                    const expansionsTowardsCandidate = getOrInsert(expansions, candidateId, () => []);
+                    expansionsTowardsCandidate.push({
+                        distance,
+                        fromId
                     });
                 }
             }
+        }
+
+        const orders = [];
+
+        for (const [target, startingPoints] of expansions) {
+            startingPoints.sort((a, b) => a.distance - b.distance);
+            orders.push({
+                type: CLAIM_STAR_ACTION,
+                star: target,
+                startingPoints,
+                score: scores.get(target)
+            });
         }
 
         return orders;
