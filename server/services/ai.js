@@ -218,7 +218,7 @@ module.exports = class AIService {
                     continue;
                 }
                 const waypoints = this._createWaypointsFromTrace(found.trace.concat([order.star]));
-                await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 1);
+                await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 0);
                 player.aiState.startedInvasions.push({
                     star: order.star
                 });
