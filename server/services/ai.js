@@ -217,18 +217,13 @@ module.exports = class AIService {
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
-                let found = null;
-                for (const start of order.startingPoints) {
-                    found = this._findClosestAssignment(game, player, context, assignments, start.fromId, this._canAffordCarrier(game, player));
-                    if (found) {
-                        break;
-                    }
-                }
+                const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(game, player));
 
                 if (!found) {
                     console.log("Claiming star: " + context.starsById.get(order.star).name + " failed. No assignments found.");
                     continue;
                 }
+
                 console.log("Claiming star: " + context.starsById.get(order.star).name + " from: " + found.assignment.star.name);
                 const waypoints = this._createWaypointsFromTrace(found.trace.concat([order.star]));
                 await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 0);
@@ -380,7 +375,7 @@ module.exports = class AIService {
 
     _findClosestAssignment(game, player, context, assignments, destinationId, allowCarrierPurchase) {
         let result = null;
-        this._searchAssignments(context, context.reachablePlayerStars, assignments, () => true, (assignment, trace) => {
+        this._searchAssignments(context, context.reachableStars, assignments, () => true, (assignment, trace) => {
             if (this._filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase)) {
                 result = {
                     assignment,
@@ -507,44 +502,28 @@ module.exports = class AIService {
     }
 
     _gatherExpansionOrders(game, player, context) {
-        const expansions = new Map();
-        const scores = new Map();
+        const orders = [];
+        const used = new Set();
 
         for (const [fromId, reachables] of context.reachableFromPlayerStars) {
-            const from = context.starsById.get(fromId);
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 const candidateId = candidate._id.toString();
-                if (!this._invasionInProgress(player, candidateId)) {
-                    const distance = this.distanceService.getDistanceBetweenLocations(candidate.location, from.location);
+                if (!this._invasionInProgress(player, candidateId) && !used.has(candidateId)) {
+                    used.add(candidateId);
 
-                    if (!scores.has(candidateId)) {
-                        let score = 1;
-                        if (candidate.naturalResources) {
-                            score = candidate.naturalResources.economy + candidate.naturalResources.industry + candidate.naturalResources.science;
-                        }
-                        scores.set(candidateId, score);
+                    let score = 1;
+                    if (candidate.naturalResources) {
+                        score = candidate.naturalResources.economy + candidate.naturalResources.industry + candidate.naturalResources.science;
                     }
 
-                    const expansionsTowardsCandidate = getOrInsert(expansions, candidateId, () => []);
-                    expansionsTowardsCandidate.push({
-                        distance,
-                        fromId
+                    orders.push({
+                        type: CLAIM_STAR_ACTION,
+                        star: candidateId,
+                        score
                     });
                 }
             }
-        }
-
-        const orders = [];
-
-        for (const [target, startingPoints] of expansions) {
-            startingPoints.sort((a, b) => a.distance - b.distance);
-            orders.push({
-                type: CLAIM_STAR_ACTION,
-                star: target,
-                startingPoints,
-                score: scores.get(target)
-            });
         }
 
         return orders;
