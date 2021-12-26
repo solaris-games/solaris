@@ -330,15 +330,22 @@ module.exports = class AIService {
     }
 
     _searchAssignments(context, starGraph, assignments, nextFilter, onAssignment, startStarId) {
-        const queue = [{
+        const queue = new Heap({
+            comparBefore: (b1, b2) => b1.totalDistance > b2.totalDistance,
+            compar: (b1, b2) => b2.totalDistance - b1.totalDistance
+        });
+
+        const init = {
             trace: [startStarId],
-            starId: startStarId
-        }];
+            starId: startStarId,
+            totalDistance: 0
+        };
+        queue.push(init);
 
         const visited = new Set();
 
         while (queue.length > 0) {
-            const {starId, trace} = queue.shift();
+            const {starId, trace, totalDistance} = queue.shift();
             visited.add(starId);
 
             const currentStarAssignment = assignments.get(starId);
@@ -354,18 +361,16 @@ module.exports = class AIService {
                 const star = context.starsById.get(starId);
 
                 const fittingCandidates = Array.from(nextCandidates)
-                    .filter(candidate => nextFilter(trace, candidate))
-                    .sort((a, b) => {
-                        const distToA = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(a));
-                        const distToB = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(b));
-                        return distToA - distToB;
-                    });
+                    .filter(candidate => nextFilter(trace, candidate));
 
                 for (const fittingCandidate of fittingCandidates) {
                     if (!visited.has(fittingCandidate)) {
+                        const distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(fittingCandidate));
+                        const newTotalDist = totalDistance + distToNext;
                         queue.push({
                             starId: fittingCandidate,
-                            trace: [fittingCandidate].concat(trace)
+                            trace: [fittingCandidate].concat(trace),
+                            totalDistance: newTotalDist
                         });
                     }
                 }
