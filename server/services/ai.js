@@ -101,10 +101,11 @@ module.exports = class AIService {
             starsById.set(star._id.toString(), star);
         }
 
-        const reachableStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
+        const reachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
+        const reachableStars = this._computeStarGraph(game, player, game.galaxy.stars, game.galaxy.stars);
         const borderStars = [];
-        for (const [from, reachables] of reachableStars) {
+        for (const [from, reachables] of reachableFromPlayerStars) {
             for (const reachableId of reachables) {
                 const reachable = starsById.get(reachableId);
                 if (!reachable.ownedByPlayerId) {
@@ -149,13 +150,14 @@ module.exports = class AIService {
             playerStars,
             playerCarriers,
             starsById,
-            reachableStars,
+            reachableFromPlayerStars,
             reachablePlayerStars,
             borderStars,
             carriersOrbiting,
             carriersById,
             attacksByStarId,
-            attackedStarIds
+            attackedStarIds,
+            reachableStars
         }
     }
 
@@ -508,7 +510,7 @@ module.exports = class AIService {
         const expansions = new Map();
         const scores = new Map();
 
-        for (const [fromId, reachables] of context.reachableStars) {
+        for (const [fromId, reachables] of context.reachableFromPlayerStars) {
             const from = context.starsById.get(fromId);
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
@@ -617,7 +619,7 @@ module.exports = class AIService {
         const borderStarPriorities = new Map();
         for (const borderStarId of context.borderStars) {
             // Really, this should be calculated the other way around, going out from the enemy... but for now this should do it
-            const enemyStars = this._countEnemyStars(game, player, context, context.reachableStars.get(borderStarId));
+            const enemyStars = this._countEnemyStars(game, player, context, context.reachableFromPlayerStars.get(borderStarId));
             // Maybe include some other properties, like infrastructure/specialists in the priority calculation later
             borderStarPriorities.set(borderStarId, 1 + enemyStars);
         }
@@ -689,15 +691,15 @@ module.exports = class AIService {
         const starGraph = new Map();
 
         playerStars.forEach((star, starIdx) => {
-            const reachableStars = new Set();
+            const reachableFromPlayerStars = new Set();
 
             starCandidates.forEach((otherStar, otherStarIdx) => {
                 if (starIdx !== otherStarIdx && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
-                    reachableStars.add(otherStar._id.toString());
+                    reachableFromPlayerStars.add(otherStar._id.toString());
                 }
             });
 
-            starGraph.set(star._id.toString(), reachableStars);
+            starGraph.set(star._id.toString(), reachableFromPlayerStars);
         });
 
         return starGraph;
