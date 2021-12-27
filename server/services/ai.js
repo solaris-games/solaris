@@ -199,7 +199,7 @@ module.exports = class AIService {
                     newKnownAttacks.push(attackData);
                 } else {
                     console.log("Performing defense on: " + defendingStar.name);
-                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(context, game, player, true));
+                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.reachablePlayerStars, assignments, order.star, order.ticksUntil, this._canAffordCarrier(context, game, player, true));
 
                     let shipsNeeded = requiredAdditionallyForDefense;
 
@@ -224,7 +224,9 @@ module.exports = class AIService {
                     continue;
                 }
 
-                const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(context, game, player, false));
+                const ticksLimit = game.settings.galaxy.productionTicks * 2; // If star is not reachable in that time, try again next cycle
+                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.reachableStars, assignments, order.star, ticksLimit, this._canAffordCarrier(context, game, player, false), true)
+                const found = fittingAssignments && fittingAssignments[0];
 
                 if (!found) {
                     console.log("Claiming star: " + context.starsById.get(order.star).name + " failed. No assignments found.");
@@ -402,28 +404,12 @@ module.exports = class AIService {
         }
     }
 
-    _findClosestAssignment(game, player, context, assignments, destinationId, allowCarrierPurchase) {
-        let result = null;
-        this._searchAssignments(context, context.reachableStars, assignments, () => true, (assignment, trace) => {
-            if (this._filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase)) {
-                result = {
-                    assignment,
-                    trace
-                };
-                return false;
-            } else {
-                return true;
-            }
-        }, destinationId);
-        return result;
-    }
-
     _filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase) {
         const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
         return allowCarrierPurchase || hasCarriers;
     }
 
-    _findAssignmentsWithTickLimit(game, player, context, assignments, destinationId, ticksLimit, allowCarrierPurchase) {
+    _findAssignmentsWithTickLimit(game, player, context, starGraph, assignments, destinationId, ticksLimit, allowCarrierPurchase, onlyOne = false) {
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
         const nextFilter = (trace, nextStarId) => {
@@ -442,10 +428,10 @@ module.exports = class AIService {
                     trace
                 });
             }
-            return true;
+            return !onlyOne;
         }
 
-        this._searchAssignments(context, context.reachablePlayerStars, assignments, nextFilter, onAssignment, destinationId)
+        this._searchAssignments(context, starGraph, assignments, nextFilter, onAssignment, destinationId)
 
         return fittingAssignments;
     }
