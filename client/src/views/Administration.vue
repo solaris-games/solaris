@@ -51,7 +51,10 @@
                     @click="toggleTimeMachineGame(game)" v-if="isAdministrator" title="Time Machine"></i>
                 </td>
                 <td><i class="fas" :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}" :title="game.state.startDate"></i></td>
-                <td><i class="fas" :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}" :title="game.state.endDate"></i></td>
+                <td>
+                  <i class="clickable fas" :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}" :title="game.state.endDate"
+                    @click="forceGameFinish(game)"></i>
+                </td>
                 <td :class="{'text-warning':gameNeedsAttention(game)}">{{game.state.tick}}</td>
                 <td>
                   <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success">View</router-link>
@@ -267,6 +270,23 @@ export default {
         game.settings.general.featured = !game.settings.general.featured
 
         await AdminApiService.setGameFeatured(game._id, game.settings.general.featured)
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async forceGameFinish (game) {
+      if (!this.isAdministrator || !game.state.startDate || game.state.endDate) {
+        return
+      }
+
+      if (!await this.$confirm('Force Game Finish', 'Are you sure you want to force this game to finish?')) {
+        return
+      }
+
+      try {
+        game.state.endDate = moment().utc()
+
+        await AdminApiService.forceGameFinish(game._id)
       } catch (err) {
         console.error(err)
       }

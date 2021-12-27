@@ -623,12 +623,12 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
-    async declareReadyToQuit(game, player) {
-        if (game.state.productionTick <= 0) {
+    async declareReadyToQuit(game, player, force = false) {
+        if (!force && game.state.productionTick <= 0) {
             throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
         }
 
-        if (this.gameTypeService.isTutorialGame(game)) {
+        if (!force && this.gameTypeService.isTutorialGame(game)) {
             throw new ValidationError('Cannot declare ready to quit in a tutorial.');
         }
 

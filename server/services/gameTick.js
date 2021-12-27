@@ -152,6 +152,10 @@ module.exports = class GameTickService extends EventEmitter {
             return false;
         }
 
+        if (this.gameService.isAllUndefeatedPlayersReadyToQuit(game)) {
+            return true;
+        }
+
         let lastTick = moment(game.state.lastTickDate).utc();
         let nextTick;
         
@@ -159,9 +163,9 @@ module.exports = class GameTickService extends EventEmitter {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
             nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
         } else if (this.gameTypeService.isTurnBasedGame(game)) {
-            // If in turn based mode, then check if all undefeated players are ready OR all players are ready to quit
+            // If in turn based mode, then check if all undefeated players are ready
             // OR the max time wait limit has been reached.
-            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game) || this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
+            let isAllPlayersReady = this.gameService.isAllUndefeatedPlayersReady(game);
             
             if (isAllPlayersReady) {
                 return true;

@@ -81,6 +81,11 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  forceGameFinish (gameId) {
+    return axios.patch(this.BASE_URL + 'admin/game/' + gameId + '/finish', {},
+    { withCredentials: true })
+  }
+
   setGameTimeMachine (gameId, timeMachine) {
     return axios.patch(this.BASE_URL + 'admin/game/' + gameId + '/timeMachine', {
       timeMachine

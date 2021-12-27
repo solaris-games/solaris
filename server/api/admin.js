@@ -147,6 +147,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/admin/game/:gameId/finish', middleware.authenticateAdmin, middleware.loadGamePlayersSettingsState, middleware.validateGameLocked, middleware.validateGameInProgress, async (req, res, next) => {
+        try {
+            await container.gameService.forceAllUndefeatedPlayersReadyToQuit(req.game);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     return router;
 
 };

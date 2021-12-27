@@ -527,6 +527,14 @@ module.exports = class GameService extends EventEmitter {
 
         return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
+
+    async forceAllUndefeatedPlayersReadyToQuit(game) {
+        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+
+        for (let player of undefeatedPlayers) {
+            await this.playerService.declareReadyToQuit(game, player, true);
+        }
+    }
     
     // TODO: Should be in a player service?
     async quitAllActiveGames(userId) {
