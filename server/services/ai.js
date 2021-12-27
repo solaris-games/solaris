@@ -391,6 +391,7 @@ module.exports = class AIService {
 
                 for (const fittingCandidate of fittingCandidates) {
                     if (!visited.has(fittingCandidate)) {
+                        visited.add(fittingCandidate);
                         const distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(fittingCandidate));
                         const newTotalDist = totalDistance + distToNext;
                         queue.push({
@@ -413,7 +414,7 @@ module.exports = class AIService {
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
         const nextFilter = (trace, nextStarId) => {
-            const entireTrace = trace.concat([nextStarId]).map(starId => context.starsById.get(starId));
+            const entireTrace = trace.concat([nextStarId]).map(starId => context.starsById.get(starId).location);
             const entireDistance = this.distanceService.getDistanceAlongLocationList(entireTrace);
             const ticksRequired = Math.ceil(entireDistance / distancePerTick);
             return ticksRequired <= ticksLimit;
