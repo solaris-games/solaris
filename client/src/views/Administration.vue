@@ -100,6 +100,7 @@
                 </td>
                 <td>
                   <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
+                  <i class="fas fa-eraser clickable text-warning ml-1" @click="resetAchievements(user)" title="Reset Achievements"></i>
                   <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user)" title="Impersonate User"></i>
                 </td>
               </tr>
@@ -220,6 +221,17 @@ export default {
         } else {
           await AdminApiService.unban(user._id)
         }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async resetAchievements (user) {
+      if (!await this.$confirm('Reset Achievements', 'Are you sure you want to reset this players achievements?')) {
+        return
+      }
+
+      try {
+        await AdminApiService.resetAchievements(user._id)
       } catch (err) {
         console.error(err)
       }

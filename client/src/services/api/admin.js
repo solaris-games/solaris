@@ -52,6 +52,11 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  resetAchievements (userId) {
+    return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/resetachievements', {},
+    { withCredentials: true })
+  }
+
   promoteToEstablishedPlayer (userId) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/promoteToEstablishedPlayer', {},
     { withCredentials: true })

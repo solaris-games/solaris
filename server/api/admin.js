@@ -84,6 +84,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/admin/user/:userId/resetAchievements', middleware.authenticateAdmin, async (req, res, next) => {
+        try {
+            await container.adminService.resetAchievements(req.params.userId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.promoteToEstablishedPlayer(req.params.userId);
