@@ -230,7 +230,7 @@ module.exports = class AIService {
                 const waypoints = this._createWaypointsFromTrace(found.trace);
                 await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 0);
                 for (const visitedStar of found.trace) {
-                    newClaimedStars.push(visitedStar);
+                    newClaimedStars.add(visitedStar);
                 }
             } else if (order.type === REINFORCE_STAR_ACTION) {
                 const assignment = assignments.get(order.source);
