@@ -14,6 +14,16 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/admin/passwordresets', middleware.authenticateAdmin, async (req, res, next) => {
+        try {
+            let result = await container.adminService.listPasswordResets();
+            
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.patch('/api/admin/user/:userId/contributor', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setRoleContributor(req.params.userId, req.body.enabled);

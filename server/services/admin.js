@@ -15,7 +15,6 @@ module.exports = class AdminService {
             banned: 1,
             roles: 1,
             emailEnabled: 1,
-            resetPasswordToken: 1,
             lastSeen: 1,
             lastSeenIP: 1,
             'achievements.rank': 1,
@@ -29,6 +28,18 @@ module.exports = class AdminService {
         }
 
         return users;
+    }
+
+    async listPasswordResets() {
+        return await this.userRepo.find({
+            resetPasswordToken: { $ne: null }
+        }, {
+            username: 1,
+            email: 1,
+            resetPasswordToken: 1
+        }, {
+            lastSeen: -1
+        });
     }
 
     async listGames(limit) {

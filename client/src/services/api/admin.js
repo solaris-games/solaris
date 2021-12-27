@@ -7,6 +7,10 @@ class AdminService extends BaseApiService {
     return axios.get(this.BASE_URL + 'admin/user', { withCredentials: true })
   }
 
+  getPasswordResets () {
+    return axios.get(this.BASE_URL + 'admin/passwordresets', { withCredentials: true })
+  }
+
   setRoleContributor (userId, enabled) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/contributor', {
       enabled

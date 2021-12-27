@@ -9,6 +9,9 @@
       <li class="nav-item" v-if="isAdministrator">
           <a class="nav-link" data-toggle="tab" href="#users">Users</a>
       </li>
+      <li class="nav-item" v-if="isAdministrator">
+          <a class="nav-link" data-toggle="tab" href="#passwordResets">Password Resets</a>
+      </li>
     </ul>
 
     <loading-spinner :loading="isLoading"/>
@@ -24,7 +27,6 @@
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Type</th>
                 <th>Players</th>
                 <th>Settings</th>
                 <th>Started</th>
@@ -37,9 +39,8 @@
               <tr v-for="game of games" :key="game._id">
                 <td>
                   {{game.settings.general.name}}
-                </td>
-                <td>
-                  {{game.settings.general.type}}
+                  <br/>
+                  <small>{{game.settings.general.type}}</small>
                 </td>
                 <td>
                   {{game.state.players}}/{{game.settings.general.playerLimit}}
@@ -78,7 +79,6 @@
                 <th>Email</th>
                 <th>EP</th>
                 <th></th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -99,12 +99,32 @@
                 <td><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
                 <td><i class="fas clickable" :class="{'fa-check':user.isEstablishedPlayer,'fa-times text-danger': !user.isEstablishedPlayer}" @click="promoteToEstablishedPlayer(user)"></i></td>
                 <td>
-                  <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">PW Reset</a>
-                </td>
-                <td>
                   <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
                   <i class="fas fa-eraser clickable text-warning ml-1" @click="resetAchievements(user)" title="Reset Achievements"></i>
                   <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user)" title="Impersonate User"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="passwordResets" v-if="isAdministrator">
+        <div v-if="passwordResets">
+          <h4 class="mb-1">Recent Password Resets</h4>
+          <table class="mt-2 table table-sm table-striped table-responsive">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user of passwordResets" :key="user._id">
+                <td>{{user.username}}</td>
+                <td>{{user.email}}</td>
+                <td>
+                  <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">Reset Link</a>
                 </td>
               </tr>
             </tbody>
@@ -133,13 +153,15 @@ export default {
     return {
       isLoading: false,
       users: null,
-      games: null
+      games: null,
+      passwordResets: null
     }
   },
   async mounted () {
     this.isLoading = true
     this.users = null
     this.games = null
+    this.passwordResets = null
 
     try {
       let requests = [
@@ -148,6 +170,7 @@ export default {
 
       if (this.isAdministrator) {
         requests.push(AdminApiService.getUsers())
+        requests.push(AdminApiService.getPasswordResets())
       }
 
       let responses = await Promise.all(requests)
@@ -158,6 +181,10 @@ export default {
       
       if (responses[1] && responses[1].status === 200) {
         this.users = responses[1].data
+      }
+      
+      if (responses[2] && responses[2].status === 200) {
+        this.passwordResets = responses[2].data
       }
     } catch (err) {
       console.error(err)
