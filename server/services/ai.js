@@ -11,7 +11,7 @@ const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
 module.exports = class AIService {
-    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService) {
+    constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
         this.starService = starService;
@@ -20,6 +20,7 @@ module.exports = class AIService {
         this.combatService = combatService;
         this.shipTransferService = shipTransferService;
         this.technologyService = technologyService;
+        this.playerService = playerService;
     }
 
     async play(game, player) {
@@ -158,7 +159,10 @@ module.exports = class AIService {
             carriersById,
             attacksByStarId,
             attackedStarIds,
-            reachableStars
+            reachableStars,
+            playerEconomy: this.playerService.calculateTotalEconomy(playerStars),
+            playerIndustry: this.playerService.calculateTotalIndustry(playerStars),
+            playerScience: this.playerService.calculateTotalScience(playerStars)
         }
     }
 
@@ -198,13 +202,13 @@ module.exports = class AIService {
                     newKnownAttacks.push(attackData);
                 } else {
                     console.log("Performing defense on: " + defendingStar.name);
-                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(game, player));
+                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, assignments, order.star, order.ticksUntil, this._canAffordCarrier(context, game, player, true));
 
                     let shipsNeeded = requiredAdditionallyForDefense;
 
                     for (const {assignment, trace} of allPossibleAssignments) {
                         // Skip assignments that we cannot afford to fulfill
-                        if ((!assignment.carriers || assignment.carriers.length === 0) && !this._canAffordCarrier(game, player)) {
+                        if ((!assignment.carriers || assignment.carriers.length === 0) && !this._canAffordCarrier(context, game, player, true)) {
                             continue;
                         }
 
@@ -218,7 +222,7 @@ module.exports = class AIService {
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
-                const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(game, player));
+                const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(context, game, player, false));
 
                 if (!found) {
                     console.log("Claiming star: " + context.starsById.get(order.star).name + " failed. No assignments found.");
@@ -270,7 +274,7 @@ module.exports = class AIService {
                     const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, source);
                     const shipProductionPerTick = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, source.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
                     const ticksProduced = assignment.totalShips / shipProductionPerTick;
-                    if (ticksProduced > (game.settings.galaxy.productionTicks * 0.5) && this._canAffordCarrier(game, player)) {
+                    if (ticksProduced > (game.settings.galaxy.productionTicks * 0.5) && this._canAffordCarrier(context, game, player, false)) {
                         await reinforce();
                     }
                 }
@@ -328,9 +332,12 @@ module.exports = class AIService {
         return waypoints;
     }
 
-    _canAffordCarrier(game, player) {
+    _canAffordCarrier(context, game, player, highPriority) {
+        // Keep 20% of budget for upgrades
+        const leaveOver = highPriority ? 0 : context.playerEconomy * 2;
+        const availableFunds = player.credits - leaveOver;
         const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
-        return player.credits >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
+        return availableFunds >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
     _searchAssignments(context, starGraph, assignments, nextFilter, onAssignment, startStarId) {
