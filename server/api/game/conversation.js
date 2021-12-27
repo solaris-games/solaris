@@ -113,6 +113,10 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        if (req.session.isImpersonating) {
+            return res.sendStatus(200);
+        }
+
         try {
             let convo = await container.conversationService.markConversationAsRead(
                 req.game,
