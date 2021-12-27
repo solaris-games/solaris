@@ -76,7 +76,7 @@ module.exports = class AIService {
     _setupAi(game, player) {
         player.aiState = {
             knownAttacks: [],
-            startedInvasions: []
+            startedClaims: []
         }
     }
 
@@ -87,10 +87,6 @@ module.exports = class AIService {
 
         if (player.aiState.knownAttacks) {
             player.aiState.knownAttacks = player.aiState.knownAttacks.filter(attack => attack.arrivalTick > game.state.tick);
-        }
-
-        if (player.aiState.startedInvasions) {
-            player.aiState.startedInvasions = player.aiState.startedInvasions.filter(invasion => invasion.arrivalTick > game.state.tick);
         }
     }
 
@@ -186,6 +182,7 @@ module.exports = class AIService {
         }
 
         const newKnownAttacks = [];
+        const newClaimedStars = new Set(player.aiState.startedClaims);
 
         // For now, process orders in order of importance and try to find the best assignment possible for each order.
         // Later, a different scoring process could be used to maximize overall scores.
@@ -232,9 +229,9 @@ module.exports = class AIService {
                 console.log("Claiming star: " + context.starsById.get(order.star).name + " from: " + found.assignment.star.name);
                 const waypoints = this._createWaypointsFromTrace(found.trace);
                 await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 0);
-                player.aiState.startedInvasions.push({
-                    star: order.star
-                });
+                for (const visitedStar of found.trace) {
+                    newClaimedStars.push(visitedStar);
+                }
             } else if (order.type === REINFORCE_STAR_ACTION) {
                 const assignment = assignments.get(order.source);
                 if (!assignment) {
@@ -282,6 +279,17 @@ module.exports = class AIService {
         }
 
         player.aiState.knownAttacks = newKnownAttacks;
+
+        const claimsInProgress = [];
+
+        for (const claim of newClaimedStars) {
+            const star = context.starsById.get(claim);
+            if (!star.ownedByPlayerId) {
+                claimsInProgress.push(claim);
+            }
+        }
+
+        player.aiState.startedClaims = claimsInProgress;
     }
 
     async _useAssignment(context, game, player, assignments, assignment, waypoints, ships) {
@@ -513,8 +521,8 @@ module.exports = class AIService {
         return defenseOrders.concat(expansionOrders, movementOrders);
     }
 
-    _invasionInProgress(player, starId) {
-        return player.aiState && player.aiState.startedInvasions && player.aiState.startedInvasions.find(invasion => invasion.star === starId.toString());
+    _claimInProgress(player, starId) {
+        return player.aiState && player.aiState.startedClaims && player.aiState.startedClaims.find(claim => claim === starId.toString());
     }
 
     _gatherExpansionOrders(game, player, context) {
@@ -525,7 +533,7 @@ module.exports = class AIService {
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 const candidateId = candidate._id.toString();
-                if (!this._invasionInProgress(player, candidateId) && !used.has(candidateId)) {
+                if (!this._claimInProgress(player, candidateId) && !used.has(candidateId)) {
                     used.add(candidateId);
 
                     let score = 1;
