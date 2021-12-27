@@ -4,6 +4,7 @@ const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 const Heap = require('qheap');
 const { getOrInsert, minBy, minElementBy, reverseSort } = require('../utils.js')
+const mongoose = require("mongoose");
 
 const DEFEND_STAR_ACTION = 'DEFEND_STAR';
 const CLAIM_STAR_ACTION = 'CLAIM_STAR';
@@ -241,6 +242,7 @@ module.exports = class AIService {
                     console.log("Reinforcing star " +  context.starsById.get(order.star).name +  " from " + context.starsById.get(order.source).name)
                     const waypoints = [
                         {
+                            _id: new mongoose.Types.ObjectId(),
                             source: order.source,
                             destination: order.star,
                             action: 'dropAll',
@@ -248,6 +250,7 @@ module.exports = class AIService {
                             delayTicks: 0
                         },
                         {
+                            _id: new mongoose.Types.ObjectId(),
                             source: order.star,
                             destination: order.source,
                             action: 'nothing',
@@ -312,6 +315,7 @@ module.exports = class AIService {
         let last = trace[0];
         for (let i = 1; i < trace.length; i++) {
             waypoints.push({
+                _id: new mongoose.Types.ObjectId(),
                 source: last,
                 destination: trace[i],
                 action: 'nothing',
