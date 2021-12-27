@@ -208,6 +208,10 @@ export default {
       }
     },
     async toggleBan (user) {
+      if (!await this.$confirm('Ban/Unban', 'Are you sure you want to ban/unban this player?')) {
+        return
+      }
+
       try {
         user.banned = !user.banned
 
