@@ -10,6 +10,11 @@ const DEFEND_STAR_ACTION = 'DEFEND_STAR';
 const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
+// IMPORTANT IMPLEMENTATION NOTES
+// During AI tick, care must be taken to NEVER write any changes to the database.
+// This is performed automatically by mongoose (when calling game.save()).
+// Use the writeToDB parameters to skip (or introduce them where needed).
+// Otherwise, changes will get duplicated.
 module.exports = class AIService {
     constructor(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService) {
         this.starUpgradeService = starUpgradeService;
@@ -302,19 +307,19 @@ module.exports = class AIService {
     async _useAssignment(context, game, player, assignments, assignment, waypoints, ships) {
         let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
-        await this.shipTransferService.transferAllToStar(game, player, starId);
+        await this.shipTransferService.transferAllToStar(game, player, starId, false);
         let carrier = assignment.carriers && assignment.carriers[0];
         if (carrier) {
             assignment.carriers.shift();
         } else {
-            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1);
+            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
             shipsToTransfer -= 1;
             carrier = buildResult.carrier;
         }
         if (shipsToTransfer > 0) {
             await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, assignment.totalShips - shipsToTransfer);
         }
-        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false);
+        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         let remainingShips = assignment.totalShips - shipsToTransfer;
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {

@@ -8,7 +8,7 @@ module.exports = class ShipTransferService {
         this.starService = starService;
     }
 
-    async transferAllToStar(game, player, starId) {
+    async transferAllToStar(game, player, starId, writeToDB = true) {
         let star = this.starService.getById(game, starId);
         let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
             .filter(c => c.ownedByPlayerId.equals(player._id));
@@ -29,36 +29,38 @@ module.exports = class ShipTransferService {
         star.shipsActual += shipsToTransfer;
         star.ships = Math.floor(star.shipsActual);
 
-        // Generate an array of all requires DB updates.
-        let dbWrites = carriersAtStar.map(c => {
-            return {
+        if (writeToDB) {
+            // Generate an array of all requires DB updates.
+            let dbWrites = carriersAtStar.map(c => {
+                return {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.carriers._id': c._id
+                        },
+                        update: {
+                            'galaxy.carriers.$.ships': c.ships
+                        }
+                    }
+                };
+            });
+
+            dbWrites.push({
                 updateOne: {
                     filter: {
                         _id: game._id,
-                        'galaxy.carriers._id': c._id
+                        'galaxy.stars._id': star._id
                     },
                     update: {
-                        'galaxy.carriers.$.ships': c.ships
+                        'galaxy.stars.$.shipsActual': star.shipsActual,
+                        'galaxy.stars.$.ships': star.ships
                     }
                 }
-            };
-        });
+            });
 
-        dbWrites.push({
-            updateOne: {
-                filter: {
-                    _id: game._id,
-                    'galaxy.stars._id': star._id
-                },
-                update: {
-                    'galaxy.stars.$.shipsActual': star.shipsActual,
-                    'galaxy.stars.$.ships': star.ships
-                }
-            }
-        });
-
-        // Update the DB.
-        await this.gameRepo.bulkWrite(dbWrites);
+            // Update the DB.
+            await this.gameRepo.bulkWrite(dbWrites);
+        }
 
         return {
             star: {
@@ -74,7 +76,7 @@ module.exports = class ShipTransferService {
         };
     }
 
-    async transfer(game, player, carrierId, carrierShips, starId, starShips) {
+    async transfer(game, player, carrierId, carrierShips, starId, starShips, skipDB = false) {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
@@ -117,31 +119,33 @@ module.exports = class ShipTransferService {
         star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
-        await this.gameRepo.bulkWrite([
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.stars._id': star._id
-                    },
-                    update: {
-                        'galaxy.stars.$.shipsActual': star.shipsActual,
-                        'galaxy.stars.$.ships': star.ships
+        if (!skipDB) {
+            await this.gameRepo.bulkWrite([
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            'galaxy.stars.$.shipsActual': star.shipsActual,
+                            'galaxy.stars.$.ships': star.ships
+                        }
+                    }
+                },
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.carriers._id': carrier._id
+                        },
+                        update: {
+                            'galaxy.carriers.$.ships': carrier.ships
+                        }
                     }
                 }
-            },
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.carriers._id': carrier._id
-                    },
-                    update: {
-                        'galaxy.carriers.$.ships': carrier.ships
-                    }
-                }
-            }
-        ]);
+            ]);
+        }
 
         return {
             player,

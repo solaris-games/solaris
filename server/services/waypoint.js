@@ -19,7 +19,7 @@ module.exports = class WaypointService {
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
     }
 
-    async saveWaypointsForCarrier(game, player, carrier, waypoints, looped) {
+    async saveWaypointsForCarrier(game, player, carrier, waypoints, looped, writeToDB = true) {
         if (looped == null) {
             looped = false;
         }
@@ -104,15 +104,17 @@ module.exports = class WaypointService {
         carrier.waypointsLooped = looped;
 
         // Update the DB.
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.carriers._id': carrier._id
-        }, {
-            $set: {
-                'galaxy.carriers.$.waypoints': waypoints,
-                'galaxy.carriers.$.waypointsLooped': looped,
-            }
-        })
+        if (writeToDB) {
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.carriers._id': carrier._id
+            }, {
+                $set: {
+                    'galaxy.carriers.$.waypoints': waypoints,
+                    'galaxy.carriers.$.waypointsLooped': looped,
+                }
+            });
+        }
 
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.

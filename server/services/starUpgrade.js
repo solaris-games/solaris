@@ -91,7 +91,7 @@ module.exports = class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async buildCarrier(game, player, starId, ships) {
+    async buildCarrier(game, player, starId, ships, writeToDB = true) {
         ships = ships || 1;
 
         if (ships < 1) {
@@ -130,33 +130,35 @@ module.exports = class StarUpgradeService extends EventEmitter {
         player.credits -= cost;
 
         // Update the DB.
-        await this.gameRepo.bulkWrite([
-            await this._getDeductPlayerCreditsDBWrite(game, player, cost),
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.stars._id': star._id
-                    },
-                    update: {
-                        'galaxy.stars.$.shipsActual': star.shipsActual,
-                        'galaxy.stars.$.ships': star.ships
+        if (writeToDB) {
+            await this.gameRepo.bulkWrite([
+                await this._getDeductPlayerCreditsDBWrite(game, player, cost),
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            'galaxy.stars.$.shipsActual': star.shipsActual,
+                            'galaxy.stars.$.ships': star.ships
+                        }
                     }
-                }
-            },
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id
-                    },
-                    update: {
-                        $push: {
-                            'galaxy.carriers': carrier
+                },
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id
+                        },
+                        update: {
+                            $push: {
+                                'galaxy.carriers': carrier
+                            }
                         }
                     }
                 }
-            }
-        ]);
+            ]);
+        }
 
         if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementCarriersBuilt(player.userId);
