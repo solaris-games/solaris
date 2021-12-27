@@ -483,11 +483,25 @@ module.exports = class CarrierService {
         if (this.isLaunching(carrier)) {
             waypoint.source = carrier.orbiting;
         }
-
+        let closestAlliedStar = this.starService.getClosestPlayerStar(game, carrier, player);
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
         let destinationStar = waypoint.isCarrier ? game.galaxy.carriers.find(c => c._id.equals(waypoint.destination)) : game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
 
         if (sourceStar === undefined) sourceStar = game.galaxy.carriers.find(c => c._id.equals(waypoint.source));
+        if (destinationStar === undefined) {
+            if (carrier.waypoints.length > 1) {
+                carrier.waypoints = carrier.waypoints.slice(1)
+            } else {
+                carrier.waypoints = [{
+                    source: carrier._id,
+                    destination: closestAlliedStar._id,
+                    isCarrier: false,
+                    action: 'collectAll',
+                    delayTicks: 0
+                }]
+            }
+            return this.moveCarrier(game, gameUsers, carrier)
+        }
 
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
@@ -518,7 +532,22 @@ module.exports = class CarrierService {
         }
         // Otherwise, move X distance in the direction of the star.
         else {
-            this.moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick);
+            if (waypoint.isCarrier && destinationStar.orbiting !== null) {
+                if (carrier.waypoints.length > 1) {
+                    carrier.waypoints = carrier.waypoints.slice(1)
+                } else {
+                    carrier.waypoints = [{
+                        source: carrier._id,
+                        destination: closestAlliedStar._id,
+                        isCarrier: false,
+                        action: 'collectAll',
+                        delayTicks: 0
+                    }]
+                }
+                return await this.moveCarrier(game, gameUsers, carrier)
+            } else {
+                this.moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick);
+            }
         }
 
         return carrierMovementReport;
