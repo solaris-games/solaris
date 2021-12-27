@@ -219,6 +219,11 @@ module.exports = class AIService {
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
+                // Skip double claiming stars that might have been claimed by an earlier action
+                if (newClaimedStars.has(order.star)) {
+                    continue;
+                }
+
                 const found = this._findClosestAssignment(game, player, context, assignments, order.star, this._canAffordCarrier(context, game, player, false));
 
                 if (!found) {
