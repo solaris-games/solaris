@@ -279,13 +279,13 @@ class Star extends EventEmitter {
   }
 
   drawSpecialist () {
-    if (!this.hasSpecialist()) {
-      return
-    }
-
     if (this.specialistSprite) {
       this.container.removeChild(this.specialistSprite)
       this.specialistSprite = null
+    }
+    
+    if (!this.hasSpecialist()) {
+      return
     }
 
     //FIXME potential resource leak, should not create a new sprite every time
