@@ -11,6 +11,10 @@ class AdminService extends BaseApiService {
     return axios.get(this.BASE_URL + 'admin/passwordresets', { withCredentials: true })
   }
 
+  getReports () {
+    return axios.get(this.BASE_URL + 'admin/reports', { withCredentials: true })
+  }
+
   setRoleContributor (userId, enabled) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/contributor', {
       enabled
@@ -66,11 +70,8 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
-  impersonate (userId, username, roles) {
-    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {
-      username,
-      roles
-    },
+  impersonate (userId) {
+    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/impersonate', {},
     { withCredentials: true })
   }
 
@@ -94,6 +95,11 @@ class AdminService extends BaseApiService {
     return axios.patch(this.BASE_URL + 'admin/game/' + gameId + '/timeMachine', {
       timeMachine
     },
+    { withCredentials: true })
+  }
+
+  actionReport (reportId) {
+    return axios.patch(this.BASE_URL + 'admin/reports/' + reportId + '/action', {},
     { withCredentials: true })
   }
 

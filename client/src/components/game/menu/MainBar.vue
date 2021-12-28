@@ -23,7 +23,8 @@
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenTradeRequested="onOpenTradeRequested"
-        @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
+        @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
       <trade v-if="menuState == MENU_STATES.TRADE" 
         @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onOpenTradeRequested="onOpenTradeRequested"
@@ -127,6 +128,10 @@
         :recipientPlayerId="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <report-player v-if="menuState == MENU_STATES.REPORT_PLAYER"
+        :playerId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
@@ -178,6 +183,7 @@ import FooterBarVue from './FooterBar.vue'
 import NotLoggedInBarVue from './NotLoggedInBar'
 import DarkModeWarningBarVue from './DarkModeWarningBar.vue'
 import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
+import ReportPlayerVue from '../report/ReportPlayer.vue'
 
 export default {
   components: {
@@ -217,6 +223,7 @@ export default {
     'not-logged-in-bar': NotLoggedInBarVue,
     'dark-mode-warning-bar': DarkModeWarningBarVue,
     'player-badge-shop': PlayerBadgeShopVue,
+    'report-player': ReportPlayerVue
   },
   props: {
     menuState: String,
@@ -317,6 +324,9 @@ export default {
     },
     onOpenPurchasePlayerBadgeRequested (e) {
       this.changeMenuState(MENU_STATES.PLAYER_BADGE_SHOP, e)
+    },
+    onOpenReportPlayerRequested (e) {
+      this.changeMenuState(MENU_STATES.REPORT_PLAYER, e)
     },
     canHandleConversationEvents () {
       return window.innerWidth < 992
