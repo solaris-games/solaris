@@ -194,7 +194,7 @@ module.exports = class AIService {
         // Later, a different scoring process could be used to maximize overall scores.
 
         for (const order of orders) {
-            console.log(order);
+            //console.log(order);
             if (order.type === DEFEND_STAR_ACTION) {
                 // Later, take weapons level and specialists into account
                 const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData();
@@ -235,11 +235,9 @@ module.exports = class AIService {
                 const found = fittingAssignments && fittingAssignments[0];
 
                 if (!found) {
-                    console.log("Claiming star: " + context.starsById.get(order.star).name + " failed. No assignments found.");
                     continue;
                 }
 
-                console.log("Claiming star: " + context.starsById.get(order.star).name + " from: " + found.assignment.star.name);
                 const waypoints = this._createWaypointsFromTrace(found.trace);
                 await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, 0);
                 for (const visitedStar of found.trace) {
