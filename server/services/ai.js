@@ -104,9 +104,9 @@ module.exports = class AIService {
             starsById.set(star._id.toString(), star);
         }
 
-        const reachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
-        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === player._id.toString());
+        const reachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
+        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
         const borderStars = [];
         for (const [from, reachables] of reachableFromPlayerStars) {
