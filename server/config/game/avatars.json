@@ -45,13 +45,13 @@
         "id": 7,
         "name": "Morn",
         "description": "The Morn’s history of interstellar expansion is strife with betrayal and regret. Every attempt at peaceful contact with other races has been met with conflict, leaving the Morn jaded. Developing a culture of suspicion and pessimism that accompanies them across the stars.",
-        "price": null
+        "price": 1
     },
     {
         "id": 8,
         "name": "Morn",
         "description": "The Morn’s history of interstellar expansion is strife with betrayal and regret. Every attempt at peaceful contact with other races has been met with conflict, leaving the Morn jaded. Developing a culture of suspicion and pessimism that accompanies them across the stars.",
-        "price": null
+        "price": 1
     },
     {
         "id": 9,
@@ -159,13 +159,13 @@
         "id": 26,
         "name": "Cult of Nifra",
         "description": "With each life taken, the Nifrans grow closer to their pantheon of death god's. Once enough blood has been spilled they will earn a place at their master's table.",
-        "price": null
+        "price": 1
     },
     {
         "id": 27,
         "name": "Cult of Nifra",
         "description": "With each life taken, the Nifrans grow closer to their pantheon of death god's. Once enough blood has been spilled they will earn a place at their master's table.",
-        "price": null
+        "price": 1
     },
     {
         "id": 28,
@@ -183,13 +183,13 @@
         "id": 30,
         "name": "Pichek",
         "description": "The Pichek's home system is littered with asteroids, resulting in hazardous space that's difficult to navigate. By looting these stranded vessels the Pichek literally stole their way to the stars, bringing that same spirit of piracy with them.",
-        "price": null
+        "price": 1
     },
     {
         "id": 31,
         "name": "Pichek",
         "description": "The Pichek's home system is littered with asteroids, resulting in hazardous space that's difficult to navigate. By looting these stranded vessels the Pichek literally stole their way to the stars, bringing that same spirit of piracy with them.",
-        "price": null
+        "price": 1
     },
     {
         "id": 32,
@@ -213,13 +213,13 @@
         "id": 35,
         "name": "Mihn",
         "description": "The Mihn see advanced technology as a blight to the natural order. They plan to revert the galaxy to a more primitive state, before dismantling their own ships and continuing as nature intended.",
-        "price": null
+        "price": 1
     },
     {
         "id": 36,
         "name": "Mihn",
         "description": "The Mihn see advanced technology as a blight to the natural order. They plan to revert the galaxy to a more primitive state, before dismantling their own ships and continuing as nature intended.",
-        "price": null
+        "price": 1
     },
     {
         "id": 37,

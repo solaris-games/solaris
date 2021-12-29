@@ -840,7 +840,7 @@ class GameHelper {
     return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type)
   }
 
-  isAllUndefeatedPlayersReady(game) {
+  listAllUndefeatedPlayers (game) {
     let undefeatedPlayers
 
     if (this.isTutorialGame(game)) {
@@ -849,7 +849,19 @@ class GameHelper {
       undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated)
     }
 
-    return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+    return undefeatedPlayers
+  }
+
+  isAllUndefeatedPlayersReady(game) {
+    let undefeatedPlayers = this.listAllUndefeatedPlayers(game)
+
+    return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length
+  }
+
+  isAllUndefeatedPlayersReadyToQuit(game) {
+      let undefeatedPlayers = this.listAllUndefeatedPlayers(game)
+
+      return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length
   }
 
   gameHasOpenSlots (game) {
@@ -867,6 +879,10 @@ class GameHelper {
       return false
     }
 
+    if (this.isAllUndefeatedPlayersReadyToQuit(game)) {
+      return true
+    }
+
     let lastTick = moment(game.state.lastTickDate).utc();
     let nextTick;
 
@@ -874,14 +890,6 @@ class GameHelper {
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
-        // If in turn based mode, then check if all undefeated players are ready.
-        // OR the max time wait limit has been reached.
-        let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
-        
-        if (isAllPlayersReady) {
-            return true;
-        }
-
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
         throw new Error(`Unsupported game type.`);

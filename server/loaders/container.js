@@ -6,6 +6,7 @@ const HistoryModel = require('../models/History');
 const EventModel = require('../models/Event');
 const GuildModel = require('../models/Guild');
 const PaymentModel = require('../models/Payment');
+const ReportModel = require('../models/Report');
 const DatabaseRepository = require('../models/DatabaseRepository');
 
 const gameRepository = new DatabaseRepository(GameModel);
@@ -14,6 +15,7 @@ const historyRepository = new DatabaseRepository(HistoryModel);
 const eventRepository = new DatabaseRepository(EventModel);
 const guildRepository = new DatabaseRepository(GuildModel);
 const paymentRepository = new DatabaseRepository(PaymentModel);
+const reportRepository = new DatabaseRepository(ReportModel);
 
 const AdminService = require('../services/admin');
 const PasswordService = require('../services/password');
@@ -67,6 +69,7 @@ const DiplomacyService = require('../services/diplomacy');
 const AvatarService = require('../services/avatar');
 const PaypalService = require('../services/paypal');
 const BadgeService = require('../services/badge');
+const ReportService = require('../services/report');
 
 const ResourceService = require('../services/resource')
 const CircularMapService = require('../services/maps/circular');
@@ -119,6 +122,7 @@ module.exports = (config, io) => {
     const customMapService = new CustomMapService();
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService);
+    const reportService = new ReportService(ReportModel, reportRepository, playerService);
     const ledgerService = new LedgerService(gameRepository, playerService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService);
     const leaderboardService = new LeaderboardService(userRepository, userService, playerService, guildUserService, ratingService, gameService, gameTypeService);
@@ -201,5 +205,6 @@ module.exports = (config, io) => {
         avatarService,
         paypalService,
         badgeService,
+        reportService,
     };
 };

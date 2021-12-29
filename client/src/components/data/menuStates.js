@@ -39,5 +39,6 @@ export default {
   GAME_NOTES: 'gameNotes',
   CREATE_CONVERSATION: 'createConversation',
   CONVERSATION: 'conversation',
-  PLAYER_BADGE_SHOP: 'playerBadgeShop'
+  PLAYER_BADGE_SHOP: 'playerBadgeShop',
+  REPORT_PLAYER: 'reportPlayer'
 }

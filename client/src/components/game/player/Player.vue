@@ -47,6 +47,11 @@
     <player-badges v-if="player && isValidUser" 
       :playerId="player._id"
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
+
+    <player-report 
+      v-if="player && !player.isEmptySlot && userPlayer && player != userPlayer"
+      :playerId="player._id"
+      @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
 </div>
 </template>
 
@@ -63,6 +68,7 @@ import PlayerBadges from '../badges/PlayerBadges'
 import Reputation from './Reputation'
 import PlayerTradeVue from './PlayerTrade'
 import EloRating from './EloRating'
+import PlayerReport from './PlayerReport'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
@@ -80,7 +86,8 @@ export default {
     'player-badges': PlayerBadges,
     'reputation': Reputation,
     'player-trade': PlayerTradeVue,
-    'elo-rating': EloRating
+    'elo-rating': EloRating,
+    'player-report': PlayerReport
   },
   props: {
     playerId: String
@@ -126,6 +133,9 @@ export default {
     },
     onOpenPurchasePlayerBadgeRequested (e) {
       this.$emit('onOpenPurchasePlayerBadgeRequested', e)
+    },
+    onOpenReportPlayerRequested (e) {
+      this.$emit('onOpenReportPlayerRequested', e)
     },
     panToPlayer (e) {
       GameContainer.map.panToPlayer(this.$store.state.game, this.player)

@@ -9,6 +9,12 @@
       <li class="nav-item" v-if="isAdministrator">
           <a class="nav-link" data-toggle="tab" href="#users">Users</a>
       </li>
+      <li class="nav-item" v-if="isAdministrator">
+          <a class="nav-link" data-toggle="tab" href="#passwordResets">Password Resets</a>
+      </li>
+      <li class="nav-item" v-if="isAdministrator">
+          <a class="nav-link" data-toggle="tab" href="#reports">Reports</a>
+      </li>
     </ul>
 
     <loading-spinner :loading="isLoading"/>
@@ -24,7 +30,6 @@
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Type</th>
                 <th>Players</th>
                 <th>Settings</th>
                 <th>Started</th>
@@ -37,9 +42,8 @@
               <tr v-for="game of games" :key="game._id">
                 <td>
                   {{game.settings.general.name}}
-                </td>
-                <td>
-                  {{game.settings.general.type}}
+                  <br/>
+                  <small>{{game.settings.general.type}}</small>
                 </td>
                 <td>
                   {{game.state.players}}/{{game.settings.general.playerLimit}}
@@ -51,7 +55,10 @@
                     @click="toggleTimeMachineGame(game)" v-if="isAdministrator" title="Time Machine"></i>
                 </td>
                 <td><i class="fas" :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}" :title="game.state.startDate"></i></td>
-                <td><i class="fas" :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}" :title="game.state.endDate"></i></td>
+                <td>
+                  <i class="clickable fas" :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}" :title="game.state.endDate"
+                    @click="forceGameFinish(game)"></i>
+                </td>
                 <td :class="{'text-warning':gameNeedsAttention(game)}">{{game.state.tick}}</td>
                 <td>
                   <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success">View</router-link>
@@ -75,7 +82,6 @@
                 <th>Email</th>
                 <th>EP</th>
                 <th></th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -96,11 +102,72 @@
                 <td><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
                 <td><i class="fas clickable" :class="{'fa-check':user.isEstablishedPlayer,'fa-times text-danger': !user.isEstablishedPlayer}" @click="promoteToEstablishedPlayer(user)"></i></td>
                 <td>
-                  <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">PW Reset</a>
+                  <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
+                  <i class="fas fa-eraser clickable text-warning ml-1" @click="resetAchievements(user)" title="Reset Achievements"></i>
+                  <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user._id)" title="Impersonate User"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="passwordResets" v-if="isAdministrator">
+        <div v-if="passwordResets">
+          <h4 class="mb-1">Recent Password Resets</h4>
+          <table class="mt-2 table table-sm table-striped table-responsive">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user of passwordResets" :key="user._id">
+                <td>{{user.username}}</td>
+                <td>{{user.email}}</td>
+                <td>
+                  <a v-if="user.resetPasswordToken" :href="'#/account/reset-password-external?token=' + user.resetPasswordToken">Reset Link</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="reports" v-if="isAdministrator">
+        <div v-if="reports">
+          <h4 class="mb-1">Recent Reports</h4>
+          <table class="mt-2 table table-sm table-striped table-responsive">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Reported By</th>
+                <th>Reasons</th>
+                <th>Game</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="report of reports" :key="report._id">
+                <td>
+                  <i class="fas fa-user clickable text-info" @click="impersonate(report.reportedUserId)" title="Impersonate User"></i>
+                  {{report.reportedPlayerAlias}}
                 </td>
                 <td>
-                  <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
-                  <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user)" title="Impersonate User"></i>
+                  <i class="fas fa-user clickable text-info" @click="impersonate(report.reportedByUserId)" title="Impersonate User"></i>
+                  {{report.reportedByPlayerAlias}}
+                </td>
+                <td>
+                  <span v-if="report.reasons.abuse" class="mr-2">Abuse</span>
+                  <span v-if="report.reasons.spamming" class="mr-2">Spamming</span>
+                  <span v-if="report.reasons.multiboxing" class="mr-2">Multiboxing</span>
+                  <span v-if="report.reasons.inappropriateAlias" class="mr-2">Inappropriate Alias</span>
+                </td>
+                <td>
+                  <router-link :to="{ path: '/game/detail', query: { id: report.gameId } }">View</router-link>
+                </td>
+                <td>
+                  <i class="fas clickable" :class="{'fa-check text-success':report.actioned,'fa-times text-danger':!report.actioned}" @click="actionReport(report)" title="Action Report"></i>
                 </td>
               </tr>
             </tbody>
@@ -129,13 +196,17 @@ export default {
     return {
       isLoading: false,
       users: null,
-      games: null
+      games: null,
+      passwordResets: null,
+      reports: null
     }
   },
   async mounted () {
     this.isLoading = true
     this.users = null
     this.games = null
+    this.passwordResets = null
+    this.reports = null
 
     try {
       let requests = [
@@ -144,6 +215,8 @@ export default {
 
       if (this.isAdministrator) {
         requests.push(AdminApiService.getUsers())
+        requests.push(AdminApiService.getPasswordResets())
+        requests.push(AdminApiService.getReports())
       }
 
       let responses = await Promise.all(requests)
@@ -154,6 +227,14 @@ export default {
       
       if (responses[1] && responses[1].status === 200) {
         this.users = responses[1].data
+      }
+      
+      if (responses[2] && responses[2].status === 200) {
+        this.passwordResets = responses[2].data
+      }
+      
+      if (responses[3] && responses[3].status === 200) {
+        this.reports = responses[3].data
       }
     } catch (err) {
       console.error(err)
@@ -208,6 +289,10 @@ export default {
       }
     },
     async toggleBan (user) {
+      if (!await this.$confirm('Ban/Unban', 'Are you sure you want to ban/unban this player?')) {
+        return
+      }
+
       try {
         user.banned = !user.banned
 
@@ -216,6 +301,17 @@ export default {
         } else {
           await AdminApiService.unban(user._id)
         }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async resetAchievements (user) {
+      if (!await this.$confirm('Reset Achievements', 'Are you sure you want to reset this players achievements?')) {
+        return
+      }
+
+      try {
+        await AdminApiService.resetAchievements(user._id)
       } catch (err) {
         console.error(err)
       }
@@ -233,13 +329,15 @@ export default {
         console.error(err)
       }
     },
-    async impersonate (user) {
+    async impersonate (userId) {
       try {
-        await AdminApiService.impersonate(user._id, user.username, user.roles)
+        let response = await AdminApiService.impersonate(userId)
         
-        this.$store.commit('setUserId', user._id)
-        this.$store.commit('setUsername', user.username)
-        this.$store.commit('setRoles', user.roles)
+        if (response.status === 200) {
+          this.$store.commit('setUserId', response.data._id)
+          this.$store.commit('setUsername', response.data.username)
+          this.$store.commit('setRoles', response.data.roles)
+        }
 
         router.push({ name: 'home' })
       } catch (err) {
@@ -255,6 +353,23 @@ export default {
         console.error(err)
       }
     },
+    async forceGameFinish (game) {
+      if (!this.isAdministrator || !game.state.startDate || game.state.endDate) {
+        return
+      }
+
+      if (!await this.$confirm('Force Game Finish', 'Are you sure you want to force this game to finish?')) {
+        return
+      }
+
+      try {
+        game.state.endDate = moment().utc()
+
+        await AdminApiService.forceGameFinish(game._id)
+      } catch (err) {
+        console.error(err)
+      }
+    },
     async toggleTimeMachineGame (game) {
       try {
         if (game.settings.general.timeMachine === 'enabled') {
@@ -264,6 +379,19 @@ export default {
         }
 
         await AdminApiService.setGameTimeMachine(game._id, game.settings.general.timeMachine)
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async actionReport (report) {
+      if (!await this.$confirm('Action Report', 'Are you sure you want to action this report?')) {
+        return
+      }
+
+      try {
+        report.actioned = true
+
+        await AdminApiService.actionReport(report._id)
       } catch (err) {
         console.error(err)
       }
