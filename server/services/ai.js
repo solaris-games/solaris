@@ -106,7 +106,8 @@ module.exports = class AIService {
 
         const reachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
-        const reachableStars = this._computeStarGraph(game, player, game.galaxy.stars, game.galaxy.stars);
+        const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === player._id.toString());
+        const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
         const borderStars = [];
         for (const [from, reachables] of reachableFromPlayerStars) {
             for (const reachableId of reachables) {
@@ -160,7 +161,7 @@ module.exports = class AIService {
             carriersById,
             attacksByStarId,
             attackedStarIds,
-            reachableStars,
+            freelyReachableStars,
             playerEconomy: this.playerService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerService.calculateTotalIndustry(playerStars),
             playerScience: this.playerService.calculateTotalScience(playerStars)
@@ -230,7 +231,7 @@ module.exports = class AIService {
                 }
 
                 const ticksLimit = game.settings.galaxy.productionTicks * 2; // If star is not reachable in that time, try again next cycle
-                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.reachableStars, assignments, order.star, ticksLimit, this._canAffordCarrier(context, game, player, false), true)
+                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.freelyReachableStars, assignments, order.star, ticksLimit, this._canAffordCarrier(context, game, player, false), true)
                 const found = fittingAssignments && fittingAssignments[0];
 
                 if (!found) {
