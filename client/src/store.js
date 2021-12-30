@@ -208,8 +208,14 @@ export default new Vuex.Store({
 
       player.credits -= data.cost
       player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
-      player.currentResearchTicksEta = data.currentResearchTicksEta
-      player.nextResearchTicksEta = data.nextResearchTicksEta
+
+      if (data.currentResearchTicksEta) {
+        player.currentResearchTicksEta = data.currentResearchTicksEta
+      }
+      
+      if (data.nextResearchTicksEta) {
+        player.nextResearchTicksEta = data.nextResearchTicksEta
+      }
       
       // Update player total stats.
       switch (data.infrastructureType) {
