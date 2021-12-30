@@ -57,11 +57,11 @@ function getNewConversation(game, playerId, name, participantIds) {
 
 module.exports = class ConversationService extends EventEmitter {
 
-    constructor(gameRepo, eventRepo) {
+    constructor(gameRepo, tradeService) {
         super();
 
         this.gameRepo = gameRepo;
-        this.eventRepo = eventRepo;
+        this.tradeService = tradeService;
     }
 
     async create(game, playerId, name, participantIds) {
@@ -157,7 +157,7 @@ module.exports = class ConversationService extends EventEmitter {
         // If there are only two participants, then include any trade events that occurred
         // between the players.
         if (includeEvents && convo.participants.length === 2) {
-            let events = await this._getTradeEventsBetweenParticipants(game, playerId, convo.participants);
+            let events = await this.tradeService.listTradeEventsBetweenPlayers(game, playerId, convo.participants);
 
             convo.messages = convo.messages.concat(events);
         }
@@ -259,40 +259,6 @@ module.exports = class ConversationService extends EventEmitter {
         });
 
         return convo;
-    }
-
-    async _getTradeEventsBetweenParticipants(game, playerId, participants) {
-        let events = await this.eventRepo.find({
-            gameId: game._id,
-            playerId: playerId,
-            type: {
-                $in: [
-                    'playerCreditsReceived',
-                    'playerCreditsSpecialistsReceived',
-                    'playerRenownReceived',
-                    'playerTechnologyReceived',
-                    'playerCreditsSent',
-                    'playerCreditsSpecialistsSent',
-                    'playerRenownSent',
-                    'playerTechnologySent'
-                ]
-            },
-            $or: [
-                { 'data.fromPlayerId': { $in: participants } },
-                { 'data.toPlayerId': { $in: participants } }
-            ]
-        });
-
-        return events
-        .map(e => {
-            return {
-                playerId: e.playerId,
-                type: e.type,
-                data: e.data,
-                sentDate: moment(e._id.getTimestamp()),
-                sentTick: game.state.tick
-            }
-        });
     }
 
     getUnreadCount(game, playerId) {

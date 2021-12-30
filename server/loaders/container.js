@@ -105,7 +105,6 @@ module.exports = (config, io) => {
     const gameStateService = new GameStateService();
     const diplomacyService = new DiplomacyService(gameRepository);
     const avatarService = new AvatarService(userRepository, userService);
-    const conversationService = new ConversationService(gameRepository, eventRepository);
     const achievementService = new AchievementService(userRepository, guildService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
@@ -129,7 +128,8 @@ module.exports = (config, io) => {
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerService, starService, userService, gameTypeService);
     const reputationService = new ReputationService(gameRepository, playerService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
-    const tradeService = new TradeService(gameRepository, userService, playerService, ledgerService, achievementService, reputationService, gameTypeService);
+    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, ledgerService, achievementService, reputationService, gameTypeService);
+    const conversationService = new ConversationService(gameRepository, tradeService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService, gameTypeService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerService, gameTypeService);
