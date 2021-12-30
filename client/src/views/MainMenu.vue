@@ -77,7 +77,7 @@
     
     <tutorial-game />
 
-    <!-- <hr/>
+    <hr/>
 
     <div class="row">
       <div class="col-12 col-lg-6">
@@ -86,7 +86,7 @@
       <div class="d-none d-lg-block col-6">
         <iframe src="https://discord.com/widget?id=686524791943069734&theme=dark" style="width:100%;height:100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
       </div>
-    </div> -->
+    </div>
   </view-container>
 </div>
 </template>
