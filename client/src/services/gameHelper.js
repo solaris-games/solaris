@@ -890,6 +890,12 @@ class GameHelper {
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
+      let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
+            
+      if (isAllPlayersReady) {
+        return true
+      }
+
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
         throw new Error(`Unsupported game type.`);

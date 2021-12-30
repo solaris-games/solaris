@@ -293,7 +293,6 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`You have confirmed that you are ready to quit.`, { type: 'success' })
 
-          player.ready = true
           player.readyToQuit = true
         }
       } catch (err) {
@@ -309,7 +308,6 @@ export default {
         let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
 
         if (response.status === 200) {
-          player.ready = false
           player.readyToQuit = false
         }
       } catch (err) {

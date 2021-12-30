@@ -176,14 +176,12 @@ export default new Vuex.Store({
     gamePlayerReadyToQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.ready = true
       player.readyToQuit = true
     },
 
     gamePlayerNotReadyToQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.ready = false
       player.readyToQuit = false
     },
 

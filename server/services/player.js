@@ -632,7 +632,6 @@ module.exports = class PlayerService extends EventEmitter {
             throw new ValidationError('Cannot declare ready to quit in a tutorial.');
         }
 
-        player.ready = true;
         player.readyToQuit = true;
 
         await this.gameRepo.updateOne({
@@ -640,7 +639,6 @@ module.exports = class PlayerService extends EventEmitter {
             'galaxy.players._id': player._id
         }, {
             $set: {
-                'galaxy.players.$.ready': true,
                 'galaxy.players.$.readyToQuit': true
             }
         });
@@ -655,7 +653,6 @@ module.exports = class PlayerService extends EventEmitter {
             throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
         }
         
-        player.ready = false;
         player.readyToQuit = false;
 
         await this.gameRepo.updateOne({
@@ -663,7 +660,6 @@ module.exports = class PlayerService extends EventEmitter {
             'galaxy.players._id': player._id
         }, {
             $set: {
-                'galaxy.players.$.ready': false,
                 'galaxy.players.$.readyToQuit': false
             }
         });
