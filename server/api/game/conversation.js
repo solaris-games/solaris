@@ -100,7 +100,7 @@ module.exports = (router, io, container) => {
             
             let message = await container.conversationService.send(
                 req.game,
-                req.player._id,
+                req.player,
                 req.params.conversationId,
                 req.body.message);
 

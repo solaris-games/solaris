@@ -5,9 +5,9 @@
     <div class="row mt-0" :style="{'background-color': getFriendlyColour(fromPlayer.colour.value)}" style="height:6px;"></div>
     <div class="row mt-0" v-if="message">
       <div class="col mt-1 mb-0">
-        <span class="pointer" @click="onOpenPlayerDetailRequested(fromPlayer)">
-          <player-icon :playerId="fromPlayer._id"/>
-          <strong class="ml-2">{{fromPlayer.alias}}</strong>
+        <span class="pointer" @click="onOpenPlayerDetailRequested">
+          <player-icon :playerId="message.fromPlayerId"/>
+          <strong class="ml-2">{{message.fromPlayerAlias}}</strong>
         </span>
       </div>
       <div class="col-auto thumbtack" v-if="conversation.createdBy">
@@ -65,8 +65,8 @@ export default {
     getFriendlyColour (colour) {
       return GameHelper.getFriendlyColour(colour)
     },
-    onOpenPlayerDetailRequested (player) {
-      this.$emit('onOpenPlayerDetailRequested', player._id)
+    onOpenPlayerDetailRequested () {
+      this.$emit('onOpenPlayerDetailRequested', this.message.fromPlayerId)
     },
     onPinned () {
       this.message.pinned = true

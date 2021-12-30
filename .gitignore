@@ -23,3 +23,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Mongo playground files
+*.mongodb

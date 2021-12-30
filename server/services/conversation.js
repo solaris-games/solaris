@@ -168,23 +168,24 @@ module.exports = class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async send(game, playerId, conversationId, message) {
+    async send(game, player, conversationId, message) {
         message = message.trim()
 
         if (message === '') {
             throw new ValidationError(`Message must not be empty.`);
         }
 
-        let convo = await this.detail(game, playerId, conversationId, false); // Call this for the validation.
+        let convo = await this.detail(game, player._id, conversationId, false); // Call this for the validation.
 
         let newMessage = {
             _id: mongoose.Types.ObjectId(),
-            fromPlayerId: playerId,
+            fromPlayerId: player._id,
+            fromPlayerAlias: player.alias,
             message,
             sentDate: moment().utc(),
             sentTick: game.state.tick,
             pinned: false,
-            readBy: [playerId]
+            readBy: [player._id]
         };
 
         // Push a new message into the conversation messages array.
@@ -199,7 +200,7 @@ module.exports = class ConversationService extends EventEmitter {
 
         newMessage.conversationId = conversationId;
         newMessage.type = 'message';
-        newMessage.toPlayerIds = convo.participants.filter(p => p.toString() !== playerId.toString());
+        newMessage.toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
 
         return newMessage;
     }
