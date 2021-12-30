@@ -23,8 +23,8 @@ module.exports = {
     await expressLoader(config, expressApp, io, container);
     console.log('Express Intialized');
 
-    await container.donateService.listRecentDonations();
-    console.log('Loaded recent donations to cache');
+    // await container.donateService.listRecentDonations();
+    // console.log('Loaded recent donations to cache');
   },
 
   async cleanup() {
