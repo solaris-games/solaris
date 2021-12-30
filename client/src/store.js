@@ -206,12 +206,12 @@ export default new Vuex.Store({
         GameContainer.reloadStar(star)
       })
 
+      player.credits -= data.cost
       player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
+      player.currentResearchTicksEta = data.currentResearchTicksEta
+      player.nextResearchTicksEta = data.nextResearchTicksEta
       
       // Update player total stats.
-
-      player.credits -= data.cost
-
       switch (data.infrastructureType) {
         case 'economy': 
           player.stats.totalEconomy += data.upgraded 
