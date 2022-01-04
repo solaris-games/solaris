@@ -1,13 +1,13 @@
-db.games.find({
-    'conversations': { $ne: null }
-}).forEach(function(game) {
-    for (let convo of game.conversations) {
-        for (let message of convo.messages) {
-            let fromPlayer = game.galaxy.players.find(p => p._id.equals(message.fromPlayerId));
-
-            message.fromPlayerAlias = fromPlayer.alias;
-        }
+db.gamehistories.find({
+    'stars.naturalResources': {$type: 'int'}
+}).forEach(function(history) {
+    for (let star of history.stars) {
+        star.naturalResources.economy = star.naturalResources;
+        star.naturalResources.industry = star.naturalResources;
+        star.naturalResources.science = star.naturalResources;
+        
+        delete star.naturalResources;
     }
 
-    db.games.save(game);
+    db.gamehistories.save(history);
 });
