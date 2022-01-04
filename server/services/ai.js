@@ -312,19 +312,19 @@ module.exports = class AIService {
             assignment.carriers.shift();
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
-            shipsToTransfer -= 1;
             carrier = buildResult.carrier;
+            shipsToTransfer -= 1;
+            assignment.totalShips -= 1;
         }
         if (shipsToTransfer > 0) {
-            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, assignment.totalShips - shipsToTransfer);
+            const remaining = Math.max(assignment.totalShips - shipsToTransfer - 1, 0);
+            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining);
+            assignment.totalShips -= shipsToTransfer;
         }
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
-        let remainingShips = assignment.totalShips - shipsToTransfer;
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {
             assignments.delete(starId);
-        } else {
-            assignment.totalShips = remainingShips;
         }
     }
 
