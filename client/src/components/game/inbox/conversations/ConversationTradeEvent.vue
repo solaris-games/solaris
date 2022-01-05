@@ -25,6 +25,9 @@
         <p v-if="event.data.technology" class="mb-1">
             <em>Sent <span class="text-warning">Level {{event.data.technology.level}} {{getTechnologyFriendlyName(event.data.technology.name)}}</span>.</em>
         </p>
+        <p v-if="event.data.carrierShips" class="mb-1">
+            <em>Sent <span class="text-warning">{{event.data.carrierShips}} ships</span>.</em>
+        </p>
       </div>
     </div>
 </div>
@@ -56,11 +59,13 @@ export default {
         case 'playerCreditsSpecialistsReceived':
         case 'playerRenownReceived':
         case 'playerTechnologyReceived':
+        case 'playerGiftReceived':
           return GameHelper.getPlayerById(this.$store.state.game, this.event.data.fromPlayerId)
         case 'playerCreditsSent':
         case 'playerCreditsSpecialistsSent':
         case 'playerRenownSent':
         case 'playerTechnologySent':
+        case 'playerGiftSent':
           return GameHelper.getPlayerById(this.$store.state.game, this.event.playerId)
       }
     },

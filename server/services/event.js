@@ -24,6 +24,8 @@ module.exports = class EventService {
         PLAYER_CREDITS_SPECIALISTS_SENT: 'playerCreditsSpecialistsSent',
         PLAYER_RENOWN_RECEIVED: 'playerRenownReceived',
         PLAYER_RENOWN_SENT: 'playerRenownSent',
+        PLAYER_GIFT_RECEIVED: 'playerGiftReceived',
+        PLAYER_GIFT_SENT: 'playerGiftSent',
         PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
@@ -37,7 +39,7 @@ module.exports = class EventService {
 
     constructor(eventModel, eventRepo, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService, specialistService, badgeService) {
+        ledgerService, conversationService, combatService, specialistService, badgeService, carrierService) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
         this.broadcastService = broadcastService;
@@ -52,6 +54,7 @@ module.exports = class EventService {
         this.combatService = combatService;
         this.specialistService = specialistService;
         this.badgeService = badgeService;
+        this.carrierService = carrierService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
@@ -85,6 +88,9 @@ module.exports = class EventService {
         this.tradeService.on('onPlayerRenownSent', (args) => this.createRenownSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
         this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
+
+        this.carrierService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier));
+        this.carrierService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier));
 
         this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
@@ -168,7 +174,9 @@ module.exports = class EventService {
                     this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT,
                     this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED,
                     this.EVENT_TYPES.PLAYER_RENOWN_SENT,
-                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
+                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_GIFT_SENT,
+                    this.EVENT_TYPES.PLAYER_GIFT_RECEIVED
                 ]
             }
         },
@@ -453,6 +461,26 @@ module.exports = class EventService {
         };
 
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
+    }
+
+    async createGiftReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, carrier) {
+        let data = {
+            fromPlayerId: fromPlayer._id,
+            carrierName: carrier.name,
+            carrierShips: carrier.ships
+        };
+
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_RECEIVED, data);
+    }
+
+    async createGiftSentEvent(gameId, gameTick, fromPlayer, toPlayer, carrier) {
+        let data = {
+            toPlayerId: toPlayer._id,
+            carrierName: carrier.name,
+            carrierShips: carrier.ships
+        };
+
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_SENT, data, true);
     }
 
     async createStarAbandonedEvent(gameId, gameTick, player, star) {

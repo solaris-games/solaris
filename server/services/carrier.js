@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const ValidationError = require('../errors/validation');
+const EventEmitter = require('events');
 
-module.exports = class CarrierService {
+module.exports = class CarrierService extends EventEmitter {
 
     constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService) {
+        super();
+
         this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
@@ -331,6 +334,17 @@ module.exports = class CarrierService {
 
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
             carrier.specialistId = null; // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
+
+            let eventObject = {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                fromPlayer: carrierPlayer,
+                toPlayer: starPlayer,
+                carrier
+            };
+    
+            this.emit('onPlayerGiftReceived', eventObject);
+            this.emit('onPlayerGiftSent', eventObject);
         }
 
         carrier.isGift = false;

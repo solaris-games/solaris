@@ -146,7 +146,7 @@ module.exports = (config, io) => {
     const badgeService = new BadgeService(userRepository, userService, playerService);
 
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService, specialistService, badgeService);
+        ledgerService, conversationService, combatService, specialistService, badgeService, carrierService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService);
