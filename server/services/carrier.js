@@ -340,14 +340,21 @@ module.exports = class CarrierService extends EventEmitter {
                 gameTick: game.state.tick,
                 fromPlayer: carrierPlayer,
                 toPlayer: starPlayer,
-                carrier
+                carrier,
+                star
             };
     
             this.emit('onPlayerGiftReceived', eventObject);
             this.emit('onPlayerGiftSent', eventObject);
-        }
 
-        carrier.isGift = false;
+            carrier.isGift = false;
+        } else if (!carrier.waypoints.length) {
+            // Note: If the carrier has landed at a star the player already owns and
+            // there are still waypoints then this means the carrier is passing
+            // through owned territory and therefore should not be ungifted.
+            // We should ungift in owned territory only if there are no remaining waypoints.
+            carrier.isGift = false;
+        }
     }
 
     async scuttle(game, player, carrierId) {
